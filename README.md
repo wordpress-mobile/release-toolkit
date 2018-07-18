@@ -1,2 +1,2 @@
 # release-toolkit
-Shared tools used in release automation
+Shared tools used in mobile release automation
