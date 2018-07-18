@@ -1,18 +1,18 @@
-# ghhelper plugin
+# Mobile Release Toolkit plugin
 
 [![fastlane Plugin Badge](https://rawcdn.githack.com/fastlane/fastlane/master/fastlane/assets/plugin-badge.svg)](https://rubygems.org/gems/fastlane-plugin-ghhelper)
 
 ## Getting Started
 
-This project is a [_fastlane_](https://github.com/fastlane/fastlane) plugin. To get started with `fastlane-plugin-ghhelper`, add it to your project by running:
+This project is a [_fastlane_](https://github.com/fastlane/fastlane) plugin. To get started with `fastlane-plugin-wpmreleasetoolkit`, add it to your project by running:
 
 ```bash
-fastlane add_plugin ghhelper
+fastlane add_plugin wpreleasetoolkit
 ```
 
-## About ghhelper
+## About wpmreleasetoolkit
 
-GitHub helper functions
+WordPress mobile release toolkit
 
 **Note to author:** Add a more detailed description about this plugin here. If your plugin contains multiple actions, make sure to mention them here.
 
