@@ -56,18 +56,18 @@ module Fastlane
         strings = get_promo_strings_for(locale)
         files = Dir["#{get_screenshots_orig_path(locale)}#{@device[:device]}*"].sort
         text_size = get_text_size_for(locale_options)
-        puts text_size
+        text_font = get_text_font_for(locale_options)
         text_offset = get_text_offset_y()
 
         idx = 1
         files.each do | file |
-          generate_screenshot(file, get_local_at(idx.to_s, strings), target_folder, text_size, text_offset)
+          generate_screenshot(file, get_local_at(idx.to_s, strings), target_folder, text_size, text_offset, text_font)
           idx = idx + 1
         end
       end
 
       # Generate a promo screenshot
-      def generate_screenshot(file, string, target_folder, text_size, text_offset)
+      def generate_screenshot(file, string, target_folder, text_size, text_offset, text_font)
         target_file = "#{target_folder}#{File.basename(file)}"
         puts "Generate screenshots for #{file} to #{target_file}"
 
@@ -83,7 +83,7 @@ module Fastlane
         File.delete(resized_file) if File.exist?(resized_file)
 
         # 3. Put the promo string on top of it
-        Fastlane::Actions::sh("magick \"#{comp_file}\" -gravity north -pointsize #{text_size} -font #{PromoScreenshots.get_font_path()} -draw \"fill white text #{TEXT_OFFSET_X},#{text_offset} \\\"#{string}\\\"\" \"#{target_file}\"")
+        Fastlane::Actions::sh("magick \"#{comp_file}\" -gravity north -pointsize #{text_size} -font \"#{text_font}\" -draw \"fill white text #{TEXT_OFFSET_X},#{text_offset} \\\"#{string}\\\"\" \"#{target_file}\"")
         File.delete(comp_file) if File.exist?(comp_file)
       end
 
@@ -133,9 +133,13 @@ module Fastlane
       # Helpers
       def get_text_size_for(locale_options)
         text_adj = (@device.key?(:text_adj) ? @device[:text_adj] : 100) / 100.0
-        puts text_adj
         return (DEFAULT_TEXT_SIZE * text_adj) unless locale_options.key?(:text_size)
         locale_options[:text_size] * text_adj
+      end
+
+      def get_text_font_for(locale_options)
+        return PromoScreenshots.get_font_path() unless locale_options.key?(:font)
+        locale_options[:font]
       end
 
       def get_text_offset_y()
