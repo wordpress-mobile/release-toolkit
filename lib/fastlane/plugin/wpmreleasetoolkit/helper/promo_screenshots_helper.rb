@@ -2,9 +2,14 @@ require 'tmpdir'
 
 module Fastlane
   module Helper
-   
+    
     class PromoScreenshots
       attr_reader :device, :locales, :orig_folder, :target_folder, :default_locale, :metadata_folder
+
+      TEXT_OFFSET_X = 0
+      TEXT_OFFSET_Y = 58
+      DEFAULT_TEXT_SIZE = 80
+      private_constant :TEXT_OFFSET_X, :TEXT_OFFSET_Y, :DEFAULT_TEXT_SIZE
 
       def initialize(locales, default_locale, orig_folder, target_folder, metadata_folder)
         @locales = locales
@@ -22,8 +27,8 @@ module Fastlane
         @device = device
         UI.message("Generate promo screenshot for device: #{@device[:device]}")
 
-        locales.each do | locale |
-          generate_locale(locale)
+        locales.each do | locale, options |
+          generate_locale(locale, options)
         end
       end
 
@@ -35,46 +40,50 @@ module Fastlane
           return
         end
 
-        font_folder = File.dir_name(font_file)
-        Dir.mkdir() unless File.exist?(font_folder)
+        font_folder = File.dirname(font_file)
+        Dir.mkdir(font_folder) unless File.exist?(font_folder)
         Fastlane::Actions::sh("wget \"https://fonts.google.com/download?family=Noto%20Serif\" -O \"#{font_folder}/noto.zip\"")
         Fastlane::Actions::sh("unzip \"#{font_folder}/noto.zip\" -d \"#{font_folder}\"")
       end
 
-      private
+    private
       # Generate the screenshots for
       # the provided locale
-      def generate_locale(locale)
+      def generate_locale(locale, locale_options)
         UI.message("Generating #{locale}...")
 
         target_folder = verify_target_folder(locale)
         strings = get_promo_strings_for(locale)
         files = Dir["#{get_screenshots_orig_path(locale)}#{@device[:device]}*"].sort
+        text_size = get_text_size_for(locale_options)
+        puts text_size
+        text_offset = get_text_offset_y()
 
-        idx = 0
+        idx = 1
         files.each do | file |
-          generate_screenshot(file, get_local_at(0, strings), target_folder)
+          generate_screenshot(file, get_local_at(idx.to_s, strings), target_folder, text_size, text_offset)
+          idx = idx + 1
         end
       end
 
       # Generate a promo screenshot
-      def generate_screenshot(file, string, target_folder)
+      def generate_screenshot(file, string, target_folder, text_size, text_offset)
         target_file = "#{target_folder}#{File.basename(file)}"
         puts "Generate screenshots for #{file} to #{target_file}"
 
         # Temp file paths
         resized_file = "#{target_file}_resize"
         comp_file = "#{target_file}_comp"
-        
+
         # 1. Resize original screenshot
-        Fastlane::Actions::sh("magick \"#{file}\" -resize 924x1640 \"#{resized_file}\"")
-        
+        Fastlane::Actions::sh("magick \"#{file}\" -resize #{device[:comp_size]} \"#{resized_file}\"")
+
         # 2. Put it on the background
-        Fastlane::Actions::sh("magick #{@device[:template]} \"#{resized_file}\" -geometry +161+568 -composite \"#{comp_file}\"")
+        Fastlane::Actions::sh("magick #{@device[:template]} \"#{resized_file}\" -geometry #{device[:comp_offset]} -composite \"#{comp_file}\"")
         File.delete(resized_file) if File.exist?(resized_file)
 
         # 3. Put the promo string on top of it
-        Fastlane::Actions::sh("magick \"#{comp_file}\" -gravity north -pointsize 80 -font #{self.get_font_path()} -draw \"fill white text 0,58 \\\"#{string}\\\"\" \"#{target_file}\"")
+        Fastlane::Actions::sh("magick \"#{comp_file}\" -gravity north -pointsize #{text_size} -font #{PromoScreenshots.get_font_path()} -draw \"fill white text #{TEXT_OFFSET_X},#{text_offset} \\\"#{string}\\\"\" \"#{target_file}\"")
         File.delete(comp_file) if File.exist?(comp_file)
       end
 
@@ -87,12 +96,12 @@ module Fastlane
       # Gets the promo string, picking the default one
       # if the localised version is missing
       def get_local_at(index, strings)
-        if (strings.key?(index.to_s))
-          return strings[index.to_s]
+        if (strings.key?(index))
+          return strings[index]
         end
 
-        if (@default_strings.key?(index.to_s))
-          return @default_strings[index.to_s]
+        if (@default_strings.key?(index))
+          return @default_strings[index]
         end
         
         return "Unknown"
@@ -122,6 +131,18 @@ module Fastlane
       end 
 
       # Helpers
+      def get_text_size_for(locale_options)
+        text_adj = (@device.key?(:text_adj) ? @device[:text_adj] : 100) / 100.0
+        puts text_adj
+        return (DEFAULT_TEXT_SIZE * text_adj) unless locale_options.key?(:text_size)
+        locale_options[:text_size] * text_adj
+      end
+
+      def get_text_offset_y()
+        return TEXT_OFFSET_Y unless @device.key?(:text_offset)
+        @device[:text_offset]
+      end
+
       def verify_target_folder(locale)
         folder = get_screenshots_target_path(locale)
         Dir.mkdir(folder) unless File.exists?(folder)
