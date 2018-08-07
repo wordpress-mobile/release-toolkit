@@ -142,7 +142,6 @@ module Fastlane
         @rel_note_key = "whats_new"
         @release_version = release_version
         generate_keys(release_version)
-        puts "Handling key: #{@old_key}"
       end
 
       def generate_keys(release_version)
