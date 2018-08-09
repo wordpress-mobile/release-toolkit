@@ -59,8 +59,12 @@ module Fastlane
           fw.puts("msgid \"\"")
 
           # insert content
-          File.open(@content_file_path, "r").each do | line |
-            fw.puts("\"#{line.strip}\\n\"")
+          sf = File.open(@content_file_path, "r").to_a
+          sf.each do | line |
+            l = "\"#{line.strip}" 
+            l << "\\n" unless line == sf.last 
+            l << "\""
+            fw.puts(l)
           end
         end
 
