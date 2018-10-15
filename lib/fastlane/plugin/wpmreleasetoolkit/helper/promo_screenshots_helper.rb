@@ -82,6 +82,11 @@ module Fastlane
         Fastlane::Actions::sh("magick #{@device[:template]} \"#{resized_file}\" -geometry #{device[:comp_offset]} -composite \"#{comp_file}\"")
         File.delete(resized_file) if File.exist?(resized_file)
 
+        # 2.5 Put the top layer, if exists
+        if (@device.key?(:top_template))
+          Fastlane::Actions::sh("magick \"#{comp_file}\" #{@device[:top_template]}  -geometry +0+0 -composite \"#{comp_file}\"")
+        end
+
         # 3. Put the promo string on top of it
         Fastlane::Actions::sh("magick \"#{comp_file}\" -gravity north -pointsize #{text_size} -font \"#{text_font}\" -draw \"fill white text #{TEXT_OFFSET_X},#{text_offset} \\\"#{string}\\\"\" \"#{target_file}\"")
         File.delete(comp_file) if File.exist?(comp_file)
