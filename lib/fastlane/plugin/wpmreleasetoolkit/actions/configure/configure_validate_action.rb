@@ -9,6 +9,10 @@ module Fastlane
     class ConfigureValidateAction < Action
 
       def self.run(params = {})
+
+        # Start by ensuring that we've set up the project for configuration
+        validate_that_configure_file_exists
+
         # Update the repository to get the latest version of the configuration secrets – that's
         # how we'll know if we're behind in subsequent validations
         ConfigureDownloadAction::run
@@ -75,6 +79,12 @@ module Fastlane
                 UI.user_error!("`#{x["destination"]} doesn't match the file in the secrets repository (#{x["file"]}) – unable to continue")
             end
         }
+      end
+
+      def self.validate_that_configure_file_exists
+        unless Fastlane::Helper::ConfigureHelper.configuration_path_exists
+            UI.user_error!("Couldn't find `.configure` file. Please set up this project for `configure` by running `bundle exec fastlane run configure_setup`")
+        end
       end
 
       def self.absolute_project_path(relative_path)
