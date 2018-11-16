@@ -13,6 +13,10 @@ module Fastlane
         # Start by ensuring that we've set up the project for configuration
         validate_that_configure_file_exists
 
+        # Check that the secrets repo is locally clean _before_ downloading the latest version,
+        # otherwise, the error messaging isn't as helpful.
+        validate_that_secrets_repo_is_clean
+
         # Update the repository to get the latest version of the configuration secrets – that's
         # how we'll know if we're behind in subsequent validations
         ConfigureDownloadAction::run
@@ -20,8 +24,6 @@ module Fastlane
         validate_that_branches_match
 
         validate_that_hashes_match
-
-        validate_that_secrets_repo_is_clean
 
         validate_that_all_copied_files_match
 
