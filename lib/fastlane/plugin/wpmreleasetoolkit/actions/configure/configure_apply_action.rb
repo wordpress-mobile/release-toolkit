@@ -33,6 +33,13 @@ module Fastlane
             return  # Don't continue if we were able to copy the file without conflict
         end
 
+        sourceHash = Digest::SHA256.file source
+        destinationHash = Digest::SHA256.file destination
+
+        unless sourceHash != destinationHash
+            return # Don't continue if the files are identical
+        end
+
         if UI.confirm("Are sure you want to overwrite #{destination}?")
 
             if UI.confirm("Would you like to make a backup of #{destination} before overwriting?")
