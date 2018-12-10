@@ -45,23 +45,22 @@ module Fastlane
             puts Diffy::Diff.new(destination, source, :source=>"files",)
         end
 
+        if UI.confirm("Would you like to make a backup of #{destination}?")
+            extension = File.extname(destination)
+            base = File.basename(Pathname.new(destination), extension)
+
+            date_string = Time.now.strftime('%m-%d-%Y--%H-%M-%S')
+
+            backup_path = base
+            .concat("-")            # Handy-dandy separator
+            .concat(date_string)    # date string to allow multiple backups
+            .concat(extension)      # and the original file extension
+            .concat(".bak")        # add the .bak file extension - easier to .gitignore
+
+            self.copy(destination, backup_path)
+        end
+
         if UI.confirm("Would you like to overwrite #{destination}?")
-
-            if UI.confirm("Would you like to make a backup of #{destination} before overwriting?")
-                extension = File.extname(destination)
-                base = File.basename(Pathname.new(destination), extension)
-
-                date_string = Time.now.strftime('%m-%d-%Y--%H-%M-%S')
-
-                backup_path = base
-                    .concat("-")            # Handy-dandy separator
-                    .concat(date_string)    # date string to allow multiple backups
-                    .concat(extension)      # and the original file extension
-                    .concat(".bak")        # add the .bak file extension - easier to .gitignore
-                    
-                self.copy(destination, backup_path)
-            end
-
             self.copy(source, destination)
         else
             UI.message "Skipping #{destination}"
