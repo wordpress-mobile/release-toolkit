@@ -1,6 +1,7 @@
 require 'fastlane/action'
 require 'fastlane_core/ui/ui'
 require 'fileutils'
+require 'diffy'
 
 require_relative '../../helper/filesystem_helper'
 require_relative '../../helper/configure_helper'
@@ -40,7 +41,11 @@ module Fastlane
             return # Don't continue if the files are identical
         end
 
-        if UI.confirm("Are sure you want to overwrite #{destination}?")
+        if UI.confirm("#{destination} has changes that need to be merged. Would you like to see a diff?")
+            puts Diffy::Diff.new(destination, source, :source=>"files",)
+        end
+
+        if UI.confirm("Would you like to overwrite #{destination}?")
 
             if UI.confirm("Would you like to make a backup of #{destination} before overwriting?")
                 extension = File.extname(destination)
