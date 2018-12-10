@@ -45,6 +45,7 @@ module Fastlane
                     .concat("-")            # Handy-dandy separator
                     .concat(date_string)    # date string to allow multiple backups
                     .concat(extension)      # and the original file extension
+                    .concat(".bak")        # add the .bak file extension - easier to .gitignore
                     
                 self.copy(destination, backup_path)
             end
