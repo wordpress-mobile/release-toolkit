@@ -26,6 +26,9 @@ module Fastlane
         end
 
         UI.success "Configuration Secrets are up to date – don't forget to commit your changes to `.configure`."
+
+        # Apply the changes that are now in the .configure file
+        ConfigureApplyAction::run
       end
 
       def self.prompt_to_switch_branches
