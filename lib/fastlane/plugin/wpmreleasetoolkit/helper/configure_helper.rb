@@ -21,6 +21,8 @@ module Fastlane
           configuration["branch"] = ""
           configuration["pinned_hash"] = ""
           configuration["files_to_copy"] = []
+          configuration["file_dependencies"] = []
+
           return configuration
         end
       end
@@ -35,6 +37,10 @@ module Fastlane
 
         if hash["files_to_copy"] == nil
             hash["files_to_copy"] = []
+        end
+
+        if hash["file_dependencies"] == nil
+            hash["file_dependencies"] = []
         end
 
         File.open(FilesystemHelper::configure_file, 'w') { |file|
@@ -129,6 +135,12 @@ module Fastlane
       	index_of_repo_commit_hash - index_of_configure_hash
       end
 
+      ### Get a list of files changed in the secrets repo between to commits
+      def self.files_changed_between(commit_hash_1, commit_hash_2)
+        result = `cd #{repository_path} && git diff --name-only #{commit_hash_1}...#{commit_hash_2}`
+        result.each_line.map{ |s| s.strip }
+      end
+
       ### Determine whether ~/.mobile-secrets` repository is behind its remote counterpart.
       ### (ie – the remote repo has changes that the local repo doesn't)
       def self.repo_is_behind_remote
@@ -192,6 +204,14 @@ module Fastlane
       ### Returns the list of files to copy from `.configure`.
       def self.files_to_copy
         self.configuration["files_to_copy"]
+      end
+
+      ### Returns the list of files that this project uses from `.configure`.
+      def self.file_dependencies
+        file_dependencies = self.configuration["file_dependencies"]
+        file_dependencies ||= []
+
+        self.files_to_copy.map { |o| o["file"] } + file_dependencies
       end
 
       # Adds a file to the `.configure` file's `files_to_copy` hash.

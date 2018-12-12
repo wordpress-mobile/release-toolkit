@@ -23,7 +23,7 @@ module Fastlane
 
         validate_that_branches_match
 
-        validate_that_hashes_match
+        validate_that_no_dependent_files_have_changed
 
         validate_that_all_copied_files_match
 
@@ -50,14 +50,19 @@ module Fastlane
         end
       end
 
-      ### Validate that the commit hash in the .configure file matches the
-      ### latest commit hash in ~/.mobile-secrets.
-      def self.validate_that_hashes_match
+      ### Validate that based on the commit hash in the .configure file, no files have changed
+      ### that affect this project.
+      def self.validate_that_no_dependent_files_have_changed
         repo_hash = Fastlane::Helper::ConfigureHelper.repo_commit_hash
         file_hash = Fastlane::Helper::ConfigureHelper.configure_file_commit_hash
 
-        unless repo_hash == file_hash
-            UI.user_error!("The `.configure` file is out of date. Please update it before continuing.")
+        changed_files = Fastlane::Helper::ConfigureHelper.files_changed_between(file_hash, repo_hash)
+        dependencies = Fastlane::Helper::ConfigureHelper.file_dependencies
+
+        changed_dependencies = changed_files & dependencies #calculate array intersection
+
+        unless changed_dependencies.empty?
+            UI.user_error!("The following files are out of date. Please run `bundle exec fastlane run configure_update` before continuing:\n\n#{changed_dependencies.to_s}")
         end
       end
 
