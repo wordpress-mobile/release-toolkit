@@ -58,11 +58,16 @@ module Fastlane
 
         changed_files = Fastlane::Helper::ConfigureHelper.files_changed_between(file_hash, repo_hash)
         dependencies = Fastlane::Helper::ConfigureHelper.file_dependencies
+        new_files = Fastlane::Helper::ConfigureHelper.new_files_in(changed_files)
 
         changed_dependencies = changed_files & dependencies #calculate array intersection
 
         unless changed_dependencies.empty?
             UI.user_error!("The following files are out of date. Please run `bundle exec fastlane run configure_update` before continuing:\n\n#{changed_dependencies.to_s}")
+        end
+
+        unless new_files.empty?
+            UI.user_error!("The following files are in the secrets repository, but aren't available for your project. Please run `bundle exec fastlane run configure_update` before continuing:\n\n#{new_files}")
         end
       end
 

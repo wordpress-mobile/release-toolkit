@@ -211,7 +211,44 @@ module Fastlane
         file_dependencies = self.configuration["file_dependencies"]
         file_dependencies ||= []
 
-        self.files_to_copy.map { |o| o["file"] } + file_dependencies
+        # Allows support for specifying directories – they'll be expanded recursively
+        expanded_file_dependencies = file_dependencies.map { |path|
+
+            abs_path = self.mobile_secrets_path(path)
+
+            if File.directory?(abs_path)
+                Dir.glob("#{abs_path}**/*").map{ |path|
+                    path.gsub(repository_path + "/", "")
+                }
+            else
+                return path
+            end
+        }
+
+        self.files_to_copy.map { |o| o["file"] } + expanded_file_dependencies
+      end
+
+      ## If we specify a directory in `file_dependencies` instead of listing each file
+      ## individually, there may be new files that we don't know about. This method finds those.
+      def self.new_files_in(files)
+        file_dependencies = self.configuration["file_dependencies"]
+        file_dependencies ||= []
+
+        directory_dependencies = file_dependencies.select { |path|
+            File.directory?(self.mobile_secrets_path(path))
+        }
+
+        new_files = []
+
+        files.each do |path|
+            directory_dependencies.each do |directory_name|
+                if path.start_with?(directory_name)
+                    new_files << path
+                end
+            end
+        end
+
+        new_files
       end
 
       # Adds a file to the `.configure` file's `files_to_copy` hash.
@@ -234,6 +271,11 @@ module Fastlane
         data_hash = self.configuration
         data_hash["files_to_copy"].push(new_file)
         update_configuration(data_hash)
+      end
+
+      ## Turns a relative mobile secrets path into an absolute path
+      def self.mobile_secrets_path(path)
+        "#{repository_path}/#{path}"
       end
     end
   end
