@@ -14,7 +14,7 @@ module Fastlane
 
       # Downloads data from GlotPress, 
       # in JSON format
-      def download(target_locale, glotpress_url)
+      def download(target_locale, glotpress_url, is_source)
         uri = URI(glotpress_url)
         response = Net::HTTP.get_response(uri)
         if response.code == "301"
@@ -22,11 +22,11 @@ module Fastlane
         end
 
         loc_data = JSON.parse(response.body) rescue loc_data = nil
-        parse_data(target_locale, loc_data)       
+        parse_data(target_locale, loc_data, is_source)       
       end
 
       # Parse JSON data and update the local files
-      def parse_data(target_locale, loc_data)
+      def parse_data(target_locale, loc_data, is_source)
         delete_existing_metadata(target_locale)
       
         if (loc_data == nil)
@@ -36,14 +36,16 @@ module Fastlane
         
         loc_data.each do | d |
           key = d[0].split(/\u0004/).first
-          
+          source = d[0].split(/\u0004/).last
+
           target_files.each do | file |
             if (file[0].to_s == key)
-              data=file[1]
-              if (data.key?(:max_size)) && (data[:max_size] != 0) && ((d[1].to_s.length - 3) > data[:max_size]) then
-                UI.message("Rejecting #{target_locale} traslation for #{key}: translation length: #{d[1].to_s.length} - max allowed length: #{data[:max_size]}")
+              data = file[1]
+              msg = is_source ? source : d[1]
+              if (data.key?(:max_size)) && (data[:max_size] != 0) && ((msg.to_s.length - 3) > data[:max_size]) then
+                UI.message("Rejecting #{target_locale} traslation for #{key}: translation length: #{msg.to_s.length} - max allowed length: #{data[:max_size]}")
               else
-                save_metadata(target_locale, file[1][:desc], d[1])
+                save_metadata(target_locale, file[1][:desc], msg)
               end 
             end
           end
