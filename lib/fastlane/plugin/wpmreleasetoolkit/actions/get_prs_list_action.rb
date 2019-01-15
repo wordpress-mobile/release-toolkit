@@ -26,8 +26,12 @@ module Fastlane
         client = Fastlane::Helper::GhhelperHelper.GHClient()
         File.open(report_path, "w") do | file |
           pr_list.each do | pr_number |
-            data = client.pull_request(repository, pr_number.to_i)
-            file.puts("##{data[:number]}: #{data[:title]} @#{data[:user][:login]} #{data[:html_url]}")
+            begin
+              data = client.pull_request(repository, pr_number.to_i)
+              file.puts("##{data[:number]}: #{data[:title]} @#{data[:user][:login]} #{data[:html_url]}")
+            rescue
+              UI.message("Could not find a PR with number #{pr_number.to_i}. Usually this is due to a bad reference in a commit message, but you probably want to check.")
+            end
           end 
         end 
       end
