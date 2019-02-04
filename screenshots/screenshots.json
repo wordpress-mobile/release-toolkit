@@ -1,0 +1,117 @@
+{
+	"version": 0.1,
+	"shadow_offset": 40,
+	"devices": [
+		{
+			"name": "iPhone Xs max",
+			"canvas_size": [1242,2688],
+			"text_size": [1024, 510],
+			"screenshot_size": [921, 1994],
+			"screenshot_offset": [161, 559],
+			"screenshot_mask": "resources/iphone-max-mask.png",
+			"device_frame": "resources/iphone-x.svg"
+		}
+	],
+	"entries": [
+		{
+			"device": "iPhone Xs max",
+			"filename": "screenshot-1-xs-max.png",
+			"text": "resources/screenshot-1.html",
+			"screenshot": "resources/screenshot-1.png",
+			"attachments": [
+				{
+					"file": "resources/attachments/1-top.png",
+					"size": [969,648],
+					"position": [71, 1085]
+				},
+				{
+					"file": "resources/attachments/1-bottom.png",
+					"size": [969,648],
+					"position": [210, 1801]
+				}
+			]
+		},
+		{
+			"device": "iPhone Xs max",
+			"filename": "screenshot-2-xs-max.png",
+			"text": "resources/screenshot-2.html",
+			"screenshot": "resources/screenshot-2.png",
+			"attachments": [
+				{
+					"file": "resources/attachments/2-chart.png",
+					"size": [1060,672],
+					"position": [91, 811]
+				}
+			]
+		},
+		{
+			"device": "iPhone Xs max",
+			"filename": "screenshot-3-xs-max.png",
+			"text": "resources/screenshot-3.html",
+			"screenshot": "resources/screenshot-3.png",
+			"attachments": [
+				{
+					"file": "resources/attachments/3-1.png",
+					"size": [968,288],
+					"position": [89, 906]
+				},
+				{
+					"file": "resources/attachments/3-2.png",
+					"size": [968,288],
+					"position": [197, 1386]
+				},
+				{
+					"file": "resources/attachments/3-3.png",
+					"size": [968,288],
+					"position": [89, 1878]
+				}
+			]
+		},
+		{
+			"device": "iPhone Xs max",
+			"filename": "screenshot-4-xs-max.png",
+			"text": "resources/screenshot-4.html",
+			"screenshot": "resources/screenshot-4.png",
+			"attachments": [
+				{
+					"file": "resources/attachments/4-1.png",
+					"size": [420,420],
+					"position": [516, 1993]
+				},
+				{
+					"file": "resources/attachments/4-2.png",
+					"size": [380,380],
+					"position": [85, 1540]
+				},
+				{
+					"file": "resources/attachments/4-3.png",
+					"size": [500,500],
+					"position": [516, 971]
+				},
+				{
+					"file": "resources/attachments/4-4.png",
+					"size": [320,320],
+					"position": [823, 1561]
+				},
+				{
+					"file": "resources/attachments/4-5.png",
+					"size": [320,320],
+					"position": [71, 872]
+				}
+			]
+		},
+		{
+			"device": "iPhone Xs max",
+			"filename": "screenshot-5-xs-max.png",
+			"text": "resources/screenshot-5.html",
+			"screenshot": "resources/screenshot-5.png",
+			"attachments": [
+				{
+					"file": "resources/attachments/5-1.png",
+					"size": [1058,288],
+					"position": [92, 1988]
+				}
+			]
+		}
+	]
+}
