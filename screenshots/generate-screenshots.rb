@@ -6,12 +6,12 @@ require 'tempfile'
 
 include Magick
 
-def canvas_with_device_frame(device)
+def canvas_with_device_frame(device, background_color)
 
     canvas_size = device["canvas_size"]
 
     canvas = Image.new(canvas_size[0], canvas_size[1]) {
-        self.background_color = "#016087"
+        self.background_color = background_color
     }
 
     device_frame = Magick::Image.read(device["device_frame"]) {
@@ -19,13 +19,17 @@ def canvas_with_device_frame(device)
         self.background_color = 'transparent'
     }.first
 
-    canvas.composite(device_frame, SouthGravity, 0, 90, Magick::OverCompositeOp)
+    x = device["device_frame_offset"][0]
+    y = device["device_frame_offset"][1]
+
+    canvas.composite(device_frame, NorthWestGravity, x, y, Magick::OverCompositeOp)
 end
 
 def add_caption_to_canvas(entry, canvas, device)
 
     text = entry["text"]
     text_size = device["text_size"]
+    font_size = device["font_size"]
 
     width = text_size[0]
     height = text_size[1]
@@ -38,7 +42,7 @@ def add_caption_to_canvas(entry, canvas, device)
 
     begin
 
-        unless system("./drawText.swift html=" + text + " maxWidth=#{width} maxHeight=#{height} output=#{tempTextFile.path}")
+        unless system("./drawText.swift html=" + text + " maxWidth=#{width} maxHeight=#{height} output=#{tempTextFile.path} fontSize=#{font_size} stylesheet=resources/style.css")
             abort()
         end
 
@@ -49,8 +53,8 @@ def add_caption_to_canvas(entry, canvas, device)
         text_frame.composite!(text_content, CenterGravity, Magick::OverCompositeOp)
 
         ensure
-        tempTextFile.close
-        tempTextFile.unlink
+            tempTextFile.close
+            tempTextFile.unlink
     end
 
     canvas.composite!(text_frame, NorthGravity, Magick::OverCompositeOp)
@@ -64,14 +68,17 @@ def draw_screenshot_to_canvas(entry, canvas, device)
 
     screenshot = entry["screenshot"]
 
-    screenshot_mask = Magick::Image.read(device_mask).first
-
     screenshot = Magick::Image.read(screenshot) {
         self.background_color = 'transparent'
     }
     .first
-    .composite(screenshot_mask, 0, 0, CopyOpacityCompositeOp)
-    .adaptive_resize(screenshot_size[0], screenshot_size[1])
+
+    if device_mask != nil
+        screenshot_mask = Magick::Image.read(device_mask).first
+        screenshot = screenshot.composite(screenshot_mask, 0, 0, CopyOpacityCompositeOp)
+    end
+
+    screenshot = screenshot.adaptive_resize(screenshot_size[0], screenshot_size[1])
 
     x_offset = screenshot_offset[0]
     y_offset = screenshot_offset[1]
@@ -108,6 +115,10 @@ end
 
 config = JSON.parse(open("screenshots.json").read)
 
+global_background_color = config["background_color"]
+global_shadow_offset = config["shadow_offset"]
+
+
 devices = config["devices"]
 names = devices.map { |device| device["name"] }
 
@@ -117,10 +128,10 @@ config["entries"].each{ |entry|
 
     device = devices[entry["device"]]
 
-    canvas = canvas_with_device_frame(device)
+    canvas = canvas_with_device_frame(device, global_background_color)
     canvas = add_caption_to_canvas(entry, canvas, device)
     canvas = draw_screenshot_to_canvas(entry, canvas, device)
-    canvas = draw_attachments_to_canvas(entry, canvas, 40)
+    canvas = draw_attachments_to_canvas(entry, canvas, global_shadow_offset)
 
     canvas.write(entry["filename"])
 }

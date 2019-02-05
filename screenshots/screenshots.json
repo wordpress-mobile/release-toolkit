@@ -1,15 +1,31 @@
 {
 	"version": 0.1,
 	"shadow_offset": 40,
+	"background_color": "#016087",
+	"stylesheet": "resources/style.css",
 	"devices": [
 		{
 			"name": "iPhone Xs max",
 			"canvas_size": [1242,2688],
 			"text_size": [1024, 510],
+			"font_size": "90px",
 			"screenshot_size": [921, 1994],
 			"screenshot_offset": [161, 559],
 			"screenshot_mask": "resources/iphone-max-mask.png",
-			"device_frame": "resources/iphone-x.svg"
+			"device_frame": "resources/iPhone X.svg",
+			"device_frame_size": [1200, 2268],
+			"device_frame_offset": [21, 420]
+		},
+		{
+			"name": "iPhone 8",
+			"canvas_size": [1242,2208],
+			"text_size": [1024, 320],
+			"font_size": "70px",
+			"screenshot_size": [921, 1638],
+			"screenshot_offset": [161, 580],
+			"device_frame": "resources/iPhone 8.svg",
+			"device_frame_size": [1200, 2268],
+			"device_frame_offset": [21, 261]
 		}
 	],
 	"entries": [
@@ -112,6 +128,37 @@
 					"position": [92, 1988]
 				}
 			]
-		}
+		},
+		{
+			"device": "iPhone 8",
+			"filename": "screenshot-1-iphone-8.png",
+			"text": "resources/screenshot-1.html",
+			"screenshot": "resources/captures/da/iPhone 8-1-PostEditor.png",
+			"attachments": [
+				{
+					"file": "resources/attachments/1-top.png",
+					"size": [969,579],
+					"position": [71, 1090]
+				},
+				{
+					"file": "resources/attachments/1-bottom.png",
+					"size": [969,579],
+					"position": [210, 1720]
+				}
+			]
+		},
+		{
+			"device": "iPhone 8",
+			"filename": "screenshot-2-iphone-8.png",
+			"text": "resources/screenshot-2.html",
+			"screenshot": "resources/captures/da/iPhone 8-4-Stats.png",
+			"attachments": [
+				{
+					"file": "resources/attachments/2-chart.png",
+					"size": [1060,672],
+					"position": [91, 833]
+				}
+			]
+		},
 	]
 }

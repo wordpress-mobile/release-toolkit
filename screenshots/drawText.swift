@@ -24,7 +24,14 @@ func commandLineArguments() -> [String : String] {
 
 func printUsageAndExit() -> Never {
     print("""
-    Usage: ./draw-text html={file path or quotes-enclosed HTML string} maxWidth={ integer } maxHeight={ integer }
+    Usage: ./draw-text
+        html={file path or quotes-enclosed HTML string [required]}
+        maxWidth={ integer [required] }
+        maxHeight={ integer [required] }
+        fontSize={ CSS-size compatible string [default = 12px }
+        color={ color or hex code [default = white] }
+        align={ CSS text-alignment value [default = center] }
+        stylesheet={ File Path to a custom stylesheet [default = none] }
     """)
     exit(1)
 }
@@ -35,12 +42,30 @@ func printError(_ string: String) {
     fputs("\(redColor)Error: \(string)\(endColor)\n", stderr)
 }
 
+func applyCustomStyles(to styles: String, from path: String?) -> String {
+
+    guard let path = path,
+        FileManager.default.fileExists(atPath: path),
+        let fileContents = FileManager.default.contents(atPath: path),
+        let externalStyles = String(bytes: fileContents, encoding: .utf8) else {
+            return styles
+        }
+
+    return styles.replacingOccurrences(of: "/* EXTERNAL STYLES */", with: externalStyles)
+}
+
 let args = commandLineArguments()
 
 let drawingOptions: NSString.DrawingOptions = [
     .usesLineFragmentOrigin,
     .usesFontLeading,
 ]
+
+// Read the HTML string out of the args. This can either be raw HTML, or a path to an HTML file
+guard let htmlString = args["html"] else {
+    printError("Unable to read HTML string")
+    printUsageAndExit()
+}
 
 guard let maxWidthString = args["maxWidth"] else {
     printError("Missing maxWidth argument")
@@ -62,22 +87,27 @@ guard let maxHeight = Int(maxHeightString) else {
     printUsageAndExit()
 }
 
-let styleString = """
+let color = args["color"] ?? "white"
+let fontSize = args["fontSize"] ?? "12px"
+let alignment = args["align"] ?? "center"
+
+var styleString = """
 <style>
-p{
-padding: 0;
-margin: 0;
+*{
+    padding: 0;
+    margin: 0;
+    color: \(color);
+    font-size: \(fontSize);
+    text-align: \(alignment);
 }
+
+/* EXTERNAL STYLES */
 </style>
 """
 
-// Read the HTML string out of the args. This can either be raw HTML, or a path to an HTML file
-guard let htmlString = args["html"] else {
-    printError("Unable to read HTML string")
-    printUsageAndExit()
-}
-
 let possibleFilePath = NSString(string: htmlString).expandingTildeInPath
+
+styleString = applyCustomStyles(to: styleString, from: args["stylesheet"])
 
 // Convert the HTML to data
 var htmlData = styleString.data(using: .utf8) ?? Data()
