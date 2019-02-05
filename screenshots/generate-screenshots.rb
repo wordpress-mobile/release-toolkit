@@ -52,9 +52,9 @@ def add_caption_to_canvas(entry, canvas, device)
 
         text_frame.composite!(text_content, CenterGravity, Magick::OverCompositeOp)
 
-        ensure
-            tempTextFile.close
-            tempTextFile.unlink
+    ensure
+        tempTextFile.close
+        tempTextFile.unlink
     end
 
     canvas.composite!(text_frame, NorthGravity, Magick::OverCompositeOp)
@@ -113,7 +113,11 @@ def draw_attachments_to_canvas(entry, canvas, shadowOffset)
     return canvas
 end
 
-config = JSON.parse(open("screenshots.json").read)
+begin
+    config = JSON.parse(open("screenshots.json").read)
+rescue
+    abort("Invalid JSON configuration")
+end
 
 global_background_color = config["background_color"]
 global_shadow_offset = config["shadow_offset"]
