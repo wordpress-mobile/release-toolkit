@@ -59,6 +59,30 @@ module Fastlane
         return :added
       end
 
+      # Verify a string
+      def self.verifystring(main_strings, library, string_line)
+        string_name = string_line.attr("name")
+        string_content = string_line.content
+      
+        # Skip strings in the exclusions list
+        return if skip_string_by_exclusion_list(library, string_name)
+      
+        # Search for the string in the main file
+        main_strings.xpath('//string').each do | this_string | 
+          if (this_string.attr("name") == string_name) then
+            # Skip if the string has the content_override tag
+            return if skip_string_by_tag(this_string)
+            
+            # Update if needed
+            UI.user_error!("String #{string_name} [#{string_content}] has been updated in the main file but not in the library #{library[:library]}.") if (this_string.content != string_content)   
+            return
+          end
+        end
+      
+        # String not found and not in the exclusion list: 
+        UI.user_error!("String #{string_name} [#{string_content}] was found in library #{library[:library]} but not in the main file.")
+      end
+
       def self.merge_lib(main, library)
         UI.message("Merging #{library[:library]} strings into #{main}")
         main_strings = File.open(main) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
@@ -92,6 +116,34 @@ module Fastlane
       
         UI.message("Done (#{added_count} added, #{updated_count} updated, #{untouched_count} untouched, #{skipped_count} skipped).")
         return (added_count + updated_count) != 0
+      end
+
+      def self.verify_diff(diff_string, main_strings, lib_strings, library)
+        if diff_string.start_with?("name=") then
+          diff_string.slice!('name="')
+          diff_string=diff_string.slice(0..(diff_string.index('"') - 1))
+
+          lib_strings.xpath('//string').each do |string_line|
+            if (string_line.attr("name") == diff_string) then 
+              res = verifystring(main_strings, library, string_line) 
+            end 
+          end
+        end
+      end
+
+      def self.verify_lib(main, library)
+        UI.message("Checking #{library[:library]} strings vs #{main}")
+        main_strings = File.open(main) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+        lib_strings = File.open(library[:strings_path]) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+        
+        `git diff #{main}`.each_line do | line | 
+          if (line.start_with?("+ ") or line.start_with?("- ")) then
+            diffs = line.gsub(/\s+/m, ' ').strip.split(" ")
+            diffs.each do | diff |
+              verify_diff(diff, main_strings, lib_strings, library)
+            end 
+          end
+        end
       end
     end
   end
