@@ -131,12 +131,29 @@ module Fastlane
         end
       end
 
-      def self.verify_lib(main, library)
+      def self.verify_lib(main, library, source_diff)
         UI.message("Checking #{library[:library]} strings vs #{main}")
         main_strings = File.open(main) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
         lib_strings = File.open(library[:strings_path]) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
         
+        verify_local_diff(main, library, main_strings, lib_strings)
+        verify_pr_diff(main, library, main_strings, lib_strings, source_diff) unless source_diff.nil?
+        
+      end
+
+      def self.verify_local_diff(main, library, main_strings, lib_strings)
         `git diff #{main}`.each_line do | line | 
+          if (line.start_with?("+ ") or line.start_with?("- ")) then
+            diffs = line.gsub(/\s+/m, ' ').strip.split(" ")
+            diffs.each do | diff |
+              verify_diff(diff, main_strings, lib_strings, library)
+            end 
+          end
+        end
+      end
+
+      def self.verify_pr_diff(main, library, main_strings, lib_strings, source_diff)
+        source_diff.each_line do | line | 
           if (line.start_with?("+ ") or line.start_with?("- ")) then
             diffs = line.gsub(/\s+/m, ' ').strip.split(" ")
             diffs.each do | diff |
