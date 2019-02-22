@@ -31,9 +31,8 @@
 	"entries": [
 		{
 			"device": "iPhone Xs max",
-			"filename": "screenshot-1-xs-max.png",
 			"text": "resources/screenshot-1.html",
-			"screenshot": "resources/screenshot-1.png",
+			"screenshot": "iPhone XS Max-1-PostEditor.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/1-top.png",
@@ -49,9 +48,8 @@
 		},
 		{
 			"device": "iPhone Xs max",
-			"filename": "screenshot-2-xs-max.png",
 			"text": "resources/screenshot-2.html",
-			"screenshot": "resources/screenshot-2.png",
+			"screenshot": "iPhone XS Max-4-Stats.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/2-chart.png",
@@ -62,9 +60,8 @@
 		},
 		{
 			"device": "iPhone Xs max",
-			"filename": "screenshot-3-xs-max.png",
 			"text": "resources/screenshot-3.html",
-			"screenshot": "resources/screenshot-3.png",
+			"screenshot": "iPhone XS Max-5-Notifications.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/3-1.png",
@@ -85,9 +82,8 @@
 		},
 		{
 			"device": "iPhone Xs max",
-			"filename": "screenshot-4-xs-max.png",
 			"text": "resources/screenshot-4.html",
-			"screenshot": "resources/screenshot-4.png",
+			"screenshot": "iPhone XS Max-3-Media.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/4-1.png",
@@ -118,9 +114,8 @@
 		},
 		{
 			"device": "iPhone Xs max",
-			"filename": "screenshot-5-xs-max.png",
 			"text": "resources/screenshot-5.html",
-			"screenshot": "resources/screenshot-5.png",
+			"screenshot": "iPhone XS Max-2-DraftEditor.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/5-1.png",
@@ -131,9 +126,8 @@
 		},
 		{
 			"device": "iPhone 8",
-			"filename": "screenshot-1-iphone-8.png",
 			"text": "resources/screenshot-1.html",
-			"screenshot": "resources/captures/da/iPhone 8-1-PostEditor.png",
+			"screenshot": "iPhone 8 Plus-1-PostEditor.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/1-top.png",
@@ -149,9 +143,8 @@
 		},
 		{
 			"device": "iPhone 8",
-			"filename": "screenshot-2-iphone-8.png",
 			"text": "resources/screenshot-2.html",
-			"screenshot": "resources/captures/da/iPhone 8-4-Stats.png",
+			"screenshot": "iPhone 8 Plus-4-Stats.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/2-chart.png",
