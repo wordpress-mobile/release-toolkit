@@ -3,6 +3,8 @@
 require 'RMagick'
 require 'json'
 require 'tempfile'
+require 'optparse'
+require 'pathname'
 
 include Magick
 
@@ -119,16 +121,62 @@ rescue
     abort("Invalid JSON configuration")
 end
 
+options = {}
+OptionParser.new do |parser|
+    parser.banner = "Usage: generate-screenshots [options]"
+
+    parser.on("--languages [COMMA SEPARATED LIST OF LANGUAGES]") do |v|
+        options[:languages] = v
+    end
+
+    parser.on("--directory [BASEDIRECTORY]") do |v|
+        options[:base_dir] = v
+    end
+end.parse!
+
+if options[:base_dir] == nil
+    abort("You need to specify --directory")
+end
+
+if !File.directory?(options[:base_dir])
+    abort("The directory #{options[:base_dir]} does not exist")
+end
+
+# Define input and output constants
+BASE_DIR = Pathname.new(options[:base_dir])
+OUTPUT_DIR = Pathname.new(Dir.pwd) + "output"
+
+# Determine which languages we're going to generate screenshots
+subdirectories = []
+Dir.chdir(BASE_DIR) do
+    subdirectories = Dir["*"].reject{|o| not File.directory?(o)}.sort
+end
+
+languages = subdirectories & options[:languages].split(",")
+
+# Create a hash of devices, keyed by device name
+devices = config["devices"]
+devices = Hash[devices.map { |device| device["name"] }.zip(devices)]
+
+# Move global settings from the configuration into variables
 global_background_color = config["background_color"]
 global_shadow_offset = config["shadow_offset"]
 
+config["entries"]
+.flat_map { |entry|
 
-devices = config["devices"]
-names = devices.map { |device| device["name"] }
+    languages.map { |language|
 
-devices = Hash[names.zip(devices)]
 
-config["entries"].each{ |entry|
+        newEntry = entry.dup
+
+        newEntry["screenshot"] = BASE_DIR + language + entry["screenshot"]
+        newEntry["filename"] =  OUTPUT_DIR + language + entry["screenshot"]
+
+        newEntry
+    }
+}
+.each{ |entry|
 
     device = devices[entry["device"]]
 
@@ -136,6 +184,12 @@ config["entries"].each{ |entry|
     canvas = add_caption_to_canvas(entry, canvas, device)
     canvas = draw_screenshot_to_canvas(entry, canvas, device)
     canvas = draw_attachments_to_canvas(entry, canvas, global_shadow_offset)
+
+    # Automatically create intermediate directories for output
+    dirname = File.dirname(entry["filename"])
+    unless File.directory?(dirname)
+        FileUtils.mkdir_p(dirname)
+    end
 
     canvas.write(entry["filename"])
 }
