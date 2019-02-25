@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'diffy'
   spec.add_dependency 'nokogiri'
   spec.add_dependency 'octokit'
+  spec.add_dependency 'git'
   
   spec.add_development_dependency('pry')
   spec.add_development_dependency('bundler')
