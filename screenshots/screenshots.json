@@ -152,6 +152,72 @@
 					"position": [91, 833]
 				}
 			]
+		},
+		{
+			"device": "iPhone 8",
+			"text": "resources/screenshot-3.html",
+			"screenshot": "iPhone 8 Plus-5-Notifications.png",
+			"attachments": [
+				{
+					"file": "resources/attachments/3-1.png",
+					"size": [968,288],
+					"position": [89, 906]
+				},
+				{
+					"file": "resources/attachments/3-2.png",
+					"size": [968,288],
+					"position": [197, 1386]
+				},
+				{
+					"file": "resources/attachments/3-3.png",
+					"size": [968,288],
+					"position": [89, 1878]
+				}
+			]
+		},
+		{
+			"device": "iPhone 8",
+			"text": "resources/screenshot-4.html",
+			"screenshot": "iPhone 8 Plus-3-Media.png",
+			"attachments": [
+				{
+					"file": "resources/attachments/4-1.png",
+					"size": [420,420],
+					"position": [405, 1744]
+				},
+				{
+					"file": "resources/attachments/4-2.png",
+					"size": [380,380],
+					"position": [55, 1271]
+				},
+				{
+					"file": "resources/attachments/4-3.png",
+					"size": [500,500],
+					"position": [552, 799]
+				},
+				{
+					"file": "resources/attachments/4-4.png",
+					"size": [320,320],
+					"position": [850, 1373]
+				},
+				{
+					"file": "resources/attachments/4-5.png",
+					"size": [320,320],
+					"position": [85, 705]
+				}
+			]
+		},
+		{
+			"device": "iPhone 8",
+			"text": "resources/screenshot-5.html",
+			"screenshot": "iPhone 8 Plus-2-DraftEditor.png",
+			"attachments": [
+				{
+					"file": "resources/attachments/5-1.png",
+					"size": [1058,288],
+					"position": [92, 1695]
+				}
+			]
 		}
 	]
 }
