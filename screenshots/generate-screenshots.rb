@@ -129,7 +129,7 @@ OptionParser.new do |parser|
         options[:languages] = v
     end
 
-    parser.on("--directory [BASEDIRECTORY]") do |v|
+    parser.on("--inputDirectory [BASEDIRECTORY]") do |v|
         options[:base_dir] = v
     end
 end.parse!
