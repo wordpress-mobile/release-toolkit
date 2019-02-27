@@ -118,6 +118,11 @@
 			"screenshot": "iPhone XS Max-2-DraftEditor.png",
 			"attachments": [
 				{
+					"file": "resources/ios-dictation-keyboard-x.png",
+					"size": [841,815],
+					"position": [201, 1697]
+				},
+				{
 					"file": "resources/attachments/5-1.png",
 					"size": [1058,288],
 					"position": [92, 1988]
@@ -129,6 +134,11 @@
 			"text": "resources/screenshot-1.html",
 			"screenshot": "iPhone 8 Plus-1-PostEditor.png",
 			"attachments": [
+				{
+					"file": "resources/white-box.svg",
+					"size": [841,689],
+					"position": [201, 1557]
+				},
 				{
 					"file": "resources/attachments/1-top.png",
 					"size": [969,579],
@@ -212,6 +222,11 @@
 			"text": "resources/screenshot-5.html",
 			"screenshot": "iPhone 8 Plus-2-DraftEditor.png",
 			"attachments": [
+				{
+					"file": "resources/ios-dictation-keyboard.png",
+					"size": [841,815],
+					"position": [201, 1353]
+				},
 				{
 					"file": "resources/attachments/5-1.png",
 					"size": [1058,288],
