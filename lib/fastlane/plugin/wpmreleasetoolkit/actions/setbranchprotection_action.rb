@@ -10,7 +10,6 @@ module Fastlane
         branch_prot = {}
 
         branch_url = "https://api.github.com/repos/#{repository}/branches/" + branch_name
-        branch_prot[:required_status_checks] = {:url=>branch_url + "/protection/required_status_checks", :strict=>true, :contexts=>["Buddybuild : WordPress/57a120bbe0f5520100e11c19"], :contexts_url=>branch_url + "/protection/required_status_checks/contexts"}
         branch_prot[:restrictions] = {:url=>branch_url + "/protection/restrictions", :users_url=>branch_url + "/protection/restrictions/users", :teams_url=>branch_url + "/protection/restrictions/teams", :users=>[], :teams=>[]}
         branch_prot[:enforce_admins] = nil
         branch_prot[:required_pull_request_reviews] = {:url=>branch_url + "/protection/required_pull_request_reviews", :dismiss_stale_reviews=>false, :require_code_owner_reviews=>false}
