@@ -26,6 +26,18 @@
 			"device_frame": "resources/iPhone 8.svg",
 			"device_frame_size": [1200, 2268],
 			"device_frame_offset": [21, 261]
+		},
+		{
+			"name": "iPad X",
+			"canvas_size": [2732,2048],
+			"text_size": [2732, 317],
+			"font_size": "90px",
+			"screenshot_size": [2220, 1638],
+			"screenshot_offset": [257, 410],
+			"screenshot_mask": "resources/ipad-x-mask.png",
+			"device_frame": "resources/iPad X.svg",
+			"device_frame_size": [2425, 1877],
+			"device_frame_offset": [154, 307]
 		}
 	],
 	"entries": [
@@ -35,14 +47,19 @@
 			"screenshot": "iPhone XS Max-1-PostEditor.png",
 			"attachments": [
 				{
+					"file": "resources/white-box.svg",
+					"size": [841,689],
+					"position": [201, 1557]
+				},
+				{
 					"file": "resources/attachments/1-top.png",
-					"size": [969,648],
-					"position": [71, 1085]
+					"size": [1351,688],
+					"position": [751, 719]
 				},
 				{
 					"file": "resources/attachments/1-bottom.png",
-					"size": [969,648],
-					"position": [210, 1801]
+					"size": [1093,688],
+					"position": [871, 1459]
 				}
 			]
 		},
@@ -231,6 +248,104 @@
 					"file": "resources/attachments/5-1.png",
 					"size": [1058,288],
 					"position": [92, 1695]
+				}
+			]
+		},
+		{
+			"device": "iPad X",
+			"text": "resources/screenshot-1.html",
+			"screenshot": "iPad Pro (12.9-inch)-1-PostEditor.png",
+			"attachments": [
+				{
+					"file": "resources/white-box.svg",
+					"size": [2140,790],
+					"position": [297, 1218]
+				},
+				{
+					"file": "resources/attachments/1-top.png",
+					"size": [1094,688],
+					"position": [751, 719]
+				},
+				{
+					"file": "resources/attachments/1-bottom.png",
+					"size": [1094,689],
+					"position": [871, 1459]
+				}
+			]
+		},
+		{
+			"device": "iPad X",
+			"text": "resources/screenshot-4.html",
+			"screenshot": "iPad Pro (12.9-inch)-3-Media.png",
+			"attachments": [
+				{
+					"file": "resources/attachments/4-1.png",
+					"size": [573,573],
+					"position": [1360, 1302]
+				},
+				{
+					"file": "resources/attachments/4-2.png",
+					"size": [380,380],
+					"position": [736, 1137]
+				},
+				{
+					"file": "resources/attachments/4-3.png",
+					"size": [500,500],
+					"position": [1548, 507]
+				},
+				{
+					"file": "resources/attachments/4-4.png",
+					"size": [320,320],
+					"position": [2211, 1007]
+				},
+				{
+					"file": "resources/attachments/4-5.png",
+					"size": [320,320],
+					"position": [956, 597]
+				}
+			]
+		},
+		{
+			"device": "iPad X",
+			"text": "resources/screenshot-2.html",
+			"screenshot": "iPad Pro (12.9-inch)-4-Stats.png",
+			"attachments": [
+				{
+					"file": "resources/attachments/2-chart-ipad.png",
+					"size": [1745,720],
+					"position": [746,525]
+				}
+			]
+		},
+		{
+			"device": "iPad X",
+			"text": "resources/screenshot-3.html",
+			"screenshot": "iPad Pro (12.9-inch)-5-Notifications.png",
+			"attachments": [
+				{
+					"file": "resources/white-box.svg",
+					"size": [1530,1362],
+					"position": [907, 564]
+				},
+				{
+					"file": "resources/attachments/3-1.png",
+					"size": [774,230],
+					"position": [117, 688]
+				},
+				{
+					"file": "resources/attachments/3-2.png",
+					"size": [794,230],
+					"position": [203, 1132]
+				},
+				{
+					"file": "resources/attachments/3-3.png",
+					"size": [774,230],
+					"position": [117, 1616]
+				},
+				{
+					"file": "resources/attachments/3-star.png",
+					"size": [492,417],
+					"position": [1407, 957]
 				}
 			]
 		}
