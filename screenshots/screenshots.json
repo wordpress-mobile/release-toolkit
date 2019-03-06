@@ -43,7 +43,7 @@
 	"entries": [
 		{
 			"device": "iPhone Xs max",
-			"text": "resources/screenshot-1.html",
+			"text": "metadata/%s/app_store_screenshot_1.html",
 			"screenshot": "iPhone XS Max-1-PostEditor.png",
 			"attachments": [
 				{
@@ -53,19 +53,19 @@
 				},
 				{
 					"file": "resources/attachments/1-top.png",
-					"size": [1351,688],
-					"position": [751, 719]
+					"size": [969,648],
+					"position": [71, 1086]
 				},
 				{
 					"file": "resources/attachments/1-bottom.png",
-					"size": [1093,688],
-					"position": [871, 1459]
+					"size": [969,648],
+					"position": [210, 1801]
 				}
 			]
 		},
 		{
 			"device": "iPhone Xs max",
-			"text": "resources/screenshot-2.html",
+			"text": "metadata/%s/app_store_screenshot_2.html",
 			"screenshot": "iPhone XS Max-4-Stats.png",
 			"attachments": [
 				{
@@ -77,7 +77,7 @@
 		},
 		{
 			"device": "iPhone Xs max",
-			"text": "resources/screenshot-3.html",
+			"text": "metadata/%s/app_store_screenshot_3.html",
 			"screenshot": "iPhone XS Max-5-Notifications.png",
 			"attachments": [
 				{
@@ -99,7 +99,7 @@
 		},
 		{
 			"device": "iPhone Xs max",
-			"text": "resources/screenshot-4.html",
+			"text": "metadata/%s/app_store_screenshot_4.html",
 			"screenshot": "iPhone XS Max-3-Media.png",
 			"attachments": [
 				{
@@ -131,7 +131,7 @@
 		},
 		{
 			"device": "iPhone Xs max",
-			"text": "resources/screenshot-5.html",
+			"text": "metadata/%s/app_store_screenshot_5.html",
 			"screenshot": "iPhone XS Max-2-DraftEditor.png",
 			"attachments": [
 				{
@@ -148,7 +148,7 @@
 		},
 		{
 			"device": "iPhone 8",
-			"text": "resources/screenshot-1.html",
+			"text": "metadata/%s/app_store_screenshot_1.html",
 			"screenshot": "iPhone 8 Plus-1-PostEditor.png",
 			"attachments": [
 				{
@@ -170,7 +170,7 @@
 		},
 		{
 			"device": "iPhone 8",
-			"text": "resources/screenshot-2.html",
+			"text": "metadata/%s/app_store_screenshot_2.html",
 			"screenshot": "iPhone 8 Plus-4-Stats.png",
 			"attachments": [
 				{
@@ -182,7 +182,7 @@
 		},
 		{
 			"device": "iPhone 8",
-			"text": "resources/screenshot-3.html",
+			"text": "metadata/%s/app_store_screenshot_3.html",
 			"screenshot": "iPhone 8 Plus-5-Notifications.png",
 			"attachments": [
 				{
@@ -204,7 +204,7 @@
 		},
 		{
 			"device": "iPhone 8",
-			"text": "resources/screenshot-4.html",
+			"text": "metadata/%s/app_store_screenshot_4.html",
 			"screenshot": "iPhone 8 Plus-3-Media.png",
 			"attachments": [
 				{
@@ -236,7 +236,7 @@
 		},
 		{
 			"device": "iPhone 8",
-			"text": "resources/screenshot-5.html",
+			"text": "metadata/%s/app_store_screenshot_5.html",
 			"screenshot": "iPhone 8 Plus-2-DraftEditor.png",
 			"attachments": [
 				{
@@ -253,7 +253,7 @@
 		},
 		{
 			"device": "iPad X",
-			"text": "resources/screenshot-1.html",
+			"text": "metadata/%s/app_store_screenshot_1.html",
 			"screenshot": "iPad Pro (12.9-inch)-1-PostEditor.png",
 			"attachments": [
 				{
@@ -275,7 +275,7 @@
 		},
 		{
 			"device": "iPad X",
-			"text": "resources/screenshot-4.html",
+			"text": "metadata/%s/app_store_screenshot_4.html",
 			"screenshot": "iPad Pro (12.9-inch)-3-Media.png",
 			"attachments": [
 				{
@@ -307,7 +307,7 @@
 		},
 		{
 			"device": "iPad X",
-			"text": "resources/screenshot-2.html",
+			"text": "metadata/%s/app_store_screenshot_2.html",
 			"screenshot": "iPad Pro (12.9-inch)-4-Stats.png",
 			"attachments": [
 				{
@@ -319,7 +319,7 @@
 		},
 		{
 			"device": "iPad X",
-			"text": "resources/screenshot-3.html",
+			"text": "metadata/%s/app_store_screenshot_3.html",
 			"screenshot": "iPad Pro (12.9-inch)-5-Notifications.png",
 			"attachments": [
 				{
