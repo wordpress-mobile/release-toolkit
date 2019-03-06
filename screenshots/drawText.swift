@@ -110,21 +110,20 @@ let possibleFilePath = NSString(string: htmlString).expandingTildeInPath
 styleString = applyCustomStyles(to: styleString, from: args["stylesheet"])
 
 // Convert the HTML to data
-var htmlData = styleString.data(using: .utf8) ?? Data()
 if FileManager.default.fileExists(atPath: possibleFilePath) {
-
-    if let fileContents = FileManager.default.contents(atPath: possibleFilePath) {
-        htmlData.append(fileContents)
-    }
+    let fileContents = try! String(contentsOfFile: possibleFilePath, encoding: .utf8)
+    styleString += fileContents
 }
+// If there's no file at that location, treat the argument as the string to be drawn
 else{
-    if let data = htmlString.data(using: .utf8) {
-        htmlData.append(data)
-    }
+   styleString += htmlString
 }
+
+// NSMutableAttributedSting uses utf16 internally, so encode it that way
+let stringData = styleString.data(using: .utf16)!
 
 // Ensure that the HTML data was valid
-guard let attributedString = NSMutableAttributedString(html: htmlData, options: [:], documentAttributes: nil) else{
+guard let attributedString = NSMutableAttributedString(html: stringData, documentAttributes: nil) else{
     printError("Unable to read HTML string")
     exit(1)
 }
@@ -136,7 +135,7 @@ let fittingSize = CGSize(width: outputRect.width, height: CGFloat.greatestFinite
 let fittingRect = attributedString.boundingRect(with: fittingSize, options: drawingOptions)
 
 guard fittingRect.height <= outputRect.height else {
-    printError("Provided string doesn't fit in the provided dimensions")
+    printError("Provided string (\(attributedString))doesn't fit in the provided dimensions")
     exit(1)
 }
 
