@@ -32,6 +32,15 @@ def add_caption_to_canvas(entry, canvas, device)
     text = entry["text"]
     text_size = device["text_size"]
     font_size = device["font_size"]
+    locale = entry["locale"]
+
+    # Add the locale to the location string
+    localizedFile = sprintf(text, locale)
+    if File.exists?(localizedFile)
+        text = localizedFile
+    else
+        text = sprintf(text, "source")
+    end
 
     width = text_size[0]
     height = text_size[1]
@@ -125,34 +134,40 @@ options = {}
 OptionParser.new do |parser|
     parser.banner = "Usage: generate-screenshots [options]"
 
-    parser.on("--languages [COMMA SEPARATED LIST OF LANGUAGES]") do |v|
-        options[:languages] = v
+    parser.on("--translationsDirectory [METADATADIRECTORY]") do |v|
+        options[:translationsDir] = v
     end
 
-    parser.on("--inputDirectory [BASEDIRECTORY]") do |v|
-        options[:base_dir] = v
+    parser.on("--imageSourceDirectory [BASEDIRECTORY]") do |v|
+        options[:image_dir] = v
     end
 end.parse!
 
-if options[:base_dir] == nil
-    abort("You need to specify --directory")
+if options[:image_dir] == nil
+    abort("You need to specify --imageSourceDirectory")
 end
 
-if !File.directory?(options[:base_dir])
+if !File.directory?(options[:image_dir])
     abort("The directory #{options[:base_dir]} does not exist")
 end
 
 # Define input and output constants
-BASE_DIR = Pathname.new(options[:base_dir])
+BASE_DIR = Pathname.new(options[:image_dir])
+LANG_DIR = Pathname.new(options[:translationsDir])
 OUTPUT_DIR = Pathname.new(Dir.pwd) + "output"
 
 # Determine which languages we're going to generate screenshots
-subdirectories = []
+imageDirectories = []
 Dir.chdir(BASE_DIR) do
-    subdirectories = Dir["*"].reject{|o| not File.directory?(o)}.sort
+    imageDirectories = Dir["*"].reject{|o| not File.directory?(o)}.sort
 end
 
-languages = subdirectories & options[:languages].split(",")
+translationDirectories = []
+Dir.chdir(LANG_DIR) do
+    translationDirectories = Dir["*"].reject{|o| not File.directory?(o)}.sort
+end
+
+languages = imageDirectories & translationDirectories
 
 # Create a hash of devices, keyed by device name
 devices = config["devices"]
@@ -172,6 +187,7 @@ config["entries"]
 
         newEntry["screenshot"] = BASE_DIR + language + entry["screenshot"]
         newEntry["filename"] =  OUTPUT_DIR + language + entry["screenshot"]
+        newEntry["locale"] = language
 
         newEntry
     }
