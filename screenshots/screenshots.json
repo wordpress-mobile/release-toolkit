@@ -32,8 +32,8 @@
 			"canvas_size": [2732,2048],
 			"text_size": [2732, 317],
 			"font_size": "90px",
-			"screenshot_size": [1998, 1498],
-			"screenshot_offset": [367, 411],
+			"screenshot_size": [2060, 1544],
+			"screenshot_offset": [345, 388],
 			"device_frame": "resources/iPad Air.svg",
 			"device_frame_size": [2425, 1707],
 			"device_frame_offset": [154, 307]
@@ -432,9 +432,9 @@
 			"screenshot": "iPad Pro (12.9-inch)-5-Notifications.png",
 			"attachments": [
 				{
-					"file": "resources/white-box.svg",
-					"size": [1530,1362],
-					"position": [907, 564]
+					"file": "resources/grey-box.svg",
+					"size": [1413,1357],
+					"position": [952, 535]
 				},
 				{
 					"file": "resources/attachments/3-1.png",
