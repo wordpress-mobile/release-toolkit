@@ -58,11 +58,6 @@
 			"screenshot": "iPhone XS Max-1-PostEditor.png",
 			"attachments": [
 				{
-					"file": "resources/white-box.svg",
-					"size": [841,689],
-					"position": [201, 1557]
-				},
-				{
 					"file": "resources/attachments/1-top.png",
 					"size": [969,648],
 					"position": [71, 1086]
@@ -162,11 +157,6 @@
 			"text": "metadata/%s/app_store_screenshot_1.html",
 			"screenshot": "iPhone 8 Plus-1-PostEditor.png",
 			"attachments": [
-				{
-					"file": "resources/white-box.svg",
-					"size": [841,689],
-					"position": [201, 1557]
-				},
 				{
 					"file": "resources/attachments/1-top.png",
 					"size": [969,579],
@@ -268,11 +258,6 @@
 			"screenshot": "iPad Pro (12.9-inch)-1-PostEditor.png",
 			"attachments": [
 				{
-					"file": "resources/white-box.svg",
-					"size": [2140,790],
-					"position": [297, 1218]
-				},
-				{
 					"file": "resources/attachments/1-top.png",
 					"size": [1094,688],
 					"position": [751, 719]
@@ -334,7 +319,7 @@
 			"screenshot": "iPad Pro (12.9-inch)-5-Notifications.png",
 			"attachments": [
 				{
-					"file": "resources/white-box.svg",
+					"file": "resources/grey-box.svg",
 					"size": [1530,1362],
 					"position": [907, 564]
 				},
@@ -365,11 +350,6 @@
 			"text": "metadata/%s/app_store_screenshot_1.html",
 			"screenshot": "iPad Pro (12.9-inch)-1-PostEditor.png",
 			"attachments": [
-				{
-					"file": "resources/white-box.svg",
-					"size": [2140,790],
-					"position": [297, 1218]
-				},
 				{
 					"file": "resources/attachments/1-top.png",
 					"size": [1094,688],
