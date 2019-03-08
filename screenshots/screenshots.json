@@ -72,7 +72,7 @@
 		{
 			"device": "iPhone Xs max",
 			"text": "metadata/%s/app_store_screenshot_2.html",
-			"screenshot": "iPhone XS Max-4-Stats.png",
+			"screenshot": "iPhone XS Max-2-Stats.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/2-chart.png",
@@ -84,7 +84,7 @@
 		{
 			"device": "iPhone Xs max",
 			"text": "metadata/%s/app_store_screenshot_3.html",
-			"screenshot": "iPhone XS Max-5-Notifications.png",
+			"screenshot": "iPhone XS Max-3-Notifications.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/3-1.png",
@@ -106,7 +106,7 @@
 		{
 			"device": "iPhone Xs max",
 			"text": "metadata/%s/app_store_screenshot_4.html",
-			"screenshot": "iPhone XS Max-3-Media.png",
+			"screenshot": "iPhone XS Max-4-Media.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/4-1.png",
@@ -138,7 +138,7 @@
 		{
 			"device": "iPhone Xs max",
 			"text": "metadata/%s/app_store_screenshot_5.html",
-			"screenshot": "iPhone XS Max-2-DraftEditor.png",
+			"screenshot": "iPhone XS Max-5-DraftEditor.png",
 			"attachments": [
 				{
 					"file": "resources/ios-dictation-keyboard-x.png",
@@ -172,7 +172,7 @@
 		{
 			"device": "iPhone 8",
 			"text": "metadata/%s/app_store_screenshot_2.html",
-			"screenshot": "iPhone 8 Plus-4-Stats.png",
+			"screenshot": "iPhone 8 Plus-2-Stats.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/2-chart.png",
@@ -184,7 +184,7 @@
 		{
 			"device": "iPhone 8",
 			"text": "metadata/%s/app_store_screenshot_3.html",
-			"screenshot": "iPhone 8 Plus-5-Notifications.png",
+			"screenshot": "iPhone 8 Plus-3-Notifications.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/3-1.png",
@@ -206,7 +206,7 @@
 		{
 			"device": "iPhone 8",
 			"text": "metadata/%s/app_store_screenshot_4.html",
-			"screenshot": "iPhone 8 Plus-3-Media.png",
+			"screenshot": "iPhone 8 Plus-4-Media.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/4-1.png",
@@ -238,7 +238,7 @@
 		{
 			"device": "iPhone 8",
 			"text": "metadata/%s/app_store_screenshot_5.html",
-			"screenshot": "iPhone 8 Plus-2-DraftEditor.png",
+			"screenshot": "iPhone 8 Plus-5-DraftEditor.png",
 			"attachments": [
 				{
 					"file": "resources/ios-dictation-keyboard.png",
@@ -255,7 +255,7 @@
 		{
 			"device": "iPad X",
 			"text": "metadata/%s/app_store_screenshot_1.html",
-			"screenshot": "iPad Pro (12.9-inch)-1-PostEditor.png",
+			"screenshot": "iPad Pro (12.9-inch) (3rd generation)-1-PostEditor.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/1-top.png",
@@ -272,7 +272,7 @@
 		{
 			"device": "iPad X",
 			"text": "metadata/%s/app_store_screenshot_4.html",
-			"screenshot": "iPad Pro (12.9-inch)-3-Media.png",
+			"screenshot": "iPad Pro (12.9-inch) (3rd generation)-4-Media.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/4-1.png",
@@ -304,7 +304,7 @@
 		{
 			"device": "iPad X",
 			"text": "metadata/%s/app_store_screenshot_2.html",
-			"screenshot": "iPad Pro (12.9-inch)-4-Stats.png",
+			"screenshot": "iPad Pro (12.9-inch) (3rd generation)-2-Stats.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/2-chart-ipad.png",
@@ -316,7 +316,7 @@
 		{
 			"device": "iPad X",
 			"text": "metadata/%s/app_store_screenshot_3.html",
-			"screenshot": "iPad Pro (12.9-inch)-5-Notifications.png",
+			"screenshot": "iPad Pro (12.9-inch) (3rd generation)-3-Notifications.png",
 			"attachments": [
 				{
 					"file": "resources/grey-box.svg",
@@ -355,7 +355,7 @@
 		{
 			"device": "iPad Pro",
 			"text": "metadata/%s/app_store_screenshot_1.html",
-			"screenshot": "iPad Pro (12.9-inch)-1-PostEditor.png",
+			"screenshot": "iPad Pro (12.9-inch) (2nd generation)-1-PostEditor",
 			"attachments": [
 				{
 					"file": "resources/attachments/1-top.png",
@@ -372,7 +372,7 @@
 		{
 			"device": "iPad Pro",
 			"text": "metadata/%s/app_store_screenshot_4.html",
-			"screenshot": "iPad Pro (12.9-inch)-3-Media.png",
+			"screenshot": "iPad Pro (12.9-inch) (2nd generation)-4-Media.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/4-1.png",
@@ -404,7 +404,7 @@
 		{
 			"device": "iPad Pro",
 			"text": "metadata/%s/app_store_screenshot_2.html",
-			"screenshot": "iPad Pro (12.9-inch)-4-Stats.png",
+			"screenshot": "iPad Pro (12.9-inch) (2nd generation)-2-Stats.png",
 			"attachments": [
 				{
 					"file": "resources/attachments/2-chart-ipad.png",
@@ -416,7 +416,7 @@
 		{
 			"device": "iPad Pro",
 			"text": "metadata/%s/app_store_screenshot_3.html",
-			"screenshot": "iPad Pro (12.9-inch)-5-Notifications.png",
+			"screenshot": "iPad Pro (12.9-inch) (2nd generation)-3-Notifications.png",
 			"attachments": [
 				{
 					"file": "resources/grey-box.svg",
