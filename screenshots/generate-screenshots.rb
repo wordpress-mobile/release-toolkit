@@ -16,10 +16,13 @@ def canvas_with_device_frame(device, background_color)
         self.background_color = background_color
     }
 
+    w = device["device_frame_size"][0]
+    h = device["device_frame_size"][1]
+
     device_frame = Magick::Image.read(device["device_frame"]) {
         self.format = 'SVG'
         self.background_color = 'transparent'
-    }.first
+    }.first.adaptive_resize(w, h)
 
     x = device["device_frame_offset"][0]
     y = device["device_frame_offset"][1]
