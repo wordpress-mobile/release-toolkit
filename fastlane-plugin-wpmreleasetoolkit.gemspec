@@ -22,16 +22,20 @@ Gem::Specification.new do |spec|
   # since this would cause a circular dependency
 
   # spec.add_dependency 'your-dependency', '~> 1.0.0'
-  spec.add_dependency 'diffy'
-  spec.add_dependency 'nokogiri'
-  spec.add_dependency 'octokit'
-  spec.add_dependency 'git'
-  
-  spec.add_development_dependency('pry')
-  spec.add_development_dependency('bundler')
-  spec.add_development_dependency('rspec')
-  spec.add_development_dependency('rspec_junit_formatter')
-  spec.add_development_dependency('rake')
+  spec.add_dependency 'diffy', '~> 3.3'
+  spec.add_dependency 'nokogiri', '1.10.1'
+  spec.add_dependency 'octokit', '~> 4.13'
+  spec.add_dependency 'git', '~> 1.3'
+  spec.add_dependency 'rmagick', '~> 3.0'
+  spec.add_dependency('rake', '~> 12.3')
+  spec.add_dependency('rake-compiler', '~> 1.0')
+  spec.add_dependency('progress_bar', '~> 1.3')
+  spec.add_dependency('parallel', '~> 1.14')
+
+  spec.add_development_dependency('pry', '~> 0.12.2')
+  spec.add_development_dependency('bundler', '~> 1.17')
+  spec.add_development_dependency('rspec', '~> 3.8')
+  spec.add_development_dependency('rspec_junit_formatter', '~> 0.4.1')
   spec.add_development_dependency('rubocop', '0.49.1')
   spec.add_development_dependency('rubocop-require_tools')
   spec.add_development_dependency('simplecov')
