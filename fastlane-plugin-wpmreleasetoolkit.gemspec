@@ -16,7 +16,14 @@ Gem::Specification.new do |spec|
 
   spec.files         = Dir["lib/**/*"] + %w(README.md LICENSE)
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
-  spec.require_paths = ['lib']
+  spec.extensions    = ['ext/drawText/extconf.rb']
+
+  spec.files << 'ext/drawText/extconf.rb'
+  spec.files << Dir["bin/*"]
+
+  # Bring in any generated executables
+  spec.bindir = "bin"
+  spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
 
   # Don't add a dependency to fastlane or fastlane_re
   # since this would cause a circular dependency

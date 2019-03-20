@@ -37,6 +37,9 @@ module Fastlane
         rescue
            UI.user_error!("Invalid JSON configuration")
         end
+
+        # Ensure that the drawText tool is ready to go
+        system("bundle exec drawText usage 1>/dev/null 2>/dev/null")
       end
 
       # Download the used font to the tmp folder if it's not there
@@ -67,8 +70,7 @@ module Fastlane
 
         languages = imageDirectories & translationDirectories
 
-        UI.message("Creating Promo Screenshots for:")
-        puts languages
+        UI.message("Creating Promo Screenshots for: #{languages.join(", ")}")
 
         # Create a hash of devices, keyed by device name
         devices = @config["devices"]

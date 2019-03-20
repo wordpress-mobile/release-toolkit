@@ -1,0 +1,10 @@
+build:
+	swiftc -o drawText drawText.swift
+
+clean:
+	swiftc --version
+
+install:
+	swiftc --version
+
+.PHONY: build
