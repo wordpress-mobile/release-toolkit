@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.email         = 'lore.mattei@gmail.com'
 
   spec.summary       = 'GitHub helper functions'
-  # spec.homepage      = "https://github.com/<GITHUB_USERNAME>/fastlane-plugin-wpmreleasetoolkit"
+  spec.homepage      = "https://github.com/wordpress-mobile/release-toolkit"
   spec.license       = "MIT"
 
   spec.files         = Dir["lib/**/*"] + %w(README.md LICENSE)
@@ -37,7 +37,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('rspec', '~> 3.8')
   spec.add_development_dependency('rspec_junit_formatter', '~> 0.4.1')
   spec.add_development_dependency('rubocop', '0.49.1')
-  spec.add_development_dependency('rubocop-require_tools')
-  spec.add_development_dependency('simplecov')
-  spec.add_development_dependency('fastlane', '>= 2.99.0')
+  spec.add_development_dependency('rubocop-require_tools', '~> 0.1.2')
+  spec.add_development_dependency('simplecov', '~> 0.16.1')
+  spec.add_development_dependency('fastlane', '~> 2')
 end
