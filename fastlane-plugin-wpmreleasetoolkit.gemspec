@@ -16,7 +16,6 @@ Gem::Specification.new do |spec|
 
   spec.files         = Dir["lib/**/*"] + %w(README.md LICENSE)
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
-  spec.extensions    = ['ext/drawText/extconf.rb']
 
   spec.files << 'ext/drawText/extconf.rb'
   spec.files << Dir["bin/*"]
