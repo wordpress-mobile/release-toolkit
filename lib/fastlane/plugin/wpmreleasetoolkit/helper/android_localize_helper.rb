@@ -121,8 +121,12 @@ module Fastlane
       def self.verify_diff(diff_string, main_strings, lib_strings, library)
         if diff_string.start_with?("name=") then
           diff_string.slice!('name="')
-          diff_string=diff_string.slice(0..(diff_string.index('"') - 1))
 
+          end_index = diff_string.index('"')
+          end_index ||= diff_string.length # Use the whole string if there's no '"'
+
+          diff_string=diff_string.slice(0..(end_index - 1))
+          
           lib_strings.xpath('//string').each do |string_line|
             if (string_line.attr("name") == diff_string) then 
               res = verifystring(main_strings, library, string_line) 
