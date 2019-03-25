@@ -73,7 +73,7 @@ module Fastlane
         def self.create_config()
           @current_version = Fastlane::Helpers::IosVersionHelper.get_build_version()
           @current_version_internal = Fastlane::Helpers::IosVersionHelper.get_internal_version() unless ENV["INTERNAL_CONFIG_FILE"].nil?
-          @new_version_internal = Fastlane::Helpers::IosVersionHelper.create_internal_version(@current_version) unless ENV["INTERNAL_CONFIG_FILE"].nil?
+          @new_version_internal = Fastlane::Helpers::IosVersionHelper.create_internal_version(@new_version) unless ENV["INTERNAL_CONFIG_FILE"].nil?
           @new_short_version = Fastlane::Helpers::IosVersionHelper.get_short_version_string(@new_version)
           @new_release_branch = "release/#{@new_short_version}"
         end
