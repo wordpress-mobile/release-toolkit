@@ -6,6 +6,7 @@ require 'optparse'
 require 'pathname'
 require 'progress_bar'
 require 'parallel'
+require 'jsonlint'
 
 include Magick
 
@@ -35,7 +36,11 @@ module Fastlane
         begin
           @config = JSON.parse(open(@configFilePath).read)
         rescue
-           UI.user_error!("Invalid JSON configuration")
+            linter = JsonLint::Linter.new
+            linter.check(@configFilePath)
+            linter.display_errors
+
+            UI.user_error!("Invalid JSON configuration. See errors in log.")
         end
 
         # Ensure that the drawText tool is ready to go
