@@ -1,0 +1,5 @@
+require 'dotenv'
+Dotenv.load('~/.wpios-env.default')
+
+# Make sure to update these keys for a new version
+app_version "10.1.1"
