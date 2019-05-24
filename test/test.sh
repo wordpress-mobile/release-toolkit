@@ -12,11 +12,9 @@ git tag -d 10.1
 
 # Test ios_bump_version_hotfix
 CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-echo $CURRENT_BRANCH
 git tag 10.1
 bundle exec fastlane run ios_bump_version_hotfix previous_version:10.1 version:10.1.1
 git checkout $CURRENT_BRANCH
 git tag -d 10.1
-git branch -D "release/10.1.1"
 git push origin --delete "release/10.1.1"
-
+git branch -D "release/10.1.1"
