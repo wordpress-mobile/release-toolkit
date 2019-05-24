@@ -82,9 +82,8 @@ module Fastlane
         devices = Hash[devices.map { |device| device["name"] }.zip(devices)]
 
         # Move global settings from the configuration into variables
-        global_background_color = @config["background_color"]
-        global_shadow_offset = @config["shadow_offset"]
-        stylesheet = @config["stylesheet"]
+        @global_background_color = @config["background_color"]
+        @stylesheet = @config["stylesheet"]
 
         entries = @config["entries"]
           .flat_map { |entry|
@@ -111,10 +110,10 @@ module Fastlane
         }) do |entry|
           device = devices[entry["device"]]
 
-          canvas = canvas_with_device_frame(device, global_background_color)
-          canvas = add_caption_to_canvas(entry, canvas, device, stylesheet)
+          canvas = canvas_with_device_frame(device, entry)
+          canvas = add_caption_to_canvas(entry, canvas, device)
           canvas = draw_screenshot_to_canvas(entry, canvas, device)
-          canvas = draw_attachments_to_canvas(entry, canvas, global_shadow_offset)
+          canvas = draw_attachments_to_canvas(entry, canvas)
 
           # Automatically create intermediate directories for output
           output_filename = resolve_path(entry["filename"])
@@ -145,13 +144,19 @@ module Fastlane
 
       private
 
-      def canvas_with_device_frame(device, background_color)
+      def canvas_with_device_frame(device, entry)
 
         canvas_size = device["canvas_size"]
 
         canvas = Image.new(canvas_size[0], canvas_size[1]) {
           self.background_color = background_color
         }
+
+        if entry["background"] != nil
+          background_image = resolve_path(entry["background"]).realpath
+          background_image = Magick::Image.read(background_image).first
+          canvas = canvas.composite(background_image, NorthWestGravity, 0, 0, Magick::OverCompositeOp)
+        end
 
         w = device["device_frame_size"][0]
         h = device["device_frame_size"][1]
@@ -168,7 +173,7 @@ module Fastlane
         canvas.composite(device_frame, NorthWestGravity, x, y, Magick::OverCompositeOp)
       end
 
-      def add_caption_to_canvas(entry, canvas, device, stylesheet)
+      def add_caption_to_canvas(entry, canvas, device)
 
         text = entry["text"]
         text_size = device["text_size"]
@@ -192,7 +197,7 @@ module Fastlane
           self.background_color = 'transparent'
         }
 
-        stylesheet_path = resolve_path(stylesheet)
+        stylesheet_path = resolve_path(@stylesheet)
         tempTextFile = Tempfile.new()
 
         begin
@@ -252,17 +257,13 @@ module Fastlane
         canvas.composite(screenshot, NorthWestGravity, x_offset, y_offset, Magick::OverCompositeOp)
       end
 
-      def draw_attachments_to_canvas(entry, canvas, shadowOffset)
+      def draw_attachments_to_canvas(entry, canvas)
 
         entry["attachments"].each { |attachment|
 
           file = resolve_path(attachment["file"])
-
-          # Resize the images with extra size to account for the shadows
-          size = attachment["size"].map{ |i| i + (shadowOffset * 2) }
-
-          # Correct for the shadow offset by centering the image within the shadow bounds
-          position = attachment["position"].map{ |i| i - shadowOffset }
+          size = attachment["size"]
+          position = attachment["position"]
 
           attachment_image = Magick::Image.read(file) {
             self.background_color = 'transparent'
