@@ -112,7 +112,7 @@ styleString = applyCustomStyles(to: styleString, from: args["stylesheet"])
 // Convert the HTML to data
 if FileManager.default.fileExists(atPath: possibleFilePath) {
     let fileContents = try! String(contentsOfFile: possibleFilePath, encoding: .utf8)
-    styleString += fileContents
+    styleString += fileContents.replacingOccurrences(of: "\n", with: "<br />")
 }
 // If there's no file at that location, treat the argument as the string to be drawn
 else{
