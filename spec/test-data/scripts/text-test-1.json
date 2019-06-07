@@ -1,0 +1,24 @@
+{
+	"devices": [
+		{
+			"name": "Test Device",
+			"screenshot_size": [500, 500],
+			"screenshot_offset": [250, 250],
+			"screenshot_mask": "images/source/black-circle.png",
+
+			"device_frame": "images/source/black-circle.png",
+			"device_frame_size": [500, 500],
+			"device_frame_offset": [250, 250],
+
+			"text_size": [500, 250],
+			"text_offset": [0, -50],
+			"font_size": "90px"
+		}
+	],
+	"entries": [
+		{
+			"device": "Test Device",
+			"text": "Test Text"
+		}
+	]
+}

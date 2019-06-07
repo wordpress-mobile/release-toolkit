@@ -1,0 +1,18 @@
+{
+	"attachments": 
+	[
+		{
+			"file": "images/source/blue-square.png",
+			"position": [25, 25],
+			"offset": [-25, -25],
+			"size": [100, 100],
+			"operations": [
+				{
+					"type": "crop",
+					"at": [0, 0],
+					"to": [250, 250]
+				}
+			]
+		}
+	]
+}

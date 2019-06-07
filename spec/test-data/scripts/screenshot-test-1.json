@@ -1,0 +1,21 @@
+{
+	"devices": [
+		{
+			"name": "Test Device",
+			"screenshot_size": [500, 500],
+			"screenshot_offset": [250, 250],
+			"screenshot_mask": "images/source/black-circle.png",
+
+			"device_frame": "images/source/black-circle.png",
+			"device_frame_size": [500, 500],
+			"device_frame_offset": [250, 250]
+		}
+	],
+	"entries": [
+		{
+			"device": "Test Device",
+			"text": "Test Text",
+			"screenshot": "images/source/blue-square.png"
+		}
+	]
+}

@@ -33,6 +33,28 @@ module Fastlane
             dir
         end
 
+        def self.plugin_root
+
+            continue = true
+            dir = Pathname.new(__FILE__).dirname
+
+            while continue
+                child_filenames = dir.children.map! { |x| File.basename(x) }
+
+                if child_filenames.include? "fastlane-plugin-wpmreleasetoolkit.gemspec"
+                    continue = false
+                else
+                    dir = dir.parent
+                end
+
+                if dir.root?
+                    UI.user_error!("Unable to determine the plugin root directory.")
+                end
+            end
+
+            dir
+        end
+
         ### Returns the path to the project's `.configure` file.
         def self.configure_file
             Pathname.new(project_path) + ".configure"
