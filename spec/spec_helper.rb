@@ -13,3 +13,7 @@ require 'fastlane' # to import the Action super class
 require 'fastlane/plugin/wpmreleasetoolkit' # import the actual plugin
 
 Fastlane.load_actions # load other actions (in case your plugin calls other actions or shared values)
+
+RSpec.configure do |config|
+  config.filter_run_when_matching :focus
+end

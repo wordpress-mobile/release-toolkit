@@ -1,0 +1,21 @@
+{
+	"devices": [
+		{
+			"name": "Test Device"
+		}
+	],
+	"entries": [
+		{
+			"device": "Test Device",
+			"text": "Test Text",
+			"attachments": 
+			[
+				{
+					"file": "images/source/blue-square.png",
+					"size": [100, 100],
+					"position": [0, 0]
+				}
+			]
+		}
+	]
+}

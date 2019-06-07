@@ -1,4 +1,5 @@
 require 'fastlane/action'
+require 'active_support/all'
 require_relative '../../helper/promo_screenshots_helper.rb'
 
 module Fastlane
@@ -10,19 +11,124 @@ module Fastlane
         UI.message "Translation source: #{params[:metadata_folder]}"
         UI.message "Output Folder: #{params[:output_folder]}"
 
-
         unless params[:force] then
           confirm_directory_overwrite(params[:output_folder], "the existing promo screenshots")
         end
 
-        screenshot_gen = Fastlane::Helper::PromoScreenshots.new(
-          params[:config_file],
-          params[:orig_folder],
-          params[:metadata_folder],
-          params[:output_folder]
-        )
+        config = helper.read_json(params[:config_file])
+        imageDirectory = helper.resolve_path( params[:orig_folder] )
+        translationDirectory = helper.resolve_path( params[:metadata_folder] )
+        outputDirectory = helper.resolve_path( params[:output_folder] )
 
-        screenshot_gen.create()
+         unless imageDirectory.exist? then
+           UI.user_error!("Unable to locate original image directory.")
+         end
+
+         unless translationDirectory.exist? then
+           UI.user_error!("Unable to locate translations directory.")
+         end
+
+        imageDirectories = []
+
+        Dir.chdir(imageDirectory) do
+          imageDirectories = Dir["*"].reject{|o| not File.directory?(o)}.sort
+        end
+
+        translationDirectories = []
+
+        Dir.chdir(translationDirectory) do
+          translationDirectories = Dir["*"].reject{|o| not File.directory?(o)}.sort
+        end
+
+        languages = imageDirectories & translationDirectories
+
+        UI.message("Creating Promo Screenshots for: #{languages.join(", ")}")
+
+        # Create a hash of devices, keyed by device name
+        devices = config["devices"]
+        devices = Hash[devices.map { |device| device["name"] }.zip(devices)]
+
+        stylesheet_path = config["stylesheet"]
+
+        entries = config["entries"]
+          .flat_map { |entry|
+
+            languages.map { |language|
+
+              newEntry = entry.deep_dup
+
+              # Not every output file will have a screenshot, so handle cases where no 
+              # screenshot file is defined
+              if entry["screenshot"] != nil
+                newEntry["screenshot"] = imageDirectory + language + entry["screenshot"]
+                newEntry["filename"] =  outputDirectory + language + entry["screenshot"]
+              elsif entry["filename"] != nil
+                newEntry["filename"] =  outputDirectory + language + entry["filename"]
+              end
+
+              newEntry["locale"] = language
+
+              # Localize file paths for text
+              if entry["text"] != nil
+                newEntry["text"].sub!("{locale}", language.dup)
+              end
+
+              # Map attachments paths to their localized versions
+              newEntry["attachments"].each { |attachment|
+                if attachment["file"] != nil
+                  attachment["file"].sub!("{locale}", language.dup)
+                end
+
+                if attachment["text"] != nil
+                  attachment["text"].sub!("{locale}", language.dup)
+                end
+              }
+
+              newEntry
+            }
+          }
+          .sort { |x,y|
+            x["screenshot"] <=> y["screenshot"]
+          }
+
+        bar = ProgressBar.new(entries.count, :bar, :counter, :eta, :rate)
+
+        Parallel.map(entries, finish: -> (item, i, result) {
+          bar.increment!
+        }) do |entry|
+
+          device = devices[entry["device"]]
+
+          if device == nil
+            UI.message("Unable to find device #{entry["device"]}")
+          end
+
+          width = device["canvas_size"][0]
+          height = device["canvas_size"][1]
+
+          canvas = helper.create_image(width, height)
+          canvas = helper.draw_background_to_canvas(canvas, entry)
+
+          canvas = helper.draw_device_frame_to_canvas(device, canvas)
+          canvas = helper.draw_caption_to_canvas(entry, canvas, device, stylesheet_path)
+          canvas = helper.draw_screenshot_to_canvas(entry, canvas, device)
+          canvas = helper.draw_attachments_to_canvas(entry, canvas)
+
+          # Automatically create intermediate directories for output
+          output_filename = entry["filename"]
+          dirname = File.dirname(output_filename)
+
+          unless File.directory?(dirname)
+            FileUtils.mkdir_p(dirname)
+          end
+
+          canvas.write(output_filename)
+          canvas.destroy!
+
+          # Run the GC in the same thread to clean up after RMagick
+          GC.start
+        
+        end
       end
 
       def self.confirm_directory_overwrite(path, description)
@@ -36,6 +142,14 @@ module Fastlane
         else
           Dir.mkdir(path)
         end
+      end
+
+      def self.resolve_path(path)
+        return Fastlane::Helper::PromoScreenshots.resolve_path(path)
+      end
+
+      def self.helper
+        return Fastlane::Helper::PromoScreenshots.new
       end
 
       def self.description
