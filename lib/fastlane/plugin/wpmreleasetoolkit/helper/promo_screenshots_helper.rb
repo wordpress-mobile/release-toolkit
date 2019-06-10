@@ -32,20 +32,6 @@ module Fastlane
         end
       end
 
-      # Download the used font to the tmp folder
-      # if it's not there
-      def self.require_font()
-        font_file = self.get_font_path()
-        if (File.exist?(font_file))
-          return
-        end
-
-        font_folder = File.dirname(font_file)
-        Dir.mkdir(font_folder) unless File.exist?(font_folder)
-        Fastlane::Actions::sh("wget \"https://fonts.google.com/download?family=Noto%20Serif\" -O \"#{font_folder}/noto.zip\"")
-        Fastlane::Actions::sh("unzip \"#{font_folder}/noto.zip\" -d \"#{font_folder}\"")
-      end
-
     private
       # Generate the screenshots for
       # the provided locale
