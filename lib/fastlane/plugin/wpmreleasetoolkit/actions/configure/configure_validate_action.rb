@@ -23,6 +23,8 @@ module Fastlane
 
         validate_that_branches_match
 
+        validate_that_hashes_match
+
         validate_that_no_dependent_files_have_changed
 
         validate_that_all_copied_files_match
@@ -48,6 +50,26 @@ module Fastlane
             "To fix this issue, switch back to the `#{file_branch_name}` branch in the mobile secrets repository.",
           ].join("\n"))
         end
+      end
+
+      ### Validate that the pinned hash specified in .configure matches
+      ### the current hash of ~/.mobile-secrets
+      def self.validate_that_hashes_match
+        puts "### MPTEST ###"
+        repo_hash = Fastlane::Helper::ConfigureHelper.repo_commit_hash
+        file_hash = Fastlane::Helper::ConfigureHelper.configure_file_commit_hash
+
+        puts repo_hash
+        puts file_hash
+
+        unless repo_hash == file_hash
+
+          UI.user_error!([
+            "The pinned_hash specified in `.configure` is not the currently checked out hash in the secrets repository.",
+            "To fix this issue, check out the `#{file_hash}` hash in the mobile secrets repository.",
+          ].join("\n"))
+        end
+        puts "### MPTEST ###"
       end
 
       ### Validate that based on the commit hash in the .configure file, no files have changed
