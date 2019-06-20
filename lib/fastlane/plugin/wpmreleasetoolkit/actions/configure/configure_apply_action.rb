@@ -10,6 +10,17 @@ module Fastlane
   module Actions
     class ConfigureApplyAction < Action
       def self.run(params = {})
+
+        ### Make sure secrets repo is at the proper hash as specified in .configure
+        repo_branch_name = Fastlane::Helper::ConfigureHelper.repo_branch_name
+        file_branch_name = Fastlane::Helper::ConfigureHelper.configure_file_branch_name
+        repo_hash = Fastlane::Helper::ConfigureHelper.repo_commit_hash
+        file_hash = Fastlane::Helper::ConfigureHelper.configure_file_commit_hash
+
+        unless repo_branch_name == file_branch_name && repo_hash == file_hash
+          sh("cd #{repository_path} && git checkout #{file_hash}")
+        end
+
         files_to_copy.each { |x|
 
             source = absolute_secret_store_path(x["file"])
