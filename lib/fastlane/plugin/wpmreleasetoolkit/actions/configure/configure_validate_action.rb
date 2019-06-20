@@ -55,12 +55,8 @@ module Fastlane
       ### Validate that the pinned hash specified in .configure matches
       ### the current hash of ~/.mobile-secrets
       def self.validate_that_hashes_match
-        puts "### MPTEST ###"
         repo_hash = Fastlane::Helper::ConfigureHelper.repo_commit_hash
         file_hash = Fastlane::Helper::ConfigureHelper.configure_file_commit_hash
-
-        puts repo_hash
-        puts file_hash
 
         unless repo_hash == file_hash
 
@@ -69,7 +65,6 @@ module Fastlane
             "To fix this issue, check out the `#{file_hash}` hash in the mobile secrets repository.",
           ].join("\n"))
         end
-        puts "### MPTEST ###"
       end
 
       ### Validate that based on the commit hash in the .configure file, no files have changed
