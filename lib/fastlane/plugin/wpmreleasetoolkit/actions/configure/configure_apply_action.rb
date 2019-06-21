@@ -18,7 +18,7 @@ module Fastlane
         file_hash = Fastlane::Helper::ConfigureHelper.configure_file_commit_hash
 
         unless repo_branch_name == file_branch_name && repo_hash == file_hash
-          sh("cd #{repository_path} && git checkout #{file_hash}")
+          sh("cd #{repository_path} && git fetch && git checkout #{file_hash}")
         end
 
         files_to_copy.each { |x|
