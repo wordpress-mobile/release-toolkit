@@ -35,7 +35,7 @@ module Fastlane
 
         ### Restore secrets repo to original branch.  If it was originally in a 
         ### detached HEAD state, we need to use the hash since there's no branch name.
-        original_repo_branch = repo_commit_hash if (original_repo_branch == nil)
+        original_repo_branch = repo_hash if (original_repo_branch == nil)
 
         sh("cd #{repository_path} && git checkout #{original_repo_branch}")
 
