@@ -11,7 +11,7 @@ module Fastlane
     class ConfigureApplyAction < Action
       def self.run(params = {})
 
-        ### Make sure secrets repo is at the proper hash as specified in .configure
+        ### Make sure secrets repo is at the proper hash as specified in .configure.
         repo_hash = Fastlane::Helper::ConfigureHelper.repo_commit_hash
         file_hash = Fastlane::Helper::ConfigureHelper.configure_file_commit_hash
         original_repo_branch = Fastlane::Helper::ConfigureHelper.repo_branch_name
@@ -33,7 +33,10 @@ module Fastlane
             end
         }
 
-        ### Restore secrets repo to original branch
+        ### Restore secrets repo to original branch.  If it was originally in a 
+        ### detached HEAD state, we need to extract the hash from the branch name.
+        original_repo_branch = original_repo_branch.sub("(HEAD detached at ", "").sub(")", "")
+
         sh("cd #{repository_path} && git checkout #{original_repo_branch}")
 
         UI.success "Applied configuration"
