@@ -32,11 +32,15 @@ module Fastlane
       end
 
       def self.prompt_to_switch_branches
-
-        if UI.confirm("The current branch is `#{current_branch}`. Would you like to switch branches?")
+        branch_name_to_display = current_branch == nil ? current_hash : current_branch
+        if UI.confirm("The current branch is `#{branch_name_to_display}`. Would you like to switch branches?")
           new_branch = UI.select("Select the branch you'd like to switch to: ", get_branches)
           checkout_branch(new_branch)
           update_configure_file
+        else
+          if current_branch == nil
+            UI.user_error!("The local secrets store is in a deatched HEAD state.  Please check out a branch and try again.")
+          end
         end
       end
 
@@ -55,6 +59,10 @@ module Fastlane
 
       def self.current_branch
         Fastlane::Helper::ConfigureHelper.repo_branch_name
+      end
+
+      def self.current_hash
+        Fastlane::Helper::ConfigureHelper.repo_commit_hash
       end
 
       def self.update_configure_file
