@@ -293,7 +293,7 @@ module Fastlane
       #
       # @return [Magick::Image] The masked image
       def mask_image(image, mask, offset_x = 0, offset_y = 0)
-          image.composite(mask, offset_x, offset_y, CopyOpacityCompositeOp)
+          image.composite(mask, offset_x, offset_y, CopyAlphaCompositeOp)
       end
 
       # resize_image
