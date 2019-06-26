@@ -2,3 +2,6 @@
 /tmp
 /lib/drawText
 /coverage
+
+# Testing
+/test_results
