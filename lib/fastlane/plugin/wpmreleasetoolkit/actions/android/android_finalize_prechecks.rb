@@ -13,8 +13,8 @@ module Fastlane
   
           UI.user_error!("This is not a release branch. Abort.") unless other_action.git_branch.start_with?("release/")
   
-          version = Fastlane::Helpers::AndroidVersionHelper::get_version_name
-          message = "Finalizing release: #{version}\n"
+          version = Fastlane::Helpers::AndroidVersionHelper::get_public_version
+          message = "Finalizing release: #{version[Fastlane::Helpers::AndroidVersionHelper::VERSION_NAME]}\n"
           if (!params[:skip_confirm])
             if (!UI.confirm("#{message}Do you want to continue?"))
               UI.user_error!("Aborted by user request")
@@ -26,7 +26,7 @@ module Fastlane
           # Check local repo status
           other_action.ensure_git_status_clean()
   
-          version
+          version[Fastlane::Helpers::AndroidVersionHelper::VERSION_NAME]
         end
   
         #####################################################
