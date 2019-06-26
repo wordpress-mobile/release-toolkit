@@ -178,7 +178,6 @@ module Fastlane
               image = apply_operation(image, operation, canvas)
             }
 
-            image.write("after-image.png")
           end
 
           size = attachment["size"]

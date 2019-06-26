@@ -1,9 +1,17 @@
 $LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
 
 require 'simplecov'
+require 'codecov'
 
 # SimpleCov.minimum_coverage 95
 SimpleCov.start
+
+code_coverage_token = ENV['CODECOV_TOKEN'] || false
+
+# If the environment variable is present, format for Codecov
+if code_coverage_token
+  SimpleCov.formatter = SimpleCov::Formatter::Codecov
+end
 
 # This module is only used to check the environment is currently a testing env
 module SpecHelper
