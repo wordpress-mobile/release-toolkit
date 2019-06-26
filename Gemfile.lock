@@ -30,6 +30,10 @@ GEM
     babosa (1.0.2)
     chroma (0.2.0)
     claide (1.0.2)
+    codecov (0.1.15)
+      json
+      simplecov
+      url
     coderay (1.1.2)
     colored (1.2)
     colored2 (3.1.2)
@@ -233,6 +237,7 @@ GEM
       unf_ext
     unf_ext (0.0.7.5)
     unicode-display_width (1.6.0)
+    url (0.3.2)
     word_wrap (1.0.0)
     xcodeproj (1.8.1)
       CFPropertyList (>= 2.3.3, < 4.0)
@@ -250,6 +255,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (>= 1.17)
+  codecov
   fastlane (~> 2)
   fastlane-plugin-wpmreleasetoolkit!
   pry (~> 0.12.2)
