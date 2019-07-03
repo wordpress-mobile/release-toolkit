@@ -8,7 +8,7 @@ module Fastlane
           require_relative '../../helper/android/android_version_helper.rb'
           require_relative '../../helper/android/android_git_helper.rb'
           
-          # TODO: Re-enable before merging into develop other_action.ensure_git_branch(branch: "develop")
+          other_action.ensure_git_branch(branch: "develop")
 
           # Create new configuration
           @new_short_version = Fastlane::Helpers::AndroidVersionHelper.bump_version_release()
