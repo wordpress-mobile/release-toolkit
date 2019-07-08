@@ -6,6 +6,18 @@ module Fastlane
           Action.sh("git checkout #{branch}")
           Action.sh("git pull")
         end
+
+        def self.git_checkout_and_pull_release_branch_for(version)
+          branch_name = "release/#{version}"
+          Action.sh("git pull")
+          begin
+            Action.sh("git checkout #{branch_name}")
+            Action.sh("git pull origin #{branch_name}")
+            return true
+          rescue
+            return false
+          end
+        end
         
         def self.do_release_branch(branch_name)
           if (check_branch_exists(branch_name) == true) then
@@ -48,9 +60,32 @@ module Fastlane
           Action.sh("git push")
         end
 
+        def self.bump_version_beta()
+          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]} && git add ./build.gradle")
+          Action.sh("git commit -m \"Bump version number\"")
+          Action.sh("git push")
+        end
+
+        def self.bump_version_hotfix(version)
+          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]} && git add ./build.gradle")
+          Action.sh("git commit -m \"Bump version number\"")
+          Action.sh("git push")
+        end
+
         def self.tag_build(release_version, alpha_version)
           tag_and_push(release_version)
           tag_and_push(alpha_version) unless alpha_version.nil?
+        end
+
+        def self.check_on_branch(branch_name) 
+          current_branch_name=Action.sh("git symbolic-ref -q HEAD")
+          UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)
+        end
+
+        def self.branch_for_hotfix(tag_version, new_version)
+          Action.sh("git checkout #{tag_version}")
+          Action.sh("git checkout -b release/#{new_version}")
+          Action.sh("git push --set-upstream origin release/#{new_version}")
         end
 
         private

@@ -58,7 +58,7 @@ module Fastlane
         def self.calc_next_beta_version(version, alpha_version = nil)
           # Bump version name
           beta_number = is_beta_version(version) ? version[VERSION_NAME].split('-')[2].to_i + 1 : 1
-          version_name = "#{version[VERSION_NAME]}#{RC_SUFFIX}-#{beta_number}"
+          version_name = "#{version[VERSION_NAME].split('-')[0]}#{RC_SUFFIX}-#{beta_number}"
 
           # Bump version code
           version_code = alpha_version.nil? ? version[VERSION_CODE] + 1 : alpha_version[VERSION_CODE] + 1
@@ -85,6 +85,10 @@ module Fastlane
         def self.calc_next_release_version(version, alpha_version = nil)
           nv = calc_next_release_base_version({ VERSION_NAME => version[VERSION_NAME], VERSION_CODE => alpha_version.nil? ? version[VERSION_CODE] : [version[VERSION_CODE], alpha_version[VERSION_CODE]].max})
           calc_next_beta_version(nv)
+        end
+
+        def self.calc_next_hotfix_version(hotfix_version_name, hotfix_version_code)
+          { VERSION_NAME => hotfix_version_name, VERSION_CODE => hotfix_version_code}
         end
 
         def self.calc_prev_release_version(version)
@@ -119,6 +123,13 @@ module Fastlane
         def self.update_versions(new_version_beta, new_version_alpha)
           self.update_version(new_version_beta, ENV["HAS_ALPHA_VERSION"].nil? ? "defaultConfig" : "vanilla {")
           self.update_version(new_version_alpha, "defaultConfig") unless new_version_alpha.nil?
+        end
+
+        def self.calc_prev_hotfix_version_name(version_name)
+          vp = get_version_parts(version_name)
+          vp[HOTFIX_NUMBER] -= 1 unless vp[HOTFIX_NUMBER] == 0
+          return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}" unless vp[HOTFIX_NUMBER] == 0
+          "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}"
         end
 
         # private 
