@@ -71,6 +71,12 @@ module Fastlane
           Action.sh("git commit -m \"Bump version number\"")
           Action.sh("git push")
         end
+        
+        def self.bump_version_final()
+          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]} && git add ./build.gradle")
+          Action.sh("git commit -m \"Bump version number\"")
+          Action.sh("git push")
+        end
 
         def self.tag_build(release_version, alpha_version)
           tag_and_push(release_version)
