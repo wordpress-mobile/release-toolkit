@@ -1,0 +1,12 @@
+version: 2.1
+
+orbs:
+  ios: wordpress-mobile/ios@0.0.29
+
+jobs: # a collection of steps
+  build: # runs not using Workflows must have a `build` job as entry point
+    executor:
+      name: ios/default
+      xcode-version: "10.2.1"
+    steps: # a collection of executable commands
+      - checkout # special step to check out source code to working directory
