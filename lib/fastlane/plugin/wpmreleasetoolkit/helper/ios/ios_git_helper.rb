@@ -25,11 +25,11 @@ module Fastlane
           Action.sh("git push --set-upstream origin release/#{new_version}")
         end
   
-        def self.bump_version_release()
+        def self.bump_version_release(skip_deliver=false, skip_metadata=false)
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && git add ./config/.")
-          Action.sh("git add fastlane/Deliverfile")
-          Action.sh("git add fastlane/download_metadata.swift")
-          Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/Resources/#{ENV["APP_STORE_STRINGS_FILE_NAME"]}")
+          Action.sh("git add fastlane/Deliverfile") unless skip_deliver
+          Action.sh("git add fastlane/download_metadata.swift") unless skip_metadata
+          Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/Resources/#{ENV["APP_STORE_STRINGS_FILE_NAME"]}") unless skip_metadata
           Action.sh("git commit -m \"Bump version number\"")
           Action.sh("git push")
         end
