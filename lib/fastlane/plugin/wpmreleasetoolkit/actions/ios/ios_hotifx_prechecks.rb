@@ -5,8 +5,8 @@ module Fastlane
         UI.message "Skip confirm: #{params[:skip_confirm]}"
         UI.message "" 
 
-        require_relative '../../helpers/ios/ios_version_helper.rb'
-        require_relative '../../helpers/ios/ios_git_helper.rb'
+        require_relative '../../helper/ios/ios_version_helper.rb'
+        require_relative '../../helper/ios/ios_git_helper.rb'
 
         # Evaluate previous tag
         new_ver = params[:version]
