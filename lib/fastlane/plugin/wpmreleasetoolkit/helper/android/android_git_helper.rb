@@ -41,7 +41,7 @@ module Fastlane
           Action.sh("echo \"#{new_version}\n-----\n \" > #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
           Action.sh("cat #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.bak >> #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
           Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
-          Action.sh("git commit -m \"Update release notes.\"")
+          Action.sh("git diff-index --quiet HEAD || git commit -m \"Update release notes.\"")
           Action.sh("git push")
         end
   
@@ -49,7 +49,7 @@ module Fastlane
           Action.sh("./tools/update-translations.sh")
           Action.sh("./gradlew #{validate_translation_command}")
           Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/src/main/res")
-          Action.sh("git commit -m \"Updates translations\"")
+          Action.sh("git diff-index --quiet HEAD || git commit -m \"Updates translations\"")
   
           Action.sh("git push")
         end

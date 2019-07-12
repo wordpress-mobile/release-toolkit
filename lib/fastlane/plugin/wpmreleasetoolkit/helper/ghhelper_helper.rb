@@ -41,14 +41,18 @@ module Fastlane
         last_stone = nil
         milestones.each do | mile |
           if (last_stone.nil?)
-            last_stone = mile   
+            last_stone = mile unless mile[:title].split(' ')[0].split('.').length < 2 
           else
-            if (mile[:title].split(' ')[0].split('.')[0] > last_stone[:title].split(' ')[0].split('.')[0])
-              last_stone = mile 
-            else
-              if (mile[:title].split(' ')[0].split('.')[1] > last_stone[:title].split(' ')[0].split('.')[1])
+            begin
+              if (mile[:title].split(' ')[0].split('.')[0] > last_stone[:title].split(' ')[0].split('.')[0])
                 last_stone = mile 
+              else
+                if (mile[:title].split(' ')[0].split('.')[1] > last_stone[:title].split(' ')[0].split('.')[1])
+                  last_stone = mile 
+                end
               end
+            rescue
+              puts "Found invalid milestone"
             end
           end
         end
