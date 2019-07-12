@@ -37,7 +37,6 @@ module Fastlane
         def self.bump_version_hotfix(version)
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && git add ./config/.")
           Action.sh("git add fastlane/Deliverfile")
-          Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/Resources/#{ENV["APP_STORE_STRINGS_FILE_NAME"]}")
           Action.sh("git commit -m \"Bump version number\"")
           Action.sh("git push")
         end
