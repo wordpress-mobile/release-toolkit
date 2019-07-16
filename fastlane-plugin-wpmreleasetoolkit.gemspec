@@ -32,7 +32,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'nokogiri', '1.10.1'
   spec.add_dependency 'octokit', '~> 4.13'
   spec.add_dependency 'git', '~> 1.3'
-  spec.add_dependency 'rmagick', '~> 3.0'
   spec.add_dependency 'jsonlint'
   spec.add_dependency('rake', '~> 12.3')
   spec.add_dependency('rake-compiler', '~> 1.0')
