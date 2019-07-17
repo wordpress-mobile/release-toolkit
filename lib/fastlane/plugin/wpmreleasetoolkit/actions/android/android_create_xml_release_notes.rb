@@ -1,9 +1,5 @@
 module Fastlane
   module Actions
-    module SharedValues
-      ANDROID_UPDATE_METADATA_CUSTOM_VALUE = :ANDROID_UPDATE_METADATA_CUSTOM_VALUE
-    end
-
     class AndroidCreateXmlReleaseNotesAction < Action
       def self.run(params)
         require_relative '../../helper/android/android_git_helper.rb'
