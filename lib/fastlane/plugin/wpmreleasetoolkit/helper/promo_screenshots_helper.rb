@@ -1,5 +1,12 @@
 require 'tmpdir'
-require 'RMagick'
+begin
+  skip_magick = false
+  require 'RMagick'
+rescue LoadError
+  puts "Please, install RMagick if you aim to generate the PromoScreenshots."
+  puts "\'bundle install --with screenshots\' should do it if your project is configured for PromoScreenshots."
+  skip_magick = true
+end
 require 'json'
 require 'tempfile'
 require 'optparse'
@@ -8,7 +15,7 @@ require 'progress_bar'
 require 'parallel'
 require 'jsonlint'
 
-include Magick
+include Magick unless skip_magick
 
 module Fastlane
   module Helper
