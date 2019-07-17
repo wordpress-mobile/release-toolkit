@@ -49,14 +49,6 @@ module Fastlane
         ]
       end
 
-      def self.output
-        
-      end
-
-      def self.return_value
-        
-      end
-
       def self.authors
         ["loremattei"]
       end
@@ -76,7 +68,7 @@ module Fastlane
 
       def self.show_config()
         UI.message("Current version: #{@current_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_NAME]}(#{@current_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_CODE]})")
-        UI.message("New hotifx version: #{@new_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_NAME]}(#{@new_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_CODE]})")
+        UI.message("New hotfix version: #{@new_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_NAME]}(#{@new_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_CODE]})")
         UI.message("Release branch: #{@new_release_branch}")
       end
     end
