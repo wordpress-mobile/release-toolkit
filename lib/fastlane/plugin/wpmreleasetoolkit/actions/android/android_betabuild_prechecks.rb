@@ -29,11 +29,11 @@ module Fastlane
         end
 
         next_beta_version = Fastlane::Helpers::AndroidVersionHelper::calc_next_beta_version(release_version, alpha_release_version)
-        next_alpha_version = Fastlane::Helpers::AndroidVersionHelper::calc_next_alpha_version(release_version, alpha_release_version)
+        next_alpha_version = Fastlane::Helpers::AndroidVersionHelper::calc_next_alpha_version(release_version, alpha_release_version) unless alpha_release_version.nil?
 
         # Verify
         message << "Updating branch to version: #{next_beta_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_NAME]}(#{next_beta_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_CODE]}) "
-        message << "and #{next_alpha_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_NAME]}(#{next_alpha_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_CODE]}).\n"
+        message << "and #{next_alpha_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_NAME]}(#{next_alpha_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_CODE]}).\n" unless alpha_release_version.nil?
         if (!params[:skip_confirm])
           if (!UI.confirm("#{message}Do you want to continue?"))
             UI.user_error!("Aborted by user request")
