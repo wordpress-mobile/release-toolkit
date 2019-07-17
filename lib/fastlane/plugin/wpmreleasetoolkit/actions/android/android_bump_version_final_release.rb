@@ -30,18 +30,6 @@ module Fastlane
         "Bumps the version of the app for a new beta"
       end
 
-      def self.available_options
-        
-      end
-
-      def self.output
-        
-      end
-
-      def self.return_value
-        
-      end
-
       def self.authors
         ["loremattei"]
       end
@@ -62,7 +50,7 @@ module Fastlane
         vcode = Fastlane::Helpers::AndroidVersionHelper::VERSION_CODE
         UI.message("Current version: #{@current_version[vname]}(#{@current_version[vcode]})")
         UI.message("Current alpha version: #{@current_version_alpha[vname]}(#{@current_version_alpha[vcode]})") unless ENV["HAS_ALPHA_VERSION"].nil?
-        UI.message("New Final version: #{@final_version[vname]}(#{@final_version[vcode]})")
+        UI.message("New release version: #{@final_version[vname]}(#{@final_version[vcode]})")
       end
     end
   end
