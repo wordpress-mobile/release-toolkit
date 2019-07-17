@@ -6,6 +6,7 @@ module Fastlane
 
         message = ""
         message << "Building version #{Fastlane::Helpers::IosVersionHelper.get_internal_version()} and uploading to HockeyApp\n" unless !params[:internal]
+        message << "Building version #{Fastlane::Helpers::IosVersionHelper.get_build_version()} and uploading to HockeyApp\n" unless !params[:internal_on_single_version]
         message << "Building version #{Fastlane::Helpers::IosVersionHelper.get_build_version()} and uploading to TestFlight\n" unless !params[:external]
 
         if (!params[:skip_confirm])
@@ -44,11 +45,16 @@ module Fastlane
                                        description: "True if this is for an internal build",
                                        is_string: false, 
                                        default_value: false), 
-            FastlaneCore::ConfigItem.new(key: :external,
+          FastlaneCore::ConfigItem.new(key: :external,
                                         env_name: "FL_IOS_BUILD_PRECHECKS_EXTERNAL_BUILD",
                                         description: "True if this is for a public build",
                                         is_string: false, 
                                         default_value: false), 
+          FastlaneCore::ConfigItem.new(key: :internal_on_single_version,
+                                          env_name: "FL_IOS_BUILD_PRECHECKS_INTERNAL_SV_BUILD",
+                                          description: "True if this is for an internal build that follows the same versioning of the external",
+                                          is_string: false, 
+                                          default_value: false), 
         ]
       end
 

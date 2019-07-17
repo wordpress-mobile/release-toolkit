@@ -20,18 +20,19 @@ module Fastlane
           Fastlane::Helpers::IosGitHelper.do_release_branch(@new_release_branch)
           UI.message "Done!"
 
-          UI.message "Updating glotPressKeys..."
-          update_glotpress_key
-          UI.message "Done"
+          UI.message "Updating glotPressKeys..."  unless params[:skip_glotpress]
+          update_glotpress_key unless params [:skip_glotpress]
+          UI.message "Done" unless params [:skip_glotpress]
 
-          UI.message "Updating Fastlane deliver file..."
-          Fastlane::Helpers::IosVersionHelper.update_fastlane_deliver(@new_short_version)
-          UI.message "Done!"
+          UI.message "Updating Fastlane deliver file..." unless params[:skip_deliver]
+          Fastlane::Helpers::IosVersionHelper.update_fastlane_deliver(@new_short_version) unless params[:skip_deliver]
+          UI.message "Done!" unless params [:skip_deliver]
+
           UI.message "Updating XcConfig..."
           Fastlane::Helpers::IosVersionHelper.update_xc_configs(@new_version, @new_short_version, @new_version_internal) 
           UI.message "Done!"
 
-          Fastlane::Helpers::IosGitHelper.bump_version_release()
+          Fastlane::Helpers::IosGitHelper.bump_version_release(params[:skip_deliver], params[:skip_glotpress])
           
           UI.message "Done."
         end
@@ -49,7 +50,19 @@ module Fastlane
         end
   
         def self.available_options
-          
+          [
+            FastlaneCore::ConfigItem.new(key: :skip_glotpress,
+                                         env_name: "FL_IOS_CODEFREEZE_BUMP_SKIPGLOTPRESS",
+                                         description: "Skips GlotPress key update",
+                                         is_string: false, # true: verifies the input is a string, false: every kind of value
+                                         default_value: false), # the default value if the user didn't provide one
+            FastlaneCore::ConfigItem.new(key: :skip_deliver,
+                                          env_name: "FL_IOS_CODEFREEZE_BUMP_SKIPDELIVER",
+                                          description: "Skips Deliver key update",
+                                          is_string: false, # true: verifies the input is a string, false: every kind of value
+                                          default_value: false), # the default value if the user didn't provide one
+
+          ]
         end
   
         def self.output
