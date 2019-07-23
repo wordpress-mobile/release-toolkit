@@ -1,5 +1,10 @@
 require 'tmpdir'
-require 'RMagick'
+begin
+  $skip_magick = false
+  require 'RMagick'
+rescue LoadError
+  $skip_magick = true
+end
 require 'json'
 require 'tempfile'
 require 'optparse'
@@ -8,7 +13,7 @@ require 'progress_bar'
 require 'parallel'
 require 'jsonlint'
 
-include Magick
+include Magick unless $skip_magick
 
 module Fastlane
   module Helper
@@ -16,6 +21,14 @@ module Fastlane
     class PromoScreenshots
 
       def initialize(configFilePath, imageDirectory, translationDirectory, outputDirectory)
+        if ($skip_magick)
+          message = "PromoScreenshots feature is currently disabled.\n"
+          message << "Please, install RMagick if you aim to generate the PromoScreenshots.\n"
+          message << "\'bundle install --with screenshots\' should do it if your project is configured for PromoScreenshots.\n"
+          message << "Aborting."
+          UI.user_error!(message)
+        end
+
         @configFilePath = resolve_path(configFilePath)
         @imageDirectory = resolve_path(imageDirectory)
         @translationDirectory = resolve_path(translationDirectory)
