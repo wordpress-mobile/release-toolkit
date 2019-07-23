@@ -25,11 +25,11 @@ module Fastlane
           Action.sh("git push --set-upstream origin release/#{new_version}")
         end
   
-        def self.bump_version_release()
+        def self.bump_version_release(skip_deliver=false, skip_metadata=false)
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && git add ./config/.")
-          Action.sh("git add fastlane/Deliverfile")
-          Action.sh("git add fastlane/download_metadata.swift")
-          Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/Resources/#{ENV["APP_STORE_STRINGS_FILE_NAME"]}")
+          Action.sh("git add fastlane/Deliverfile") unless skip_deliver
+          Action.sh("git add fastlane/download_metadata.swift") unless skip_metadata
+          Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/Resources/#{ENV["APP_STORE_STRINGS_FILE_NAME"]}") unless skip_metadata
           Action.sh("git commit -m \"Bump version number\"")
           Action.sh("git push")
         end
@@ -37,7 +37,6 @@ module Fastlane
         def self.bump_version_hotfix(version)
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && git add ./config/.")
           Action.sh("git add fastlane/Deliverfile")
-          Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/Resources/#{ENV["APP_STORE_STRINGS_FILE_NAME"]}")
           Action.sh("git commit -m \"Bump version number\"")
           Action.sh("git push")
         end
@@ -91,11 +90,11 @@ module Fastlane
         def self.update_metadata()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && ./Scripts/update-translations.rb")
           Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/*.lproj/Localizable.strings")
-          Action.sh("git commit -m \"Updates translation\"")
+          Action.sh("git diff-index --quiet HEAD || git commit -m \"Updates translation\"")
   
           Action.sh("cd fastlane && ./download_metadata.swift")
           Action.sh("git add ./fastlane/metadata/")
-          Action.sh("git commit -m \"Updates metadata translation\"")
+          Action.sh("git diff-index --quiet HEAD || git commit -m \"Updates metadata translation\"")
   
           Action.sh("git push")
         end

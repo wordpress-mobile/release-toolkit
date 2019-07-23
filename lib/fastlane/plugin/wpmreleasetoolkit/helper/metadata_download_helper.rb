@@ -58,7 +58,7 @@ module Fastlane
         file_path = get_target_file_path(locale, file_name)
         
         dir_path = File.dirname(file_path)
-        Dir.mkdir(dir_path) unless File.exists?(dir_path)
+        FileUtils.mkdir_p(dir_path) unless File.exists?(dir_path)
 
         File.open(file_path, "w") { |file| file.puts(content) }
       end

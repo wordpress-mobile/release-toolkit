@@ -44,6 +44,13 @@ module Fastlane
           version[VERSION_NAME].include?(RC_SUFFIX)
         end
   
+        def self.calc_final_release_version(beta_version, alpha_version)
+          version_name = beta_version[VERSION_NAME].split('-')[0]
+          version_code = alpha_version.nil? ? beta_version[VERSION_CODE] + 1 : alpha_version[VERSION_CODE] + 1 
+
+          { VERSION_NAME => version_name, VERSION_CODE => version_code }
+        end
+
         def self.calc_next_alpha_version(version, alpha_version)
           # Bump alpha name
           alpha_number = alpha_version[VERSION_NAME].sub(ALPHA_PREFIX, '')
