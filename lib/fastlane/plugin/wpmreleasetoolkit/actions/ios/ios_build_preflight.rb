@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
 
         # Validate mobile configuration secrets
-        other_action.configure_validate
+        other_action.configure_apply
 
         Action.sh("cd .. && rm -rf ~/Library/Developer/Xcode/DerivedData")
 
