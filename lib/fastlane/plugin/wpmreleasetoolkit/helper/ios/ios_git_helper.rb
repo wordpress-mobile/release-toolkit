@@ -91,11 +91,11 @@ module Fastlane
         def self.update_metadata()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && ./Scripts/update-translations.rb")
           Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/*.lproj/Localizable.strings")
-          Action.sh("git commit -m \"Updates translation\"")
+          Action.sh("git commit --allow-empty -m \"Updates translation\"")
   
           Action.sh("cd fastlane && ./download_metadata.swift")
           Action.sh("git add ./fastlane/metadata/")
-          Action.sh("git commit -m \"Updates metadata translation\"")
+          Action.sh("git commit --allow-empty -m \"Updates metadata translation\"")
   
           Action.sh("git push")
         end
