@@ -5,23 +5,36 @@ module Fastlane
   module Actions
     class PromoScreenshotsAction < Action
       def self.run(params)
-        UI.message "Origin Folder: #{params[:orig_folder]}"
-        UI.message "Target Folder: #{params[:output_folder]}"
-        UI.message "Locales: #{params[:locales].inspect}"
-        UI.message "Configuration: #{params[:device_config].inspect}"
-        UI.message "Default locale: #{params[:default_locale]}"
-        UI.message "Metadata folder path: #{params[:metadata_folder]}"
+        UI.message "Creating Promo Screenshots"
+        UI.message "Original Screenshot Source: #{params[:orig_folder]}"
+        UI.message "Translation source: #{params[:metadata_folder]}"
+        UI.message "Output Folder: #{params[:output_folder]}"
 
-        Fastlane::Helper::PromoScreenshots.require_font()
-        screenshot_gen = Fastlane::Helper::PromoScreenshots.new(params[:locales], 
-          params[:default_locale],
-          params[:orig_folder], 
-          params[:output_folder],
-          params[:metadata_folder])
 
-        device_config = params[:device_config]
-        device_config.each do | device |
-          screenshot_gen.generate_device(device)
+        unless params[:force] then
+          confirm_directory_overwrite(params[:output_folder], "the existing promo screenshots")
+        end
+
+        screenshot_gen = Fastlane::Helper::PromoScreenshots.new(
+          params[:config_file],
+          params[:orig_folder],
+          params[:metadata_folder],
+          params[:output_folder]
+        )
+
+        screenshot_gen.create()
+      end
+
+      def self.confirm_directory_overwrite(path, description)
+        if (File.exists?(path)) then
+          if UI.confirm("Do you want to overwrite #{description}?") then
+            FileUtils.rm_rf(path)
+            Dir.mkdir(path)
+          else
+            UI.user_error!("Exiting to avoid overwriting #{description}.")
+          end
+        else
+          Dir.mkdir(path)
         end
       end
 
@@ -46,7 +59,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :orig_folder,
                                    env_name: "PROMOSS_ORIG",
-                                description: "The path of the original screenshots",
+                                description: "The directory containing the original screenshots",
                                    optional: false,
                                   is_string: true),
           FastlaneCore::ConfigItem.new(key: :output_folder,
@@ -54,26 +67,26 @@ module Fastlane
                                      description: "The path of the folder to save the promo screenshots",
                                         optional: false,
                                       is_string: true),
-          FastlaneCore::ConfigItem.new(key: :locales,
-                                        env_name: "PROMOSS_LOCALES",
-                                     description: "The list of locales to generate",
-                                        optional: false,
-                                      is_string: false),
-          FastlaneCore::ConfigItem.new(key: :device_config,
-                                        env_name: "PROMOSS_DEVICE_CONFIGHASH",
-                                     description: "A hash with the configuration data",
-                                        optional: false,
-                                      is_string: false),
-          FastlaneCore::ConfigItem.new(key: :default_locale,
-                                        env_name: "PROMOSS_DEFAULT_LOCALE",
-                                     description: "The default locale to use in case of missing translations",
-                                        optional: false,
-                                      is_string: true),
+
           FastlaneCore::ConfigItem.new(key: :metadata_folder,
                                         env_name: "PROMOSS_METADATA_FOLDER",
-                                     description: "The default locale to use in case of missing translations",
+                                     description: "The directory containing the translation data",
                                         optional: false,
                                       is_string: true),
+
+          FastlaneCore::ConfigItem.new(key: :config_file,
+                                        env_name: "PROMOSS_CONFIG_FILE",
+                                     description: "The path to the file containing the promo screenshot configuration",
+                                        optional: true,
+                                       is_string: true,
+                                   default_value: "screenshots.json"),
+
+          FastlaneCore::ConfigItem.new(key: :force,
+                                        env_name: "PROMOSS_FORCE_CREATION",
+                                     description: "Overwrite existing promo screenshots without asking first?",
+                                        optional: true,
+                                       is_string: false,
+                                   default_value: false),
         ]
       end
 

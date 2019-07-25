@@ -1,178 +1,277 @@
 require 'tmpdir'
+begin
+  skip_magick = false
+  require 'RMagick'
+rescue LoadError
+  puts "Please, install RMagick if you aim to generate the PromoScreenshots."
+  puts "\'bundle install --with screenshots\' should do it if your project is configured for PromoScreenshots."
+  skip_magick = true
+end
+require 'json'
+require 'tempfile'
+require 'optparse'
+require 'pathname'
+require 'progress_bar'
+require 'parallel'
+require 'jsonlint'
+
+include Magick unless skip_magick
 
 module Fastlane
   module Helper
     
     class PromoScreenshots
-      attr_reader :device, :locales, :orig_folder, :target_folder, :default_locale, :metadata_folder
 
-      TEXT_OFFSET_X = 0
-      TEXT_OFFSET_Y = 58
-      DEFAULT_TEXT_SIZE = 80
-      private_constant :TEXT_OFFSET_X, :TEXT_OFFSET_Y, :DEFAULT_TEXT_SIZE
+      def initialize(configFilePath, imageDirectory, translationDirectory, outputDirectory)
+        @configFilePath = resolve_path(configFilePath)
+        @imageDirectory = resolve_path(imageDirectory)
+        @translationDirectory = resolve_path(translationDirectory)
+        @outputDirectory = resolve_path(outputDirectory)
 
-      def initialize(locales, default_locale, orig_folder, target_folder, metadata_folder)
-        @locales = locales
-        @default_locale = default_locale
-        @orig_folder = orig_folder
-        @target_folder = target_folder
-        @metadata_folder = metadata_folder
-
-        load_default_locale()
-      end
-
-      # Generate all the required screenshots for
-      # the provided device
-      def generate_device(device)
-        @device = device
-        UI.message("Generate promo screenshot for device: #{@device[:device]}")
-
-        locales.each do | locale, options |
-          generate_locale(locale, options)
-        end
-      end
-
-      # Download the used font to the tmp folder
-      # if it's not there
-      def self.require_font()
-        font_file = self.get_font_path()
-        if (File.exist?(font_file))
-          return
+        unless @configFilePath.exist? then
+          UI.user_error!("Unable to locate configuration file.")
         end
 
-        font_folder = File.dirname(font_file)
-        Dir.mkdir(font_folder) unless File.exist?(font_folder)
-        Fastlane::Actions::sh("wget \"https://fonts.google.com/download?family=Noto%20Serif\" -O \"#{font_folder}/noto.zip\"")
-        Fastlane::Actions::sh("unzip \"#{font_folder}/noto.zip\" -d \"#{font_folder}\"")
-      end
-
-    private
-      # Generate the screenshots for
-      # the provided locale
-      def generate_locale(locale, locale_options)
-        UI.message("Generating #{locale}...")
-
-        target_folder = verify_target_folder(locale)
-        strings = get_promo_strings_for(locale)
-        files = Dir["#{get_screenshots_orig_path(locale)}#{@device[:device]}*"].sort
-        text_size = get_text_size_for(locale_options)
-        text_font = get_text_font_for(locale_options)
-        text_offset = get_text_offset_y()
-
-        idx = 1
-        files.each do | file |
-          generate_screenshot(file, get_local_at(idx.to_s, strings), target_folder, text_size, text_offset, text_font)
-          idx = idx + 1
-        end
-      end
-
-      # Generate a promo screenshot
-      def generate_screenshot(file, string, target_folder, text_size, text_offset, text_font)
-        target_file = "#{target_folder}#{File.basename(file)}"
-        puts "Generate screenshots for #{file} to #{target_file}"
-
-        # Temp file paths
-        resized_file = "#{target_file}_resize"
-        comp_file = "#{target_file}_comp"
-
-        # 1. Resize original screenshot
-        Fastlane::Actions::sh("magick \"#{file}\" -resize #{device[:comp_size]} \"#{resized_file}\"")
-
-        # 2. Put it on the background
-        Fastlane::Actions::sh("magick #{@device[:template]} \"#{resized_file}\" -geometry #{device[:comp_offset]} -composite \"#{comp_file}\"")
-        File.delete(resized_file) if File.exist?(resized_file)
-
-        # 2.5 Put the top layer, if exists
-        if (@device.key?(:top_template))
-          Fastlane::Actions::sh("magick \"#{comp_file}\" #{@device[:top_template]}  -geometry +0+0 -composite \"#{comp_file}\"")
+        unless @imageDirectory.exist? then
+          UI.user_error!("Unable to locate original image directory.")
         end
 
-        # 3. Put the promo string on top of it
-        Fastlane::Actions::sh("magick \"#{comp_file}\" -gravity north -pointsize #{text_size} -font \"#{text_font}\" -draw \"fill white text #{TEXT_OFFSET_X},#{text_offset} \\\"#{string}\\\"\" \"#{target_file}\"")
-        File.delete(comp_file) if File.exist?(comp_file)
-      end
-
-      # Loads the promo strings in the default locale
-      # -> to be used when a localisation is missing
-      def load_default_locale()
-        @default_strings = get_promo_strings_for(@default_locale)
-      end
-
-      # Gets the promo string, picking the default one
-      # if the localised version is missing
-      def get_local_at(index, strings)
-        if (strings.key?(index))
-          return strings[index]
+        unless @translationDirectory.exist? then
+          UI.user_error!("Unable to locate translations directory.")
         end
 
-        if (@default_strings.key?(index))
-          return @default_strings[index]
+        begin
+          @config = JSON.parse(open(@configFilePath).read)
+        rescue
+            linter = JsonLint::Linter.new
+            linter.check(@configFilePath)
+            linter.display_errors
+
+            UI.user_error!("Invalid JSON configuration. See errors in log.")
         end
-        
-        return "Unknown"
+
+        # Ensure that the drawText tool is ready to go
+        system("bundle exec drawText usage 1>/dev/null 2>/dev/null")
       end
 
-      # Loads the localised promo string set for
-      # the provided locale
-      def get_promo_strings_for(locale)
-        strings = { }
+      def create()
+        imageDirectories = []
 
-        path = get_locale_path(locale)
-        files = Dir["#{path}*"]
+        Dir.chdir(@imageDirectory) do
+          imageDirectories = Dir["*"].reject{|o| not File.directory?(o)}.sort
+        end
 
-        files.each do | promo_file |
-          # Extract the string ID code
-          promo_file_name = File.basename(promo_file, ".txt")
-          promo_id = promo_file_name.split('_').last
+        translationDirectories = []
 
-          # Read the file into a string
-          promo_string = File.read(promo_file)
+        Dir.chdir(@translationDirectory) do
+          translationDirectories = Dir["*"].reject{|o| not File.directory?(o)}.sort
+        end
+
+        languages = imageDirectories & translationDirectories
+
+        UI.message("Creating Promo Screenshots for: #{languages.join(", ")}")
+
+        # Create a hash of devices, keyed by device name
+        devices = @config["devices"]
+        devices = Hash[devices.map { |device| device["name"] }.zip(devices)]
+
+        # Move global settings from the configuration into variables
+        @global_background_color = @config["background_color"]
+        @stylesheet = @config["stylesheet"]
+
+        entries = @config["entries"]
+          .flat_map { |entry|
+
+            languages.map { |language|
+
+              newEntry = entry.dup
+
+              newEntry["screenshot"] = @imageDirectory + language + entry["screenshot"]
+              newEntry["filename"] =  @outputDirectory + language + entry["screenshot"]
+              newEntry["locale"] = language
+
+              newEntry
+            }
+          }
+          .sort { |x,y|
+            x["screenshot"] <=> y["screenshot"]
+          }
+
+        bar = ProgressBar.new(entries.count, :bar, :counter, :eta, :rate)
+
+        Parallel.map(entries, finish: -> (item, i, result) {
+          bar.increment!
+        }) do |entry|
+          device = devices[entry["device"]]
+
+          canvas = canvas_with_device_frame(device, entry)
+          canvas = add_caption_to_canvas(entry, canvas, device)
+          canvas = draw_screenshot_to_canvas(entry, canvas, device)
+          canvas = draw_attachments_to_canvas(entry, canvas)
+
+          # Automatically create intermediate directories for output
+          output_filename = resolve_path(entry["filename"])
+          dirname = File.dirname(output_filename)
+          unless File.directory?(dirname)
+            FileUtils.mkdir_p(dirname)
+          end
+
+          canvas.write(output_filename)
+          canvas.destroy!
+
+          # Run the GC in the same thread to clean up after RMagick
+          GC.start
           
-          # Add to hash
-          strings[promo_id] = promo_string
+        end
+      end
+
+      def resolve_path(path)
+
+        current_path = Pathname.new(path)
+
+        if current_path.exist? then
+          return current_path
         end
 
-        return strings
-      end 
-
-      # Helpers
-      def get_text_size_for(locale_options)
-        text_adj = (@device.key?(:text_adj) ? @device[:text_adj] : 100) / 100.0
-        return (DEFAULT_TEXT_SIZE * text_adj) unless locale_options.key?(:text_size)
-        locale_options[:text_size] * text_adj
+        Pathname.new(FastlaneCore::FastlaneFolder.fastfile_path).dirname + path
       end
 
-      def get_text_font_for(locale_options)
-        return PromoScreenshots.get_font_path() unless locale_options.key?(:font)
-        locale_options[:font]
+      private
+
+      def canvas_with_device_frame(device, entry)
+
+        canvas_size = device["canvas_size"]
+
+        canvas = Image.new(canvas_size[0], canvas_size[1]) {
+          self.background_color = background_color
+        }
+
+        if entry["background"] != nil
+          background_image = resolve_path(entry["background"]).realpath
+          background_image = Magick::Image.read(background_image).first
+          canvas = canvas.composite(background_image, NorthWestGravity, 0, 0, Magick::OverCompositeOp)
+        end
+
+        w = device["device_frame_size"][0]
+        h = device["device_frame_size"][1]
+
+        device_frame = resolve_path(device["device_frame"]).realpath
+        device_frame = Magick::Image.read(device_frame) {
+            self.format = 'SVG'
+            self.background_color = 'transparent'
+        }.first.adaptive_resize(w, h)
+
+        x = device["device_frame_offset"][0]
+        y = device["device_frame_offset"][1]
+
+        canvas.composite(device_frame, NorthWestGravity, x, y, Magick::OverCompositeOp)
       end
 
-      def get_text_offset_y()
-        return TEXT_OFFSET_Y unless @device.key?(:text_offset)
-        @device[:text_offset]
+      def add_caption_to_canvas(entry, canvas, device)
+
+        text = entry["text"]
+        text_size = device["text_size"]
+        font_size = device["font_size"]
+        locale = entry["locale"]
+
+        # Add the locale to the location string
+        localizedFile = sprintf(text, locale)
+        if File.exist?(localizedFile)
+          text = localizedFile
+        elsif File.exist?(resolve_path(localizedFile))
+          text = resolve_path(localizedFile).realpath.to_s
+        else
+          text = sprintf(text, "source")
+        end
+
+        width = text_size[0]
+        height = text_size[1]
+
+        text_frame = Image.new(width, height) {
+          self.background_color = 'transparent'
+        }
+
+        stylesheet_path = resolve_path(@stylesheet)
+        tempTextFile = Tempfile.new()
+
+        begin
+
+          command = "bundle exec drawText html=" + text + " maxWidth=#{width} maxHeight=#{height} output=#{tempTextFile.path} fontSize=#{font_size} stylesheet=#{stylesheet_path}"
+
+          unless system(command)
+            UI.crash!("Unable to draw text")
+          end
+
+        text_content = Magick::Image.read(tempTextFile.path) {
+          self.background_color = 'transparent'
+        }.first
+
+          x = 0
+          y = 0
+
+          if device["text_offset"] != nil
+              x = device["text_offset"][0]
+              y = device["text_offset"][1]
+          end
+
+          text_frame.composite!(text_content, CenterGravity, x, y, Magick::OverCompositeOp)
+
+        ensure
+          tempTextFile.close
+          tempTextFile.unlink
+        end
+
+        canvas.composite!(text_frame, NorthGravity, Magick::OverCompositeOp)
       end
 
-      def verify_target_folder(locale)
-        folder = get_screenshots_target_path(locale)
-        Dir.mkdir(folder) unless File.exists?(folder)
+      def draw_screenshot_to_canvas(entry, canvas, device)
 
-        return folder
+        device_mask = device["screenshot_mask"]
+        screenshot_size = device["screenshot_size"]
+        screenshot_offset = device["screenshot_offset"]
+
+        screenshot = entry["screenshot"]
+
+        screenshot = Magick::Image.read(screenshot) {
+          self.background_color = 'transparent'
+        }
+        .first
+
+        if device_mask != nil
+          device_mask = resolve_path(device_mask)
+          screenshot_mask = Magick::Image.read(device_mask).first
+          screenshot = screenshot.composite(screenshot_mask, 0, 0, CopyOpacityCompositeOp)
+        end
+
+        screenshot = screenshot.adaptive_resize(screenshot_size[0], screenshot_size[1])
+
+        x_offset = screenshot_offset[0]
+        y_offset = screenshot_offset[1]
+
+        canvas.composite(screenshot, NorthWestGravity, x_offset, y_offset, Magick::OverCompositeOp)
       end
 
-      def get_locale_path(locale)
-        "#{@metadata_folder}/#{locale}/"
-      end
+      def draw_attachments_to_canvas(entry, canvas)
 
-      def get_screenshots_orig_path(locale)
-        "#{@orig_folder}/#{locale}/"
-      end
+        entry["attachments"].each { |attachment|
 
-      def get_screenshots_target_path(locale)
-        "#{@target_folder}/#{locale}/"
-      end
+          file = resolve_path(attachment["file"])
+          size = attachment["size"]
+          position = attachment["position"]
 
-      def self.get_font_path()
-        "#{Dir.tmpdir()}/font/NotoSerif-Bold.ttf"
+          attachment_image = Magick::Image.read(file) {
+            self.background_color = 'transparent'
+          }
+          .first
+          .adaptive_resize(size[0], size[1])
+
+          x = position[0]
+          y = position[1]
+
+          canvas.composite!(attachment_image, NorthWestGravity, x, y, Magick::OverCompositeOp)
+        }
+
+        canvas
       end
     end
   end

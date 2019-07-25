@@ -10,6 +10,17 @@ module Fastlane
   module Actions
     class ConfigureApplyAction < Action
       def self.run(params = {})
+
+        ### Make sure secrets repo is at the proper hash as specified in .configure.
+        repo_hash = Fastlane::Helper::ConfigureHelper.repo_commit_hash
+        file_hash = Fastlane::Helper::ConfigureHelper.configure_file_commit_hash
+        original_repo_branch = Fastlane::Helper::ConfigureHelper.repo_branch_name
+
+        unless repo_hash == file_hash
+          sh("cd #{repository_path} && git fetch && git checkout #{file_hash}")
+        end
+
+        ### Copy the files
         files_to_copy.each { |x|
 
             source = absolute_secret_store_path(x["file"])
@@ -21,6 +32,12 @@ module Fastlane
                 copy_with_confirmation(source, destination)
             end
         }
+
+        ### Restore secrets repo to original branch.  If it was originally in a 
+        ### detached HEAD state, we need to use the hash since there's no branch name.
+        original_repo_branch = repo_hash if (original_repo_branch == nil)
+
+        sh("cd #{repository_path} && git checkout #{original_repo_branch}")
 
         UI.success "Applied configuration"
       end

@@ -1,9 +1,12 @@
-require 'bundler/gem_tasks'
+require 'rake'
 
-require 'rspec/core/rake_task'
-RSpec::Core::RakeTask.new
+load 'tasks/compile.rake'
 
-require 'rubocop/rake_task'
-RuboCop::RakeTask.new(:rubocop)
-
-task(default: [:spec, :rubocop])
+begin
+  require 'rubocop/rake_task'
+  RuboCop::RakeTask.new
+  task default: %i[spec rubocop]
+rescue LoadError
+  warn 'RuboCop is not available'
+  task default: :spec
+end
