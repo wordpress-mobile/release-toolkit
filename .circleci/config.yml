@@ -1,12 +1,20 @@
 version: 2.1
 
 orbs:
-  ios: wordpress-mobile/ios@0.0.29
+  bundle-install: toshimaru/bundle-install@0.3.1
 
-jobs: # a collection of steps
-  build: # runs not using Workflows must have a `build` job as entry point
-    executor:
-      name: ios/default
-      xcode-version: "10.2.1"
-    steps: # a collection of executable commands
-      - checkout # special step to check out source code to working directory
+jobs:
+  test:
+    docker:
+      - image: circleci/ruby:2.4
+    steps:
+      - checkout
+      - bundle-install/bundle-install
+      - run:
+          name: Run Tests
+          command: bundle exec rspec
+
+workflows:
+  test:
+    jobs:
+      - test
