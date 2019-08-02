@@ -5,3 +5,8 @@
 
 # Testing
 /test_results
+/lib/drawText.bundle
+/ext/drawText/drawText.xcodeproj/xcuserdata
+/ext/drawText/drawText.xcodeproj/project.xcworkspace/xcuserdata
+/ext/drawText/test-output
+/default.profraw
