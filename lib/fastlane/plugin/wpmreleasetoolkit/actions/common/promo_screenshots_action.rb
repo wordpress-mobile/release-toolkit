@@ -59,11 +59,17 @@ module Fastlane
 
               # Not every output file will have a screenshot, so handle cases where no 
               # screenshot file is defined
-              if entry["screenshot"] != nil
+              if entry["screenshot"] != nil && entry["filename"] != nil
+                newEntry["screenshot"] = imageDirectory + language + entry["screenshot"]
+                newEntry["filename"] =  outputDirectory + language + entry["filename"]
+              elsif entry["screenshot"] != nil && entry["filename"] == nil
                 newEntry["screenshot"] = imageDirectory + language + entry["screenshot"]
                 newEntry["filename"] =  outputDirectory + language + entry["screenshot"]
-              elsif entry["filename"] != nil
+              elsif entry["screenshot"] == nil && entry["filename"] != nil
                 newEntry["filename"] =  outputDirectory + language + entry["filename"]
+              else
+                puts newEntry
+                abort "Unable to find output file names"
               end
 
               newEntry["locale"] = language
@@ -88,7 +94,7 @@ module Fastlane
             }
           }
           .sort { |x,y|
-            x["screenshot"] <=> y["screenshot"]
+            x["filename"] <=> y["filename"]
           }
 
         bar = ProgressBar.new(entries.count, :bar, :counter, :eta, :rate)
@@ -100,7 +106,7 @@ module Fastlane
           device = devices[entry["device"]]
 
           if device == nil
-            UI.message("Unable to find device #{entry["device"]}")
+            UI.message("Unable to find device #{entry["device"]}.")
           end
 
           width = device["canvas_size"][0]
