@@ -52,6 +52,10 @@ workflows:
           paths:
             - vendor/bundle
 
+      - run: # Compile drawText
+          name: Compile Native Dependencies
+          command: bundle exec rake compile
+
       - run:
           name: Run rspec and upload coverage report
           command: |
