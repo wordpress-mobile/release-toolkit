@@ -98,14 +98,14 @@ module Fastlane
       def self.validate_that_all_copied_files_match
         Fastlane::Helper::ConfigureHelper.files_to_copy.each{ |x|
 
-            source = absolute_secret_store_path(x[:file])
-            destination = absolute_project_path(x[:destination])
+            source = absolute_secret_store_path(x.file)
+            destination = absolute_project_path(x.destination)
 
             sourceHash = file_hash(source)
             destinationHash = file_hash(destination)
 
             unless sourceHash == destinationHash
-                UI.user_error!("`#{x[:destination]} doesn't match the file in the secrets repository (#{x[:file]}) – unable to continue")
+                UI.user_error!("`#{x.destination} doesn't match the file in the secrets repository (#{x.file}) – unable to continue")
             end
         }
       end

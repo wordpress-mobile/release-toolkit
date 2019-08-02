@@ -17,7 +17,7 @@ describe Fastlane::Configuration do
       {
         branch: "a_branch",
         pinned_hash: 'a_hash',
-        files_to_copy: [ 'a_file_to_copy' ],
+        files_to_copy: [ { file: 'a_file_to_copy', destination: 'a_destination' } ],
         file_dependencies: [ 'a_file_dependencies' ],
       }
     end
@@ -33,14 +33,29 @@ describe Fastlane::Configuration do
     it 'reads instantiates the configuration object from JSON' do
       expect(subject.branch).to eq(configure_json[:branch])
       expect(subject.pinned_hash).to eq(configure_json[:pinned_hash])
-      expect(subject.files_to_copy).to eq(configure_json[:files_to_copy])
       expect(subject.file_dependencies).to eq(configure_json[:file_dependencies])
+
+      expect(subject.files_to_copy.length).to eq(1)
+      expect(subject.files_to_copy.first.file).to eq(configure_json[:files_to_copy][0][:file])
+      expect(subject.files_to_copy.first.destination).to eq(configure_json[:files_to_copy][0][:destination])
     end
 
     it 'write the configuration to disk as JSON' do
       expect(File).to receive(:write).with(configure_path, configure_json_string)
 
       subject.save_to_file(configure_path)
+    end
+  end
+
+  describe '#add_file_to_copy' do
+    it 'adds files to copy' do
+      expect(subject.files_to_copy).to eq([])
+
+      subject.add_file_to_copy('copy_file', 'to_here')
+
+      expect(subject.files_to_copy.length).to eq(1)
+      expect(subject.files_to_copy.first.file).to eq('copy_file')
+      expect(subject.files_to_copy.first.destination).to eq('to_here')
     end
   end
 end

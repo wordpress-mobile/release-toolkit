@@ -204,7 +204,7 @@ module Fastlane
             end
         }
 
-        self.files_to_copy.map { |o| o[:file] } + expanded_file_dependencies
+        self.files_to_copy.map { |o| o.file } + expanded_file_dependencies
       end
 
       ## If we specify a directory in `file_dependencies` instead of listing each file
@@ -242,13 +242,8 @@ module Fastlane
             UI.user_error!("You must pass a `destination` to `add_file`")
         end
 
-        new_file = {
-            file: params[:source],
-            destination: params[:destination],
-        }
-
         new_config = self.configuration
-        new_config.files_to_copy.push(new_file)
+        new_config.add_file_to_copy(params[:source], params[:destination])
         update_configuration(new_config)
       end
 
