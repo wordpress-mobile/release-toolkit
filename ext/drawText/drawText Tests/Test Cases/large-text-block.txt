@@ -1,0 +1,1 @@
+You <em>can</em> <a href="google.com">override</a> the <span style="color: orange;">pasteboard</span> <i>representation</i> to be "plain text" <b>only</b> in order to remove the <span class="styled">style info</span> and thus have it behave <strong>like</strong> the "Paste and Match Style" <u>command</u> from the "Edit" menu <s>automatically</s>.

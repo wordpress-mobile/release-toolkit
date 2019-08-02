@@ -1,12 +1,16 @@
 require 'rake'
 
-load 'tasks/compile.rake'
-
 begin
   require 'rubocop/rake_task'
-  RuboCop::RakeTask.new
-  task default: %i[spec rubocop]
+  require 'rake/extensiontask'
+
 rescue LoadError
-  warn 'RuboCop is not available'
-  task default: :spec
+  abort 'Please run this task using `bundle exec rake`'
 end
+
+RuboCop::RakeTask.new
+task default: %i[spec rubocop]
+
+Rake::ExtensionTask.new('drawText')
+
+
