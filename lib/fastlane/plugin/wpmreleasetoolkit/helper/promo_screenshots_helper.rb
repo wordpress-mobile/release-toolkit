@@ -210,6 +210,8 @@ module Fastlane
           stylesheet_path = resolve_path(stylesheet_path)
         end
 
+        alignment = attachment["alignment"] ||= 'center'
+
         draw_text_to_canvas(  canvas,
                               text,
                               width,
@@ -217,7 +219,8 @@ module Fastlane
                               x_position,
                               y_position,
                               font_size,
-                              stylesheet_path
+                              stylesheet_path,
+                              alignment
         )
       end
 
@@ -258,15 +261,16 @@ module Fastlane
           
           tempTextFile = Tempfile.new()
 
-          command = "bundle exec drawText html=\"#{text}\" maxWidth=#{width} maxHeight=#{height} output=#{tempTextFile.path} fontSize=#{font_size} stylesheet=\"#{stylesheet_path}\""
+          command = "bundle exec drawText html=\"#{text}\" maxWidth=#{width} maxHeight=#{height} output=#{tempTextFile.path} fontSize=#{font_size} stylesheet=\"#{stylesheet_path}\" alignment=\"#{position}\""
 
           unless system(command)
             UI.crash!("Unable to draw text")
           end
 
-          text_content = open_image(tempTextFile.path)
+          text_content = open_image(tempTextFile.path).trim
           text_frame = create_image(width, height)
           text_frame = case position
+            when 'left' then composite_image_left(text_frame, text_content, 0, 0)
             when 'center' then composite_image_center(text_frame, text_content, 0, 0)
             when 'top' then composite_image_top(text_frame, text_content, 0, 0)
             end
@@ -347,6 +351,9 @@ module Fastlane
         composite_image(original, child, x_position, y_position, NorthGravity)
       end
 
+      def composite_image_left(original, child, x_position, y_position)
+        composite_image(original, child, x_position, y_position, WestGravity)
+      end
 
       def composite_image_center(original, child, x_position, y_position)
         composite_image(original, child, x_position, y_position, CenterGravity)
