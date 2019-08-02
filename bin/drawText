@@ -5,15 +5,14 @@ require "rake"
 plugin_path = Pathname(__FILE__).dirname.parent
 executable_path = plugin_path + "lib/drawText"
 
-# Compile drawText if it hasn't been
-unless File.exist?(executable_path) then
-	Dir.chdir(plugin_path) do
-    puts Dir.pwd
-    load 'Rakefile'
-    Rake::Task['compile'].invoke
-  end
-end
+# Run the script
+allArgs = ARGV.map { |arg|
 
-# Run the binary
-allArgs = ARGV.join(" ")
-`#{executable_path} #{allArgs}`
+	argParts = arg.split("=")
+	argParts[1] = '"' + argParts[1] + '"'
+
+	argParts.join("=")
+
+}.join(" ")
+
+exec("#{executable_path} #{allArgs}")

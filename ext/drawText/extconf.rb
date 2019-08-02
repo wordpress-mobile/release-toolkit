@@ -1,19 +1,26 @@
 require 'fileutils'
+require 'mkmf'
 
-directory = File.dirname(File.absolute_path(__FILE__))
+drawTextDirectory = File.dirname(File.absolute_path(__FILE__))
+compilationDirectory = Dir.pwd
+libDirectory = File.dirname(File.dirname(drawTextDirectory)) + "/lib"
 
-# Copy the files required for compilation
-files = {
-    "drawText.swift"    => "drawText.swift",
-    "makefile.example"  => "Makefile",
-}
+# Swift is needed to compile the extension
+find_executable('swift')
+find_executable('xcodebuild')
 
-files.each do |source, destination|
+# Copy the makefile required for compilation
+FileUtils.cp(drawTextDirectory + "/makefile.example", compilationDirectory + "/Makefile")
 
-    source = directory + "/" + source
-    destination = Dir.pwd + "/" + destination
+system("xcodebuild -project #{drawTextDirectory}/drawText.xcodeproj/ -scheme drawText -derivedDataPath #{compilationDirectory} -configuration RELEASE")
 
-    unless source == destination then
-        FileUtils.cp(source, destination)
-    end
-end
+compiledPath = compilationDirectory + "/Build/Products/Release/drawText"
+destinationPath = libDirectory + "/drawText"
+
+# Delete and overwrite the binary
+FileUtils.rm_rf(destinationPath)
+FileUtils.cp(compiledPath, destinationPath)
+
+# Delete and overwrite the bundle file
+FileUtils.rm_rf(libDirectory + "/drawText.bundle")
+FileUtils.touch(File.join(compilationDirectory, 'drawText.' + RbConfig::CONFIG['DLEXT']))

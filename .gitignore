@@ -1,7 +1,14 @@
 .DS_Store
 /tmp
-/lib/drawText
 
 # Testing
 /test_results
 /coverage
+
+# DrawText
+/lib/drawText
+/lib/drawText.bundle
+/ext/drawText/drawText.xcodeproj/xcuserdata
+/ext/drawText/drawText.xcodeproj/project.xcworkspace/xcuserdata
+/ext/drawText/test-output
+/default.profraw
