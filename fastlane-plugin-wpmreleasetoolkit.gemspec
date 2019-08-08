@@ -53,4 +53,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('rubocop-require_tools', '~> 0.1.2')
   spec.add_development_dependency('simplecov', '~> 0.16.1')
   spec.add_development_dependency('fastlane', '~> 2')
+  spec.add_development_dependency('rmagick', '~> 2.15')
 end
