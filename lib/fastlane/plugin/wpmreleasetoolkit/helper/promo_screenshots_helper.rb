@@ -21,7 +21,7 @@ module Fastlane
   module Helper
     class PromoScreenshots
 
-      def initialize(configFilePath, imageDirectory, translationDirectory, outputDirectory)
+      def initialize
         if ($skip_magick)
           message = "PromoScreenshots feature is currently disabled.\n"
           message << "Please, install RMagick if you aim to generate the PromoScreenshots.\n"
@@ -29,11 +29,7 @@ module Fastlane
           message << "Aborting."
           UI.user_error!(message)
         end
-
-        @configFilePath = resolve_path(configFilePath)
-        @imageDirectory = resolve_path(imageDirectory)
-        @translationDirectory = resolve_path(translationDirectory)
-        @outputDirectory = resolve_path(outputDirectory)
+      end
 
       def read_json(configFilePath)
         configFilePath = resolve_path(configFilePath)
@@ -296,7 +292,7 @@ module Fastlane
       #
       # @return [Magick::Image] The masked image
       def mask_image(image, mask, offset_x = 0, offset_y = 0)
-          image.composite(mask, offset_x, offset_y, CopyAlphaCompositeOp)
+          image.composite(mask, offset_x, offset_y, CopyOpacityCompositeOp)
       end
 
       # resize_image
