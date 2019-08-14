@@ -1,5 +1,6 @@
 
 require 'json'
+require_relative 'file_reference.rb'
 
 module Fastlane
   class Configuration
@@ -22,12 +23,10 @@ module Fastlane
       File.write(path, JSON.pretty_generate(to_hash))
     end
 
-    def add_file_to_copy(source, destination)
-      file = FileReference.new(file: source, destination: destination)
+    def add_file_to_copy(source, destination, encrypt = false)
+      file = FileReference.new(file: source, destination: destination, encrypt: encrypt)
       self.files_to_copy << file
     end
-
-    private
 
     def to_hash
       {
@@ -37,19 +36,6 @@ module Fastlane
         files_to_copy: self.files_to_copy.map { |f| f.to_hash },
         file_dependencies: self.file_dependencies
       }
-    end
-
-    class FileReference
-      attr_accessor :file, :destination
-
-      def initialize(params = {})
-        self.file = params[:file] || ""
-        self.destination = params[:destination] || ""
-      end
-
-      def to_hash
-        { file: self.file, destination: self.destination }
-      end
     end
   end
 end

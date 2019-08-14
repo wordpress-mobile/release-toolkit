@@ -243,13 +243,17 @@ module Fastlane
         end
 
         new_config = self.configuration
-        new_config.add_file_to_copy(params[:source], params[:destination])
+        new_config.add_file_to_copy(params[:source], params[:destination], params[:encrypt])
         update_configuration(new_config)
       end
 
       ## Turns a relative mobile secrets path into an absolute path
       def self.mobile_secrets_path(path)
         "#{repository_path}/#{path}"
+      end
+
+      def self.encryption_key
+        ENV['CONFIGURE_ENCRYPTION_KEY']
       end
     end
   end
