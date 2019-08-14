@@ -22,9 +22,8 @@ module Fastlane
 
         ### Copy the files
         files_to_copy.each { |x|
-
-            source = absolute_secret_store_path(x["file"])
-            destination = absolute_project_path(x["destination"])
+            source = absolute_secret_store_path(x.file)
+            destination = absolute_project_path(x.destination)
 
             if(params[:force])
                 copy(source, destination)
