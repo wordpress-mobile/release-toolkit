@@ -23,6 +23,10 @@ module Fastlane
 
         if configure_file_is_behind_repo
           prompt_to_update_configure_file_to_most_recent_hash
+        else
+          # Update configure file even if already update to date
+          # This ensures the file format is up to date
+          update_configure_file
         end
 
         UI.success "Configuration Secrets are up to date – don't forget to commit your changes to `.configure`."
