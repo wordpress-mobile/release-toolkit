@@ -252,8 +252,40 @@ module Fastlane
         "#{repository_path}/#{path}"
       end
 
+      ## Contents of ~/.mobile-secrets/keys.json as a hash
+      def self.mobile_secrets_keys_json
+        return {} unless File.file?(Fastlane::Helper::FilesystemHelper.secret_store_keys_path)
+        JSON.parse(File.read(Fastlane::Helper::FilesystemHelper.secret_store_keys_path))
+      end
+
+      ## Gets the key to be used for encrypting/decrypting files for the project
+      ## Uses the project encryption key or the CONFIGURE_ENCRYPTION_KEY env variable, if present
       def self.encryption_key
-        ENV['CONFIGURE_ENCRYPTION_KEY']
+        return Base64.decode64(ENV['CONFIGURE_ENCRYPTION_KEY']) if ENV.key?('CONFIGURE_ENCRYPTION_KEY')
+        project_encryption_key
+      end
+
+      ## Gets the project encryption key defined in ~/.mobile-secrets/keys.json
+      def self.project_encryption_key
+        keys_json = mobile_secrets_keys_json
+        return nil unless keys_json.key?(configuration.project_name)
+        base64_key = keys_json[configuration.project_name]
+        Base64.decode64(base64_key)
+      end
+
+      ## Updates the project encryption key defined in ~/.mobile-secrets/keys.json
+      ## The updated file is commited and push to the repo
+      def self.update_project_encryption_key
+        # Update keys.json with the new key
+        keys_json = mobile_secrets_keys_json
+        keys_json[configuration.project_name] = Base64.encode64(Fastlane::Helper::EncryptionHelper.generate_key)
+        File.write(Fastlane::Helper::FilesystemHelper.secret_store_keys_path, JSON.pretty_generate(keys_json))
+
+        # Commit and push the result to the repo
+        `cd #{repository_path} && git add keys.json && git commit -m "Update keys.json for #{configuration.project_name}" && git push origin #{repo_branch_name}`
+
+        # Check command success
+        UI.user_error!("Failed to update encryption key for #{configuration.project_name}") unless $?.success?
       end
     end
   end
