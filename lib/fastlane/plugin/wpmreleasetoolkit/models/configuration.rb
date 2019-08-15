@@ -3,9 +3,10 @@ require 'json'
 
 module Fastlane
   class Configuration
-    attr_accessor :branch, :pinned_hash, :files_to_copy, :file_dependencies
+    attr_accessor :project_name, :branch, :pinned_hash, :files_to_copy, :file_dependencies
 
     def initialize(params = {})
+      self.project_name = params[:project_name] || Fastlane::Helper::FilesystemHelper.project_path.basename.to_s
       self.branch = params[:branch] || ""
       self.pinned_hash = params[:pinned_hash] || ""
       self.files_to_copy = (params[:files_to_copy] || []).map { |f| FileReference.new(f) }
@@ -30,6 +31,7 @@ module Fastlane
 
     def to_hash
       {
+        project_name: self.project_name,
         branch: self.branch,
         pinned_hash: self.pinned_hash,
         files_to_copy: self.files_to_copy.map { |f| f.to_hash },
