@@ -19,7 +19,7 @@ describe Fastlane::Configuration do
         project_name: "MyProject",
         branch: "a_branch",
         pinned_hash: 'a_hash',
-        files_to_copy: [ { file: 'a_file_to_copy', destination: 'a_destination' } ],
+        files_to_copy: [ { file: 'a_file_to_copy', destination: 'a_destination', encrypt: true } ],
         file_dependencies: [ 'a_file_dependencies' ],
       }
     end
@@ -40,6 +40,7 @@ describe Fastlane::Configuration do
       expect(subject.files_to_copy.length).to eq(1)
       expect(subject.files_to_copy.first.file).to eq(configure_json[:files_to_copy][0][:file])
       expect(subject.files_to_copy.first.destination).to eq(configure_json[:files_to_copy][0][:destination])
+      expect(subject.files_to_copy.first.encrypt).to eq(configure_json[:files_to_copy][0][:encrypt])
     end
 
     it 'write the configuration to disk as JSON' do

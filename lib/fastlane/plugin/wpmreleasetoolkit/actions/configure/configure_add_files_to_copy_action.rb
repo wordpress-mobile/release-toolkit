@@ -26,6 +26,10 @@ module Fastlane
           else
             continue = false
           end
+
+          Fastlane::Helper::ConfigureHelper.files_to_copy.each do |file_reference|
+            file_reference.update
+          end
         end
       end
 
@@ -55,7 +59,9 @@ module Fastlane
 
         destination = UI.input("Destination File Path:") # Leave the destination as a relative path, as no validation is required.
 
-        Fastlane::Helper::ConfigureHelper.add_file(source: source, destination: destination)
+        encrypt = UI.confirm("Encrypt file?:")
+
+        Fastlane::Helper::ConfigureHelper.add_file(source: source, destination: destination, encrypt: encrypt)
       end
 
       def self.secret_store_dir
