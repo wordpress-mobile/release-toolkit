@@ -12,7 +12,7 @@ gem 'fastlane-plugin-wpmreleasetoolkit', git: 'https://github.com/wordpress-mobi
 ## Usage
 
 You can use the actions in the library as common Fastlane actions. 
-Details about each action can be found [here](https://github.com/wordpress-mobile/release-toolkit/tree/develop/lib/fastlane/plugin/wpmreleasetoolkit/actions/README.md).
+More details about the actions can be found [here](lib/fastlane/plugin/wpmreleasetoolkit/actions/).
 
 ## Contributing
 
