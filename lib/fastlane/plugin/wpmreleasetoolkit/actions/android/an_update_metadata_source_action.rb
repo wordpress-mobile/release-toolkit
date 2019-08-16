@@ -1,9 +1,9 @@
 require 'fastlane/action'
-require_relative '../helper/metadata_update_helper.rb'
+require_relative '../../helper/an_metadata_update_helper.rb'
 
 module Fastlane
   module Actions
-    class GpUpdateMetadataSourceAction < Action
+    class AnUpdateMetadataSourceAction < Action
       def self.run(params)
         # fastlane will take care of reading in the parameter and fetching the environment variable:
         UI.message "Parameter .po file path: #{params[:po_file_path]}"
@@ -77,8 +77,6 @@ module Fastlane
         block_files.each do | key, file_path |
           if (key == :release_note) 
             @blocks.push (Fastlane::Helper::ReleaseNoteMetadataBlock.new(key, file_path, release_version))
-          elsif (key == :whats_new) 
-            @blocks.push (Fastlane::Helper::WhatsNewMetadataBlock.new(key, file_path, release_version))
           else
             @blocks.push (Fastlane::Helper::StandardMetadataBlock.new(key, file_path))
           end
@@ -168,7 +166,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-         [:ios, :android].include?(platform)
+        [:android].include?(platform)
       end
     end
   end

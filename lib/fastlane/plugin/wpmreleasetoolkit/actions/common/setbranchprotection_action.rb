@@ -1,5 +1,5 @@
 require 'fastlane/action'
-require_relative '../helper/ghhelper_helper'
+require_relative '../../helper/ghhelper_helper'
 
 module Fastlane
   module Actions
