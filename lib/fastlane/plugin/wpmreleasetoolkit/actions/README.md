@@ -9,7 +9,7 @@ Actions in this folder automate some tasks of the WordPress for Android release 
 ### Common
 
 Actions in this folder automate tasks that are common to both the iOS and Android release processes.
-These actions are cross-platforms and usually related to interating with GitHub, GlotPress and other services.  
+These actions are cross-platforms and usually related to integrating with GitHub, GlotPress and other services.  
 
 ### Configure
 
