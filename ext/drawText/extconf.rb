@@ -1,5 +1,11 @@
 require 'fileutils'
 require 'mkmf'
+require 'os'
+
+# Only compile drawText on macOS
+unless OS.mac? then
+    exit 0
+end
 
 drawTextDirectory = File.dirname(File.absolute_path(__FILE__))
 compilationDirectory = Dir.pwd
