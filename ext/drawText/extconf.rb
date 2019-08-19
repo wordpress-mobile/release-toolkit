@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'mkmf'
+require 'os'
 
 drawTextDirectory = File.dirname(File.absolute_path(__FILE__))
 compilationDirectory = Dir.pwd
@@ -9,18 +10,21 @@ libDirectory = File.dirname(File.dirname(drawTextDirectory)) + "/lib"
 find_executable('swift')
 find_executable('xcodebuild')
 
-# Copy the makefile required for compilation
-FileUtils.cp(drawTextDirectory + "/makefile.example", compilationDirectory + "/Makefile")
+if OS.mac? then
 
-system("xcodebuild -project #{drawTextDirectory}/drawText.xcodeproj/ -scheme drawText -derivedDataPath #{compilationDirectory} -configuration RELEASE")
+    # Copy the makefile required for compilation
+    FileUtils.cp(drawTextDirectory + "/makefile.example", compilationDirectory + "/Makefile")
 
-compiledPath = compilationDirectory + "/Build/Products/Release/drawText"
-destinationPath = libDirectory + "/drawText"
+    system("xcodebuild -project #{drawTextDirectory}/drawText.xcodeproj/ -scheme drawText -derivedDataPath #{compilationDirectory} -configuration RELEASE")
 
-# Delete and overwrite the binary
-FileUtils.rm_rf(destinationPath)
-FileUtils.cp(compiledPath, destinationPath)
+    compiledPath = compilationDirectory + "/Build/Products/Release/drawText"
+    destinationPath = libDirectory + "/drawText"
 
-# Delete and overwrite the bundle file
-FileUtils.rm_rf(libDirectory + "/drawText.bundle")
-FileUtils.touch(File.join(compilationDirectory, 'drawText.' + RbConfig::CONFIG['DLEXT']))
+    # Delete and overwrite the binary
+    FileUtils.rm_rf(destinationPath)
+    FileUtils.cp(compiledPath, destinationPath)
+
+    # Delete and overwrite the bundle file
+    FileUtils.rm_rf(libDirectory + "/drawText.bundle")
+    FileUtils.touch(File.join(compilationDirectory, 'drawText.' + RbConfig::CONFIG['DLEXT']))
+end
