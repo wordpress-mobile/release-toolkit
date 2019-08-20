@@ -38,6 +38,15 @@ module Fastlane
             Pathname.new(project_path) + ".configure"
         end
 
+        ### Returns the path to the project's `.configure-files` directory.
+        def self.configure_files_dir
+            Pathname.new(project_path) + ".configure-files"
+        end
+
+        def self.encrypted_file_path(file)
+            File.join(configure_files_dir, "#{File.basename(file)}.enc")
+        end
+
         ### Returns the path to the `~/.mobile-secrets` directory.
         def self.secret_store_dir
             return "#{Dir.home}/.mobile-secrets"
@@ -46,6 +55,11 @@ module Fastlane
         ### Transforms a relative path within the secret store to an absolute path on disk.
         def self.absolute_secret_store_path(relative_path)
             File.join(secret_store_dir, relative_path)
+        end
+
+        ### Path to keys.json in the secrets repository
+        def self.secret_store_keys_path
+            File.join(secret_store_dir, 'keys.json')
         end
 
         ### Transforms a relative path within the project to an absolute path on disk.

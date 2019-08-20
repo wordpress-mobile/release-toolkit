@@ -1,6 +1,7 @@
 require 'fastlane_core/ui/ui'
 require 'fileutils'
-require 'json'
+
+require_relative '../models/configuration'
 
 module Fastlane
   UI = FastlaneCore::UI unless Fastlane.const_defined?("UI")
@@ -9,21 +10,13 @@ module Fastlane
     class ConfigureHelper
 
       ### Returns the contents of the project's `.configure` file.
-      ### If the file doesn't exist, it'll return an empty sample hash
+      ### If the file doesn't exist, it'll return an empty Configuration
       ### that can later be saved to `.configure`.
       def self.configuration
-
         if self.configuration_path_exists
-          file = File.read(FilesystemHelper::configure_file)
-          return data_hash = JSON.parse(file)
+          Configuration.from_file(FilesystemHelper::configure_file)
         else
-          configuration = Hash.new
-          configuration["branch"] = ""
-          configuration["pinned_hash"] = ""
-          configuration["files_to_copy"] = []
-          configuration["file_dependencies"] = []
-
-          return configuration
+          Configuration.new
         end
       end
 
@@ -32,20 +25,9 @@ module Fastlane
         File.file?(FilesystemHelper::configure_file)
       end
 
-      ### A global helper to save the current configure hash to `.configure`.
-      def self.update_configuration(hash)
-
-        if hash["files_to_copy"] == nil
-            hash["files_to_copy"] = []
-        end
-
-        if hash["file_dependencies"] == nil
-            hash["file_dependencies"] = []
-        end
-
-        File.open(FilesystemHelper::configure_file, 'w') { |file|
-            file.write(JSON.pretty_generate(hash))
-        }
+      ### A global helper to save the current configuration to `.configure`.
+      def self.update_configuration(config)
+        config.save_to_file(FilesystemHelper::configure_file)
       end
 
       ###
@@ -61,25 +43,25 @@ module Fastlane
 
       ### Returns the `branch` field of the project's `.configure` file.
       def self.configure_file_branch_name
-        configuration["branch"]
+        configuration.branch
       end
 
       ### Writes the provided new branch name to the `branch` field of the project's `.configure` file.
       def self.update_configure_file_branch_name(new_branch_name)
         new_configuration = configuration
-        new_configuration["branch"] = new_branch_name
+        new_configuration.branch = new_branch_name
         update_configuration(new_configuration)
       end
 
       ### Returns the `pinned_hash` field of the project's `.configure` file.
       def self.configure_file_commit_hash
-        configuration["pinned_hash"].to_s
+        configuration.pinned_hash
       end
 
       ### Writes the provided new commit hash to the `pinned_hash` field of the project's `.configure` file.
       def self.update_configure_file_commit_hash(new_hash)
         new_configuration = configuration
-        new_configuration["pinned_hash"] = new_hash
+        new_configuration.pinned_hash = new_hash
         update_configuration(new_configuration)
       end
 
@@ -200,12 +182,12 @@ module Fastlane
 
       ### Returns the list of files to copy from `.configure`.
       def self.files_to_copy
-        self.configuration["files_to_copy"]
+        self.configuration.files_to_copy
       end
 
       ### Returns the list of files that this project uses from `.configure`.
       def self.file_dependencies
-        file_dependencies = self.configuration["file_dependencies"]
+        file_dependencies = self.configuration.file_dependencies
         file_dependencies ||= []
 
         # Allows support for specifying directories – they'll be expanded recursively
@@ -222,13 +204,13 @@ module Fastlane
             end
         }
 
-        self.files_to_copy.map { |o| o["file"] } + expanded_file_dependencies
+        self.files_to_copy.map { |o| o.file } + expanded_file_dependencies
       end
 
       ## If we specify a directory in `file_dependencies` instead of listing each file
       ## individually, there may be new files that we don't know about. This method finds those.
       def self.new_files_in(files)
-        file_dependencies = self.configuration["file_dependencies"]
+        file_dependencies = self.configuration.file_dependencies
         file_dependencies ||= []
 
         directory_dependencies = file_dependencies.select { |path|
@@ -260,19 +242,50 @@ module Fastlane
             UI.user_error!("You must pass a `destination` to `add_file`")
         end
 
-        new_file = {
-            file: params[:source],
-            destination: params[:destination],
-        }
-
-        data_hash = self.configuration
-        data_hash["files_to_copy"].push(new_file)
-        update_configuration(data_hash)
+        new_config = self.configuration
+        new_config.add_file_to_copy(params[:source], params[:destination], params[:encrypt])
+        update_configuration(new_config)
       end
 
       ## Turns a relative mobile secrets path into an absolute path
       def self.mobile_secrets_path(path)
         "#{repository_path}/#{path}"
+      end
+
+      ## Contents of ~/.mobile-secrets/keys.json as a hash
+      def self.mobile_secrets_keys_json
+        return {} unless File.file?(Fastlane::Helper::FilesystemHelper.secret_store_keys_path)
+        JSON.parse(File.read(Fastlane::Helper::FilesystemHelper.secret_store_keys_path))
+      end
+
+      ## Gets the key to be used for encrypting/decrypting files for the project
+      ## Uses the project encryption key or the CONFIGURE_ENCRYPTION_KEY env variable, if present
+      def self.encryption_key
+        return Base64.decode64(ENV['CONFIGURE_ENCRYPTION_KEY']) if ENV.key?('CONFIGURE_ENCRYPTION_KEY')
+        project_encryption_key
+      end
+
+      ## Gets the project encryption key defined in ~/.mobile-secrets/keys.json
+      def self.project_encryption_key
+        keys_json = mobile_secrets_keys_json
+        return nil unless keys_json.key?(configuration.project_name)
+        base64_key = keys_json[configuration.project_name]
+        Base64.decode64(base64_key)
+      end
+
+      ## Updates the project encryption key defined in ~/.mobile-secrets/keys.json
+      ## The updated file is commited and push to the repo
+      def self.update_project_encryption_key
+        # Update keys.json with the new key
+        keys_json = mobile_secrets_keys_json
+        keys_json[configuration.project_name] = Base64.encode64(Fastlane::Helper::EncryptionHelper.generate_key)
+        File.write(Fastlane::Helper::FilesystemHelper.secret_store_keys_path, JSON.pretty_generate(keys_json))
+
+        # Commit and push the result to the repo
+        `cd #{repository_path} && git add keys.json && git commit -m "Update keys.json for #{configuration.project_name}" && git push origin #{repo_branch_name}`
+
+        # Check command success
+        UI.user_error!("Failed to update encryption key for #{configuration.project_name}") unless $?.success?
       end
     end
   end

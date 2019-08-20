@@ -23,6 +23,25 @@ module Fastlane
 
         if configure_file_is_behind_repo
           prompt_to_update_configure_file_to_most_recent_hash
+        else
+          # Update configure file even if already update to date
+          # This ensures the file format is up to date
+          update_configure_file
+        end
+
+        # If there is no encryption key for the project, generate one
+        if Fastlane::Helper::ConfigureHelper.project_encryption_key.nil?
+          # If the user chose not to update the repo but there is no encryption key, throw an error
+          if repo_is_behind_remote
+            UI.user_error!("The local secrets behind the remote but it is missing a keys.json entry for this project. Please update it to the latest commit.")
+          end
+          Fastlane::Helper::ConfigureHelper.update_project_encryption_key
+          # Update the configure file to the new hash
+          update_configure_file
+        end
+
+        Fastlane::Helper::ConfigureHelper.files_to_copy.each do |file_reference|
+          file_reference.update
         end
 
         UI.success "Configuration Secrets are up to date – don't forget to commit your changes to `.configure`."

@@ -1,5 +1,5 @@
 require 'fastlane/action'
-require_relative '../helper/promo_screenshots_helper.rb'
+require_relative '../../helper/promo_screenshots_helper.rb'
 
 module Fastlane
   module Actions
