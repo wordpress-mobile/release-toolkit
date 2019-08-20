@@ -39,7 +39,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('parallel', '~> 1.14')
 
   spec.add_development_dependency('pry', '~> 0.12.2')
-  spec.add_development_dependency('bundler', '~> 1.17')
+  spec.add_development_dependency('bundler', '>= 1.17')
   spec.add_development_dependency('rspec', '~> 3.8')
   spec.add_development_dependency('rspec_junit_formatter', '~> 0.4.1')
   spec.add_development_dependency('rubocop', '0.49.1')
