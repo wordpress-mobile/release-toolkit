@@ -23,6 +23,14 @@ module Fastlane
           return
         end
 
+        # The mobile secrets repo must be up to date in order to generate and save the encryption key
+        if Fastlane::Helper::ConfigureHelper.repo_is_behind_remote
+          prompt_to_update_to_most_recent_version
+        end
+
+        # Generate an encryption key for the new project, if needed
+        Fastlane::Helper::ConfigureHelper.update_project_encryption_key if Fastlane::Helper::ConfigureHelper.project_encryption_key.nil?
+
         # Write out the `.configure` file.
         Fastlane::Helper::ConfigureHelper.update_configure_file_from_repository
 
@@ -33,6 +41,19 @@ module Fastlane
         ConfigureApplyAction::run
 
         UI.success "Created .configure file"
+      end
+
+      def self.prompt_to_update_to_most_recent_version
+        if UI.confirm("The current branch is #{Fastlane::Helper::ConfigureHelper.repo_commits_behind_remote} commit(s) behind. It must be updated to complete the setup. Would you like to continue?")
+          update_branch
+        else
+          UI.user_error!("Cannot complete setup when the repo is not up to date.")
+        end
+      end
+
+      ### Ensure that the local secrets respository is up to date
+      def self.update_branch
+        sh("cd '#{Fastlane::Helper::FilesystemHelper.secret_store_dir}' && git pull")
       end
 
       def self.configuration_file_exists

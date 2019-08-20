@@ -26,4 +26,11 @@ describe Fastlane::Helper::EncryptionHelper do
 
     expect(Fastlane::Helper::EncryptionHelper.decrypt('encrypted', 'key')).to eq('plain text!')
   end
+
+  it 'generates a random key' do
+    expect(cipher).to receive(:encrypt)
+    expect(cipher).to receive(:random_key).and_return('random key')
+
+    expect(Fastlane::Helper::EncryptionHelper.generate_key).to eq('random key')
+  end
 end

@@ -57,6 +57,11 @@ module Fastlane
             File.join(secret_store_dir, relative_path)
         end
 
+        ### Path to keys.json in the secrets repository
+        def self.secret_store_keys_path
+            File.join(secret_store_dir, 'keys.json')
+        end
+
         ### Transforms a relative path within the project to an absolute path on disk.
         def self.absolute_project_path(relative_path)
             File.join(project_path, relative_path)
