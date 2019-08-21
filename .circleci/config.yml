@@ -34,6 +34,10 @@ jobs:
       - bundle-install/bundle-install:
           cache_key_prefix: v1-bundler
 
+      - run: 
+          name: Install Screenshot Gems
+          command: bundle check --path vendor/bundle || bundle install --with screenshots
+
       - run: # Compile drawText
           name: Compile drawText
           command: bundle exec rake compile
