@@ -10,50 +10,32 @@ jobs:
     executor:
       name: ios/default
       xcode-version: "10.2.1"
+    environment:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      PKG_CONFIG_PATH: "/usr/local/opt/imagemagick@6/lib/pkgconfig"
     steps:
       - checkout
+
+      - restore_cache:
+          name: Restore Homebrew Dependencies
+          keys:
+            - brew-dependencies-{{ checksum ".circleci/.brewfile" }}
+
+      - run:
+          name: Install Homebrew dependencies, if neeeded
+          command: xargs brew install --verbose < .circleci/.brewfile
+
+      - save_cache:
+          name: Cache Homebrew Dependencies
+          key: brew-dependencies-{{ checksum ".circleci/.brewfile" }}
+          paths:
+            - /usr/local/Cellar
+
       - bundle-install/bundle-install:
           cache_key_prefix: v1-bundler
-      - run:
-          name: Run Tests
-          command: bundle exec rspec
-
-workflows:
-  test:
-    jobs:
-      - test
-    steps: # a collection of executable commands
-      - checkout # special step to check out source code to working directory
-
-      # Which version of bundler?
-      - run:
-          name: Which bundler?
-          command: bundle -v
-
-      # Ensure dependencies are present
-      - run:
-          name: Install Gem dependencies
-          command: brew install pkg-config libxml2 imagemagick@6
-
-      # Restore bundle cache
-      # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-      - restore_cache:
-          keys:
-            - gem-cache-bundle-v3-{{ checksum "Gemfile.lock" }}
-            - gem-cache-bundle-v3-
-
-      - run: # Install Ruby dependencies
-          name: Bundle Install
-          command: bundle check --path vendor/bundle || bundle install --deployment
-
-      # Store bundle cache for Ruby dependencies
-      - save_cache:
-          key: gem-cache-bundle-v3-{{ checksum "Gemfile.lock" }}
-          paths:
-            - vendor/bundle
 
       - run: # Compile drawText
-          name: Compile Native Dependencies
+          name: Compile drawText
           command: bundle exec rake compile
 
       - run:
@@ -71,3 +53,8 @@ workflows:
       
       # Coverage reports are sent to Codecov as part of running `rspec`, not as a CircleCI step.
       # We may wish to change this for consistency.
+
+workflows:
+  test:
+    jobs:
+      - test
