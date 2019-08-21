@@ -29,7 +29,7 @@ module Fastlane
         end
 
         next_beta_version = Fastlane::Helpers::AndroidVersionHelper::calc_next_beta_version(release_version, alpha_release_version)
-        next_alpha_version = Fastlane::Helpers::AndroidVersionHelper::calc_next_alpha_version(release_version, alpha_release_version) unless alpha_release_version.nil?
+        next_alpha_version = Fastlane::Helpers::AndroidVersionHelper::calc_next_alpha_version(next_beta_version, alpha_release_version) unless alpha_release_version.nil?
 
         # Verify
         message << "Updating branch to version: #{next_beta_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_NAME]}(#{next_beta_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_CODE]}) "
