@@ -18,6 +18,9 @@ module Fastlane
       end
 
       def self.encrypt(plain_text, key)
+        # Ensure consistent encoding
+        plain_text.force_encoding(Encoding::UTF_8)
+
         cipher = cipher(OperationType::ENCRYPT)
         cipher.key = key
 
@@ -33,6 +36,9 @@ module Fastlane
 
         decrypted = cipher.update(encrypted)
         decrypted << cipher.final
+
+        # Ensure consistent encoding
+        decrypted.force_encoding(Encoding::UTF_8)
 
         decrypted
       end
