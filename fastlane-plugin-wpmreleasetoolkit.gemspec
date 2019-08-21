@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
 
   # spec.add_dependency 'your-dependency', '~> 1.0.0'
   spec.add_dependency 'diffy', '~> 3.3'
-  spec.add_dependency 'nokogiri', '1.10.1'
+  spec.add_dependency 'nokogiri', '>= 1.10.4'
   spec.add_dependency 'octokit', '~> 4.13'
   spec.add_dependency 'git', '~> 1.3'
   spec.add_dependency 'jsonlint'
