@@ -2,21 +2,22 @@ require 'fileutils'
 require 'mkmf'
 require 'os'
 
+drawTextDirectory = File.dirname(File.absolute_path(__FILE__))
+compilationDirectory = Dir.pwd
+libDirectory = File.dirname(File.dirname(drawTextDirectory)) + "/lib"
+
+# Copy the makefile required for compilation
+FileUtils.cp(drawTextDirectory + "/makefile.example", compilationDirectory + "/Makefile")
+
 # Only compile drawText on macOS
 unless OS.mac? then
     exit 0
 end
 
-drawTextDirectory = File.dirname(File.absolute_path(__FILE__))
-compilationDirectory = Dir.pwd
-libDirectory = File.dirname(File.dirname(drawTextDirectory)) + "/lib"
-
 # Swift is needed to compile the extension
 find_executable('swift')
 find_executable('xcodebuild')
 
-# Copy the makefile required for compilation
-FileUtils.cp(drawTextDirectory + "/makefile.example", compilationDirectory + "/Makefile")
 
 system("xcodebuild -project #{drawTextDirectory}/drawText.xcodeproj/ -scheme drawText -derivedDataPath #{compilationDirectory} -configuration RELEASE")
 
