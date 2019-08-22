@@ -2,7 +2,6 @@ version: 2.1
 
 orbs:
   ios: wordpress-mobile/ios@0.0.29
-  bundle-install: toshimaru/bundle-install@0.3.1
   codecov: codecov/codecov@1.0.2
 
 jobs:
@@ -17,27 +16,25 @@ jobs:
       - checkout
 
       - restore_cache:
-          name: Restore Homebrew Dependencies
+          name: Restore Homebrew + Ruby Dependencies
           keys:
-            - brew-dependencies-{{ checksum ".circleci/.brewfile" }}
+            - brew-dependencies-{{ checksum ".circleci/.brewfile" }}-{{ checksum "Gemfile.lock" }}
 
       - run:
           name: Install Homebrew dependencies, if neeeded
           command: xargs brew install --verbose < .circleci/.brewfile
 
-      - save_cache:
-          name: Cache Homebrew Dependencies
-          key: brew-dependencies-{{ checksum ".circleci/.brewfile" }}
-          paths:
-            - /usr/local/Cellar
-
-      - bundle-install/bundle-install:
-          cache_key_prefix: v1-bundler
-
-      - run: 
-          name: Install Screenshot Gems
+      - run:
+          name: Install Ruby dependencies, if neeeded
           command: bundle check --path vendor/bundle || bundle install --with screenshots
 
+      - save_cache:
+          name: Cache Homebrew + Ruby Dependencies
+          key: brew-dependencies-{{ checksum ".circleci/.brewfile" }}
+          paths:
+            - vendor/
+            - /usr/local/Cellar
+            
       - run: # Compile drawText
           name: Compile drawText
           command: bundle exec rake compile
