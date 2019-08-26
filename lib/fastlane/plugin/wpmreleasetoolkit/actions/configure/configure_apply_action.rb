@@ -21,7 +21,7 @@ module Fastlane
       end
 
       def self.prepare_repository
-        secrets_respository_exists = File.file?(repository_path)
+        secrets_respository_exists = File.exists?(repository_path)
         if secrets_respository_exists
           ### Make sure secrets repo is at the proper hash as specified in .configure.
           repo_hash = Fastlane::Helper::ConfigureHelper.repo_commit_hash
