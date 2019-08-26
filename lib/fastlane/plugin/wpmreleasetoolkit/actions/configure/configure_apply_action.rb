@@ -22,27 +22,32 @@ module Fastlane
 
       def self.prepare_repository
         secrets_respository_exists = File.exists?(repository_path)
-        if secrets_respository_exists
-          ### Make sure secrets repo is at the proper hash as specified in .configure.
-          repo_hash = Fastlane::Helper::ConfigureHelper.repo_commit_hash
-          file_hash = Fastlane::Helper::ConfigureHelper.configure_file_commit_hash
 
-          unless repo_hash == file_hash
-            sh("cd #{repository_path} && git fetch && git checkout #{file_hash}")
-          end
+        # If the secrets repo doesn't exist, just run the block
+        unless secrets_respository_exists
+          # Run the provided block, and return
+          yield
+          return
+        end
+
+        ### Make sure secrets repo is at the proper hash as specified in .configure.
+        repo_hash = Fastlane::Helper::ConfigureHelper.repo_commit_hash
+        file_hash = Fastlane::Helper::ConfigureHelper.configure_file_commit_hash
+
+        ### Get the ref to restore the repo to
+        original_repo_ref = Fastlane::Helper::ConfigureHelper.repo_branch_name
+        original_repo_ref = repo_hash if original_repo_ref.nil?
+
+        unless repo_hash == file_hash
+          sh("cd #{repository_path} && git fetch && git checkout #{file_hash}")
         end
 
         # Run the provided block
         yield
-
-        if secrets_respository_exists
-          ### Restore secrets repo to original branch.  If it was originally in a 
-          ### detached HEAD state, we need to use the hash since there's no branch name.
-          original_repo_branch = Fastlane::Helper::ConfigureHelper.repo_branch_name
-          original_repo_branch = Fastlane::Helper::ConfigureHelper.repo_commit_hash if (original_repo_branch == nil)
-
-          sh("cd #{repository_path} && git checkout #{original_repo_branch}")
-        end
+      
+        ### Restore secrets repo to original branch.  If it was originally in a 
+        ### detached HEAD state, we need to use the hash since there's no branch name.
+        sh("cd #{repository_path} && git checkout #{original_repo_ref}")
       end
 
       ### Check with the user whether we should overwrite the file, if it exists
