@@ -160,6 +160,8 @@ module Fastlane
           return res
         end
 
+        # FIXME: This implementation is very fragile. This should be done parsing the file in a proper way. 
+        # Leveraging gradle itself is probably the easiest way.
         def self.get_data_from_file(file_path, section, keyword)
           found_section = false
           File.open(file_path, 'r') do |file|
@@ -170,7 +172,7 @@ module Fastlane
                 end
               else
                 if (line.include? keyword)
-                  return line
+                  return line unless line.include?("\"#{keyword}\"") or line.include?("P#{keyword}")
                 end
               end
             end
@@ -198,6 +200,8 @@ module Fastlane
           "#{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/build.gradle"
         end
 
+        # FIXME: This implementation is very fragile. This should be done parsing the file in a proper way. 
+        # Leveraging gradle itself is probably the easiest way.
         def self.update_version(version, section)
           gradle_path = self.gradle_path
           temp_file = Tempfile.new('fastlaneIncrementVersion')
@@ -212,7 +216,7 @@ module Fastlane
                 end
               else
                 if (version_updated < 2)
-                  if (line.include? "versionName")
+                  if (line.include? "versionName") and (!line.include? "\"versionName\"") and (!line.include?"PversionName")
                     version_name = line.split(' ')[1].tr('\"', '')
                     line.replace line.sub(version_name, version[VERSION_NAME].to_s)
                     version_updated = version_updated + 1
