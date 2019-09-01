@@ -178,9 +178,23 @@ module Fastlane
         fw.puts("msgid \"\"")
 
         # insert content
+        is_reading = false
         File.open(@content_file_path, "r").each do | line |
-          fw.puts("\"#{line.strip}\\n\"")
-        end
+          
+          if is_reading
+            fw.puts("\"#{line.strip}\\n\"")
+          end
+
+          ## Don't start reading the file until after the version number header
+          if line === "-----\n"
+            is_reading = true
+          end
+          
+          ## Stop reading the file after the first empty line
+          if line.strip.empty?
+            break
+          end
+      end
 
         # close
         fw.puts("msgstr \"\"")
