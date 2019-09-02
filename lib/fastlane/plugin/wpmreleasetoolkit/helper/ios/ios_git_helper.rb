@@ -74,10 +74,11 @@ module Fastlane
         end
   
         def self.update_release_notes(new_version)
-          Action.sh("cp #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/Resources/release_notes.txt ")
+          Action.sh("cp #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.bak")
           Action.sh("echo \"#{new_version}\n-----\n \" > #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
-          Action.sh("cat #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/Resources/release_notes.txt >> #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
-          Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/Resources/release_notes.txt")
+          Action.sh("cat #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.bak >> #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
+          Action.sh("rm #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.bak")
+          Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
           Action.sh("git commit -m \"Update release notes.\"")
           Action.sh("git push")
         end
