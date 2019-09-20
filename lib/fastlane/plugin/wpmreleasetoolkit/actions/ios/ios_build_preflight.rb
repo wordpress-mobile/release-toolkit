@@ -6,7 +6,7 @@ module Fastlane
         # Validate mobile configuration secrets
         other_action.configure_apply
 
-        Action.sh("cd .. && rm -rf ~/Library/Developer/Xcode/DerivedData")
+        Action.sh("cd .. && rm -rf #{params[:derived_data_path]}")
 
         # Verify that ImageMagick exists on this machine and can be called from the command-line.
         # Internal Builds use it to generate the App Icon as part of the build process
@@ -51,7 +51,13 @@ module Fastlane
       end
 
       def self.available_options
-        
+        [
+          FastlaneCore::ConfigItem.new(key: :derived_data_path,
+          description: "The path to the DerivedData directory for the project. Should match what's used in the `gym` action",
+          is_string: true, 
+          default_value: "~/Library/Developer/Xcode/DerivedData"
+          )
+        ]
       end
 
       def self.output
