@@ -80,6 +80,10 @@ module Fastlane
               end
 
               # Map attachments paths to their localized versions
+              if newEntry["attachments"] == nil
+                  newEntry["attachments"] = []
+              end
+
               newEntry["attachments"].each { |attachment|
                 if attachment["file"] != nil
                   attachment["file"].sub!("{locale}", language.dup)
