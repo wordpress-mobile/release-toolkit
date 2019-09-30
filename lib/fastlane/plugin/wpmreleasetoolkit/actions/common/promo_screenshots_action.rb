@@ -1,3 +1,4 @@
+require 'fileutils'
 require 'fastlane/action'
 require 'active_support/all'
 require_relative '../../helper/promo_screenshots_helper.rb'
@@ -7,42 +8,30 @@ module Fastlane
     class PromoScreenshotsAction < Action
       def self.run(params)
         UI.message "Creating Promo Screenshots"
-        UI.message "Original Screenshot Source: #{params[:orig_folder]}"
-        UI.message "Translation source: #{params[:metadata_folder]}"
-        UI.message "Output Folder: #{params[:output_folder]}"
+        UI.message "#{self.check_path(params[:orig_folder])} Original Screenshot Source: #{params[:orig_folder]}"
+        UI.message "#{self.check_path(params[:metadata_folder])} Translation source: #{params[:metadata_folder]}"
+
+        config = helper.read_json(params[:config_file])
+
+        translationDirectories = subdirectories_for_path(params[:metadata_folder])
+        imageDirectories = subdirectories_for_path(params[:orig_folder])
+
+        unless helper.can_resolve_path(params[:output_folder]) then
+          UI.message "✅ Created Output Folder: #{params[:output_folder]}"
+          FileUtils.mkdir_p(params[:output_folder])
+        else
+          UI.message "#{self.check_path(params[:output_folder])} Output Folder: #{params[:output_folder]}"
+        end
+
+        outputDirectory = helper.resolve_path( params[:output_folder] )
+
+        languages = imageDirectories & translationDirectories
+
+        UI.message("💙 Creating Promo Screenshots for: #{languages.join(", ")}")
 
         unless params[:force] then
           confirm_directory_overwrite(params[:output_folder], "the existing promo screenshots")
         end
-
-        config = helper.read_json(params[:config_file])
-        imageDirectory = helper.resolve_path( params[:orig_folder] )
-        translationDirectory = helper.resolve_path( params[:metadata_folder] )
-        outputDirectory = helper.resolve_path( params[:output_folder] )
-
-         unless imageDirectory.exist? then
-           UI.user_error!("Unable to locate original image directory.")
-         end
-
-         unless translationDirectory.exist? then
-           UI.user_error!("Unable to locate translations directory.")
-         end
-
-        imageDirectories = []
-
-        Dir.chdir(imageDirectory) do
-          imageDirectories = Dir["*"].reject{|o| not File.directory?(o)}.sort
-        end
-
-        translationDirectories = []
-
-        Dir.chdir(translationDirectory) do
-          translationDirectories = Dir["*"].reject{|o| not File.directory?(o)}.sort
-        end
-
-        languages = imageDirectories & translationDirectories
-
-        UI.message("Creating Promo Screenshots for: #{languages.join(", ")}")
 
         # Create a hash of devices, keyed by device name
         devices = config["devices"]
@@ -154,8 +143,25 @@ module Fastlane
         end
       end
 
-      def self.resolve_path(path)
-        return Fastlane::Helper::PromoScreenshots.resolve_path(path)
+      def self.subdirectories_for_path(path)
+
+        subdirectories = []
+
+        unless helper.can_resolve_path( path ) then
+          return []
+        end
+
+        resolved_path = helper.resolve_path( path )
+
+        Dir.chdir(resolved_path) do
+          subdirectories = Dir["*"].reject{|o| not File.directory?(o)}.sort
+        end
+
+        subdirectories
+      end
+
+      def self.check_path(path)
+        self.helper.can_resolve_path(path) ? "✅" : "🚫"
       end
 
       def self.helper
