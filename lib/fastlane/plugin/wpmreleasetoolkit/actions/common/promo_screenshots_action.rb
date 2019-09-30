@@ -25,7 +25,17 @@ module Fastlane
 
         outputDirectory = helper.resolve_path( params[:output_folder] )
 
-        languages = imageDirectories & translationDirectories
+        ## If there are no translated screenshot images (whether it's because they haven't been generated yet,
+        ##   or because we aren't using them), just use the translated directories.
+        if imageDirectories == []
+          languages = translationDirectories
+        ## And vice-versa.
+        elsif translationDirectories == []
+          languages = imageDirectories
+        ## If there are original screenshots and translations available, use only locales that exist in both.
+        else
+          languages = imageDirectories & translationDirectories
+        end
 
         UI.message("💙 Creating Promo Screenshots for: #{languages.join(", ")}")
 
@@ -49,10 +59,10 @@ module Fastlane
               # Not every output file will have a screenshot, so handle cases where no 
               # screenshot file is defined
               if entry["screenshot"] != nil && entry["filename"] != nil
-                newEntry["screenshot"] = imageDirectory + language + entry["screenshot"]
+                newEntry["screenshot"] = helper.resolve_path(params[:orig_folder]) + language + entry["screenshot"]
                 newEntry["filename"] =  outputDirectory + language + entry["filename"]
               elsif entry["screenshot"] != nil && entry["filename"] == nil
-                newEntry["screenshot"] = imageDirectory + language + entry["screenshot"]
+                newEntry["screenshot"] = helper.resolve_path(params[:orig_folder]) + language + entry["screenshot"]
                 newEntry["filename"] =  outputDirectory + language + entry["screenshot"]
               elsif entry["screenshot"] == nil && entry["filename"] != nil
                 newEntry["filename"] =  outputDirectory + language + entry["filename"]
