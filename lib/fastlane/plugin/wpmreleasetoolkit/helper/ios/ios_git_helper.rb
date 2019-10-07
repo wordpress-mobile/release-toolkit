@@ -69,7 +69,7 @@ module Fastlane
         def self.localize_project()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && ./Scripts/localize.py")
           Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}*.lproj/Localizable.strings")
-          Action.sh("git commit -m \"Updates strings for localization\"")
+          Action.sh("git diff-index --quiet HEAD || git commit -m \"Updates strings for localization\"")
           Action.sh("git push")
         end
   
