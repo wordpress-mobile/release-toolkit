@@ -39,7 +39,7 @@ module Fastlane
         original_repo_ref = repo_hash if original_repo_ref.nil?
 
         unless repo_hash == file_hash
-          sh("cd #{repository_path} && git fetch && git checkout #{file_hash}")
+          other_action.sh(command: "cd #{repository_path} && git fetch && git checkout #{file_hash}", log: false)
         end
 
         # Run the provided block
@@ -47,7 +47,7 @@ module Fastlane
       
         ### Restore secrets repo to original branch.  If it was originally in a 
         ### detached HEAD state, we need to use the hash since there's no branch name.
-        sh("cd #{repository_path} && git checkout #{original_repo_ref}")
+        other_action.sh(command: "cd #{repository_path} && git checkout #{original_repo_ref}", log: false)
       end
 
       ### Check with the user whether we should overwrite the file, if it exists
