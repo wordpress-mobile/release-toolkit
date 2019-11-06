@@ -73,6 +73,8 @@ module Fastlane
           if is_repo_clean then
             Action.sh("git diff-index --quiet HEAD || git commit -m \"Updates strings for localization\"")
             Action.sh("git push")
+          else
+            UI.message("No new strings, skipping commit.")
           end
         end
 
