@@ -10,11 +10,11 @@ module Fastlane
           UI.message("Localized strings have been temporarily deleted to set up for test build.")
 
           # check for missing strings by doing a build
-          UI.message("Checking for missing english strings in #{params[:res_dir]}/values/strings.xml")
+          UI.message("Checking for missing English strings in #{params[:res_dir]}/values/strings.xml")
           UI.message("Running test build without localized strings, this may take a while...")
 
           success = true
-          sh("./gradlew build > /dev/null 2>&1", error_callback: ->(result) { success = false })
+          sh("./gradlew build > /dev/null", error_callback: ->(result) { success = false })
 
           # clean build
           sh("./gradlew clean > /dev/null 2>&1")
@@ -22,11 +22,11 @@ module Fastlane
           "Cleanup complete: build cleaned, localized strings are no longer deleted"
 
           # report result
-          if (success)
-            UI.success "Check complete: no missing strings found in #{params[:res_dir]}/values/strings.xml"
-          else
-            UI.user_error!("Check complete: some strings were missing in #{params[:res_dir]}/values/strings.xml")
+          if (!success)
+            UI.user_error!("Check Failed: some English strings were missing in #{params[:res_dir]}/values/strings.xml")
           end
+
+          "Check Success: no missing English strings found in #{params[:res_dir]}/values/strings.xml"
         end
         #####################################################
         # @!group Documentation
@@ -43,7 +43,7 @@ module Fastlane
         def self.available_options
           [
             FastlaneCore::ConfigItem.new(key: :res_dir,
-                                         env_name: "FL_ANDROID_CHECK_EN_STRINGS_RES_DIR", 
+                                         env_name: "FL_ANDROID_RES_DIR", 
                                          description: "specify res directory for values/strings.xml", 
                                          is_string: true,
                                          default_value: "")
