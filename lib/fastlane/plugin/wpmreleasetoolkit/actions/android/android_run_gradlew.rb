@@ -2,7 +2,13 @@ module Fastlane
     module Actions
       class AndroidRunGradlewAction < Action
         def self.run(params)
-          Action.sh("./gradlew #{params[:command]}")
+          failed = false
+          sh("./gradlew #{params[:command]}", error_callback: ->(result) { failed = true})
+          if (failed)
+            UI.user_error!("./gradlew #{params[:command]} Failed")
+          end
+
+          "./gradlew #{params[:command]} Success"
         end
         #####################################################
         # @!group Documentation
