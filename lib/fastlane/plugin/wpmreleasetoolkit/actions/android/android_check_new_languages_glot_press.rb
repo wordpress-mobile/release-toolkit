@@ -1,24 +1,13 @@
+require_relative '../../helper/android_localize_helper'
 module Fastlane
     module Actions
       class AndroidCheckNewLanguagesGlotPressAction < Action
         def self.run(params)
-          UI.message("Checking for potential new languages...")
-          curl_command = "curl -L #{params[:glot_press_status_url]} 2> /dev/null"
-          grep_commands = "grep -B 1 morethan90 | grep \"android/dev/\""
-          sed_command = "sed \"s+.*android/dev/\\([a-zA-Z-]*\\)/default.*+\\1+\""
-          languages_to_check = sh("#{curl_command} | #{grep_commands} | #{sed_command}").split(' ')
 
+          languages_to_check = Fastlane::Helper::AndroidLocalizeHelper.get_glot_press_languages_translated_morethan90(params[:glot_press_status_url]);
           UI.message("Number of languages over 90\% translation threshold: #{languages_to_check.count}")
 
-          missing_languages = []
-          languages_to_check.each do |language_code|
-            found = true
-            sh("grep \"^#{language_code},\" #{params[:language_file]} > /dev/null 2>&1", error_callback: ->(result) { found = false })
-            if (!found)
-              missing_languages = missing_languages << language_code
-              success = false
-            end
-          end
+          missing_languages = Fastlane::Helper::AndroidLocalizeHelper.get_missing_languages(languages_to_check, params[:language_file]);
 
           if (!missing_languages.empty?)
             plural = ""
@@ -26,13 +15,14 @@ module Fastlane
               plural = "s"
             end
 
-            UI.error("Found #{missing_languages.count} language#{plural} over 90\% translation but are not found in #{params[:language_file]}:");
+            error_message = "Found #{missing_languages.count} language#{plural} over 90\% translation but are not in #{params[:language_file]}";
+            UI.error("#{error_message}:");
 
             missing_languages.each do |language_code|
               UI.error("#{language_code}");
             end
 
-            UI.user_error!("Check Failed: found languages over 90\% translation threshold that are not in #{params[:language_file]}")
+            UI.user_error!("Check Failed: #{error_message}")
           end
 
           "Check Success: all languages over 90\% translation threshold were found in #{params[:language_file]}"

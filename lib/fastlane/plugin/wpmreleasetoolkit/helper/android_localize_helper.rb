@@ -166,6 +166,21 @@ module Fastlane
           end
         end
       end
+
+      def self.get_glot_press_languages_translated_morethan90(glot_press_status_url)
+        curl_command = "curl -L #{glot_press_status_url} 2> /dev/null"
+        grep_commands = "grep -B 1 morethan90 | grep \"android/dev/\""
+        sed_command = "sed \"s+.*android/dev/\\([a-zA-Z-]*\\)/default.*+\\1+\""
+        return Action.sh("#{curl_command} | #{grep_commands} | #{sed_command}").split(' ')
+      end
+
+      def self.get_missing_languages(languages_to_check, language_file)
+        missing_languages = []
+        languages_to_check.each do |language_code|
+          Action.sh("grep \"^#{language_code},\" #{language_file} > /dev/null 2>&1", error_callback: ->(result) { missing_languages << language_code })
+        end
+        return missing_languages
+      end
     end
   end
 end
