@@ -11,8 +11,16 @@ module Fastlane
           available_devices.each do |device|
             UI.message(device.serial);
           end
+          if available_devices.empty?
+            "No Devices Found"
+          else
+            if (available_devices.count == 1)
+              "One Device Found"
+            else
+              "#{available_devices.count} Devices Found"
+            end
+          end
 
-          "Done."
         end
         #####################################################
         # @!group Documentation
