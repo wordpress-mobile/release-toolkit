@@ -176,7 +176,7 @@ module Fastlane
         response.each_line do | line |
           if line.include?("morethan90") then
             processed_line = previous_line.sub(/.*\/android\/dev\//, "")
-            languages_morethan90 << processed_line.sub(/\/default\/.*/, "")
+            languages_morethan90 << processed_line.sub(/\/default\/.*\s*/, "")
           end
           previous_line = line
         end
@@ -187,7 +187,18 @@ module Fastlane
       def self.get_missing_languages(languages_to_check, language_file)
         missing_languages = []
         languages_to_check.each do |language_code|
-          Action.sh("grep \"^#{language_code},\" #{language_file} > /dev/null 2>&1", error_callback: ->(result) { missing_languages << language_code })
+          found = false
+          File.open(language_file).each_line do |line|
+            if line.include? language_code then
+              UI.success "Language #{language_code} found."
+              found = true
+              break
+            end
+          end
+          if not found then
+            UI.error("Language #{language_code} not found.")
+            missing_languages << language_code
+          end
         end
         return missing_languages
       end
