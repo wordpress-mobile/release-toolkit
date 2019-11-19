@@ -1,6 +1,7 @@
 require 'fastlane_core/ui/ui'
 require 'fileutils'
 require 'nokogiri'
+require 'open-uri'
 
 module Fastlane
   UI = FastlaneCore::UI unless Fastlane.const_defined?("UI")
@@ -167,11 +168,20 @@ module Fastlane
         end
       end
 
-      def self.get_glot_press_languages_translated_morethan90(glot_press_status_url)
-        curl_command = "curl -L #{glot_press_status_url} 2> /dev/null"
-        grep_commands = "grep -B 1 morethan90 | grep \"android/dev/\""
-        sed_command = "sed \"s+.*android/dev/\\([a-zA-Z-]*\\)/default.*+\\1+\""
-        return Action.sh("#{curl_command} | #{grep_commands} | #{sed_command}").split(' ')
+      def self.get_glotpress_languages_translated_morethan90(glotpress_status_url)
+        response = open(glotpress_status_url).read
+
+        languages_morethan90 = [];
+        previous_line = ""
+        response.each_line do | line |
+          if line.include?("morethan90") then
+            processed_line = previous_line.sub(/.*\/android\/dev\//, "")
+            languages_morethan90 << processed_line.sub(/\/default\/.*/, "")
+          end
+          previous_line = line
+        end
+
+        return languages_morethan90
       end
 
       def self.get_missing_languages(languages_to_check, language_file)
@@ -181,6 +191,7 @@ module Fastlane
         end
         return missing_languages
       end
+
     end
   end
 end
