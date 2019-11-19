@@ -1,15 +1,15 @@
 require_relative '../../helper/android_localize_helper'
 module Fastlane
     module Actions
-      class AndroidCheckNewLanguagesGlotPressAction < Action
+      class AndroidCheckNewLanguagesGlotpressAction < Action
         def self.run(params)
 
-          languages_to_check = Fastlane::Helper::AndroidLocalizeHelper.get_glot_press_languages_translated_morethan90(params[:glot_press_status_url]);
+          languages_to_check = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90(params[:glotpress_status_url]);
           UI.message("Number of languages over 90\% translation threshold: #{languages_to_check.count}")
 
           missing_languages = Fastlane::Helper::AndroidLocalizeHelper.get_missing_languages(languages_to_check, params[:language_file]);
 
-          if (!missing_languages.empty?)
+          if (not missing_languages.empty?)
             plural = ""
             if (missing_languages.count > 1)
               plural = "s"
@@ -41,13 +41,13 @@ module Fastlane
 
         def self.available_options
           [
-            FastlaneCore::ConfigItem.new(key: :glot_press_status_url,
-                                         env_name: "FL_ANDROID_CHECK_NEW_LANG_GLOT_PRESS_STATUS_URL",
+            FastlaneCore::ConfigItem.new(key: :glotpress_status_url,
+                                         env_name: "FL_ANDROID_CHECK_NEW_LANG_GLOTPRESS_STATUS_URL",
                                          description: "specify GlotPress translation status url",
                                          is_string: true,
                                          default_value: ""),
             FastlaneCore::ConfigItem.new(key: :language_file,
-                                         env_name: "FL_ANDROID_CHECK_NEW_LANG_GLOT_PRESS_LANG_FILE",
+                                         env_name: "FL_ANDROID_CHECK_NEW_LANG_GLOTPRESS_LANG_FILE",
                                          description: "specify language file",
                                          is_string: true,
                                          default_value: "")
