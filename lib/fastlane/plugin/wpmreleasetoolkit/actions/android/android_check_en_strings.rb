@@ -28,7 +28,9 @@ module Fastlane
           success = true
           begin
             run_gradle(params[:gradlew_path], params[:project_dir], "build")
-          rescue StandardError => msg
+            UI.message("Test build complete.")
+          rescue StandardError
+            UI.error("Test build failed.");
             success = false
           end
 
