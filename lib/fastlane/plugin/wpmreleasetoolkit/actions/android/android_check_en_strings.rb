@@ -27,31 +27,36 @@ module Fastlane
 
           success = true
           begin
-            run_gradle(params[:gradlew_path], params[:project_dir], "build")
+            run_gradle(params[:gradlew_path], params[:project_dir], "build", params[:verbose])
             UI.message("Test build complete.")
           rescue StandardError
-            UI.error("Test build failed.");
+            suggestion = "";
+            if (not params[:verbose])
+              suggestion = " (set verbose to true for more information)"
+            end
+            UI.error("Test build failed#{suggestion}.");
             success = false
+          ensure
+            # clean up
+            run_gradle(params[:gradlew_path], params[:project_dir], "clean", false)
+            other_action.reset_git_repo(force: true, skip_clean: true)
+            "Cleanup complete: build cleaned, localized strings are no longer deleted"
           end
 
-          # clean build
-          run_gradle(params[:gradlew_path], params[:project_dir], "clean")
-          other_action.reset_git_repo(force: true, skip_clean: true)
-          "Cleanup complete: build cleaned, localized strings are no longer deleted"
           if (not success)
-            UI.user_error!("Check Failed: some English strings were missing in #{params[:res_dir]}/values/strings.xml")
+            UI.user_error!("Check Failed: some English strings may be missing in #{params[:res_dir]}/values/strings.xml")
           end
 
           "Check Success: no missing English strings found in #{params[:res_dir]}/values/strings.xml"
         end
 
-        def self.run_gradle(gradlew_path, project_dir, task)
+        def self.run_gradle(gradlew_path, project_dir, task, print_output)
             return other_action.gradle(
               gradle_path: gradlew_path,
               project_dir: project_dir,
               task: task,
               print_command: false,
-              print_command_output: false
+              print_command_output: print_output
             )
         end
 
@@ -83,6 +88,11 @@ module Fastlane
                                          env_name: "FL_ANDROID_PROJECT_DIR", 
                                          description: "specify project directory", 
                                          is_string: true,
+                                         default_value: ""),
+            FastlaneCore::ConfigItem.new(key: :verbose,
+                                         env_name: "FL_ANDROID_CHECK_EN_STRINGS_VERBOSE", 
+                                         description: "specify whether to display more output", 
+                                         is_string: false,
                                          default_value: "")
           ]
         end
