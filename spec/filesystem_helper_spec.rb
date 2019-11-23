@@ -13,7 +13,27 @@ describe Fastlane::Helper::FilesystemHelper do
     FileUtils.rm_rf(@temp_path)
   end
 
-  it 'delete_files can find and delete all and only files based on given criteria' do
+it 'delete_files deletes all files based on given criteria' do
+    files_match = ["file_match_1", "file_match_2", "file_match_3", "file_match_4"]
+
+    # add files to temp directory
+    files_match.each do |file|
+      File.new(file, "w")
+    end
+
+    files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", true)
+
+    # verify function return value
+    expect(files_deleted.sort).to eq files_match.sort
+
+    # verify matching files were deleted
+    files_match.each do |file|
+      expect(File.exist?(file)).to be false
+    end
+
+  end
+
+  it 'delete_files deletes only files based on given criteria' do
     files_match = ["file_match_1", "file_match_2", "file_match_3", "file_match_4"]
     files_no_match = ["file_no_match_1", "file_no_match_2"]
 
@@ -41,7 +61,7 @@ describe Fastlane::Helper::FilesystemHelper do
     end
   end
 
-  it 'delete_files does not delete files when no files exist match given criteria' do
+  it 'delete_files does not delete files when no files match given criteria' do
     files_no_match = ["file_no_match_1", "file_no_match_2"]
 
     # add files to temp directory
