@@ -4,7 +4,7 @@ module Fastlane
       class AndroidCheckNewLanguagesGlotpressAction < Action
         def self.run(params)
 
-          languages_to_check = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90(params[:glotpress_status_url]);
+          languages_to_check = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90_from_url(params[:glotpress_status_url]);
           UI.message("Number of languages over 90\% translation threshold: #{languages_to_check.count}")
 
           missing_languages = Fastlane::Helper::AndroidLocalizeHelper.get_missing_languages(languages_to_check, params[:language_file]);

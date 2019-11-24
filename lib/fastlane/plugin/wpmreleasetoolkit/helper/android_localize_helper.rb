@@ -191,7 +191,7 @@ module Fastlane
         languages_to_check.each do |language_code|
           found = false
           File.open(language_file).each_line do |line|
-            if line.include? language_code then
+            if line.match(/^#{language_code},/) then
               UI.success "Language #{language_code} found."
               found = true
               break
