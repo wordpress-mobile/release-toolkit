@@ -7,7 +7,7 @@ module Fastlane
           languages_to_check = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90_from_url(params[:glotpress_status_url]);
           UI.message("Number of languages over 90\% translation threshold: #{languages_to_check.count}")
 
-          missing_languages = Fastlane::Helper::AndroidLocalizeHelper.get_missing_languages(languages_to_check, params[:language_file]);
+          missing_languages = Fastlane::Helper::AndroidLocalizeHelper.get_missing_languages(languages_to_check, params[:language_file], params[:verbose]);
 
           if (not missing_languages.empty?)
             plural = ""
@@ -50,7 +50,12 @@ module Fastlane
                                          env_name: "FL_ANDROID_CHECK_NEW_LANG_GLOTPRESS_LANG_FILE",
                                          description: "specify language file",
                                          is_string: true,
-                                         default_value: "")
+                                         default_value: ""),
+            FastlaneCore::ConfigItem.new(key: :verbose,
+                                         env_name: "FL_ANDROID_CHECK_NEW_LANG_GLOTPRESS_VERBOSE",
+                                         description: "specify whether to display more output",
+                                         is_string: false,
+                                         default_value: true)
           ]
         end
     

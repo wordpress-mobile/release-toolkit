@@ -186,19 +186,23 @@ module Fastlane
         return languages_morethan90
       end
 
-      def self.get_missing_languages(languages_to_check, language_file)
+      def self.get_missing_languages(languages_to_check, language_file, verbose)
         missing_languages = []
         languages_to_check.each do |language_code|
           found = false
           File.open(language_file).each_line do |line|
             if line.match(/^#{language_code},/) then
-              UI.success "Language #{language_code} found."
+              if verbose then
+                UI.success "Language #{language_code} found."
+              end
               found = true
               break
             end
           end
           if not found then
-            UI.error("Language #{language_code} not found.")
+            if verbose then
+              UI.error("Language #{language_code} not found.")
+            end
             missing_languages << language_code
           end
         end
