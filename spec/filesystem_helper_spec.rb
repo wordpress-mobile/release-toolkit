@@ -20,7 +20,7 @@ describe Fastlane::Helper::FilesystemHelper do
 
       create_files(files_match)
 
-      files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", false)
+      files_deleted = delete_files("file_match_?")
 
       # verify function return value
       expect(files_deleted.sort).to eq files_match.sort
@@ -37,7 +37,7 @@ describe Fastlane::Helper::FilesystemHelper do
       create_files(files_match)
       create_files(files_no_match)
 
-      files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", false)
+      files_deleted = delete_files("file_match_?")
 
       # verify function return value
       expect(files_deleted.sort).to eq files_match.sort
@@ -53,7 +53,7 @@ describe Fastlane::Helper::FilesystemHelper do
       # add files to temp directory
       create_files(files_no_match)
 
-      files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", false)
+      files_deleted = delete_files("file_match_?")
 
       # verify function return value
       expect(files_deleted.empty?).to be true
@@ -63,12 +63,16 @@ describe Fastlane::Helper::FilesystemHelper do
     end
 
     it 'return empty result when no files exist' do
-      files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", false)
+      files_deleted = delete_files("file_match_?")
 
       # verify function return value
       expect(files_deleted.empty?).to be true
     end
   end
+end
+
+def delete_files(file_path)
+  return Fastlane::Helper::FilesystemHelper.delete_files(file_path, false)
 end
 
 def create_files(files_to_create)
