@@ -2,69 +2,72 @@ require 'tmpdir'
 require_relative './spec_helper'
 
 describe Fastlane::Helper::FilesystemHelper do
-  before(:each) do
-    @temp_path = Dir.mktmpdir
-    @previous_path = Dir.pwd
-    Dir.chdir(@temp_path)
-  end
+  context "delete_files can" do
+    before(:each) do
+      @temp_path = Dir.mktmpdir
+      @previous_path = Dir.pwd
+      Dir.chdir(@temp_path)
+    end
 
-  after(:each) do
-    Dir.chdir(@previous_path)
-    FileUtils.rm_rf(@temp_path)
-  end
+    after(:each) do
+      Dir.chdir(@previous_path)
+      FileUtils.rm_rf(@temp_path)
+    end
 
-it 'delete_files deletes all files based on given criteria' do
-    files_match = ["file_match_1", "file_match_2", "file_match_3", "file_match_4"]
 
-    create_files(files_match)
+    it 'delete all files based on given criteria' do
+      files_match = ["file_match_1", "file_match_2", "file_match_3", "file_match_4"]
 
-    files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", false)
+      create_files(files_match)
 
-    # verify function return value
-    expect(files_deleted.sort).to eq files_match.sort
+      files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", false)
 
-    # verify matching files were deleted
-    expect(check_files_exist(files_match, false)).to be true
-  end
+      # verify function return value
+      expect(files_deleted.sort).to eq files_match.sort
 
-  it 'delete_files deletes only files based on given criteria' do
-    files_match = ["file_match_1", "file_match_2", "file_match_3", "file_match_4"]
-    files_no_match = ["file_no_match_1", "file_no_match_2"]
+      # verify matching files were deleted
+      expect(check_files_exist(files_match, false)).to be true
+    end
 
-    # add files to temp directory
-    create_files(files_match)
-    create_files(files_no_match)
+    it 'delete only files based on given criteria' do
+      files_match = ["file_match_1", "file_match_2", "file_match_3", "file_match_4"]
+      files_no_match = ["file_no_match_1", "file_no_match_2"]
 
-    files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", false)
+      # add files to temp directory
+      create_files(files_match)
+      create_files(files_no_match)
 
-    # verify function return value
-    expect(files_deleted.sort).to eq files_match.sort
+      files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", false)
 
-    # verify matching files were deleted
-    expect(check_files_exist(files_match, false)).to be true
-    expect(check_files_exist(files_no_match, true)).to be true
-  end
+      # verify function return value
+      expect(files_deleted.sort).to eq files_match.sort
 
-  it 'delete_files does not delete files when no files match given criteria' do
-    files_no_match = ["file_no_match_1", "file_no_match_2"]
+      # verify matching files were deleted
+      expect(check_files_exist(files_match, false)).to be true
+      expect(check_files_exist(files_no_match, true)).to be true
+    end
 
-    # add files to temp directory
-    create_files(files_no_match)
+    it 'delete no files when none match given criteria' do
+      files_no_match = ["file_no_match_1", "file_no_match_2"]
 
-    files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", false)
+      # add files to temp directory
+      create_files(files_no_match)
 
-    # verify function return value
-    expect(files_deleted.empty?).to be true
+      files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", false)
 
-    # verify non-matching files were not deleted
-    expect(check_files_exist(files_no_match, true)).to be true
-  end
+      # verify function return value
+      expect(files_deleted.empty?).to be true
 
-  it 'delete_files results are empty when no files exist' do
-    files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", false)
+      # verify non-matching files were not deleted
+      expect(check_files_exist(files_no_match, true)).to be true
+    end
 
-    # verify function return value
-    expect(files_deleted.empty?).to be true
+    it 'return empty result when no files exist' do
+      files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", false)
+
+      # verify function return value
+      expect(files_deleted.empty?).to be true
+    end
   end
 end
 
