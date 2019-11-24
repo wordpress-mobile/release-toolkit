@@ -21,7 +21,7 @@ it 'delete_files deletes all files based on given criteria' do
       File.new(file, "w")
     end
 
-    files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", true)
+    files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", false)
 
     # verify function return value
     expect(files_deleted.sort).to eq files_match.sort
@@ -45,7 +45,7 @@ it 'delete_files deletes all files based on given criteria' do
       File.new(file, "w")
     end
 
-    files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", true)
+    files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", false)
 
     # verify function return value
     expect(files_deleted.sort).to eq files_match.sort
@@ -69,7 +69,7 @@ it 'delete_files deletes all files based on given criteria' do
       File.new(file, "w")
     end
 
-    files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", true)
+    files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", false)
 
     # verify function return value
     expect(files_deleted.empty?).to be true
@@ -81,7 +81,7 @@ it 'delete_files deletes all files based on given criteria' do
   end
 
   it 'delete_files results are empty when no files exist' do
-    files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", true)
+    files_deleted = Fastlane::Helper::FilesystemHelper.delete_files("file_match_?", false)
 
     # verify function return value
     expect(files_deleted.empty?).to be true
