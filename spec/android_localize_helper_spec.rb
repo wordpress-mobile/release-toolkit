@@ -38,7 +38,7 @@ describe Fastlane::Helper::AndroidLocalizeHelper do
       expect(languages_at_threshold.sort).to eq languages_found.sort
     end
 
-    it 'can find no languages when none is at threshold' do
+    it 'find no languages when none is at threshold' do
       test_text = %q(
             <strong><a href="/projects/apps/android/dev/zh-hk/default/">Chinese (Hong Kong)</a></strong>
             <strong><a href="/projects/apps/android/dev/cs/default/">Czech</a></strong>
@@ -128,7 +128,7 @@ describe Fastlane::Helper::AndroidLocalizeHelper do
       expect(missing_languages.sort).to eq languages_to_check_missing.sort
     end
 
-    it 'get_missing_languages returns all missing languages when language file is empty' do
+    it 'return all missing languages when language file is empty' do
       languages_to_check = ["en-us", "az", "es-cl", "zh-cn", "kmr"]
       test_file = "spec/test-data/empty.csv"
       missing_languages = Fastlane::Helper::AndroidLocalizeHelper.get_missing_languages(languages_to_check, test_file, false)
@@ -137,7 +137,7 @@ describe Fastlane::Helper::AndroidLocalizeHelper do
       expect(missing_languages.sort).to eq languages_to_check.sort
     end
 
-    it 'get_missing_languages returns all missing languages when language file is malformed' do
+    it 'return all missing languages when language file is malformed' do
       languages_to_check = ["en-us", "az", "es-cl", "zh-cn", "kmr"]
       test_file = "spec/test-data/malformed.csv"
       missing_languages = Fastlane::Helper::AndroidLocalizeHelper.get_missing_languages(languages_to_check, test_file, false)
