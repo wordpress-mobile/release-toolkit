@@ -168,12 +168,14 @@ module Fastlane
         end
       end
 
-      def self.get_glotpress_languages_translated_morethan90(glotpress_status_url)
-        response = open(glotpress_status_url).read
+      def self.get_glotpress_languages_translated_morethan90_from_url(glotpress_status_url)
+        return get_glotpress_languages_translated_morethan90(open(glotpress_status_url).read)
+      end
 
+      def self.get_glotpress_languages_translated_morethan90(text)
         languages_morethan90 = [];
         previous_line = ""
-        response.each_line do | line |
+        text.each_line do | line |
           if line.include?("morethan90") then
             processed_line = previous_line.sub(/.*\/android\/dev\//, "")
             languages_morethan90 << processed_line.sub(/\/default\/.*\s*/, "")
