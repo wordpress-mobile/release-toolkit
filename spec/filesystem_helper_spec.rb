@@ -72,7 +72,7 @@ describe Fastlane::Helper::FilesystemHelper do
 end
 
 def delete_files(file_path)
-  return Fastlane::Helper::FilesystemHelper.delete_files(file_path, false)
+  return Fastlane::Helper::FilesystemHelper.delete_files(file_path, false, false)
 end
 
 def create_files(files_to_create)

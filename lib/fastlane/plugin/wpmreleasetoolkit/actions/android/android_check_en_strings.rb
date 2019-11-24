@@ -8,8 +8,8 @@ module Fastlane
           other_action.ensure_git_status_clean(show_uncommitted_changes:true)
 
           # set up test by removing localized strings.xml
-          deleted_files = Fastlane::Helper::FilesystemHelper::delete_files("#{params[:res_dir]}/values-??/strings.xml", false)
-          deleted_files += Fastlane::Helper::FilesystemHelper::delete_files("#{params[:res_dir]}/values-??-r??/strings.xml", false)
+          deleted_files = Fastlane::Helper::FilesystemHelper::delete_files("#{params[:res_dir]}/values-??/strings.xml", true, false)
+          deleted_files += Fastlane::Helper::FilesystemHelper::delete_files("#{params[:res_dir]}/values-??-r??/strings.xml", true, false)
 
           if (deleted_files.count > 0)
             plural = ""
@@ -39,7 +39,7 @@ module Fastlane
           ensure
             # clean up
             run_gradle(params[:gradlew_path], params[:project_dir], "clean", false)
-            other_action.reset_git_repo(force: true, skip_clean: true)
+            other_action.reset_git_repo(force: true, files: deleted_files)
             "Cleanup complete: build cleaned, localized strings are no longer deleted"
           end
 
