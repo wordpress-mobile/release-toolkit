@@ -93,7 +93,7 @@ module Fastlane
                                          env_name: "FL_ANDROID_CHECK_EN_STRINGS_VERBOSE", 
                                          description: "specify whether to display more output", 
                                          is_string: false,
-                                         default_value: "")
+                                         default_value: false)
           ]
         end
 
