@@ -3,23 +3,25 @@ module Fastlane
       class AndroidCheckDevicesAction < Action
         def self.run(params)
           available_devices = other_action.adb_devices();
-          if (params[:require_device] and available_devices.empty?)
+          if params[:require_device] and available_devices.empty? then
             UI.user_error! "You need a device attached or an emulator running."
           end
 
-          UI.message("Attached Devices:");
-          available_devices.each do |device|
-            UI.message(device.serial);
-          end
-          if available_devices.empty?
-            UI.message("No Devices Found")
+          if available_devices.empty? then
+            UI.message("No Devices Found.")
           else
-            if (available_devices.count == 1)
-              UI.success "One Device Found"
+            if available_devices.count == 1 then
+              UI.success "One Device Found."
             else
-              UI.success "#{available_devices.count} Devices Found"
+              UI.success "#{available_devices.count} Devices Found."
+            end
+
+            UI.message("Attached Devices:")
+            available_devices.each do |device|
+              UI.message(device.serial)
             end
           end
+
           "Check Complete"
         end
         #####################################################
