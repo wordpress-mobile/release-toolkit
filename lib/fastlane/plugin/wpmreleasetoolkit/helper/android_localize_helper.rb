@@ -1,7 +1,6 @@
 require 'fastlane_core/ui/ui'
 require 'fileutils'
 require 'nokogiri'
-require 'open-uri'
 
 module Fastlane
   UI = FastlaneCore::UI unless Fastlane.const_defined?("UI")
