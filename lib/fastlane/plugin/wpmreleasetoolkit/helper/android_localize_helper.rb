@@ -47,7 +47,7 @@ module Fastlane
             return :skipped if skip_string_by_tag(this_string)
             
             # Update if needed
-            (if (this_string.content == string_content) then return :found else this_string.content = string_content ; return :updated end)   
+            (if (this_string.content == string_content) then return :found else this_string.content = string_content ; return :updated end)
           end
         end
       
@@ -68,7 +68,7 @@ module Fastlane
         return if skip_string_by_exclusion_list(library, string_name)
       
         # Search for the string in the main file
-        main_strings.xpath('//string').each do | this_string | 
+        main_strings.xpath('//string').each do | this_string |
           if (this_string.attr("name") == string_name) then
             # Skip if the string has the content_override tag
             return if skip_string_by_tag(this_string)
@@ -192,7 +192,7 @@ module Fastlane
           languages_in_file << language_code
           if verbose then
             if (languages_to_check.include? language_code) then
-              UI.success "Language #{language_code} found.";
+              UI.success "Language #{language_code} found."
             end
           end
         end
