@@ -25,7 +25,8 @@ module Fastlane
             UI.user_error!("Check Failed: #{error_message}")
           end
 
-          "Check Success: all languages over 90\% translation threshold were found in #{params[:language_file]}"
+          UI.success "Check Success: all languages over 90\% translation threshold were found in #{params[:language_file]}"
+          "Check Success"
         end
         #####################################################
         # @!group Documentation

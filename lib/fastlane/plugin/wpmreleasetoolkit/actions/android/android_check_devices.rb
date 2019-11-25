@@ -12,15 +12,15 @@ module Fastlane
             UI.message(device.serial);
           end
           if available_devices.empty?
-            "No Devices Found"
+            UI.message("No Devices Found")
           else
             if (available_devices.count == 1)
-              "One Device Found"
+              UI.success "One Device Found"
             else
-              "#{available_devices.count} Devices Found"
+              UI.success "#{available_devices.count} Devices Found"
             end
           end
-
+          "Check Complete"
         end
         #####################################################
         # @!group Documentation

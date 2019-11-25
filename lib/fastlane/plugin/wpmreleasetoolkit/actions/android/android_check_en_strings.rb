@@ -40,14 +40,15 @@ module Fastlane
             # clean up
             run_gradle(params[:gradlew_path], params[:project_dir], "clean", false)
             other_action.reset_git_repo(force: true, files: deleted_files)
-            "Cleanup complete: build cleaned, localized strings are no longer deleted"
+            UI.message("Cleanup complete: build cleaned, localized strings are no longer deleted")
           end
 
           if (not success)
             UI.user_error!("Check Failed: some English strings may be missing in #{params[:res_dir]}/values/strings.xml")
           end
 
-          "Check Success: no missing English strings found in #{params[:res_dir]}/values/strings.xml"
+          UI.success "Check Success: no missing English strings found in #{params[:res_dir]}/values/strings.xml"
+          "Check Success"
         end
 
         def self.run_gradle(gradlew_path, project_dir, task, print_output)
