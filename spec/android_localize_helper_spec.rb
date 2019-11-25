@@ -15,7 +15,7 @@ describe Fastlane::Helper::AndroidLocalizeHelper do
                     <span class="bubble morethan90">91%</span>
         )
 
-      languages_found = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90(test_text);
+      languages_found = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90(test_text)
 
       # verify function return value
       expect(languages_at_threshold.sort).to eq languages_found.sort
@@ -32,7 +32,7 @@ describe Fastlane::Helper::AndroidLocalizeHelper do
             <strong><a href="/projects/apps/android/dev/cs/default/">Czech</a></strong>
       )
 
-      languages_found = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90(test_text);
+      languages_found = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90(test_text)
 
       # verify function return value
       expect(languages_at_threshold.sort).to eq languages_found.sort
@@ -46,7 +46,7 @@ describe Fastlane::Helper::AndroidLocalizeHelper do
             <strong><a href="/projects/apps/android/dev/el/default/">Greek</a></strong>
       )
 
-      languages_found = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90(test_text);
+      languages_found = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90(test_text)
 
       # verify function return value
       expect(languages_found.empty?).to be true
@@ -68,7 +68,7 @@ describe Fastlane::Helper::AndroidLocalizeHelper do
                 <a href="/projects/apps/android/dev/el/default/?filters%5Btranslated%5D=yes&#038;filters%5Bstatus%5D=current">1270</a>              </td>
             <td class="stats percent">47%</td>
       )
-      languages_found = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90(test_text);
+      languages_found = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90(test_text)
 
       # verify function return value
       expect(languages_found.empty?).to be true
@@ -83,7 +83,7 @@ describe Fastlane::Helper::AndroidLocalizeHelper do
             㥯㥰㥱㥲㥳㥴㥵 㥶㥷㥸㥹㥺 俋 俌 俍 俎 俏 俐 俑 俒 俓㞢㞣㞤㞥㞦㞧㞨쨜 쨝쨠쨦걵걷 걸걹걺ﾓﾔﾕ ﾖﾗﾘﾙ
             ﵑﵓﵔ ﵕﵗ ﵘ  ﯿ ﰀﰁﰂ ﰃ ﮁﮂﮃﮄﮅᎹᏪ Ⴥჭᡴᠦᡀ
       )
-      languages_found = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90(test_text);
+      languages_found = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90(test_text)
 
       # verify function return value
       expect(languages_found.empty?).to be true
@@ -91,7 +91,7 @@ describe Fastlane::Helper::AndroidLocalizeHelper do
 
     it 'return empty result when input is empty string' do
       test_text = ""
-      languages_found = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90(test_text);
+      languages_found = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90(test_text)
 
       # verify function return value
       expect(languages_found.empty?).to be true
