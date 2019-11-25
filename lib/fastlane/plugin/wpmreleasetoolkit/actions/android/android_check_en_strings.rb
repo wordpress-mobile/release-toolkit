@@ -5,7 +5,9 @@ module Fastlane
       class AndroidCheckEnStringsAction < Action
         def self.run(params)
           # check local repo status
-          other_action.ensure_git_status_clean(show_uncommitted_changes:true)
+          if params[:ensure_git_status_clean] then
+            other_action.ensure_git_status_clean(show_uncommitted_changes:true)
+          end
 
           # set up test by removing localized strings.xml
           deleted_files = Fastlane::Helper::FilesystemHelper::delete_files("#{params[:res_dir]}/values-??/strings.xml", true, false)
@@ -90,6 +92,11 @@ module Fastlane
                                          description: "specify project directory", 
                                          is_string: true,
                                          default_value: ""),
+            FastlaneCore::ConfigItem.new(key: :ensure_git_status_clean,
+                                         env_name: "FL_ANDROID_CHECK_EN_STRINGS_ENSURE_GIT_STATUS_CLEAN", 
+                                         description: "specify whether to ensure git status is clean", 
+                                         is_string: false,
+                                         default_value: true),
             FastlaneCore::ConfigItem.new(key: :verbose,
                                          env_name: "FL_ANDROID_CHECK_EN_STRINGS_VERBOSE", 
                                          description: "specify whether to display more output", 
