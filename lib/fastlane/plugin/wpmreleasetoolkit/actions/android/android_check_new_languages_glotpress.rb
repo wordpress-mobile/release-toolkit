@@ -10,12 +10,7 @@ module Fastlane
           missing_languages = Fastlane::Helper::AndroidLocalizeHelper.get_missing_languages(languages_to_check, params[:language_file], params[:verbose]);
 
           if (not missing_languages.empty?)
-            plural = ""
-            if (missing_languages.count > 1)
-              plural = "s"
-            end
-
-            error_message = "Found #{missing_languages.count} language#{plural} over 90\% translation but are not in #{params[:language_file]}";
+            error_message = "Found #{missing_languages.count} " + "language".pluralize(missing_languages.count) + " over 90\% translation but not in #{params[:language_file]}";
             UI.error("#{error_message}:");
 
             missing_languages.each do |language_code|

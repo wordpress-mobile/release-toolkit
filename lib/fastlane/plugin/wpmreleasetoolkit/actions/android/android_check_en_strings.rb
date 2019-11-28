@@ -14,13 +14,9 @@ module Fastlane
           deleted_files += Fastlane::Helper::FilesystemHelper::delete_files("#{params[:res_dir]}/values-??-r??/strings.xml", true, false)
 
           if (deleted_files.count > 0)
-            plural = ""
-            if (deleted_files.count > 1)
-              plural = "s"
-            end
-            UI.message("#{deleted_files.count} localized string#{plural} have been temporarily deleted to set up for the test build.")
+            UI.message("#{deleted_files.count} localized string " + "file".pluralize(deleted_files.count) + " temporarily deleted to set up for the test build.")
           else
-            UI.error("No localized strings have been found for deletion. Results may be invalid. Please double check that the provided res directory (#{params[:res_dir]}) is correct.")
+            UI.error("No localized string files have been found for deletion. Results may be invalid. Please double check that the provided res directory (#{params[:res_dir]}) is correct.")
           end
 
           # check for missing strings by doing a build
@@ -42,7 +38,7 @@ module Fastlane
             # clean up
             run_gradle(params[:gradlew_path], params[:project_dir], "clean", false)
             other_action.reset_git_repo(force: true, files: deleted_files)
-            UI.message("Cleanup complete: build cleaned, localized strings are no longer deleted")
+            UI.message("Cleanup complete: build cleaned, localized string files are no longer deleted")
           end
 
           if (not success)
