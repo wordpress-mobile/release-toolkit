@@ -25,18 +25,18 @@ module Fastlane
 
           success = true
           begin
-            run_gradle(params[:gradlew_path], params[:project_dir], "build", params[:verbose])
+            run_gradle("build", params[:verbose])
             UI.message("Test build complete.")
           rescue StandardError
             suggestion = "";
             if (not params[:verbose])
               suggestion = " (set verbose to true for more information)"
             end
-            UI.error("Test build failed#{suggestion}.");
+            UI.error("Test build failed#{suggestion}.")
             success = false
           ensure
             # clean up
-            run_gradle(params[:gradlew_path], params[:project_dir], "clean", false)
+            run_gradle("clean", params[:verbose])
             other_action.reset_git_repo(force: true, files: deleted_files)
             UI.message("Cleanup complete: build cleaned, localized string files are no longer deleted")
           end
@@ -49,10 +49,9 @@ module Fastlane
           "Check Success"
         end
 
-        def self.run_gradle(gradlew_path, project_dir, task, print_output)
+        def self.run_gradle(task, print_output)
             return other_action.gradle(
-              gradle_path: gradlew_path,
-              project_dir: project_dir,
+              project_dir: "#{Fastlane::Helper::FilesystemHelper::project_path()}",
               task: task,
               print_command: false,
               print_command_output: print_output
@@ -76,16 +75,6 @@ module Fastlane
             FastlaneCore::ConfigItem.new(key: :res_dir,
                                          env_name: "FL_ANDROID_RES_DIR", 
                                          description: "specify res directory for values/strings.xml", 
-                                         is_string: true,
-                                         default_value: ""),
-            FastlaneCore::ConfigItem.new(key: :gradlew_path,
-                                         env_name: "FL_ANDROID_GRADLEW_PATH", 
-                                         description: "specify gradlew file path", 
-                                         is_string: true,
-                                         default_value: "gradlew"),
-            FastlaneCore::ConfigItem.new(key: :project_dir,
-                                         env_name: "FL_ANDROID_PROJECT_DIR", 
-                                         description: "specify project directory", 
                                          is_string: true,
                                          default_value: ""),
             FastlaneCore::ConfigItem.new(key: :ensure_git_status_clean,
