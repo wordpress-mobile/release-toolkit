@@ -1,0 +1,6 @@
+            <strong><a href="/projects/apps/android/dev/es-ve/default/">Spanish (Venezuela)</a></strong>
+                    <span class="bubble morethan90">100%</span>
+            <strong><a href="/projects/apps/android/dev/ru/default/">Russian</a></strong>
+                    <span class="bubble morethan90">100%</span>
+            <strong><a href="/projects/apps/android/dev/zh-hk/default/">Chinese (Hong Kong)</a></strong>
+            <strong><a href="/projects/apps/android/dev/cs/default/">Czech</a></strong>
