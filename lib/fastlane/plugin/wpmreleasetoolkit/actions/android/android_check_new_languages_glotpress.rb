@@ -4,23 +4,24 @@ module Fastlane
       class AndroidCheckNewLanguagesGlotpressAction < Action
         def self.run(params)
 
-          languages_to_check = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90_from_url(params[:glotpress_status_url]);
+          languages_to_check = Fastlane::Helper::AndroidLocalizeHelper.get_glotpress_languages_translated_morethan90_from_url(params[:glotpress_status_url])
           UI.message("Number of languages over 90\% translation threshold: #{languages_to_check.count}")
 
-          missing_languages = Fastlane::Helper::AndroidLocalizeHelper.get_missing_languages(languages_to_check, params[:language_file], params[:verbose]);
+          language_file_path = "#{Fastlane::Helper::FilesystemHelper::project_path()}/#{params[:language_file]}"
+          missing_languages = Fastlane::Helper::AndroidLocalizeHelper.get_missing_languages(languages_to_check, language_file_path, params[:verbose])
 
           if (not missing_languages.empty?)
-            error_message = "Found #{missing_languages.count} " + "language".pluralize(missing_languages.count) + " over 90\% translation but not in #{params[:language_file]}";
-            UI.error("#{error_message}:");
+            error_message = "Found #{missing_languages.count} " + "language".pluralize(missing_languages.count) + " over 90\% translation but not in #{language_file_path}"
+            UI.error("#{error_message}:")
 
             missing_languages.each do |language_code|
-              UI.error("#{language_code}");
+              UI.error("#{language_code}")
             end
 
             UI.user_error!("Check Failed: #{error_message}")
           end
 
-          UI.success "Check Success: all languages over 90\% translation threshold were found in #{params[:language_file]}"
+          UI.success "Check Success: all languages over 90\% translation threshold were found in #{language_file_path}"
           "Check Success"
         end
         #####################################################

@@ -9,18 +9,19 @@ module Fastlane
             other_action.ensure_git_status_clean(show_uncommitted_changes:true)
           end
 
+          res_dir = "#{Fastlane::Helper::FilesystemHelper::project_path()}/#{params[:res_dir]}"
           # set up test by removing localized strings.xml
-          deleted_files = Fastlane::Helper::FilesystemHelper::delete_files("#{params[:res_dir]}/values-??/strings.xml", true, false)
-          deleted_files += Fastlane::Helper::FilesystemHelper::delete_files("#{params[:res_dir]}/values-??-r??/strings.xml", true, false)
+          deleted_files = Fastlane::Helper::FilesystemHelper::delete_files("#{res_dir}/values-??/strings.xml", true, false)
+          deleted_files += Fastlane::Helper::FilesystemHelper::delete_files("#{res_dir}/values-??-r??/strings.xml", true, false)
 
           if (deleted_files.count > 0)
             UI.message("#{deleted_files.count} localized string " + "file".pluralize(deleted_files.count) + " temporarily deleted to set up for the test build.")
           else
-            UI.error("No localized string files have been found for deletion. Results may be invalid. Please double check that the provided res directory (#{params[:res_dir]}) is correct.")
+            UI.error("No localized string files have been found for deletion. Results may be invalid. Please double check that the provided res directory (#{res_dir}) is correct.")
           end
 
           # check for missing strings by doing a build
-          UI.message("Checking for missing English strings in #{params[:res_dir]}/values/strings.xml")
+          UI.message("Checking for missing English strings in #{res_dir}/values/strings.xml")
           UI.message("Running test build without localized strings, this may take a while...")
 
           success = true
@@ -36,16 +37,16 @@ module Fastlane
             success = false
           ensure
             # clean up
-            run_gradle("clean", params[:verbose])
+            run_gradle("clean", false)
             other_action.reset_git_repo(force: true, files: deleted_files)
             UI.message("Cleanup complete: build cleaned, localized string files are no longer deleted")
           end
 
           if (not success)
-            UI.user_error!("Check Failed: some English strings may be missing in #{params[:res_dir]}/values/strings.xml")
+            UI.user_error!("Check Failed: some English strings may be missing in #{res_dir}/values/strings.xml")
           end
 
-          UI.success "Check Success: no missing English strings found in #{params[:res_dir]}/values/strings.xml"
+          UI.success "Check Success: no missing English strings found in #{res_dir}/values/strings.xml"
           "Check Success"
         end
 
