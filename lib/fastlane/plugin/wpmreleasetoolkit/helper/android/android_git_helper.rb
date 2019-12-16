@@ -42,7 +42,7 @@ module Fastlane
           Action.sh("cat #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.bak >> #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
           Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
           Action.sh("git diff-index --quiet HEAD || git commit -m \"Update release notes.\"")
-          Action.sh("git push")
+          Action.sh("git push origin HEAD")
         end
   
         def self.update_metadata(validate_translation_command)
@@ -51,31 +51,31 @@ module Fastlane
           Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/src/main/res")
           Action.sh("git diff-index --quiet HEAD || git commit -m \"Updates translations\"")
   
-          Action.sh("git push")
+          Action.sh("git push origin HEAD")
         end
 
         def self.bump_version_release()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]} && git add ./build.gradle")
           Action.sh("git commit -m \"Bump version number\"")
-          Action.sh("git push")
+          Action.sh("git push origin HEAD")
         end
 
         def self.bump_version_beta()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]} && git add ./build.gradle")
           Action.sh("git commit -m \"Bump version number\"")
-          Action.sh("git push")
+          Action.sh("git push origin HEAD")
         end
 
         def self.bump_version_hotfix(version)
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]} && git add ./build.gradle")
           Action.sh("git commit -m \"Bump version number\"")
-          Action.sh("git push")
+          Action.sh("git push origin HEAD")
         end
         
         def self.bump_version_final()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]} && git add ./build.gradle")
           Action.sh("git commit -m \"Bump version number\"")
-          Action.sh("git push")
+          Action.sh("git push origin HEAD")
         end
 
         def self.tag_build(release_version, alpha_version)
