@@ -31,20 +31,20 @@ module Fastlane
           Action.sh("git add fastlane/download_metadata.swift") unless skip_metadata
           Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/Resources/#{ENV["APP_STORE_STRINGS_FILE_NAME"]}") unless skip_metadata
           Action.sh("git commit -m \"Bump version number\"")
-          Action.sh("git push")
+          Action.sh("git push origin HEAD")
         end
   
         def self.bump_version_hotfix(version)
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && git add ./config/.")
           Action.sh("git add fastlane/Deliverfile")
           Action.sh("git commit -m \"Bump version number\"")
-          Action.sh("git push")
+          Action.sh("git push origin HEAD")
         end
   
         def self.bump_version_beta()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && git add ./config/.")
           Action.sh("git commit -m \"Bump version number\"")
-          Action.sh("git push")
+          Action.sh("git push origin HEAD")
         end
   
         def self.delete_tags(version)
@@ -72,7 +72,7 @@ module Fastlane
 	  is_repo_clean = `git status --porcelain`.empty?
           if is_repo_clean then
             Action.sh("git diff-index --quiet HEAD || git commit -m \"Updates strings for localization\"")
-            Action.sh("git push")
+            Action.sh("git push origin HEAD")
           else
             UI.message("No new strings, skipping commit.")
           end        
@@ -85,7 +85,7 @@ module Fastlane
           Action.sh("rm #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.bak")
           Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
           Action.sh("git commit -m \"Update release notes.\"")
-          Action.sh("git push")
+          Action.sh("git push origin HEAD")
         end
   
         def self.tag_build(itc_version, internal_version)
@@ -102,7 +102,7 @@ module Fastlane
           Action.sh("git add ./fastlane/metadata/")
           Action.sh("git diff-index --quiet HEAD || git commit -m \"Updates metadata translation\"")
   
-          Action.sh("git push")
+          Action.sh("git push origin HEAD")
         end
   
         def self.do_release_branch(branch_name)
