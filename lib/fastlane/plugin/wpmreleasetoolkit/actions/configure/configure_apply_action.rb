@@ -10,6 +10,10 @@ module Fastlane
   module Actions
     class ConfigureApplyAction < Action
       def self.run(params = {})
+
+        # Preflight
+        UI.user_error!("Decryption key could not be found") if Fastlane::Helper::ConfigureHelper.encryption_key.nil?
+
         # Checkout the right commit hash etc. before applying the configuration
         prepare_repository do
           # Copy/decrypt the files
