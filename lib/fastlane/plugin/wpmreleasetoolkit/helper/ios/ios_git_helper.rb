@@ -127,6 +127,20 @@ module Fastlane
           UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)
         end
 
+        def self.is_head_on_tag()
+          !Action.sh("git tag --points-at HEAD").empty?
+        end
+
+        def self.has_final_tag_for(version)
+          head_tags=Action.sh("git tag --points-at HEAD").split("\n")
+          head_tags.each { | vtag | 
+            if (vtag == version)
+              return true
+            end 
+          }
+          return false
+        end
+
         private
         def self.tag_and_push(version)
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && git tag #{version} && git push origin #{version}") 
