@@ -18,7 +18,7 @@ module Fastlane
         end
 
         # Check local repo status
-        other_action.ensure_git_status_clean()
+        other_action.ensure_git_status_clean() unless params[:run_on_ci]
       end
 
       #####################################################
@@ -53,6 +53,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :internal_on_single_version,
                                           env_name: "FL_IOS_BUILD_PRECHECKS_INTERNAL_SV_BUILD",
                                           description: "True if this is for an internal build that follows the same versioning of the external",
+                                          is_string: false, 
+                                          default_value: false), 
+          FastlaneCore::ConfigItem.new(key: :run_on_ci,
+                                          env_name: "FL_IOS_BUILD_PRECHECKS_RUN_ON_CI",
+                                          description: "True if running on CI",
                                           is_string: false, 
                                           default_value: false), 
         ]
