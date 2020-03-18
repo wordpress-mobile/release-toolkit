@@ -1,14 +1,14 @@
 version: 2.1
 
 orbs:
-  ios: wordpress-mobile/ios@0.0.29
+  ios: wordpress-mobile/ios@1.0
   codecov: codecov/codecov@1.0.2
 
 jobs:
   test:
     executor:
       name: ios/default
-      xcode-version: "10.2.1"
+      xcode-version: "11.2.1"
     environment:
       HOMEBREW_NO_AUTO_UPDATE: 1
       PKG_CONFIG_PATH: "/usr/local/opt/imagemagick@6/lib/pkgconfig"
