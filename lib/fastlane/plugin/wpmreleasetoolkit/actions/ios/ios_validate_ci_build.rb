@@ -6,9 +6,6 @@ module Fastlane
         require_relative '../../helper/ios/ios_version_helper.rb'
 
         version = Fastlane::Helpers::IosVersionHelper::get_public_version()
-        is_hotfix = Fastlane::Helpers::IosVersionHelper::is_hotfix(version)
-        Fastlane::Helpers::IosGitHelper.check_on_branch(is_hotfix ? "hotfix" : "release")
-
         UI.user_error!("HEAD is not on tag. Aborting!") unless Fastlane::Helpers::IosGitHelper::is_head_on_tag()
 
         return Fastlane::Helpers::IosGitHelper::has_final_tag_for(version)
