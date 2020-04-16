@@ -69,7 +69,7 @@ module Fastlane
         def self.localize_project()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && ./Scripts/localize.py")
           Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}*.lproj/Localizable.strings")
-	        is_repo_clean = `git status --porcelain`.empty?
+          is_repo_clean = `git status --porcelain`.empty?
           if is_repo_clean then
             UI.message("No new strings, skipping commit.")  
           else
