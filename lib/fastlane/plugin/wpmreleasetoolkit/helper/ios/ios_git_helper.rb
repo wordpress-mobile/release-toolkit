@@ -69,12 +69,12 @@ module Fastlane
         def self.localize_project()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && ./Scripts/localize.py")
           Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}*.lproj/Localizable.strings")
-	  is_repo_clean = `git status --porcelain`.empty?
+          is_repo_clean = `git status --porcelain`.empty?
           if is_repo_clean then
-            Action.sh("git diff-index --quiet HEAD || git commit -m \"Updates strings for localization\"")
-            Action.sh("git push origin HEAD")
+            UI.message("No new strings, skipping commit.")  
           else
-            UI.message("No new strings, skipping commit.")
+            Action.sh("git commit -m \"Updates strings for localization\"")
+            Action.sh("git push origin HEAD")
           end        
         end
   
