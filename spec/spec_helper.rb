@@ -43,17 +43,3 @@ ensure
     ENV.delete 'CIRCLECI'
   end
 end
-
-def define_circle_env()
-  is_ci = ENV.key?('CIRCLECI')
-  orig_circle_ci = ENV['CIRCLECI']
-  
-
-  yield
-ensure
-  if (is_ci)
-    ENV['CIRCLECI'] = orig_circle_ci
-  else
-    ENV.delete 'CIRCLECI'
-  end
-end
