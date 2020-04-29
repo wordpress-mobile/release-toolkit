@@ -52,6 +52,7 @@ module Fastlane
       end
   
       def destination_file_path
+        return File.expand_path(self.destination) if self.destination.start_with?('~')
         File.join(Fastlane::Helper::FilesystemHelper.project_path, self.destination)
       end
     
