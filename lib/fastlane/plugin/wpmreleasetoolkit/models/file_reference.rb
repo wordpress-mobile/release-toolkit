@@ -10,7 +10,7 @@ module Fastlane
       end
   
       def source_contents
-        return File.read(secrets_repository_file_path) unless self.encrypt
+        return File.read(secrets_repository_file_path) unless (self.encrypt || ENV.key?('CIRCLECI'))
         return nil unless File.file?(encrypted_file_path)
         encrypted = File.read(encrypted_file_path)
         Fastlane::Helper::EncryptionHelper.decrypt(encrypted, encryption_key)
