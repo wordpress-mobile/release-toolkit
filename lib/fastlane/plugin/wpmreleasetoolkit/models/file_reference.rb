@@ -10,7 +10,10 @@ module Fastlane
       end
   
       def source_contents
-        return File.read(secrets_repository_file_path) unless self.encrypt
+        # TODO: This works only on CircleCI. I chose this variable because it's the one checked by Fastlane::is_ci.
+        # Fastlane::is_ci doesn't work here, so reimplementing the code has been necessary.
+        # (This should be updated if we change CI or if fastlane is updated.)
+        return File.read(secrets_repository_file_path) unless (self.encrypt || ENV.key?('CIRCLECI')) 
         return nil unless File.file?(encrypted_file_path)
         encrypted = File.read(encrypted_file_path)
         Fastlane::Helper::EncryptionHelper.decrypt(encrypted, encryption_key)
@@ -52,6 +55,7 @@ module Fastlane
       end
   
       def destination_file_path
+        return File.expand_path(self.destination) if self.destination.start_with?('~')
         File.join(Fastlane::Helper::FilesystemHelper.project_path, self.destination)
       end
     
