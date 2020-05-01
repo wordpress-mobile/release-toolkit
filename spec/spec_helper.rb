@@ -25,3 +25,21 @@ Fastlane.load_actions # load other actions (in case your plugin calls other acti
 RSpec.configure do |config|
   config.filter_run_when_matching :focus
 end
+
+def set_circle_env(define_ci)
+  is_ci = ENV.key?('CIRCLECI')
+  orig_circle_ci = ENV['CIRCLECI']
+  if (define_ci)
+    ENV['CIRCLECI'] = "true"
+  else
+    ENV.delete 'CIRCLECI'
+  end 
+
+  yield
+ensure
+  if (is_ci)
+    ENV['CIRCLECI'] = orig_circle_ci
+  else
+    ENV.delete 'CIRCLECI'
+  end
+end
