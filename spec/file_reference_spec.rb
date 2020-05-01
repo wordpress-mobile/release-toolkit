@@ -61,7 +61,7 @@ describe Fastlane::Configuration::FileReference do
       end
     end
 
-    describe '#source_contents_on_ci' do
+    describe '#source_contents on ci' do
       it 'gets the contents from the secrets repo' do
         set_circle_env(true) do
           allow(File).to receive(:read).with(subject.secrets_repository_file_path).and_return('source contents')

@@ -30,7 +30,7 @@ def set_circle_env(define_ci)
   is_ci = ENV.key?('CIRCLECI')
   orig_circle_ci = ENV['CIRCLECI']
   if (define_ci)
-    ENV['CIRCLECI'] = 'CircleCI'
+    ENV['CIRCLECI'] = "true"
   else
     ENV.delete 'CIRCLECI'
   end 
