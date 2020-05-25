@@ -134,5 +134,24 @@ module Fastlane
       end
     end
 
+    class ReleaseNoteShortMetadataBlock < ReleaseNoteMetadataBlock     
+
+      def initialize(block_key, content_file_path, release_version)
+        super(block_key, content_file_path, release_version)
+        @rel_note_key = "release_note_short"
+        @release_version = release_version
+        generate_keys(release_version)
+      end
+  
+      def is_handler_for(key)
+        values = key.split('_')
+        key.start_with?(@rel_note_key) && values.length == 4 && (Integer(values[3].sub(/^[0]*/, "")) != nil rescue false)
+      end
+
+    end
   end
+
+
+
 end
+  
