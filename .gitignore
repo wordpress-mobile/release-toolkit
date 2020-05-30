@@ -1,6 +1,9 @@
 .DS_Store
 /tmp
 
+# Ruby / Bundler
+.bundle/
+
 # Fastlane
 fastlane/README.md
 fastlane/report.xml
