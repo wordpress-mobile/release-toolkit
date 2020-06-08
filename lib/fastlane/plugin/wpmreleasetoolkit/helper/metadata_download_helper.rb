@@ -58,7 +58,9 @@ module Fastlane
           source = d[0].split(/\u0004/).last
 
           @alternates.each do | file |
+            puts "Data: #{file[0].to_s} - key: #{key}"
             if (file[0].to_s == key)
+              puts "Alternate: #{key}"
               data = file[1]
               msg = is_source ? source : d[1]
               update_key(target_locale, key, file, data, msg)
@@ -71,7 +73,7 @@ module Fastlane
         if (data.key?(:max_size)) && (data[:max_size] != 0) && ((msg.to_s.length - 3) > data[:max_size]) then
           if (data.key?(:alternate_key)) then
             UI.message("#{target_locale} traslation for #{key} exceeds maximum lenght (#{msg.to_s.length}). Switching to the alternate translation.")
-            @alternates[data[:alternate_key]] = {desc: data[:desc], max_size: data[:max_size] }
+            @alternates[data[:alternate_key]] = {desc: data[:desc], max_size: 0 }
           else
             UI.message("Rejecting #{target_locale} traslation for #{key}: translation length: #{msg.to_s.length} - max allowed length: #{data[:max_size]}")
           end
