@@ -1,3 +1,4 @@
 pkg-config
 libxml2
 imagemagick@6
+libsodium
