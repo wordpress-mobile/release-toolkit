@@ -38,6 +38,8 @@ module Fastlane
               end
             end
           end
+
+          File.delete(join_strings)
         end
 
         File.open(main_file, "w") do | f | 
