@@ -19,6 +19,8 @@ module Fastlane
         main_file = File.join(strings_folder, "strings.xml")
         return unless File.exist?(main_file)
 
+        UI.message("Merging in: #{strings_folder}")
+
         tmp_main_file = main_file + ".tmp"
         FileUtils.cp(main_file, tmp_main_file)
 
@@ -29,15 +31,12 @@ module Fastlane
           my_strings.each { | string | extra_strings << string if string.include?("<string name") }
         end
 
-        File.open(tmp_main_file).each do | line |
-          File.open(main_file, "w+") do | f | 
+        File.open(main_file, "w") do | f | 
+          File.open(tmp_main_file).each do | line |
+          
+            f.puts(extra_strings) if (line.strip == "</resources>") 
             f.puts(check_line(line, extra_strings))
           end
-        end
-
-        # Append the new strings
-        File.open(main_file, "a") do | f | 
-          f.puts(extra_strings)
         end
 
         File.delete(tmp_main_file)
