@@ -26,9 +26,18 @@ module Fastlane
 
         join_files = Dir.glob(File.join("#{strings_folder}", "strings-*.xml"))
         extra_strings = Array.new
+        extra_keys = Array.new
         join_files.each do | join_strings |
           my_strings = File.read(join_strings).split("\n")
-          my_strings.each { | string | extra_strings << string if string.include?("<string name") }
+          my_strings.each do | string | 
+            if string.include?("<string name") 
+              string_key = string.strip.split(">").first
+              if (!extra_keys.include?(string_key))
+                extra_strings << string 
+                extra_keys << string_key
+              end
+            end
+          end
         end
 
         File.open(main_file, "w") do | f | 
