@@ -72,7 +72,7 @@ module Fastlane
       def update_key(target_locale, key, file, data, msg)
         if (data.key?(:max_size)) && (data[:max_size] != 0) && ((msg.to_s.length - 3) > data[:max_size]) then
           if (data.key?(:alternate_key)) then
-            UI.message("#{target_locale} traslation for #{key} exceeds maximum lenght (#{msg.to_s.length}). Switching to the alternate translation.")
+            UI.message("#{target_locale} translation for #{key} exceeds maximum length (#{msg.to_s.length}). Switching to the alternate translation.")
             @alternates[data[:alternate_key]] = {desc: data[:desc], max_size: 0 }
           else
             UI.message("Rejecting #{target_locale} traslation for #{key}: translation length: #{msg.to_s.length} - max allowed length: #{data[:max_size]}")
