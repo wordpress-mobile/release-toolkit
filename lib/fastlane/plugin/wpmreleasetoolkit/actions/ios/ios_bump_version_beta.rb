@@ -3,7 +3,7 @@ module Fastlane
     class IosBumpVersionBetaAction < Action
       def self.run(params)
         UI.message "Bumping app release version..."
-         
+
         require_relative '../../helper/ios/ios_git_helper.rb'
         require_relative '../../helper/ios/ios_version_helper.rb'
 
@@ -12,10 +12,10 @@ module Fastlane
         show_config()
 
         UI.message "Updating XcConfig..."
-        Fastlane::Helpers::IosVersionHelper.update_xc_configs(@new_beta_version, @short_version, @new_internal_version) 
+        Fastlane::Helpers::IosVersionHelper.update_xc_configs(@new_beta_version, @short_version, @new_internal_version)
         UI.message "Done!"
- 
-        Fastlane::Helpers::IosGitHelper.bump_version_beta        
+
+        Fastlane::Helpers::IosGitHelper.bump_version_beta
       end
 
       #####################################################
@@ -31,15 +31,12 @@ module Fastlane
       end
 
       def self.available_options
-        
       end
 
       def self.output
-        
       end
 
       def self.return_value
-        
       end
 
       def self.authors
@@ -50,7 +47,8 @@ module Fastlane
         platform == :ios
       end
 
-      private 
+      private
+
       def self.create_config()
         @current_version = Fastlane::Helpers::IosVersionHelper.get_build_version()
         @current_version_internal = Fastlane::Helpers::IosVersionHelper.get_internal_version() unless ENV["INTERNAL_CONFIG_FILE"].nil?

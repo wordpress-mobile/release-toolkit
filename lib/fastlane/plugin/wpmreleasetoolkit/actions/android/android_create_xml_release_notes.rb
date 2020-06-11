@@ -6,7 +6,7 @@ module Fastlane
 
         release_notes_path = params[:download_path] + "/release_notes.xml"
         open(release_notes_path, 'w') { |f|
-          params[:locales].each do | loc |
+          params[:locales].each do |loc|
             puts "Looking for language: #{loc[1]}"
             complete_path = "#{params[:download_path]}/#{loc[1]}/changelogs/#{params[:build_number]}.txt"
             if (File.exist?(complete_path))
@@ -35,19 +35,19 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :download_path,
-                                        env_name: "ANDROID_XML_NOTES_DOWNLOAD_PATH",
-                                     description: "The path to the folder with the release notes",
-                                        optional: false,
+                                       env_name: "ANDROID_XML_NOTES_DOWNLOAD_PATH",
+                                       description: "The path to the folder with the release notes",
+                                       optional: false,
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :build_number,
-                                        env_name: "ANDROID_XML_NOTES_BUILD_NUMBER",
-                                     description: "The build number of the release notes",
-                                        optional: false,
+                                       env_name: "ANDROID_XML_NOTES_BUILD_NUMBER",
+                                       description: "The build number of the release notes",
+                                       optional: false,
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :locales,
-                                        env_name: "FL_DOWNLOAD_METADATA_LOCALES",
-                                        description: "The hash with the GLotPress locale and the project locale association",
-                                        is_string: false),
+                                       env_name: "FL_DOWNLOAD_METADATA_LOCALES",
+                                       description: "The hash with the GLotPress locale and the project locale association",
+                                       is_string: false),
         ]
       end
 

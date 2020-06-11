@@ -6,17 +6,16 @@ module Fastlane
   module Actions
     class ConfigureDownloadAction < Action
       def self.run(params = {})
-
         UI.message "Running Configure Download"
 
         # If the `~/.mobile-secrets` repository doesn't exist
         unless File.directory?("#{secrets_dir}")
-            UI.user_error!("The local secrets store does not exist. Please clone it to #{secrets_dir} before continuing.")
+          UI.user_error!("The local secrets store does not exist. Please clone it to #{secrets_dir} before continuing.")
         else
           update_repository # If the repo already exists, just update it
         end
       end
-      
+
       # Ensure the git repository at `~/.mobile-secrets` is up to date.
       # If the secrets repo is in a detached HEAD state, skip the pull,
       # since it will fail.

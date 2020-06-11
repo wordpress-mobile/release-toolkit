@@ -33,7 +33,7 @@ def set_circle_env(define_ci)
     ENV['CIRCLECI'] = "true"
   else
     ENV.delete 'CIRCLECI'
-  end 
+  end
 
   yield
 ensure

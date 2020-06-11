@@ -7,9 +7,7 @@ require_relative '../../helper/configure_helper'
 module Fastlane
   module Actions
     class ConfigureValidateAction < Action
-
       def self.run(params = {})
-
         # Start by ensuring that we've set up the project for configuration
         validate_that_configure_file_exists
 
@@ -39,7 +37,6 @@ module Fastlane
       ### Validate that the branch specified in .configure matches the branch
       ### checked out in ~/.mobile-secrets.
       def self.validate_that_branches_match
-
         repo_branch_name = Fastlane::Helper::ConfigureHelper.repo_branch_name
         file_branch_name = Fastlane::Helper::ConfigureHelper.configure_file_branch_name
 
@@ -77,42 +74,41 @@ module Fastlane
         dependencies = Fastlane::Helper::ConfigureHelper.file_dependencies
         new_files = Fastlane::Helper::ConfigureHelper.new_files_in(changed_files)
 
-        changed_dependencies = changed_files & dependencies #calculate array intersection
+        changed_dependencies = changed_files & dependencies # calculate array intersection
 
         unless changed_dependencies.empty?
-            UI.user_error!("The following files are out of date. Please run `bundle exec fastlane run configure_update` before continuing:\n\n#{changed_dependencies.to_s}")
+          UI.user_error!("The following files are out of date. Please run `bundle exec fastlane run configure_update` before continuing:\n\n#{changed_dependencies.to_s}")
         end
 
         unless new_files.empty?
-            UI.user_error!("The following files are in the secrets repository, but aren't available for your project. Please run `bundle exec fastlane run configure_update` before continuing:\n\n#{new_files}")
+          UI.user_error!("The following files are in the secrets repository, but aren't available for your project. Please run `bundle exec fastlane run configure_update` before continuing:\n\n#{new_files}")
         end
       end
 
       ### Validate that the secrets repo doesn't have any local changes
       def self.validate_that_secrets_repo_is_clean
         unless Fastlane::Helper::ConfigureHelper.repo_has_changes
-            UI.user_error!("The secrets repository has uncommitted changes. Please commit or discard them before continuing.")
+          UI.user_error!("The secrets repository has uncommitted changes. Please commit or discard them before continuing.")
         end
       end
 
       def self.validate_that_all_copied_files_match
-        Fastlane::Helper::ConfigureHelper.files_to_copy.each{ |x|
+        Fastlane::Helper::ConfigureHelper.files_to_copy.each { |x|
+          source = absolute_secret_store_path(x.file)
+          destination = absolute_project_path(x.destination)
 
-            source = absolute_secret_store_path(x.file)
-            destination = absolute_project_path(x.destination)
+          sourceHash = file_hash(source)
+          destinationHash = file_hash(destination)
 
-            sourceHash = file_hash(source)
-            destinationHash = file_hash(destination)
-
-            unless sourceHash == destinationHash
-                UI.user_error!("`#{x.destination} doesn't match the file in the secrets repository (#{x.file}) – unable to continue")
-            end
+          unless sourceHash == destinationHash
+            UI.user_error!("`#{x.destination} doesn't match the file in the secrets repository (#{x.file}) – unable to continue")
+          end
         }
       end
 
       def self.validate_that_configure_file_exists
         unless Fastlane::Helper::ConfigureHelper.configuration_path_exists
-            UI.user_error!("Couldn't find `.configure` file. Please set up this project for `configure` by running `bundle exec fastlane run configure_setup`")
+          UI.user_error!("Couldn't find `.configure` file. Please set up this project for `configure` by running `bundle exec fastlane run configure_setup`")
         end
       end
 

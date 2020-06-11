@@ -3,7 +3,7 @@ module Fastlane
     class AndroidBumpVersionFinalReleaseAction < Action
       def self.run(params)
         UI.message "Bumping app release version..."
-         
+
         require_relative '../../helper/android/android_git_helper.rb'
         require_relative '../../helper/android/android_version_helper.rb'
 
@@ -12,10 +12,10 @@ module Fastlane
         show_config()
 
         UI.message "Updating gradle.properties..."
-        Fastlane::Helpers::AndroidVersionHelper.update_versions(@final_version, @current_version_alpha)  
+        Fastlane::Helpers::AndroidVersionHelper.update_versions(@final_version, @current_version_alpha)
         UI.message "Done!"
- 
-        Fastlane::Helpers::AndroidGitHelper.bump_version_final()        
+
+        Fastlane::Helpers::AndroidGitHelper.bump_version_final()
       end
 
       #####################################################
@@ -38,7 +38,8 @@ module Fastlane
         platform == :android
       end
 
-      private 
+      private
+
       def self.create_config()
         @current_version = Fastlane::Helpers::AndroidVersionHelper.get_release_version()
         @current_version_alpha = Fastlane::Helpers::AndroidVersionHelper.get_alpha_version()

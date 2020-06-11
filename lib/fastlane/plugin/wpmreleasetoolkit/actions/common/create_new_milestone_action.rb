@@ -38,16 +38,16 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :repository,
-                                   env_name: "GHHELPER_REPOSITORY",
-                                description: "The remote path of the GH repository on which we work",
-                                   optional: false,
+                                       env_name: "GHHELPER_REPOSITORY",
+                                       description: "The remote path of the GH repository on which we work",
+                                       optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :need_appstore_submission,
-                                        env_name: "GHHELPER_NEED_APPSTORE_SUBMISSION",
-                                     description: "True if the app needs to be submitted",
-                                        optional: true,
-                                        is_string: false,
-                                        default_value: false),
+                                       env_name: "GHHELPER_NEED_APPSTORE_SUBMISSION",
+                                       description: "True if the app needs to be submitted",
+                                       optional: true,
+                                       is_string: false,
+                                       default_value: false),
         ]
       end
 

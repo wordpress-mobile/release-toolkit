@@ -3,7 +3,7 @@ module Fastlane
     class AndroidHotfixPrechecksAction < Action
       def self.run(params)
         UI.message "Skip confirm: #{params[:skip_confirm]}"
-        UI.message "" 
+        UI.message ""
 
         require_relative '../../helper/android/android_version_helper.rb'
         require_relative '../../helper/android/android_git_helper.rb'
@@ -20,7 +20,7 @@ module Fastlane
           if (!UI.confirm("#{message}Do you want to continue?"))
             UI.user_error!("Aborted by user request")
           end
-        else 
+        else
           UI.message(message)
         end
 
@@ -55,23 +55,21 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :version_name,
-                                       env_name: "FL_ANDROID_HOTFIX_PRECHECKS_VERSION", 
+                                       env_name: "FL_ANDROID_HOTFIX_PRECHECKS_VERSION",
                                        description: "The version to work on", # a short description of this parameter
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
-                                        env_name: "FL_ANDROID_HOTFIX_PRECHECKS_SKIPCONFIRM",
-                                        description: "Skips confirmation",
-                                        is_string: false, # true: verifies the input is a string, false: every kind of value
-                                        default_value: false) # the default value if the user didn't provide one
+                                       env_name: "FL_ANDROID_HOTFIX_PRECHECKS_SKIPCONFIRM",
+                                       description: "Skips confirmation",
+                                       is_string: false, # true: verifies the input is a string, false: every kind of value
+                                       default_value: false) # the default value if the user didn't provide one
         ]
       end
 
       def self.output
-        
       end
 
       def self.return_value
-        
       end
 
       def self.authors

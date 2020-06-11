@@ -3,7 +3,7 @@ module Fastlane
     class IosFinalizePrechecksAction < Action
       def self.run(params)
         UI.message "Skip confirm: #{params[:skip_confirm]}"
-        
+
         require_relative '../../helper/ios/ios_version_helper.rb'
         require_relative '../../helper/ios/ios_git_helper.rb'
 
@@ -15,7 +15,7 @@ module Fastlane
           if (!UI.confirm("#{message}Do you want to continue?"))
             UI.user_error!("Aborted by user request")
           end
-        else 
+        else
           UI.message(message)
         end
 
@@ -48,7 +48,6 @@ module Fastlane
       end
 
       def self.output
-        
       end
 
       def self.return_value

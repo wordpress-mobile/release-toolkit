@@ -23,7 +23,7 @@ module Fastlane
           UI.message "#{self.check_path(params[:output_folder])} Output Folder: #{params[:output_folder]}"
         end
 
-        outputDirectory = helper.resolve_path( params[:output_folder] )
+        outputDirectory = helper.resolve_path(params[:output_folder])
 
         ## If there are no translated screenshot images (whether it's because they haven't been generated yet,
         ##   or because we aren't using them), just use the translated directories.
@@ -50,62 +50,59 @@ module Fastlane
         stylesheet_path = config["stylesheet"]
 
         entries = config["entries"]
-          .flat_map { |entry|
+                  .flat_map { |entry|
+                    languages.map { |language|
+                      newEntry = entry.deep_dup
 
-            languages.map { |language|
+                      # Not every output file will have a screenshot, so handle cases where no
+                      # screenshot file is defined
+                      if entry["screenshot"] != nil && entry["filename"] != nil
+                        newEntry["screenshot"] = helper.resolve_path(params[:orig_folder]) + language + entry["screenshot"]
+                        newEntry["filename"] =  outputDirectory + language + entry["filename"]
+                      elsif entry["screenshot"] != nil && entry["filename"] == nil
+                        newEntry["screenshot"] = helper.resolve_path(params[:orig_folder]) + language + entry["screenshot"]
+                        newEntry["filename"] =  outputDirectory + language + entry["screenshot"]
+                      elsif entry["screenshot"] == nil && entry["filename"] != nil
+                        newEntry["filename"] =  outputDirectory + language + entry["filename"]
+                      else
+                        puts newEntry
+                        abort "Unable to find output file names"
+                      end
 
-              newEntry = entry.deep_dup
+                      newEntry["locale"] = language
 
-              # Not every output file will have a screenshot, so handle cases where no 
-              # screenshot file is defined
-              if entry["screenshot"] != nil && entry["filename"] != nil
-                newEntry["screenshot"] = helper.resolve_path(params[:orig_folder]) + language + entry["screenshot"]
-                newEntry["filename"] =  outputDirectory + language + entry["filename"]
-              elsif entry["screenshot"] != nil && entry["filename"] == nil
-                newEntry["screenshot"] = helper.resolve_path(params[:orig_folder]) + language + entry["screenshot"]
-                newEntry["filename"] =  outputDirectory + language + entry["screenshot"]
-              elsif entry["screenshot"] == nil && entry["filename"] != nil
-                newEntry["filename"] =  outputDirectory + language + entry["filename"]
-              else
-                puts newEntry
-                abort "Unable to find output file names"
-              end
+                      # Localize file paths for text
+                      if entry["text"] != nil
+                        newEntry["text"].sub!("{locale}", language.dup)
+                      end
 
-              newEntry["locale"] = language
+                      # Map attachments paths to their localized versions
+                      if newEntry["attachments"] == nil
+                        newEntry["attachments"] = []
+                      end
 
-              # Localize file paths for text
-              if entry["text"] != nil
-                newEntry["text"].sub!("{locale}", language.dup)
-              end
+                      newEntry["attachments"].each { |attachment|
+                        if attachment["file"] != nil
+                          attachment["file"].sub!("{locale}", language.dup)
+                        end
 
-              # Map attachments paths to their localized versions
-              if newEntry["attachments"] == nil
-                  newEntry["attachments"] = []
-              end
+                        if attachment["text"] != nil
+                          attachment["text"].sub!("{locale}", language.dup)
+                        end
+                      }
 
-              newEntry["attachments"].each { |attachment|
-                if attachment["file"] != nil
-                  attachment["file"].sub!("{locale}", language.dup)
-                end
-
-                if attachment["text"] != nil
-                  attachment["text"].sub!("{locale}", language.dup)
-                end
-              }
-
-              newEntry
-            }
-          }
-          .sort { |x,y|
-            x["filename"] <=> y["filename"]
-          }
+                      newEntry
+                    }
+                  }
+                  .sort { |x, y|
+          x["filename"] <=> y["filename"]
+        }
 
         bar = ProgressBar.new(entries.count, :bar, :counter, :eta, :rate)
 
-        Parallel.map(entries, finish: -> (item, i, result) {
+        Parallel.map(entries, finish: ->(item, i, result) {
           bar.increment!
         }) do |entry|
-
           device = devices[entry["device"]]
 
           if device == nil
@@ -136,7 +133,6 @@ module Fastlane
 
           # Run the GC in the same thread to clean up after RMagick
           GC.start
-        
         end
       end
 
@@ -154,17 +150,16 @@ module Fastlane
       end
 
       def self.subdirectories_for_path(path)
-
         subdirectories = []
 
-        unless helper.can_resolve_path( path ) then
+        unless helper.can_resolve_path(path) then
           return []
         end
 
-        resolved_path = helper.resolve_path( path )
+        resolved_path = helper.resolve_path(path)
 
         Dir.chdir(resolved_path) do
-          subdirectories = Dir["*"].reject{|o| not File.directory?(o)}.sort
+          subdirectories = Dir["*"].reject { |o| not File.directory?(o) }.sort
         end
 
         subdirectories
@@ -198,35 +193,35 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :orig_folder,
-                                   env_name: "PROMOSS_ORIG",
-                                description: "The directory containing the original screenshots",
-                                   optional: false,
-                                  is_string: true),
+                                       env_name: "PROMOSS_ORIG",
+                                       description: "The directory containing the original screenshots",
+                                       optional: false,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :output_folder,
-                                        env_name: "PROMOSS_OUTPUT",
-                                     description: "The path of the folder to save the promo screenshots",
-                                        optional: false,
-                                      is_string: true),
+                                       env_name: "PROMOSS_OUTPUT",
+                                       description: "The path of the folder to save the promo screenshots",
+                                       optional: false,
+                                       is_string: true),
 
           FastlaneCore::ConfigItem.new(key: :metadata_folder,
-                                        env_name: "PROMOSS_METADATA_FOLDER",
-                                     description: "The directory containing the translation data",
-                                        optional: false,
-                                      is_string: true),
+                                       env_name: "PROMOSS_METADATA_FOLDER",
+                                       description: "The directory containing the translation data",
+                                       optional: false,
+                                       is_string: true),
 
           FastlaneCore::ConfigItem.new(key: :config_file,
-                                        env_name: "PROMOSS_CONFIG_FILE",
-                                     description: "The path to the file containing the promo screenshot configuration",
-                                        optional: true,
+                                       env_name: "PROMOSS_CONFIG_FILE",
+                                       description: "The path to the file containing the promo screenshot configuration",
+                                       optional: true,
                                        is_string: true,
-                                   default_value: "screenshots.json"),
+                                       default_value: "screenshots.json"),
 
           FastlaneCore::ConfigItem.new(key: :force,
-                                        env_name: "PROMOSS_FORCE_CREATION",
-                                     description: "Overwrite existing promo screenshots without asking first?",
-                                        optional: true,
+                                       env_name: "PROMOSS_FORCE_CREATION",
+                                       description: "Overwrite existing promo screenshots without asking first?",
+                                       optional: true,
                                        is_string: false,
-                                   default_value: false),
+                                       default_value: false),
         ]
       end
 

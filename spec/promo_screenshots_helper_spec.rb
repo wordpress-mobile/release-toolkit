@@ -2,31 +2,28 @@ require 'shellwords'
 require_relative './spec_helper'
 
 describe Fastlane::Helper::PromoScreenshots do
-
   context "initialization" do
+    it "parses valid JSON test files" do
+      # helper = helper.new(test_data_path_for("empty.json"), "", "", "")
+      configuration = helper.read_json(test_data_path_for("empty.json"))
+    end
 
-      it "parses valid JSON test files" do
-        # helper = helper.new(test_data_path_for("empty.json"), "", "", "")
-        configuration = helper.read_json(test_data_path_for("empty.json"))
-      end
-
-      it "throws an error for missing json test files" do
-        expect{
-          helper.read_json(test_data_path_for("nonexistent.json"))
-        }.to raise_error(FastlaneCore::Interface::FastlaneCrash)
+    it "throws an error for missing json test files" do
+      expect {
+        helper.read_json(test_data_path_for("nonexistent.json"))
+      }.to raise_error(FastlaneCore::Interface::FastlaneCrash)
     end
 
     it "throws an error for malformed json test files" do
       silence_output
-        expect{
-          helper.read_json(test_data_path_for("malformed.json"))
-        }.to raise_error(FastlaneCore::Interface::FastlaneError)
-        unsilence_output
+      expect {
+        helper.read_json(test_data_path_for("malformed.json"))
+      }.to raise_error(FastlaneCore::Interface::FastlaneError)
+      unsilence_output
     end
   end
 
   context "helpers can" do
-
     context "resolve paths" do
       it "can find images in the test helpers" do
         path = helper.resolve_path("images/source/blue-square.png")
@@ -37,13 +34,13 @@ describe Fastlane::Helper::PromoScreenshots do
       end
     end
 
-    context "open images" do 
+    context "open images" do
       it "with a valid image path" do
         helper.open_image(test_data_path_for("images/source/blue-square.png"))
       end
 
       it "and crashes on invalid image paths" do
-        expect{
+        expect {
           helper.open_image(test_data_path_for("images/source/nonexistent-image.jpg"))
         }.to raise_error(FastlaneCore::Interface::FastlaneCrash)
       end
@@ -78,26 +75,24 @@ describe Fastlane::Helper::PromoScreenshots do
     end
 
     context "resizing and" do
-
       it "can resize images to be smaller" do
         image = source_image("white-circle.png")
 
         output = helper.resize_image(image, 50, 50)
-        sample = write_test_data(output)  #for some reason this is needed to make tests pass
+        sample = write_test_data(output) # for some reason this is needed to make tests pass
         expect(images_are_identical(output, sample)).to eq(true)
       end
 
-       it "can resize images to be larger" do
+      it "can resize images to be larger" do
         image = source_image("white-circle.png")
 
         output = helper.resize_image(image, 1000, 1000)
-        sample = write_test_data(output)  #for some reason this is needed to make tests pass
+        sample = write_test_data(output) # for some reason this is needed to make tests pass
         expect(images_are_identical(output, sample)).to eq(true)
       end
     end
 
     context "cropping and" do
-
       it "crop images within image bounds" do
         image = source_image("blue-square.png")
 
@@ -105,7 +100,7 @@ describe Fastlane::Helper::PromoScreenshots do
         expect(images_are_identical(output, "cropped-1.png")).to eq(true)
       end
 
-       it "crop images outside image bounds only keeping existing data" do
+      it "crop images outside image bounds only keeping existing data" do
         image = source_image("blue-square.png")
 
         output = helper.crop_image(image, 475, 475, 50, 50)
@@ -115,9 +110,7 @@ describe Fastlane::Helper::PromoScreenshots do
   end
 
   context "perform high-level compositing operations, including" do
-    
     it "draws attachments with cropping, resizing, and compositing" do
-
       entry = sample_script("attachment-test-1.json")
 
       image = helper.create_image(1000, 1000)
@@ -126,7 +119,6 @@ describe Fastlane::Helper::PromoScreenshots do
     end
 
     it "draws simple attachments" do
-
       entry = sample_script("attachment-test-2.json")
 
       image = helper.create_image(1000, 1000)
@@ -135,7 +127,6 @@ describe Fastlane::Helper::PromoScreenshots do
     end
 
     it "draws screenshots to the canvas with a device mask" do
-
       script = sample_script("screenshot-test-1.json")
       entry = script["entries"][0]
       device = script["devices"][0]
@@ -146,7 +137,6 @@ describe Fastlane::Helper::PromoScreenshots do
     end
 
     it "draws screenshots to the canvas without a device mask" do
-
       script = sample_script("screenshot-test-1.json")
       entry = script["entries"][0]
       device = script["devices"][0]
@@ -158,7 +148,6 @@ describe Fastlane::Helper::PromoScreenshots do
     end
 
     it "doesn't crash if no screenshot exists on the entry" do
-
       script = sample_script("screenshot-test-2.json")
       entry = script["entries"][0]
       device = script["devices"][0]
@@ -169,7 +158,6 @@ describe Fastlane::Helper::PromoScreenshots do
     end
 
     it "draws background images to the canvas" do
-
       entry = sample_script("background-test-1.json")
 
       image = helper.create_image(500, 500)
@@ -178,16 +166,14 @@ describe Fastlane::Helper::PromoScreenshots do
     end
 
     it "draws background colors to the canvas" do
-
       entry = sample_script("background-test-2.json")
-      
+
       image = helper.create_image(500, 500)
       output = helper.draw_background_to_canvas(image, entry)
       expect(images_are_identical(output, "background-test-2.png")).to eq(true)
     end
 
     it "draws the device frame to the canvas" do
-
       script = sample_script("screenshot-test-1.json")
       device = script["devices"][0]
 
@@ -197,7 +183,6 @@ describe Fastlane::Helper::PromoScreenshots do
     end
 
     it "doesn't crash if no device frame is provided" do
-
       script = sample_script("screenshot-test-1.json")
       device = script["devices"][0]
       device.delete("device_frame_size")
@@ -208,7 +193,6 @@ describe Fastlane::Helper::PromoScreenshots do
     end
 
     it "draws the caption to the canvas" do
-
       script = sample_script("text-test-1.json")
       device = script["devices"][0]
       entry = script["entries"][0]
@@ -220,7 +204,6 @@ describe Fastlane::Helper::PromoScreenshots do
     end
 
     it "draws the caption to the canvas with the stylesheet" do
-
       script = sample_script("text-test-1.json")
       device = script["devices"][0]
       entry = script["entries"][0]
@@ -259,7 +242,6 @@ def test_data_path_for(filename)
 end
 
 def write_test_data(output, filename = "")
-
   if filename.empty?
     filename = Tempfile.new(output.signature).path
   else
@@ -272,7 +254,6 @@ def write_test_data(output, filename = "")
 end
 
 def images_are_identical(image1, sample_image)
-
   if sample_image.is_a? String
     sample_image = sample_image(sample_image)
   end

@@ -3,10 +3,9 @@ module Fastlane
     class IosClearIntermediateTagsAction < Action
       def self.run(params)
         UI.message("Deleting tags for version: #{params[:version]}")
-        
+
         require_relative '../../helper/ios/ios_git_helper.rb'
         Fastlane::Helpers::IosGitHelper.delete_tags(params[:version])
-
       end
 
       #####################################################
@@ -26,16 +25,14 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_IOS_CLEAN_INTERMEDIATE_TAGS_VERSION",
                                        description: "The version of the tags to clear",
-                                       is_string: true) 
+                                       is_string: true)
         ]
       end
 
       def self.output
-        
       end
 
       def self.return_value
-        
       end
 
       def self.authors

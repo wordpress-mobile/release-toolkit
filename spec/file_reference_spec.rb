@@ -94,7 +94,7 @@ describe Fastlane::Configuration::FileReference do
         expect(Fastlane::Helper::EncryptionHelper).to receive(:decrypt).with('encrypted contents', 'key').and_return('decrypted contents')
         expect(subject.source_contents).to eq('decrypted contents')
       end
-  
+
       it 'gives nil if the encrypted does not exist' do
         allow(File).to receive(:file?).with(subject.encrypted_file_path).and_return(false)
         expect(subject.source_contents).to eq(nil)
