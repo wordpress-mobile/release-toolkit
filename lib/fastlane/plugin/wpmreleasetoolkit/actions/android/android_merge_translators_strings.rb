@@ -5,7 +5,7 @@ require_relative '../../helper/ios/ios_version_helper'
 require_relative '../../helper/android/android_version_helper'
 module Fastlane
   module Actions
-    class MergeTranslatorsStringsAction < Action
+    class AndroidMergeTranslatorsStringsAction < Action
       def self.run(params)
         folder_path = File.expand_path(params[:strings_folder])
 
