@@ -10,6 +10,7 @@ module Fastlane
       def initialize(target_folder, target_files)
         @target_folder = target_folder
         @target_files = target_files
+        @alternates = {}
       end
 
       # Downloads data from GlotPress, 
@@ -21,8 +22,10 @@ module Fastlane
           response = Net::HTTP.get_response(URI.parse(response.header['location']))
         end
 
+        @alternates.clear
         loc_data = JSON.parse(response.body) rescue loc_data = nil
-        parse_data(target_locale, loc_data, is_source)       
+        parse_data(target_locale, loc_data, is_source) 
+        reparse_alternates(target_locale, loc_data, is_source) unless (@alternates.length == 0)     
       end
 
       # Parse JSON data and update the local files
@@ -42,13 +45,40 @@ module Fastlane
             if (file[0].to_s == key)
               data = file[1]
               msg = is_source ? source : d[1]
-              if (data.key?(:max_size)) && (data[:max_size] != 0) && ((msg.to_s.length - 3) > data[:max_size]) then
-                UI.message("Rejecting #{target_locale} traslation for #{key}: translation length: #{msg.to_s.length} - max allowed length: #{data[:max_size]}")
-              else
-                save_metadata(target_locale, file[1][:desc], msg)
-              end 
+              update_key(target_locale, key, file, data, msg)
             end
           end
+        end
+      end
+
+      # Parse JSON data and update the local files
+      def reparse_alternates(target_locale, loc_data, is_source)
+        loc_data.each do | d |
+          key = d[0].split(/\u0004/).first
+          source = d[0].split(/\u0004/).last
+
+          @alternates.each do | file |
+            puts "Data: #{file[0].to_s} - key: #{key}"
+            if (file[0].to_s == key)
+              puts "Alternate: #{key}"
+              data = file[1]
+              msg = is_source ? source : d[1]
+              update_key(target_locale, key, file, data, msg)
+            end
+          end
+        end
+      end
+
+      def update_key(target_locale, key, file, data, msg)
+        if (data.key?(:max_size)) && (data[:max_size] != 0) && ((msg.to_s.length - 3) > data[:max_size]) then
+          if (data.key?(:alternate_key)) then
+            UI.message("#{target_locale} translation for #{key} exceeds maximum length (#{msg.to_s.length}). Switching to the alternate translation.")
+            @alternates[data[:alternate_key]] = {desc: data[:desc], max_size: 0 }
+          else
+            UI.message("Rejecting #{target_locale} traslation for #{key}: translation length: #{msg.to_s.length} - max allowed length: #{data[:max_size]}")
+          end
+        else
+          save_metadata(target_locale, file[1][:desc], msg)
         end
       end
 

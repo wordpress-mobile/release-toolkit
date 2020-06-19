@@ -1,0 +1,7 @@
+Build/
+Logs
+Makefile
+ModuleCache.noindex/
+drawText.bundle
+info.plist
+mkmf.log
