@@ -86,7 +86,7 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :strings_folder,
-                                   env_name: "MTS_STRING_FOLDER",
+                                   env_name: "AMTS_STRING_FOLDER",
                                 description: "The folder that contains all the translations",
                                    optional: false,
                                        type: String),
