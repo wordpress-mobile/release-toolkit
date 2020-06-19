@@ -2,49 +2,49 @@ require 'spec_helper.rb'
 require 'tmpdir'
 
 
-describe Fastlane::Actions::AndroidMergeTranslatorsStringsAction do
+describe Fastlane::Actions::IosMergeTranslatorsStringsAction do
     before do
-        @amtsTestUtils = AMTSTestUtils.new
-        @amtsTestUtils.create_test_folder
+        @imtsTestUtils = IMTSTestUtils.new
+        @imtsTestUtils.create_test_folder
     end
 
     it 'checks no merge' do
-        amts_run_test("test-merge-android-nomerge.json")
+        imts_run_test("test-merge-ios-nomerge.json")
     end
 
     it 'checks merge simple' do
-        amts_run_test("test-merge-android-merge-simple.json")
+        imts_run_test("test-merge-ios-merge-simple.json")
     end
 
     it 'checks merge overwrite' do
-        amts_run_test("test-merge-android-merge-overwrite.json")
+        imts_run_test("test-merge-ios-merge-overwrite.json")
     end
 
     it 'checks merge overwrite with double key in pending file' do
-        amts_run_test("test-merge-android-merge-overwrite-double.json")
+        imts_run_test("test-merge-ios-merge-overwrite-double.json")
     end
 
     it 'checks merge overwrite with fuzzy strings' do
-        amts_run_test("test-merge-android-merge-overwrite-fuzzy.json")
+        imts_run_test("test-merge-ios-merge-overwrite-fuzzy.json")
     end
 
     after do
-        @amtsTestUtils.delete_test_folder
+        @imtsTestUtils.delete_test_folder
     end
 end
 
-def amts_run_test(script)
-    test_script = @amtsTestUtils.get_test_from_file(script)
-    @amtsTestUtils.create_test_data(test_script)
-    Fastlane::Actions::AndroidMergeTranslatorsStringsAction.run({strings_folder: @amtsTestUtils.test_folder_path})
-    expect(@amtsTestUtils.read_result_data(test_script)).to eq(test_script["result"]["content"])
+def imts_run_test(script)
+    test_script = @imtsTestUtils.get_test_from_file(script)
+    @imtsTestUtils.create_test_data(test_script)
+    Fastlane::Actions::IosMergeTranslatorsStringsAction.run({strings_folder: @imtsTestUtils.test_folder_path})
+    expect(@imtsTestUtils.read_result_data(test_script)).to eq(test_script["result"]["content"])
 end
 
-class AMTSTestUtils
+class IMTSTestUtils
     attr_accessor :test_folder_path
 
     def initialize()  
-        @test_folder_path = File.join(Dir.tmpdir(), "amts_tests") 
+        @test_folder_path = File.join(Dir.tmpdir(), "imts_tests") 
     end
 
     def create_test_folder
@@ -86,4 +86,5 @@ class AMTSTestUtils
         return File.read(file_path)
     end
 end
+
 

@@ -1,0 +1,26 @@
+{
+	"test_data": 
+	[
+    {
+			"file": "en.lproj/Localizable.strings",
+            "content": 
+            "/* Translation-Revision-Date: Initial comment */\n"
+		},
+		{
+			"file": "en.lproj/Localizable_current.strings",
+            "content": 
+            "/* Translation-Revision-Date: Initial comment */\n\"string 1\" = \"String 1\";\n\"string 2\" = \"String 2\";\n\"string 3\" = \"String 3\";\n"
+		},
+    {
+			"file": "en.lproj/Localizable_pending.strings",
+            "content": 
+            "/* Translation-Revision-Date: Initial comment */\n\"string goodbye\" = \"String GoodBye\";\n\"string 2\" = \"Test\";\n\"string 2\" = \"Test Overwrite 2\";\n"
+		}
+    ],
+    "result":
+    {
+		"file": "en.lproj/Localizable.strings",
+        "content": 
+        "/* Translation-Revision-Date: Initial comment */\n\"string 1\" = \"String 1\";\n\n\"string 3\" = \"String 3\";\n\"string goodbye\" = \"String GoodBye\";\n\"string 2\" = \"Test\";\n"
+	}
+}
