@@ -1,0 +1,21 @@
+{
+	"test_data": 
+	[
+		{
+			"file": "values/strings.xml",
+            "content": 
+            "<?xml version='1.0' encoding='utf-8'?>\n<resources xmlns:tools=\"http://schemas.android.com/tools\">\n\t<string name=\"string_1\">Hello</string>\n\t<string name=\"string_2\">Test</string>\n\t<string name=\"string_3\">Hi</string>\n</resources>\n"
+    },
+    {
+			"file": "values/strings-pending.xml",
+            "content": 
+            "<?xml version='1.0' encoding='utf-8'?>\n<resources xmlns:tools=\"http://schemas.android.com/tools\">\n\t<string name=\"string_goodbye\">Goodbye</string>\n\t<string name=\"string_2\">Test_Overwrite</string>\n\t<string name=\"string_2\">Test_Overwrite2</string>\n</resources>\n"
+		}
+    ],
+    "result":
+    {
+		"file": "values/strings.xml",
+        "content": 
+        "<?xml version='1.0' encoding='utf-8'?>\n<resources xmlns:tools=\"http://schemas.android.com/tools\">\n\t<string name=\"string_1\">Hello</string>\n\n\t<string name=\"string_3\">Hi</string>\n\t<string name=\"string_goodbye\">Goodbye</string>\n\t<string name=\"string_2\">Test_Overwrite</string>\n</resources>\n"
+	}
+}
