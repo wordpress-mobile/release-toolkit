@@ -71,8 +71,8 @@ module Fastlane
         GHClient().create_milestone(repository, newmilestone_number, options)
       end
 
-      def self.create_release(repository, version, release_notes, assets)
-        release = GHClient().create_release(repository, version, { name: version, draft: true, body: release_notes })
+      def self.create_release(repository, version, release_notes, assets, prerelease)
+        release = GHClient().create_release(repository, version, { name: version, draft: true, prerelease: prerelease, body: release_notes })
         assets.each do | file_path |
           GHClient().upload_asset(release[:url], file_path, { content_type: "application/octet-stream"})
         end
