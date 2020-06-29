@@ -27,7 +27,7 @@ This argument is a path to the directory containing any metadata, such as locali
 
 > Note: The tool will automatically check these directories, and will be default use any locales found in both directories.
 
-**`metadata_folder`**
+**`output_folder`**
 
 This argument is a path to the destination directory for any produced images.
 
@@ -139,7 +139,7 @@ Sets the dimensions of the original screenshot image within the final image. Thi
 
 **`screenshot_offset`**
 
-Sets the origin of the original screenshot image.This must be provided as an array with two values corresponding to the x and y coordinates, respectively.  This value is optional; `[0, 0]` will be used if no value is provided.
+Sets the origin of the original screenshot image. This must be provided as an array with two values corresponding to the x and y coordinates, respectively. This value is optional; `[0, 0]` will be used if no value is provided.
 
 **`device_frame`**
 
@@ -156,7 +156,7 @@ Sets the origin of the device frame image. This must be provided as an array wit
 
 ### Entries
 
-Entries specify the set of output screenshots. This takes the form of an array of hashes, each one looking something like:
+Entries specify the set of output screenshots. This takes the form of an array of hashes, each one looking something like shown below.
 
 > Note: There is a 1:1 relationship between entries and the final screenshots. Note that it is not necessary to create a set of entries for each locale – this is automatically handled for you.
 
@@ -203,7 +203,7 @@ Specifies the path to the corresponding screenshot image for this entry. The pat
 > For instance: consider the following directory structure:
 > ```
 > screenshots
->   - ar
+>  - ar
 >    - phone
 >    - tablet
 >  - en
@@ -232,7 +232,7 @@ Specifies the path to the caption for this entry. The caption should be a plain 
 >     - caption-1.txt
 >```
 >
-> In this situation, you could specify  `translations/%s/caption-1.txt`.
+> In this situation, you could specify `translations/%s/caption-1.txt`.
 >
 
 **`attachments`** (optional)
@@ -310,7 +310,7 @@ They use the following keys:
 
 **`type`** 
 
-Describes the type of operation.  Currently `crop` is the only operation that can be specified.
+Describes the type of operation. Currently `crop` is the only operation that can be specified.
 
 **Operations**
 
