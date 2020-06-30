@@ -70,7 +70,7 @@ module Fastlane
       end
 
       def update_key(target_locale, key, file, data, msg)
-        message_len = msg.to_s.length - 3 
+        message_len = msg.to_s.length - 4 # Don't count JSON delimiters.  
         if (data.key?(:max_size)) && (data[:max_size] != 0) && ((message_len) > data[:max_size]) then
           if (data.key?(:alternate_key)) then
             UI.message("#{target_locale} translation for #{key} exceeds maximum length (#{message_len}). Switching to the alternate translation.")
