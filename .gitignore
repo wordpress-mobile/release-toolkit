@@ -19,3 +19,7 @@ fastlane/report.xml
 /ext/drawText/drawText.xcodeproj/project.xcworkspace/xcuserdata
 /ext/drawText/test-output
 /default.profraw
+
+# Bundler
+/.bundle
+/vendor

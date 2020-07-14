@@ -166,6 +166,48 @@ module Fastlane
           end
         end
       end
+
+      def self.get_glotpress_languages_translated_morethan90_from_url(glotpress_status_url)
+        return get_glotpress_languages_translated_morethan90(open(glotpress_status_url).read)
+      end
+
+      def self.get_glotpress_languages_translated_morethan90(text)
+        languages_morethan90 = [];
+        previous_line = ""
+        text.each_line do | line |
+          if line.include?("morethan90") then
+            processed_line = previous_line.sub(/.*\/android\/dev\//, "")
+            languages_morethan90 << processed_line.sub(/\/default\/.*\s*/, "")
+          end
+          previous_line = line
+        end
+
+        return languages_morethan90
+      end
+
+      def self.get_missing_languages(languages_to_check, language_file, verbose)
+        languages_in_file = []
+        File.open(language_file).each_line do |line|
+          language_code = line.sub(/,.*\s*/, "")
+          languages_in_file << language_code
+          if verbose then
+            if (languages_to_check.include? language_code) then
+              UI.success "Language #{language_code} found."
+            end
+          end
+        end
+
+        missing_languages = languages_to_check - languages_in_file
+
+        if verbose then
+          missing_languages.each do |missing_language|
+            UI.error("Language #{missing_language} not found.")
+          end
+        end
+
+        return missing_languages
+      end
+
     end
   end
 end

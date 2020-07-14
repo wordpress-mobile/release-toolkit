@@ -9,7 +9,6 @@ module Fastlane
         require_relative '../../helper/android/android_git_helper.rb'
 
         Fastlane::Helpers::AndroidGitHelper.update_metadata(ENV["validate_translations"])
-        Fastlane::Action::sh("./tools/release-checks.sh")
       end
 
       #####################################################

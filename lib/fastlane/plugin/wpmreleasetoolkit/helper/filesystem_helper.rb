@@ -98,6 +98,24 @@ module Fastlane
 
             Digest::SHA1.file absolute_path
         end
+
+        ### deletes all files matching given parameter and returns an array of files deleted
+        def self.delete_files(file_name, use_real_path, verbose)
+          deleted_files = []
+          Dir.glob(file_name).each do |file|
+            if File.exist?(file) then
+              if use_real_path then
+                file = File.realpath(file)
+              end
+              File.delete(file)
+              deleted_files << file
+              if verbose then
+                UI.message("#{file} deleted.")
+              end
+            end
+          end
+          return deleted_files
+        end
     end
   end
 end
