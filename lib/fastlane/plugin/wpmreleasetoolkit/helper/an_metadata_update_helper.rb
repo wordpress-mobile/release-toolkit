@@ -148,6 +148,9 @@ module Fastlane
         key.start_with?(@rel_note_key) && values.length == 4 && (Integer(values[3].sub(/^[0]*/, "")) != nil rescue false)
       end
 
+      def generate_block(fw)
+        super(fw) unless File.zero?(@content_file_path)
+      end
     end
   end
 end
