@@ -18,7 +18,7 @@ jobs:
       - restore_cache:
           name: Restore Homebrew + Ruby Dependencies
           keys:
-            - brew-dependencies-{{ checksum ".circleci/.brewfile" }}-{{ checksum "Gemfile.lock" }}
+            - &cache_key brew-dependencies-{{ checksum ".circleci/.brewfile" }}-{{ checksum "Gemfile.lock" }}
 
       - run:
           name: Install Homebrew dependencies, if neeeded
@@ -30,7 +30,7 @@ jobs:
 
       - save_cache:
           name: Cache Homebrew + Ruby Dependencies
-          key: brew-dependencies-{{ checksum ".circleci/.brewfile" }}
+          key: *cache_key
           paths:
             - vendor/
             - /usr/local/Cellar

@@ -19,7 +19,7 @@ module Fastlane
       end
 
       def self.description
-        "Creates a new milestone for the project"
+        "Closes an existing milestone in the project"
       end
 
       def self.authors
@@ -32,7 +32,7 @@ module Fastlane
 
       def self.details
         # Optional:
-        "Creates a new milestone for the project"
+        "Closes an existing milestone in the project"
       end
 
       def self.available_options
@@ -43,7 +43,7 @@ module Fastlane
                                    optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :milestone,
-                                        env_name: "GHHELPER_MILESTORE",
+                                        env_name: "GHHELPER_MILESTONE",
                                      description: "The GitHub milestone",
                                         optional: false,
                                             type: String),
