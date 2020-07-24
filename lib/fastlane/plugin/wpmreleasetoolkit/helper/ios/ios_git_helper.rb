@@ -68,7 +68,7 @@ module Fastlane
   
         def self.localize_project()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && ./Scripts/localize.py")
-          Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}*.lproj/Localizable.strings")
+          Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}*.lproj/*.strings")
           is_repo_clean = `git status --porcelain`.empty?
           if is_repo_clean then
             UI.message("No new strings, skipping commit.")  
@@ -95,7 +95,7 @@ module Fastlane
   
         def self.update_metadata()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && ./Scripts/update-translations.rb")
-          Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/*.lproj/Localizable.strings")
+          Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/*.lproj/*.strings")
           Action.sh("git diff-index --quiet HEAD || git commit -m \"Updates translation\"")
   
           Action.sh("cd fastlane && ./download_metadata.swift")
