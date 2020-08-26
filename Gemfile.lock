@@ -3,6 +3,7 @@ PATH
   specs:
     fastlane-plugin-wpmreleasetoolkit (0.9.13)
       activesupport (~> 4)
+      bigdecimal (~> 1.4)
       chroma (= 0.2.0)
       diffy (~> 3.3)
       git (~> 1.3)
