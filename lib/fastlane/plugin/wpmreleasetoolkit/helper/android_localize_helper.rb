@@ -65,7 +65,7 @@ module Fastlane
         end
       
         # String not found, or removed because needing update and not in the exclusion list: add to the main file
-        main_strings.xpath('//string').last().add_next_sibling("\n#{" " * 4}#{string_line.to_xml()}")
+        main_strings.xpath('//string').last().add_next_sibling("\n#{" " * 4}#{string_line.to_xml().strip}")
         return result
       end
 
@@ -180,6 +180,8 @@ module Fastlane
   end
 end
 
+# Source: https://stackoverflow.com/questions/7825258/determine-if-two-nokogiri-nodes-are-equivalent?rq=1
+# There may be better solutions now that Ruby supports canonicalization.
 class Nokogiri::XML::Node
   # Return true if this node is content-equivalent to other, false otherwise
   def =~(other)
