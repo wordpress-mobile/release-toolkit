@@ -73,6 +73,10 @@ module Fastlane
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}.#{todayDate}"
         end
   
+        def self.bump_build_number(build_number)
+          build_number.nil? ? 0 : build_number.to_i + 1
+        end
+
         def self.is_hotfix(version)
           vp = get_version_parts(version)
           return (vp.length > 2) && (vp[HOTFIX_NUMBER] != 0)
@@ -116,6 +120,12 @@ module Fastlane
             UI.message("Updating #{file_path} to version #{new_version_short}/#{new_version}")
             Action.sh("sed -i '' \"$(awk '/^VERSION_SHORT/{ print NR; exit }' \"#{file_path}\")s/=.*/=#{new_version_short}/\" \"#{file_path}\"") 
             Action.sh("sed -i '' \"$(awk '/^VERSION_LONG/{ print NR; exit }' \"#{file_path}\")s/=.*/=#{new_version}/\" \"#{file_path}\"")
+
+            build_number = read_build_number_from_config_file(file_path)
+            unless (build_number.nil?)
+              new_build_number = bump_build_number(build_number)
+              Action.sh("sed -i '' \"$(awk '/^BUILD_NUMBER/{ print NR; exit }' \"#{file_path}\")s/=.*/=#{new_build_number}/\" \"#{file_path}\"")
+            end
           else
             UI.user_error!("#{file_path} not found")
           end
@@ -134,10 +144,18 @@ module Fastlane
         end
   
         def self.read_long_version_from_config_file(filePath)
+          read_from_config_file("VERSION_LONG", filePath)
+        end
+
+        def self.read_build_number_from_config_file(filePath)
+          read_from_config_file("BUILD_NUMBER", filePath)
+        end
+
+        def self.read_from_config_file(key, filePath)
           File.open(filePath, "r") do |f|
             f.each_line do |line|
               line = line.strip()
-              if line.start_with?("VERSION_LONG=") then
+              if line.start_with?("#{key}=") then
                   return line.split("=")[1]
                 end
               end
