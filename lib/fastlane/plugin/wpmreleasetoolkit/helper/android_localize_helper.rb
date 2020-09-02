@@ -41,22 +41,32 @@ module Fastlane
         return :skipped if skip_string_by_exclusion_list(library, string_name)
       
         # Search for the string in the main file
+        result = :added
         main_strings.xpath('//string').each do | this_string | 
           if (this_string.attr("name") == string_name) then
             # Skip if the string has the content_override tag
             return :skipped if skip_string_by_tag(this_string)
             
-            # Update if needed
-            (if (this_string.content == string_content) then return :found else this_string.content = string_content ; return :updated end)   
+            # If nodes are equivalent, skip
+            return :found if (string_line =~ this_string) 
+            
+            # The string needs an update
+            result = :updated
+            if (this_string.attr("tools:ignore").nil?) 
+              # It can be updated, so remove the current one and move ahead
+              this_string.remove 
+              break 
+            else
+              # It has the tools:ignore flag, so update the content without touching the other attributes
+              this_string.content = string_content
+              return result
+            end 
           end
         end
       
-        # String not found and not in the exclusion list: add to the main file
-        new_element = Nokogiri::XML::Node.new "string", main_strings
-        new_element['name'] = string_name
-        new_element.content = string_content
-        main_strings.xpath('//string').last().add_next_sibling("\n#{" " * 4}#{new_element.to_xml()}")
-        return :added
+        # String not found, or removed because needing update and not in the exclusion list: add to the main file
+        main_strings.xpath('//string').last().add_next_sibling("\n#{" " * 4}#{string_line.to_xml().strip}")
+        return result
       end
 
       # Verify a string
@@ -167,5 +177,29 @@ module Fastlane
         end
       end
     end
+  end
+end
+
+# Source: https://stackoverflow.com/questions/7825258/determine-if-two-nokogiri-nodes-are-equivalent?rq=1
+# There may be better solutions now that Ruby supports canonicalization.
+class Nokogiri::XML::Node
+  # Return true if this node is content-equivalent to other, false otherwise
+  def =~(other)
+    return true if self == other
+    return false unless name == other.name
+    stype = node_type; otype = other.node_type
+    return false unless stype == otype
+    sa = attributes; oa = other.attributes
+    return false unless sa.length == oa.length
+    sa = sa.sort.map{ |n,a| [n,a.value,a.namespace && a.namespace.href] }
+    oa = oa.sort.map{ |n,a| [n,a.value,a.namespace && a.namespace.href] }
+    return false unless sa == oa
+    skids = children; okids = other.children
+    return false unless skids.length == okids.length
+    return false if stype == TEXT_NODE && (content != other.content)
+    sns = namespace; ons = other.namespace
+    return false if !sns ^ !ons
+    return false if sns && (sns.href != ons.href)
+    skids.to_enum.with_index.all?{ |ski,i| ski =~ okids[i] }
   end
 end
