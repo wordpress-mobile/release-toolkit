@@ -16,7 +16,10 @@ module Fastlane
 
         unless extracted_notes_file.nil?
           extracted_notes_file.close()
-          check_and_commit_extracted_notes_file(extracted_notes_file_path, version)
+
+          if params[:commit].downcase == "true"
+            check_and_commit_extracted_notes_file(extracted_notes_file_path, version)
+          end
         end
       end
 
@@ -78,6 +81,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :extracted_notes_file_path,
                                           env_name: "GHHELPER_EXTRACT_NOTES_EXTRACTED_FILE_PATH",
                                           description: "The path to the file that will contain the extracted release notes",
+                                          optional: true,
+                                          is_string: true),
+          FastlaneCore::ConfigItem.new(key: :commit,
+                                          env_name: "GHHELPER_EXTRACT_NOTES_COMMIT",
+                                          description: "Whether to commit the changes",
                                           optional: true,
                                           is_string: true),
         ]
