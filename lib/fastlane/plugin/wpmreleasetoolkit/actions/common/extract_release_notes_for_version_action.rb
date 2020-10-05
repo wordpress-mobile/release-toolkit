@@ -87,7 +87,10 @@ module Fastlane
                                           env_name: "GHHELPER_EXTRACT_NOTES_COMMIT",
                                           description: "Whether to commit the changes",
                                           optional: true,
-                                          is_string: true),
+                                          # This is a boolean parameter. See:
+                                          # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
+                                          is_string: false,
+                                          default_value: true),
         ]
       end
 
