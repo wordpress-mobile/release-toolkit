@@ -17,7 +17,7 @@ module Fastlane
         unless extracted_notes_file.nil?
           extracted_notes_file.close()
 
-          if params[:commit].downcase == "true"
+          if params[:commit]
             check_and_commit_extracted_notes_file(extracted_notes_file_path, version)
           end
         end
