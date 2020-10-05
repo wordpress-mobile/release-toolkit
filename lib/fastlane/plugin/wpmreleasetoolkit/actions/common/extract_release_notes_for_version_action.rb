@@ -12,12 +12,12 @@ module Fastlane
 
         extract_notes(release_notes_file_path, version) do | line |
           extracted_notes_file.nil? ? puts(line) : extracted_notes_file.write(line)
-        end 
+        end
 
         unless extracted_notes_file.nil?
-          extracted_notes_file.close() 
+          extracted_notes_file.close()
           check_and_commit_extracted_notes_file(extracted_notes_file_path, version)
-        end 
+        end
       end
 
       def self.extract_notes(release_notes_file_path, version)
