@@ -51,8 +51,12 @@ module Fastlane
           
         end
   
+        def self.return_type
+          :string
+        end
+        
         def self.return_value
-          
+          "The version number that has been prechecked."
         end
   
         def self.authors
