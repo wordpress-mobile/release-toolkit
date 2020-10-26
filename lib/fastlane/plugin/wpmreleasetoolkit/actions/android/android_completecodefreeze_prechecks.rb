@@ -11,8 +11,8 @@ module Fastlane
   
           version = Fastlane::Helpers::AndroidVersionHelper::get_public_version
           message = "Completing code freeze for: #{version}\n"
-          if (!params[:skip_confirm])
-            if (!UI.confirm("#{message}Do you want to continue?"))
+          unless params[:skip_confirm]
+            unless UI.confirm("#{message}Do you want to continue?")
               UI.user_error!("Aborted by user request")
             end
           else 
