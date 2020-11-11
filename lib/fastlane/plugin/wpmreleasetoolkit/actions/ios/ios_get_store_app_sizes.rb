@@ -102,8 +102,7 @@ module Fastlane
         end
   
         def self.return_value
-          # If you method provides a return value, you can describe here what it does
-          "Return the public version of the app"
+          "Return a Hash containing the details of download and install app size, for various device models, all that for each requested version of the app"
         end
   
         def self.authors
