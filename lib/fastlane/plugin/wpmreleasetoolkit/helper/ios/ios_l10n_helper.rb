@@ -137,7 +137,7 @@ module Fastlane
               diff.gsub!(/^(---|\+\+\+).*\n/, '')
               diff.empty? ? nil : [lang, diff]
               # UI.puts "### '#{lang}' vs '#{base_lang}' base\n\n#{diff}\n" unless diff.empty?
-            end]
+            end.compact]
           end
         end
 

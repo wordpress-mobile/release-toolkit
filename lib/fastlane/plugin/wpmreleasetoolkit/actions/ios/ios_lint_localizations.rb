@@ -17,7 +17,8 @@ module Fastlane
           violations.each do |lang, diff|
             UI.error "Inconsistencies found between '#{params[:base_lang]}' and '#{lang}':\n\n#{diff}\n"
           end
-
+          UI.abort_with_message!('Inconsistencies found during Localization linting. Aborting.') unless violations.empty?
+          
           violations
         end
 
