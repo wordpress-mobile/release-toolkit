@@ -23,15 +23,13 @@ module Fastlane
         end
 
         def self.repo_root
-          `git rev-parse --show-toplevel`.chomp
+          @repo_root || `git rev-parse --show-toplevel`.chomp
         end
 
+        # If the path is relative, makes the path absolute by resolving it relative to the repository's root.
+        # If the path is already absolute, it will not affect it and return it as-is.
         def self.resolve_path(path)
-          if File.relative?(path)
-            File.join(repo_root, path)
-          else
-            path
-          end
+          File.absolute_path(path, repo_root)
         end
     
         #####################################################
