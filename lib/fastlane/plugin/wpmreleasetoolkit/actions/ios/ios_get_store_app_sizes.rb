@@ -100,6 +100,10 @@ module Fastlane
           # Define the shared values you are going to provide
           
         end
+
+        def self.return_type
+          :hash
+        end
   
         def self.return_value
           "Return a Hash containing the details of download and install app size, for various device models, all that for each requested version of the app"
@@ -111,7 +115,7 @@ module Fastlane
         end
   
         def self.is_supported?(platform)
-          platform == :ios
+          [:ios, :mac].include?(platform)
         end
       end
     end
