@@ -117,7 +117,7 @@ module Fastlane
             'strings' => langs.map do |lang|
               {
                   'inputs' => ["#{lang}.lproj/Localizable.strings"],
-                  'options' => { 'separator' => "____" }, # Choose an unlikely one to avoid creating needlessly complex Stencil Context due to '.' in sentences sued as keys
+                  'options' => { 'separator' => "____" }, # Choose an unlikely one to avoid creating needlessly complex Stencil Context due to '.' in sentences used as keys
                   'outputs' => [{
                       'templatePath' => template_path,
                       'output' => output_filename(lang)
