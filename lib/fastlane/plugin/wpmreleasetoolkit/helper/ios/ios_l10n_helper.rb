@@ -169,6 +169,11 @@ module Fastlane
             return Hash[langs.map do |lang|
               file = sort_file_lines!(tmpdir, lang)
               diff = `diff -U0 "#{base_file}" "#{file}"`
+              # Remove the lines starting with `---`/`+++` which contains the file names (which are temp files we don't want to expose in the final diff to users)
+              # Note: We still keep the `@@ from-file-line-numbers to-file-line-numbers @@` lines to help the user know the index of the key to find it faster,
+              #       and also to serve as a clear visual separator between diff entries in the output.
+              #       Those numbers won't be matching the original `.strings` file line numbers because they are line numbers in the SwiftGen-generated intermediate
+              #       file instead, but they can still give an indication at the index in the list of keys at which this difference is located.
               diff.gsub!(/^(---|\+\+\+).*\n/, '')
               diff.empty? ? nil : [lang, diff]
             end.compact]
