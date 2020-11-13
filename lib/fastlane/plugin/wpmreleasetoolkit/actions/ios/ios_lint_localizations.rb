@@ -17,7 +17,9 @@ module Fastlane
           violations.each do |lang, diff|
             UI.error "Inconsistencies found between '#{params[:base_lang]}' and '#{lang}':\n\n#{diff}\n"
           end
-          UI.abort_with_message!('Inconsistencies found during Localization linting. Aborting.') unless violations.empty?
+          if params[:abort_on_violations] && !violations.empty?
+            UI.abort_with_message!('Inconsistencies found during Localization linting. Aborting.')
+          end
           
           violations
         end
@@ -76,6 +78,14 @@ module Fastlane
               type: String,
               optional: true,
               default_value: Fastlane::Helpers::IosL10nHelper::DEFAULT_BASE_LANG
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :abort_on_violations,
+              env_name: "FL_IOS_LINT_TRANSLATIONS_ABORT",
+              description: "Should we abort the rest of the lane with a global error if any violations are found?",
+              optional: true,
+              default_value: true,
+              is_string: false # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
             ),
           ]
         end
