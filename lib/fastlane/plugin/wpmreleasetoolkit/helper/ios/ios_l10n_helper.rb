@@ -27,6 +27,8 @@ module Fastlane
         def check_swiftgen_installed
           return false unless File.exists?(swiftgen_bin)
           vers_string = `#{swiftgen_bin} --version`
+          # The SwiftGen version string has this format:
+          #
           # SwiftGen v6.4.0 (Stencil v0.13.1, StencilSwiftKit v2.7.2, SwiftGenKit v6.4.0)
           return vers_string.include?("SwiftGen v#{version}")
         rescue
@@ -133,7 +135,7 @@ module Fastlane
           return [config_file, langs]
         end
 
-        # Because we use English copy verbatim as key names, some keys are the same just except for the upper/lowercase.
+        # Because we use English copy verbatim as key names, some keys are the same except for the upper/lowercase.
         # We need to sort the output again because SwiftGen only sort case-insensitively so that means keys that are
         # the same except case might be in swapped order for different outputs
         #

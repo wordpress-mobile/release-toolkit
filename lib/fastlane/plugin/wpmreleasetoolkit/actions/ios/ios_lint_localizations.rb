@@ -37,7 +37,7 @@ module Fastlane
         #####################################################
     
         def self.description
-          "Lint the different *.lproj/.strings files for different locales and ensure the parameter placeholders are consistent."
+          "Lint the different *.lproj/.strings files for each locale and ensure the parameter placeholders are consistent."
         end
     
         def self.details
@@ -49,7 +49,7 @@ module Fastlane
             FastlaneCore::ConfigItem.new(
               key: :install_path,
               env_name: "FL_IOS_LINT_TRANSLATIONS_INSTALL_PATH",
-              description: "The path where to install SwiftGen tooling needed to run the linting process. If a relative path, should be relative to your repo_root",
+              description: "The path where to install the SwiftGen tooling needed to run the linting process. If a relative path, should be relative to your repo_root",
               type: String,
               optional: true,
               default_value: "vendor/swiftgen/#{Fastlane::Helpers::IosL10nHelper::SWIFTGEN_VERSION}"
@@ -97,7 +97,7 @@ module Fastlane
         end
     
         def self.is_supported?(platform)
-          platform == :ios
+          [:ios, :mac].include?(platform)
         end
       end
     end
