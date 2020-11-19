@@ -1,7 +1,7 @@
 module Fastlane
     module Helpers
       module AndroidGitHelper
-       
+
         def self.git_checkout_and_pull(branch)
           Action.sh("git checkout #{branch}")
           Action.sh("git pull")
@@ -18,7 +18,7 @@ module Fastlane
             return false
           end
         end
-        
+
         def self.do_release_branch(branch_name)
           if (check_branch_exists(branch_name) == true) then
             UI.message("Branch #{branch_name} already exists. Skipping creation.")
@@ -26,12 +26,12 @@ module Fastlane
             Action.sh("git pull origin #{branch_name}")
           else
             Action.sh("git checkout -b #{branch_name}")
-      
+
             # Push to origin
             Action.sh("git push -u origin #{branch_name}")
-          end  
+          end
         end
-  
+
         def self.check_branch_exists(branch_name)
           !Action.sh("git branch --list #{branch_name}").empty?
         end
@@ -44,13 +44,13 @@ module Fastlane
           Action.sh("git diff-index --quiet HEAD || git commit -m \"Update release notes.\"")
           Action.sh("git push origin HEAD")
         end
-  
+
         def self.update_metadata(validate_translation_command)
           Action.sh("./tools/update-translations.sh")
           Action.sh("./gradlew #{validate_translation_command}")
           Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/src/main/res")
           Action.sh("git diff-index --quiet HEAD || git commit -m \"Updates translations\"")
-  
+
           Action.sh("git push origin HEAD")
         end
 
@@ -71,7 +71,7 @@ module Fastlane
           Action.sh("git commit -m \"Bump version number\"")
           Action.sh("git push origin HEAD")
         end
-        
+
         def self.bump_version_final()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]} && git add ./build.gradle")
           Action.sh("git commit -m \"Bump version number\"")
@@ -83,7 +83,7 @@ module Fastlane
           tag_and_push(alpha_version) unless alpha_version.nil?
         end
 
-        def self.check_on_branch(branch_name) 
+        def self.check_on_branch(branch_name)
           current_branch_name=Action.sh("git symbolic-ref -q HEAD")
           UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)
         end
@@ -96,7 +96,7 @@ module Fastlane
 
         private
         def self.tag_and_push(version)
-          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && git tag #{version} && git push origin #{version}") 
+          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && git tag #{version} && git push origin #{version}")
         end
       end
     end
