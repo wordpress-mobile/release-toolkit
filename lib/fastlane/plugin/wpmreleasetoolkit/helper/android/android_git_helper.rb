@@ -41,7 +41,7 @@ module Fastlane
         Action.sh("echo \"#{new_version}\n-----\n \" > #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
         Action.sh("cat #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.bak >> #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
         Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
-        Action.sh("git diff-index --quiet HEAD || git commit -m \"Update release notes.\"")
+        Action.sh("git diff-index --quiet HEAD || git commit -m \"Update release notes\"")
         Action.sh("git push origin HEAD")
       end
 
