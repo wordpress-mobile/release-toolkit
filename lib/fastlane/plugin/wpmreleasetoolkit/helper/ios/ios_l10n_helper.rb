@@ -170,6 +170,9 @@ module Fastlane
             langs.delete(base_lang)
             return Hash[langs.map do |lang|
               file = sort_file_lines!(tmpdir, lang)
+              # If the lang ends up not having any translation at all (e.g. a `.lproj` without any `.strings` file in it but maybe just an storyboard or assets catalog), ignore it
+              next nil if File.size(file) <= 10 && File.readlines(file).all? { |line| line.chomp.length == 0 }
+              # Compute the diff
               diff = `diff -U0 "#{base_file}" "#{file}"`
               # Remove the lines starting with `---`/`+++` which contains the file names (which are temp files we don't want to expose in the final diff to users)
               # Note: We still keep the `@@ from-file-line-numbers to-file-line-numbers @@` lines to help the user know the index of the key to find it faster,
