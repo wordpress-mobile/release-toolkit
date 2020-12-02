@@ -110,7 +110,7 @@ module Fastlane
 
           # Dynamically create a SwiftGen config which will cover all supported languages
           langs = Dir.chdir(input_dir) do
-              Dir.glob('*.lproj').map { |dir| File.basename(dir, '.lproj') }
+              Dir.glob('*.lproj/Localizable.strings').map { |loc_file| File.basename(File.dirname(loc_file), '.lproj') }
           end.sort
       
           config = {
@@ -118,7 +118,7 @@ module Fastlane
             'output_dir' => output_dir,
             'strings' => langs.map do |lang|
               {
-                  'inputs' => ["#{lang}.lproj"],
+                  'inputs' => ["#{lang}.lproj/Localizable.strings"],
                   # Choose an unlikely separator (instead of the default '.') to avoid creating needlessly complex Stencil Context nested
                   # structure just because we have '.' in the English sentences we use (instead of structured reverse-dns notation) for the keys 
                   'options' => { 'separator' => "____" },
@@ -146,6 +146,7 @@ module Fastlane
         #
         def sort_file_lines!(dir, lang)
           file = File.join(dir, output_filename(lang))
+          return nil unless File.exists?(file)
           sorted_lines = File.readlines(file).sort
           File.write(file, sorted_lines.join)
           return file
@@ -171,7 +172,7 @@ module Fastlane
             return Hash[langs.map do |lang|
               file = sort_file_lines!(tmpdir, lang)
               # If the lang ends up not having any translation at all (e.g. a `.lproj` without any `.strings` file in it but maybe just an storyboard or assets catalog), ignore it
-              next nil if File.size(file) <= 10 && File.readlines(file).all? { |line| line.chomp.length == 0 }
+              next nil if file.nil? || File.size(file) <= 10 && File.readlines(file).all? { |line| line.chomp.length == 0 }
               # Compute the diff
               diff = `diff -U0 "#{base_file}" "#{file}"`
               # Remove the lines starting with `---`/`+++` which contains the file names (which are temp files we don't want to expose in the final diff to users)
