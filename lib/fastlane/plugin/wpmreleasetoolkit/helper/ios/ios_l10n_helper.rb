@@ -174,7 +174,10 @@ module Fastlane
             langs.delete(base_lang)
             return Hash[langs.map do |lang|
               file = sort_file_lines!(tmpdir, lang)
-              # If the lang ends up not having any translation at all (e.g. a `.lproj` without any `.strings` file in it but maybe just an storyboard or assets catalog), ignore it
+              # If the lang ends up not having any translation at all (e.g. a `.lproj` without any `.strings` file in it but maybe just a storyboard or assets catalog), ignore it
+              # Note: to check if the file is "almost" empty, i.e. only containing newlines, we only read it if it's small enough (arbitrary max length of 10 bytes) because that
+              # situation typically comes from a template having a couple of newlines at top and bottom between what's usually the content – but is empty in this case – and we don't
+              # want to waste RAM reading a big file of multiple KB for nothing, so considering only files that are "small enough to be candidates for only-newlines files" seems enough.
               next nil if file.nil? || File.size(file) <= 10 && File.readlines(file).all? { |line| line.chomp.length == 0 }
               # Compute the diff
               diff = `diff -U0 "#{base_file}" "#{file}"`
