@@ -165,7 +165,7 @@ module Fastlane
         def find_diffs(input_dir:, base_lang:, only_langs: nil)
           Dir.mktmpdir('a8c-lint-translations-') do |tmpdir|
             # Run SwiftGen 
-            langs = only_langs.nil? ? nil : only_langs + [base_lang]
+            langs = only_langs.nil? ? nil : (only_langs + [base_lang]).uniq
             (config_file, langs) = generate_swiftgen_config!(input_dir, tmpdir, only_langs: langs)
             Action.sh(swiftgen_bin, 'config', 'run', '--config', config_file)
             
@@ -175,10 +175,7 @@ module Fastlane
             return Hash[langs.map do |lang|
               file = sort_file_lines!(tmpdir, lang)
               # If the lang ends up not having any translation at all (e.g. a `.lproj` without any `.strings` file in it but maybe just a storyboard or assets catalog), ignore it
-              # Note: to check if the file is "almost" empty, i.e. only containing newlines, we only read it if it's small enough (arbitrary max length of 10 bytes) because that
-              # situation typically comes from a template having a couple of newlines at top and bottom between what's usually the content – but is empty in this case – and we don't
-              # want to waste RAM reading a big file of multiple KB for nothing, so considering only files that are "small enough to be candidates for only-newlines files" seems enough.
-              next nil if file.nil? || File.size(file) <= 10 && File.readlines(file).all? { |line| line.chomp.length == 0 }
+              next nil if file.nil? || only_empty_lines?(file)
               # Compute the diff
               diff = `diff -U0 "#{base_file}" "#{file}"`
               # Remove the lines starting with `---`/`+++` which contains the file names (which are temp files we don't want to expose in the final diff to users)
@@ -192,6 +189,15 @@ module Fastlane
           end
         end
 
+        # Returns true if the file only contains empty lines, i.e. lines that only contains whitespace (space, tab, CR, LF)
+        def only_empty_lines?(file)
+          File.open(file) do |f|  
+            while line = f.gets
+              return false if not line.strip.empty?
+            end  
+          end  
+          return true
+        end
       end
     end
 end
