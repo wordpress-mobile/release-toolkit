@@ -60,9 +60,9 @@ module Fastlane
         # @return [Hash<String, String>] A hash whose keys are the language codes (basename of `.lproj` folders) for which violations were found,
         #         and the values are the output of the `diff` showing these violations.
         #
-        def run(input_dir:, base_lang: DEFAULT_BASE_LANG)
+        def run(input_dir:, base_lang: DEFAULT_BASE_LANG, only_langs: nil)
           check_swiftgen_installed || install_swiftgen!
-          find_diffs(input_dir: input_dir, base_lang: base_lang)
+          find_diffs(input_dir: input_dir, base_lang: base_lang, only_langs: only_langs)
         end
 
         ##################
@@ -103,15 +103,16 @@ module Fastlane
         #
         # @return [(String, Array<String>)] A tuple of (config_file_absolute_path, Array<langs>)
         #
-        def generate_swiftgen_config!(input_dir, output_dir)
+        def generate_swiftgen_config!(input_dir, output_dir, only_langs: nil)
           # Create the template file
           template_path = File.absolute_path(File.join(output_dir, 'strings-types.stencil'))
           File.write(template_path, template_content)
 
           # Dynamically create a SwiftGen config which will cover all supported languages
           langs = Dir.chdir(input_dir) do
-              Dir.glob('*.lproj').map { |dir| File.basename(dir, '.lproj') }
+              Dir.glob('*.lproj/Localizable.strings').map { |loc_file| File.basename(File.dirname(loc_file), '.lproj') }
           end.sort
+          langs.select! { |lang| only_langs.include?(lang) } unless only_langs.nil?
       
           config = {
             'input_dir' => input_dir,
@@ -146,6 +147,7 @@ module Fastlane
         #
         def sort_file_lines!(dir, lang)
           file = File.join(dir, output_filename(lang))
+          return nil unless File.exists?(file)
           sorted_lines = File.readlines(file).sort
           File.write(file, sorted_lines.join)
           return file
@@ -155,14 +157,16 @@ module Fastlane
         #
         # @param [String] input_dir The directory where the `.lproj` folders to scan are located
         # @param [String] base_lang The base language used as source of truth that all other languages will be compared against
+        # @param [Array<String>] only_langs The list of languages to limit the generation for. Useful to focus only on a couple of issues or just one language
         # @return [Hash<String, String>] A hash of violations, keyed by language code, whose values are the diff output.
         #
         # @note The returned Hash contains keys only for locales with violations. Locales parsed but without any violations found will not appear in the resulting hash.
         #
-        def find_diffs(input_dir:, base_lang:)
+        def find_diffs(input_dir:, base_lang:, only_langs: nil)
           Dir.mktmpdir('a8c-lint-translations-') do |tmpdir|
             # Run SwiftGen 
-            (config_file, langs) = generate_swiftgen_config!(input_dir, tmpdir)
+            langs = only_langs.nil? ? nil : (only_langs + [base_lang]).uniq
+            (config_file, langs) = generate_swiftgen_config!(input_dir, tmpdir, only_langs: langs)
             Action.sh(swiftgen_bin, 'config', 'run', '--config', config_file)
             
             # Run diffs
@@ -170,6 +174,9 @@ module Fastlane
             langs.delete(base_lang)
             return Hash[langs.map do |lang|
               file = sort_file_lines!(tmpdir, lang)
+              # If the lang ends up not having any translation at all (e.g. a `.lproj` without any `.strings` file in it but maybe just a storyboard or assets catalog), ignore it
+              next nil if file.nil? || only_empty_lines?(file)
+              # Compute the diff
               diff = `diff -U0 "#{base_file}" "#{file}"`
               # Remove the lines starting with `---`/`+++` which contains the file names (which are temp files we don't want to expose in the final diff to users)
               # Note: We still keep the `@@ from-file-line-numbers to-file-line-numbers @@` lines to help the user know the index of the key to find it faster,
@@ -182,6 +189,15 @@ module Fastlane
           end
         end
 
+        # Returns true if the file only contains empty lines, i.e. lines that only contains whitespace (space, tab, CR, LF)
+        def only_empty_lines?(file)
+          File.open(file) do |f|  
+            while line = f.gets
+              return false if not line.strip.empty?
+            end  
+          end  
+          return true
+        end
       end
     end
 end

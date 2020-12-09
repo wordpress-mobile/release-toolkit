@@ -12,6 +12,7 @@ module Fastlane
           violations = helper.run(
             input_dir: resolve_path(params[:input_dir]),
             base_lang: params[:base_lang],
+            only_langs: params[:only_langs]
           )
         
           violations.each do |lang, diff|
@@ -78,6 +79,13 @@ module Fastlane
               type: String,
               optional: true,
               default_value: Fastlane::Helpers::IosL10nHelper::DEFAULT_BASE_LANG
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :only_langs,
+              env_name: "FL_IOS_LINT_TRANSLATIONS_ONLY_LANGS",
+              description: "The list of languages to limit the analysis to",
+              type: Array,
+              optional: true
             ),
             FastlaneCore::ConfigItem.new(
               key: :abort_on_violations,
