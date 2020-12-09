@@ -71,7 +71,7 @@ module Fastlane
         Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}*.lproj/*.strings")
         is_repo_clean = `git status --porcelain`.empty?
         if is_repo_clean then
-          UI.message("No new strings, skipping commit.")
+          UI.message("No new strings, skipping commit")
         else
           Action.sh("git commit -m \"Updates strings for localization\"")
           Action.sh("git push origin HEAD")
@@ -84,7 +84,7 @@ module Fastlane
         Action.sh("cat #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.bak >> #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
         Action.sh("rm #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.bak")
         Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
-        Action.sh("git commit -m \"Update release notes.\"")
+        Action.sh("git commit -m \"Update release notes\"")
         Action.sh("git push origin HEAD")
       end
 
