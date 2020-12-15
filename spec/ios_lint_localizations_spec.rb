@@ -11,12 +11,18 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     # allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true) # Alternative solution 
   end
 
-  context 'SwiftGen Install' do
-    it 'Installs SwiftGen only when it is not yet installed' do      
+  context 'SwiftGen Installation Logic' do
+    it 'only installs SwiftGen the first time, when it is not yet installed' do
       Dir.mktmpdir('a8c-lint-l10n-tests-swiftgen-install-') do |install_dir|
         Dir.mktmpdir('a8c-lint-l10n-tests-data-') do |empty_dataset|
           # Expect install dir to be empty before we start
           expect(Dir.entries(install_dir)).to eq(['.','..'])
+
+          # First run: expect curl, unzip and cp_r to be called to install SwiftGen before it gets run
+          expect_shell_command("curl", any_args, /\/.*swiftgen-6.4.0.zip/)
+          expect_shell_command("unzip", any_args)
+          expect(FileUtils).to receive(:cp_r)
+          expect_shell_command("#{install_dir}/bin/swiftgen", "config", "run", "--config", anything)
 
           Fastlane::Actions::IosLintLocalizationsAction.run(
             install_path: install_dir,
@@ -24,16 +30,17 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
             base_lang: 'en'
           )
 
-          # Ensure SwiftGen got installed after first run
-          expect(Dir.entries(install_dir)).to include('bin')
-          expect(Dir.entries(install_dir)).to include('lib')
-          expect(Dir.entries(install_dir)).to include('templates')
-          expect(Dir.chdir(install_dir) { Dir.glob('bin/swiftgen') }).to_not be_empty
+          # Create a fake SwiftGen binstub to simulate SwiftGen has been installed at that point
+          script = <<~SCRIPT
+            #!/bin/sh
+            echo "SwiftGen v6.4.0 (Fake binstub)"
+          SCRIPT
+          FileUtils.mkdir_p File.join(install_dir, 'bin')
+          File.write(File.join(install_dir, 'bin/swiftgen'), script, { perm: 0766 })
 
-          # Ensure another run only runs swiftgen directly (without curl nor unzip beforehand)
-          expect_shell_command(
-            "#{install_dir}/bin/swiftgen", "config", "run", "--config", anything
-          )
+          # Second run: ensure we only run SwiftGen directly, without a call to curl nor unzip beforehand
+          expect_shell_command("#{install_dir}/bin/swiftgen", "config", "run", "--config", anything)
+
           Fastlane::Actions::IosLintLocalizationsAction.run(
             install_path: install_dir,
             input_dir: empty_dataset,
@@ -44,7 +51,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     end
   end
 
-  context 'Linter Behavior' do
+  context 'Linter' do
     before(:all) do
       @swiftgen_install_dir = Dir.mktmpdir('a8c-lint-l10n-tests-swiftgen-install-')
     end
