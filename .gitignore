@@ -3,6 +3,7 @@
 
 # Ruby / Bundler
 .bundle/
+vendor/bundle
 
 # Fastlane
 fastlane/README.md
