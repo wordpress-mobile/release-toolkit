@@ -1,24 +1,24 @@
 test_data:
-    en: |
-        "string_no_pos" = "String %@ here.";
-        "string_pos" = "Pos String %1$@ here.";
-        "string_int_pos" = "String %1$@ and Int %2$d";
-        "string_int_pos_inv" = "Int %2$d before String %1$@";
-        "many_placeholders_mix_pos" = "String %2$@, Float %4$f, Int %1$d, Long %5$li, Precise %3$.3lf";
-        "repeated_placeholder" = "String %1$@, yes, I repeat, that's %1$@ indeed, not %2$@.";
-    fr: |
-        "string_no_pos" = "String %@ here.";
-        "string_pos" = "Pos String %1$@ here.";
-        "string_int_pos" = "String %1$@ and Int %2$d";
-        "string_int_pos_inv" = "Int %2$d before String %1$@";
-        "many_placeholders_mix_pos" = "String %2$@, Float %4$f, Int %1$d, Long %5$li, Precise %3$.3lf";
-        "repeated_placeholder" = "String %1$@, yes, that's it indeed, and not %2$@.";
-    it: |
-        "string_no_pos" = "String %@ here.";
-        "string_pos" = "Pos String %1$@ here.";
-        "string_int_pos" = "String %1$@ and Int %2$d";
-        "string_int_pos_inv" = "Int %2$d before String %1$@";
-        "many_placeholders_mix_pos" = "String %2$@, Float %4$f, Int %1$d, Long %5$li, Precise %3$.3lf";
-        "repeated_placeholder" = "String %1$@, yes, and not %2$@, I repeat, that's not %2$@.";
+  en: |
+    "string_no_pos" = "String %@ here.";
+    "string_pos" = "Pos String %1$@ here.";
+    "string_int_pos" = "String %1$@ and Int %2$d";
+    "string_int_pos_inv" = "Int %2$d before String %1$@";
+    "many_placeholders_mix_pos" = "String %2$@, Float %4$f, Int %1$d, Long %5$li, Precise %3$.3lf";
+    "repeated_placeholder" = "String %1$@, yes, I repeat, that's %1$@ indeed, not %2$@.";
+  fr: |
+    "string_no_pos" = "String %@ here.";
+    "string_pos" = "Pos String %1$@ here.";
+    "string_int_pos" = "String %1$@ and Int %2$d";
+    "string_int_pos_inv" = "Int %2$d before String %1$@";
+    "many_placeholders_mix_pos" = "String %2$@, Float %4$f, Int %1$d, Long %5$li, Precise %3$.3lf";
+    "repeated_placeholder" = "String %1$@, yes, that's it indeed, and not %2$@.";
+  it: |
+    "string_no_pos" = "String %@ here.";
+    "string_pos" = "Pos String %1$@ here.";
+    "string_int_pos" = "String %1$@ and Int %2$d";
+    "string_int_pos_inv" = "Int %2$d before String %1$@";
+    "many_placeholders_mix_pos" = "String %2$@, Float %4$f, Int %1$d, Long %5$li, Precise %3$.3lf";
+    "repeated_placeholder" = "String %1$@, yes, and not %2$@, I repeat, that's not %2$@.";
 
 result: {}

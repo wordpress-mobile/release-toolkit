@@ -61,17 +61,17 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       run_test('wrong-placeholder-count')
     end
 
-    # it 'detects inconsistent placeholder types' do
-    #   run_test('wrong-placeholder-types')
-    # end
+    it 'detects inconsistent placeholder types' do
+      run_test('wrong-placeholder-types')
+    end
 
-    # it 'detects invisible characters messing up placeholders' do
-    #   run_test('tricky-placeholder')
-    # end
+    it 'detects invisible characters messing up placeholders' do
+      run_test('tricky-chars')
+    end
 
-    # it 'does not fail if a locale does not have any Localizable.strings' do
-    #   run_test('no-strings')
-    # end
+    it 'does not fail if a locale does not have any Localizable.strings' do
+      run_test('no-strings')
+    end
 
     after(:each) do
       FileUtils.remove_entry @test_data_dir
