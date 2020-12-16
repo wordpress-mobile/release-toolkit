@@ -32,10 +32,12 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
           # Create a fake SwiftGen binstub to simulate SwiftGen has been installed at that point
           script = <<~SCRIPT
             #!/bin/sh
-            echo "SwiftGen v#{Fastlane::Helpers::IosL10nHelper::SWIFTGEN_VERSION} (Fake binstub)"
+            if [[ "$1" == "--version" ]]; then
+              echo "SwiftGen v#{Fastlane::Helpers::IosL10nHelper::SWIFTGEN_VERSION} (Fake binstub)"
+            fi
           SCRIPT
           FileUtils.mkdir_p File.join(install_dir, 'bin')
-          File.write(File.join(install_dir, 'bin/swiftgen'), script, { perm: 0766 })
+          File.write(File.join(install_dir, 'bin/swiftgen'), script, perm: 0766)
 
           # Second run: ensure we only run SwiftGen directly, without a call to curl nor unzip beforehand
           expect_shell_command("#{install_dir}/bin/swiftgen", "config", "run", "--config", anything)
