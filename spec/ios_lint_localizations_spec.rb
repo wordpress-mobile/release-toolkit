@@ -93,7 +93,6 @@ end
 
 def run_test(data_file)
   # Arrange: Prepare test files
-
   test_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', "test-lint-ios-#{data_file}.yaml")
   yml = YAML.load_file(test_file)
 
@@ -104,7 +103,6 @@ def run_test(data_file)
     FileUtils.mkdir_p(lproj)
     File.write(File.join(lproj, 'Localizable.strings'), content) unless content.nil?
   end
-  # Dir.glob("#{@test_data_dir}/**/*.strings").each { |f| puts "-- #{f} --"; puts File.read(f) } # for DEBUG
 
   # Act
   result = Fastlane::Actions::IosLintLocalizationsAction.run(
