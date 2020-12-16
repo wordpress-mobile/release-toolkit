@@ -73,7 +73,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       run_test('wrong-placeholder-types')
     end
 
-    it 'detects invisible characters messing up placeholders' do
+    it 'properly handles misleading characters and placeholders in RTL languages' do
       run_test('tricky-chars')
     end
 
