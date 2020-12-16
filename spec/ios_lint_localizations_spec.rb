@@ -6,9 +6,8 @@ require 'yaml'
 describe Fastlane::Actions::IosLintLocalizationsAction do
   before do
     # Ensure `Action.sh` is not skipped during test – so that SwiftGen will be installed by our action as normal
-    # See https://github.com/fastlane/fastlane/blob/master/fastlane_core/lib/fastlane_core/helper.rb#L68-L70
-    ENV['FORCE_SH_DURING_TESTS'] = '1'
-    # allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true) # Alternative solution 
+    # See https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/helper/sh_helper.rb#L45-L85
+    allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true)
   end
 
   context 'SwiftGen Installation Logic' do
@@ -19,7 +18,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
           expect(Dir.entries(install_dir)).to eq(['.','..'])
 
           # First run: expect curl, unzip and cp_r to be called to install SwiftGen before it gets run
-          expect_shell_command("curl", any_args, /\/.*swiftgen-6.4.0.zip/)
+          expect_shell_command("curl", any_args, /\/.*swiftgen-#{Fastlane::Helpers::IosL10nHelper::SWIFTGEN_VERSION}.zip/)
           expect_shell_command("unzip", any_args)
           expect(FileUtils).to receive(:cp_r)
           expect_shell_command("#{install_dir}/bin/swiftgen", "config", "run", "--config", anything)
@@ -33,7 +32,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
           # Create a fake SwiftGen binstub to simulate SwiftGen has been installed at that point
           script = <<~SCRIPT
             #!/bin/sh
-            echo "SwiftGen v6.4.0 (Fake binstub)"
+            echo "SwiftGen v#{Fastlane::Helpers::IosL10nHelper::SWIFTGEN_VERSION} (Fake binstub)"
           SCRIPT
           FileUtils.mkdir_p File.join(install_dir, 'bin')
           File.write(File.join(install_dir, 'bin/swiftgen'), script, { perm: 0766 })
