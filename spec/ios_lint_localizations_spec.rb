@@ -59,6 +59,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     
     before(:each) do
       @test_data_dir = Dir.mktmpdir('a8c-lint-l10n-tests-data-')
+      allow(FastlaneCore::UI).to receive(:'abort_with_message!')
     end
 
     it 'succeeds when there are no violations' do
