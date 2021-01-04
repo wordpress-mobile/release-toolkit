@@ -6,7 +6,7 @@ require 'yaml'
 describe Fastlane::Actions::IosLintLocalizationsAction do
   before do
     # Ensure `Action.sh` is not skipped during test – so that SwiftGen will be installed by our action as normal
-    # See https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/helper/sh_helper.rb#L45-L85
+    # See https://github.com/fastlane/fastlane/blob/e6bd288f17038a39cd1bfc1b70373cab1fa1e173/fastlane/lib/fastlane/helper/sh_helper.rb#L45-L85
     allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true)
   end
 
@@ -15,9 +15,9 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       Dir.mktmpdir('a8c-lint-l10n-tests-swiftgen-install-') do |install_dir|
         Dir.mktmpdir('a8c-lint-l10n-tests-data-') do |empty_dataset|
           # Expect install dir to be empty before we start
-          expect(Dir.entries(install_dir)).to eq(['.','..'])
+          expect(Dir.empty?(install_dir)).to be true
 
-          # First run: expect curl, unzip and cp_r to be called to install SwiftGen before it gets run
+          # First run: expect curl, unzip and cp_r to be called to install SwiftGen before running the action
           expect_shell_command("curl", any_args, /\/.*swiftgen-#{Fastlane::Helpers::IosL10nHelper::SWIFTGEN_VERSION}.zip/)
           expect_shell_command("unzip", any_args)
           expect(FileUtils).to receive(:cp_r)
