@@ -43,7 +43,8 @@ module Fastlane
 
           - Either cancel this lane (reply 'No' below), then work with polyglots in #i18n
             to fix those directly in GlotPress – by rejecting the inconsistent
-            translations, or by submitting a fixed copy. Then run the lane again.
+            translations, or by submitting a fixed copy. Rerun the lane when everything
+            has been fixed.
 
             This is the recommended way to go, as it will fix the issues at their source.
 
@@ -56,7 +57,7 @@ module Fastlane
             need to let the translators know that they will need to fix those copies
             at some point before the next build to fix the root issue.
 
-          Did you fix the .strings files locally and want to lint them again?
+          Did you fix the `.strings` files locally and want to lint them again?
         MSG
 
         def self.repo_root
