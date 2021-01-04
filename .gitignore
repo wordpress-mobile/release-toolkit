@@ -20,3 +20,6 @@ fastlane/report.xml
 /ext/drawText/drawText.xcodeproj/project.xcworkspace/xcuserdata
 /ext/drawText/test-output
 /default.profraw
+
+# L10n Linter
+vendor/swiftgen

@@ -53,10 +53,6 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
   end
 
   context 'Linter' do
-    before(:all) do
-      @swiftgen_install_dir = Dir.mktmpdir('a8c-lint-l10n-tests-swiftgen-install-')
-    end
-    
     before(:each) do
       @test_data_dir = Dir.mktmpdir('a8c-lint-l10n-tests-data-')
       allow(FastlaneCore::UI).to receive(:'abort_with_message!')
@@ -85,10 +81,6 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     after(:each) do
       FileUtils.remove_entry @test_data_dir
     end
-
-    after(:all) do
-      FileUtils.remove_entry @swiftgen_install_dir
-    end
   end
 end
 
@@ -106,8 +98,12 @@ def run_test(data_file)
   end
 
   # Act
+  # Note: We will install SwiftGen in vendor/swiftgen if it's not already installed yet, and intentionally won't
+  #       remove this after the test ends, so that further executions of the test run faster.
+  #       Only the first execution of the tests might take longer if it needs to install SwiftGen first to be able to run the tests.
+  install_dir = "vendor/swiftgen/#{Fastlane::Helpers::IosL10nHelper::SWIFTGEN_VERSION}"
   result = Fastlane::Actions::IosLintLocalizationsAction.run(
-    install_path: @swiftgen_install_dir,
+    install_path: install_dir,
     input_dir: @test_data_dir,
     base_lang: 'en'
   )
