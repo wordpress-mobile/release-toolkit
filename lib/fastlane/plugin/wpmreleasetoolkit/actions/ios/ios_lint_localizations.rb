@@ -10,7 +10,7 @@ module Fastlane
           end
 
           if !violations.empty? && params[:abort_on_violations]
-            UI.abort_with_message!('Inconsistencies found during Localization linting. Aborting.')
+            UI.abort_with_message!(ABORT_MESSAGE)
           end
 
           violations
@@ -39,9 +39,9 @@ module Fastlane
 
         RETRY_MESSAGE = <<~MSG
           Inconsistencies found during Localization linting.
-          You need to fix them before continuing. From this point on, you should:
+          You need to fix them before continuing. From this point on, you should either:
 
-          - Either cancel this lane (reply 'No' below), then work with polyglots in #i18n
+          - Cancel this lane (reply 'No' below), then work with polyglots in #i18n
             to fix those directly in GlotPress – by rejecting the inconsistent
             translations, or by submitting a fixed copy. Rerun the lane when everything
             has been fixed.
@@ -55,9 +55,13 @@ module Fastlane
             This is only a workaround to allow you to submit a build if translators are
             not available to help you fix the issues in GlotPress in time. You will still
             need to let the translators know that they will need to fix those copies
-            at some point before the next build to fix the root issue.
+            at some point before the next build to fix the root of the issue.
 
           Did you fix the `.strings` files locally and want to lint them again?
+        MSG
+
+        ABORT_MESSAGE = <<~MSG
+          Inconsistencies found during Localization linting. Aborting.
         MSG
 
         def self.repo_root
