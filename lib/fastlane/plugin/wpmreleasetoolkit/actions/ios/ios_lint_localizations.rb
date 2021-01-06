@@ -2,6 +2,21 @@ module Fastlane
     module Actions
       class IosLintLocalizationsAction < Action
         def self.run(params)
+          violations = {}
+
+          loop do
+            violations = self.run_linter(params)
+            break unless !violations.empty? && params[:allow_retry] && UI.confirm(RETRY_MESSAGE)
+          end
+
+          if !violations.empty? && params[:abort_on_violations]
+            UI.abort_with_message!(ABORT_MESSAGE)
+          end
+
+          violations
+        end
+
+        def self.run_linter(params)
           UI.message "Linting localizations for parameter placeholders consistency..."
     
           require_relative '../../helper/ios/ios_l10n_helper.rb'
@@ -18,12 +33,36 @@ module Fastlane
           violations.each do |lang, diff|
             UI.error "Inconsistencies found between '#{params[:base_lang]}' and '#{lang}':\n\n#{diff}\n"
           end
-          if params[:abort_on_violations] && !violations.empty?
-            UI.abort_with_message!('Inconsistencies found during Localization linting. Aborting.')
-          end
-          
+
           violations
         end
+
+        RETRY_MESSAGE = <<~MSG
+          Inconsistencies found during Localization linting.
+          You need to fix them before continuing. From this point on, you should either:
+
+          - Cancel this lane (reply 'No' below), then work with polyglots in #i18n
+            to fix those directly in GlotPress – by rejecting the inconsistent
+            translations, or by submitting a fixed copy. Rerun the lane when everything
+            has been fixed.
+
+            This is the recommended way to go, as it will fix the issues at their source.
+
+          - Or manually edit the `Localizable.strings` files to fix the inconsistencies
+            locally, commit them, then reply 'Yes' below to re-lint and validate that all
+            inconsistencies have been fixed locally so you can continue with the build.
+
+            This is only a workaround to allow you to submit a build if translators are
+            not available to help you fix the issues in GlotPress in time. You will still
+            need to let the translators know that they will need to fix those copies
+            at some point before the next build to fix the root of the issue.
+
+          Did you fix the `.strings` files locally and want to lint them again?
+        MSG
+
+        ABORT_MESSAGE = <<~MSG
+          Inconsistencies found during Localization linting. Aborting.
+        MSG
 
         def self.repo_root
           @repo_root || `git rev-parse --show-toplevel`.chomp
@@ -93,6 +132,14 @@ module Fastlane
               description: "Should we abort the rest of the lane with a global error if any violations are found?",
               optional: true,
               default_value: true,
+              is_string: false # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :allow_retry,
+              env_name: "FL_IOS_LINT_TRANSLATIONS_ALLOW_RETRY",
+              description: "If any violations are found, show an interactive prompt allowing the user to manually fix the issues locally and retry the linting",
+              optional: true,
+              default_value: false,
               is_string: false # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
             ),
           ]
