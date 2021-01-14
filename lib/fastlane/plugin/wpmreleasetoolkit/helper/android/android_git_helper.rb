@@ -47,6 +47,7 @@ module Fastlane
 
       def self.update_metadata(validate_translation_command)
         Action.sh("./tools/update-translations.sh")
+        Action.sh("git submodule update --init --recursive")
         Action.sh("./gradlew #{validate_translation_command}")
         Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/src/main/res")
         Action.sh("git diff-index --quiet HEAD || git commit -m \"Updates translations\"")
