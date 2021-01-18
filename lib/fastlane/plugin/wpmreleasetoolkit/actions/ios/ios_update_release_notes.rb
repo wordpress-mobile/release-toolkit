@@ -4,10 +4,15 @@ module Fastlane
       def self.run(params)
         UI.message "Updating the release notes..."
 
-        require_relative '../../helper/ios/ios_git_helper.rb'
         require_relative '../../helper/ios/ios_version_helper.rb'
+        require_relative '../../helper/release_notes_helper.rb'
+        require_relative '../../helper/git_helper.rb'
+
+        path = File.join(ENV["PROJECT_ROOT_FOLDER"] || '.', 'RELEASE-NOTES.txt')
         next_version = Fastlane::Helpers::IosVersionHelper.calc_next_release_version(params[:new_version])
-        Fastlane::Helpers::IosGitHelper.update_release_notes(next_version)
+
+        Fastlane::Helper::ReleaseNotesHelper.add_new_section(path: path, section_title: next_version)
+        Fastlane::Helper::GitHelper.commit(message: "Update release notes", files: path, push: true)
           
         UI.message "Done."
       end

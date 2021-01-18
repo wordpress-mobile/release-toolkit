@@ -36,27 +36,6 @@ module Fastlane
         !Action.sh("git branch --list #{branch_name}").empty?
       end
 
-      # Update the RELEASE-NOTES.txt to add a new entry for the new version, then commit the changes.
-      #
-      # @env [String] PROJECT_ROOT_FOLDER The env variable containing the project's root folder. Uses current folder if nil.
-      #
-      # @param [String] new_version The new version number to add an entry for
-      # 
-      def self.update_release_notes(new_version)
-        path = File.join(ENV["PROJECT_ROOT_FOLDER"] || '.', 'RELEASE-NOTES.txt')
-        lines = File.readlines(path)
-        # Find the index of the first non-empty line that is also NOT a comment. That way we keep commment headers as the very top of the file
-        line_idx = lines.find_index { |l| !l.start_with?('***') && !l.start_with?('//') && !l.chomp.empty? }
-        # Put back the header, then the new entry, then the rest (note: '...' excludes the higher bound of the range, unlike '..')
-        new_lines = lines[0...line_idx] + ["#{new_version}\n", "-----\n", "\n", "\n"] + lines[line_idx..]
-        File.write(path, new_lines.join)
-
-        # Commit the changes
-        Action.sh("git", "add", path)
-        Action.sh("git", "commit", "-m", "Update release notes")
-        Action.sh("git", "push", "origin", "HEAD")
-      end
-
       def self.update_metadata(validate_translation_command)
         Action.sh("./tools/update-translations.sh")
         Action.sh("./gradlew #{validate_translation_command}")
