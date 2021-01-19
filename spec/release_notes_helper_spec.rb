@@ -52,7 +52,8 @@ describe Fastlane::Helper::ReleaseNotesHelper do
   it 'does not consider ** as comments' do
     prefix = <<~NOT_HEADER
       ** This is not a comment
-      *** But this is
+      *** This is; but it's after the non-comment line above, so not at the very top of the file
+      *** and should hence not be considered part of the pinned header to be skipped.
     NOT_HEADER
     run_release_notes_test('', prefix + FAKE_CONTENT)
   end
@@ -79,14 +80,14 @@ NEW_SECTION = <<~CONTENT
 
 CONTENT
 
-def run_release_notes_test(header, original_content = FAKE_CONTENT)
+def run_release_notes_test(header, post_header_content = FAKE_CONTENT)
   Dir.mktmpdir('a8c-release-notes-test-') do |dir|
     tmp_file = File.join(dir, 'TEST-REL-NOTES.txt')
-    File.write(tmp_file, header + original_content)
+    File.write(tmp_file, header + post_header_content)
 
     Fastlane::Helper::ReleaseNotesHelper.add_new_section(path: tmp_file, section_title: "New Section")
 
     new_content = File.read(tmp_file)
-    expect(new_content).to eq(header + NEW_SECTION + original_content)
+    expect(new_content).to eq(header + NEW_SECTION + post_header_content)
   end
 end
