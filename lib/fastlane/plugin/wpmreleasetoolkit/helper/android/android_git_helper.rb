@@ -36,15 +36,6 @@ module Fastlane
         !Action.sh("git branch --list #{branch_name}").empty?
       end
 
-      def self.update_release_notes(new_version)
-        Action.sh("cp #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.bak")
-        Action.sh("echo \"#{new_version}\n-----\n \" > #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
-        Action.sh("cat #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.bak >> #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
-        Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}RELEASE-NOTES.txt")
-        Action.sh("git diff-index --quiet HEAD || git commit -m \"Update release notes\"")
-        Action.sh("git push origin HEAD")
-      end
-
       def self.update_metadata(validate_translation_command)
         Action.sh("./tools/update-translations.sh")
         Action.sh("git submodule update --init --recursive")
