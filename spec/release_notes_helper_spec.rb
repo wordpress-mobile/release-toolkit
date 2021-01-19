@@ -2,14 +2,6 @@ require 'tmpdir'
 require_relative './spec_helper'
 
 describe Fastlane::Helper::ReleaseNotesHelper do
-  before(:each) do
-    @path = Dir.mktmpdir
-  end
-
-  after(:each) do
-    FileUtils.rm_rf(@path)
-  end
-
   it 'adds a new section on top if there are no header comments' do
     run_release_notes_test ''
   end

@@ -80,7 +80,7 @@ describe Fastlane::Helper::GitHelper do
 
     it 'does not push to origin if not asked' do
       expect_shell_command('git', 'commit', '-m', @message)
-      expect_shell_command('git', 'push', 'origin', 'HEAD').never
+      expect_shell_command('git', 'push', any_args).never
       Fastlane::Helper::GitHelper.commit(message: @message)
     end
 
