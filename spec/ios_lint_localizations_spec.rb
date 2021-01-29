@@ -5,9 +5,8 @@ require 'yaml'
 
 describe Fastlane::Actions::IosLintLocalizationsAction do
   before do
-    # Ensure `Action.sh` is not skipped during test – so that SwiftGen will be installed by our action as normal
-    # See https://github.com/fastlane/fastlane/blob/e6bd288f17038a39cd1bfc1b70373cab1fa1e173/fastlane/lib/fastlane/helper/sh_helper.rb#L45-L85
-    allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true)
+    # Ensure `Action.sh` is not skipped during test – so that SwiftGen will be installed by our action as normal – See spec_helper.rb
+    allow_fastlane_action_sh()
   end
 
   context 'SwiftGen Installation Logic' do
@@ -18,6 +17,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
           expect(Dir.empty?(install_dir)).to be true
 
           # First run: expect curl, unzip and cp_r to be called to install SwiftGen before running the action
+          # See spec_helper.rb for documentation about `expect_shell_command`.
           expect_shell_command("curl", any_args, /\/.*swiftgen-#{Fastlane::Helpers::IosL10nHelper::SWIFTGEN_VERSION}.zip/)
           expect_shell_command("unzip", any_args)
           expect(FileUtils).to receive(:cp_r)
@@ -59,23 +59,23 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     end
 
     it 'succeeds when there are no violations' do
-      run_test('no-violations')
+      run_l10n_linter_test('no-violations')
     end
 
     it 'detects inconsistent placeholder count' do
-      run_test('wrong-placeholder-count')
+      run_l10n_linter_test('wrong-placeholder-count')
     end
 
     it 'detects inconsistent placeholder types' do
-      run_test('wrong-placeholder-types')
+      run_l10n_linter_test('wrong-placeholder-types')
     end
 
     it 'properly handles misleading characters and placeholders in RTL languages' do
-      run_test('tricky-chars')
+      run_l10n_linter_test('tricky-chars')
     end
 
     it 'does not fail if a locale does not have any Localizable.strings' do
-      run_test('no-strings')
+      run_l10n_linter_test('no-strings')
     end
 
     after(:each) do
@@ -84,7 +84,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
   end
 end
 
-def run_test(data_file)
+def run_l10n_linter_test(data_file)
   # Arrange: Prepare test files
   test_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', "test-lint-ios-#{data_file}.yaml")
   yml = YAML.load_file(test_file)
@@ -110,13 +110,4 @@ def run_test(data_file)
   
   # Assert
   expect(result).to eq(yml["result"])
-end
-
-def expect_shell_command(*command, exitstatus: 0, output: "")
-  mock_input = double(:input)
-  mock_output = StringIO.new(output)
-  mock_status = double(:status, exitstatus: exitstatus)
-  mock_thread = double(:thread, value: mock_status)
-
-  expect(Open3).to receive(:popen2e).with(*command).and_yield(mock_input, mock_output, mock_thread)
 end
