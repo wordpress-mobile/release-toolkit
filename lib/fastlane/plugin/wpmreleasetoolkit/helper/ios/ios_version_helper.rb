@@ -1,10 +1,16 @@
 module Fastlane
     module Helpers
       module IosVersionHelper
+        # @!group The indices for various parts of the version parts array.
+        # The index for the major version number part
         MAJOR_NUMBER = 0
+        # The index for the minor version number part
         MINOR_NUMBER = 1
+        # The index for the hotfix version number part
         HOTFIX_NUMBER = 2
+        # The index for the build version number part
         BUILD_NUMBER = 3
+        # @!endgroup
   
         # Returns the public-facing version string.
         #
@@ -200,6 +206,15 @@ module Fastlane
           end
         end
 
+        # Update the `.xcconfig` files (the public one, and the internal one if it exists) with the new version strings.
+        #
+        # @env PUBLIC_CONFIG_FILE The path to the xcconfig file containing the public version numbers.
+        # @env INTERNAL_CONFIG_FILE The path to the xcconfig file containing the internal version numbers. Can be nil.
+        #
+        # @param [String] new_version The new version number to use as `VERSION_LONG` for the public xcconfig file
+        # @param [String] new_version_short The new version number to use for `VERSION_SHORT` (for both public and internal xcconfig files)
+        # @param [String] internal_version The new version number to use as `VERSION_LONG` for the interrnal xcconfig file, if it exists
+        #
         def self.update_xc_configs(new_version, new_version_short, internal_version)
           update_xc_config(ENV["PUBLIC_CONFIG_FILE"], new_version, new_version_short) 
           update_xc_config(ENV["INTERNAL_CONFIG_FILE"], internal_version, new_version_short) unless ENV["INTERNAL_CONFIG_FILE"].nil?
