@@ -14,7 +14,7 @@ module Fastlane
         beta_version = Fastlane::Helpers::AndroidVersionHelper.get_release_version() unless !params[:beta] and !params[:final]
         alpha_version = Fastlane::Helpers::AndroidVersionHelper.get_alpha_version() unless !params[:alpha]
         
-        if (params[:final] and Fastlane::Helpers::AndroidVersionHelper.is_beta_version(beta_version))
+        if (params[:final] and Fastlane::Helpers::AndroidVersionHelper.is_beta_version?(beta_version))
           UI.user_error!("Can't build a final release out of this branch because it's configured as a beta release!")
         end
 

@@ -12,7 +12,7 @@ module Fastlane
         def self.get_public_version
           version = get_release_version
           vp = get_version_parts(version[VERSION_NAME])
-          return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix(version)
+          return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}"
         end
 
@@ -36,11 +36,11 @@ module Fastlane
           return { VERSION_NAME => name, VERSION_CODE => code }
         end
   
-        def self.is_alpha_version(version)
+        def self.is_alpha_version?(version)
           version[VERSION_NAME].start_with?(ALPHA_PREFIX)
         end
   
-        def self.is_beta_version(version)
+        def self.is_beta_version?(version)
           version[VERSION_NAME].include?(RC_SUFFIX)
         end
   
@@ -64,7 +64,7 @@ module Fastlane
   
         def self.calc_next_beta_version(version, alpha_version = nil)
           # Bump version name
-          beta_number = is_beta_version(version) ? version[VERSION_NAME].split('-')[2].to_i + 1 : 1
+          beta_number = is_beta_version?(version) ? version[VERSION_NAME].split('-')[2].to_i + 1 : 1
           version_name = "#{version[VERSION_NAME].split('-')[0]}#{RC_SUFFIX}-#{beta_number}"
 
           # Bump version code
@@ -110,8 +110,8 @@ module Fastlane
            "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}"
         end
   
-        def self.is_hotfix(version)
-          return false if is_alpha_version(version)
+        def self.is_hotfix?(version)
+          return false if is_alpha_version?(version)
           vp = get_version_parts(version[VERSION_NAME])
           return (vp.length > 2) && (vp[HOTFIX_NUMBER] != 0)
         end
@@ -184,7 +184,7 @@ module Fastlane
           v_parts = get_version_parts(version)
           
           v_parts.each do | part |
-            if (!is_number?(part)) then
+            if (!is_int?(part)) then
               UI.user_error!("Version value can only contains numbers.")
             end
           end
@@ -192,8 +192,8 @@ module Fastlane
           "#{v_parts[MAJOR_NUMBER]}.#{v_parts[MINOR_NUMBER]}"
         end
 
-        def self.is_number? string
-          true if Float(string) rescue false
+        def self.is_int? string
+          true if Integer(string) rescue false
         end
 
         def self.gradle_path 

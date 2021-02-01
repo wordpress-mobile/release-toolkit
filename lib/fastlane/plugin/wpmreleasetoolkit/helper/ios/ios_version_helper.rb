@@ -15,7 +15,7 @@ module Fastlane
         def self.get_public_version
           version = get_build_version
           vp = get_version_parts(version)
-          return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix(version)
+          return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}"
         end
   
@@ -150,7 +150,7 @@ module Fastlane
         #
         # @return [Bool] True if the version number has a non-zero 3rd component, meaning that it is a hotfix version.
         #
-        def self.is_hotfix(version)
+        def self.is_hotfix?(version)
           vp = get_version_parts(version)
           return (vp.length > 2) && (vp[HOTFIX_NUMBER] != 0)
         end
@@ -312,7 +312,7 @@ module Fastlane
           v_parts = get_version_parts(version)
           
           v_parts.each do | part |
-            if (!is_number?(part)) then
+            if (!is_int?(part)) then
               UI.user_error!("Version value can only contains numbers.")
             end
           end
@@ -320,8 +320,8 @@ module Fastlane
           "#{v_parts[MAJOR_NUMBER]}.#{v_parts[MINOR_NUMBER]}.#{v_parts[HOTFIX_NUMBER]}.#{v_parts[BUILD_NUMBER]}"
         end
 
-        def self.is_number? string
-          true if Float(string) rescue false
+        def self.is_int? string
+          true if Integer(string) rescue false
         end
       end
     end
