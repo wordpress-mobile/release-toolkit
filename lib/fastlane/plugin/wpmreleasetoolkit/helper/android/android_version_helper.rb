@@ -19,8 +19,8 @@ module Fastlane
         def self.get_release_version
           section = ENV["HAS_ALPHA_VERSION"].nil? ? "defaultConfig" : "vanilla {"
           gradle_path = self.gradle_path
-          name = get_version_name_from_file(gradle_path, section)
-          code = get_version_build_from_file(gradle_path, section)
+          name = get_version_name_from_gradle_file(gradle_path, section)
+          code = get_version_build_from_gradle_file(gradle_path, section)
           return { VERSION_NAME => name, VERSION_CODE => code }
         end
 
@@ -31,8 +31,8 @@ module Fastlane
 
           section = "defaultConfig"
           gradle_path = self.gradle_path
-          name = get_version_name_from_file(gradle_path, section)
-          code = get_version_build_from_file(gradle_path, section)
+          name = get_version_name_from_gradle_file(gradle_path, section)
+          code = get_version_build_from_gradle_file(gradle_path, section)
           return { VERSION_NAME => name, VERSION_CODE => code }
         end
   
@@ -148,31 +148,30 @@ module Fastlane
           version.split(".").fill("0", version.length...3).map{|chr| chr.to_i}
         end
   
-        def self.get_version_name_from_file(file_path, section)
-          res = get_data_from_file(file_path, section, "versionName")
-          res = res.split(' ')[1].tr('\"', '') unless res.nil?
+        def self.get_version_name_from_gradle_file(file_path, section)
+          res = get_keyword_from_gradle_file(file_path, section, "versionName")
+          res = res.tr('\"', '') unless res.nil?
           return res
         end
   
-        def self.get_version_build_from_file(file_path, section)
-          res = get_data_from_file(file_path, section, "versionCode")
-          res = res.split(' ')[1].to_i
-          return res
+        def self.get_version_build_from_gradle_file(file_path, section)
+          res = get_keyword_from_gradle_file(file_path, section, "versionCode")
+          return res.to_i
         end
 
         # FIXME: This implementation is very fragile. This should be done parsing the file in a proper way. 
         # Leveraging gradle itself is probably the easiest way.
-        def self.get_data_from_file(file_path, section, keyword)
+        def self.get_keyword_from_gradle_file(file_path, section, keyword)
           found_section = false
           File.open(file_path, 'r') do |file|
             file.each_line do |line|
               if !found_section
-                if (line.include? section) 
+                if line.include?(section)
                   found_section = true
                 end
               else
-                if (line.include? keyword)
-                  return line unless line.include?("\"#{keyword}\"") or line.include?("P#{keyword}")
+                if line.include?(keyword) && !line.include?("\"#{keyword}\"") && !line.include?("P#{keyword}")
+                  return line.split(' ')[1]
                 end
               end
             end
@@ -216,15 +215,15 @@ module Fastlane
                 end
               else
                 if (version_updated < 2)
-                  if (line.include? "versionName") and (!line.include? "\"versionName\"") and (!line.include?"PversionName")
+                  if line.include?("versionName") && !line.include?('"versionName"') && !line.include?("PversionName")
                     version_name = line.split(' ')[1].tr('\"', '')
-                    line.replace line.sub(version_name, version[VERSION_NAME].to_s)
+                    line.sub!(version_name, version[VERSION_NAME].to_s)
                     version_updated = version_updated + 1
                   end
 
                   if (line.include? "versionCode")
                     version_code = line.split(' ')[1]
-                    line.replace line.sub(version_code, version[VERSION_CODE].to_s)
+                    line.sub!(version_code, version[VERSION_CODE].to_s)
                     version_updated = version_updated + 1
                   end
                 end
