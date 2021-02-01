@@ -209,7 +209,7 @@ module Fastlane
         # @param [String] hotfix_version_name The next version name we want for the hotfix
         # @param [String] hotfix_version_code The next version code we want for the hotfix
         #
-        # @return [Hash] The predicted next hotfix version, as a Hash containing the keys `"name"`` and `"code"``
+        # @return [Hash] The predicted next hotfix version, as a Hash containing the keys `"name"` and `"code"`
         #
         def self.calc_next_hotfix_version(hotfix_version_name, hotfix_version_code)
           { VERSION_NAME => hotfix_version_name, VERSION_CODE => hotfix_version_code }
