@@ -25,9 +25,7 @@ module Fastlane
         end
 
         def self.get_alpha_version
-          if (ENV["HAS_ALPHA_VERSION"].nil?)
-            return nil
-          end
+          return nil if ENV["HAS_ALPHA_VERSION"].nil?
 
           section = "defaultConfig"
           gradle_path = self.gradle_path
@@ -145,7 +143,9 @@ module Fastlane
         end
 
         def self.get_version_parts(version)
-          version.split(".").fill("0", version.length...3).map{|chr| chr.to_i}
+          parts = version.split(".").map(&:to_i)
+          parts.fill(0, parts.length...3) # add 0 if needed to ensure array has at least 3 components
+          return parts
         end
   
         def self.get_version_name_from_gradle_file(file_path, section)
@@ -196,7 +196,7 @@ module Fastlane
         end
 
         def self.gradle_path 
-          "#{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/build.gradle"
+          File.join(ENV["PROJECT_ROOT_FOLDER"], ENV["PROJECT_NAME"], 'build.gradle')
         end
 
         # FIXME: This implementation is very fragile. This should be done parsing the file in a proper way. 
