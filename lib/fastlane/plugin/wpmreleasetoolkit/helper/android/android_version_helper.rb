@@ -20,7 +20,12 @@ module Fastlane
   
         # Returns the public-facing version string.
         #
-        # @return [String] The public-facing version number, extracted from the varsion name of the build.gradle file.
+        # @example
+        #    "1.2" # Assuming build.gradle contains versionName "1.2"
+        #    "1.2" # Assuming build.gradle contains versionName "1.2.0"
+        #    "1.2.3" # Assuming build.gradle contains versionName "1.2.3"
+        #
+        # @return [String] The public-facing version number, extracted from the `versionName` of the `build.gradle` file.
         #         - If this version is a hotfix (more than 2 parts and 3rd part is non-zero), returns the "X.Y.Z" formatted string
         #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
         #
@@ -32,7 +37,7 @@ module Fastlane
         end
 
         # Extract the version name and code from the `vanilla` flavor of the `$PROJECT_NAME/build.gradle file`
-        # – or for the defaultConfig if `HAS_ALPHA_VERSION` is not defined.
+        #   or for the defaultConfig if `HAS_ALPHA_VERSION` is not defined.
         #
         # @env HAS_ALPHA_VERSION If set (with any value), indicates that the project uses `vanilla` flavor.
         #
@@ -123,17 +128,22 @@ module Fastlane
           { VERSION_NAME => alpha_name, VERSION_CODE => alpha_code }
         end
   
-        # Returns the version name and code to use for the next alpha.
+        # Compute the version name and code to use for the next beta (`X.Y.Z-rc-N`).
         #
         # - The next version name corresponds to the `version`'s name with the value after the `-rc-` suffix incremented by one,
         #     or with `-rc-1` added if there was no previous rc suffix (if `version` was not a beta but a release)
         # - The next version code corresponds to the `alpha_version`'s (or `version`'s if `alpha_version` is nil) code, incremented by one.
         #
+        # @example
+        #   calc_next_beta_version({"name": "1.2.3", "code": 456}) #=> {"name": "1.2.3-rc-1", "code": 457}
+        #   calc_next_beta_version({"name": "1.2.3-rc-2", "code": 456}) #=> {"name": "1.2.3-rc-3", "code": 457}
+        #   calc_next_beta_version({"name": "1.2.3", "code": 456}, {"name": "alpha-1.2.3", "code": 457}) #=> {"name": "1.2.3-rc-1", "code": 458}
+        #
         # @param [Hash] version The version hash for the current beta or release, containing values for keys "name" and "code"
         # @param [Hash] alpha_version The version hash for the alpha, containing values for keys "name" and "code",
         #                             or `nil` if no alpha version to consider.
         #
-        # @return [<Type>] <description>
+        # @return [Hash] A hash with keys `"name"` and `"code"` containing the next beta version name and code.
         #
         def self.calc_next_beta_version(version, alpha_version = nil)
           # Bump version name
@@ -145,11 +155,26 @@ module Fastlane
           { VERSION_NAME => version_name, VERSION_CODE => version_code }
         end
 
+        # Compute the version name to use for the next release (`"X.Y"`).
+        #
+        # @param [String] version The version name (string) to increment
+        #
+        # @return [String] The version name for the next release
+        #
         def self.calc_next_release_short_version(version)
           v = self.calc_next_release_base_version({ VERSION_NAME => version, VERSION_CODE => nil })
           return v[VERSION_NAME]
         end
 
+        # Compute the next release version name for the given version, without incrementing the version code
+        # 
+        #  - The version name sees its minor version part incremented by one (and carried to next major if it reaches 10)
+        #  - The version code is unchanged. This method is intended to be called internally by other methods taking care of the version code bump.
+        #
+        # @param [Hash] version A version hash, with keys `"name"` and `"code"`, containing the version to increment
+        #
+        # @return [Hash] Hash containing the next release version name ("X.Y") and code.
+        #
         def self.calc_next_release_base_version(version)
           version_name = remove_beta_suffix(version[VERSION_NAME])
           vp = get_version_parts(version_name)
@@ -162,15 +187,45 @@ module Fastlane
           { VERSION_NAME => "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}", VERSION_CODE => version[VERSION_CODE] }
         end
 
+        # Compute the name of the next version to use after code freeze, by incrementing the current version name and making it a `-rc-1`
+        #
+        # @example
+        #   calc_next_release_version({"name": "1.2", "code": 456}) #=> {"name":"1.3-rc-1", "code": 457}
+        #   calc_next_release_version({"name": "1.2.3", "code": 456}) #=> {"name":"1.3-rc-1", "code": 457}
+        #   calc_next_release_version({"name": "1.2", "code": 456}, {"name":"alpha-1.2", "code": 457}) #=> {"name":"1.3-rc-1", "code": 458}
+        #
+        # @param [Hash] version The current version hash, with keys `"name"` and `"code"`
+        # @param [Hash] alpha_version The current alpha version hash, with keys `"name"` and `"code"`, or nil if no alpha version
+        #
+        # @return [Hash] The hash containing the version name and code to use after release cut
+        #
         def self.calc_next_release_version(version, alpha_version = nil)
           nv = calc_next_release_base_version({ VERSION_NAME => version[VERSION_NAME], VERSION_CODE => alpha_version.nil? ? version[VERSION_CODE] : [version[VERSION_CODE], alpha_version[VERSION_CODE]].max})
           calc_next_beta_version(nv)
         end
 
+        # Compute the name and code of the next hotfix version.
+        #
+        # @param [String] hotfix_version_name The next version name we want for the hotfix
+        # @param [String] hotfix_version_code The next version code we want for the hotfix
+        #
+        # @return [Hash] The predicted next hotfix version, as a Hash containing the keys `"name"`` and `"code"``
+        #
         def self.calc_next_hotfix_version(hotfix_version_name, hotfix_version_code)
-          { VERSION_NAME => hotfix_version_name, VERSION_CODE => hotfix_version_code}
+          { VERSION_NAME => hotfix_version_name, VERSION_CODE => hotfix_version_code }
         end
 
+        # Compute the name of the previous release version, by decrementing the minor version number
+        #
+        # @example
+        #    calc_prev_release_version("1.2") => "1.1"
+        #    calc_prev_release_version("1.2.3") => "1.1"
+        #    calc_prev_release_version("3.0") => "2.9"
+        #
+        # @param [String] version The version string to decrement
+        #
+        # @return [String] A 2-parts version string "X.Y" corresponding to the guessed previous release version.
+        #
         def self.calc_prev_release_version(version)
           vp = get_version_parts(version)
           if (vp[MINOR_NUMBER] == 0)
@@ -296,9 +351,9 @@ module Fastlane
         #
         # @param [String] file_path The path of the `.gradle` file to extract the value from
         # @param [String] section The name of the section from which we want to extract this keyword from. For example `defaultConfig` or `myFlavor`
-        # @param [<Type>] keyword The keyword (key name) we want the value for
+        # @param [String] keyword The keyword (key name) we want the value for
         #
-        # @return [<Type>] Returns the value for that keyword in the section of the `.gradle` file, or nil if not found.
+        # @return [String] Returns the value for that keyword in the section of the `.gradle` file, or nil if not found.
         #
         def self.get_keyword_from_gradle_file(file_path, section, keyword)
           found_section = false
