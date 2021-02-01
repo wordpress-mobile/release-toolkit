@@ -2,8 +2,9 @@ require 'yaml'
 require 'tmpdir'
 
 module Fastlane
-    module Helper
-      class IosL10nHelper
+  module Helper
+    module Ios
+      class L10nHelper
         SWIFTGEN_VERSION = '6.4.0'
         DEFAULT_BASE_LANG = 'en'
         CONFIG_FILE_NAME = 'swiftgen-stringtypes.yml'
@@ -200,4 +201,5 @@ module Fastlane
         end
       end
     end
+  end
 end

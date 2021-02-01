@@ -20,7 +20,7 @@ module Fastlane
           UI.message "Linting localizations for parameter placeholders consistency..."
     
           require_relative '../../helper/ios/ios_l10n_helper.rb'
-          helper = Fastlane::Helper::IosL10nHelper.new(
+          helper = Fastlane::Helper::Ios::L10nHelper.new(
             install_path: resolve_path(params[:install_path]),
             version: params[:version]
           )
@@ -94,7 +94,7 @@ module Fastlane
               description: "The path where to install the SwiftGen tooling needed to run the linting process. If a relative path, should be relative to your repo_root",
               type: String,
               optional: true,
-              default_value: "vendor/swiftgen/#{Fastlane::Helper::IosL10nHelper::SWIFTGEN_VERSION}"
+              default_value: "vendor/swiftgen/#{Fastlane::Helper::Ios::L10nHelper::SWIFTGEN_VERSION}"
             ),
             FastlaneCore::ConfigItem.new(
               key: :version,
@@ -102,7 +102,7 @@ module Fastlane
               description: "The version of SwiftGen to install and use for linting",
               type: String,
               optional: true,
-              default_value: Fastlane::Helper::IosL10nHelper::SWIFTGEN_VERSION
+              default_value: Fastlane::Helper::Ios::L10nHelper::SWIFTGEN_VERSION
             ),
             FastlaneCore::ConfigItem.new(
               key: :input_dir,
@@ -117,7 +117,7 @@ module Fastlane
               description: "The language that should be used as the base language that every other language will be compared against",
               type: String,
               optional: true,
-              default_value: Fastlane::Helper::IosL10nHelper::DEFAULT_BASE_LANG
+              default_value: Fastlane::Helper::Ios::L10nHelper::DEFAULT_BASE_LANG
             ),
             FastlaneCore::ConfigItem.new(
               key: :only_langs,
