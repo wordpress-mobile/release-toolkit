@@ -1,5 +1,5 @@
 --no-save
 --private --protected
---tag env:"Environment Variables used"
+--name-tag env:"Environment Variables used"
 --markup markdown
 --output-dir yard-doc
