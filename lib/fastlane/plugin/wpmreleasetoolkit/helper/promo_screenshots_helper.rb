@@ -324,8 +324,8 @@ module Fastlane
       #   other = open_image("other-path")
       #   composite_image(image, other, 0, 0)
       #
-      # @param [Magick::Image] image The original image.
-      # @param [Magick::Image] image The image that will be placed onto the original image.
+      # @param [Magick::Image] original The original image.
+      # @param [Magick::Image] child The image that will be placed onto the original image.
       # @param [Integer] x_position The horizontal position for the image to be placed.
       # @param [Integer] y_position The vertical position for the image to be placed.
       #
