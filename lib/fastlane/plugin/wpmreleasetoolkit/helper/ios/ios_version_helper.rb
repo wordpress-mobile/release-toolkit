@@ -1,5 +1,7 @@
 module Fastlane
     module Helpers
+      # A module containing helper methods to manipulate/extract/bump iOS version strings in xcconfig files
+      #
       module IosVersionHelper
         # @!group The indices for various parts of the version parts array.
         # The index for the major version number part
@@ -306,8 +308,8 @@ module Fastlane
 
         # Read the version numbers from the xcconfig file
         #
-        # @env PUBLIC_CONFIG_FILE
-        # @env INTERNAL_CONFIG_FILE
+        # @env PUBLIC_CONFIG_FILE The path to the xcconfig file containing the public version numbers.
+        # @env INTERNAL_CONFIG_FILE The path to the xcconfig file containing the internal version numbers. Can be nil.
         #
         # @return [String] Array of long version strings found.
         #         The first element is always present and contains the version extracted from the public config file

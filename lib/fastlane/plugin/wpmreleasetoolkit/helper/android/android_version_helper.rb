@@ -22,10 +22,10 @@ module Fastlane
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}"
         end
 
-        # Extract the version name and code from the vanilla flavor of the $PROJECT_NAME/build.gradle file
-        # – or for the defaultConfig if HAS_ALPHA_VERSION is not defined
+        # Extract the version name and code from the `vanilla` flavor of the `$PROJECT_NAME/build.gradle file`
+        # – or for the defaultConfig if `HAS_ALPHA_VERSION` is not defined.
         #
-        # @env HAS_ALPHA_VERSION
+        # @env HAS_ALPHA_VERSION If set (with any value), indicates that the project uses `vanilla` flavor.
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
@@ -37,9 +37,10 @@ module Fastlane
           return { VERSION_NAME => name, VERSION_CODE => code }
         end
 
-        # Extract the version name and code from the defaultConfig of the $PROJECT_NAME/build.gradle file
+        # Extract the version name and code from the `defaultConfig` of the `$PROJECT_NAME/build.gradle` file
         #
-        # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
+        # @return [Hash] A hash with 2 keys `"name"`` and `"code"`` containing the extracted version name and code, respectively,
+        #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
         def self.get_alpha_version
           return nil if ENV["HAS_ALPHA_VERSION"].nil?
@@ -51,11 +52,11 @@ module Fastlane
           return { VERSION_NAME => name, VERSION_CODE => code }
         end
   
-        # Determines if a version name corresponds to an alpha version (starts with "alpha-" prefix)
+        # Determines if a version name corresponds to an alpha version (starts with `"alpha-"`` prefix)
         #
         # @param [String] version The version name to check
         #
-        # @return [Bool] true if the version name starts with the ALPHA_PREFIX, false otherwise.
+        # @return [Bool] true if the version name starts with the `ALPHA_PREFIX`, false otherwise.
         #
         #private
         def self.is_alpha_version?(version)
@@ -204,7 +205,7 @@ module Fastlane
         #
         # @param [Hash] new_version_beta The version hash for the beta (vanilla flavor), containing values for keys "name" and "code"
         # @param [Hash] new_version_alpha The version hash for the alpha (defaultConfig), containing values for keys "name" and "code"
-        # @env HAS_ALPHA_VERSION
+        # @env HAS_ALPHA_VERSION If set (with any value), indicates that the project uses `vanilla` flavor.
         #
         def self.update_versions(new_version_beta, new_version_alpha)
           self.update_version(new_version_beta, ENV["HAS_ALPHA_VERSION"].nil? ? "defaultConfig" : "vanilla {")
@@ -327,7 +328,7 @@ module Fastlane
           "#{v_parts[MAJOR_NUMBER]}.#{v_parts[MINOR_NUMBER]}"
         end
 
-        # Check if a string is an integer
+        # Check if a string is an integer.
         #
         # @param [String] string The string to test
         #
@@ -337,18 +338,18 @@ module Fastlane
           true if Integer(string) rescue false
         end
 
-        # The path to the build.gradle file for the project
+        # The path to the build.gradle file for the project.
         #
-        # @env PROJECT_ROOT_FOLDER
-        # @env PROJECT_NAME
+        # @env PROJECT_ROOT_FOLDER The path to the root of the project (the folder containing the `.git` directory).
+        # @env PROJECT_NAME The name of the project, i.e. the name of the subdirectory containing the project's `build.gradle` file.
         #
         # @return [String] The path of the `build.gradle` file inside the project subfolder in the project's repo
         #
         def self.gradle_path 
-          File.join(ENV["PROJECT_ROOT_FOLDER"], ENV["PROJECT_NAME"], 'build.gradle')
+          File.join(ENV["PROJECT_ROOT_FOLDER"] || '.', ENV["PROJECT_NAME"], 'build.gradle')
         end
 
-        # Update both the versionName and versionCode of the build.gradle file to the specified version
+        # Update both the versionName and versionCode of the build.gradle file to the specified version.
         #
         # @param [Hash] version The version hash, containing values for keys "name" and "code"
         # @param [String] section The name of the section to update in the build.gradle file, e.g. "defaultConfig" or "vanilla"
