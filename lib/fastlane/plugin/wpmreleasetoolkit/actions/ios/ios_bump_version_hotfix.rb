@@ -5,7 +5,7 @@ module Fastlane
         UI.message "Bumping app release version for hotfix..."
         
         require_relative '../../helper/ios/ios_git_helper.rb'
-        Fastlane::Helper::IosGitHelper.branch_for_hotfix(params[:previous_version], params[:version])
+        Fastlane::Helper::Ios::GitHelper.branch_for_hotfix(params[:previous_version], params[:version])
         create_config(params[:previous_version], params[:version])
         show_config()
         
@@ -16,7 +16,7 @@ module Fastlane
         Fastlane::Helper::Ios::VersionHelper.update_xc_configs(@new_version, @new_short_version, @new_version_internal) 
         UI.message "Done!"
 
-        Fastlane::Helper::IosGitHelper.bump_version_hotfix(params[:version])
+        Fastlane::Helper::Ios::GitHelper.bump_version_hotfix(params[:version])
         
         UI.message "Done."
       end

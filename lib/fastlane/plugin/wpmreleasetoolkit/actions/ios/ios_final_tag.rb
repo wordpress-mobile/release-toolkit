@@ -8,7 +8,7 @@ module Fastlane
         
         UI.message("Tagging final #{version}...")
 
-        Fastlane::Helper::IosGitHelper.final_tag(version)
+        Fastlane::Helper::Ios::GitHelper.final_tag(version)
         
         other_action.ios_clear_intermediate_tags(version: version)
       end

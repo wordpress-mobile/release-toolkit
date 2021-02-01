@@ -7,7 +7,7 @@ module Fastlane
     
           release_ver = Fastlane::Helper::Android::VersionHelper.get_release_version()
           alpha_ver = Fastlane::Helper::Android::VersionHelper.get_alpha_version() unless ENV["HAS_ALPHA_VERSION"].nil?
-          Fastlane::Helper::AndroidGitHelper.tag_build(release_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME], (ENV["HAS_ALPHA_VERSION"].nil? or (params[:tag_alpha] == false)) ? nil : alpha_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME])
+          Fastlane::Helper::Android::GitHelper.tag_build(release_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME], (ENV["HAS_ALPHA_VERSION"].nil? or (params[:tag_alpha] == false)) ? nil : alpha_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME])
         end
     
         #####################################################

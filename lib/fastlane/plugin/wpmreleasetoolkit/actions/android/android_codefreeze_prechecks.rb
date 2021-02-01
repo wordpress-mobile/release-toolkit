@@ -12,7 +12,7 @@ module Fastlane
           require_relative '../../helper/android/android_git_helper.rb'
   
           # Checkout develop and update
-          Fastlane::Helper::AndroidGitHelper.git_checkout_and_pull("develop")
+          Fastlane::Helper::Android::GitHelper.git_checkout_and_pull("develop")
 
           # Create versions
           current_version = Fastlane::Helper::Android::VersionHelper.get_release_version

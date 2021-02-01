@@ -7,7 +7,7 @@ module Fastlane
         require_relative '../../helper/ios/ios_git_helper.rb'
         require_relative '../../helper/ios/ios_version_helper.rb'
 
-        Fastlane::Helper::IosGitHelper.check_on_branch("release")
+        Fastlane::Helper::Ios::GitHelper.check_on_branch("release")
         create_config()
         show_config()
 
@@ -15,7 +15,7 @@ module Fastlane
         Fastlane::Helper::Ios::VersionHelper.update_xc_configs(@new_beta_version, @short_version, @new_internal_version) 
         UI.message "Done!"
  
-        Fastlane::Helper::IosGitHelper.bump_version_beta        
+        Fastlane::Helper::Ios::GitHelper.bump_version_beta        
       end
 
       #####################################################
