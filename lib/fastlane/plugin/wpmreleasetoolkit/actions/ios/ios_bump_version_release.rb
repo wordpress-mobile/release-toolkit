@@ -11,7 +11,7 @@ module Fastlane
           other_action.ensure_git_branch(branch: "develop")
 
           # Create new configuration
-          @new_version = Fastlane::Helper::IosVersionHelper.bump_version_release()
+          @new_version = Fastlane::Helper::Ios::VersionHelper.bump_version_release()
           create_config()
           show_config()
 
@@ -25,11 +25,11 @@ module Fastlane
           UI.message "Done" unless params [:skip_glotpress]
 
           UI.message "Updating Fastlane deliver file..." unless params[:skip_deliver]
-          Fastlane::Helper::IosVersionHelper.update_fastlane_deliver(@new_short_version) unless params[:skip_deliver]
+          Fastlane::Helper::Ios::VersionHelper.update_fastlane_deliver(@new_short_version) unless params[:skip_deliver]
           UI.message "Done!" unless params [:skip_deliver]
 
           UI.message "Updating XcConfig..."
-          Fastlane::Helper::IosVersionHelper.update_xc_configs(@new_version, @new_short_version, @new_version_internal) 
+          Fastlane::Helper::Ios::VersionHelper.update_xc_configs(@new_version, @new_short_version, @new_version_internal) 
           UI.message "Done!"
 
           Fastlane::Helper::IosGitHelper.bump_version_release(params[:skip_deliver], params[:skip_glotpress])
@@ -84,10 +84,10 @@ module Fastlane
 
         private
         def self.create_config()
-          @current_version = Fastlane::Helper::IosVersionHelper.get_build_version()
-          @current_version_internal = Fastlane::Helper::IosVersionHelper.get_internal_version() unless ENV["INTERNAL_CONFIG_FILE"].nil?
-          @new_version_internal = Fastlane::Helper::IosVersionHelper.create_internal_version(@new_version) unless ENV["INTERNAL_CONFIG_FILE"].nil?
-          @new_short_version = Fastlane::Helper::IosVersionHelper.get_short_version_string(@new_version)
+          @current_version = Fastlane::Helper::Ios::VersionHelper.get_build_version()
+          @current_version_internal = Fastlane::Helper::Ios::VersionHelper.get_internal_version() unless ENV["INTERNAL_CONFIG_FILE"].nil?
+          @new_version_internal = Fastlane::Helper::Ios::VersionHelper.create_internal_version(@new_version) unless ENV["INTERNAL_CONFIG_FILE"].nil?
+          @new_short_version = Fastlane::Helper::Ios::VersionHelper.get_short_version_string(@new_version)
           @new_release_branch = "release/#{@new_short_version}"
         end
 

@@ -12,7 +12,7 @@ module Fastlane
         show_config()
 
         UI.message "Updating build.gradle..."
-        Fastlane::Helper::AndroidVersionHelper.update_versions(@new_version_beta, @new_version_alpha)  
+        Fastlane::Helper::Android::VersionHelper.update_versions(@new_version_beta, @new_version_alpha)  
         UI.message "Done!"
  
         Fastlane::Helper::AndroidGitHelper.bump_version_beta()        
@@ -52,15 +52,15 @@ module Fastlane
 
       private 
       def self.create_config()
-        @current_version = Fastlane::Helper::AndroidVersionHelper.get_release_version()
-        @current_version_alpha = Fastlane::Helper::AndroidVersionHelper.get_alpha_version()
-        @new_version_beta = Fastlane::Helper::AndroidVersionHelper.calc_next_beta_version(@current_version, @current_version_alpha)
-        @new_version_alpha = ENV["HAS_ALPHA_VERSION"].nil? ? nil : Fastlane::Helper::AndroidVersionHelper.calc_next_alpha_version(@new_version_beta, @current_version_alpha)
+        @current_version = Fastlane::Helper::Android::VersionHelper.get_release_version()
+        @current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version()
+        @new_version_beta = Fastlane::Helper::Android::VersionHelper.calc_next_beta_version(@current_version, @current_version_alpha)
+        @new_version_alpha = ENV["HAS_ALPHA_VERSION"].nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(@new_version_beta, @current_version_alpha)
       end
 
       def self.show_config()
-        vname = Fastlane::Helper::AndroidVersionHelper::VERSION_NAME
-        vcode = Fastlane::Helper::AndroidVersionHelper::VERSION_CODE
+        vname = Fastlane::Helper::Android::VersionHelper::VERSION_NAME
+        vcode = Fastlane::Helper::Android::VersionHelper::VERSION_CODE
         UI.message("Current version: #{@current_version[vname]}(#{@current_version[vcode]})")
         UI.message("Current alpha version: #{@current_version_alpha[vname]}(#{@current_version_alpha[vcode]})") unless ENV["HAS_ALPHA_VERSION"].nil?
         UI.message("New beta version: #{@new_version_beta[vname]}(#{@new_version_beta[vcode]})")

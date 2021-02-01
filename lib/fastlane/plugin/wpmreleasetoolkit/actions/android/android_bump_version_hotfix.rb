@@ -10,7 +10,7 @@ module Fastlane
         show_config()
         
         UI.message "Updating build.gradle..."
-        Fastlane::Helper::AndroidVersionHelper.update_versions(@new_version, @current_version_alpha) 
+        Fastlane::Helper::Android::VersionHelper.update_versions(@new_version, @current_version_alpha) 
         UI.message "Done!"
 
         Fastlane::Helper::AndroidGitHelper.bump_version_hotfix(params[:version_name])
@@ -59,16 +59,16 @@ module Fastlane
 
       private 
       def self.create_config(previous_version, new_version_name, new_version_code)
-        @current_version = Fastlane::Helper::AndroidVersionHelper.get_release_version()
-        @current_version_alpha = Fastlane::Helper::AndroidVersionHelper.get_alpha_version()
-        @new_version = Fastlane::Helper::AndroidVersionHelper.calc_next_hotfix_version(new_version_name, new_version_code)
+        @current_version = Fastlane::Helper::Android::VersionHelper.get_release_version()
+        @current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version()
+        @new_version = Fastlane::Helper::Android::VersionHelper.calc_next_hotfix_version(new_version_name, new_version_code)
         @new_short_version = new_version_name
         @new_release_branch = "release/#{@new_short_version}"
       end
 
       def self.show_config()
-        UI.message("Current version: #{@current_version[Fastlane::Helper::AndroidVersionHelper::VERSION_NAME]}(#{@current_version[Fastlane::Helper::AndroidVersionHelper::VERSION_CODE]})")
-        UI.message("New hotfix version: #{@new_version[Fastlane::Helper::AndroidVersionHelper::VERSION_NAME]}(#{@new_version[Fastlane::Helper::AndroidVersionHelper::VERSION_CODE]})")
+        UI.message("Current version: #{@current_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{@current_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]})")
+        UI.message("New hotfix version: #{@new_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{@new_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]})")
         UI.message("Release branch: #{@new_release_branch}")
       end
     end

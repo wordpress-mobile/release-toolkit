@@ -13,7 +13,7 @@ module Fastlane
   
           UI.user_error!("This is not a release branch. Abort.") unless other_action.git_branch.start_with?("release/")
   
-          version = Fastlane::Helper::AndroidVersionHelper::get_public_version
+          version = Fastlane::Helper::Android::VersionHelper::get_public_version
           message = "Finalizing release: #{version}\n"
           if (!params[:skip_confirm])
             if (!UI.confirm("#{message}Do you want to continue?"))
@@ -26,7 +26,7 @@ module Fastlane
           # Check local repo status
           other_action.ensure_git_status_clean()
   
-          version[Fastlane::Helper::AndroidVersionHelper::VERSION_NAME]
+          version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]
         end
   
         #####################################################

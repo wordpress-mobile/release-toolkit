@@ -12,7 +12,7 @@ module Fastlane
         show_config()
 
         UI.message "Updating XcConfig..."
-        Fastlane::Helper::IosVersionHelper.update_xc_configs(@new_beta_version, @short_version, @new_internal_version) 
+        Fastlane::Helper::Ios::VersionHelper.update_xc_configs(@new_beta_version, @short_version, @new_internal_version) 
         UI.message "Done!"
  
         Fastlane::Helper::IosGitHelper.bump_version_beta        
@@ -52,11 +52,11 @@ module Fastlane
 
       private 
       def self.create_config()
-        @current_version = Fastlane::Helper::IosVersionHelper.get_build_version()
-        @current_version_internal = Fastlane::Helper::IosVersionHelper.get_internal_version() unless ENV["INTERNAL_CONFIG_FILE"].nil?
-        @new_internal_version = Fastlane::Helper::IosVersionHelper.create_internal_version(@current_version) unless ENV["INTERNAL_CONFIG_FILE"].nil?
-        @new_beta_version = Fastlane::Helper::IosVersionHelper.calc_next_build_version(@current_version)
-        @short_version = Fastlane::Helper::IosVersionHelper.get_short_version_string(@new_beta_version)
+        @current_version = Fastlane::Helper::Ios::VersionHelper.get_build_version()
+        @current_version_internal = Fastlane::Helper::Ios::VersionHelper.get_internal_version() unless ENV["INTERNAL_CONFIG_FILE"].nil?
+        @new_internal_version = Fastlane::Helper::Ios::VersionHelper.create_internal_version(@current_version) unless ENV["INTERNAL_CONFIG_FILE"].nil?
+        @new_beta_version = Fastlane::Helper::Ios::VersionHelper.calc_next_build_version(@current_version)
+        @short_version = Fastlane::Helper::Ios::VersionHelper.get_short_version_string(@new_beta_version)
       end
 
       def self.show_config()

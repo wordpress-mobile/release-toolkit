@@ -10,7 +10,7 @@ module Fastlane
 
         # Evaluate previous tag
         new_ver = params[:version]
-        prev_ver = Fastlane::Helper::IosVersionHelper::calc_prev_hotfix_version(new_ver)
+        prev_ver = Fastlane::Helper::Ios::VersionHelper::calc_prev_hotfix_version(new_ver)
 
         # Confirm
         message = "Requested Hotfix version: #{new_ver}\n"
