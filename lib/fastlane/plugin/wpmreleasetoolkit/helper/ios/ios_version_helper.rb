@@ -1,5 +1,5 @@
 module Fastlane
-    module Helpers
+    module Helper
       # A module containing helper methods to manipulate/extract/bump iOS version strings in xcconfig files
       #
       module IosVersionHelper

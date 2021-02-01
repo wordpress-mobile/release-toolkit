@@ -13,7 +13,7 @@ module Fastlane
         UI.message("Last detected milestone: #{last_stone[:title]} due on #{last_stone[:due_on]}.")
         milestone_duedate = last_stone[:due_on]
         newmilestone_duedate = (milestone_duedate.to_datetime.next_day(14).to_time).utc
-        newmilestone_number = Fastlane::Helpers::IosVersionHelper.calc_next_release_version(last_stone[:title])
+        newmilestone_number = Fastlane::Helper::IosVersionHelper.calc_next_release_version(last_stone[:title])
         UI.message("Next milestone: #{newmilestone_number} due on #{newmilestone_duedate}.")
         Fastlane::Helper::GhhelperHelper.create_milestone(repository, newmilestone_number, newmilestone_duedate, params[:need_appstore_submission])
       end

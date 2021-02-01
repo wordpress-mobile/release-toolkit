@@ -3,7 +3,7 @@ module Fastlane
       class IosGetAppVersionAction < Action
         def self.run(params)
           require_relative '../../helper/ios/ios_version_helper.rb'
-          Fastlane::Helpers::IosVersionHelper::get_public_version
+          Fastlane::Helper::IosVersionHelper::get_public_version
         end
   
         #####################################################

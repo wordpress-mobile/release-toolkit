@@ -5,7 +5,7 @@ module Fastlane
         UI.message("Deleting tags for version: #{params[:version]}")
         
         require_relative '../../helper/ios/ios_git_helper.rb'
-        Fastlane::Helpers::IosGitHelper.delete_tags(params[:version])
+        Fastlane::Helper::IosGitHelper.delete_tags(params[:version])
 
       end
 

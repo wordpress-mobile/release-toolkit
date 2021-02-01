@@ -1,7 +1,7 @@
 require 'spaceship'
 
 module Fastlane
-    module Helpers
+    module Helper
       module IosADCAppSizesHelper
         DEFAULT_DEVICES = ["Universal", "iPhone 8", "iPhone X"]
 

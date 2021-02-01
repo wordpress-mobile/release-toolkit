@@ -1,5 +1,5 @@
 module Fastlane
-    module Helpers
+    module Helper
       # A module containing helper methods to manipulate/extract/bump Android version strings in gradle files
       #
       module AndroidVersionHelper

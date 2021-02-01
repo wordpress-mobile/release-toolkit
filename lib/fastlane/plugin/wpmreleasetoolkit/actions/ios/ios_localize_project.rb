@@ -6,7 +6,7 @@ module Fastlane
   
         require_relative '../../helper/ios/ios_git_helper.rb'
         other_action.cocoapods()
-        Fastlane::Helpers::IosGitHelper.localize_project()
+        Fastlane::Helper::IosGitHelper.localize_project()
           
         UI.message "Done."
       end

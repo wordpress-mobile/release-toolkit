@@ -5,9 +5,9 @@ module Fastlane
           require_relative '../../helper/android/android_version_helper.rb'
           require_relative '../../helper/android/android_git_helper.rb'
     
-          release_ver = Fastlane::Helpers::AndroidVersionHelper.get_release_version()
-          alpha_ver = Fastlane::Helpers::AndroidVersionHelper.get_alpha_version() unless ENV["HAS_ALPHA_VERSION"].nil?
-          Fastlane::Helpers::AndroidGitHelper.tag_build(release_ver[Fastlane::Helpers::AndroidVersionHelper::VERSION_NAME], (ENV["HAS_ALPHA_VERSION"].nil? or (params[:tag_alpha] == false)) ? nil : alpha_ver[Fastlane::Helpers::AndroidVersionHelper::VERSION_NAME])
+          release_ver = Fastlane::Helper::AndroidVersionHelper.get_release_version()
+          alpha_ver = Fastlane::Helper::AndroidVersionHelper.get_alpha_version() unless ENV["HAS_ALPHA_VERSION"].nil?
+          Fastlane::Helper::AndroidGitHelper.tag_build(release_ver[Fastlane::Helper::AndroidVersionHelper::VERSION_NAME], (ENV["HAS_ALPHA_VERSION"].nil? or (params[:tag_alpha] == false)) ? nil : alpha_ver[Fastlane::Helper::AndroidVersionHelper::VERSION_NAME])
         end
     
         #####################################################
