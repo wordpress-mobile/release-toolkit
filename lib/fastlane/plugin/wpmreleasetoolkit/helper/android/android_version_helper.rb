@@ -1,12 +1,21 @@
 module Fastlane
     module Helpers
+      # A module containing helper methods to manipulate/extract/bump Android version strings in gradle files
+      #
       module AndroidVersionHelper
+        # The key used in internal version Hash objects to hold the versionName value
         VERSION_NAME = "name"
+        # The key used in internal version Hash objects to hold the versionCode value
         VERSION_CODE = "code"
+        # The index for the major version number part
         MAJOR_NUMBER = 0
+        # The index for the minor version number part
         MINOR_NUMBER = 1
+        # The index for the hotfix version number part
         HOTFIX_NUMBER = 2
+        # The prefix used in front of the versionName for alpha versions
         ALPHA_PREFIX = "alpha-"
+        # The suffix used in the versionName for RC (beta) versions
         RC_SUFFIX = "-rc"
   
         # Returns the public-facing version string.
