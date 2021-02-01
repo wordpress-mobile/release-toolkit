@@ -189,7 +189,7 @@ module Fastlane
         # Updates the app_version entry in the `Deliverfile`
         #
         # @param [String] new_version The new value to set the `app_version` entry to.
-        # @throws [UserError] If the Deliverfile was not found.
+        # @raise [UserError] If the Deliverfile was not found.
         #
         def self.update_fastlane_deliver(new_version)
           fd_file = "./fastlane/Deliverfile"
@@ -211,7 +211,7 @@ module Fastlane
         # @param [String] file_path The path to the xcconfig file
         # @param [String] new_version The new version number to use for VERSION_LONG
         # @param [String] new_version_short The new version number to use for VERSION_SHORT
-        # @throws [UserError] If the xcconfig file was not found
+        # @raise [UserError] If the xcconfig file was not found
         #
         def self.update_xc_config(file_path, new_version, new_version_short)
           if File.exist?(file_path) then
@@ -229,14 +229,17 @@ module Fastlane
           end
         end
 
-        private 
+        #----------------------------------------
+        private
+        #----------------------------------------
+
   
         # Split a version string into its 4 parts, ensuring its parts count is valid
         #
-        # @param [String] Version the version string to split into parts
+        # @param [String] version The version string to split into parts
         # @return [Array<String>] An array of exactly 4 elements, containing each part of the version string.
         # @note If the original version string contains less than 4 parts, the returned array is filled with zeros at the end to always contain 4 items.
-        # @throws [UserError] Interrupts the lane if the provided version contains _more_ than 4 parts
+        # @raise [UserError] Interrupts the lane if the provided version contains _more_ than 4 parts
         #
         def self.get_version_parts(version)
           parts=version.split(".")
@@ -306,7 +309,7 @@ module Fastlane
         #
         # @param [String] version The version string to validate
         # @return [String] The version string, re-validated as being a string of the form `X.Y.Z.T`
-        # @throw [UserError] Interrupts the lane with a user_error! if the version contains non-numberic parts
+        # @raise [UserError] Interrupts the lane with a user_error! if the version contains non-numberic parts
         #
         def self.verify_version(version)
           v_parts = get_version_parts(version)

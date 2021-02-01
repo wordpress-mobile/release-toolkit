@@ -37,7 +37,7 @@ module Fastlane
 
         # Download the ZIP of SwiftGen for the requested `version` and install it in the `install_path`
         #
-        # @warning This action nukes anything at `install_path` – if something already exists – prior to install SwiftGen there
+        # @note This action nukes anything at `install_path` – if something already exists – prior to install SwiftGen there
         #
         def install_swiftgen!
           UI.message "Installing SwiftGen #{version} into #{install_path}"
