@@ -10,7 +10,7 @@ module Fastlane
         # @return [Array<Hash>] app build details, one entry per app version found
         #         Each entry is a hash with keys `cfBundleVersion` and `sizesInBytes`.
         #         Value for key `sizeInBytes` is itself a Hash with one entry per device name (including special name "Universal")
-        #         whose value is a Hash with keys {'compressed', 'uncompressed'}
+        #         whose value is a Hash with keys `compressed` and `uncompressed`
         #
         def self.get_adc_sizes(adc_user:, adc_team: 'Automattic, Inc.', bundle_id:, only_version: nil, limit: 10)
           UI.message "Connecting to ADC..."

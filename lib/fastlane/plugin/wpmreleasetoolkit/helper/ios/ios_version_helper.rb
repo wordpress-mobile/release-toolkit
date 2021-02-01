@@ -9,7 +9,7 @@ module Fastlane
         # Returns the public-facing version string.
         #
         # @return [String] The public-facing version number, extracted from the VERSION_LONG entry of the xcconfig file.
-        #         - If this version is a hotfix (more than 2 parts and 3rd part is NOT 0), returns the "X.Y.Z" formatted string
+        #         - If this version is a hotfix (more than 2 parts and 3rd part is non-zero), returns the "X.Y.Z" formatted string
         #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
         #
         def self.get_public_version
@@ -323,6 +323,12 @@ module Fastlane
           "#{v_parts[MAJOR_NUMBER]}.#{v_parts[MINOR_NUMBER]}.#{v_parts[HOTFIX_NUMBER]}.#{v_parts[BUILD_NUMBER]}"
         end
 
+        # Check if a string is an integer
+        #
+        # @param [String] string The string to test
+        #
+        # @return [Bool] true if the string is representing an integer value, false if not
+        #
         def self.is_int? string
           true if Integer(string) rescue false
         end
