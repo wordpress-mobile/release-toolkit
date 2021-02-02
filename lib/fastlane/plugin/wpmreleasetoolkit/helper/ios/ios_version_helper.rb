@@ -4,7 +4,6 @@ module Fastlane
       # A module containing helper methods to manipulate/extract/bump iOS version strings in xcconfig files
       #
       module VersionHelper
-        # @!group The indices for various parts of the version parts array.
         # The index for the major version number part
         MAJOR_NUMBER = 0
         # The index for the minor version number part
@@ -13,7 +12,6 @@ module Fastlane
         HOTFIX_NUMBER = 2
         # The index for the build version number part
         BUILD_NUMBER = 3
-        # @!endgroup
   
         # Returns the public-facing version string.
         #
@@ -195,7 +193,7 @@ module Fastlane
           return verified_version
         end
 
-        # Updates the app_version entry in the `Deliverfile`
+        # Updates the `app_version` entry in the `Deliverfile`
         #
         # @param [String] new_version The new value to set the `app_version` entry to.
         # @raise [UserError] If the Deliverfile was not found.
