@@ -9,19 +9,19 @@ module Fastlane
         require_relative '../../helper/ios/ios_git_helper.rb'
 
         # Checkout develop and update
-        Fastlane::Helper::IosGitHelper::git_checkout_and_pull("develop")
+        Fastlane::Helper::Ios::GitHelper::git_checkout_and_pull("develop")
 
         # Check versions
-        build_version = Fastlane::Helper::IosVersionHelper::get_build_version
+        build_version = Fastlane::Helper::Ios::VersionHelper::get_build_version
         message = "The following current version has been detected: #{build_version}\n"
         
         # Check branch
-        app_version = Fastlane::Helper::IosVersionHelper::get_public_version
-        UI.user_error!("#{message}Release branch for version #{app_version} doesn't exist. Abort.") unless (!params[:base_version].nil? || Fastlane::Helper::IosGitHelper::git_checkout_and_pull_release_branch_for(app_version))
+        app_version = Fastlane::Helper::Ios::VersionHelper::get_public_version
+        UI.user_error!("#{message}Release branch for version #{app_version} doesn't exist. Abort.") unless (!params[:base_version].nil? || Fastlane::Helper::Ios::GitHelper::git_checkout_and_pull_release_branch_for(app_version))
         
         # Check user overwrite
         build_version = get_user_build_version(params[:base_version], message) unless params[:base_version].nil?
-        next_version = Fastlane::Helper::IosVersionHelper::calc_next_build_version(build_version)
+        next_version = Fastlane::Helper::Ios::VersionHelper::calc_next_build_version(build_version)
 
         # Verify
         message << "Updating branch to version: #{next_version}.\n"
@@ -41,8 +41,8 @@ module Fastlane
       end
 
       def self.get_user_build_version(version, message)
-        UI.user_error!("Release branch for version #{version} doesn't exist. Abort.") unless Fastlane::Helper::IosGitHelper::git_checkout_and_pull_release_branch_for(version)
-        build_version = Fastlane::Helper::IosVersionHelper::get_build_version
+        UI.user_error!("Release branch for version #{version} doesn't exist. Abort.") unless Fastlane::Helper::Ios::GitHelper::git_checkout_and_pull_release_branch_for(version)
+        build_version = Fastlane::Helper::Ios::VersionHelper::get_build_version
         message << "Looking at branch release/#{version} as requested by user. Detected version: #{build_version}.\n"
         build_version
       end

@@ -1,8 +1,9 @@
 module Fastlane
-    module Helper
+  module Helper
+    module Android
       # A module containing helper methods to manipulate/extract/bump Android version strings in gradle files
       #
-      module AndroidVersionHelper
+      module VersionHelper
         # The key used in internal version Hash objects to hold the versionName value
         VERSION_NAME = "name"
         # The key used in internal version Hash objects to hold the versionCode value
@@ -462,3 +463,4 @@ module Fastlane
       end
     end
   end
+end

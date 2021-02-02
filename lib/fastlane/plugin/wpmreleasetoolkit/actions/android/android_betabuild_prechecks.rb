@@ -9,17 +9,17 @@ module Fastlane
         require_relative '../../helper/android/android_git_helper.rb'
 
         # Checkout develop and update
-        Fastlane::Helper::AndroidGitHelper::git_checkout_and_pull("develop")
+        Fastlane::Helper::Android::GitHelper::git_checkout_and_pull("develop")
 
         # Check versions
-        release_version = Fastlane::Helper::AndroidVersionHelper::get_release_version
-        message = "The following current version has been detected: #{release_version[Fastlane::Helper::AndroidVersionHelper::VERSION_NAME]}\n"
-        alpha_release_version = Fastlane::Helper::AndroidVersionHelper::get_alpha_version
-        message << "The following Alpha version has been detected: #{alpha_release_version[Fastlane::Helper::AndroidVersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
+        release_version = Fastlane::Helper::Android::VersionHelper::get_release_version
+        message = "The following current version has been detected: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n"
+        alpha_release_version = Fastlane::Helper::Android::VersionHelper::get_alpha_version
+        message << "The following Alpha version has been detected: #{alpha_release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
         
         # Check branch
-        app_version = Fastlane::Helper::AndroidVersionHelper::get_public_version
-        UI.user_error!("#{message}Release branch for version #{app_version} doesn't exist. Abort.") unless (!params[:base_version].nil? || Fastlane::Helper::AndroidGitHelper::git_checkout_and_pull_release_branch_for(app_version))
+        app_version = Fastlane::Helper::Android::VersionHelper::get_public_version
+        UI.user_error!("#{message}Release branch for version #{app_version} doesn't exist. Abort.") unless (!params[:base_version].nil? || Fastlane::Helper::Android::GitHelper::git_checkout_and_pull_release_branch_for(app_version))
         
         # Check user overwrite
         if (!params[:base_version].nil?)
@@ -28,12 +28,12 @@ module Fastlane
           alpha_release_version = overwrite_version[1]
         end
 
-        next_beta_version = Fastlane::Helper::AndroidVersionHelper::calc_next_beta_version(release_version, alpha_release_version)
-        next_alpha_version = Fastlane::Helper::AndroidVersionHelper::calc_next_alpha_version(next_beta_version, alpha_release_version) unless alpha_release_version.nil?
+        next_beta_version = Fastlane::Helper::Android::VersionHelper::calc_next_beta_version(release_version, alpha_release_version)
+        next_alpha_version = Fastlane::Helper::Android::VersionHelper::calc_next_alpha_version(next_beta_version, alpha_release_version) unless alpha_release_version.nil?
 
         # Verify
-        message << "Updating branch to version: #{next_beta_version[Fastlane::Helper::AndroidVersionHelper::VERSION_NAME]}(#{next_beta_version[Fastlane::Helper::AndroidVersionHelper::VERSION_CODE]}) "
-        message << "and #{next_alpha_version[Fastlane::Helper::AndroidVersionHelper::VERSION_NAME]}(#{next_alpha_version[Fastlane::Helper::AndroidVersionHelper::VERSION_CODE]}).\n" unless alpha_release_version.nil?
+        message << "Updating branch to version: #{next_beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{next_beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) "
+        message << "and #{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n" unless alpha_release_version.nil?
         if (!params[:skip_confirm])
           if (!UI.confirm("#{message}Do you want to continue?"))
             UI.user_error!("Aborted by user request")
@@ -50,11 +50,11 @@ module Fastlane
       end
 
       def self.get_user_build_version(version, message)
-        UI.user_error!("Release branch for version #{version} doesn't exist. Abort.") unless Fastlane::Helper::AndroidGitHelper::git_checkout_and_pull_release_branch_for(version)
-        release_version = Fastlane::Helper::AndroidVersionHelper::get_release_version
-        message << "Looking at branch release/#{version} as requested by user. Detected version: #{release_version[Fastlane::Helper::AndroidVersionHelper::VERSION_NAME]}.\n"
-        alpha_release_version = Fastlane::Helper::AndroidVersionHelper::get_alpha_version
-        message << "and Alpha Version: #{alpha_release_version[Fastlane::Helper::AndroidVersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
+        UI.user_error!("Release branch for version #{version} doesn't exist. Abort.") unless Fastlane::Helper::Android::GitHelper::git_checkout_and_pull_release_branch_for(version)
+        release_version = Fastlane::Helper::Android::VersionHelper::get_release_version
+        message << "Looking at branch release/#{version} as requested by user. Detected version: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}.\n"
+        alpha_release_version = Fastlane::Helper::Android::VersionHelper::get_alpha_version
+        message << "and Alpha Version: #{alpha_release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
         [release_version, alpha_release_version]
       end
 

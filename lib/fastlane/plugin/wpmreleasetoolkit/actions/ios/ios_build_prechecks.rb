@@ -5,9 +5,9 @@ module Fastlane
         require_relative '../../helper/ios/ios_version_helper.rb'
 
         message = ""
-        message << "Building version #{Fastlane::Helper::IosVersionHelper.get_internal_version()} and uploading to App Center\n" unless !params[:internal]
-        message << "Building version #{Fastlane::Helper::IosVersionHelper.get_build_version()} and uploading to App Center\n" unless !params[:internal_on_single_version]
-        message << "Building version #{Fastlane::Helper::IosVersionHelper.get_build_version()} and uploading to TestFlight\n" unless !params[:external]
+        message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_internal_version()} and uploading to App Center\n" unless !params[:internal]
+        message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_build_version()} and uploading to App Center\n" unless !params[:internal_on_single_version]
+        message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_build_version()} and uploading to TestFlight\n" unless !params[:external]
 
         if (!params[:skip_confirm])
           if (!UI.confirm("#{message}Do you want to continue?"))

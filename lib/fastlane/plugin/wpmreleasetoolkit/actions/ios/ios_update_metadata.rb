@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         require_relative '../../helper/ios/ios_git_helper.rb'
 
-        Fastlane::Helper::IosGitHelper.update_metadata()
+        Fastlane::Helper::Ios::GitHelper.update_metadata()
       end
 
       #####################################################

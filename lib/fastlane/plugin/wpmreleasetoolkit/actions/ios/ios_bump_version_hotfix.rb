@@ -5,18 +5,18 @@ module Fastlane
         UI.message "Bumping app release version for hotfix..."
         
         require_relative '../../helper/ios/ios_git_helper.rb'
-        Fastlane::Helper::IosGitHelper.branch_for_hotfix(params[:previous_version], params[:version])
+        Fastlane::Helper::Ios::GitHelper.branch_for_hotfix(params[:previous_version], params[:version])
         create_config(params[:previous_version], params[:version])
         show_config()
         
         UI.message "Updating Fastlane deliver file..."
-        Fastlane::Helper::IosVersionHelper.update_fastlane_deliver(@new_short_version)
+        Fastlane::Helper::Ios::VersionHelper.update_fastlane_deliver(@new_short_version)
         UI.message "Done!"
         UI.message "Updating XcConfig..."
-        Fastlane::Helper::IosVersionHelper.update_xc_configs(@new_version, @new_short_version, @new_version_internal) 
+        Fastlane::Helper::Ios::VersionHelper.update_xc_configs(@new_version, @new_short_version, @new_version_internal) 
         UI.message "Done!"
 
-        Fastlane::Helper::IosGitHelper.bump_version_hotfix(params[:version])
+        Fastlane::Helper::Ios::GitHelper.bump_version_hotfix(params[:version])
         
         UI.message "Done."
       end
@@ -68,9 +68,9 @@ module Fastlane
       private 
       def self.create_config(previous_version, new_short_version)
         @current_version = previous_version
-        @current_version_internal = Fastlane::Helper::IosVersionHelper.get_internal_version() unless ENV["INTERNAL_CONFIG_FILE"].nil?
+        @current_version_internal = Fastlane::Helper::Ios::VersionHelper.get_internal_version() unless ENV["INTERNAL_CONFIG_FILE"].nil?
         @new_version = "#{new_short_version}.0"
-        @new_version_internal = Fastlane::Helper::IosVersionHelper.create_internal_version(@new_version) unless ENV["INTERNAL_CONFIG_FILE"].nil?
+        @new_version_internal = Fastlane::Helper::Ios::VersionHelper.create_internal_version(@new_version) unless ENV["INTERNAL_CONFIG_FILE"].nil?
         @new_short_version = new_short_version
         @new_release_branch = "release/#{@new_short_version}"
       end

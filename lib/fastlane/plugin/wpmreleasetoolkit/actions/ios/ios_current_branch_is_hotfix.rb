@@ -3,7 +3,7 @@ module Fastlane
     class IosCurrentBranchIsHotfixAction < Action
       def self.run(params)
         require_relative '../../helper/ios/ios_version_helper.rb'
-        Fastlane::Helper::IosVersionHelper::is_hotfix?(Fastlane::Helper::IosVersionHelper::get_public_version)
+        Fastlane::Helper::Ios::VersionHelper::is_hotfix?(Fastlane::Helper::Ios::VersionHelper::get_public_version)
       end
 
       #####################################################

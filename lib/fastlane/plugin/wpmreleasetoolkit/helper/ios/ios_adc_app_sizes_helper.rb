@@ -1,8 +1,9 @@
 require 'spaceship'
 
 module Fastlane
-    module Helper
-      module IosADCAppSizesHelper
+  module Helper
+    module Ios
+      module ADCAppSizesHelper
         DEFAULT_DEVICES = ["Universal", "iPhone 8", "iPhone X"]
 
         # Fetch the App Sizes stats from ADC
@@ -71,4 +72,5 @@ module Fastlane
         end
       end
     end
+  end
 end

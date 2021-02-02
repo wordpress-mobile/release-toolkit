@@ -5,10 +5,10 @@ module Fastlane
         require_relative '../../helper/ios/ios_git_helper.rb'
         require_relative '../../helper/ios/ios_version_helper.rb'
 
-        version = Fastlane::Helper::IosVersionHelper::get_public_version()
-        UI.user_error!("HEAD is not on tag. Aborting!") unless Fastlane::Helper::IosGitHelper::is_head_on_tag()
+        version = Fastlane::Helper::Ios::VersionHelper::get_public_version()
+        UI.user_error!("HEAD is not on tag. Aborting!") unless Fastlane::Helper::Ios::GitHelper::is_head_on_tag()
 
-        return Fastlane::Helper::IosGitHelper::has_final_tag_for(version)
+        return Fastlane::Helper::Ios::GitHelper::has_final_tag_for(version)
       end
 
       #####################################################

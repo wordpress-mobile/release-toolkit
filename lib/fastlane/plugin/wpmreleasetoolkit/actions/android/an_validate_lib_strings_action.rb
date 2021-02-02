@@ -1,5 +1,5 @@
 require 'fastlane/action'
-require_relative '../../helper/android_localize_helper'
+require_relative '../../helper/android/android_localize_helper'
 
 module Fastlane
   module Actions

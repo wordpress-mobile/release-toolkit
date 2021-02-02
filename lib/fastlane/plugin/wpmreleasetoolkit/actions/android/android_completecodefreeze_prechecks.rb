@@ -9,7 +9,7 @@ module Fastlane
   
           UI.user_error!("This is not a release branch. Abort.") unless other_action.git_branch.start_with?("release/")
   
-          version = Fastlane::Helper::AndroidVersionHelper::get_public_version
+          version = Fastlane::Helper::Android::VersionHelper::get_public_version
           message = "Completing code freeze for: #{version}\n"
           unless params[:skip_confirm]
             unless UI.confirm("#{message}Do you want to continue?")

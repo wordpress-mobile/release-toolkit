@@ -1,8 +1,9 @@
 module Fastlane
-    module Helper
+  module Helper
+    module Ios
       # A module containing helper methods to manipulate/extract/bump iOS version strings in xcconfig files
       #
-      module IosVersionHelper
+      module VersionHelper
         # The index for the major version number part
         MAJOR_NUMBER = 0
         # The index for the minor version number part
@@ -350,3 +351,4 @@ module Fastlane
       end
     end
   end
+end
