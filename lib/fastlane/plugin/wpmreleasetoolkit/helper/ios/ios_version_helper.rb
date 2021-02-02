@@ -194,7 +194,7 @@ module Fastlane
           return verified_version
         end
 
-        # Updates the app_version entry in the `Deliverfile`
+        # Updates the `app_version` entry in the `Deliverfile`
         #
         # @param [String] new_version The new value to set the `app_version` entry to.
         # @raise [UserError] If the Deliverfile was not found.

@@ -53,7 +53,7 @@ module Fastlane
 
         # Extract the version name and code from the `defaultConfig` of the `$PROJECT_NAME/build.gradle` file
         #
-        # @return [Hash] A hash with 2 keys `"name"`` and `"code"`` containing the extracted version name and code, respectively,
+        # @return [Hash] A hash with 2 keys `"name"` and `"code"` containing the extracted version name and code, respectively,
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
         def self.get_alpha_version
@@ -72,7 +72,8 @@ module Fastlane
         #
         # @return [Bool] true if the version name starts with the `ALPHA_PREFIX`, false otherwise.
         #
-        #private
+        # @private
+        #
         def self.is_alpha_version?(version)
           version[VERSION_NAME].start_with?(ALPHA_PREFIX)
         end
@@ -84,7 +85,6 @@ module Fastlane
         #
         # @return [Bool] True if the version string contains `-rc`, indicating it is a beta version.
         #
-        #public
         def self.is_beta_version?(version)
           version[VERSION_NAME].include?(RC_SUFFIX)
         end
@@ -250,7 +250,7 @@ module Fastlane
           return (vp.length > 2) && (vp[HOTFIX_NUMBER] != 0)
         end
   
-        # Prints the current and next release version names to stdout, then return the next release version
+        # Prints the current and next release version names to stdout, then returns the next release version
         #
         # @return [String] The next release version name to use after bumping the currently used release version.
         #
@@ -265,7 +265,7 @@ module Fastlane
           return verified_version
         end
 
-        # Update the build.gradle file with new versionName and versionCode values, both or the defaultConfig and vanilla flavors
+        # Update the `build.gradle` file with new `versionName` and `versionCode` values, both or the `defaultConfig` and `vanilla` flavors
         #
         # @param [Hash] new_version_beta The version hash for the beta (vanilla flavor), containing values for keys "name" and "code"
         # @param [Hash] new_version_alpha The version hash for the alpha (defaultConfig), containing values for keys "name" and "code"
@@ -281,7 +281,7 @@ module Fastlane
         # @param [String] version_name The current version name we want to decrement
         #
         # @return [String] The predicted previous hotfix version, in the form of "X.Y.Z", or "X.Y" if Z is 0.
-        #         Corresponds to decrementing the 3rd component Z of the version, striping it if it ends up being zero.
+        #         Corresponds to decrementing the 3rd component Z of the version, stripping it if it ends up being zero.
         #
         def self.calc_prev_hotfix_version_name(version_name)
           vp = get_version_parts(version_name)
