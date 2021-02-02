@@ -282,8 +282,8 @@ module Fastlane
       #
       # @example
       #
-      #.  image = open_image("image-path")
-      #.  mask  = open_image("mask-path")
+      #   image = open_image("image-path")
+      #   mask  = open_image("mask-path")
       #
       #   mask_image(image, mask)
       #
@@ -299,7 +299,7 @@ module Fastlane
       #
       # @example
       #
-      #.  image = open_image("image-path")
+      #   image = open_image("image-path")
       #   resize_image(image, 640, 480)
       #
       # @param [Magick::Image] original An ImageMagick object containing the image to be masked.
@@ -320,12 +320,12 @@ module Fastlane
       #
       # @example
       #
-      #.  image = open_image("image-path")
-      #.  other = open_image("other-path")
+      #   image = open_image("image-path")
+      #   other = open_image("other-path")
       #   composite_image(image, other, 0, 0)
       #
-      # @param [Magick::Image] image The original image.
-      # @param [Magick::Image] image The image that will be placed onto the original image.
+      # @param [Magick::Image] original The original image.
+      # @param [Magick::Image] child The image that will be placed onto the original image.
       # @param [Integer] x_position The horizontal position for the image to be placed.
       # @param [Integer] y_position The vertical position for the image to be placed.
       #
@@ -359,7 +359,7 @@ module Fastlane
       #
       # @example
       #
-      #.  image = open_image("image-path")
+      #   image = open_image("image-path")
       #   crop_image(image, other, 0, 0)
       #
       # @param [Magick::Image] original The original image.

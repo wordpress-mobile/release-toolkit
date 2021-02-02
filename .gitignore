@@ -10,16 +10,19 @@ fastlane/README.md
 fastlane/report.xml
 
 # Testing
-/test_results
-/coverage
+test_results/
+coverage/
+
+# YARD Documentation
+yard-doc/
 
 # DrawText
-/lib/drawText
-/lib/drawText.bundle
-/ext/drawText/drawText.xcodeproj/xcuserdata
-/ext/drawText/drawText.xcodeproj/project.xcworkspace/xcuserdata
-/ext/drawText/test-output
-/default.profraw
+lib/drawText
+lib/drawText.bundle
+ext/drawText/drawText.xcodeproj/xcuserdata
+ext/drawText/drawText.xcodeproj/project.xcworkspace/xcuserdata
+ext/drawText/test-output
+default.profraw
 
 # L10n Linter
 vendor/swiftgen

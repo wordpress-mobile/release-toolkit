@@ -304,6 +304,7 @@ GEM
       rouge (~> 2.0.7)
     xcpretty-travis-formatter (1.0.0)
       xcpretty (~> 0.2, >= 0.0.7)
+    yard (0.9.26)
 
 PLATFORMS
   ruby
@@ -316,12 +317,13 @@ DEPENDENCIES
   fastlane-plugin-wpmreleasetoolkit!
   pry (~> 0.12.2)
   rmagick (~> 4.1)
-  rspec (~> 3.8)
+  rspec
   rspec_junit_formatter (~> 0.4.1)
   rubocop (= 0.75)
   rubocop-require_tools (~> 0.1.2)
   rubocop-rspec
   simplecov (~> 0.16.1)
+  yard
 
 BUNDLED WITH
    2.1.4
