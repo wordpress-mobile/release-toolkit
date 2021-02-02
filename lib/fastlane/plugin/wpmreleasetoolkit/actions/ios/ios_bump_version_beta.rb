@@ -7,15 +7,15 @@ module Fastlane
         require_relative '../../helper/ios/ios_git_helper.rb'
         require_relative '../../helper/ios/ios_version_helper.rb'
 
-        Fastlane::Helpers::IosGitHelper.check_on_branch("release")
+        Fastlane::Helper::IosGitHelper.check_on_branch("release")
         create_config()
         show_config()
 
         UI.message "Updating XcConfig..."
-        Fastlane::Helpers::IosVersionHelper.update_xc_configs(@new_beta_version, @short_version, @new_internal_version) 
+        Fastlane::Helper::IosVersionHelper.update_xc_configs(@new_beta_version, @short_version, @new_internal_version) 
         UI.message "Done!"
  
-        Fastlane::Helpers::IosGitHelper.bump_version_beta        
+        Fastlane::Helper::IosGitHelper.bump_version_beta        
       end
 
       #####################################################
@@ -52,11 +52,11 @@ module Fastlane
 
       private 
       def self.create_config()
-        @current_version = Fastlane::Helpers::IosVersionHelper.get_build_version()
-        @current_version_internal = Fastlane::Helpers::IosVersionHelper.get_internal_version() unless ENV["INTERNAL_CONFIG_FILE"].nil?
-        @new_internal_version = Fastlane::Helpers::IosVersionHelper.create_internal_version(@current_version) unless ENV["INTERNAL_CONFIG_FILE"].nil?
-        @new_beta_version = Fastlane::Helpers::IosVersionHelper.calc_next_build_version(@current_version)
-        @short_version = Fastlane::Helpers::IosVersionHelper.get_short_version_string(@new_beta_version)
+        @current_version = Fastlane::Helper::IosVersionHelper.get_build_version()
+        @current_version_internal = Fastlane::Helper::IosVersionHelper.get_internal_version() unless ENV["INTERNAL_CONFIG_FILE"].nil?
+        @new_internal_version = Fastlane::Helper::IosVersionHelper.create_internal_version(@current_version) unless ENV["INTERNAL_CONFIG_FILE"].nil?
+        @new_beta_version = Fastlane::Helper::IosVersionHelper.calc_next_build_version(@current_version)
+        @short_version = Fastlane::Helper::IosVersionHelper.get_short_version_string(@new_beta_version)
       end
 
       def self.show_config()

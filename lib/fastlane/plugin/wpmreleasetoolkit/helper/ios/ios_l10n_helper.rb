@@ -2,7 +2,7 @@ require 'yaml'
 require 'tmpdir'
 
 module Fastlane
-    module Helpers
+    module Helper
       class IosL10nHelper
         SWIFTGEN_VERSION = '6.4.0'
         DEFAULT_BASE_LANG = 'en'

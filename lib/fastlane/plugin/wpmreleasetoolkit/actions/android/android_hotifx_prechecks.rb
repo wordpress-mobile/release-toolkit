@@ -10,7 +10,7 @@ module Fastlane
 
         # Evaluate previous tag
         new_ver = params[:version_name]
-        prev_ver = Fastlane::Helpers::AndroidVersionHelper::calc_prev_hotfix_version_name(new_ver)
+        prev_ver = Fastlane::Helper::AndroidVersionHelper::calc_prev_hotfix_version_name(new_ver)
 
         # Confirm
         message = "Requested Hotfix version: #{new_ver}\n"

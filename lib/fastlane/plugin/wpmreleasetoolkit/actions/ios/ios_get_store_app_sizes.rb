@@ -3,7 +3,7 @@ require_relative '../../helper/ios/ios_adc_app_sizes_helper.rb'
 module Fastlane
     module Actions
       class IosGetStoreAppSizesAction < Action
-        Helper = Fastlane::Helpers::IosADCAppSizesHelper
+        Helper = Fastlane::Helper::IosADCAppSizesHelper
 
         def self.run(params)
           app_sizes = Helper::get_adc_sizes(

@@ -1,5 +1,5 @@
 module Fastlane
-  module Helpers
+  module Helper
     module AndroidGitHelper
 
       def self.git_checkout_and_pull(branch)

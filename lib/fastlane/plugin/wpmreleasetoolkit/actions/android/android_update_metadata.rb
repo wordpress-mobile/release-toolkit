@@ -8,7 +8,7 @@ module Fastlane
       def self.run(params)
         require_relative '../../helper/android/android_git_helper.rb'
 
-        Fastlane::Helpers::AndroidGitHelper.update_metadata(ENV["validate_translations"])
+        Fastlane::Helper::AndroidGitHelper.update_metadata(ENV["validate_translations"])
       end
 
       #####################################################

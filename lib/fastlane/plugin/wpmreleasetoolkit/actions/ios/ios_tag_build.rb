@@ -5,9 +5,9 @@ module Fastlane
         require_relative '../../helper/ios/ios_version_helper.rb'
         require_relative '../../helper/ios/ios_git_helper.rb'
   
-        itc_ver = Fastlane::Helpers::IosVersionHelper.get_build_version()
-        int_ver = Fastlane::Helpers::IosVersionHelper.get_internal_version() unless ENV["INTERNAL_CONFIG_FILE"].nil?
-        Fastlane::Helpers::IosGitHelper.tag_build(itc_ver, int_ver)
+        itc_ver = Fastlane::Helper::IosVersionHelper.get_build_version()
+        int_ver = Fastlane::Helper::IosVersionHelper.get_internal_version() unless ENV["INTERNAL_CONFIG_FILE"].nil?
+        Fastlane::Helper::IosGitHelper.tag_build(itc_ver, int_ver)
       end
   
       #####################################################

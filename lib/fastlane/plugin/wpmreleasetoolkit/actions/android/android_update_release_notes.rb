@@ -9,7 +9,7 @@ module Fastlane
           require_relative '../../helper/git_helper.rb'
 
           path = File.join(ENV["PROJECT_ROOT_FOLDER"] || '.', 'RELEASE-NOTES.txt')
-          next_version = Fastlane::Helpers::AndroidVersionHelper.calc_next_release_short_version(params[:new_version])
+          next_version = Fastlane::Helper::AndroidVersionHelper.calc_next_release_short_version(params[:new_version])
 
           Fastlane::Helper::ReleaseNotesHelper.add_new_section(path: path, section_title: next_version)
           Fastlane::Helper::GitHelper.commit(message: "Release Notes: add new section for next version (#{next_version})", files: path, push: true)

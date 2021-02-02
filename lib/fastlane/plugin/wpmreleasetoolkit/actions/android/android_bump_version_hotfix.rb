@@ -5,15 +5,15 @@ module Fastlane
         UI.message "Bumping app release version for hotfix..."
         
         require_relative '../../helper/android/android_git_helper.rb'
-        Fastlane::Helpers::AndroidGitHelper.branch_for_hotfix(params[:previous_version_name], params[:version_name])
+        Fastlane::Helper::AndroidGitHelper.branch_for_hotfix(params[:previous_version_name], params[:version_name])
         create_config(params[:previous_version_name], params[:version_name], params[:version_code])
         show_config()
         
         UI.message "Updating build.gradle..."
-        Fastlane::Helpers::AndroidVersionHelper.update_versions(@new_version, @current_version_alpha) 
+        Fastlane::Helper::AndroidVersionHelper.update_versions(@new_version, @current_version_alpha) 
         UI.message "Done!"
 
-        Fastlane::Helpers::AndroidGitHelper.bump_version_hotfix(params[:version_name])
+        Fastlane::Helper::AndroidGitHelper.bump_version_hotfix(params[:version_name])
         
         UI.message "Done."
       end
@@ -59,16 +59,16 @@ module Fastlane
 
       private 
       def self.create_config(previous_version, new_version_name, new_version_code)
-        @current_version = Fastlane::Helpers::AndroidVersionHelper.get_release_version()
-        @current_version_alpha = Fastlane::Helpers::AndroidVersionHelper.get_alpha_version()
-        @new_version = Fastlane::Helpers::AndroidVersionHelper.calc_next_hotfix_version(new_version_name, new_version_code)
+        @current_version = Fastlane::Helper::AndroidVersionHelper.get_release_version()
+        @current_version_alpha = Fastlane::Helper::AndroidVersionHelper.get_alpha_version()
+        @new_version = Fastlane::Helper::AndroidVersionHelper.calc_next_hotfix_version(new_version_name, new_version_code)
         @new_short_version = new_version_name
         @new_release_branch = "release/#{@new_short_version}"
       end
 
       def self.show_config()
-        UI.message("Current version: #{@current_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_NAME]}(#{@current_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_CODE]})")
-        UI.message("New hotfix version: #{@new_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_NAME]}(#{@new_version[Fastlane::Helpers::AndroidVersionHelper::VERSION_CODE]})")
+        UI.message("Current version: #{@current_version[Fastlane::Helper::AndroidVersionHelper::VERSION_NAME]}(#{@current_version[Fastlane::Helper::AndroidVersionHelper::VERSION_CODE]})")
+        UI.message("New hotfix version: #{@new_version[Fastlane::Helper::AndroidVersionHelper::VERSION_NAME]}(#{@new_version[Fastlane::Helper::AndroidVersionHelper::VERSION_CODE]})")
         UI.message("Release branch: #{@new_release_branch}")
       end
     end

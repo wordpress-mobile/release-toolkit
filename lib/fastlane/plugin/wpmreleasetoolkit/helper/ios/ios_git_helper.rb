@@ -1,5 +1,5 @@
 module Fastlane
-  module Helpers
+  module Helper
     module IosGitHelper
 
       def self.git_checkout_and_pull(branch)
