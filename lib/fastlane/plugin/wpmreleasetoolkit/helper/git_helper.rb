@@ -13,6 +13,23 @@ module Fastlane
         `git config --get-regex lfs`.length > 0
       end
 
+      # Switch to the given branch and pull its latest commits.
+      #
+      # @param [String,Hash] branch Name of the branch to pull.
+      #        If you provide a Hash with a single key=>value pair, it will build the branch name as `"#{key}/#{value}"`,
+      #        i.e. `checkout_and_pull(release: version)` is equivalent to `checkout_and_pull("release/#{version}")`.    
+      #
+      # @return [Bool] True if it succeeded switching and pulling, false if there was an error during the switch or pull.
+      #
+      def self.checkout_and_pull(branch)
+        branch = branch.first.join('/') if branch.is_a?(Hash)
+        Action.sh("git", "checkout", branch)
+        Action.sh("git", "pull")
+        return true
+      rescue
+        return false
+      end
+
       # `git add` the specified files (if any provided) then commit them using the provided message.
       # Optionally, push the commit to the remote too.
       #

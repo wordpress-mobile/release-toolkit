@@ -16,7 +16,7 @@ module Fastlane
           show_config()
 
           # Update local develop and branch
-          Fastlane::Helper::Ios::GitHelper.git_checkout_and_pull("develop")
+          Fastlane::Helper::GitHelper.checkout_and_pull("develop")
           Fastlane::Helper::Ios::GitHelper.do_release_branch(@new_release_branch)
           UI.message "Done!"
 
