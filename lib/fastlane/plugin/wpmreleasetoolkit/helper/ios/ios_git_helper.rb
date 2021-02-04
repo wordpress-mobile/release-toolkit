@@ -2,12 +2,6 @@ module Fastlane
   module Helper
     module Ios
       module GitHelper
-        def self.branch_for_hotfix(tag_version, new_version)
-          Action.sh("git checkout #{tag_version}")
-          Action.sh("git checkout -b release/#{new_version}")
-          Action.sh("git push --set-upstream origin release/#{new_version}")
-        end
-
         def self.bump_version_release(skip_deliver=false, skip_metadata=false)
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && git add ./config/.")
           Action.sh("git add fastlane/Deliverfile") unless skip_deliver

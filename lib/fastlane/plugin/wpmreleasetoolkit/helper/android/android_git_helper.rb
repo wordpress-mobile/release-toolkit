@@ -63,12 +63,6 @@ module Fastlane
           UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)
         end
 
-        def self.branch_for_hotfix(tag_version, new_version)
-          Action.sh("git checkout #{tag_version}")
-          Action.sh("git checkout -b release/#{new_version}")
-          Action.sh("git push --set-upstream origin release/#{new_version}")
-        end
-
         private
         def self.tag_and_push(version)
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && git tag #{version} && git push origin #{version}")

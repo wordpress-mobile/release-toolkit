@@ -30,6 +30,20 @@ module Fastlane
         return false
       end
 
+      # Create a new branch in preparation to do a hotfix.
+      #
+      # - Cuts the new branch from the tag `tag_version`
+      # - The name of the new branch will be `release/#{new_verison}`
+      #
+      # @param [String] tag_version The name of the tag to cut the hotfix from
+      # @param [String] new_version The name of the new version, e.g. "1.2.3"
+      #
+      def self.create_branch_for_hotfix(tag_version, new_version)
+        Action.sh("git", "checkout", tag_version)
+        Action.sh("git", "checkout", "-b", "release/#{new_version}")
+        Action.sh("git", "push", "--set-upstream", "origin", "release/#{new_version}")
+      end
+
       # `git add` the specified files (if any provided) then commit them using the provided message.
       # Optionally, push the commit to the remote too.
       #
