@@ -44,16 +44,22 @@ module Fastlane
           Fastlane::Helper::GitHelper.commit(message: "Update strings for localization", files: strings_files, push: true) || UI.message("No new strings, skipping commit")
         end
 
+        # Call the `Scripts/update-translations.rb` then the `fastlane/download_metadata` Scripts from the host project folder
+        #
+        # @env PROJECT_ROOT_FOLDER The path to the git root of the project
+        # @env PROJECT_NAME The name of the directory containing the project code (especially containing the `build.gradle` file)
+        #
         def self.update_metadata()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && ./Scripts/update-translations.rb")
-          Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/*.lproj/*.strings")
-          Action.sh("git diff-index --quiet HEAD || git commit -m \"Updates translation\"")
+
+          strings_files = Dir.chdir(File.join(ENV["PROJECT_ROOT_FOLDER"], ENV["PROJECT_NAME"])) do
+            Dir.glob("*.lproj/*.strings")
+          end
+          Fastlane::Helper::GitHelper.commit(message: "Update translations", files: strings_files, push: false)
 
           Action.sh("cd fastlane && ./download_metadata.swift")
-          Action.sh("git add ./fastlane/metadata/")
-          Action.sh("git diff-index --quiet HEAD || git commit -m \"Updates metadata translation\"")
-
-          Action.sh("git push origin HEAD")
+          
+          Fastlane::Helper::GitHelper.commit(message: "Update metadata translations", files: "./fastlane/metadata/", push: true)
         end
       end
     end
