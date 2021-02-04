@@ -56,8 +56,8 @@ module Fastlane
         end
 
         def self.tag_build(itc_version, internal_version)
-          tag_and_push(itc_version)
-          tag_and_push(internal_version) unless internal_version.nil?
+          Fastlane::Helper::GitHelper.create_tag(itc_version)
+          Fastlane::Helper::GitHelper.create_tag(internal_version) unless internal_version.nil?
         end
 
         def self.update_metadata()
@@ -106,11 +106,6 @@ module Fastlane
             end
           }
           return false
-        end
-
-        private
-        def self.tag_and_push(version)
-          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && git tag #{version} && git push origin #{version}")
         end
       end
     end
