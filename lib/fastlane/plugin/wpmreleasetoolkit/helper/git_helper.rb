@@ -60,6 +60,8 @@ module Fastlane
       #        Also accepts the special symbol `:all` to add all the files (`git commit -a -m …`).
       # @param [Bool] push If true, will `git push` to `origin` after the commit has been created. Defaults to `false`.
       #
+      # @return [Bool] True if commit and push were successful, false if there was an issue during commit & push (most likely being "nothing to commit").
+      #
       def self.commit(message:, files: nil, push: false)
         files = [files] if files.is_a?(String)
         args = []
@@ -68,8 +70,13 @@ module Fastlane
         elsif !files.nil? && !files.empty?
           Action.sh("git", "add", *files)
         end
-        Action.sh("git", "commit", *args, "-m", message)
-        Action.sh("git", "push", "origin", "HEAD") if push
+        begin
+          Action.sh("git", "commit", *args, "-m", message)
+          Action.sh("git", "push", "origin", "HEAD") if push
+          return true
+        rescue
+          return false
+        end
       end
 
       # Creates a tag for the given version, and optionally push it to the remote.

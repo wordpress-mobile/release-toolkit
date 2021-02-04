@@ -28,16 +28,20 @@ module Fastlane
           Fastlane::Helper::GitHelper.commit(message: "Bump version number", files: files_list, push: true)
         end
 
+        # Calls the `Scripts/localize.py` script in the project root folder and push the `*.strings` files
+        #
+        # That script updates the `.strings` files with translations from GlotPress.
+        #
+        # @env PROJECT_ROOT_FOLDER The path to the git root of the project
+        # @env PROJECT_NAME The name of the directory containing the project code (especially containing the `build.gradle` file)
+        #
         def self.localize_project()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && ./Scripts/localize.py")
-          Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}*.lproj/*.strings")
-          is_repo_clean = `git status --porcelain`.empty?
-          if is_repo_clean then
-            UI.message("No new strings, skipping commit")
-          else
-            Action.sh("git commit -m \"Updates strings for localization\"")
-            Action.sh("git push origin HEAD")
+
+          strings_files = Dir.chdir(File.join(ENV["PROJECT_ROOT_FOLDER"], ENV["PROJECT_NAME"])) do
+            Dir.glob("*.lproj/*.strings")
           end
+          Fastlane::Helper::GitHelper.commit(message: "Update strings for localization", files: strings_files, push: true) || UI.message("No new strings, skipping commit")
         end
 
         def self.update_metadata()
