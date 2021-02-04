@@ -2,26 +2,17 @@ module Fastlane
   module Helper
     module Ios
       module GitHelper
-        def self.bump_version_release(skip_deliver=false, skip_metadata=false)
-          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && git add ./config/.")
-          Action.sh("git add fastlane/Deliverfile") unless skip_deliver
-          Action.sh("git add fastlane/download_metadata.swift") unless skip_metadata
-          Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/Resources/#{ENV["APP_STORE_STRINGS_FILE_NAME"]}") unless skip_metadata
-          Action.sh("git commit -m \"Bump version number\"")
-          Action.sh("git push origin HEAD")
-        end
+        def self.commit_version_bump(include_deliverfile: true, include_metadata: true)
+          files_list = [ File.join(ENV["PROJECT_ROOT_FOLDER"], "config", ".") ]
+          if include_deliverfile
+            files_list.append File.join("fastlane", "Deliverfile")
+          end
+          if include_metadata
+            files_list.append File.join("fastlane", "download_metadata.swift")
+            files_list.append File.join(ENV["PROJECT_ROOT_FOLDER"], ENV["PROJECT_NAME"], "Resources", ENV["APP_STORE_STRINGS_FILE_NAME"])
+          end
 
-        def self.bump_version_hotfix(version)
-          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && git add ./config/.")
-          Action.sh("git add fastlane/Deliverfile")
-          Action.sh("git commit -m \"Bump version number\"")
-          Action.sh("git push origin HEAD")
-        end
-
-        def self.bump_version_beta()
-          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && git add ./config/.")
-          Action.sh("git commit -m \"Bump version number\"")
-          Action.sh("git push origin HEAD")
+          Fastlane::Helper::GitHelper.commit(message: "Bump version number", files: files_list, push: true)
         end
 
         def self.delete_tags(version)
