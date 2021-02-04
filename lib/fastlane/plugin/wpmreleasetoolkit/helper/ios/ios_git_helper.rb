@@ -2,6 +2,19 @@ module Fastlane
   module Helper
     module Ios
       module GitHelper
+        # Commit and push the files that are modified when we bump version numbers on an iOS project
+        #
+        # This typically commits and pushes:
+        #  - The files in `./config/*` – especially `Version.*.xcconfig` files
+        #  - The `fastlane/Deliverfile` file (which contains the `app_version` line)
+        #  - The `<ProjectRoot>/<ProjectName>/Resources/AppStoreStrings.pot` file, containing a key for that version's release notes
+        #
+        # @env PROJECT_ROOT_FOLDER The path to the git root of the project
+        # @env PROJECT_NAME The name of the directory containing the project code (especially containing the Resources/ subfolder)
+        #
+        # @param [Bool] include_deliverfile If true (the default), includes the `fastlane/Deliverfile` in files being commited
+        # @param [Bool] include_metadata If true (the default), includes the `fastlane/download_metadata.swift` file and the `.pot` file (which typically contains an entry or release notes for the new version)
+        #
         def self.commit_version_bump(include_deliverfile: true, include_metadata: true)
           files_list = [ File.join(ENV["PROJECT_ROOT_FOLDER"], "config", ".") ]
           if include_deliverfile

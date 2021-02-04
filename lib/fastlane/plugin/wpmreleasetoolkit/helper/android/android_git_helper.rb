@@ -12,6 +12,13 @@ module Fastlane
           Action.sh("git push origin HEAD")
         end
 
+        # Commit and push the files that are modified when we bump version numbers on an iOS project
+        #
+        # This typically commits and pushes the `build.gradle` file inside the project subfolder.
+        #
+        # @env PROJECT_ROOT_FOLDER The path to the git root of the project
+        # @env PROJECT_NAME The name of the directory containing the project code (especially containing the `build.gradle` file)
+        #
         def self.commit_version_bump()
           Fastlane::Helper::GitHelper.commit(
             message: "Bump version number",
