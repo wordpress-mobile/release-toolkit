@@ -30,6 +30,17 @@ module Fastlane
         return false
       end
 
+      def self.cut_release_branch(branch_name)
+        if branch_exists?(branch_name)
+          UI.message("Branch #{branch_name} already exists. Skipping creation.")
+          Action.sh("git", "checkout", branch_name)
+          Action.sh("git", "pull", "origin", branch_name)
+        else
+          Action.sh("git", "checkout", "-b", branch_name)
+          Action.sh("git", "push", "-u", "origin", branch_name)
+        end
+      end
+
       # Create a new branch in preparation to do a hotfix.
       #
       # - Cuts the new branch from the tag `tag_version`
@@ -81,6 +92,16 @@ module Fastlane
       #
       def self.list_tags_on_current_commit
         Action.sh("git", "tag", "--points-at", "HEAD").split("\n")
+      end
+
+      # Checks if a branch exists locally.
+      #
+      # @param [String] branch_name The name of the branch to check for
+      #
+      # @return [Bool] True if the branch exists in the local working copy, false otherwise.
+      #
+      def self.branch_exists?(branch_name)
+        !Action.sh("git", "branch", "--list", branch_name).empty?
       end
     end
   end

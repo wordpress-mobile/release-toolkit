@@ -62,23 +62,6 @@ module Fastlane
           Action.sh("git push origin HEAD")
         end
 
-        def self.do_release_branch(branch_name)
-          if (check_branch_exists(branch_name) == true) then
-            UI.message("Branch #{branch_name} already exists. Skipping creation.")
-            Action.sh("git checkout #{branch_name}")
-            Action.sh("git pull origin #{branch_name}")
-          else
-            Action.sh("git checkout -b #{branch_name}")
-
-            # Push to origin
-            Action.sh("git push -u origin #{branch_name}")
-          end
-        end
-
-        def self.check_branch_exists(branch_name)
-          !Action.sh("git branch --list #{branch_name}").empty?
-        end
-
         def self.check_on_branch(branch_name)
           current_branch_name=Action.sh("git symbolic-ref -q HEAD")
           UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)

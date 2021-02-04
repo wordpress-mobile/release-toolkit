@@ -2,23 +2,6 @@ module Fastlane
   module Helper
     module Android
       module GitHelper
-        def self.do_release_branch(branch_name)
-          if (check_branch_exists(branch_name) == true) then
-            UI.message("Branch #{branch_name} already exists. Skipping creation.")
-            Action.sh("git checkout #{branch_name}")
-            Action.sh("git pull origin #{branch_name}")
-          else
-            Action.sh("git checkout -b #{branch_name}")
-
-            # Push to origin
-            Action.sh("git push -u origin #{branch_name}")
-          end
-        end
-
-        def self.check_branch_exists(branch_name)
-          !Action.sh("git branch --list #{branch_name}").empty?
-        end
-
         def self.update_metadata(validate_translation_command)
           Action.sh("./tools/update-translations.sh")
           Action.sh("git submodule update --init --recursive")

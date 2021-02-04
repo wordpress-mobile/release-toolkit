@@ -17,7 +17,7 @@ module Fastlane
 
           # Update local develop and branch
           UI.message "Creating new branch..."
-          Fastlane::Helper::Android::GitHelper.do_release_branch(@new_release_branch)
+          Fastlane::Helper::GitHelper.cut_release_branch(@new_release_branch)
           UI.message "Done!"
 
           UI.message "Updating versions..."
