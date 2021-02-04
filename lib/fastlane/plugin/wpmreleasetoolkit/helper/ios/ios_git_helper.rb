@@ -38,11 +38,6 @@ module Fastlane
           end
         end
 
-        def self.final_tag(version)
-          Action.sh("git tag #{version}")
-          Action.sh("git push origin #{version}")
-        end
-
         def self.localize_project()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && ./Scripts/localize.py")
           Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}*.lproj/*.strings")
