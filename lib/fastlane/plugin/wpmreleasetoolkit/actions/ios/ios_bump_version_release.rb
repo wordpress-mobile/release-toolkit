@@ -17,7 +17,7 @@ module Fastlane
 
           # Update local develop and branch
           Fastlane::Helper::GitHelper.checkout_and_pull("develop")
-          Fastlane::Helper::GitHelper.cut_release_branch(@new_release_branch)
+          Fastlane::Helper::GitHelper.create_branch(@new_release_branch, from: "develop")
           UI.message "Done!"
 
           UI.message "Updating glotPressKeys..."  unless params[:skip_glotpress]

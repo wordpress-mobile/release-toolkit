@@ -30,29 +30,25 @@ module Fastlane
         return false
       end
 
-      def self.cut_release_branch(branch_name)
+      # Create a new branch named `branch_name`, cutting it from branch/commit/tag `from`, and push it
+      #
+      # If the branch with that name already exists, it will instead switch to it and pull new commits.
+      #
+      # @param [String] branch_name The full name of the new branch to create, e.g "release/1.2"
+      # @param [String?] from The branch or tag from which to cut the branch from.
+      #        If `nil`, will cut the new branch from the current commit. Otherwise, will checkout that commit/branch/tag before cutting the branch.
+      # @param [Bool] push If true, will also push the branch to `origin`, tracking the upstream branch with the local one.
+      #
+      def self.create_branch(branch_name, from: nil, push: true)
         if branch_exists?(branch_name)
           UI.message("Branch #{branch_name} already exists. Skipping creation.")
           Action.sh("git", "checkout", branch_name)
           Action.sh("git", "pull", "origin", branch_name)
         else
+          Action.sh("git", "checkout", from) unless from.nil?
           Action.sh("git", "checkout", "-b", branch_name)
-          Action.sh("git", "push", "-u", "origin", branch_name)
+          Action.sh("git", "push", "-u", "origin", branch_name) if push
         end
-      end
-
-      # Create a new branch in preparation to do a hotfix.
-      #
-      # - Cuts the new branch from the tag `tag_version`
-      # - The name of the new branch will be `release/#{new_verison}`
-      #
-      # @param [String] tag_version The name of the tag to cut the hotfix from
-      # @param [String] new_version The name of the new version, e.g. "1.2.3"
-      #
-      def self.cut_hotfix_branch(tag_version, new_version)
-        Action.sh("git", "checkout", tag_version)
-        Action.sh("git", "checkout", "-b", "release/#{new_version}")
-        Action.sh("git", "push", "--set-upstream", "origin", "release/#{new_version}")
       end
 
       # `git add` the specified files (if any provided) then commit them using the provided message.
