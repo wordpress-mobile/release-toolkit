@@ -4,12 +4,20 @@ module Fastlane
   module Helper
     module GitHelper
 
-      def self.is_git_repo
+      # Checks if the current directory is (inside) a git repo
+      #
+      # @return [Bool] True if the current directory is the root of a git repo (i.e. a local working copy) or a subdirectory of one.
+      #
+      def self.is_git_repo?
         system "git rev-parse --git-dir 1> /dev/null 2>/dev/null"
       end
 
-      def self.has_git_lfs
-        return false unless is_git_repo
+      # Check if the current directory has git-lfs enabled
+      #
+      # @return [Bool] True if the current directory is a git working copy and has git-lfs enabled.
+      #
+      def self.has_git_lfs?
+        return false unless is_git_repo?
         `git config --get-regex lfs`.length > 0
       end
 
