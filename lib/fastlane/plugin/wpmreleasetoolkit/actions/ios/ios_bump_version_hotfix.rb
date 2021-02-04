@@ -5,7 +5,7 @@ module Fastlane
         UI.message "Bumping app release version for hotfix..."
         
         require_relative '../../helper/ios/ios_git_helper.rb'
-        Fastlane::Helper::GitHelper.create_branch_for_hotfix(params[:previous_version], params[:version])
+        Fastlane::Helper::GitHelper.cut_hotfix_branch(params[:previous_version], params[:version])
         create_config(params[:previous_version], params[:version])
         show_config()
         
