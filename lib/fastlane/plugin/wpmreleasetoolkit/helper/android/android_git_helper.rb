@@ -12,28 +12,12 @@ module Fastlane
           Action.sh("git push origin HEAD")
         end
 
-        def self.bump_version_release()
-          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]} && git add ./build.gradle")
-          Action.sh("git commit -m \"Bump version number\"")
-          Action.sh("git push origin HEAD")
-        end
-
-        def self.bump_version_beta()
-          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]} && git add ./build.gradle")
-          Action.sh("git commit -m \"Bump version number\"")
-          Action.sh("git push origin HEAD")
-        end
-
-        def self.bump_version_hotfix(version)
-          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]} && git add ./build.gradle")
-          Action.sh("git commit -m \"Bump version number\"")
-          Action.sh("git push origin HEAD")
-        end
-
-        def self.bump_version_final()
-          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]} && git add ./build.gradle")
-          Action.sh("git commit -m \"Bump version number\"")
-          Action.sh("git push origin HEAD")
+        def self.commit_version_bump()
+          Fastlane::Helper::GitHelper.commit(
+            message: "Bump version number",
+            files: File.join(ENV["PROJECT_ROOT_FOLDER"], ENV["PROJECT_NAME"], "build.gradle"),
+            push: true
+          )
         end
       end
     end

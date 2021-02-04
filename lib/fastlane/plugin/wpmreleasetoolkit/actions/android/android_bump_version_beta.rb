@@ -15,7 +15,7 @@ module Fastlane
         Fastlane::Helper::Android::VersionHelper.update_versions(@new_version_beta, @new_version_alpha)  
         UI.message "Done!"
  
-        Fastlane::Helper::Android::GitHelper.bump_version_beta()        
+        Fastlane::Helper::Android::GitHelper.commit_version_bump()        
       end
 
       #####################################################

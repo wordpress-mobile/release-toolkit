@@ -22,7 +22,7 @@ module Fastlane
 
           UI.message "Updating versions..."
           Fastlane::Helper::Android::VersionHelper.update_versions(@new_version_beta, @new_version_alpha) 
-          Fastlane::Helper::Android::GitHelper.bump_version_release()         
+          Fastlane::Helper::Android::GitHelper.commit_version_bump()         
           UI.message "Done."
         end
   
