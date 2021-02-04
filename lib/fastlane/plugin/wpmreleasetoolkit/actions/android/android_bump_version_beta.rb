@@ -7,7 +7,7 @@ module Fastlane
         require_relative '../../helper/android/android_git_helper.rb'
         require_relative '../../helper/android/android_version_helper.rb'
 
-        Fastlane::Helper::Android::GitHelper.check_on_branch("release")
+        Fastlane::Helper::GitHelper.ensure_on_branch!("release")
         create_config()
         show_config()
 

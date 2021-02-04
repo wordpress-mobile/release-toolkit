@@ -8,7 +8,7 @@ module Fastlane
           UI.user_error!("Can't build beta and final at the same time!")
         end
 
-        Fastlane::Helper::Android::GitHelper.check_on_branch("release") unless other_action.is_ci()
+        Fastlane::Helper::GitHelper.ensure_on_branch!("release") unless other_action.is_ci()
         
         message = ""
         beta_version = Fastlane::Helper::Android::VersionHelper.get_release_version() unless !params[:beta] and !params[:final]

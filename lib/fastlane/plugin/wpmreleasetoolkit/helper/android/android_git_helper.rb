@@ -35,11 +35,6 @@ module Fastlane
           Action.sh("git commit -m \"Bump version number\"")
           Action.sh("git push origin HEAD")
         end
-
-        def self.check_on_branch(branch_name)
-          current_branch_name=Action.sh("git symbolic-ref -q HEAD")
-          UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)
-        end
       end
     end
   end

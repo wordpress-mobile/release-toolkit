@@ -7,7 +7,7 @@ module Fastlane
         require_relative '../../helper/ios/ios_git_helper.rb'
         require_relative '../../helper/ios/ios_version_helper.rb'
 
-        Fastlane::Helper::Ios::GitHelper.check_on_branch("release")
+        Fastlane::Helper::GitHelper.ensure_on_branch!("release")
         create_config()
         show_config()
 
