@@ -74,6 +74,14 @@ module Fastlane
         Action.sh("git", "tag", version)
         Action.sh("git", "push", "origin", version) if push
       end
+
+      # Returns the list of tags that are pointing to the current commit (HEAD)
+      #
+      # @return [Array<String>] List of tags associated with the HEAD commit
+      #
+      def self.list_tags_on_current_commit
+        Action.sh("git", "tag", "--points-at", "HEAD").split("\n")
+      end
     end
   end
 end

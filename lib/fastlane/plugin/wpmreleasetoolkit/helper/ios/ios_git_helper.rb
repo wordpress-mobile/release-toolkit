@@ -83,20 +83,6 @@ module Fastlane
           current_branch_name=Action.sh("git symbolic-ref -q HEAD")
           UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)
         end
-
-        def self.is_head_on_tag()
-          !Action.sh("git tag --points-at HEAD").empty?
-        end
-
-        def self.has_final_tag_for(version)
-          head_tags=Action.sh("git tag --points-at HEAD").split("\n")
-          head_tags.each { | vtag |
-            if (vtag == version)
-              return true
-            end
-          }
-          return false
-        end
       end
     end
   end
