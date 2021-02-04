@@ -53,11 +53,6 @@ module Fastlane
           Action.sh("git push origin HEAD")
         end
 
-        def self.tag_build(release_version, alpha_version)
-          Fastlane::Helper::GitHelper.create_tag(release_version)
-          Fastlane::Helper::GitHelper.create_tag(alpha_version) unless alpha_version.nil?
-        end
-
         def self.check_on_branch(branch_name)
           current_branch_name=Action.sh("git symbolic-ref -q HEAD")
           UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)

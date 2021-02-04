@@ -55,11 +55,6 @@ module Fastlane
           end
         end
 
-        def self.tag_build(itc_version, internal_version)
-          Fastlane::Helper::GitHelper.create_tag(itc_version)
-          Fastlane::Helper::GitHelper.create_tag(internal_version) unless internal_version.nil?
-        end
-
         def self.update_metadata()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && ./Scripts/update-translations.rb")
           Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}/*.lproj/*.strings")
