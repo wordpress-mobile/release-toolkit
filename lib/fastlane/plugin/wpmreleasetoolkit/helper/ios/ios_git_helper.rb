@@ -28,20 +28,6 @@ module Fastlane
           Fastlane::Helper::GitHelper.commit(message: "Bump version number", files: files_list, push: true)
         end
 
-        def self.delete_tags(version)
-          Action.sh("git tag | xargs git tag -d; git fetch --tags")
-          tags = Action.sh("git tag")
-          tags.split("\n").each do | tag |
-            if (tag.split(".").length == 4) then
-              if tag.start_with?(version) then
-                UI.message("Removing: #{tag}")
-                Action.sh("git tag -d #{tag}")
-                Action.sh("git push origin :refs/tags/#{tag}")
-              end
-            end
-          end
-        end
-
         def self.localize_project()
           Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && ./Scripts/localize.py")
           Action.sh("git add #{ENV["PROJECT_ROOT_FOLDER"]}#{ENV["PROJECT_NAME"]}*.lproj/*.strings")

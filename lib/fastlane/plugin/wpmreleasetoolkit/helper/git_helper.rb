@@ -90,6 +90,36 @@ module Fastlane
         Action.sh("git", "tag", "--points-at", "HEAD").split("\n")
       end
 
+      # List all the tags in the local working copy, optionally filtering the list using a pattern
+      #
+      # @param [String] matching The pattern of the tag(s) to match and filter on; use "*" for wildcards.
+      #        For example, `"1.2.*"` will match every tag starting with `"1.2."`. Defaults to '*' which lists all tags.
+      #
+      # @return [Array<String>] The list of local tags matching the pattern
+      #
+      def self.list_local_tags(matching: "*")
+        Action.sh("git", "tag", "--list", matching).split("\n")
+      end
+
+      # Delete the mentioned local tags in the local working copy, and optionally delete them on the remote too.
+      #
+      # @param [Array<String>] tag_names The list of tags to delete
+      # @param [Bool] delete_on_remote If true, will also delete the tag from the remote. Otherwise, it will only be deleted locally.
+      #
+      def self.delete_tags(tag_names, delete_on_remote: false)
+        Action.sh("git", "tag", "-d", *tag_names)
+        if delete_on_remote
+          remote_refs = tag_names.map { |tag| ":refs/tags/#{tag}" }
+          Action.sh("git", "push", "origin", *remote_refs)
+        end
+      end
+
+      # Fetch all the tags from the remote.
+      #
+      def self.fetch_all_tags()
+        Action.sh("git", "fetch", "--tags")
+      end
+
       # Checks if a branch exists locally.
       #
       # @param [String] branch_name The name of the branch to check for
