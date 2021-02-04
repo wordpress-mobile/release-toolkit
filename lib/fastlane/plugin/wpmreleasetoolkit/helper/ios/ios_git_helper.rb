@@ -1,6 +1,8 @@
 module Fastlane
   module Helper
     module Ios
+      # Helper methods to execute git-related operations that are specific to iOS projects
+      #
       module GitHelper
         # Commit and push the files that are modified when we bump version numbers on an iOS project
         #

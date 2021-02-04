@@ -2,6 +2,8 @@ require 'git'
 
 module Fastlane
   module Helper
+    # Helper methods to execute git-related operations
+    #
     module GitHelper
 
       # Checks if the current directory is (inside) a git repo
