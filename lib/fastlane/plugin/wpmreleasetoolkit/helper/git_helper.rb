@@ -92,7 +92,7 @@ module Fastlane
       # Creates a tag for the given version, and optionally push it to the remote.
       #
       # @param [String] version The name of the tag to push, e.g. "1.2"
-      # @param [Bool] push If true 9the default), the tag will also be pushed to `origin`
+      # @param [Bool] push If true (the default), the tag will also be pushed to `origin`
       #
       def self.create_tag(version, push: true)
         Action.sh("git", "tag", version)
