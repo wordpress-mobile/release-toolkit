@@ -78,7 +78,7 @@ class IMTSTestUtils
             FileUtils.mkdir_p(dir)
         end
 
-        File.open(file_path, 'w') {|f| f.write(content) }
+        File.open(file_path, 'w') { |f| f.write(content) }
     end
 
     def read_result_data(test_script)
