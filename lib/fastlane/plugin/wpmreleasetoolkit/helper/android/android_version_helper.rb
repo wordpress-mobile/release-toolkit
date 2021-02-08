@@ -257,11 +257,11 @@ module Fastlane
         #
         def self.bump_version_release
           # Bump release
-          current_version=get_release_version()
+          current_version = get_release_version()
           UI.message("Current version: #{current_version[VERSION_NAME]}")
-          new_version=calc_next_release_base_version(current_version)
+          new_version = calc_next_release_base_version(current_version)
           UI.message("New version: #{new_version[VERSION_NAME]}")
-          verified_version=verify_version(new_version[VERSION_NAME])
+          verified_version = verify_version(new_version[VERSION_NAME])
 
           return verified_version
         end

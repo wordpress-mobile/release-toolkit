@@ -136,7 +136,7 @@ module Fastlane
             end_index = diff_string.index('"')
             end_index ||= diff_string.length # Use the whole string if there's no '"'
 
-            diff_string=diff_string.slice(0..(end_index - 1))
+            diff_string = diff_string.slice(0..(end_index - 1))
             
             lib_strings.xpath('//string').each do |string_line|
               if (string_line.attr("name") == diff_string) then 

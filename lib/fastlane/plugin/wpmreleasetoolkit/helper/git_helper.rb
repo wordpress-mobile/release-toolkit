@@ -75,7 +75,7 @@ module Fastlane
       def self.commit(message:, files: nil, push: false)
         files = [files] if files.is_a?(String)
         args = []
-        if files  == :all
+        if files == :all
           args = ['-a']
         elsif !files.nil? && !files.empty?
           Action.sh("git", "add", *files)

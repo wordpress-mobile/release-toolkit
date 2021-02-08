@@ -184,11 +184,11 @@ module Fastlane
         #
         def self.bump_version_release
           # Bump release
-          current_version=get_public_version()
+          current_version = get_public_version()
           UI.message("Current version: #{current_version}")
-          new_version=calc_next_release_version(current_version)
+          new_version = calc_next_release_version(current_version)
           UI.message("New version: #{new_version}")
-          verified_version=verify_version(new_version)
+          verified_version = verify_version(new_version)
 
           return verified_version
         end
@@ -258,8 +258,8 @@ module Fastlane
         # @raise [UserError] Interrupts the lane if the provided version contains _more_ than 4 parts
         #
         def self.get_version_parts(version)
-          parts=version.split(".")
-          parts=parts.fill("0", parts.length...4).map{|chr| chr.to_i}
+          parts = version.split(".")
+          parts = parts.fill("0", parts.length...4).map{|chr| chr.to_i}
           if (parts.length > 4) then        
             UI.user_error!("Bad version string: #{version}")
           end
