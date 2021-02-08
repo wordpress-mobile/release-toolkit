@@ -1,6 +1,48 @@
+inherit_from: .rubocop_todo.yml
+
 require: 
 - rubocop-rspec
 
-Metrics/BlockLength:
+########## Code Style
+
+# We are ok using single and double quotes interchangeably
+Style/StringLiterals:
+  Enabled: false
+
+# This gem is included as part of the `Pluginfile`, which is `required` separately,
+# so makes it hard to keep it ordered with the rest of the gems
+Gemspec/OrderedDependencies:
   Exclude:
-    - 'spec/**/*.rb'
+    - 'fastlane-plugin-wpmreleasetoolkit.gemspec'
+
+########## Max Lengths Rules
+
+Metrics/LineLength:
+  Max: 300
+
+Metrics/AbcSize:
+  Max: 140
+
+Metrics/BlockLength:
+  Max: 80
+
+Metrics/ClassLength:
+  Max: 300
+
+
+Metrics/MethodLength:
+  Max: 100
+
+Metrics/ModuleLength:
+  Max: 300
+
+Metrics/ParameterLists:
+  Max: 10
+
+########## Complexity
+
+Metrics/CyclomaticComplexity:
+  Max: 20
+
+Metrics/PerceivedComplexity:
+  Max: 20
