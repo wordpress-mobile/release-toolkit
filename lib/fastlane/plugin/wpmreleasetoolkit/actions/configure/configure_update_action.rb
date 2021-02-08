@@ -111,8 +111,8 @@ module Fastlane
       def self.get_branches
         branches = sh("cd #{absolute_secret_store_path} && git branch -r")
         branches.split("\n")
-          .map { |s| s.strip!.split("/")[1] }
-          .reject { |s| s.include? "HEAD" }
+                .map { |s| s.strip!.split("/")[1] }
+                .reject { |s| s.include? "HEAD" }
       end
 
       ### Switch to the given branch, but don't ensure that it's up-to-date – that's for another step

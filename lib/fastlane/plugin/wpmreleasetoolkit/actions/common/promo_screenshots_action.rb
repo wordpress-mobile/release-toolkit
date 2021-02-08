@@ -50,7 +50,7 @@ module Fastlane
         stylesheet_path = config["stylesheet"]
 
         entries = config["entries"]
-          .flat_map { |entry|
+                  .flat_map { |entry|
 
             languages.map { |language|
 
@@ -95,10 +95,10 @@ module Fastlane
 
               newEntry
             }
-          }
-          .sort { |x, y|
+                  }
+                  .sort { |x, y|
             x["filename"] <=> y["filename"]
-          }
+        }
 
         bar = ProgressBar.new(entries.count, :bar, :counter, :eta, :rate)
 
