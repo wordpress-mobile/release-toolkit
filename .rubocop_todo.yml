@@ -244,17 +244,6 @@ Layout/MultilineMethodCallIndentation:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_devices_to_provisioning_profiles.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
 
-# Offense count: 7
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBrackets.
-# SupportedStyles: space, no_space, compact
-# SupportedStylesForEmptyBrackets: space, no_space
-Layout/SpaceInsideArrayLiteralBrackets:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_validate_ci_build.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_git_helper.rb'
-    - 'spec/configuration_spec.rb'
-
 # Offense count: 10
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBraces, SpaceBeforeBlockParameters.
