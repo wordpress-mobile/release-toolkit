@@ -6,8 +6,8 @@ module Fastlane
 
   module Helper
     class GithubHelper
-      def self.github_client()
-        client = Octokit::Client.new(:access_token => ENV["GHHELPER_ACCESS"])
+      def self.github_client
+        client = Octokit::Client.new(access_token: ENV["GHHELPER_ACCESS"])
 
         # Fetch the current user
         user = client.user
@@ -31,7 +31,7 @@ module Fastlane
 
       def self.get_last_milestone(repository)
         options = {}
-        options[:state]="open"
+        options[:state] = "open"
 
         milestones = github_client().list_milestones(repository, options)
         if (milestones.nil?)
@@ -46,12 +46,10 @@ module Fastlane
             begin
               if (mile[:title].split(' ')[0].split('.')[0] > last_stone[:title].split(' ')[0].split('.')[0])
                 last_stone = mile 
-              else
-                if (mile[:title].split(' ')[0].split('.')[1] > last_stone[:title].split(' ')[0].split('.')[1])
-                  last_stone = mile 
-                end
+              elsif (mile[:title].split(' ')[0].split('.')[1] > last_stone[:title].split(' ')[0].split('.')[1])
+                last_stone = mile
               end
-            rescue
+            rescue StandardError
               puts "Found invalid milestone"
             end
           end
@@ -63,7 +61,7 @@ module Fastlane
       def self.create_milestone(repository, newmilestone_number, newmilestone_duedate, need_submission)
         submission_date = need_submission ? newmilestone_duedate.to_datetime.next_day(11) : newmilestone_duedate.to_datetime.next_day(14)
         release_date = newmilestone_duedate.to_datetime.next_day(14)
-        comment = "Code freeze: #{newmilestone_duedate.to_datetime.strftime("%B %d, %Y")} App Store submission: #{submission_date.strftime("%B %d, %Y")} Release: #{release_date.strftime("%B %d, %Y")}"
+        comment = "Code freeze: #{newmilestone_duedate.to_datetime.strftime('%B %d, %Y')} App Store submission: #{submission_date.strftime('%B %d, %Y')} Release: #{release_date.strftime('%B %d, %Y')}"
 
         options = {}
         options[:due_on] = newmilestone_duedate
@@ -72,12 +70,11 @@ module Fastlane
       end
 
       def self.create_release(repository, version, release_notes, assets, prerelease)
-        release = github_client().create_release(repository, version, { name: version, draft: true, prerelease: prerelease, body: release_notes })
+        release = github_client().create_release(repository, version, name: version, draft: true, prerelease: prerelease, body: release_notes)
         assets.each do | file_path |
-          github_client().upload_asset(release[:url], file_path, { content_type: "application/octet-stream"})
+          github_client().upload_asset(release[:url], file_path, content_type: "application/octet-stream")
         end
       end
-
     end
   end
 end
