@@ -10,7 +10,7 @@ module Fastlane
 
         ### Traverse the file system to find the root project directory.
         ### For the purposes of this function, we're assuming the root project
-        ### directory is the one with the `.git` file in it. 
+        ### directory is the one with the `.git` file in it.
         def self.project_path
 
             continue = true

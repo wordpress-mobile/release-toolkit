@@ -27,7 +27,7 @@ module Fastlane
       #
       # @param [String,Hash] branch Name of the branch to pull.
       #        If you provide a Hash with a single key=>value pair, it will build the branch name as `"#{key}/#{value}"`,
-      #        i.e. `checkout_and_pull(release: version)` is equivalent to `checkout_and_pull("release/#{version}")`.    
+      #        i.e. `checkout_and_pull(release: version)` is equivalent to `checkout_and_pull("release/#{version}")`.
       #
       # @return [Bool] True if it succeeded switching and pulling, false if there was an error during the switch or pull.
       #

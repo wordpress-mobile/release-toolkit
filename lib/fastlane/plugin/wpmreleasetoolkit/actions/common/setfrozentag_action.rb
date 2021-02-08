@@ -17,7 +17,7 @@ module Fastlane
         mile_title = milestone[:title]
         puts freeze
         if freeze
-          # Check if the state needs changes 
+          # Check if the state needs changes
           if (is_frozen(milestone))
             UI.message("Milestone #{mile_title} is already frozen. Nothing to do")
             return  # Already frozen: nothing to do
@@ -36,7 +36,7 @@ module Fastlane
         unless (milestone.nil?)
           return milestone[:title].include?("❄️")
         end
-    
+
         return false
       end
 

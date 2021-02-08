@@ -16,7 +16,7 @@ module Fastlane
           update_repository # If the repo already exists, just update it
         end
       end
-      
+
       # Ensure the git repository at `~/.mobile-secrets` is up to date.
       # If the secrets repo is in a detached HEAD state, skip the pull,
       # since it will fail.

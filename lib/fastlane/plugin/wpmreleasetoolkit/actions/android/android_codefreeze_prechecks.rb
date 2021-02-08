@@ -7,10 +7,10 @@ module Fastlane
         def self.run(params)
           # fastlane will take care of reading in the parameter and fetching the environment variable:
           UI.message "Skip confirm on code freeze: #{params[:skip_confirm]}"
-  
+
           require_relative '../../helper/android/android_version_helper.rb'
           require_relative '../../helper/android/android_git_helper.rb'
-  
+
           # Checkout develop and update
           Fastlane::Helper::GitHelper.checkout_and_pull("develop")
 
@@ -31,28 +31,28 @@ module Fastlane
               UI.user_error!("Aborted by user request")
             end
           end
-  
+
           # Check local repo status
           other_action.ensure_git_status_clean()
-  
+
           # Return the current version
           Fastlane::Helper::Android::VersionHelper.get_public_version
         end
-  
+
         #####################################################
         # @!group Documentation
         #####################################################
-  
+
         def self.description
           "Runs some prechecks before code freeze"
         end
-  
+
         def self.details
           "Updates the develop branch, checks the app version and ensure the branch is clean"
         end
-  
+
         def self.available_options
-          # Define all options your action supports. 
+          # Define all options your action supports.
           [
             FastlaneCore::ConfigItem.new(key: :skip_confirm,
                                          env_name: "FL_ANDROID_CODEFREEZE_PRECHECKS_SKIPCONFIRM",
@@ -61,19 +61,19 @@ module Fastlane
                                          default_value: false) # the default value if the user didn't provide one
           ]
         end
-  
+
         def self.output
-  
+
         end
-  
+
         def self.return_value
           "Version of the app before code freeze"
         end
-  
+
         def self.authors
           ["loremattei"]
         end
-  
+
         def self.is_supported?(platform)
           platform == :android
         end

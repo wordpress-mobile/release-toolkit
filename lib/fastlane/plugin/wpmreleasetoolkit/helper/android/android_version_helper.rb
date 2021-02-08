@@ -18,7 +18,7 @@ module Fastlane
         ALPHA_PREFIX = "alpha-"
         # The suffix used in the versionName for RC (beta) versions
         RC_SUFFIX = "-rc"
-  
+
         # Returns the public-facing version string.
         #
         # @example
@@ -66,7 +66,7 @@ module Fastlane
           code = get_version_build_from_gradle_file(gradle_path, section)
           return { VERSION_NAME => name, VERSION_CODE => code }
         end
-  
+
         # Determines if a version name corresponds to an alpha version (starts with `"alpha-"`` prefix)
         #
         # @param [String] version The version name to check
@@ -78,7 +78,6 @@ module Fastlane
         def self.is_alpha_version?(version)
           version[VERSION_NAME].start_with?(ALPHA_PREFIX)
         end
-  
 
         # Check if this versionName corresponds to a beta, i.e. contains some `-rc` suffix
         #
@@ -89,7 +88,7 @@ module Fastlane
         def self.is_beta_version?(version)
           version[VERSION_NAME].include?(RC_SUFFIX)
         end
-  
+
         # Returns the version name and code to use for the final release.
         #
         # - The final version name corresponds to the beta's versionName, without the `-rc` suffix
@@ -103,7 +102,7 @@ module Fastlane
         #
         def self.calc_final_release_version(beta_version, alpha_version)
           version_name = beta_version[VERSION_NAME].split('-')[0]
-          version_code = alpha_version.nil? ? beta_version[VERSION_CODE] + 1 : alpha_version[VERSION_CODE] + 1 
+          version_code = alpha_version.nil? ? beta_version[VERSION_CODE] + 1 : alpha_version[VERSION_CODE] + 1
 
           { VERSION_NAME => version_name, VERSION_CODE => version_code }
         end
@@ -128,7 +127,7 @@ module Fastlane
 
           { VERSION_NAME => alpha_name, VERSION_CODE => alpha_code }
         end
-  
+
         # Compute the version name and code to use for the next beta (`X.Y.Z-rc-N`).
         #
         # - The next version name corresponds to the `version`'s name with the value after the `-rc-` suffix incremented by one,
@@ -168,7 +167,7 @@ module Fastlane
         end
 
         # Compute the next release version name for the given version, without incrementing the version code
-        # 
+        #
         #  - The version name sees its minor version part incremented by one (and carried to next major if it reaches 10)
         #  - The version code is unchanged. This method is intended to be called internally by other methods taking care of the version code bump.
         #
@@ -235,10 +234,10 @@ module Fastlane
           else
             vp[MINOR_NUMBER] -= 1
           end
-          
+
            "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}"
         end
-  
+
         # Determines if a version name corresponds to a hotfix
         #
         # @param [String] version The version number to test
@@ -250,7 +249,7 @@ module Fastlane
           vp = get_version_parts(version[VERSION_NAME])
           return (vp.length > 2) && (vp[HOTFIX_NUMBER] != 0)
         end
-  
+
         # Prints the current and next release version names to stdout, then returns the next release version
         #
         # @return [String] The next release version name to use after bumping the currently used release version.
@@ -294,7 +293,7 @@ module Fastlane
         #----------------------------------------
         private
         #----------------------------------------
-        
+
         # Remove the beta suffix (part after the `-`) from a version string
         #
         # @param [String] version The version string to remove the suffix from
@@ -319,7 +318,7 @@ module Fastlane
           parts.fill(0, parts.length...3) # add 0 if needed to ensure array has at least 3 components
           return parts
         end
-  
+
         # Extract the versionName from a build.gradle file
         #
         # @param [String] file_path The path to the `.gradle` file
@@ -332,7 +331,7 @@ module Fastlane
           res = res.tr('\"', '') unless res.nil?
           return res
         end
-  
+
         # Extract the versionCode rom a build.gradle file
         #
         # @param [String] file_path The path to the `.gradle` file
@@ -347,7 +346,7 @@ module Fastlane
 
         # Extract the value for a specific keyword in a specific section of a `.gradle` file
         #
-        # @todo: This implementation is very fragile. This should be done parsing the file in a proper way. 
+        # @todo: This implementation is very fragile. This should be done parsing the file in a proper way.
         #        Leveraging gradle itself is probably the easiest way.
         #
         # @param [String] file_path The path of the `.gradle` file to extract the value from
@@ -383,7 +382,7 @@ module Fastlane
         #
         def self.verify_version(version)
           v_parts = get_version_parts(version)
-          
+
           v_parts.each do |part|
             if (!is_int?(part)) then
               UI.user_error!("Version value can only contains numbers.")
@@ -421,7 +420,7 @@ module Fastlane
         # @param [Hash] version The version hash, containing values for keys "name" and "code"
         # @param [String] section The name of the section to update in the build.gradle file, e.g. "defaultConfig" or "vanilla"
         #
-        # @todo This implementation is very fragile. This should be done parsing the file in a proper way. 
+        # @todo This implementation is very fragile. This should be done parsing the file in a proper way.
         #       Leveraging gradle itself is probably the easiest way.
         #
         def self.update_version(version, section)
@@ -433,7 +432,7 @@ module Fastlane
             file.each_line do |line|
               if !found_section
                 temp_file.puts line
-                if (line.include? section) 
+                if (line.include? section)
                   found_section = true
                 end
               else

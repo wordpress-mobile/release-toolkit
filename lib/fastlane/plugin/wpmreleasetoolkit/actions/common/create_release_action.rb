@@ -10,7 +10,7 @@ module Fastlane
         repository = params[:repository]
         version = params[:version]
         assets = params[:release_assets]
-        release_notes = params[:release_notes_file_path].nil? ? "" : IO.read(params[:release_notes_file_path]) 
+        release_notes = params[:release_notes_file_path].nil? ? "" : IO.read(params[:release_notes_file_path])
         prerelease = params[:prerelease]
 
         UI.message("Creating draft release #{version} in #{repository}.")
@@ -18,7 +18,7 @@ module Fastlane
         assets.each do |file_path|
           UI.user_error!("Can't find file #{file_path}!") unless File.exist?(file_path)
         end
- 
+
         Fastlane::Helper::GithubHelper.create_release(repository, version, release_notes, assets, prerelease)
         UI.message("Done")
       end
@@ -61,7 +61,7 @@ module Fastlane
                                         env_name: "GHHELPER_CREATE_RELEASE_ASSETS",
                                         description: "Assets to upload",
                                         type: Array,
-                                        optional: false, 
+                                        optional: false,
                                       ),
           FastlaneCore::ConfigItem.new(key: :prerelease,
                                         env_name: "GHHELPER_CREATE_RELEASE_PRERELEASE",

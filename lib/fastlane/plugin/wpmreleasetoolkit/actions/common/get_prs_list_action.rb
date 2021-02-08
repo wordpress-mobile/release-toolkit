@@ -32,8 +32,8 @@ module Fastlane
             rescue
               UI.message("Could not find a PR with number #{pr_number.to_i}. Usually this is due to a bad reference in a commit message, but you probably want to check.")
             end
-          end 
-        end 
+          end
+        end
       end
 
       def self.description

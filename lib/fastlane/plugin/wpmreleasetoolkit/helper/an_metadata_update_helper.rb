@@ -1,6 +1,5 @@
 module Fastlane
   module Helper
-    
     # Basic line handler
     class MetadataBlock
       attr_reader :block_key
@@ -18,7 +17,7 @@ module Fastlane
       end
     end
 
-    class UnknownMetadataBlock < MetadataBlock     
+    class UnknownMetadataBlock < MetadataBlock
       attr_reader :content_file_path
 
       def initialize()
@@ -26,7 +25,7 @@ module Fastlane
       end
     end
 
-    class StandardMetadataBlock < MetadataBlock     
+    class StandardMetadataBlock < MetadataBlock
       attr_reader :content_file_path
 
       def initialize(block_key, content_file_path)
@@ -39,7 +38,7 @@ module Fastlane
       end
 
       def handle_line(fw, line)
-        # put the new content on block start 
+        # put the new content on block start
         # and skip all the other content
         if line.start_with?('msgctxt')
           generate_block(fw)
@@ -70,7 +69,7 @@ module Fastlane
       end
     end
 
-    class ReleaseNoteMetadataBlock < StandardMetadataBlock     
+    class ReleaseNoteMetadataBlock < StandardMetadataBlock
       attr_reader :new_key, :keep_key, :rel_note_key, :release_version
 
       def initialize(block_key, content_file_path, release_version)
@@ -107,7 +106,7 @@ module Fastlane
             generate_block(fw)
           end
         end
-        
+
         if (@is_copying)
           fw.puts(line)
         end
@@ -134,7 +133,7 @@ module Fastlane
       end
     end
 
-    class ReleaseNoteShortMetadataBlock < ReleaseNoteMetadataBlock     
+    class ReleaseNoteShortMetadataBlock < ReleaseNoteMetadataBlock
 
       def initialize(block_key, content_file_path, release_version)
         super(block_key, content_file_path, release_version)
@@ -142,7 +141,7 @@ module Fastlane
         @release_version = release_version
         generate_keys(release_version)
       end
-  
+
       def is_handler_for(key)
         values = key.split('_')
         key.start_with?(@rel_note_key) && values.length == 4 && (Integer(values[3].sub(/^[0]*/, "")) != nil rescue false)

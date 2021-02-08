@@ -1,10 +1,10 @@
 module Fastlane
     module Actions
       class IosCheckBetaDepsAction < Action
-        def self.run(params)          
+        def self.run(params)
           require_relative '../../helper/ios/ios_version_helper.rb'
           require_relative '../../helper/ios/ios_git_helper.rb'
-  
+
            beta_pods = []
            File.open(params[:podfile]).each do |li|
              beta_pods << li if (li.match('^\s*\t*pod.*beta'))
@@ -21,19 +21,19 @@ module Fastlane
           end
           UI.important(message)
         end
-  
+
         #####################################################
         # @!group Documentation
         #####################################################
-  
+
         def self.description
           "Runs some prechecks before finalizing a release"
         end
-  
+
         def self.details
           "Runs some prechecks before finalizing a release"
         end
-  
+
         def self.available_options
           [
             FastlaneCore::ConfigItem.new(key: :podfile,
@@ -42,19 +42,19 @@ module Fastlane
                                          is_string: true),
           ]
         end
-  
+
         def self.output
-          
+
         end
-  
+
         def self.return_value
           ""
         end
-  
+
         def self.authors
           ["loremattei"]
         end
-  
+
         def self.is_supported?(platform)
           platform == :ios
         end

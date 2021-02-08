@@ -1,9 +1,9 @@
 module Fastlane
-    module Actions    
+    module Actions
       class AndroidUpdateReleaseNotesAction < Action
         def self.run(params)
           UI.message "Updating the release notes..."
-  
+
           require_relative '../../helper/android/android_version_helper.rb'
           require_relative '../../helper/release_notes_helper.rb'
           require_relative '../../helper/git_helper.rb'
@@ -16,40 +16,40 @@ module Fastlane
 
           UI.message "Done."
         end
-    
+
         #####################################################
         # @!group Documentation
         #####################################################
-    
+
         def self.description
           "Updates the release notes file for the next app version"
         end
-    
+
         def self.details
           "Updates the release notes file for the next app version"
         end
-    
+
         def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :new_version,
-                                      env_name: "FL_ANDROID_UPDATE_RELEASE_NOTES_VERSION", 
+                                      env_name: "FL_ANDROID_UPDATE_RELEASE_NOTES_VERSION",
                                       description: "The version we are currently freezing; An empty entry for the _next_ version after this one will be added to the release notes",
                                       is_string: true)
         ]
         end
-  
+
         def self.output
-            
+
         end
-    
+
         def self.return_value
-            
+
         end
-    
+
         def self.authors
           ["loremattei"]
         end
-    
+
         def self.is_supported?(platform)
           platform == :android
         end

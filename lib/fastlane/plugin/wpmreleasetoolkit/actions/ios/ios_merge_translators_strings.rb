@@ -26,11 +26,11 @@ module Fastlane
         extra_keys = Array.new
         join_files.each do |join_strings|
           my_strings = File.read(join_strings).split("\n")
-          my_strings.each do |string| 
-            if string[/^\"(.*)\" = \"(.*)\";$/] 
+          my_strings.each do |string|
+            if string[/^\"(.*)\" = \"(.*)\";$/]
               /^\"(?<string_key>.*)\" = \"/i =~ string
               if (!extra_keys.include?(string_key))
-                extra_strings << string 
+                extra_strings << string
                 extra_keys << string_key
               end
             end
@@ -39,7 +39,7 @@ module Fastlane
           File.delete(join_strings)
         end
 
-        File.open(main_file, "w") do |f| 
+        File.open(main_file, "w") do |f|
           File.open(tmp_main_file).each do |line|
             f.puts(check_line(line, extra_keys))
           end
@@ -51,7 +51,7 @@ module Fastlane
 
       def self.check_line(line, extra_keys)
         return line unless (line[/^\"(.*)\" = \"(.*)\";$/])
-        
+
         /^\"(?<line_key>.*)\" = \"/i =~ line
         return "" if (extra_keys.include?(line_key))
 

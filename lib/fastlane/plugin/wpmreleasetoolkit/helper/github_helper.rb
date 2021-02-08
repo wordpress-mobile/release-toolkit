@@ -19,13 +19,13 @@ module Fastlane
       def self.get_milestone(repository, release)
         miles = github_client().list_milestones(repository)
         mile = nil
-      
-        miles&.each do |mm| 
+
+        miles&.each do |mm|
           if mm[:title].start_with?(release)
             mile = mm
           end
         end
-  
+
         return mile
       end
 
@@ -41,11 +41,11 @@ module Fastlane
         last_stone = nil
         milestones.each do |mile|
           if (last_stone.nil?)
-            last_stone = mile unless mile[:title].split(' ')[0].split('.').length < 2 
+            last_stone = mile unless mile[:title].split(' ')[0].split('.').length < 2
           else
             begin
               if (mile[:title].split(' ')[0].split('.')[0] > last_stone[:title].split(' ')[0].split('.')[0])
-                last_stone = mile 
+                last_stone = mile
               elsif (mile[:title].split(' ')[0].split('.')[1] > last_stone[:title].split(' ')[0].split('.')[1])
                 last_stone = mile
               end

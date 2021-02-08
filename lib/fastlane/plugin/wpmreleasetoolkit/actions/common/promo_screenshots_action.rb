@@ -56,7 +56,7 @@ module Fastlane
 
               newEntry = entry.deep_dup
 
-              # Not every output file will have a screenshot, so handle cases where no 
+              # Not every output file will have a screenshot, so handle cases where no
               # screenshot file is defined
               if entry["screenshot"] != nil && entry["filename"] != nil
                 newEntry["screenshot"] = helper.resolve_path(params[:orig_folder]) + language + entry["screenshot"]
@@ -136,7 +136,7 @@ module Fastlane
 
           # Run the GC in the same thread to clean up after RMagick
           GC.start
-        
+
         end
       end
 

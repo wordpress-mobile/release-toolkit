@@ -150,7 +150,7 @@ module Fastlane
       end
 
       def draw_attachments_to_canvas(entry, canvas)
-        
+
         entry["attachments"].each { |attachment|
           if attachment["file"] != nil
             canvas = draw_file_attachment_to_canvas(attachment, canvas, entry)
@@ -158,7 +158,7 @@ module Fastlane
             canvas = draw_text_attachment_to_canvas(attachment, canvas, entry["locale"])
           end
         }
-        
+
         return canvas
       end
 
@@ -221,7 +221,7 @@ module Fastlane
       end
 
       def apply_operation(image, operation, canvas)
-      
+
         return case operation["type"]
           when "crop"
             x_pos = operation["at"][0]
@@ -254,7 +254,6 @@ module Fastlane
 
       def draw_text_to_canvas(canvas, text, width, height, x_position, y_position, font_size, stylesheet_path, position = 'center')
         begin
-          
           tempTextFile = Tempfile.new()
 
           command = "bundle exec drawText html=\"#{text}\" maxWidth=#{width} maxHeight=#{height} output=#{tempTextFile.path} fontSize=#{font_size} stylesheet=\"#{stylesheet_path}\" alignment=\"#{position}\""
@@ -370,7 +369,7 @@ module Fastlane
       #
       # @return [Magick::Image] The resized image
       def crop_image(original, x_position, y_position, width, height)
-        
+
         if !original.is_a?(Magick::Image)
           UI.user_error!("You must pass an image object to `crop_image`.")
         end
@@ -416,7 +415,7 @@ module Fastlane
           Fastlane::Helper::FilesystemHelper.plugin_root + path,                        # Path Relative to the plugin
           Fastlane::Helper::FilesystemHelper.plugin_root + "spec/test-data/" + path,    # Path Relative to the test data
         ]
-        .each { |resolved_path| 
+        .each { |resolved_path|
 
           if resolved_path != nil && resolved_path.exist?
             return resolved_path

@@ -48,8 +48,8 @@ module Fastlane
 
         # Run the provided block
         yield
-      
-        ### Restore secrets repo to original branch.  If it was originally in a 
+
+        ### Restore secrets repo to original branch.  If it was originally in a
         ### detached HEAD state, we need to use the hash since there's no branch name.
         other_action.sh(command: "cd #{repository_path} && git checkout #{original_repo_ref}", log: false)
       end

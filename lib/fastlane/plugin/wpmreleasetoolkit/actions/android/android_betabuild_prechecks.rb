@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         UI.message "Skip confirm: #{params[:skip_confirm]}"
         UI.message "Work on version: #{params[:base_version]}" unless params[:base_version].nil?
-        
+
         require_relative '../../helper/android/android_version_helper.rb'
         require_relative '../../helper/android/android_git_helper.rb'
 
@@ -16,11 +16,11 @@ module Fastlane
         message = "The following current version has been detected: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n"
         alpha_release_version = Fastlane::Helper::Android::VersionHelper::get_alpha_version
         message << "The following Alpha version has been detected: #{alpha_release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
-        
+
         # Check branch
         app_version = Fastlane::Helper::Android::VersionHelper::get_public_version
         UI.user_error!("#{message}Release branch for version #{app_version} doesn't exist. Abort.") unless (!params[:base_version].nil? || Fastlane::Helper::GitHelper::checkout_and_pull(release: app_version))
-        
+
         # Check user overwrite
         if (!params[:base_version].nil?)
           overwrite_version = get_user_build_version(params[:base_version], message)
@@ -38,7 +38,7 @@ module Fastlane
           if (!UI.confirm("#{message}Do you want to continue?"))
             UI.user_error!("Aborted by user request")
           end
-        else 
+        else
           UI.message(message)
         end
 
@@ -73,7 +73,7 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :base_version,
-                                       env_name: "FL_ANDROID_BETABUILD_PRECHECKS_BASE_VERSION", 
+                                       env_name: "FL_ANDROID_BETABUILD_PRECHECKS_BASE_VERSION",
                                        description: "The version to work on", # a short description of this parameter
                                        is_string: true,
                                        optional: true), # true: verifies the input is a string, false: every kind of value),
@@ -86,7 +86,7 @@ module Fastlane
       end
 
       def self.output
-        
+
       end
 
       def self.return_value

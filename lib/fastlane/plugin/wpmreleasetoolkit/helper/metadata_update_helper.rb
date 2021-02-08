@@ -1,6 +1,6 @@
 module Fastlane
   module Helper
-    
+
     # Basic line handler
     class MetadataBlock
       attr_reader :block_key
@@ -18,7 +18,7 @@ module Fastlane
       end
     end
 
-    class UnknownMetadataBlock < MetadataBlock     
+    class UnknownMetadataBlock < MetadataBlock
       attr_reader :content_file_path
 
       def initialize()
@@ -26,7 +26,7 @@ module Fastlane
       end
     end
 
-    class StandardMetadataBlock < MetadataBlock     
+    class StandardMetadataBlock < MetadataBlock
       attr_reader :content_file_path
 
       def initialize(block_key, content_file_path)
@@ -39,7 +39,7 @@ module Fastlane
       end
 
       def handle_line(fw, line)
-        # put the new content on block start 
+        # put the new content on block start
         # and skip all the other content
         if line.start_with?('msgctxt')
           generate_block(fw)
@@ -61,8 +61,8 @@ module Fastlane
           # insert content
           sf = File.open(@content_file_path, "r").to_a
           sf.each do |line|
-            l = "\"#{line.strip}" 
-            l << "\\n" unless line == sf.last 
+            l = "\"#{line.strip}"
+            l << "\\n" unless line == sf.last
             l << "\""
             fw.puts(l)
           end
@@ -74,7 +74,7 @@ module Fastlane
       end
     end
 
-    class ReleaseNoteMetadataBlock < StandardMetadataBlock     
+    class ReleaseNoteMetadataBlock < StandardMetadataBlock
       attr_reader :new_key, :keep_key, :rel_note_key, :release_version
 
       def initialize(block_key, content_file_path, release_version)
@@ -111,7 +111,7 @@ module Fastlane
             generate_block(fw)
           end
         end
-        
+
         if (@is_copying)
           fw.puts(line)
         end
@@ -138,7 +138,7 @@ module Fastlane
       end
     end
 
-    class WhatsNewMetadataBlock < StandardMetadataBlock     
+    class WhatsNewMetadataBlock < StandardMetadataBlock
       attr_reader :new_key, :old_key, :rel_note_key, :release_version
 
       def initialize(block_key, content_file_path, release_version)

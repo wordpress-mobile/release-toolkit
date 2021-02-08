@@ -66,7 +66,7 @@ module Fastlane
           Fastlane::Helper::GitHelper.commit(message: "Update translations", files: strings_files, push: false)
 
           Action.sh("cd fastlane && ./download_metadata.swift")
-          
+
           Fastlane::Helper::GitHelper.commit(message: "Update metadata translations", files: "./fastlane/metadata/", push: true)
         end
       end

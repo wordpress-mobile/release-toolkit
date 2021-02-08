@@ -18,7 +18,7 @@ describe Fastlane::Helper::ReleaseNotesHelper do
     run_release_notes_test <<~HEADER
       *** This is a header
       *** that we want to keep pinned on top.
-      
+
     HEADER
   end
 
@@ -38,7 +38,7 @@ describe Fastlane::Helper::ReleaseNotesHelper do
 
 
       // It also contains some empty lines we want to count as part of the pinned lines.
-      
+
     HEADER
   end
 
@@ -65,7 +65,7 @@ FAKE_CONTENT = <<~CONTENT
   - Item 1 for v1.2.3
   - Item 2 for v1.2.3
 
-  // Comment in the middle 
+  // Comment in the middle
 
   1.2.2
   -----

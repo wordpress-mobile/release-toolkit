@@ -3,7 +3,6 @@ require 'json'
 
 module Fastlane
   module Helper
-    
     class MetadataDownloader
       attr_reader :target_folder, :target_files
 
@@ -13,7 +12,7 @@ module Fastlane
         @alternates = {}
       end
 
-      # Downloads data from GlotPress, 
+      # Downloads data from GlotPress,
       # in JSON format
       def download(target_locale, glotpress_url, is_source)
         uri = URI(glotpress_url)
@@ -24,19 +23,19 @@ module Fastlane
 
         @alternates.clear
         loc_data = JSON.parse(response.body) rescue loc_data = nil
-        parse_data(target_locale, loc_data, is_source) 
-        reparse_alternates(target_locale, loc_data, is_source) unless (@alternates.length == 0)     
+        parse_data(target_locale, loc_data, is_source)
+        reparse_alternates(target_locale, loc_data, is_source) unless (@alternates.length == 0)
       end
 
       # Parse JSON data and update the local files
       def parse_data(target_locale, loc_data, is_source)
         delete_existing_metadata(target_locale)
-      
+
         if (loc_data == nil)
           UI.message "No translation available for #{target_locale}"
           return
         end
-        
+
         loc_data.each do |d|
           key = d[0].split(/\u0004/).first
           source = d[0].split(/\u0004/).last
@@ -70,7 +69,7 @@ module Fastlane
       end
 
       def update_key(target_locale, key, file, data, msg)
-        message_len = msg.to_s.length - 4 # Don't count JSON delimiters.  
+        message_len = msg.to_s.length - 4 # Don't count JSON delimiters.
         if (data.key?(:max_size)) && (data[:max_size] != 0) && ((message_len) > data[:max_size]) then
           if (data.key?(:alternate_key)) then
             UI.message("#{target_locale} translation for #{key} exceeds maximum length (#{message_len}). Switching to the alternate translation.")
@@ -87,7 +86,7 @@ module Fastlane
       # to the target file
       def save_metadata(locale, file_name, content)
         file_path = get_target_file_path(locale, file_name)
-        
+
         dir_path = File.dirname(file_path)
         FileUtils.mkdir_p(dir_path) unless File.exists?(dir_path)
 
@@ -101,12 +100,10 @@ module Fastlane
           File.delete(file_path) if File.exists? file_path
         end
       end
-      
+
       def get_target_file_path(locale, file_name)
         "#{@target_folder}/#{locale}/#{file_name}"
       end
     end
-
-    
   end
 end

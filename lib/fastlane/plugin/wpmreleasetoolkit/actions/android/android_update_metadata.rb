@@ -24,15 +24,15 @@ module Fastlane
       end
 
       def self.available_options
-        
+
       end
 
       def self.output
-        
+
       end
 
       def self.return_value
-        
+
       end
 
       def self.authors

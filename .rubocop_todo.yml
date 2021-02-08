@@ -252,12 +252,6 @@ Layout/Tab:
     - 'bin/drawText'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/configure_helper.rb'
 
-# Offense count: 599
-# Cop supports --auto-correct.
-# Configuration parameters: AllowInHeredoc.
-Layout/TrailingWhitespace:
-  Enabled: false
-
 # Offense count: 1
 # Configuration parameters: AllowSafeAssignment.
 Lint/AssignmentInCondition:

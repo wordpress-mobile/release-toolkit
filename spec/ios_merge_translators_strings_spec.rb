@@ -43,8 +43,8 @@ end
 class IMTSTestUtils
     attr_accessor :test_folder_path
 
-    def initialize()  
-        @test_folder_path = File.join(Dir.tmpdir(), "imts_tests") 
+    def initialize()
+        @test_folder_path = File.join(Dir.tmpdir(), "imts_tests")
     end
 
     def create_test_folder
@@ -65,14 +65,14 @@ class IMTSTestUtils
     end
 
     def create_test_data(test_script)
-        test_script["test_data"].each do |test_file| 
+        test_script["test_data"].each do |test_file|
             self.generate_test_file(test_file["file"], test_file["content"])
         end
     end
 
     def generate_test_file(filename, content)
         file_path = File.join(@test_folder_path, filename)
-        
+
         dir = File.dirname(file_path)
         unless File.directory?(dir)
             FileUtils.mkdir_p(dir)

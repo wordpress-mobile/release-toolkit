@@ -6,7 +6,7 @@ module Fastlane
       #
       # @param [String] path The path to the release notes text file.
       # @param [String] section_title The title of the new section (typically the new version number) to add.
-      # 
+      #
       def self.add_new_section(path:, section_title:)
         lines = File.readlines(path)
 
@@ -17,7 +17,7 @@ module Fastlane
 
         File.write(path, new_lines.join)
       end
-    
+
     end
   end
 end

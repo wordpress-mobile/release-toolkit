@@ -69,7 +69,7 @@ module Fastlane
         ##################
 
         private
-        
+
         # Path to the swiftgen binary installed at install_path
         def swiftgen_bin
           "#{install_path}/bin/swiftgen"
@@ -79,7 +79,7 @@ module Fastlane
         def output_filename(lang)
           "L10nParamsList.#{lang}.txt"
         end
-        
+
         # The Stencil template that we want SwiftGen to use to generate the output.
         # It iterates on every "table" (`.strings` file, in most cases there's only one, `Localizable.strings`),
         # and for each, iterates on every entry found to print the key and the corresponding types parsed by SwiftGen from the placeholders found in that translation
@@ -114,7 +114,7 @@ module Fastlane
               Dir.glob('*.lproj/Localizable.strings').map { |loc_file| File.basename(File.dirname(loc_file), '.lproj') }
           end.sort
           langs.select! { |lang| only_langs.include?(lang) } unless only_langs.nil?
-      
+
           config = {
             'input_dir' => input_dir,
             'output_dir' => output_dir,
@@ -122,7 +122,7 @@ module Fastlane
               {
                   'inputs' => ["#{lang}.lproj/Localizable.strings"],
                   # Choose an unlikely separator (instead of the default '.') to avoid creating needlessly complex Stencil Context nested
-                  # structure just because we have '.' in the English sentences we use (instead of structured reverse-dns notation) for the keys 
+                  # structure just because we have '.' in the English sentences we use (instead of structured reverse-dns notation) for the keys
                   'options' => { 'separator' => "____" },
                   'outputs' => [{
                       'templatePath' => template_path,
@@ -131,11 +131,11 @@ module Fastlane
               }
             end
           }
-      
+
           # Write SwiftGen config file
           config_file = File.join(output_dir, CONFIG_FILE_NAME)
           File.write(config_file, config.to_yaml)
-      
+
           return [config_file, langs]
         end
 
@@ -165,11 +165,11 @@ module Fastlane
         #
         def find_diffs(input_dir:, base_lang:, only_langs: nil)
           Dir.mktmpdir('a8c-lint-translations-') do |tmpdir|
-            # Run SwiftGen 
+            # Run SwiftGen
             langs = only_langs.nil? ? nil : (only_langs + [base_lang]).uniq
             (config_file, langs) = generate_swiftgen_config!(input_dir, tmpdir, only_langs: langs)
             Action.sh(swiftgen_bin, 'config', 'run', '--config', config_file)
-            
+
             # Run diffs
             base_file = sort_file_lines!(tmpdir, base_lang)
             langs.delete(base_lang)
@@ -192,11 +192,11 @@ module Fastlane
 
         # Returns true if the file only contains empty lines, i.e. lines that only contains whitespace (space, tab, CR, LF)
         def only_empty_lines?(file)
-          File.open(file) do |f|  
+          File.open(file) do |f|
             while line = f.gets
               return false if not line.strip.empty?
-            end  
-          end  
+            end
+          end
           return true
         end
       end

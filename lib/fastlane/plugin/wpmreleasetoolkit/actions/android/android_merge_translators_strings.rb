@@ -29,11 +29,11 @@ module Fastlane
         extra_keys = Array.new
         join_files.each do |join_strings|
           my_strings = File.read(join_strings).split("\n")
-          my_strings.each do |string| 
-            if string.include?("<string name") 
+          my_strings.each do |string|
+            if string.include?("<string name")
               string_key = string.strip.split(">").first
               if (!extra_keys.include?(string_key))
-                extra_strings << string 
+                extra_strings << string
                 extra_keys << string_key
               end
             end
@@ -42,10 +42,9 @@ module Fastlane
           File.delete(join_strings)
         end
 
-        File.open(main_file, "w") do |f| 
+        File.open(main_file, "w") do |f|
           File.open(tmp_main_file).each do |line|
-          
-            f.puts(extra_strings) if (line.strip == "</resources>") 
+            f.puts(extra_strings) if (line.strip == "</resources>")
             f.puts(check_line(line, extra_strings))
           end
         end
@@ -55,10 +54,10 @@ module Fastlane
 
       def self.check_line(line, extra_strings)
         return line unless (line.include?("<string name"))
-        
+
         test_line = line.strip.split(">").first
         extra_strings.each do |overwrite_string|
-          if (overwrite_string.strip.split(">").first == test_line) then 
+          if (overwrite_string.strip.split(">").first == test_line) then
             return ""
           end
         end

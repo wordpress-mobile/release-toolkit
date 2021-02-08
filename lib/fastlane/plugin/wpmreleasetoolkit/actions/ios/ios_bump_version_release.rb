@@ -1,5 +1,5 @@
 module Fastlane
-    module Actions    
+    module Actions
       class IosBumpVersionReleaseAction < Action
         def self.run(params)
           # fastlane will take care of reading in the parameter and fetching the environment variable:
@@ -7,7 +7,7 @@ module Fastlane
 
           require_relative '../../helper/ios/ios_version_helper.rb'
           require_relative '../../helper/ios/ios_git_helper.rb'
-          
+
           other_action.ensure_git_branch(branch: "develop")
 
           # Create new configuration
@@ -29,29 +29,29 @@ module Fastlane
           UI.message "Done!" unless params [:skip_deliver]
 
           UI.message "Updating XcConfig..."
-          Fastlane::Helper::Ios::VersionHelper.update_xc_configs(@new_version, @new_short_version, @new_version_internal) 
+          Fastlane::Helper::Ios::VersionHelper.update_xc_configs(@new_version, @new_short_version, @new_version_internal)
           UI.message "Done!"
 
           Fastlane::Helper::Ios::GitHelper.commit_version_bump(
             include_deliverfile: !params[:skip_deliver],
             include_metadata: !params[:skip_glotpress]
           )
-          
+
           UI.message "Done."
         end
-  
+
         #####################################################
         # @!group Documentation
         #####################################################
-  
+
         def self.description
           "Bumps the version of the app and creates the new release branch"
         end
-  
+
         def self.details
           "Bumps the version of the app and creates the new release branch"
         end
-  
+
         def self.available_options
           [
             FastlaneCore::ConfigItem.new(key: :skip_glotpress,
@@ -67,19 +67,19 @@ module Fastlane
 
           ]
         end
-  
+
         def self.output
-          
+
         end
-  
+
         def self.return_value
-          
+
         end
-  
+
         def self.authors
           ["loremattei"]
         end
-  
+
         def self.is_supported?(platform)
           platform == :ios
         end

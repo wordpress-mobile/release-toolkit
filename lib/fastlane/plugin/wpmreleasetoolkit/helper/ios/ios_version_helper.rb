@@ -12,7 +12,7 @@ module Fastlane
         HOTFIX_NUMBER = 2
         # The index for the build version number part
         BUILD_NUMBER = 3
-  
+
         # Returns the public-facing version string.
         #
         # @return [String] The public-facing version number, extracted from the VERSION_LONG entry of the xcconfig file.
@@ -25,7 +25,7 @@ module Fastlane
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}"
         end
-  
+
         # Compute the name of the next release version.
         #
         # @param [String] version The current version that we want to increment
@@ -41,10 +41,10 @@ module Fastlane
             vp[MAJOR_NUMBER] += 1
             vp[MINOR_NUMBER] = 0
           end
-  
+
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}"
         end
-  
+
         # Return the short version string "X.Y" from the full version.
         #
         # @param [String] version The version to convert to a short version
@@ -71,10 +71,10 @@ module Fastlane
           else
             vp[MINOR_NUMBER] -= 1
           end
-          
+
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}"
         end
-  
+
         # Compute the name of the next build version.
         #
         # @param [String] version The current version we want to increment
@@ -87,7 +87,7 @@ module Fastlane
           vp[BUILD_NUMBER] += 1
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}.#{vp[BUILD_NUMBER]}"
         end
-  
+
         # Compute the name of the next hotfix version.
         #
         # @param [String] version The current version we want to increment
@@ -100,7 +100,7 @@ module Fastlane
           vp[HOTFIX_NUMBER] += 1
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}"
         end
-  
+
         # Compute the name of the previous build version.
         #
         # @param [String] version The current version we want to decrement
@@ -113,7 +113,7 @@ module Fastlane
           vp[BUILD_NUMBER] -= 1 unless vp[BUILD_NUMBER] == 0
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}.#{vp[BUILD_NUMBER]}"
         end
-  
+
         # Compute the name of the previous hotfix version.
         #
         # @param [String] version The current version we want to decrement
@@ -140,7 +140,7 @@ module Fastlane
           todayDate = d.strftime("%Y%m%d")
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}.#{todayDate}"
         end
-  
+
         # Return the build number value incremented by one.
         #
         # @param [String|Int|nil] build_number The build number to increment
@@ -161,7 +161,7 @@ module Fastlane
           vp = get_version_parts(version)
           return (vp.length > 2) && (vp[HOTFIX_NUMBER] != 0)
         end
-  
+
         # Returns the current value of the `VERSION_LONG` key from the public xcconfig file
         #
         # @return [String] The current version according to the public xcconfig file.
@@ -169,7 +169,7 @@ module Fastlane
         def self.get_build_version
           versions = get_version_strings()[0]
         end
-  
+
         # Returns the current value of the `VERSION_LONG` key from the internal xcconfig file
         #
         # @return [String] The current version according to the internal xcconfig file.
@@ -177,7 +177,7 @@ module Fastlane
         def self.get_internal_version
           get_version_strings()[1]
         end
-  
+
         # Prints the current and next release version numbers to stdout, then return the next release version
         #
         # @return [String] The next release version to use after bumping the currently used public version.
@@ -217,7 +217,7 @@ module Fastlane
         # @param [String] internal_version The new version number to use as `VERSION_LONG` for the interrnal xcconfig file, if it exists
         #
         def self.update_xc_configs(new_version, new_version_short, internal_version)
-          update_xc_config(ENV["PUBLIC_CONFIG_FILE"], new_version, new_version_short) 
+          update_xc_config(ENV["PUBLIC_CONFIG_FILE"], new_version, new_version_short)
           update_xc_config(ENV["INTERNAL_CONFIG_FILE"], internal_version, new_version_short) unless ENV["INTERNAL_CONFIG_FILE"].nil?
         end
 
@@ -232,7 +232,7 @@ module Fastlane
         def self.update_xc_config(file_path, new_version, new_version_short)
           if File.exist?(file_path) then
             UI.message("Updating #{file_path} to version #{new_version_short}/#{new_version}")
-            Action.sh("sed -i '' \"$(awk '/^VERSION_SHORT/{ print NR; exit }' \"#{file_path}\")s/=.*/=#{new_version_short}/\" \"#{file_path}\"") 
+            Action.sh("sed -i '' \"$(awk '/^VERSION_SHORT/{ print NR; exit }' \"#{file_path}\")s/=.*/=#{new_version_short}/\" \"#{file_path}\"")
             Action.sh("sed -i '' \"$(awk '/^VERSION_LONG/{ print NR; exit }' \"#{file_path}\")s/=.*/=#{new_version}/\" \"#{file_path}\"")
 
             build_number = read_build_number_from_config_file(file_path)
@@ -249,7 +249,6 @@ module Fastlane
         private
         #----------------------------------------
 
-  
         # Split a version string into its 4 parts, ensuring its parts count is valid
         #
         # @param [String] version The version string to split into parts
@@ -260,13 +259,13 @@ module Fastlane
         def self.get_version_parts(version)
           parts = version.split(".")
           parts = parts.fill("0", parts.length...4).map { |chr| chr.to_i }
-          if (parts.length > 4) then        
+          if (parts.length > 4) then
             UI.user_error!("Bad version string: #{version}")
           end
 
           return parts
         end
-  
+
         # Extract the VERSION_LONG entry from an `xcconfig` file
         #
         # @param [String] filePath The path to the `.xcconfig` file to read the value from
@@ -329,7 +328,7 @@ module Fastlane
         #
         def self.verify_version(version)
           v_parts = get_version_parts(version)
-          
+
           v_parts.each do |part|
             if (!is_int?(part)) then
               UI.user_error!("Version value can only contains numbers.")
