@@ -12,5 +12,3 @@ RuboCop::RakeTask.new
 task default: %i[spec rubocop]
 
 Rake::ExtensionTask.new('drawText')
-
-

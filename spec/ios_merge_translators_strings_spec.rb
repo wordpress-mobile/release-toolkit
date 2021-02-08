@@ -86,5 +86,3 @@ class IMTSTestUtils
         return File.read(file_path)
     end
 end
-
-
