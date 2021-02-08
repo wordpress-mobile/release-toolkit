@@ -23,7 +23,7 @@ module Fastlane
           UI.message "#{self.check_path(params[:output_folder])} Output Folder: #{params[:output_folder]}"
         end
 
-        outputDirectory = helper.resolve_path( params[:output_folder] )
+        outputDirectory = helper.resolve_path(params[:output_folder])
 
         ## If there are no translated screenshot images (whether it's because they haven't been generated yet,
         ##   or because we aren't using them), just use the translated directories.
@@ -157,11 +157,11 @@ module Fastlane
 
         subdirectories = []
 
-        unless helper.can_resolve_path( path ) then
+        unless helper.can_resolve_path(path) then
           return []
         end
 
-        resolved_path = helper.resolve_path( path )
+        resolved_path = helper.resolve_path(path)
 
         Dir.chdir(resolved_path) do
           subdirectories = Dir["*"].reject { |o| not File.directory?(o) }.sort

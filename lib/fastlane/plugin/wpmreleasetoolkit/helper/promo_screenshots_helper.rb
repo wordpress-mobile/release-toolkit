@@ -74,14 +74,14 @@ module Fastlane
           y_position = device["text_offset"][1]
         end
 
-        draw_text_to_canvas(  canvas,
-                              text,
-                              width,
-                              height,
-                              x_position,
-                              y_position,
-                              font_size,
-                              stylesheet_path
+        draw_text_to_canvas(canvas,
+                            text,
+                            width,
+                            height,
+                            x_position,
+                            y_position,
+                            font_size,
+                            stylesheet_path
         )
       end
 
@@ -208,15 +208,15 @@ module Fastlane
 
         alignment = attachment["alignment"] ||= 'center'
 
-        draw_text_to_canvas(  canvas,
-                              text,
-                              width,
-                              height,
-                              x_position,
-                              y_position,
-                              font_size,
-                              stylesheet_path,
-                              alignment
+        draw_text_to_canvas(canvas,
+                            text,
+                            width,
+                            height,
+                            x_position,
+                            y_position,
+                            font_size,
+                            stylesheet_path,
+                            alignment
         )
       end
 
