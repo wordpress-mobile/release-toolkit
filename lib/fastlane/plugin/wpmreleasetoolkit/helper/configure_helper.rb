@@ -102,7 +102,7 @@ module Fastlane
       def self.configure_file_commits_behind_repo
      	# Get a sily number of revisions to ensure we don't miss any
       	result = `cd #{repository_path} && git --no-pager log -10000 --pretty=format:"%H" && echo`
-      	hashes = result.each_line.map{ |s| s.strip }.reverse
+      	hashes = result.each_line.map { |s| s.strip }.reverse
 
       	index_of_configure_hash = hashes.find_index(configure_file_commit_hash)
       	index_of_repo_commit_hash = hashes.find_index(repo_commit_hash)
@@ -117,7 +117,7 @@ module Fastlane
       ### Get a list of files changed in the secrets repo between to commits
       def self.files_changed_between(commit_hash_1, commit_hash_2)
         result = `cd #{repository_path} && git diff --name-only #{commit_hash_1}...#{commit_hash_2}`
-        result.each_line.map{ |s| s.strip }
+        result.each_line.map { |s| s.strip }
       end
 
       ### Determine whether ~/.mobile-secrets` repository is behind its remote counterpart.
@@ -196,7 +196,7 @@ module Fastlane
             abs_path = self.mobile_secrets_path(path)
 
             if File.directory?(abs_path)
-                Dir.glob("#{abs_path}**/*").map{ |path|
+                Dir.glob("#{abs_path}**/*").map { |path|
                     path.gsub(repository_path + "/", "")
                 }
             else

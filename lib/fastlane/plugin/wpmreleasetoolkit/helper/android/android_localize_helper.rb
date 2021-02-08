@@ -193,8 +193,8 @@ class Nokogiri::XML::Node
     return false unless stype == otype
     sa = attributes; oa = other.attributes
     return false unless sa.length == oa.length
-    sa = sa.sort.map{ |n, a| [n, a.value, a.namespace && a.namespace.href] }
-    oa = oa.sort.map{ |n, a| [n, a.value, a.namespace && a.namespace.href] }
+    sa = sa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
+    oa = oa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
     return false unless sa == oa
     skids = children; okids = other.children
     return false unless skids.length == okids.length
@@ -202,6 +202,6 @@ class Nokogiri::XML::Node
     sns = namespace; ons = other.namespace
     return false if !sns ^ !ons
     return false if sns && (sns.href != ons.href)
-    skids.to_enum.with_index.all?{ |ski, i| ski =~ okids[i] }
+    skids.to_enum.with_index.all? { |ski, i| ski =~ okids[i] }
   end
 end

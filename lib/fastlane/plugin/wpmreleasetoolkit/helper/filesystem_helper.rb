@@ -17,7 +17,7 @@ module Fastlane
             dir = Pathname.new(Dir.pwd)
 
             while continue
-                child_filenames = dir.children.map!{ |x| File.basename(x) }
+                child_filenames = dir.children.map! { |x| File.basename(x) }
 
                 if child_filenames.include? ".git"
                     continue = false

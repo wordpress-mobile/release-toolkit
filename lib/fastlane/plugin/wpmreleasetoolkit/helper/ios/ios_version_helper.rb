@@ -259,7 +259,7 @@ module Fastlane
         #
         def self.get_version_parts(version)
           parts = version.split(".")
-          parts = parts.fill("0", parts.length...4).map{|chr| chr.to_i}
+          parts = parts.fill("0", parts.length...4).map {|chr| chr.to_i}
           if (parts.length > 4) then        
             UI.user_error!("Bad version string: #{version}")
           end

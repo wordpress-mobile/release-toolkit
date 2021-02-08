@@ -96,7 +96,7 @@ module Fastlane
       end
 
       def self.validate_that_all_copied_files_match
-        Fastlane::Helper::ConfigureHelper.files_to_copy.each{ |x|
+        Fastlane::Helper::ConfigureHelper.files_to_copy.each { |x|
 
             source = absolute_secret_store_path(x.file)
             destination = absolute_project_path(x.destination)

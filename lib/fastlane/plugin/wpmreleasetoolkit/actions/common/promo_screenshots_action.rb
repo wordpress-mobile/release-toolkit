@@ -164,7 +164,7 @@ module Fastlane
         resolved_path = helper.resolve_path( path )
 
         Dir.chdir(resolved_path) do
-          subdirectories = Dir["*"].reject{|o| not File.directory?(o)}.sort
+          subdirectories = Dir["*"].reject {|o| not File.directory?(o)}.sort
         end
 
         subdirectories
