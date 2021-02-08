@@ -47,13 +47,6 @@ Layout/ClosingParenthesisIndentation:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_build_preflight.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-Layout/CommentIndentation:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_add_files_to_copy_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/configure_helper.rb'
-
 # Offense count: 22
 # Cop supports --auto-correct.
 Layout/EmptyLineAfterGuardClause:
