@@ -234,11 +234,11 @@ module Fastlane
       # The hash for this method must contain the `source` and `destination` keys
       def self.add_file(params)
 
-        unless(params[:source])
+        unless (params[:source])
             UI.user_error!("You must pass a `source` to `add_file`")
         end
 
-        unless(params[:destination])
+        unless (params[:destination])
             UI.user_error!("You must pass a `destination` to `add_file`")
         end
 
