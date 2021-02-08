@@ -1,5 +1,5 @@
 require 'fastlane/action'
-require_relative '../../helper/ghhelper_helper'
+require_relative '../../helper/github_helper'
 
 module Fastlane
   module Actions
@@ -9,7 +9,7 @@ module Fastlane
         milestone_title = params[:milestone]
         freeze = params[:freeze]
 
-        milestone = Fastlane::Helper::GhhelperHelper.get_milestone(repository, milestone_title)
+        milestone = Fastlane::Helper::GithubHelper.get_milestone(repository, milestone_title)
         if (milestone.nil?)
           UI.user_error!("Milestone #{milestone_title} not found.")
         end
@@ -29,7 +29,7 @@ module Fastlane
         end
 
         UI.message("New milestone: #{mile_title}")
-        Fastlane::Helper::GhhelperHelper.GHClient().update_milestone(repository, milestone[:number], {:title => mile_title})
+        Fastlane::Helper::GithubHelper.github_client().update_milestone(repository, milestone[:number], { :title => mile_title})
       end
 
       def self.is_frozen(milestone)

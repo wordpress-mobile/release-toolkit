@@ -5,8 +5,8 @@ module Fastlane
   UI = FastlaneCore::UI unless Fastlane.const_defined?("UI")
 
   module Helper
-    class GhhelperHelper
-      def self.GHClient()
+    class GithubHelper
+      def self.github_client()
         client = Octokit::Client.new(:access_token => ENV["GHHELPER_ACCESS"])
 
         # Fetch the current user
@@ -17,7 +17,7 @@ module Fastlane
       end
 
       def self.get_milestone(repository, release)
-        miles = GHClient().list_milestones(repository)
+        miles = github_client().list_milestones(repository)
         mile = nil
       
         miles&.each do |mm| 
@@ -33,7 +33,7 @@ module Fastlane
         options = {}
         options[:state]="open"
 
-        milestones = GHClient().list_milestones(repository, options)
+        milestones = github_client().list_milestones(repository, options)
         if (milestones.nil?)
           return nil
         end
@@ -68,13 +68,13 @@ module Fastlane
         options = {}
         options[:due_on] = newmilestone_duedate
         options[:description] = comment
-        GHClient().create_milestone(repository, newmilestone_number, options)
+        github_client().create_milestone(repository, newmilestone_number, options)
       end
 
       def self.create_release(repository, version, release_notes, assets, prerelease)
-        release = GHClient().create_release(repository, version, { name: version, draft: true, prerelease: prerelease, body: release_notes })
+        release = github_client().create_release(repository, version, { name: version, draft: true, prerelease: prerelease, body: release_notes })
         assets.each do | file_path |
-          GHClient().upload_asset(release[:url], file_path, { content_type: "application/octet-stream"})
+          github_client().upload_asset(release[:url], file_path, { content_type: "application/octet-stream"})
         end
       end
 

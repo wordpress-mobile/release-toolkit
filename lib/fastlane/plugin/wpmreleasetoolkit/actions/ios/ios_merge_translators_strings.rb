@@ -1,6 +1,6 @@
 require 'fastlane/action'
 require 'date'
-require_relative '../../helper/ghhelper_helper'
+require_relative '../../helper/github_helper'
 require_relative '../../helper/ios/ios_version_helper'
 module Fastlane
   module Actions

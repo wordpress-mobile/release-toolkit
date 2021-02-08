@@ -1,6 +1,6 @@
 require 'fastlane/action'
 require 'date'
-require_relative '../../helper/ghhelper_helper'
+require_relative '../../helper/github_helper'
 require_relative '../../helper/ios/ios_version_helper'
 require_relative '../../helper/android/android_version_helper'
 module Fastlane
@@ -19,7 +19,7 @@ module Fastlane
           UI.user_error!("Can't find file #{file_path}!") unless File.exist?(file_path)
         end
  
-        Fastlane::Helper::GhhelperHelper.create_release(repository, version, release_notes, assets, prerelease)
+        Fastlane::Helper::GithubHelper.create_release(repository, version, release_notes, assets, prerelease)
         UI.message("Done")
       end
 

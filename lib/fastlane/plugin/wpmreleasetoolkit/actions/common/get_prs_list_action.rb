@@ -1,5 +1,5 @@
 require 'fastlane/action'
-require_relative '../../helper/ghhelper_helper'
+require_relative '../../helper/github_helper'
 
 module Fastlane
   module Actions
@@ -23,7 +23,7 @@ module Fastlane
         end
 
         # Get infos from GitHub and put into the target file
-        client = Fastlane::Helper::GhhelperHelper.GHClient()
+        client = Fastlane::Helper::GithubHelper.github_client()
         File.open(report_path, "w") do | file |
           pr_list.each do | pr_number |
             begin
