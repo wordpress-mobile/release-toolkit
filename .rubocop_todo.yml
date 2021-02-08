@@ -221,14 +221,6 @@ Layout/LeadingBlankLines:
   Exclude:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/models/configuration.rb'
 
-# Offense count: 27
-# Cop supports --auto-correct.
-# Configuration parameters: AllowDoxygenCommentStyle.
-Layout/LeadingCommentSpace:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_validate_action.rb'
-    - 'spec/promo_screenshots_helper_spec.rb'
-
 # Offense count: 4
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
