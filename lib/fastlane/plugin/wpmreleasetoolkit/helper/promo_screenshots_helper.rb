@@ -81,8 +81,7 @@ module Fastlane
                             x_position,
                             y_position,
                             font_size,
-                            stylesheet_path
-        )
+                            stylesheet_path)
       end
 
       def draw_background_to_canvas(canvas, entry)
@@ -216,8 +215,7 @@ module Fastlane
                             y_position,
                             font_size,
                             stylesheet_path,
-                            alignment
-        )
+                            alignment)
       end
 
       def apply_operation(image, operation, canvas)

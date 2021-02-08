@@ -214,16 +214,6 @@ Layout/LeadingBlankLines:
   Exclude:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/models/configuration.rb'
 
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: symmetrical, new_line, same_line
-Layout/MultilineMethodCallBraceLayout:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/create_release_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_build_preflight.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
-
 # Offense count: 13
 # Cop supports --auto-correct.
 # Configuration parameters: IndentationWidth.
