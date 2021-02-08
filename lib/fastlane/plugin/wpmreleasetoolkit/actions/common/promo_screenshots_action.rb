@@ -102,7 +102,7 @@ module Fastlane
 
         bar = ProgressBar.new(entries.count, :bar, :counter, :eta, :rate)
 
-        Parallel.map(entries, finish: -> (item, i, result) {
+        Parallel.map(entries, finish: ->(item, i, result) {
           bar.increment!
         }) do |entry|
 
