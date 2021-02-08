@@ -6,7 +6,7 @@ module Fastlane
         Helper = Fastlane::Helper::Ios::ADCAppSizesHelper
 
         def self.run(params)
-          app_sizes = Helper::get_adc_sizes(
+          app_sizes = Helper.get_adc_sizes(
             adc_user: params[:adc_user],
             adc_team: params[:adc_team],
             bundle_id: params[:bundle_id],
@@ -18,10 +18,10 @@ module Fastlane
 
           case params[:format]
           when 'csv'
-            csv = Helper::format_csv(app_sizes, devices: devices)
+            csv = Helper.format_csv(app_sizes, devices: devices)
             UI.message "Result (CSV)\n\n#{csv}\n"
           when 'markdown'
-            tables = Helper::format_markdown(app_sizes, devices: devices)
+            tables = Helper.format_markdown(app_sizes, devices: devices)
             tables.each do |table|
               UI.message "Result (Markdown)\n\n#{table}\n"
             end

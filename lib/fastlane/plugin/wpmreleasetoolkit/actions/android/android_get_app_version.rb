@@ -3,7 +3,7 @@ module Fastlane
       class AndroidGetAppVersionAction < Action
         def self.run(params)
           require_relative '../../helper/android/android_version_helper.rb'
-          Fastlane::Helper::Android::VersionHelper::get_public_version
+          Fastlane::Helper::Android::VersionHelper.get_public_version
         end
 
         #####################################################

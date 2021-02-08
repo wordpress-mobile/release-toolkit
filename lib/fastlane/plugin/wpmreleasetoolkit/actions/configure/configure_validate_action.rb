@@ -19,7 +19,7 @@ module Fastlane
 
         # Update the repository to get the latest version of the configuration secrets – that's
         # how we'll know if we're behind in subsequent validations
-        ConfigureDownloadAction::run
+        ConfigureDownloadAction.run
 
         validate_that_branches_match
 

@@ -14,7 +14,7 @@ module Fastlane
       ### that can later be saved to `.configure`.
       def self.configuration
         if self.configuration_path_exists
-          Configuration.from_file(FilesystemHelper::configure_file)
+          Configuration.from_file(FilesystemHelper.configure_file)
         else
           Configuration.new
         end
@@ -22,12 +22,12 @@ module Fastlane
 
       ### Returns whether or not the `.configure` file exists in the project.
       def self.configuration_path_exists
-        File.file?(FilesystemHelper::configure_file)
+        File.file?(FilesystemHelper.configure_file)
       end
 
       ### A global helper to save the current configuration to `.configure`.
       def self.update_configuration(config)
-        config.save_to_file(FilesystemHelper::configure_file)
+        config.save_to_file(FilesystemHelper.configure_file)
       end
 
       ###

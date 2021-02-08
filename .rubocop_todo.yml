@@ -612,11 +612,6 @@ Style/ClassCheck:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_development_certificates_to_provisioning_profiles.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_devices_to_provisioning_profiles.rb'
 
-# Offense count: 40
-# Cop supports --auto-correct.
-Style/ColonMethodCall:
-  Enabled: false
-
 # Offense count: 2
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SingleLineConditionsOnly, IncludeTernaryExpressions.

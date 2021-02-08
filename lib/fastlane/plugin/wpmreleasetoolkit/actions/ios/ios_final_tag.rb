@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         require_relative '../../helper/ios/ios_git_helper.rb'
         require_relative '../../helper/ios/ios_version_helper.rb'
-        version = Fastlane::Helper::Ios::VersionHelper::get_public_version
+        version = Fastlane::Helper::Ios::VersionHelper.get_public_version
 
         UI.message("Tagging final #{version}...")
 

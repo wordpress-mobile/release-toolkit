@@ -35,10 +35,10 @@ module Fastlane
         Fastlane::Helper::ConfigureHelper.update_configure_file_from_repository
 
         # Walk the user through adding files to copy to the `.configure` file.
-        ConfigureAddFilesToCopyAction::run
+        ConfigureAddFilesToCopyAction.run
 
         # Copy the files we just walked the user through setting up.
-        ConfigureApplyAction::run
+        ConfigureApplyAction.run
 
         UI.success "Created .configure file"
       end
