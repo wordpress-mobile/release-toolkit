@@ -1,6 +1,9 @@
 .DS_Store
 /tmp
 
+# RubyMine IDE
+.idea
+
 # Ruby / Bundler
 .bundle/
 vendor/bundle
