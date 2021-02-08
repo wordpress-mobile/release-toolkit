@@ -96,7 +96,7 @@ module Fastlane
               newEntry
             }
           }
-          .sort { |x,y|
+          .sort { |x, y|
             x["filename"] <=> y["filename"]
           }
 
