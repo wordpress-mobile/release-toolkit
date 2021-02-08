@@ -17,7 +17,7 @@ module Fastlane
         # Download
         downloader = Fastlane::Helper::MetadataDownloader.new(params[:download_path], params[:target_files])
 
-        params[:locales].each do | loc |
+        params[:locales].each do |loc|
 
           if loc.kind_of?(Array) then
             puts "Downloading language: #{loc[1]}"

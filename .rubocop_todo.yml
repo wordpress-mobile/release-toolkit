@@ -244,13 +244,6 @@ Layout/MultilineMethodCallIndentation:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_devices_to_provisioning_profiles.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
 
-# Offense count: 106
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleInsidePipes.
-# SupportedStylesInsidePipes: space, no_space
-Layout/SpaceAroundBlockParameters:
-  Enabled: false
-
 # Offense count: 3
 # Cop supports --auto-correct.
 Layout/SpaceAroundKeyword:

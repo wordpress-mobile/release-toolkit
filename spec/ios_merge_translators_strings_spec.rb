@@ -65,7 +65,7 @@ class IMTSTestUtils
     end
 
     def create_test_data(test_script)
-        test_script["test_data"].each do | test_file | 
+        test_script["test_data"].each do |test_file| 
             self.generate_test_file(test_file["file"], test_file["content"])
         end
     end

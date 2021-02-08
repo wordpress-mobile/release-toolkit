@@ -37,11 +37,11 @@ module Fastlane
           return
         end
         
-        loc_data.each do | d |
+        loc_data.each do |d|
           key = d[0].split(/\u0004/).first
           source = d[0].split(/\u0004/).last
 
-          target_files.each do | file |
+          target_files.each do |file|
             if (file[0].to_s == key)
               data = file[1]
               msg = is_source ? source : d[1]
@@ -53,11 +53,11 @@ module Fastlane
 
       # Parse JSON data and update the local files
       def reparse_alternates(target_locale, loc_data, is_source)
-        loc_data.each do | d |
+        loc_data.each do |d|
           key = d[0].split(/\u0004/).first
           source = d[0].split(/\u0004/).last
 
-          @alternates.each do | file |
+          @alternates.each do |file|
             puts "Data: #{file[0].to_s} - key: #{key}"
             if (file[0].to_s == key)
               puts "Alternate: #{key}"
@@ -96,7 +96,7 @@ module Fastlane
 
       # Some small helpers
       def delete_existing_metadata(target_locale)
-        @target_files.each do | file |
+        @target_files.each do |file|
           file_path = get_target_file_path(target_locale, file[1][:desc])
           File.delete(file_path) if File.exists? file_path
         end

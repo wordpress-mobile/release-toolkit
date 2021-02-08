@@ -43,7 +43,7 @@ module Fastlane
         
           # Search for the string in the main file
           result = :added
-          main_strings.xpath('//string').each do | this_string | 
+          main_strings.xpath('//string').each do |this_string| 
             if (this_string.attr("name") == string_name) then
               # Skip if the string has the content_override tag
               return :skipped if skip_string_by_tag(this_string)
@@ -79,7 +79,7 @@ module Fastlane
           return if skip_string_by_exclusion_list(library, string_name)
         
           # Search for the string in the main file
-          main_strings.xpath('//string').each do | this_string | 
+          main_strings.xpath('//string').each do |this_string| 
             if (this_string.attr("name") == string_name) then
               # Skip if the string has the content_override tag
               return if skip_string_by_tag(this_string)
@@ -121,7 +121,7 @@ module Fastlane
               end
           end
 
-          File.open(main, "w:UTF-8") do | f |
+          File.open(main, "w:UTF-8") do |f|
             f.write(main_strings.to_xml(:indent => 4))
           end
         
@@ -157,10 +157,10 @@ module Fastlane
         end
 
         def self.verify_local_diff(main, library, main_strings, lib_strings)
-          `git diff #{main}`.each_line do | line | 
+          `git diff #{main}`.each_line do |line| 
             if (line.start_with?("+ ") or line.start_with?("- ")) then
               diffs = line.gsub(/\s+/m, ' ').strip.split(" ")
-              diffs.each do | diff |
+              diffs.each do |diff|
                 verify_diff(diff, main_strings, lib_strings, library)
               end 
             end
@@ -168,10 +168,10 @@ module Fastlane
         end
 
         def self.verify_pr_diff(main, library, main_strings, lib_strings, source_diff)
-          source_diff.each_line do | line | 
+          source_diff.each_line do |line| 
             if (line.start_with?("+ ") or line.start_with?("- ")) then
               diffs = line.gsub(/\s+/m, ' ').strip.split(" ")
-              diffs.each do | diff |
+              diffs.each do |diff|
                 verify_diff(diff, main_strings, lib_strings, library)
               end 
             end

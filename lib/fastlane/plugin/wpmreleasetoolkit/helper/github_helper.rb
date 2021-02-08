@@ -39,7 +39,7 @@ module Fastlane
         end
 
         last_stone = nil
-        milestones.each do | mile |
+        milestones.each do |mile|
           if (last_stone.nil?)
             last_stone = mile unless mile[:title].split(' ')[0].split('.').length < 2 
           else
@@ -71,7 +71,7 @@ module Fastlane
 
       def self.create_release(repository, version, release_notes, assets, prerelease)
         release = github_client().create_release(repository, version, name: version, draft: true, prerelease: prerelease, body: release_notes)
-        assets.each do | file_path |
+        assets.each do |file_path|
           github_client().upload_asset(release[:url], file_path, content_type: "application/octet-stream")
         end
       end

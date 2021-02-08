@@ -330,7 +330,7 @@ module Fastlane
         def self.verify_version(version)
           v_parts = get_version_parts(version)
           
-          v_parts.each do | part |
+          v_parts.each do |part|
             if (!is_int?(part)) then
               UI.user_error!("Version value can only contains numbers.")
             end

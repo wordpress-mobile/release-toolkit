@@ -15,7 +15,7 @@ module Fastlane
 
         # Extract PRs
         pr_list = []
-        commit_list.split("\n").each do | commit |
+        commit_list.split("\n").each do |commit|
           if (commit.include?("Merge pull request #"))
             # PR found, so extract PR number
             pr_list.push(commit.partition('#').last.split(' ')[0])
@@ -24,8 +24,8 @@ module Fastlane
 
         # Get infos from GitHub and put into the target file
         client = Fastlane::Helper::GithubHelper.github_client()
-        File.open(report_path, "w") do | file |
-          pr_list.each do | pr_number |
+        File.open(report_path, "w") do |file|
+          pr_list.each do |pr_number|
             begin
               data = client.pull_request(repository, pr_number.to_i)
               file.puts("##{data[:number]}: #{data[:title]} @#{data[:user][:login]} #{data[:html_url]}")

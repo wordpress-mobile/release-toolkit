@@ -59,7 +59,7 @@ module Fastlane
           fw.puts("msgid \"\"")
 
           # insert content
-          File.open(@content_file_path, "r").each do | line |
+          File.open(@content_file_path, "r").each do |line|
             fw.puts("\"#{line.strip}\\n\"")
           end
         end
@@ -120,7 +120,7 @@ module Fastlane
         fw.puts("\"#{@release_version}:\\n\"")
 
         # insert content
-        File.open(@content_file_path, "r").each do | line |
+        File.open(@content_file_path, "r").each do |line|
           fw.puts("\"#{line.strip}\\n\"")
         end
 
