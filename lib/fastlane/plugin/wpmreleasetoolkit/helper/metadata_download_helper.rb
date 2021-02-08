@@ -74,7 +74,7 @@ module Fastlane
         if (data.key?(:max_size)) && (data[:max_size] != 0) && ((message_len) > data[:max_size]) then
           if (data.key?(:alternate_key)) then
             UI.message("#{target_locale} translation for #{key} exceeds maximum length (#{message_len}). Switching to the alternate translation.")
-            @alternates[data[:alternate_key]] = {desc: data[:desc], max_size: 0 }
+            @alternates[data[:alternate_key]] = { desc: data[:desc], max_size: 0 }
           else
             UI.message("Rejecting #{target_locale} traslation for #{key}: translation length: #{message_len} - max allowed length: #{data[:max_size]}")
           end

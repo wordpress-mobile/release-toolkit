@@ -244,23 +244,6 @@ Layout/MultilineMethodCallIndentation:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_devices_to_provisioning_profiles.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
 
-# Offense count: 19
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBraces.
-# SupportedStyles: space, no_space, compact
-# SupportedStylesForEmptyBraces: space, no_space
-Layout/SpaceInsideHashLiteralBraces:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/close_milestone_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/removebranchprotection_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/setbranchprotection_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/setfrozentag_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_version_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ghhelper_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_download_helper.rb'
-    - 'spec/android_merge_translators_strings_spec.rb'
-    - 'spec/ios_merge_translators_strings_spec.rb'
-
 # Offense count: 8
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
