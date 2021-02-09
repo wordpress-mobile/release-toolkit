@@ -3,12 +3,6 @@ inherit_from: .rubocop_todo.yml
 require: 
 - rubocop-rspec
 
-########## Code Style
-
-# We are ok using single and double quotes interchangeably
-Style/StringLiterals:
-  Enabled: false
-
 # This gem is included as part of the `Pluginfile`, which is `required` separately,
 # so makes it hard to keep it ordered with the rest of the gems
 Gemspec/OrderedDependencies:
@@ -28,7 +22,6 @@ Metrics/BlockLength:
 
 Metrics/ClassLength:
   Max: 300
-
 
 Metrics/MethodLength:
   Max: 100
