@@ -1,7 +1,7 @@
 .DS_Store
 /tmp
 
-# RubyMine IDE
+# JetBrains IDE files
 .idea
 
 # Ruby / Bundler
