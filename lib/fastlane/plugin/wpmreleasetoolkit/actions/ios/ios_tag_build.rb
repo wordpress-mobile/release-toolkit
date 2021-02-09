@@ -7,7 +7,8 @@ module Fastlane
   
         itc_ver = Fastlane::Helper::Ios::VersionHelper.get_build_version()
         int_ver = Fastlane::Helper::Ios::VersionHelper.get_internal_version() unless ENV["INTERNAL_CONFIG_FILE"].nil?
-        Fastlane::Helper::Ios::GitHelper.tag_build(itc_ver, int_ver)
+        Fastlane::Helper::GitHelper.create_tag(itc_ver)
+        Fastlane::Helper::GitHelper.create_tag(int_ver) unless int_ver.nil?
       end
   
       #####################################################
