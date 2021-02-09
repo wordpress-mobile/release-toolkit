@@ -26,6 +26,9 @@ module Fastlane
         #
         # @param [String] validate_translation_command The name of the gradle task to run to validate the translations
         #
+        # @todo Migrate the scripts, currently in each host repo and called by this method, to be helpers and actions
+        #       in the release-toolkit instead, and move this code away from `ios_git_helper`.
+        #
         def self.update_metadata(validate_translation_command)
           Action.sh("./tools/update-translations.sh")
           Action.sh("git", "submodule", "update", "--init", "--recursive")
