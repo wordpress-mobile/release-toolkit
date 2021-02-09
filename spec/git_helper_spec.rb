@@ -40,7 +40,7 @@ describe Fastlane::Helper::GitHelper do
       allow_fastlane_action_sh()
       @message = "Some commit message with spaces"
     end
-  
+
     it 'commits without adding any file if none are provided' do
       expect_shell_command('git', 'add', any_args).never
       expect_shell_command('git', 'commit', '-m', @message)

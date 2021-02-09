@@ -4,12 +4,12 @@ module Fastlane
       def self.run(params)
         require_relative '../../helper/ios/ios_git_helper.rb'
         require_relative '../../helper/ios/ios_version_helper.rb'
-        version = Fastlane::Helper::Ios::VersionHelper::get_public_version
-        
+        version = Fastlane::Helper::Ios::VersionHelper.get_public_version
+
         UI.message("Tagging final #{version}...")
 
         Fastlane::Helper::GitHelper.create_tag(version)
-        
+
         other_action.ios_clear_intermediate_tags(version: version)
       end
 
@@ -28,18 +28,18 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :version,
-                                        env_name: "FL_IOS_FINAL_TAG_VERSION", 
-                                        description: "The version of the release to finalize", 
+                                        env_name: "FL_IOS_FINAL_TAG_VERSION",
+                                        description: "The version of the release to finalize",
                                         is_string: true)
         ]
       end
 
       def self.output
-        
+
       end
 
       def self.return_value
-        
+
       end
 
       def self.authors

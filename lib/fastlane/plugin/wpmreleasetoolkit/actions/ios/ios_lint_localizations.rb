@@ -18,7 +18,7 @@ module Fastlane
 
         def self.run_linter(params)
           UI.message "Linting localizations for parameter placeholders consistency..."
-    
+
           require_relative '../../helper/ios/ios_l10n_helper.rb'
           helper = Fastlane::Helper::Ios::L10nHelper.new(
             install_path: resolve_path(params[:install_path]),
@@ -29,7 +29,7 @@ module Fastlane
             base_lang: params[:base_lang],
             only_langs: params[:only_langs]
           )
-        
+
           violations.each do |lang, diff|
             UI.error "Inconsistencies found between '#{params[:base_lang]}' and '#{lang}':\n\n#{diff}\n"
           end
@@ -73,19 +73,19 @@ module Fastlane
         def self.resolve_path(path)
           File.absolute_path(path, repo_root)
         end
-    
+
         #####################################################
         # @!group Documentation
         #####################################################
-    
+
         def self.description
           "Lint the different *.lproj/.strings files for each locale and ensure the parameter placeholders are consistent."
         end
-    
+
         def self.details
           "Compares the translations against a base language to find potential mismatches for the %s/%d/… parameter placeholders between locales."
         end
-    
+
         def self.available_options
           [
             FastlaneCore::ConfigItem.new(
@@ -144,11 +144,11 @@ module Fastlane
             ),
           ]
         end
-    
+
         def self.output
           nil
         end
-    
+
         def self.return_type
           :hash_of_strings
         end
@@ -156,11 +156,11 @@ module Fastlane
         def self.return_value
           "A hash, keyed by language code, whose values are the diff found for said language"
         end
-    
+
         def self.authors
           ["AliSoftware"]
         end
-    
+
         def self.is_supported?(platform)
           [:ios, :mac].include?(platform)
         end

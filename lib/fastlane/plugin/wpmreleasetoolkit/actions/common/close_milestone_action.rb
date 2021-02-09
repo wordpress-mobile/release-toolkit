@@ -1,6 +1,6 @@
 require 'fastlane/action'
 require 'date'
-require_relative '../../helper/ghhelper_helper'
+require_relative '../../helper/github_helper'
 require_relative '../../helper/ios/ios_version_helper'
 require_relative '../../helper/android/android_version_helper'
 module Fastlane
@@ -10,12 +10,12 @@ module Fastlane
         repository = params[:repository]
         milestone_title = params[:milestone]
 
-        milestone = Fastlane::Helper::GhhelperHelper.get_milestone(repository, milestone_title)
+        milestone = Fastlane::Helper::GithubHelper.get_milestone(repository, milestone_title)
         if (milestone.nil?)
           UI.user_error!("Milestone #{milestone_title} not found.")
         end
 
-        Fastlane::Helper::GhhelperHelper.GHClient().update_milestone(repository, milestone[:number], {:state => "closed"})
+        Fastlane::Helper::GithubHelper.github_client().update_milestone(repository, milestone[:number], { :state => "closed" })
       end
 
       def self.description

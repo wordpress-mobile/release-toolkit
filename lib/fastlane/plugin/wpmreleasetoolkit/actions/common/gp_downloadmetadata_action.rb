@@ -10,14 +10,14 @@ module Fastlane
         UI.message "Locales: #{params[:locales].inspect}"
         UI.message "Source locale: #{params[:source_locale].nil? ? '-' : params[:source_locale]}"
         UI.message "Path: #{params[:download_path]}"
-        
+
         # Check download path
         Dir.mkdir(params[:download_path]) unless File.exists?(params[:download_path])
 
         # Download
         downloader = Fastlane::Helper::MetadataDownloader.new(params[:download_path], params[:target_files])
 
-        params[:locales].each do | loc |
+        params[:locales].each do |loc|
 
           if loc.kind_of?(Array) then
             puts "Downloading language: #{loc[1]}"
@@ -46,8 +46,8 @@ module Fastlane
       end
 
       def self.available_options
-        # Define all options your action supports. 
-        
+        # Define all options your action supports.
+
         # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :project_url,
@@ -73,7 +73,7 @@ module Fastlane
       end
 
       def self.output
-        
+
       end
 
       def self.return_value

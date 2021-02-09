@@ -1,6 +1,6 @@
 require 'fastlane/action'
 require 'date'
-require_relative '../../helper/ghhelper_helper'
+require_relative '../../helper/github_helper'
 require_relative '../../helper/ios/ios_version_helper'
 module Fastlane
   module Actions
@@ -9,7 +9,7 @@ module Fastlane
         folder_path = File.expand_path(params[:strings_folder])
 
         subfolders = Dir.entries("#{folder_path}")
-        subfolders.each do | strings_folder |
+        subfolders.each do |strings_folder|
           merge_folder(File.join(folder_path, strings_folder)) if strings_folder.ends_with?(".lproj")
         end
       end
@@ -24,13 +24,13 @@ module Fastlane
         join_files = Dir.glob(File.join("#{strings_folder}", "Localizable_*.strings")) - [tmp_main_file]
         extra_strings = Array.new
         extra_keys = Array.new
-        join_files.each do | join_strings |
+        join_files.each do |join_strings|
           my_strings = File.read(join_strings).split("\n")
-          my_strings.each do | string | 
-            if string[/^\"(.*)\" = \"(.*)\";$/] 
+          my_strings.each do |string|
+            if string[/^\"(.*)\" = \"(.*)\";$/]
               /^\"(?<string_key>.*)\" = \"/i =~ string
               if (!extra_keys.include?(string_key))
-                extra_strings << string 
+                extra_strings << string
                 extra_keys << string_key
               end
             end
@@ -39,8 +39,8 @@ module Fastlane
           File.delete(join_strings)
         end
 
-        File.open(main_file, "w") do | f | 
-          File.open(tmp_main_file).each do | line |
+        File.open(main_file, "w") do |f|
+          File.open(tmp_main_file).each do |line|
             f.puts(check_line(line, extra_keys))
           end
           f.puts(extra_strings)
@@ -51,7 +51,7 @@ module Fastlane
 
       def self.check_line(line, extra_keys)
         return line unless (line[/^\"(.*)\" = \"(.*)\";$/])
-        
+
         /^\"(?<line_key>.*)\" = \"/i =~ line
         return "" if (extra_keys.include?(line_key))
 

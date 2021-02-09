@@ -107,7 +107,7 @@ def run_l10n_linter_test(data_file)
     input_dir: @test_data_dir,
     base_lang: 'en'
   )
-  
+
   # Assert
   expect(result).to eq(yml["result"])
 end

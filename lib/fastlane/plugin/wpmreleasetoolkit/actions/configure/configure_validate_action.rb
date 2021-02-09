@@ -19,7 +19,7 @@ module Fastlane
 
         # Update the repository to get the latest version of the configuration secrets – that's
         # how we'll know if we're behind in subsequent validations
-        ConfigureDownloadAction::run
+        ConfigureDownloadAction.run
 
         validate_that_branches_match
 
@@ -77,7 +77,7 @@ module Fastlane
         dependencies = Fastlane::Helper::ConfigureHelper.file_dependencies
         new_files = Fastlane::Helper::ConfigureHelper.new_files_in(changed_files)
 
-        changed_dependencies = changed_files & dependencies #calculate array intersection
+        changed_dependencies = changed_files & dependencies # calculate array intersection
 
         unless changed_dependencies.empty?
             UI.user_error!("The following files are out of date. Please run `bundle exec fastlane run configure_update` before continuing:\n\n#{changed_dependencies.to_s}")
@@ -96,7 +96,7 @@ module Fastlane
       end
 
       def self.validate_that_all_copied_files_match
-        Fastlane::Helper::ConfigureHelper.files_to_copy.each{ |x|
+        Fastlane::Helper::ConfigureHelper.files_to_copy.each { |x|
 
             source = absolute_secret_store_path(x.file)
             destination = absolute_project_path(x.destination)

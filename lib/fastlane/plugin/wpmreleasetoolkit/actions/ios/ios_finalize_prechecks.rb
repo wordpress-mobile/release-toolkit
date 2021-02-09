@@ -3,19 +3,19 @@ module Fastlane
     class IosFinalizePrechecksAction < Action
       def self.run(params)
         UI.message "Skip confirm: #{params[:skip_confirm]}"
-        
+
         require_relative '../../helper/ios/ios_version_helper.rb'
         require_relative '../../helper/ios/ios_git_helper.rb'
 
         UI.user_error!("This is not a release branch. Abort.") unless other_action.git_branch.start_with?("release/")
 
-        version = Fastlane::Helper::Ios::VersionHelper::get_public_version
+        version = Fastlane::Helper::Ios::VersionHelper.get_public_version
         message = "Finalizing release: #{version}\n"
         if (!params[:skip_confirm])
           if (!UI.confirm("#{message}Do you want to continue?"))
             UI.user_error!("Aborted by user request")
           end
-        else 
+        else
           UI.message(message)
         end
 
@@ -48,7 +48,7 @@ module Fastlane
       end
 
       def self.output
-        
+
       end
 
       def self.return_value

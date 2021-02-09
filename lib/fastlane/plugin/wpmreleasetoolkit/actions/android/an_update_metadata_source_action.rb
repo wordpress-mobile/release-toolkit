@@ -20,10 +20,10 @@ module Fastlane
         UI.message "File #{params[:po_file_path]} updated!"
       end
 
-      # Verifies that all the source files are available  
+      # Verifies that all the source files are available
       # to this action
       def self.check_source_files(source_files)
-        source_files.values.each do | file_path |
+        source_files.values.each do |file_path|
           UI.user_error!("Couldn't find file at path '#{file_path}'") unless File.exist?(file_path)
         end
       end
@@ -37,21 +37,21 @@ module Fastlane
         target = self.create_target_file_path(orig)
 
         # Clear if older exists
-        File.delete(target) if File.exists? target 
+        File.delete(target) if File.exists? target
 
         # Create the new one
         begin
           File.open(target, "a") do |fw|
             File.open(orig, "r").each do |fr|
               write_target_block(fw, fr)
-            end 
+            end
           end
-        rescue 
-          File.delete(target) if File.exists? target 
-          raise 
-        end 
+        rescue
+          File.delete(target) if File.exists? target
+          raise
+        end
 
-        target 
+        target
       end
 
       # Deletes the old po and moves the temp one
@@ -61,7 +61,7 @@ module Fastlane
         File.rename(temp_file_path, orig_file_path)
       end
 
-      # Generates the temp file path 
+      # Generates the temp file path
       def self.create_target_file_path(orig_file_path)
         "#{File.dirname(orig_file_path)}/#{File.basename(orig_file_path, ".*")}.tmp"
       end
@@ -74,7 +74,7 @@ module Fastlane
         @blocks.push (Fastlane::Helper::UnknownMetadataBlock.new)
 
         # Init special handlers
-        block_files.each do | key, file_path |
+        block_files.each do |key, file_path|
           case key
           when :release_note
             @blocks.push (Fastlane::Helper::ReleaseNoteMetadataBlock.new(key, file_path, release_version))
@@ -85,7 +85,7 @@ module Fastlane
           end
         end
 
-        # Sets the default 
+        # Sets the default
         @current_block = @blocks[0]
       end
 
@@ -93,7 +93,7 @@ module Fastlane
       def self.write_target_block(fw, line)
         if (is_block_id(line))
           key = line.split(' ')[1].tr('\"', '')
-          @blocks.each do | block |
+          @blocks.each do |block|
             @current_block = block if block.is_handler_for(key)
           end
         end
@@ -128,13 +128,13 @@ module Fastlane
       end
 
       def self.available_options
-        # Define all options your action supports. 
-        
+        # Define all options your action supports.
+
         # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :po_file_path,
-                                       env_name: "FL_UPDATE_METADATA_SOURCE_PO_FILE_PATH", 
-                                       description: "The path of the .po file to update", 
+                                       env_name: "FL_UPDATE_METADATA_SOURCE_PO_FILE_PATH",
+                                       description: "The path of the .po file to update",
                                        is_string: true,
                                        verify_block: proc do |value|
                                           UI.user_error!("No .po file path for UpdateMetadataSourceAction given, pass using `po_file_path: 'file path'`") unless (value and not value.empty?)
@@ -144,7 +144,7 @@ module Fastlane
                                        env_name: "FL_UPDATE_METADATA_SOURCE_RELEASE_VERSION",
                                        description: "The release version of the app (to use to mark the release notes)",
                                        verify_block: proc do |value|
-                                        UI.user_error!("No relase version for UpdateMetadataSourceAction given, pass using `release_version: 'version'`") unless (value and not value.empty?) 
+                                        UI.user_error!("No relase version for UpdateMetadataSourceAction given, pass using `release_version: 'version'`") unless (value and not value.empty?)
                                       end),
           FastlaneCore::ConfigItem.new(key: :source_files,
                                         env_name: "FL_UPDATE_METADATA_SOURCE_SOURCE_FILES",
@@ -157,7 +157,7 @@ module Fastlane
       end
 
       def self.output
-          
+
       end
 
       def self.return_value

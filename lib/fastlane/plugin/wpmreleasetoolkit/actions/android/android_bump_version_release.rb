@@ -1,5 +1,5 @@
 module Fastlane
-    module Actions    
+    module Actions
       class AndroidBumpVersionReleaseAction < Action
         def self.run(params)
           # fastlane will take care of reading in the parameter and fetching the environment variable:
@@ -7,7 +7,7 @@ module Fastlane
 
           require_relative '../../helper/android/android_version_helper.rb'
           require_relative '../../helper/android/android_git_helper.rb'
-          
+
           other_action.ensure_git_branch(branch: "develop")
 
           # Create new configuration
@@ -21,39 +21,39 @@ module Fastlane
           UI.message "Done!"
 
           UI.message "Updating versions..."
-          Fastlane::Helper::Android::VersionHelper.update_versions(@new_version_beta, @new_version_alpha) 
-          Fastlane::Helper::Android::GitHelper.commit_version_bump()         
+          Fastlane::Helper::Android::VersionHelper.update_versions(@new_version_beta, @new_version_alpha)
+          Fastlane::Helper::Android::GitHelper.commit_version_bump()
           UI.message "Done."
         end
-  
+
         #####################################################
         # @!group Documentation
         #####################################################
-  
+
         def self.description
           "Bumps the version of the app and creates the new release branch"
         end
-  
+
         def self.details
           "Bumps the version of the app and creates the new release branch"
         end
-  
+
         def self.available_options
-          
+
         end
-  
+
         def self.output
-          
+
         end
-  
+
         def self.return_value
-          
+
         end
-  
+
         def self.authors
           ["loremattei"]
         end
-  
+
         def self.is_supported?(platform)
           platform == :android
         end

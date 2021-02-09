@@ -18,7 +18,7 @@ module Fastlane
         # @param [Bool] include_metadata If true (the default), includes the `fastlane/download_metadata.swift` file and the `.pot` file (which typically contains an entry or release notes for the new version)
         #
         def self.commit_version_bump(include_deliverfile: true, include_metadata: true)
-          files_list = [ File.join(ENV["PROJECT_ROOT_FOLDER"], "config", ".") ]
+          files_list = [File.join(ENV["PROJECT_ROOT_FOLDER"], "config", ".")]
           if include_deliverfile
             files_list.append File.join("fastlane", "Deliverfile")
           end
@@ -66,7 +66,7 @@ module Fastlane
           Fastlane::Helper::GitHelper.commit(message: "Update translations", files: strings_files, push: false)
 
           Action.sh("cd fastlane && ./download_metadata.swift")
-          
+
           Fastlane::Helper::GitHelper.commit(message: "Update metadata translations", files: "./fastlane/metadata/", push: true)
         end
       end

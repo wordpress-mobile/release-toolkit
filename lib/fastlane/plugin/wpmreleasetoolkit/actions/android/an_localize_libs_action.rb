@@ -9,7 +9,7 @@ module Fastlane
         libraries_strings_path = params[:libs_strings_path]
 
         any_changes = false
-        libraries_strings_path.each do | lib |
+        libraries_strings_path.each do |lib|
           any_changes = Fastlane::Helper::AndroidLocalizeHelper.merge_lib(main_strings_path, lib) or any_changes
         end
 
@@ -27,7 +27,7 @@ module Fastlane
       end
 
       def self.return_value
-        
+
       end
 
       def self.details

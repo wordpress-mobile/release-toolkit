@@ -33,7 +33,7 @@ module Fastlane
           Action.sh("./tools/update-translations.sh")
           Action.sh("git", "submodule", "update", "--init", "--recursive")
           Action.sh("./gradlew", validate_translation_command)
-          
+
           res_dir = File.join(ENV["PROJECT_ROOT_FOLDER"], ENV["PROJECT_NAME"], "src", "main", "res")
           Fastlane::Helper::GitHelper.commit(message: "Update translations", files: res_dir, push: true)
         end

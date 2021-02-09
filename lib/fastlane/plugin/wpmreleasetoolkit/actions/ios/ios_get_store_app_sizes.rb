@@ -6,7 +6,7 @@ module Fastlane
         Helper = Fastlane::Helper::Ios::ADCAppSizesHelper
 
         def self.run(params)
-          app_sizes = Helper::get_adc_sizes(
+          app_sizes = Helper.get_adc_sizes(
             adc_user: params[:adc_user],
             adc_team: params[:adc_team],
             bundle_id: params[:bundle_id],
@@ -18,10 +18,10 @@ module Fastlane
 
           case params[:format]
           when 'csv'
-            csv = Helper::format_csv(app_sizes, devices: devices)
+            csv = Helper.format_csv(app_sizes, devices: devices)
             UI.message "Result (CSV)\n\n#{csv}\n"
           when 'markdown'
-            tables = Helper::format_markdown(app_sizes, devices: devices)
+            tables = Helper.format_markdown(app_sizes, devices: devices)
             tables.each do |table|
               UI.message "Result (Markdown)\n\n#{table}\n"
             end
@@ -29,19 +29,19 @@ module Fastlane
 
           return app_sizes
         end
-  
+
         #####################################################
         # @!group Documentation
         #####################################################
-  
+
         def self.description
           "Gets the size of the app as reported in Apple Developer Portal for recent versions"
         end
-  
+
         def self.details
           "Gets the download + installed size of the app from the Apple Developer Portail for various app versions release to AppStore and various device types"
         end
-  
+
         def self.available_options
           [
             FastlaneCore::ConfigItem.new(
@@ -95,29 +95,28 @@ module Fastlane
             ),
           ]
         end
-  
+
         def self.output
           # Define the shared values you are going to provide
-          
+
         end
 
         def self.return_type
           :hash
         end
-  
+
         def self.return_value
           "Return a Hash containing the details of download and install app size, for various device models, all that for each requested version of the app"
         end
-  
+
         def self.authors
           # So no one will ever forget your contribution to fastlane :) You are awesome btw!
           ["AliSoftware"]
         end
-  
+
         def self.is_supported?(platform)
           [:ios, :mac].include?(platform)
         end
       end
     end
   end
-  

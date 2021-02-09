@@ -48,8 +48,8 @@ module Fastlane
 
         # Run the provided block
         yield
-      
-        ### Restore secrets repo to original branch.  If it was originally in a 
+
+        ### Restore secrets repo to original branch.  If it was originally in a
         ### detached HEAD state, we need to use the hash since there's no branch name.
         other_action.sh(command: "cd #{repository_path} && git checkout #{original_repo_ref}", log: false)
       end
@@ -78,10 +78,10 @@ module Fastlane
             date_string = Time.now.strftime('%m-%d-%Y--%H-%M-%S')
 
             backup_path = base
-            .concat("-")            # Handy-dandy separator
-            .concat(date_string)    # date string to allow multiple backups
-            .concat(extension)      # and the original file extension
-            .concat(".bak")        # add the .bak file extension - easier to .gitignore
+                          .concat("-")            # Handy-dandy separator
+                          .concat(date_string)    # date string to allow multiple backups
+                          .concat(extension)      # and the original file extension
+                          .concat(".bak")        # add the .bak file extension - easier to .gitignore
 
             # Create the destination directory if it doesn't exist
             FileUtils.mkdir_p(Pathname.new(file_reference.destination).dirname)

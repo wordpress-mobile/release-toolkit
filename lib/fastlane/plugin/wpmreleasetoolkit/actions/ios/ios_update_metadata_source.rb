@@ -6,11 +6,11 @@ module Fastlane
         other_action.ensure_git_status_clean()
 
         other_action.gp_update_metadata_source(po_file_path: params[:po_file_path],
-          source_files: params[:source_files], 
+          source_files: params[:source_files],
           release_version: params[:release_version])
 
         Action.sh("git add #{params[:po_file_path]}")
-        params[:source_files].each do | key, file |
+        params[:source_files].each do |key, file|
           Action.sh("git add #{file}")
         end
 
@@ -35,13 +35,13 @@ module Fastlane
       end
 
       def self.available_options
-        # Define all options your action supports. 
-        
+        # Define all options your action supports.
+
         # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :po_file_path,
-                                        env_name: "FL_IOS_UPDATE_METADATA_SOURCE_PO_FILE_PATH", 
-                                        description: "The path of the .po file to update", 
+                                        env_name: "FL_IOS_UPDATE_METADATA_SOURCE_PO_FILE_PATH",
+                                        description: "The path of the .po file to update",
                                         is_string: true,
                                         verify_block: proc do |value|
                                           UI.user_error!("No .po file path for UpdateMetadataSourceAction given, pass using `po_file_path: 'file path'`") unless (value and not value.empty?)
@@ -51,7 +51,7 @@ module Fastlane
                                         env_name: "FL_IOS_UPDATE_METADATA_SOURCE_RELEASE_VERSION",
                                         description: "The release version of the app (to use to mark the release notes)",
                                         verify_block: proc do |value|
-                                          UI.user_error!("No relase version for UpdateMetadataSourceAction given, pass using `release_version: 'version'`") unless (value and not value.empty?) 
+                                          UI.user_error!("No relase version for UpdateMetadataSourceAction given, pass using `release_version: 'version'`") unless (value and not value.empty?)
                                         end),
           FastlaneCore::ConfigItem.new(key: :source_files,
                                         env_name: "FL_IOS_UPDATE_METADATA_SOURCE_SOURCE_FILES",
@@ -68,7 +68,7 @@ module Fastlane
       end
 
       def self.return_value
-        
+
       end
 
       def self.authors

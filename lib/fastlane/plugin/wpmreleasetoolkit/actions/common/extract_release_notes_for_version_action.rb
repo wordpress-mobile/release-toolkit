@@ -10,19 +10,19 @@ module Fastlane
 
         extracted_notes_file = File.open(extracted_notes_file_path, 'w') unless extracted_notes_file_path.blank?
 
-        extract_notes(release_notes_file_path, version) do | line |
+        extract_notes(release_notes_file_path, version) do |line|
           extracted_notes_file.nil? ? puts(line) : extracted_notes_file.write(line)
-        end 
+        end
 
         unless extracted_notes_file.nil?
-          extracted_notes_file.close() 
+          extracted_notes_file.close()
           check_and_commit_extracted_notes_file(extracted_notes_file_path, version)
-        end 
+        end
       end
 
       def self.extract_notes(release_notes_file_path, version)
         state = :discarding
-        File.open(release_notes_file_path).each do | line |
+        File.open(release_notes_file_path).each do |line|
           case state
           when :discarding
             if (line.match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/)) and (line.strip() == version)

@@ -1,6 +1,9 @@
 .DS_Store
 /tmp
 
+# JetBrains IDE files
+.idea
+
 # Ruby / Bundler
 .bundle/
 vendor/bundle

@@ -1,6 +1,6 @@
 require 'fastlane/action'
 require 'date'
-require_relative '../../helper/ghhelper_helper'
+require_relative '../../helper/github_helper'
 require_relative '../../helper/ios/ios_version_helper'
 require_relative '../../helper/android/android_version_helper'
 module Fastlane
@@ -9,13 +9,13 @@ module Fastlane
       def self.run(params)
         repository = params[:repository]
 
-        last_stone = Fastlane::Helper::GhhelperHelper.get_last_milestone(repository)
+        last_stone = Fastlane::Helper::GithubHelper.get_last_milestone(repository)
         UI.message("Last detected milestone: #{last_stone[:title]} due on #{last_stone[:due_on]}.")
         milestone_duedate = last_stone[:due_on]
         newmilestone_duedate = (milestone_duedate.to_datetime.next_day(14).to_time).utc
         newmilestone_number = Fastlane::Helper::Ios::VersionHelper.calc_next_release_version(last_stone[:title])
         UI.message("Next milestone: #{newmilestone_number} due on #{newmilestone_duedate}.")
-        Fastlane::Helper::GhhelperHelper.create_milestone(repository, newmilestone_number, newmilestone_duedate, params[:need_appstore_submission])
+        Fastlane::Helper::GithubHelper.create_milestone(repository, newmilestone_number, newmilestone_duedate, params[:need_appstore_submission])
       end
 
       def self.description

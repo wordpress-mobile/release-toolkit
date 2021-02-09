@@ -5,7 +5,7 @@ module Fastlane
         require_relative '../../helper/ios/ios_git_helper.rb'
         require_relative '../../helper/ios/ios_version_helper.rb'
 
-        version = Fastlane::Helper::Ios::VersionHelper::get_public_version()
+        version = Fastlane::Helper::Ios::VersionHelper.get_public_version()
         head_tags = Fastlane::Helper::GitHelper.list_tags_on_current_commit()
         UI.user_error!("HEAD is not on tag. Aborting!") if head_tags.empty?
 
@@ -25,9 +25,7 @@ module Fastlane
       end
 
       def self.available_options
-        [
-
-        ]
+        []
       end
 
       def self.output
@@ -35,7 +33,7 @@ module Fastlane
       end
 
       def self.return_value
-        
+
       end
 
       def self.authors

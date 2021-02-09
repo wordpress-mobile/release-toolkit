@@ -16,8 +16,8 @@ module Fastlane
         end
 
         any_error = false
-        libraries_strings_path.each do | lib |
-            Fastlane::Helper::AndroidLocalizeHelper.verify_lib(main_strings_path, lib, source_diff) 
+        libraries_strings_path.each do |lib|
+            Fastlane::Helper::AndroidLocalizeHelper.verify_lib(main_strings_path, lib, source_diff)
         end
       end
 
@@ -30,7 +30,7 @@ module Fastlane
       end
 
       def self.return_value
-        
+
       end
 
       def self.details
@@ -52,7 +52,7 @@ module Fastlane
                                     env_name: "CHECK_LIBS_DIFF_URL",
                                  description: "The url of the diff to check",
                                     optional: true,
-                                   is_string: true),                        
+                                   is_string: true),
         ]
       end
 

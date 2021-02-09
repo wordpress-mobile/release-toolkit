@@ -3,14 +3,14 @@ module Fastlane
     class AndroidHotfixPrechecksAction < Action
       def self.run(params)
         UI.message "Skip confirm: #{params[:skip_confirm]}"
-        UI.message "" 
+        UI.message ""
 
         require_relative '../../helper/android/android_version_helper.rb'
         require_relative '../../helper/android/android_git_helper.rb'
 
         # Evaluate previous tag
         new_ver = params[:version_name]
-        prev_ver = Fastlane::Helper::Android::VersionHelper::calc_prev_hotfix_version_name(new_ver)
+        prev_ver = Fastlane::Helper::Android::VersionHelper.calc_prev_hotfix_version_name(new_ver)
 
         # Confirm
         message = "Requested Hotfix version: #{new_ver}\n"
@@ -20,7 +20,7 @@ module Fastlane
           if (!UI.confirm("#{message}Do you want to continue?"))
             UI.user_error!("Aborted by user request")
           end
-        else 
+        else
           UI.message(message)
         end
 
@@ -55,7 +55,7 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :version_name,
-                                       env_name: "FL_ANDROID_HOTFIX_PRECHECKS_VERSION", 
+                                       env_name: "FL_ANDROID_HOTFIX_PRECHECKS_VERSION",
                                        description: "The version to work on", # a short description of this parameter
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
@@ -67,11 +67,11 @@ module Fastlane
       end
 
       def self.output
-        
+
       end
 
       def self.return_value
-        
+
       end
 
       def self.authors

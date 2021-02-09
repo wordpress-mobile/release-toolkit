@@ -29,7 +29,7 @@ module Fastlane
         # Check gems and pods are up to date. This will exit if it fails
         begin
           Action.sh("bundle check")
-        rescue 
+        rescue
           UI.user_error!("You should run 'rake dependencies' to make sure gems are up to date")
           raise
         end
@@ -52,20 +52,21 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :derived_data_path,
-          description: "The path to the DerivedData directory for the project. Should match what's used in the `gym` action",
-          is_string: true, 
-          default_value: "~/Library/Developer/Xcode/DerivedData"
+          FastlaneCore::ConfigItem.new(
+            key: :derived_data_path,
+            description: "The path to the DerivedData directory for the project. Should match what's used in the `gym` action",
+            is_string: true,
+            default_value: "~/Library/Developer/Xcode/DerivedData"
           )
         ]
       end
 
       def self.output
-        
+
       end
 
       def self.return_value
-       
+
       end
 
       def self.authors

@@ -36,15 +36,15 @@ end
 def imts_run_test(script)
     test_script = @imtsTestUtils.get_test_from_file(script)
     @imtsTestUtils.create_test_data(test_script)
-    Fastlane::Actions::IosMergeTranslatorsStringsAction.run({strings_folder: @imtsTestUtils.test_folder_path})
+    Fastlane::Actions::IosMergeTranslatorsStringsAction.run({ strings_folder: @imtsTestUtils.test_folder_path })
     expect(@imtsTestUtils.read_result_data(test_script)).to eq(test_script["result"]["content"])
 end
 
 class IMTSTestUtils
     attr_accessor :test_folder_path
 
-    def initialize()  
-        @test_folder_path = File.join(Dir.tmpdir(), "imts_tests") 
+    def initialize()
+        @test_folder_path = File.join(Dir.tmpdir(), "imts_tests")
     end
 
     def create_test_folder
@@ -65,20 +65,20 @@ class IMTSTestUtils
     end
 
     def create_test_data(test_script)
-        test_script["test_data"].each do | test_file | 
+        test_script["test_data"].each do |test_file|
             self.generate_test_file(test_file["file"], test_file["content"])
         end
     end
 
     def generate_test_file(filename, content)
         file_path = File.join(@test_folder_path, filename)
-        
+
         dir = File.dirname(file_path)
         unless File.directory?(dir)
             FileUtils.mkdir_p(dir)
         end
 
-        File.open(file_path, 'w') {|f| f.write(content) }
+        File.open(file_path, 'w') { |f| f.write(content) }
     end
 
     def read_result_data(test_script)
@@ -86,5 +86,3 @@ class IMTSTestUtils
         return File.read(file_path)
     end
 end
-
-

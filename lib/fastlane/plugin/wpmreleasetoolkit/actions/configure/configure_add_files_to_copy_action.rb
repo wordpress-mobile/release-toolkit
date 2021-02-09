@@ -13,7 +13,7 @@ module Fastlane
 
         continue = true
 
-        while(continue)
+        while (continue)
 
           confirmation = "Do you want to specify a file that should be copied from the secrets repository into your project?"
 
@@ -81,7 +81,7 @@ module Fastlane
       end
 
       def self.return_value
-          # If your method provides a return value, you can describe here what it does
+        # If your method provides a return value, you can describe here what it does
       end
 
       def self.details

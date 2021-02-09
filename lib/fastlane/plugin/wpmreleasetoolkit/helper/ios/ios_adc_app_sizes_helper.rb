@@ -38,7 +38,7 @@ module Fastlane
         end
 
         def self.sz(bytes)
-          (bytes.to_f / (1024*1024)).round(1)
+          (bytes.to_f / (1024 * 1024)).round(1)
         end
 
         def self.sz_mb(bytes)
@@ -62,7 +62,7 @@ module Fastlane
             build_number = details['cfBundleVersion']
             sizes = details['sizesInBytes'].select { |name, _| devices.include?(name) }
             col_size = devices.map(&:length).max
-            table  = "| #{build_number.ljust(col_size)} | Download | Install  |\n"
+            table = "| #{build_number.ljust(col_size)} | Download | Install  |\n"
             table += "|:#{'-' * col_size}-|---------:|---------:|\n"
             sizes.each do |(device_name, sizes)|
               table += "| #{device_name.ljust(col_size)} | #{sz_mb(sizes['compressed'])} | #{sz_mb(sizes['uncompressed'])} |\n"

@@ -23,7 +23,7 @@ module Fastlane
           UI.message "#{self.check_path(params[:output_folder])} Output Folder: #{params[:output_folder]}"
         end
 
-        outputDirectory = helper.resolve_path( params[:output_folder] )
+        outputDirectory = helper.resolve_path(params[:output_folder])
 
         ## If there are no translated screenshot images (whether it's because they haven't been generated yet,
         ##   or because we aren't using them), just use the translated directories.
@@ -50,13 +50,13 @@ module Fastlane
         stylesheet_path = config["stylesheet"]
 
         entries = config["entries"]
-          .flat_map { |entry|
+                  .flat_map { |entry|
 
             languages.map { |language|
 
               newEntry = entry.deep_dup
 
-              # Not every output file will have a screenshot, so handle cases where no 
+              # Not every output file will have a screenshot, so handle cases where no
               # screenshot file is defined
               if entry["screenshot"] != nil && entry["filename"] != nil
                 newEntry["screenshot"] = helper.resolve_path(params[:orig_folder]) + language + entry["screenshot"]
@@ -95,14 +95,14 @@ module Fastlane
 
               newEntry
             }
-          }
-          .sort { |x,y|
+                  }
+                  .sort { |x, y|
             x["filename"] <=> y["filename"]
-          }
+        }
 
         bar = ProgressBar.new(entries.count, :bar, :counter, :eta, :rate)
 
-        Parallel.map(entries, finish: -> (item, i, result) {
+        Parallel.map(entries, finish: ->(item, i, result) {
           bar.increment!
         }) do |entry|
 
@@ -136,7 +136,7 @@ module Fastlane
 
           # Run the GC in the same thread to clean up after RMagick
           GC.start
-        
+
         end
       end
 
@@ -157,14 +157,14 @@ module Fastlane
 
         subdirectories = []
 
-        unless helper.can_resolve_path( path ) then
+        unless helper.can_resolve_path(path) then
           return []
         end
 
-        resolved_path = helper.resolve_path( path )
+        resolved_path = helper.resolve_path(path)
 
         Dir.chdir(resolved_path) do
-          subdirectories = Dir["*"].reject{|o| not File.directory?(o)}.sort
+          subdirectories = Dir["*"].reject { |o| not File.directory?(o) }.sort
         end
 
         subdirectories
