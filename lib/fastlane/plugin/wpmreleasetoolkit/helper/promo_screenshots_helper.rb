@@ -266,7 +266,7 @@ module Fastlane
                        when 'left' then composite_image_left(text_frame, text_content, 0, 0)
                        when 'center' then composite_image_center(text_frame, text_content, 0, 0)
                        when 'top' then composite_image_top(text_frame, text_content, 0, 0)
-            end
+                       end
         ensure
           tempTextFile.close
           tempTextFile.unlink
