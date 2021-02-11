@@ -150,7 +150,6 @@ module Fastlane
       end
 
       def self.subdirectories_for_path(path)
-
         subdirectories = []
 
         unless helper.can_resolve_path(path) then

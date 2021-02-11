@@ -10,7 +10,6 @@ module Fastlane
   module Actions
     class ConfigureAddFilesToCopyAction < Action
       def self.run(params = {})
-
         continue = true
 
         while (continue)
@@ -36,7 +35,6 @@ module Fastlane
       ### Walks the user through adding a file to the project's `/.configure `file.
       ###
       def self.add_file
-
         invalid_file = true
 
         while invalid_file

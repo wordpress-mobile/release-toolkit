@@ -153,7 +153,6 @@ module Fastlane
 
           verify_local_diff(main, library, main_strings, lib_strings)
           verify_pr_diff(main, library, main_strings, lib_strings, source_diff) unless source_diff.nil?
-
         end
 
         def self.verify_local_diff(main, library, main_strings, lib_strings)

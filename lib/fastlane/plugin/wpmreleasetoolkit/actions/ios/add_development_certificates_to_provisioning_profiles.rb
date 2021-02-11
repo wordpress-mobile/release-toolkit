@@ -25,7 +25,6 @@ module Fastlane
             UI.success "Applied #{all_certificates.length} certificates to #{profile.name}"
           }
         }
-
       end
 
       #####################################################

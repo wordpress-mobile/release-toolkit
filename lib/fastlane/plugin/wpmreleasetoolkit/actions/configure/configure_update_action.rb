@@ -8,7 +8,6 @@ module Fastlane
   module Actions
     class ConfigureUpdateAction < Action
       def self.run(params = {})
-
         prompt_to_switch_branches
 
         if repo_is_ahead_of_remote

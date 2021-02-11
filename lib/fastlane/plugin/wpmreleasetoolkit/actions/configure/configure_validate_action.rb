@@ -8,7 +8,6 @@ module Fastlane
   module Actions
     class ConfigureValidateAction < Action
       def self.run(params = {})
-
         # Start by ensuring that we've set up the project for configuration
         validate_that_configure_file_exists
 
@@ -38,7 +37,6 @@ module Fastlane
       ### Validate that the branch specified in .configure matches the branch
       ### checked out in ~/.mobile-secrets.
       def self.validate_that_branches_match
-
         repo_branch_name = Fastlane::Helper::ConfigureHelper.repo_branch_name
         file_branch_name = Fastlane::Helper::ConfigureHelper.configure_file_branch_name
 
