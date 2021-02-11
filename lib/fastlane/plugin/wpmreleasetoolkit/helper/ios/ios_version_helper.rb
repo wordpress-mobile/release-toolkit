@@ -295,10 +295,10 @@ module Fastlane
           File.open(filePath, 'r') do |f|
             f.each_line do |line|
               line = line.strip()
-              if line.start_with?("#{key}=") then
-                  return line.split('=')[1]
-                end
+              if line.start_with?("#{key}=")
+                return line.split('=')[1]
               end
+            end
           end
 
           return nil

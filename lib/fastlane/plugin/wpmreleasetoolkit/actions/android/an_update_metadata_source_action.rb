@@ -135,15 +135,15 @@ module Fastlane
                                        description: 'The path of the .po file to update',
                                        is_string: true,
                                        verify_block: proc do |value|
-                                          UI.user_error!("No .po file path for UpdateMetadataSourceAction given, pass using `po_file_path: 'file path'`") unless (value and not value.empty?)
-                                          UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
+                                         UI.user_error!("No .po file path for UpdateMetadataSourceAction given, pass using `po_file_path: 'file path'`") unless (value and not value.empty?)
+                                         UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :release_version,
                                        env_name: 'FL_UPDATE_METADATA_SOURCE_RELEASE_VERSION',
                                        description: 'The release version of the app (to use to mark the release notes)',
                                        verify_block: proc do |value|
-                                        UI.user_error!("No relase version for UpdateMetadataSourceAction given, pass using `release_version: 'version'`") unless (value and not value.empty?)
-                                      end),
+                                         UI.user_error!("No relase version for UpdateMetadataSourceAction given, pass using `release_version: 'version'`") unless (value and not value.empty?)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :source_files,
                                        env_name: 'FL_UPDATE_METADATA_SOURCE_SOURCE_FILES',
                                        description: 'The hash with the path to the source files and the key to use to include their content',
