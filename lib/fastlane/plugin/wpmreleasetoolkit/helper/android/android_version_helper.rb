@@ -235,7 +235,7 @@ module Fastlane
             vp[MINOR_NUMBER] -= 1
           end
 
-           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}"
+          "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}"
         end
 
         # Determines if a version name corresponds to a hotfix

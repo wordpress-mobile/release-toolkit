@@ -5,10 +5,10 @@ module Fastlane
           require_relative '../../helper/ios/ios_version_helper.rb'
           require_relative '../../helper/ios/ios_git_helper.rb'
 
-           beta_pods = []
-           File.open(params[:podfile]).each do |li|
-             beta_pods << li if (li.match('^\s*\t*pod.*beta'))
-           end
+          beta_pods = []
+          File.open(params[:podfile]).each do |li|
+            beta_pods << li if (li.match('^\s*\t*pod.*beta'))
+          end
 
           if beta_pods.count == 0
             UI.message('No beta pods found. You can continue with the code freeze.')
