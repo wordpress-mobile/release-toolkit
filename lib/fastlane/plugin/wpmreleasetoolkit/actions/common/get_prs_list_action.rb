@@ -69,11 +69,11 @@ module Fastlane
                                     optional: true,
                                default_value: '.',
                                    is_string: true),
-            FastlaneCore::ConfigItem.new(key: :report_path,
-                                    env_name: 'GHHELPER_REPORTPATH',
-                                 description: 'The path of the report file',
-                                    optional: false,
-                                   is_string: true)
+          FastlaneCore::ConfigItem.new(key: :report_path,
+                                  env_name: 'GHHELPER_REPORTPATH',
+                               description: 'The path of the report file',
+                                  optional: false,
+                                 is_string: true)
         ]
       end
 
