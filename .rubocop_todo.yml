@@ -106,14 +106,6 @@ Layout/ExtraSpacing:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_bump_version_release.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, IndentationWidth.
-# SupportedStyles: special_inside_parentheses, consistent, align_brackets
-Layout/IndentFirstArrayElement:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_apply_action.rb'
-
 # Offense count: 2
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, IndentationWidth.
