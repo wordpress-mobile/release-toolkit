@@ -105,14 +105,6 @@ Layout/LeadingBlankLines:
   Exclude:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/models/configuration.rb'
 
-# Offense count: 13
-# Cop supports --auto-correct.
-# Configuration parameters: IndentationWidth.
-Layout/Tab:
-  Exclude:
-    - 'bin/drawText'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/configure_helper.rb'
-
 # Offense count: 1
 # Configuration parameters: AllowSafeAssignment.
 Lint/AssignmentInCondition:

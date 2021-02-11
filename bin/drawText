@@ -13,10 +13,10 @@ executable_path = plugin_path + 'lib/drawText'
 # Run the script
 allArgs = ARGV.map { |arg|
 
-	 argParts = arg.split('=')
-	 argParts[1] = '"' + argParts[1] + '"'
+  argParts = arg.split('=')
+  argParts[1] = '"' + argParts[1] + '"'
 
-	 argParts.join('=')
+  argParts.join('=')
 
 }.join(' ')
 
