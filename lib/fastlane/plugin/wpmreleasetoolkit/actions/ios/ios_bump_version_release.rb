@@ -20,7 +20,7 @@ module Fastlane
         Fastlane::Helper::GitHelper.create_branch(@new_release_branch, from: 'develop')
         UI.message 'Done!'
 
-        UI.message 'Updating glotPressKeys...'  unless params[:skip_glotpress]
+        UI.message 'Updating glotPressKeys...' unless params[:skip_glotpress]
         update_glotpress_key unless params [:skip_glotpress]
         UI.message 'Done' unless params [:skip_glotpress]
 

@@ -6,16 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 5
-# Cop supports --auto-correct.
-# Configuration parameters: AllowForAlignment, AllowBeforeTrailingComments, ForceEqualSignAlignment.
-Layout/ExtraSpacing:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/setfrozentag_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_apply_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_bump_version_release.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 Layout/LeadingBlankLines:

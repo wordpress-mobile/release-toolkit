@@ -89,7 +89,7 @@ module Fastlane
           if can_resolve_path(entry['background'])
             background_image = open_image(entry['background'])
             return composite_image(canvas, background_image, 0, 0)
-          else  # Otherwise, let's assume this is a colour code
+          else # Otherwise, let's assume this is a colour code
             background_image = create_image(canvas.columns, canvas.rows, entry['background'])
             canvas = composite_image(canvas, background_image, 0, 0)
           end

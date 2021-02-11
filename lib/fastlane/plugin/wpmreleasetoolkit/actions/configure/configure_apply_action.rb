@@ -59,7 +59,7 @@ module Fastlane
         # If the file doesn't exist or force is true, we don't need to confirm
         if !File.file?(file_reference.destination) || force
           file_reference.apply
-          return  # Don't continue if we were able to copy the file without conflict
+          return # Don't continue if we were able to copy the file without conflict
         end
 
         unless file_reference.needs_apply?
@@ -77,10 +77,10 @@ module Fastlane
           date_string = Time.now.strftime('%m-%d-%Y--%H-%M-%S')
 
           backup_path = base
-                        .concat('-')            # Handy-dandy separator
-                        .concat(date_string)    # date string to allow multiple backups
-                        .concat(extension)      # and the original file extension
-                        .concat('.bak')        # add the .bak file extension - easier to .gitignore
+                        .concat('-') # Handy-dandy separator
+                        .concat(date_string) # date string to allow multiple backups
+                        .concat(extension) # and the original file extension
+                        .concat('.bak') # add the .bak file extension - easier to .gitignore
 
           # Create the destination directory if it doesn't exist
           FileUtils.mkdir_p(Pathname.new(file_reference.destination).dirname)
