@@ -34,6 +34,7 @@ module Fastlane
           version = get_release_version
           vp = get_version_parts(version[VERSION_NAME])
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
+
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}"
         end
 
@@ -246,6 +247,7 @@ module Fastlane
         #
         def self.is_hotfix?(version)
           return false if is_alpha_version?(version)
+
           vp = get_version_parts(version[VERSION_NAME])
           return (vp.length > 2) && (vp[HOTFIX_NUMBER] != 0)
         end
@@ -287,6 +289,7 @@ module Fastlane
           vp = get_version_parts(version_name)
           vp[HOTFIX_NUMBER] -= 1 unless vp[HOTFIX_NUMBER] == 0
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}" unless vp[HOTFIX_NUMBER] == 0
+
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}"
         end
 

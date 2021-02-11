@@ -23,6 +23,7 @@ module Fastlane
           version = get_build_version
           vp = get_version_parts(version)
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
+
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}"
         end
 
@@ -125,6 +126,7 @@ module Fastlane
           vp = get_version_parts(version)
           vp[HOTFIX_NUMBER] -= 1 unless vp[HOTFIX_NUMBER] == 0
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}" unless vp[HOTFIX_NUMBER] == 0
+
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}"
         end
 

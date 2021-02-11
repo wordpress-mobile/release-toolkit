@@ -20,6 +20,7 @@ module Fastlane
       #
       def self.has_git_lfs?
         return false unless is_git_repo?
+
         `git config --get-regex lfs`.length > 0
       end
 

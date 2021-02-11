@@ -27,6 +27,7 @@ module Fastlane
         #
         def check_swiftgen_installed
           return false unless File.exists?(swiftgen_bin)
+
           vers_string = `#{swiftgen_bin} --version`
           # The SwiftGen version string has this format:
           #
@@ -149,6 +150,7 @@ module Fastlane
         def sort_file_lines!(dir, lang)
           file = File.join(dir, output_filename(lang))
           return nil unless File.exists?(file)
+
           sorted_lines = File.readlines(file).sort
           File.write(file, sorted_lines.join)
           return file
@@ -177,6 +179,7 @@ module Fastlane
               file = sort_file_lines!(tmpdir, lang)
               # If the lang ends up not having any translation at all (e.g. a `.lproj` without any `.strings` file in it but maybe just a storyboard or assets catalog), ignore it
               next nil if file.nil? || only_empty_lines?(file)
+
               # Compute the diff
               diff = `diff -U0 "#{base_file}" "#{file}"`
               # Remove the lines starting with `---`/`+++` which contains the file names (which are temp files we don't want to expose in the final diff to users)

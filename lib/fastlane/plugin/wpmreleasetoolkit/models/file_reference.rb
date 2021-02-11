@@ -15,12 +15,14 @@ module Fastlane
         # (This should be updated if we change CI or if fastlane is updated.)
         return File.read(secrets_repository_file_path) unless (self.encrypt || ENV.key?('CIRCLECI'))
         return nil unless File.file?(encrypted_file_path)
+
         encrypted = File.read(encrypted_file_path)
         Fastlane::Helper::EncryptionHelper.decrypt(encrypted, encryption_key)
       end
 
       def destination_contents
         return nil unless File.file?(destination_file_path)
+
         File.read(destination_file_path)
       end
 
@@ -31,6 +33,7 @@ module Fastlane
 
       def update
         return unless self.encrypt
+
         # Create the destination directory if it doesn't exist
         FileUtils.mkdir_p(Pathname.new(encrypted_file_path).dirname)
         # Encrypt the file
@@ -56,6 +59,7 @@ module Fastlane
 
       def destination_file_path
         return File.expand_path(self.destination) if self.destination.start_with?('~')
+
         File.join(Fastlane::Helper::FilesystemHelper.project_path, self.destination)
       end
 

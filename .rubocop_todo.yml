@@ -6,18 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 22
-# Cop supports --auto-correct.
-Layout/EmptyLineAfterGuardClause:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_version_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/configure_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/git_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_l10n_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_version_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/models/file_reference.rb'
-
 # Offense count: 9
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
