@@ -35,7 +35,7 @@ module Fastlane
               state = :discarding
               return
             else
-             yield(line)
+              yield(line)
             end
           end
         end

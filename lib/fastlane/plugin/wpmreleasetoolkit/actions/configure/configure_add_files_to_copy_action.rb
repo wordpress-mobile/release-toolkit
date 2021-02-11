@@ -65,19 +65,19 @@ module Fastlane
       end
 
       def self.secret_store_dir
-          Fastlane::Helper::FilesystemHelper.secret_store_dir
+        Fastlane::Helper::FilesystemHelper.secret_store_dir
       end
 
       def self.absolute_secret_store_path(relative_path)
-          Fastlane::Helper::FilesystemHelper.absolute_secret_store_path(relative_path)
+        Fastlane::Helper::FilesystemHelper.absolute_secret_store_path(relative_path)
       end
 
       def self.description
-          'Interactively add files to the `files_to_copy` list in .configure.'
+        'Interactively add files to the `files_to_copy` list in .configure.'
       end
 
       def self.authors
-          ['Jeremy Massel']
+        ['Jeremy Massel']
       end
 
       def self.return_value
@@ -85,15 +85,15 @@ module Fastlane
       end
 
       def self.details
-          'Interactively add files to the `files_to_copy` list in .configure.'
+        'Interactively add files to the `files_to_copy` list in .configure.'
       end
 
       def self.available_options
-          []
+        []
       end
 
       def self.is_supported?(platform)
-          true
+        true
       end
     end
   end

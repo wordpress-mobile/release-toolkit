@@ -12,15 +12,15 @@ module Fastlane
         params[:app_identifier].each { |identifier|
           Spaceship.provisioning_profile.find_by_bundle_id(bundle_id: identifier)
                    .select { |profile|
-              profile.kind_of? Spaceship::Portal::ProvisioningProfile::Development
+            profile.kind_of? Spaceship::Portal::ProvisioningProfile::Development
           }
                    .tap { |profiles|
-              UI.important "Warning: Unable to find any profiles associated with #{identifier}" unless profiles.length > 0
+            UI.important "Warning: Unable to find any profiles associated with #{identifier}" unless profiles.length > 0
           }
                    .each { |profile|
-              profile.devices = devices
-              profile.update!
-              UI.success "Applied #{devices.length} devices to #{profile.name}"
+            profile.devices = devices
+            profile.update!
+            UI.success "Applied #{devices.length} devices to #{profile.name}"
           }
         }
       end

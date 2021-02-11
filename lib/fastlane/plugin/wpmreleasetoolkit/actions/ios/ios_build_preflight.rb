@@ -11,19 +11,19 @@ module Fastlane
         # Verify that ImageMagick exists on this machine and can be called from the command-line.
         # Internal Builds use it to generate the App Icon as part of the build process
         begin
-            Action.sh('which convert')
+          Action.sh('which convert')
         rescue
-            UI.user_error!("Couldn't find ImageMagick. Please install it by running `brew install imagemagick`")
-            raise
+          UI.user_error!("Couldn't find ImageMagick. Please install it by running `brew install imagemagick`")
+          raise
         end
 
         # Verify that Ghostscript exists on this machine and can be called from the command-line.
         # Internal Builds use it to generate the App Icon as part of the build process
         begin
-            Action.sh('which gs')
+          Action.sh('which gs')
         rescue
-            UI.user_error!("Couldn't find Ghostscript. Please install it by running `brew install ghostscript`")
-            raise
+          UI.user_error!("Couldn't find Ghostscript. Please install it by running `brew install ghostscript`")
+          raise
         end
 
         # Check gems and pods are up to date. This will exit if it fails

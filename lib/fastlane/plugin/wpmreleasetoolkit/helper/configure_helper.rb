@@ -96,22 +96,22 @@ module Fastlane
       ### Returns whether or not the `.configure` file has a pinned hash that's older than the most recent
       ### ~/.mobile-secrets` commit hash.
       def self.configure_file_is_behind_local
-      	configure_file_commits_behind_repo > 0
+      	 configure_file_commits_behind_repo > 0
       end
 
       def self.configure_file_commits_behind_repo
-     	 # Get a sily number of revisions to ensure we don't miss any
-      	result = `cd #{repository_path} && git --no-pager log -10000 --pretty=format:"%H" && echo`
-      	hashes = result.each_line.map { |s| s.strip }.reverse
+     	  # Get a sily number of revisions to ensure we don't miss any
+      	 result = `cd #{repository_path} && git --no-pager log -10000 --pretty=format:"%H" && echo`
+      	 hashes = result.each_line.map { |s| s.strip }.reverse
 
-      	index_of_configure_hash = hashes.find_index(configure_file_commit_hash)
-      	index_of_repo_commit_hash = hashes.find_index(repo_commit_hash)
+      	 index_of_configure_hash = hashes.find_index(configure_file_commit_hash)
+      	 index_of_repo_commit_hash = hashes.find_index(repo_commit_hash)
 
-      	if index_of_configure_hash >= index_of_repo_commit_hash
-      		return 0
-      	end
+      	 if index_of_configure_hash >= index_of_repo_commit_hash
+       		 return 0
+       	end
 
-      	index_of_repo_commit_hash - index_of_configure_hash
+      	 index_of_repo_commit_hash - index_of_configure_hash
       end
 
       ### Get a list of files changed in the secrets repo between to commits
@@ -131,7 +131,7 @@ module Fastlane
         matches = repo_status.match(/behind \d+/)
 
         if matches == nil
-            return 0
+          return 0
         end
 
         parse_distance(matches[0])
@@ -148,7 +148,7 @@ module Fastlane
         matches = repo_status.match(/ahead \d+/)
 
         if matches == nil
-            return 0
+          return 0
         end
 
         parse_distance(matches[0])
@@ -160,7 +160,7 @@ module Fastlane
         distance = match.to_s.scan(/\d+/).first
 
         if distance == nil
-            return 0
+          return 0
         end
 
         distance.to_i
@@ -193,15 +193,15 @@ module Fastlane
         # Allows support for specifying directories – they'll be expanded recursively
         expanded_file_dependencies = file_dependencies.map { |path|
 
-            abs_path = self.mobile_secrets_path(path)
+          abs_path = self.mobile_secrets_path(path)
 
-            if File.directory?(abs_path)
-                Dir.glob("#{abs_path}**/*").map { |path|
-                    path.gsub(repository_path + '/', '')
-                }
-            else
-                return path
-            end
+          if File.directory?(abs_path)
+            Dir.glob("#{abs_path}**/*").map { |path|
+              path.gsub(repository_path + '/', '')
+            }
+          else
+            return path
+          end
         }
 
         self.files_to_copy.map { |o| o.file } + expanded_file_dependencies
@@ -214,17 +214,17 @@ module Fastlane
         file_dependencies ||= []
 
         directory_dependencies = file_dependencies.select { |path|
-            File.directory?(self.mobile_secrets_path(path))
+          File.directory?(self.mobile_secrets_path(path))
         }
 
         new_files = []
 
         files.each do |path|
-            directory_dependencies.each do |directory_name|
-                if path.start_with?(directory_name)
-                    new_files << path
-                end
+          directory_dependencies.each do |directory_name|
+            if path.start_with?(directory_name)
+              new_files << path
             end
+          end
         end
 
         new_files
@@ -235,11 +235,11 @@ module Fastlane
       def self.add_file(params)
 
         unless (params[:source])
-            UI.user_error!('You must pass a `source` to `add_file`')
+          UI.user_error!('You must pass a `source` to `add_file`')
         end
 
         unless (params[:destination])
-            UI.user_error!('You must pass a `destination` to `add_file`')
+          UI.user_error!('You must pass a `destination` to `add_file`')
         end
 
         new_config = self.configuration

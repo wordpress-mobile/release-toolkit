@@ -11,7 +11,7 @@ module Fastlane
 
         # If the `~/.mobile-secrets` repository doesn't exist
         unless File.directory?("#{secrets_dir}")
-            UI.user_error!("The local secrets store does not exist. Please clone it to #{secrets_dir} before continuing.")
+          UI.user_error!("The local secrets store does not exist. Please clone it to #{secrets_dir} before continuing.")
         else
           update_repository # If the repo already exists, just update it
         end

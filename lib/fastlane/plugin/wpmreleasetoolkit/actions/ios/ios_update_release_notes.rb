@@ -30,12 +30,12 @@ module Fastlane
       end
 
       def self.available_options
-      [
-        FastlaneCore::ConfigItem.new(key: :new_version,
-                                     env_name: 'FL_IOS_UPDATE_RELEASE_NOTES_VERSION',
-                                     description: 'The version we are currently freezing; An empty entry for the _next_ version after this one will be added to the release notes',
-                                     is_string: true)
-      ]
+        [
+          FastlaneCore::ConfigItem.new(key: :new_version,
+                                       env_name: 'FL_IOS_UPDATE_RELEASE_NOTES_VERSION',
+                                       description: 'The version we are currently freezing; An empty entry for the _next_ version after this one will be added to the release notes',
+                                       is_string: true)
+        ]
       end
 
       def self.output

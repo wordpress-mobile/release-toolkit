@@ -52,52 +52,52 @@ module Fastlane
         entries = config['entries']
                   .flat_map { |entry|
 
-            languages.map { |language|
+                    languages.map { |language|
 
-              newEntry = entry.deep_dup
+                      newEntry = entry.deep_dup
 
-              # Not every output file will have a screenshot, so handle cases where no
-              # screenshot file is defined
-              if entry['screenshot'] != nil && entry['filename'] != nil
-                newEntry['screenshot'] = helper.resolve_path(params[:orig_folder]) + language + entry['screenshot']
-                newEntry['filename'] =  outputDirectory + language + entry['filename']
-              elsif entry['screenshot'] != nil && entry['filename'] == nil
-                newEntry['screenshot'] = helper.resolve_path(params[:orig_folder]) + language + entry['screenshot']
-                newEntry['filename'] =  outputDirectory + language + entry['screenshot']
-              elsif entry['screenshot'] == nil && entry['filename'] != nil
-                newEntry['filename'] =  outputDirectory + language + entry['filename']
-              else
-                puts newEntry
-                abort 'Unable to find output file names'
-              end
+                      # Not every output file will have a screenshot, so handle cases where no
+                      # screenshot file is defined
+                      if entry['screenshot'] != nil && entry['filename'] != nil
+                        newEntry['screenshot'] = helper.resolve_path(params[:orig_folder]) + language + entry['screenshot']
+                        newEntry['filename'] =  outputDirectory + language + entry['filename']
+                      elsif entry['screenshot'] != nil && entry['filename'] == nil
+                        newEntry['screenshot'] = helper.resolve_path(params[:orig_folder]) + language + entry['screenshot']
+                        newEntry['filename'] =  outputDirectory + language + entry['screenshot']
+                      elsif entry['screenshot'] == nil && entry['filename'] != nil
+                        newEntry['filename'] =  outputDirectory + language + entry['filename']
+                      else
+                        puts newEntry
+                        abort 'Unable to find output file names'
+                      end
 
-              newEntry['locale'] = language
+                      newEntry['locale'] = language
 
-              # Localize file paths for text
-              if entry['text'] != nil
-                newEntry['text'].sub!('{locale}', language.dup)
-              end
+                      # Localize file paths for text
+                      if entry['text'] != nil
+                        newEntry['text'].sub!('{locale}', language.dup)
+                      end
 
-              # Map attachments paths to their localized versions
-              if newEntry['attachments'] == nil
-                  newEntry['attachments'] = []
-              end
+                      # Map attachments paths to their localized versions
+                      if newEntry['attachments'] == nil
+                        newEntry['attachments'] = []
+                      end
 
-              newEntry['attachments'].each { |attachment|
-                if attachment['file'] != nil
-                  attachment['file'].sub!('{locale}', language.dup)
-                end
+                      newEntry['attachments'].each { |attachment|
+                        if attachment['file'] != nil
+                          attachment['file'].sub!('{locale}', language.dup)
+                        end
 
-                if attachment['text'] != nil
-                  attachment['text'].sub!('{locale}', language.dup)
-                end
-              }
+                        if attachment['text'] != nil
+                          attachment['text'].sub!('{locale}', language.dup)
+                        end
+                      }
 
-              newEntry
-            }
+                      newEntry
+                    }
                   }
                   .sort { |x, y|
-            x['filename'] <=> y['filename']
+          x['filename'] <=> y['filename']
         }
 
         bar = ProgressBar.new(entries.count, :bar, :counter, :eta, :rate)

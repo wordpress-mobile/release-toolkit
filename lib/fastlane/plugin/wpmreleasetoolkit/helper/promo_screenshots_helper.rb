@@ -37,11 +37,11 @@ module Fastlane
         begin
           return JSON.parse(open(configFilePath).read)
         rescue
-            linter = JsonLint::Linter.new
-            linter.check(configFilePath)
-            linter.display_errors
+          linter = JsonLint::Linter.new
+          linter.check(configFilePath)
+          linter.display_errors
 
-            UI.user_error!('Invalid JSON configuration. See errors in log.')
+          UI.user_error!('Invalid JSON configuration. See errors in log.')
         end
       end
 
@@ -163,30 +163,30 @@ module Fastlane
 
       def draw_file_attachment_to_canvas(attachment, canvas, entry)
 
-          file = resolve_path(attachment['file'])
+        file = resolve_path(attachment['file'])
 
-          image = open_image(file)
+        image = open_image(file)
 
-          if attachment.member?('operations')
+        if attachment.member?('operations')
 
-            attachment['operations'].each { |operation|
-              image = apply_operation(image, operation, canvas)
-            }
+          attachment['operations'].each { |operation|
+            image = apply_operation(image, operation, canvas)
+          }
 
-          end
+        end
 
-          size = attachment['size']
+        size = attachment['size']
 
-          x_pos = attachment['position'][0]
-          y_pos = attachment['position'][1]
+        x_pos = attachment['position'][0]
+        y_pos = attachment['position'][1]
 
-          if attachment['offset'] != nil
-            x_pos += attachment['offset'][0]
-            y_pos += attachment['offset'][1]
-          end
+        if attachment['offset'] != nil
+          x_pos += attachment['offset'][0]
+          y_pos += attachment['offset'][1]
+        end
 
-          image = resize_image(image, size[0], size[1])
-          canvas = composite_image(canvas, image, x_pos, y_pos)
+        image = resize_image(image, size[0], size[1])
+        canvas = composite_image(canvas, image, x_pos, y_pos)
       end
 
       def draw_text_attachment_to_canvas(attachment, canvas, locale)
@@ -289,7 +289,7 @@ module Fastlane
       #
       # @return [Magick::Image] The masked image
       def mask_image(image, mask, offset_x = 0, offset_y = 0)
-          image.composite(mask, offset_x, offset_y, CopyAlphaCompositeOp)
+        image.composite(mask, offset_x, offset_y, CopyAlphaCompositeOp)
       end
 
       # resize_image
@@ -376,11 +376,11 @@ module Fastlane
       end
 
       def open_image(path)
-          path = resolve_path(path)
+        path = resolve_path(path)
 
-          Magick::Image.read(path)  {
-            self.background_color = 'transparent'
-          }.first
+        Magick::Image.read(path)  {
+          self.background_color = 'transparent'
+        }.first
       end
 
       def create_image(width, height, background = 'transparent')

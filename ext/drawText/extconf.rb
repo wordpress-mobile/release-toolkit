@@ -11,7 +11,7 @@ FileUtils.cp(File.join(drawTextDirectory, 'makefile.example'), File.join(compila
 
 # Only compile drawText on macOS
 unless OS.mac? then
-    exit 0
+  exit 0
 end
 
 # Swift is needed to compile the extension

@@ -111,7 +111,7 @@ module Fastlane
 
           # Dynamically create a SwiftGen config which will cover all supported languages
           langs = Dir.chdir(input_dir) do
-              Dir.glob('*.lproj/Localizable.strings').map { |loc_file| File.basename(File.dirname(loc_file), '.lproj') }
+            Dir.glob('*.lproj/Localizable.strings').map { |loc_file| File.basename(File.dirname(loc_file), '.lproj') }
           end.sort
           langs.select! { |lang| only_langs.include?(lang) } unless only_langs.nil?
 

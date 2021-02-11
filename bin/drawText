@@ -4,7 +4,7 @@ require 'rake'
 require 'os'
 
 unless OS.mac? then
-    abort 'Fatal Error: `drawText` can only be run on macOS.'
+  abort 'Fatal Error: `drawText` can only be run on macOS.'
 end
 
 plugin_path = Pathname(__FILE__).dirname.parent
@@ -13,10 +13,10 @@ executable_path = plugin_path + 'lib/drawText'
 # Run the script
 allArgs = ARGV.map { |arg|
 
-	argParts = arg.split('=')
-	argParts[1] = '"' + argParts[1] + '"'
+	 argParts = arg.split('=')
+	 argParts[1] = '"' + argParts[1] + '"'
 
-	argParts.join('=')
+	 argParts.join('=')
 
 }.join(' ')
 

@@ -149,7 +149,7 @@ module Fastlane
                                        description: 'The hash with the path to the source files and the key to use to include their content',
                                        is_string: false,
                                        verify_block: proc do |value|
-                                          UI.user_error!("No source file hash for UpdateMetadataSourceAction given, pass using `source_files: 'source file hash'`") unless (value and not value.empty?)
+                                         UI.user_error!("No source file hash for UpdateMetadataSourceAction given, pass using `source_files: 'source file hash'`") unless (value and not value.empty?)
                                        end)
         ]
       end
