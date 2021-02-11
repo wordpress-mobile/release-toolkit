@@ -85,18 +85,18 @@ module Fastlane
         # and for each, iterates on every entry found to print the key and the corresponding types parsed by SwiftGen from the placeholders found in that translation
         def template_content
           <<~TEMPLATE
-          {% macro recursiveBlock table item %}
-            {% for string in item.strings %}
-          "{{string.key}}" => [{{string.types|join:","}}]
-            {% endfor %}
-            {% for child in item.children %}
-            {% call recursiveBlock table child %}
-            {% endfor %}
-          {% endmacro %}
+            {% macro recursiveBlock table item %}
+              {% for string in item.strings %}
+            "{{string.key}}" => [{{string.types|join:","}}]
+              {% endfor %}
+              {% for child in item.children %}
+              {% call recursiveBlock table child %}
+              {% endfor %}
+            {% endmacro %}
 
-          {% for table in tables %}
-          {% call recursiveBlock table.name table.levels %}
-          {% endfor %}
+            {% for table in tables %}
+            {% call recursiveBlock table.name table.levels %}
+            {% endfor %}
           TEMPLATE
         end
 
