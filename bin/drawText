@@ -17,7 +17,6 @@ allArgs = ARGV.map { |arg|
   argParts[1] = '"' + argParts[1] + '"'
 
   argParts.join('=')
-
 }.join(' ')
 
 exec("#{executable_path} #{allArgs}")
