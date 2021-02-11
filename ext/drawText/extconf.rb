@@ -18,7 +18,6 @@ end
 find_executable('swift')
 find_executable('xcodebuild')
 
-
 system(
   'xcodebuild',
   '-project', File.join(drawTextDirectory, 'drawText.xcodeproj'),

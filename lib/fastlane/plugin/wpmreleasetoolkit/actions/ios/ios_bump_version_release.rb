@@ -84,7 +84,6 @@ module Fastlane
           platform == :ios
         end
 
-
         private
         def self.create_config()
           @current_version = Fastlane::Helper::Ios::VersionHelper.get_build_version()

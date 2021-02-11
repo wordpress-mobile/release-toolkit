@@ -58,7 +58,6 @@ module Fastlane
           platform == :android
         end
 
-
         private
         def self.create_config()
           @current_version = Fastlane::Helper::Android::VersionHelper.get_release_version()

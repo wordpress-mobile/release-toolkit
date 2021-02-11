@@ -37,19 +37,6 @@ Layout/EmptyLineAfterGuardClause:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_version_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/models/file_reference.rb'
 
-# Offense count: 10
-# Cop supports --auto-correct.
-Layout/EmptyLines:
-  Exclude:
-    - 'bin/drawText'
-    - 'ext/drawText/extconf.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/an_update_metadata_source_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_bump_version_release.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_update_metadata_source.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_bump_version_release.rb'
-    - 'spec/android_merge_translators_strings_spec.rb'
-    - 'spec/ios_merge_translators_strings_spec.rb'
-
 # Offense count: 9
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.

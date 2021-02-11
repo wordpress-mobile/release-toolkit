@@ -1,7 +1,6 @@
 require 'spec_helper.rb'
 require 'tmpdir'
 
-
 describe Fastlane::Actions::AndroidMergeTranslatorsStringsAction do
     before do
         @amtsTestUtils = AMTSTestUtils.new

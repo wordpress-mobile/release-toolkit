@@ -1,7 +1,6 @@
 require 'spec_helper.rb'
 require 'tmpdir'
 
-
 describe Fastlane::Actions::IosMergeTranslatorsStringsAction do
     before do
         @imtsTestUtils = IMTSTestUtils.new
