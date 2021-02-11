@@ -17,7 +17,7 @@ module Fastlane
       def download(target_locale, glotpress_url, is_source)
         uri = URI(glotpress_url)
         response = Net::HTTP.get_response(uri)
-        if response.code == "301"
+        if response.code == '301'
           response = Net::HTTP.get_response(URI.parse(response.header['location']))
         end
 
@@ -90,7 +90,7 @@ module Fastlane
         dir_path = File.dirname(file_path)
         FileUtils.mkdir_p(dir_path) unless File.exists?(dir_path)
 
-        File.open(file_path, "w") { |file| file.puts(content) }
+        File.open(file_path, 'w') { |file| file.puts(content) }
       end
 
       # Some small helpers

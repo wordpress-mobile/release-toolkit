@@ -30,7 +30,7 @@ def set_circle_env(define_ci)
   is_ci = ENV.key?('CIRCLECI')
   orig_circle_ci = ENV['CIRCLECI']
   if (define_ci)
-    ENV['CIRCLECI'] = "true"
+    ENV['CIRCLECI'] = 'true'
   else
     ENV.delete 'CIRCLECI'
   end
@@ -59,7 +59,7 @@ end
 # @param [String] output The output string to expect as a result of running the command. Defaults to "".
 # @return [MessageExpectation] self, to support further chaining.
 #
-def expect_shell_command(*command, exitstatus: 0, output: "")
+def expect_shell_command(*command, exitstatus: 0, output: '')
   mock_input = double(:input)
   mock_output = StringIO.new(output)
   mock_status = double(:status, exitstatus: exitstatus)

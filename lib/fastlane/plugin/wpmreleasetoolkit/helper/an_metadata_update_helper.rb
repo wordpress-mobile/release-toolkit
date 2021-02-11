@@ -55,17 +55,17 @@ module Fastlane
           fw.puts("msgid \"#{File.open(@content_file_path, "r").read}\"")
         else
           # Multiple line output
-          fw.puts("msgid \"\"")
+          fw.puts('msgid ""')
 
           # insert content
-          File.open(@content_file_path, "r").each do |line|
+          File.open(@content_file_path, 'r').each do |line|
             fw.puts("\"#{line.strip}\\n\"")
           end
         end
 
         # close
-        fw.puts("msgstr \"\"")
-        fw.puts("")
+        fw.puts('msgstr ""')
+        fw.puts('')
       end
     end
 
@@ -74,7 +74,7 @@ module Fastlane
 
       def initialize(block_key, content_file_path, release_version)
         super(block_key, content_file_path)
-        @rel_note_key = "release_note"
+        @rel_note_key = 'release_note'
         @release_version = release_version
         generate_keys(release_version)
       end
@@ -93,7 +93,7 @@ module Fastlane
 
       def is_handler_for(key)
         values = key.split('_')
-        key.start_with?(@rel_note_key) && values.length == 3 && (Integer(values[2].sub(/^[0]*/, "")) != nil rescue false)
+        key.start_with?(@rel_note_key) && values.length == 3 && (Integer(values[2].sub(/^[0]*/, '')) != nil rescue false)
       end
 
       def handle_line(fw, line)
@@ -115,17 +115,17 @@ module Fastlane
       def generate_block(fw)
         # init
         fw.puts("msgctxt \"#{@new_key}\"")
-        fw.puts("msgid \"\"")
+        fw.puts('msgid ""')
         fw.puts("\"#{@release_version}:\\n\"")
 
         # insert content
-        File.open(@content_file_path, "r").each do |line|
+        File.open(@content_file_path, 'r').each do |line|
           fw.puts("\"#{line.strip}\\n\"")
         end
 
         # close
-        fw.puts("msgstr \"\"")
-        fw.puts("")
+        fw.puts('msgstr ""')
+        fw.puts('')
       end
 
       def extract_key(line)
@@ -137,14 +137,14 @@ module Fastlane
 
       def initialize(block_key, content_file_path, release_version)
         super(block_key, content_file_path, release_version)
-        @rel_note_key = "release_note_short"
+        @rel_note_key = 'release_note_short'
         @release_version = release_version
         generate_keys(release_version)
       end
 
       def is_handler_for(key)
         values = key.split('_')
-        key.start_with?(@rel_note_key) && values.length == 4 && (Integer(values[3].sub(/^[0]*/, "")) != nil rescue false)
+        key.start_with?(@rel_note_key) && values.length == 4 && (Integer(values[3].sub(/^[0]*/, '')) != nil rescue false)
       end
 
       def generate_block(fw)

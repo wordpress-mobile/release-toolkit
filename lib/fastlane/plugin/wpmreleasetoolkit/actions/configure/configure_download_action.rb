@@ -7,7 +7,7 @@ module Fastlane
     class ConfigureDownloadAction < Action
       def self.run(params = {})
 
-        UI.message "Running Configure Download"
+        UI.message 'Running Configure Download'
 
         # If the `~/.mobile-secrets` repository doesn't exist
         unless File.directory?("#{secrets_dir}")
@@ -33,11 +33,11 @@ module Fastlane
       end
 
       def self.description
-        "Updates the mobile secrets."
+        'Updates the mobile secrets.'
       end
 
       def self.authors
-        ["Jeremy Massel"]
+        ['Jeremy Massel']
       end
 
       def self.return_value
@@ -45,7 +45,7 @@ module Fastlane
       end
 
       def self.details
-        "Pulls down the latest remote changes to the ~/.mobile-secrets repository."
+        'Pulls down the latest remote changes to the ~/.mobile-secrets repository.'
       end
 
       def self.available_options

@@ -2,12 +2,12 @@ require 'fastlane_core/ui/ui'
 require 'octokit'
 
 module Fastlane
-  UI = FastlaneCore::UI unless Fastlane.const_defined?("UI")
+  UI = FastlaneCore::UI unless Fastlane.const_defined?('UI')
 
   module Helper
     class GithubHelper
       def self.github_client
-        client = Octokit::Client.new(access_token: ENV["GHHELPER_ACCESS"])
+        client = Octokit::Client.new(access_token: ENV['GHHELPER_ACCESS'])
 
         # Fetch the current user
         user = client.user
@@ -31,7 +31,7 @@ module Fastlane
 
       def self.get_last_milestone(repository)
         options = {}
-        options[:state] = "open"
+        options[:state] = 'open'
 
         milestones = github_client().list_milestones(repository, options)
         if (milestones.nil?)
@@ -50,7 +50,7 @@ module Fastlane
                 last_stone = mile
               end
             rescue StandardError
-              puts "Found invalid milestone"
+              puts 'Found invalid milestone'
             end
           end
         end
@@ -72,7 +72,7 @@ module Fastlane
       def self.create_release(repository, version, release_notes, assets, prerelease)
         release = github_client().create_release(repository, version, name: version, draft: true, prerelease: prerelease, body: release_notes)
         assets.each do |file_path|
-          github_client().upload_asset(release[:url], file_path, content_type: "application/octet-stream")
+          github_client().upload_asset(release[:url], file_path, content_type: 'application/octet-stream')
         end
       end
     end

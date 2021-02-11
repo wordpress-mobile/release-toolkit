@@ -38,11 +38,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Download translated metadata"
+        'Download translated metadata'
       end
 
       def self.details
-        "Downloads tranlated metadata from GlotPress and updates local files"
+        'Downloads tranlated metadata from GlotPress and updates local files'
       end
 
       def self.available_options
@@ -51,23 +51,23 @@ module Fastlane
         # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :project_url,
-                                       env_name: "FL_DOWNLOAD_METADATA_PROJECT_URL", # The name of the environment variable
-                                       description: "GlotPress project URL"),
+                                       env_name: 'FL_DOWNLOAD_METADATA_PROJECT_URL', # The name of the environment variable
+                                       description: 'GlotPress project URL'),
           FastlaneCore::ConfigItem.new(key: :target_files,
-                                        env_name: "FL_DOWNLOAD_METADATA_TARGET_FILES",
-                                        description: "The hash with the path to the target files and the key to use to extract their content",
+                                        env_name: 'FL_DOWNLOAD_METADATA_TARGET_FILES',
+                                        description: 'The hash with the path to the target files and the key to use to extract their content',
                                         is_string: false),
           FastlaneCore::ConfigItem.new(key: :locales,
-                                          env_name: "FL_DOWNLOAD_METADATA_LOCALES",
-                                          description: "The hash with the GLotPress locale and the project locale association",
+                                          env_name: 'FL_DOWNLOAD_METADATA_LOCALES',
+                                          description: 'The hash with the GLotPress locale and the project locale association',
                                           is_string: false),
           FastlaneCore::ConfigItem.new(key: :source_locale,
-                                          env_name: "FL_DOWNLOAD_METADATA_SOURCE_LOCALE",
-                                          description: "The source locale code",
+                                          env_name: 'FL_DOWNLOAD_METADATA_SOURCE_LOCALE',
+                                          description: 'The source locale code',
                                           optional: true),
           FastlaneCore::ConfigItem.new(key: :download_path,
-                                          env_name: "FL_DOWNLOAD_METADATA_DOWNLOAD_PATH",
-                                          description: "The path of the target files",
+                                          env_name: 'FL_DOWNLOAD_METADATA_DOWNLOAD_PATH',
+                                          description: 'The path of the target files',
                                           is_string: true)
         ]
       end
@@ -81,7 +81,7 @@ module Fastlane
       end
 
       def self.authors
-        ["loremattei"]
+        ['loremattei']
       end
 
       def self.is_supported?(platform)

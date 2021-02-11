@@ -4,8 +4,8 @@ module Fastlane
       attr_accessor :file, :destination, :encrypt
 
       def initialize(params = {})
-        self.file = params[:file] || ""
-        self.destination = params[:destination] || ""
+        self.file = params[:file] || ''
+        self.destination = params[:destination] || ''
         self.encrypt = params[:encrypt] || false
       end
 

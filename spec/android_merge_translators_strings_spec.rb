@@ -9,23 +9,23 @@ describe Fastlane::Actions::AndroidMergeTranslatorsStringsAction do
     end
 
     it 'checks no merge' do
-        amts_run_test("test-merge-android-nomerge.json")
+        amts_run_test('test-merge-android-nomerge.json')
     end
 
     it 'checks merge simple' do
-        amts_run_test("test-merge-android-merge-simple.json")
+        amts_run_test('test-merge-android-merge-simple.json')
     end
 
     it 'checks merge overwrite' do
-        amts_run_test("test-merge-android-merge-overwrite.json")
+        amts_run_test('test-merge-android-merge-overwrite.json')
     end
 
     it 'checks merge overwrite with double key in pending file' do
-        amts_run_test("test-merge-android-merge-overwrite-double.json")
+        amts_run_test('test-merge-android-merge-overwrite-double.json')
     end
 
     it 'checks merge overwrite with fuzzy strings' do
-        amts_run_test("test-merge-android-merge-overwrite-fuzzy.json")
+        amts_run_test('test-merge-android-merge-overwrite-fuzzy.json')
     end
 
     after do
@@ -37,14 +37,14 @@ def amts_run_test(script)
     test_script = @amtsTestUtils.get_test_from_file(script)
     @amtsTestUtils.create_test_data(test_script)
     Fastlane::Actions::AndroidMergeTranslatorsStringsAction.run({ strings_folder: @amtsTestUtils.test_folder_path })
-    expect(@amtsTestUtils.read_result_data(test_script)).to eq(test_script["result"]["content"])
+    expect(@amtsTestUtils.read_result_data(test_script)).to eq(test_script['result']['content'])
 end
 
 class AMTSTestUtils
     attr_accessor :test_folder_path
 
     def initialize()
-        @test_folder_path = File.join(Dir.tmpdir(), "amts_tests")
+        @test_folder_path = File.join(Dir.tmpdir(), 'amts_tests')
     end
 
     def create_test_folder
@@ -61,12 +61,12 @@ class AMTSTestUtils
     end
 
     def test_data_path_for(filename)
-        File.expand_path(File.join(File.dirname(__FILE__), "test-data", filename))
+        File.expand_path(File.join(File.dirname(__FILE__), 'test-data', filename))
     end
 
     def create_test_data(test_script)
-        test_script["test_data"].each do |test_file|
-            self.generate_test_file(test_file["file"], test_file["content"])
+        test_script['test_data'].each do |test_file|
+            self.generate_test_file(test_file['file'], test_file['content'])
         end
     end
 
@@ -82,7 +82,7 @@ class AMTSTestUtils
     end
 
     def read_result_data(test_script)
-        file_path = File.join(@test_folder_path, test_script["result"]["file"])
+        file_path = File.join(@test_folder_path, test_script['result']['file'])
         return File.read(file_path)
     end
 end

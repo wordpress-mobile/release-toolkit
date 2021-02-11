@@ -137,7 +137,7 @@ module Fastlane
         def self.create_internal_version(version)
           vp = get_version_parts(version)
           d = DateTime.now
-          todayDate = d.strftime("%Y%m%d")
+          todayDate = d.strftime('%Y%m%d')
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}.#{todayDate}"
         end
 
@@ -199,7 +199,7 @@ module Fastlane
         # @raise [UserError] If the Deliverfile was not found.
         #
         def self.update_fastlane_deliver(new_version)
-          fd_file = "./fastlane/Deliverfile"
+          fd_file = './fastlane/Deliverfile'
           if (File.exist?(fd_file)) then
             Action.sh("sed -i '' \"s/app_version.*/app_version \\\"#{new_version}\\\"/\" #{fd_file}")
           else
@@ -217,8 +217,8 @@ module Fastlane
         # @param [String] internal_version The new version number to use as `VERSION_LONG` for the interrnal xcconfig file, if it exists
         #
         def self.update_xc_configs(new_version, new_version_short, internal_version)
-          update_xc_config(ENV["PUBLIC_CONFIG_FILE"], new_version, new_version_short)
-          update_xc_config(ENV["INTERNAL_CONFIG_FILE"], internal_version, new_version_short) unless ENV["INTERNAL_CONFIG_FILE"].nil?
+          update_xc_config(ENV['PUBLIC_CONFIG_FILE'], new_version, new_version_short)
+          update_xc_config(ENV['INTERNAL_CONFIG_FILE'], internal_version, new_version_short) unless ENV['INTERNAL_CONFIG_FILE'].nil?
         end
 
         # Updates an xcconfig file with new values for VERSION_SHORT and VERSION_LONG entries.
@@ -257,8 +257,8 @@ module Fastlane
         # @raise [UserError] Interrupts the lane if the provided version contains _more_ than 4 parts
         #
         def self.get_version_parts(version)
-          parts = version.split(".")
-          parts = parts.fill("0", parts.length...4).map { |chr| chr.to_i }
+          parts = version.split('.')
+          parts = parts.fill('0', parts.length...4).map { |chr| chr.to_i }
           if (parts.length > 4) then
             UI.user_error!("Bad version string: #{version}")
           end
@@ -272,7 +272,7 @@ module Fastlane
         # @return [String] The long version found in said xcconfig file, or nil if not found
         #
         def self.read_long_version_from_config_file(filePath)
-          read_from_config_file("VERSION_LONG", filePath)
+          read_from_config_file('VERSION_LONG', filePath)
         end
 
         # Extract the BUILD_NUMBER entry from an `xcconfig` file
@@ -281,7 +281,7 @@ module Fastlane
         # @return [String] The build number found in said xcconfig file, or nil if not found
         #
         def self.read_build_number_from_config_file(filePath)
-          read_from_config_file("BUILD_NUMBER", filePath)
+          read_from_config_file('BUILD_NUMBER', filePath)
         end
 
         # Read the value of a given key from an `.xcconfig` file.
@@ -292,11 +292,11 @@ module Fastlane
         # @return [String] The value for the given key, or `nil` if the key was not found.
         #
         def self.read_from_config_file(key, filePath)
-          File.open(filePath, "r") do |f|
+          File.open(filePath, 'r') do |f|
             f.each_line do |line|
               line = line.strip()
               if line.start_with?("#{key}=") then
-                  return line.split("=")[1]
+                  return line.split('=')[1]
                 end
               end
           end
@@ -314,8 +314,8 @@ module Fastlane
         #         The second element is the version extracted from the internal config file, only present if one was provided.
         def self.get_version_strings
           version_strings = Array.new
-          version_strings << read_long_version_from_config_file(ENV["PUBLIC_CONFIG_FILE"])
-          version_strings << read_long_version_from_config_file(ENV["INTERNAL_CONFIG_FILE"]) unless ENV["INTERNAL_CONFIG_FILE"].nil?
+          version_strings << read_long_version_from_config_file(ENV['PUBLIC_CONFIG_FILE'])
+          version_strings << read_long_version_from_config_file(ENV['INTERNAL_CONFIG_FILE']) unless ENV['INTERNAL_CONFIG_FILE'].nil?
 
           return version_strings
         end
@@ -331,7 +331,7 @@ module Fastlane
 
           v_parts.each do |part|
             if (!is_int?(part)) then
-              UI.user_error!("Version value can only contains numbers.")
+              UI.user_error!('Version value can only contains numbers.')
             end
           end
 

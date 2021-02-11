@@ -15,10 +15,10 @@ module Fastlane
 
         while (continue)
 
-          confirmation = "Do you want to specify a file that should be copied from the secrets repository into your project?"
+          confirmation = 'Do you want to specify a file that should be copied from the secrets repository into your project?'
 
           if Fastlane::Helper::ConfigureHelper.has_files
-            confirmation = "Do you want to specify additional files that should be copied from the secrets repository into your project?"
+            confirmation = 'Do you want to specify additional files that should be copied from the secrets repository into your project?'
           end
 
           if UI.confirm(confirmation)
@@ -40,10 +40,10 @@ module Fastlane
         invalid_file = true
 
         while invalid_file
-          UI.header "Please provide the location of the source file relative to the secrets repository"
-          UI.message "Example: google-services.json"
+          UI.header 'Please provide the location of the source file relative to the secrets repository'
+          UI.message 'Example: google-services.json'
 
-          source = UI.input("Source File Path:")
+          source = UI.input('Source File Path:')
           sourcePath = absolute_secret_store_path(source) # Transform the relative path into an absolute path.
 
           # Don't allow the developer to accidentally specify an invalid file, otherwise validation will never succeed.
@@ -54,12 +54,12 @@ module Fastlane
           end
         end
 
-        UI.header "Please provide the destination of the file relative to the project root"
-        UI.message "Example: WordPress/google-services.json"
+        UI.header 'Please provide the destination of the file relative to the project root'
+        UI.message 'Example: WordPress/google-services.json'
 
-        destination = UI.input("Destination File Path:") # Leave the destination as a relative path, as no validation is required.
+        destination = UI.input('Destination File Path:') # Leave the destination as a relative path, as no validation is required.
 
-        encrypt = UI.confirm("Encrypt file?:")
+        encrypt = UI.confirm('Encrypt file?:')
 
         Fastlane::Helper::ConfigureHelper.add_file(source: source, destination: destination, encrypt: encrypt)
       end
@@ -73,11 +73,11 @@ module Fastlane
       end
 
       def self.description
-          "Interactively add files to the `files_to_copy` list in .configure."
+          'Interactively add files to the `files_to_copy` list in .configure.'
       end
 
       def self.authors
-          ["Jeremy Massel"]
+          ['Jeremy Massel']
       end
 
       def self.return_value
@@ -85,7 +85,7 @@ module Fastlane
       end
 
       def self.details
-          "Interactively add files to the `files_to_copy` list in .configure."
+          'Interactively add files to the `files_to_copy` list in .configure.'
       end
 
       def self.available_options

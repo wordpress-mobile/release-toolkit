@@ -1,7 +1,7 @@
 source('https://rubygems.org')
 
 gemspec
-gem "danger", "~> 8.0"
+gem 'danger', '~> 8.0'
 
 group :test do
   gem 'codecov', :require => false

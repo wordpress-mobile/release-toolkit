@@ -8,9 +8,9 @@ module Fastlane
           UI.user_error!("Can't build beta and final at the same time!")
         end
 
-        Fastlane::Helper::GitHelper.ensure_on_branch!("release") unless other_action.is_ci()
+        Fastlane::Helper::GitHelper.ensure_on_branch!('release') unless other_action.is_ci()
 
-        message = ""
+        message = ''
         beta_version = Fastlane::Helper::Android::VersionHelper.get_release_version() unless !params[:beta] and !params[:final]
         alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version() unless !params[:alpha]
 
@@ -24,7 +24,7 @@ module Fastlane
 
         if (!params[:skip_confirm])
           if (!UI.confirm("#{message}Do you want to continue?"))
-            UI.user_error!("Aborted by user request")
+            UI.user_error!('Aborted by user request')
           end
         else
           UI.message(message)
@@ -39,33 +39,33 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Runs some prechecks before the build"
+        'Runs some prechecks before the build'
       end
 
       def self.details
-        "Runs some prechecks before the build"
+        'Runs some prechecks before the build'
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
-                                       env_name: "FL_ANDROID_BUILD_PRECHECKS_SKIP_CONFIRM",
-                                       description: "True to avoid the system ask for confirmation",
+                                       env_name: 'FL_ANDROID_BUILD_PRECHECKS_SKIP_CONFIRM',
+                                       description: 'True to avoid the system ask for confirmation',
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :alpha,
-                                       env_name: "FL_ANDROID_BUILD_PRECHECKS_ALPHA_BUILD",
-                                       description: "True if this is for an alpha build",
+                                       env_name: 'FL_ANDROID_BUILD_PRECHECKS_ALPHA_BUILD',
+                                       description: 'True if this is for an alpha build',
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :beta,
-                                      env_name: "FL_ANDROID_BUILD_PRECHECKS_BETA_BUILD",
-                                      description: "True if this is for a beta build",
+                                      env_name: 'FL_ANDROID_BUILD_PRECHECKS_BETA_BUILD',
+                                      description: 'True if this is for a beta build',
                                       is_string: false,
                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :final,
-                                      env_name: "FL_ANDROID_BUILD_PRECHECKS_FINAL_BUILD",
-                                      description: "True if this is for a final build",
+                                      env_name: 'FL_ANDROID_BUILD_PRECHECKS_FINAL_BUILD',
+                                      description: 'True if this is for a final build',
                                       is_string: false,
                                       default_value: false),
         ]
@@ -80,7 +80,7 @@ module Fastlane
       end
 
       def self.authors
-        ["loremattei"]
+        ['loremattei']
       end
 
       def self.is_supported?(platform)

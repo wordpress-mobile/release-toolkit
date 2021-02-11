@@ -15,15 +15,15 @@ module Fastlane
           UI.user_error!("Milestone #{milestone_title} not found.")
         end
 
-        Fastlane::Helper::GithubHelper.github_client().update_milestone(repository, milestone[:number], { :state => "closed" })
+        Fastlane::Helper::GithubHelper.github_client().update_milestone(repository, milestone[:number], { :state => 'closed' })
       end
 
       def self.description
-        "Closes an existing milestone in the project"
+        'Closes an existing milestone in the project'
       end
 
       def self.authors
-        ["Lorenzo Mattei"]
+        ['Lorenzo Mattei']
       end
 
       def self.return_value
@@ -32,19 +32,19 @@ module Fastlane
 
       def self.details
         # Optional:
-        "Closes an existing milestone in the project"
+        'Closes an existing milestone in the project'
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :repository,
-                                   env_name: "GHHELPER_REPOSITORY",
-                                description: "The remote path of the GH repository on which we work",
+                                   env_name: 'GHHELPER_REPOSITORY',
+                                description: 'The remote path of the GH repository on which we work',
                                    optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :milestone,
-                                        env_name: "GHHELPER_MILESTONE",
-                                     description: "The GitHub milestone",
+                                        env_name: 'GHHELPER_MILESTONE',
+                                     description: 'The GitHub milestone',
                                         optional: false,
                                             type: String),
         ]

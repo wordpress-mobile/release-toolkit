@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require "rake"
+require 'rake'
 require 'os'
 
 unless OS.mac? then
@@ -9,16 +9,16 @@ end
 
 
 plugin_path = Pathname(__FILE__).dirname.parent
-executable_path = plugin_path + "lib/drawText"
+executable_path = plugin_path + 'lib/drawText'
 
 # Run the script
 allArgs = ARGV.map { |arg|
 
-	argParts = arg.split("=")
+	argParts = arg.split('=')
 	argParts[1] = '"' + argParts[1] + '"'
 
-	argParts.join("=")
+	argParts.join('=')
 
-}.join(" ")
+}.join(' ')
 
 exec("#{executable_path} #{allArgs}")

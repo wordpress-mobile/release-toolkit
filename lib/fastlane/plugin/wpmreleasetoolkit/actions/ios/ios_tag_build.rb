@@ -6,7 +6,7 @@ module Fastlane
         require_relative '../../helper/ios/ios_git_helper.rb'
 
         itc_ver = Fastlane::Helper::Ios::VersionHelper.get_build_version()
-        int_ver = Fastlane::Helper::Ios::VersionHelper.get_internal_version() unless ENV["INTERNAL_CONFIG_FILE"].nil?
+        int_ver = Fastlane::Helper::Ios::VersionHelper.get_internal_version() unless ENV['INTERNAL_CONFIG_FILE'].nil?
         Fastlane::Helper::GitHelper.create_tag(itc_ver)
         Fastlane::Helper::GitHelper.create_tag(int_ver) unless int_ver.nil?
       end
@@ -16,11 +16,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Tags the current build"
+        'Tags the current build'
       end
 
       def self.details
-        "Tags the current build"
+        'Tags the current build'
       end
 
       def self.available_options
@@ -36,7 +36,7 @@ module Fastlane
       end
 
       def self.authors
-        ["loremattei"]
+        ['loremattei']
       end
 
       def self.is_supported?(platform)

@@ -22,11 +22,11 @@ module Fastlane
       end
 
       def self.description
-        "Checks that the strings to be localised are updated from the libs into the main application file"
+        'Checks that the strings to be localised are updated from the libs into the main application file'
       end
 
       def self.authors
-        ["Lorenzo Mattei"]
+        ['Lorenzo Mattei']
       end
 
       def self.return_value
@@ -34,23 +34,23 @@ module Fastlane
       end
 
       def self.details
-        "Checks that the strings to be localised are updated from the libs into the main application file"
+        'Checks that the strings to be localised are updated from the libs into the main application file'
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :app_strings_path,
-                                 description: "The path of the main strings file",
+                                 description: 'The path of the main strings file',
                                     optional: false,
                                    is_string: true),
           FastlaneCore::ConfigItem.new(key: :libs_strings_path,
-                                   env_name: "CHECK_LIBS_STRINGS_PATH",
-                                description: "The list of libs to merge",
+                                   env_name: 'CHECK_LIBS_STRINGS_PATH',
+                                description: 'The list of libs to merge',
                                    optional: false,
                                   is_string: false),
           FastlaneCore::ConfigItem.new(key: :diff_url,
-                                    env_name: "CHECK_LIBS_DIFF_URL",
-                                 description: "The url of the diff to check",
+                                    env_name: 'CHECK_LIBS_DIFF_URL',
+                                 description: 'The url of the diff to check',
                                     optional: true,
                                    is_string: true),
         ]

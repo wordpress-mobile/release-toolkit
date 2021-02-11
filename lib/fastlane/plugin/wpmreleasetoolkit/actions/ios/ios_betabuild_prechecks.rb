@@ -9,7 +9,7 @@ module Fastlane
         require_relative '../../helper/ios/ios_git_helper.rb'
 
         # Checkout develop and update
-        Fastlane::Helper::GitHelper.checkout_and_pull("develop")
+        Fastlane::Helper::GitHelper.checkout_and_pull('develop')
 
         # Check versions
         build_version = Fastlane::Helper::Ios::VersionHelper.get_build_version
@@ -27,7 +27,7 @@ module Fastlane
         message << "Updating branch to version: #{next_version}.\n"
         if (!params[:skip_confirm])
           if (!UI.confirm("#{message}Do you want to continue?"))
-            UI.user_error!("Aborted by user request")
+            UI.user_error!('Aborted by user request')
           end
         else
           UI.message(message)
@@ -52,23 +52,23 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Runs some prechecks before preparing for a new test build"
+        'Runs some prechecks before preparing for a new test build'
       end
 
       def self.details
-        "Updates the relevant release branch, checks the app version and ensure the branch is clean"
+        'Updates the relevant release branch, checks the app version and ensure the branch is clean'
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :base_version,
-                                       env_name: "FL_IOS_BETABUILD_PRECHECKS_BASE_VERSION",
-                                       description: "The version to work on", # a short description of this parameter
+                                       env_name: 'FL_IOS_BETABUILD_PRECHECKS_BASE_VERSION',
+                                       description: 'The version to work on', # a short description of this parameter
                                        is_string: true,
                                        optional: true), # true: verifies the input is a string, false: every kind of value),
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
-                                        env_name: "FL_IOS_BETABUILD_PRECHECKS_SKIPCONFIRM",
-                                        description: "Skips confirmation",
+                                        env_name: 'FL_IOS_BETABUILD_PRECHECKS_SKIPCONFIRM',
+                                        description: 'Skips confirmation',
                                         is_string: false, # true: verifies the input is a string, false: every kind of value
                                         default_value: false) # the default value if the user didn't provide one
         ]
@@ -84,7 +84,7 @@ module Fastlane
 
       def self.authors
         # So no one will ever forget your contribution to fastlane :) You are awesome btw!
-        ["loremattei"]
+        ['loremattei']
       end
 
       def self.is_supported?(platform)

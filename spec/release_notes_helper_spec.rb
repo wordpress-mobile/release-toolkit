@@ -85,7 +85,7 @@ def run_release_notes_test(header, post_header_content = FAKE_CONTENT)
     tmp_file = File.join(dir, 'TEST-REL-NOTES.txt')
     File.write(tmp_file, header + post_header_content)
 
-    Fastlane::Helper::ReleaseNotesHelper.add_new_section(path: tmp_file, section_title: "New Section")
+    Fastlane::Helper::ReleaseNotesHelper.add_new_section(path: tmp_file, section_title: 'New Section')
 
     new_content = File.read(tmp_file)
     expect(new_content).to eq(header + NEW_SECTION + post_header_content)

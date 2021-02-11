@@ -18,18 +18,18 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Finalize a relasae"
+        'Finalize a relasae'
       end
 
       def self.details
-        "Removes the temp tags and pushes the final one"
+        'Removes the temp tags and pushes the final one'
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :version,
-                                        env_name: "FL_IOS_FINAL_TAG_VERSION",
-                                        description: "The version of the release to finalize",
+                                        env_name: 'FL_IOS_FINAL_TAG_VERSION',
+                                        description: 'The version of the release to finalize',
                                         is_string: true)
         ]
       end
@@ -43,7 +43,7 @@ module Fastlane
       end
 
       def self.authors
-        ["loremattei"]
+        ['loremattei']
       end
 
       def self.is_supported?(platform)

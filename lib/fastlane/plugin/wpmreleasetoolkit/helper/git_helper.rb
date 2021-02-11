@@ -11,7 +11,7 @@ module Fastlane
       # @return [Bool] True if the current directory is the root of a git repo (i.e. a local working copy) or a subdirectory of one.
       #
       def self.is_git_repo?
-        system "git rev-parse --git-dir 1> /dev/null 2>/dev/null"
+        system 'git rev-parse --git-dir 1> /dev/null 2>/dev/null'
       end
 
       # Check if the current directory has git-lfs enabled
@@ -33,8 +33,8 @@ module Fastlane
       #
       def self.checkout_and_pull(branch)
         branch = branch.first.join('/') if branch.is_a?(Hash)
-        Action.sh("git", "checkout", branch)
-        Action.sh("git", "pull")
+        Action.sh('git', 'checkout', branch)
+        Action.sh('git', 'pull')
         return true
       rescue
         return false
@@ -52,12 +52,12 @@ module Fastlane
       def self.create_branch(branch_name, from: nil, push: true)
         if branch_exists?(branch_name)
           UI.message("Branch #{branch_name} already exists. Skipping creation.")
-          Action.sh("git", "checkout", branch_name)
-          Action.sh("git", "pull", "origin", branch_name)
+          Action.sh('git', 'checkout', branch_name)
+          Action.sh('git', 'pull', 'origin', branch_name)
         else
-          Action.sh("git", "checkout", from) unless from.nil?
-          Action.sh("git", "checkout", "-b", branch_name)
-          Action.sh("git", "push", "-u", "origin", branch_name) if push
+          Action.sh('git', 'checkout', from) unless from.nil?
+          Action.sh('git', 'checkout', '-b', branch_name)
+          Action.sh('git', 'push', '-u', 'origin', branch_name) if push
         end
       end
 
@@ -78,11 +78,11 @@ module Fastlane
         if files == :all
           args = ['-a']
         elsif !files.nil? && !files.empty?
-          Action.sh("git", "add", *files)
+          Action.sh('git', 'add', *files)
         end
         begin
-          Action.sh("git", "commit", *args, "-m", message)
-          Action.sh("git", "push", "origin", "HEAD") if push
+          Action.sh('git', 'commit', *args, '-m', message)
+          Action.sh('git', 'push', 'origin', 'HEAD') if push
           return true
         rescue
           return false
@@ -95,8 +95,8 @@ module Fastlane
       # @param [Bool] push If true (the default), the tag will also be pushed to `origin`
       #
       def self.create_tag(version, push: true)
-        Action.sh("git", "tag", version)
-        Action.sh("git", "push", "origin", version) if push
+        Action.sh('git', 'tag', version)
+        Action.sh('git', 'push', 'origin', version) if push
       end
 
       # Returns the list of tags that are pointing to the current commit (HEAD)
@@ -104,7 +104,7 @@ module Fastlane
       # @return [Array<String>] List of tags associated with the HEAD commit
       #
       def self.list_tags_on_current_commit
-        Action.sh("git", "tag", "--points-at", "HEAD").split("\n")
+        Action.sh('git', 'tag', '--points-at', 'HEAD').split("\n")
       end
 
       # List all the tags in the local working copy, optionally filtering the list using a pattern
@@ -114,8 +114,8 @@ module Fastlane
       #
       # @return [Array<String>] The list of local tags matching the pattern
       #
-      def self.list_local_tags(matching: "*")
-        Action.sh("git", "tag", "--list", matching).split("\n")
+      def self.list_local_tags(matching: '*')
+        Action.sh('git', 'tag', '--list', matching).split("\n")
       end
 
       # Delete the mentioned local tags in the local working copy, and optionally delete them on the remote too.
@@ -124,17 +124,17 @@ module Fastlane
       # @param [Bool] delete_on_remote If true, will also delete the tag from the remote. Otherwise, it will only be deleted locally.
       #
       def self.delete_tags(tag_names, delete_on_remote: false)
-        Action.sh("git", "tag", "-d", *tag_names)
+        Action.sh('git', 'tag', '-d', *tag_names)
         if delete_on_remote
           remote_refs = tag_names.map { |tag| ":refs/tags/#{tag}" }
-          Action.sh("git", "push", "origin", *remote_refs)
+          Action.sh('git', 'push', 'origin', *remote_refs)
         end
       end
 
       # Fetch all the tags from the remote.
       #
       def self.fetch_all_tags()
-        Action.sh("git", "fetch", "--tags")
+        Action.sh('git', 'fetch', '--tags')
       end
 
       # Checks if a branch exists locally.
@@ -144,7 +144,7 @@ module Fastlane
       # @return [Bool] True if the branch exists in the local working copy, false otherwise.
       #
       def self.branch_exists?(branch_name)
-        !Action.sh("git", "branch", "--list", branch_name).empty?
+        !Action.sh('git', 'branch', '--list', branch_name).empty?
       end
 
       # Ensure that we are on the expected branch, and abort if not.
@@ -154,7 +154,7 @@ module Fastlane
       # @raise [UserError] Raises a user_error! and interrupts the lane if we are not on the expected branch.
       #
       def self.ensure_on_branch!(branch_name)
-        current_branch_name = Action.sh("git", "symbolic-ref", "-q", "HEAD")
+        current_branch_name = Action.sh('git', 'symbolic-ref', '-q', 'HEAD')
         UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)
       end
     end

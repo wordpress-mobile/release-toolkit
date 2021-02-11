@@ -17,7 +17,7 @@ module Fastlane
         end
 
         def self.run_linter(params)
-          UI.message "Linting localizations for parameter placeholders consistency..."
+          UI.message 'Linting localizations for parameter placeholders consistency...'
 
           require_relative '../../helper/ios/ios_l10n_helper.rb'
           helper = Fastlane::Helper::Ios::L10nHelper.new(
@@ -79,65 +79,65 @@ module Fastlane
         #####################################################
 
         def self.description
-          "Lint the different *.lproj/.strings files for each locale and ensure the parameter placeholders are consistent."
+          'Lint the different *.lproj/.strings files for each locale and ensure the parameter placeholders are consistent.'
         end
 
         def self.details
-          "Compares the translations against a base language to find potential mismatches for the %s/%d/… parameter placeholders between locales."
+          'Compares the translations against a base language to find potential mismatches for the %s/%d/… parameter placeholders between locales.'
         end
 
         def self.available_options
           [
             FastlaneCore::ConfigItem.new(
               key: :install_path,
-              env_name: "FL_IOS_LINT_TRANSLATIONS_INSTALL_PATH",
-              description: "The path where to install the SwiftGen tooling needed to run the linting process. If a relative path, should be relative to your repo_root",
+              env_name: 'FL_IOS_LINT_TRANSLATIONS_INSTALL_PATH',
+              description: 'The path where to install the SwiftGen tooling needed to run the linting process. If a relative path, should be relative to your repo_root',
               type: String,
               optional: true,
               default_value: "vendor/swiftgen/#{Fastlane::Helper::Ios::L10nHelper::SWIFTGEN_VERSION}"
             ),
             FastlaneCore::ConfigItem.new(
               key: :version,
-              env_name: "FL_IOS_LINT_TRANSLATIONS_SWIFTGEN_VERSION",
-              description: "The version of SwiftGen to install and use for linting",
+              env_name: 'FL_IOS_LINT_TRANSLATIONS_SWIFTGEN_VERSION',
+              description: 'The version of SwiftGen to install and use for linting',
               type: String,
               optional: true,
               default_value: Fastlane::Helper::Ios::L10nHelper::SWIFTGEN_VERSION
             ),
             FastlaneCore::ConfigItem.new(
               key: :input_dir,
-              env_name: "FL_IOS_LINT_TRANSLATIONS_INPUT_DIR",
-              description: "The path to the directory containing the .lproj folders to lint, relative to your git repo root",
+              env_name: 'FL_IOS_LINT_TRANSLATIONS_INPUT_DIR',
+              description: 'The path to the directory containing the .lproj folders to lint, relative to your git repo root',
               type: String,
               optional: false
             ),
             FastlaneCore::ConfigItem.new(
               key: :base_lang,
-              env_name: "FL_IOS_LINT_TRANSLATIONS_BASE_LANG",
-              description: "The language that should be used as the base language that every other language will be compared against",
+              env_name: 'FL_IOS_LINT_TRANSLATIONS_BASE_LANG',
+              description: 'The language that should be used as the base language that every other language will be compared against',
               type: String,
               optional: true,
               default_value: Fastlane::Helper::Ios::L10nHelper::DEFAULT_BASE_LANG
             ),
             FastlaneCore::ConfigItem.new(
               key: :only_langs,
-              env_name: "FL_IOS_LINT_TRANSLATIONS_ONLY_LANGS",
-              description: "The list of languages to limit the analysis to",
+              env_name: 'FL_IOS_LINT_TRANSLATIONS_ONLY_LANGS',
+              description: 'The list of languages to limit the analysis to',
               type: Array,
               optional: true
             ),
             FastlaneCore::ConfigItem.new(
               key: :abort_on_violations,
-              env_name: "FL_IOS_LINT_TRANSLATIONS_ABORT",
-              description: "Should we abort the rest of the lane with a global error if any violations are found?",
+              env_name: 'FL_IOS_LINT_TRANSLATIONS_ABORT',
+              description: 'Should we abort the rest of the lane with a global error if any violations are found?',
               optional: true,
               default_value: true,
               is_string: false # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
             ),
             FastlaneCore::ConfigItem.new(
               key: :allow_retry,
-              env_name: "FL_IOS_LINT_TRANSLATIONS_ALLOW_RETRY",
-              description: "If any violations are found, show an interactive prompt allowing the user to manually fix the issues locally and retry the linting",
+              env_name: 'FL_IOS_LINT_TRANSLATIONS_ALLOW_RETRY',
+              description: 'If any violations are found, show an interactive prompt allowing the user to manually fix the issues locally and retry the linting',
               optional: true,
               default_value: false,
               is_string: false # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
@@ -154,11 +154,11 @@ module Fastlane
         end
 
         def self.return_value
-          "A hash, keyed by language code, whose values are the diff found for said language"
+          'A hash, keyed by language code, whose values are the diff found for said language'
         end
 
         def self.authors
-          ["AliSoftware"]
+          ['AliSoftware']
         end
 
         def self.is_supported?(platform)

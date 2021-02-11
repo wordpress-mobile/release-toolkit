@@ -5,9 +5,9 @@ module Fastlane
       #
       module VersionHelper
         # The key used in internal version Hash objects to hold the versionName value
-        VERSION_NAME = "name"
+        VERSION_NAME = 'name'
         # The key used in internal version Hash objects to hold the versionCode value
-        VERSION_CODE = "code"
+        VERSION_CODE = 'code'
         # The index for the major version number part
         MAJOR_NUMBER = 0
         # The index for the minor version number part
@@ -15,9 +15,9 @@ module Fastlane
         # The index for the hotfix version number part
         HOTFIX_NUMBER = 2
         # The prefix used in front of the versionName for alpha versions
-        ALPHA_PREFIX = "alpha-"
+        ALPHA_PREFIX = 'alpha-'
         # The suffix used in the versionName for RC (beta) versions
-        RC_SUFFIX = "-rc"
+        RC_SUFFIX = '-rc'
 
         # Returns the public-facing version string.
         #
@@ -45,7 +45,7 @@ module Fastlane
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_release_version
-          section = ENV["HAS_ALPHA_VERSION"].nil? ? "defaultConfig" : "vanilla {"
+          section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
           gradle_path = self.gradle_path
           name = get_version_name_from_gradle_file(gradle_path, section)
           code = get_version_build_from_gradle_file(gradle_path, section)
@@ -58,9 +58,9 @@ module Fastlane
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
         def self.get_alpha_version
-          return nil if ENV["HAS_ALPHA_VERSION"].nil?
+          return nil if ENV['HAS_ALPHA_VERSION'].nil?
 
-          section = "defaultConfig"
+          section = 'defaultConfig'
           gradle_path = self.gradle_path
           name = get_version_name_from_gradle_file(gradle_path, section)
           code = get_version_build_from_gradle_file(gradle_path, section)
@@ -272,8 +272,8 @@ module Fastlane
         # @env HAS_ALPHA_VERSION If set (with any value), indicates that the project uses `vanilla` flavor.
         #
         def self.update_versions(new_version_beta, new_version_alpha)
-          self.update_version(new_version_beta, ENV["HAS_ALPHA_VERSION"].nil? ? "defaultConfig" : "vanilla {")
-          self.update_version(new_version_alpha, "defaultConfig") unless new_version_alpha.nil?
+          self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
+          self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
         end
 
         # Compute the name of the previous hotfix version.
@@ -314,7 +314,7 @@ module Fastlane
         #                      Always contains 3 items at minimum (0 are added to the end if the original string contains less than 3 parts)
         #
         def self.get_version_parts(version)
-          parts = version.split(".").map(&:to_i)
+          parts = version.split('.').map(&:to_i)
           parts.fill(0, parts.length...3) # add 0 if needed to ensure array has at least 3 components
           return parts
         end
@@ -327,7 +327,7 @@ module Fastlane
         # @return [String] The value of the versionName attribute as found in the build.gradle file and for this section.
         #
         def self.get_version_name_from_gradle_file(file_path, section)
-          res = get_keyword_from_gradle_file(file_path, section, "versionName")
+          res = get_keyword_from_gradle_file(file_path, section, 'versionName')
           res = res.tr('\"', '') unless res.nil?
           return res
         end
@@ -340,7 +340,7 @@ module Fastlane
         # @return [String] The value of the versionCode attribute as found in the build.gradle file and for this section.
         #
         def self.get_version_build_from_gradle_file(file_path, section)
-          res = get_keyword_from_gradle_file(file_path, section, "versionCode")
+          res = get_keyword_from_gradle_file(file_path, section, 'versionCode')
           return res.to_i
         end
 
@@ -385,7 +385,7 @@ module Fastlane
 
           v_parts.each do |part|
             if (!is_int?(part)) then
-              UI.user_error!("Version value can only contains numbers.")
+              UI.user_error!('Version value can only contains numbers.')
             end
           end
 
@@ -410,9 +410,9 @@ module Fastlane
         # @return [String] The path of the `build.gradle` file inside the project subfolder in the project's repo
         #
         def self.gradle_path
-          UI.user_error!("You need to set the \`PROJECT_ROOT_FOLDER\` environment variable to the path to the project's root") if ENV["PROJECT_ROOT_FOLDER"].nil?
-          UI.user_error!("You need to set the \`PROJECT_NAME\` environment variable to the relative path to the project subfolder name") if ENV["PROJECT_NAME"].nil?
-          File.join(ENV["PROJECT_ROOT_FOLDER"], ENV["PROJECT_NAME"], 'build.gradle')
+          UI.user_error!("You need to set the \`PROJECT_ROOT_FOLDER\` environment variable to the path to the project's root") if ENV['PROJECT_ROOT_FOLDER'].nil?
+          UI.user_error!("You need to set the \`PROJECT_NAME\` environment variable to the relative path to the project subfolder name") if ENV['PROJECT_NAME'].nil?
+          File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'build.gradle')
         end
 
         # Update both the versionName and versionCode of the build.gradle file to the specified version.
@@ -437,13 +437,13 @@ module Fastlane
                 end
               else
                 if (version_updated < 2)
-                  if line.include?("versionName") && !line.include?('"versionName"') && !line.include?("PversionName")
+                  if line.include?('versionName') && !line.include?('"versionName"') && !line.include?('PversionName')
                     version_name = line.split(' ')[1].tr('\"', '')
                     line.sub!(version_name, version[VERSION_NAME].to_s)
                     version_updated = version_updated + 1
                   end
 
-                  if (line.include? "versionCode")
+                  if (line.include? 'versionCode')
                     version_code = line.split(' ')[1]
                     line.sub!(version_code, version[VERSION_CODE].to_s)
                     version_updated = version_updated + 1

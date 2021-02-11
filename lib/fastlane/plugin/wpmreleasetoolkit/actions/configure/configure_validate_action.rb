@@ -29,7 +29,7 @@ module Fastlane
 
         validate_that_all_copied_files_match
 
-        UI.success "Configuration is valid"
+        UI.success 'Configuration is valid'
       end
 
       ###
@@ -46,7 +46,7 @@ module Fastlane
         unless repo_branch_name == file_branch_name
 
           UI.user_error!([
-            "The branch specified in `.configure` is not the currently checked out branch in the secrets repository.",
+            'The branch specified in `.configure` is not the currently checked out branch in the secrets repository.',
             "To fix this issue, switch back to the `#{file_branch_name}` branch in the mobile secrets repository.",
           ].join("\n"))
         end
@@ -61,7 +61,7 @@ module Fastlane
         unless repo_hash == file_hash
 
           UI.user_error!([
-            "The pinned_hash specified in `.configure` is not the currently checked out hash in the secrets repository.",
+            'The pinned_hash specified in `.configure` is not the currently checked out hash in the secrets repository.',
             "To fix this issue, check out the `#{file_hash}` hash in the mobile secrets repository.",
           ].join("\n"))
         end
@@ -91,7 +91,7 @@ module Fastlane
       ### Validate that the secrets repo doesn't have any local changes
       def self.validate_that_secrets_repo_is_clean
         unless Fastlane::Helper::ConfigureHelper.repo_has_changes
-            UI.user_error!("The secrets repository has uncommitted changes. Please commit or discard them before continuing.")
+            UI.user_error!('The secrets repository has uncommitted changes. Please commit or discard them before continuing.')
         end
       end
 
@@ -129,15 +129,15 @@ module Fastlane
       end
 
       def self.description
-        "Ensure that the configuration is valid"
+        'Ensure that the configuration is valid'
       end
 
       def self.authors
-        ["Jeremy Massel"]
+        ['Jeremy Massel']
       end
 
       def self.details
-        "Ensure that the configuration is valid"
+        'Ensure that the configuration is valid'
       end
 
       def self.is_supported?(platform)

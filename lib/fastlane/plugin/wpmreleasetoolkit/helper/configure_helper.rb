@@ -4,7 +4,7 @@ require 'fileutils'
 require_relative '../models/configuration'
 
 module Fastlane
-  UI = FastlaneCore::UI unless Fastlane.const_defined?("UI")
+  UI = FastlaneCore::UI unless Fastlane.const_defined?('UI')
 
   module Helper
     class ConfigureHelper
@@ -73,7 +73,7 @@ module Fastlane
       ### NB: Returns nil if the repo is in a detached HEAD state.
       def self.repo_branch_name
         result = `cd #{repository_path} && git rev-parse --abbrev-ref HEAD`.strip
-        (result == "HEAD") ? nil : result
+        (result == 'HEAD') ? nil : result
       end
 
       ### Returns the most recent commit hash in the `~/.mobile-secrets` repository.
@@ -197,7 +197,7 @@ module Fastlane
 
             if File.directory?(abs_path)
                 Dir.glob("#{abs_path}**/*").map { |path|
-                    path.gsub(repository_path + "/", "")
+                    path.gsub(repository_path + '/', '')
                 }
             else
                 return path
@@ -235,11 +235,11 @@ module Fastlane
       def self.add_file(params)
 
         unless (params[:source])
-            UI.user_error!("You must pass a `source` to `add_file`")
+            UI.user_error!('You must pass a `source` to `add_file`')
         end
 
         unless (params[:destination])
-            UI.user_error!("You must pass a `destination` to `add_file`")
+            UI.user_error!('You must pass a `destination` to `add_file`')
         end
 
         new_config = self.configuration

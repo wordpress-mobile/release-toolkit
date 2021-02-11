@@ -3,7 +3,7 @@ require 'fileutils'
 require 'digest'
 
 module Fastlane
-  UI = FastlaneCore::UI unless Fastlane.const_defined?("UI")
+  UI = FastlaneCore::UI unless Fastlane.const_defined?('UI')
 
   module Helper
     class FilesystemHelper
@@ -19,7 +19,7 @@ module Fastlane
             while continue
                 child_filenames = dir.children.map! { |x| File.basename(x) }
 
-                if child_filenames.include? ".git"
+                if child_filenames.include? '.git'
                     continue = false
                 else
                     dir = dir.parent
@@ -41,14 +41,14 @@ module Fastlane
             while continue
                 child_filenames = dir.children.map! { |x| File.basename(x) }
 
-                if child_filenames.include? "fastlane-plugin-wpmreleasetoolkit.gemspec"
+                if child_filenames.include? 'fastlane-plugin-wpmreleasetoolkit.gemspec'
                     continue = false
                 else
                     dir = dir.parent
                 end
 
                 if dir.root?
-                    UI.user_error!("Unable to determine the plugin root directory.")
+                    UI.user_error!('Unable to determine the plugin root directory.')
                 end
             end
 
@@ -57,12 +57,12 @@ module Fastlane
 
         ### Returns the path to the project's `.configure` file.
         def self.configure_file
-            Pathname.new(project_path) + ".configure"
+            Pathname.new(project_path) + '.configure'
         end
 
         ### Returns the path to the project's `.configure-files` directory.
         def self.configure_files_dir
-            Pathname.new(project_path) + ".configure-files"
+            Pathname.new(project_path) + '.configure-files'
         end
 
         def self.encrypted_file_path(file)

@@ -11,11 +11,11 @@ module Fastlane
         #####################################################
 
         def self.description
-          "Gets the public version of the app"
+          'Gets the public version of the app'
         end
 
         def self.details
-          "Gets the public version of the app"
+          'Gets the public version of the app'
         end
 
         def self.available_options
@@ -29,12 +29,12 @@ module Fastlane
 
         def self.return_value
           # If you method provides a return value, you can describe here what it does
-          "Return the public version of the app"
+          'Return the public version of the app'
         end
 
         def self.authors
           # So no one will ever forget your contribution to fastlane :) You are awesome btw!
-          ["loremattei"]
+          ['loremattei']
         end
 
         def self.is_supported?(platform)

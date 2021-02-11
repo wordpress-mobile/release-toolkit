@@ -123,7 +123,7 @@ module Fastlane
                   'inputs' => ["#{lang}.lproj/Localizable.strings"],
                   # Choose an unlikely separator (instead of the default '.') to avoid creating needlessly complex Stencil Context nested
                   # structure just because we have '.' in the English sentences we use (instead of structured reverse-dns notation) for the keys
-                  'options' => { 'separator' => "____" },
+                  'options' => { 'separator' => '____' },
                   'outputs' => [{
                       'templatePath' => template_path,
                       'output' => output_filename(lang)

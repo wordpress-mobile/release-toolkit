@@ -6,9 +6,9 @@ module Fastlane
           require_relative '../../helper/android/android_git_helper.rb'
 
           release_ver = Fastlane::Helper::Android::VersionHelper.get_release_version()
-          alpha_ver = Fastlane::Helper::Android::VersionHelper.get_alpha_version() unless ENV["HAS_ALPHA_VERSION"].nil?
+          alpha_ver = Fastlane::Helper::Android::VersionHelper.get_alpha_version() unless ENV['HAS_ALPHA_VERSION'].nil?
           Fastlane::Helper::GitHelper.create_tag(release_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME])
-          Fastlane::Helper::GitHelper.create_tag(alpha_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]) unless ENV["HAS_ALPHA_VERSION"].nil? || (params[:tag_alpha] == false)
+          Fastlane::Helper::GitHelper.create_tag(alpha_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]) unless ENV['HAS_ALPHA_VERSION'].nil? || (params[:tag_alpha] == false)
         end
 
         #####################################################
@@ -16,18 +16,18 @@ module Fastlane
         #####################################################
 
         def self.description
-          "Tags the current build"
+          'Tags the current build'
         end
 
         def self.details
-          "Tags the current build"
+          'Tags the current build'
         end
 
         def self.available_options
           [
             FastlaneCore::ConfigItem.new(key: :tag_alpha,
-                                         env_name: "FL_ANDROID_TAG_BUILD_ALPHA",
-                                         description: "True to skip tagging the alpha version",
+                                         env_name: 'FL_ANDROID_TAG_BUILD_ALPHA',
+                                         description: 'True to skip tagging the alpha version',
                                          is_string: false,
                                          default_value: true)
           ]
@@ -42,7 +42,7 @@ module Fastlane
         end
 
         def self.authors
-          ["loremattei"]
+          ['loremattei']
         end
 
         def self.is_supported?(platform)
