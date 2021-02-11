@@ -7,7 +7,6 @@ module Fastlane
 
   module Helper
     class FilesystemHelper
-
       ### Traverse the file system to find the root project directory.
       ### For the purposes of this function, we're assuming the root project
       ### directory is the one with the `.git` file in it.

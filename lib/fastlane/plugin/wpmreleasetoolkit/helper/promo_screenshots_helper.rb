@@ -20,7 +20,6 @@ include Magick unless $skip_magick
 module Fastlane
   module Helper
     class PromoScreenshots
-
       def initialize
         if ($skip_magick)
           message = "PromoScreenshots feature is currently disabled.\n"

@@ -7,7 +7,6 @@ require_relative '../../helper/configure_helper'
 module Fastlane
   module Actions
     class ConfigureUpdateAction < Action
-
       def self.run(params = {})
 
         prompt_to_switch_branches

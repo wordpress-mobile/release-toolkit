@@ -134,7 +134,6 @@ module Fastlane
     end
 
     class ReleaseNoteShortMetadataBlock < ReleaseNoteMetadataBlock
-
       def initialize(block_key, content_file_path, release_version)
         super(block_key, content_file_path, release_version)
         @rel_note_key = 'release_note_short'

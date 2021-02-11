@@ -9,7 +9,6 @@ require_relative '../../helper/configure_helper'
 module Fastlane
   module Actions
     class ConfigureSetupAction < Action
-
       def self.run(params = {})
 
         # Check to see if the local secret storage is set up at ~/.mobile-secrets.

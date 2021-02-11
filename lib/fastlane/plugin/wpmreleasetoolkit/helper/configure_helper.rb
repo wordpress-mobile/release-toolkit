@@ -8,7 +8,6 @@ module Fastlane
 
   module Helper
     class ConfigureHelper
-
       ### Returns the contents of the project's `.configure` file.
       ### If the file doesn't exist, it'll return an empty Configuration
       ### that can later be saved to `.configure`.

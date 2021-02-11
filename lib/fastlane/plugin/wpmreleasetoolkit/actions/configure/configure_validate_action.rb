@@ -7,7 +7,6 @@ require_relative '../../helper/configure_helper'
 module Fastlane
   module Actions
     class ConfigureValidateAction < Action
-
       def self.run(params = {})
 
         # Start by ensuring that we've set up the project for configuration
