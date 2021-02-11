@@ -106,19 +106,19 @@ module Fastlane
           lib_strings.xpath('//string').each do |string_line|
             res = merge_string(main_strings, library, string_line)
             case res
-              when :updated
-                puts "#{string_line.attr("name")} updated."
-                updated_count = updated_count + 1
-              when :found
-                untouched_count = untouched_count + 1
-              when :added
-                puts "#{string_line.attr("name")} added."
-                added_count = added_count + 1
-              when :skipped
-                skipped_count = skipped_count + 1
-              else
-                UI.user_error!("Internal Error! #{res}")
-              end
+            when :updated
+              puts "#{string_line.attr("name")} updated."
+              updated_count = updated_count + 1
+            when :found
+              untouched_count = untouched_count + 1
+            when :added
+              puts "#{string_line.attr("name")} added."
+              added_count = added_count + 1
+            when :skipped
+              skipped_count = skipped_count + 1
+            else
+              UI.user_error!("Internal Error! #{res}")
+            end
           end
 
           File.open(main, 'w:UTF-8') do |f|

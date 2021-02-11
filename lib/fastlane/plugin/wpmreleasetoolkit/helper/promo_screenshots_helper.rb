@@ -220,34 +220,34 @@ module Fastlane
 
       def apply_operation(image, operation, canvas)
 
-        return case operation['type']
-          when 'crop'
-            x_pos = operation['at'][0]
-            y_pos = operation['at'][1]
+        case operation['type']
+        when 'crop'
+          x_pos = operation['at'][0]
+          y_pos = operation['at'][1]
 
-            width = operation['to'][0]
-            height = operation['to'][1]
+          width = operation['to'][0]
+          height = operation['to'][1]
 
-            crop_image(image, x_pos, y_pos, width, height)
+          crop_image(image, x_pos, y_pos, width, height)
 
-          when 'resize'
-            width = operation['to'][0]
-            height = operation['to'][1]
+        when 'resize'
+          width = operation['to'][0]
+          height = operation['to'][1]
 
-            resize_image(image, width, height)
+          resize_image(image, width, height)
 
-          when 'composite'
+        when 'composite'
 
-            x_pos = operation['at'][0]
-            y_pos = operation['at'][1]
+          x_pos = operation['at'][0]
+          y_pos = operation['at'][1]
 
-            if operation.member?('offset')
-              x_pos += operation['offset'][0]
-              y_pos += operation['offset'][1]
-            end
-
-            composite_image(canvas, image, x_pos, y_pos)
+          if operation.member?('offset')
+            x_pos += operation['offset'][0]
+            y_pos += operation['offset'][1]
           end
+
+          composite_image(canvas, image, x_pos, y_pos)
+        end
       end
 
       def draw_text_to_canvas(canvas, text, width, height, x_position, y_position, font_size, stylesheet_path, position = 'center')
@@ -263,9 +263,9 @@ module Fastlane
           text_content = open_image(tempTextFile.path).trim
           text_frame = create_image(width, height)
           text_frame = case position
-            when 'left' then composite_image_left(text_frame, text_content, 0, 0)
-            when 'center' then composite_image_center(text_frame, text_content, 0, 0)
-            when 'top' then composite_image_top(text_frame, text_content, 0, 0)
+                       when 'left' then composite_image_left(text_frame, text_content, 0, 0)
+                       when 'center' then composite_image_center(text_frame, text_content, 0, 0)
+                       when 'top' then composite_image_top(text_frame, text_content, 0, 0)
             end
         ensure
           tempTextFile.close

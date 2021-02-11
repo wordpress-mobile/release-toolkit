@@ -25,15 +25,6 @@ Layout/BlockAlignment:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_update_metadata_source.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_version_helper.rb'
 
-# Offense count: 10
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, IndentOneStep, IndentationWidth.
-# SupportedStyles: case, end
-Layout/CaseIndentation:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
-
 # Offense count: 22
 # Cop supports --auto-correct.
 Layout/EmptyLineAfterGuardClause:
