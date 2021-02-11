@@ -126,11 +126,11 @@ module Fastlane
       def self.available_options
         [
             FastlaneCore::ConfigItem.new(key: :force,
-                             env_name: 'FORCE_OVERWRITE',
-                             description: 'Overwrite copied files without confirmation',
-                             optional: true,
-                             default_value: false,
-                             is_string: false),
+                                         env_name: 'FORCE_OVERWRITE',
+                                         description: 'Overwrite copied files without confirmation',
+                                         optional: true,
+                                         default_value: false,
+                                         is_string: false),
         ]
       end
 

@@ -78,10 +78,10 @@ module Fastlane
                                        is_string: true,
                                        optional: true), # true: verifies the input is a string, false: every kind of value),
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
-                                        env_name: 'FL_ANDROID_BETABUILD_PRECHECKS_SKIPCONFIRM',
-                                        description: 'Skips confirmation',
-                                        is_string: false, # true: verifies the input is a string, false: every kind of value
-                                        default_value: false) # the default value if the user didn't provide one
+                                       env_name: 'FL_ANDROID_BETABUILD_PRECHECKS_SKIPCONFIRM',
+                                       description: 'Skips confirmation',
+                                       is_string: false, # true: verifies the input is a string, false: every kind of value
+                                       default_value: false) # the default value if the user didn't provide one
         ]
       end
 

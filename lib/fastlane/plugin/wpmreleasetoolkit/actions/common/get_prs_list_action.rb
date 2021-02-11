@@ -56,24 +56,24 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :repository,
-                                   env_name: 'GHHELPER_REPOSITORY',
-                                description: 'The remote path of the GH repository on which we work',
-                                   optional: false,
+                                       env_name: 'GHHELPER_REPOSITORY',
+                                       description: 'The remote path of the GH repository on which we work',
+                                       optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :start_tag,
-                                description: 'The tag from which the report starts',
-                                   optional: false,
-                                  is_string: true),
+                                       description: 'The tag from which the report starts',
+                                       optional: false,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :end_tag,
-                                 description: 'The tag to which the report ends',
-                                    optional: true,
-                               default_value: '.',
-                                   is_string: true),
+                                       description: 'The tag to which the report ends',
+                                       optional: true,
+                                       default_value: '.',
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :report_path,
-                                  env_name: 'GHHELPER_REPORTPATH',
-                               description: 'The path of the report file',
-                                  optional: false,
-                                 is_string: true)
+                                       env_name: 'GHHELPER_REPORTPATH',
+                                       description: 'The path of the report file',
+                                       optional: false,
+                                       is_string: true)
         ]
       end
 

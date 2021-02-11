@@ -46,15 +46,15 @@ module Fastlane
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :external,
-                                        env_name: 'FL_IOS_BUILD_PRECHECKS_EXTERNAL_BUILD',
-                                        description: 'True if this is for a public build',
-                                        is_string: false,
-                                        default_value: false),
+                                       env_name: 'FL_IOS_BUILD_PRECHECKS_EXTERNAL_BUILD',
+                                       description: 'True if this is for a public build',
+                                       is_string: false,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :internal_on_single_version,
-                                          env_name: 'FL_IOS_BUILD_PRECHECKS_INTERNAL_SV_BUILD',
-                                          description: 'True if this is for an internal build that follows the same versioning of the external',
-                                          is_string: false,
-                                          default_value: false)
+                                       env_name: 'FL_IOS_BUILD_PRECHECKS_INTERNAL_SV_BUILD',
+                                       description: 'True if this is for an internal build that follows the same versioning of the external',
+                                       is_string: false,
+                                       default_value: false)
         ]
       end
 

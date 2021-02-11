@@ -144,10 +144,10 @@ module Fastlane
                                         UI.user_error!("No relase version for UpdateMetadataSourceAction given, pass using `release_version: 'version'`") unless (value and not value.empty?)
                                       end),
           FastlaneCore::ConfigItem.new(key: :source_files,
-                                        env_name: 'FL_UPDATE_METADATA_SOURCE_SOURCE_FILES',
-                                        description: 'The hash with the path to the source files and the key to use to include their content',
-                                        is_string: false,
-                                        verify_block: proc do |value|
+                                       env_name: 'FL_UPDATE_METADATA_SOURCE_SOURCE_FILES',
+                                       description: 'The hash with the path to the source files and the key to use to include their content',
+                                       is_string: false,
+                                       verify_block: proc do |value|
                                           UI.user_error!("No source file hash for UpdateMetadataSourceAction given, pass using `source_files: 'source file hash'`") unless (value and not value.empty?)
                                        end)
         ]

@@ -59,10 +59,10 @@ module Fastlane
                                        description: 'The version to work on', # a short description of this parameter
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
-                                        env_name: 'FL_IOS_HOTFIX_PRECHECKS_SKIPCONFIRM',
-                                        description: 'Skips confirmation',
-                                        is_string: false, # true: verifies the input is a string, false: every kind of value
-                                        default_value: false) # the default value if the user didn't provide one
+                                       env_name: 'FL_IOS_HOTFIX_PRECHECKS_SKIPCONFIRM',
+                                       description: 'Skips confirmation',
+                                       is_string: false, # true: verifies the input is a string, false: every kind of value
+                                       default_value: false) # the default value if the user didn't provide one
         ]
       end
 

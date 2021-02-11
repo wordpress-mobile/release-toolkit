@@ -54,21 +54,21 @@ module Fastlane
                                        env_name: 'FL_DOWNLOAD_METADATA_PROJECT_URL', # The name of the environment variable
                                        description: 'GlotPress project URL'),
           FastlaneCore::ConfigItem.new(key: :target_files,
-                                        env_name: 'FL_DOWNLOAD_METADATA_TARGET_FILES',
-                                        description: 'The hash with the path to the target files and the key to use to extract their content',
-                                        is_string: false),
+                                       env_name: 'FL_DOWNLOAD_METADATA_TARGET_FILES',
+                                       description: 'The hash with the path to the target files and the key to use to extract their content',
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :locales,
-                                          env_name: 'FL_DOWNLOAD_METADATA_LOCALES',
-                                          description: 'The hash with the GLotPress locale and the project locale association',
-                                          is_string: false),
+                                       env_name: 'FL_DOWNLOAD_METADATA_LOCALES',
+                                       description: 'The hash with the GLotPress locale and the project locale association',
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :source_locale,
-                                          env_name: 'FL_DOWNLOAD_METADATA_SOURCE_LOCALE',
-                                          description: 'The source locale code',
-                                          optional: true),
+                                       env_name: 'FL_DOWNLOAD_METADATA_SOURCE_LOCALE',
+                                       description: 'The source locale code',
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :download_path,
-                                          env_name: 'FL_DOWNLOAD_METADATA_DOWNLOAD_PATH',
-                                          description: 'The path of the target files',
-                                          is_string: true)
+                                       env_name: 'FL_DOWNLOAD_METADATA_DOWNLOAD_PATH',
+                                       description: 'The path of the target files',
+                                       is_string: true)
         ]
       end
 

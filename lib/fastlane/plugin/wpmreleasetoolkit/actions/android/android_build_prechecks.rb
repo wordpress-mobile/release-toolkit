@@ -59,15 +59,15 @@ module Fastlane
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :beta,
-                                      env_name: 'FL_ANDROID_BUILD_PRECHECKS_BETA_BUILD',
-                                      description: 'True if this is for a beta build',
-                                      is_string: false,
-                                      default_value: false),
+                                       env_name: 'FL_ANDROID_BUILD_PRECHECKS_BETA_BUILD',
+                                       description: 'True if this is for a beta build',
+                                       is_string: false,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :final,
-                                      env_name: 'FL_ANDROID_BUILD_PRECHECKS_FINAL_BUILD',
-                                      description: 'True if this is for a final build',
-                                      is_string: false,
-                                      default_value: false),
+                                       env_name: 'FL_ANDROID_BUILD_PRECHECKS_FINAL_BUILD',
+                                       description: 'True if this is for a final build',
+                                       is_string: false,
+                                       default_value: false),
         ]
       end
 

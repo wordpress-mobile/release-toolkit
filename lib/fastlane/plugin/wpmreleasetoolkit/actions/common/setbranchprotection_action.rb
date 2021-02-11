@@ -36,15 +36,15 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :repository,
-                                   env_name: 'GHHELPER_REPOSITORY',
-                                description: 'The remote path of the GH repository on which we work',
-                                   optional: false,
+                                       env_name: 'GHHELPER_REPOSITORY',
+                                       description: 'The remote path of the GH repository on which we work',
+                                       optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :branch,
-                                        env_name: 'GHHELPER_BRANCH',
-                                     description: 'The branch to protect',
-                                        optional: false,
-                                            type: String)
+                                       env_name: 'GHHELPER_BRANCH',
+                                       description: 'The branch to protect',
+                                       optional: false,
+                                       type: String)
         ]
       end
 

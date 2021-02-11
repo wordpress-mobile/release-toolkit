@@ -28,9 +28,9 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :version,
-                                        env_name: 'FL_IOS_FINAL_TAG_VERSION',
-                                        description: 'The version of the release to finalize',
-                                        is_string: true)
+                                       env_name: 'FL_IOS_FINAL_TAG_VERSION',
+                                       description: 'The version of the release to finalize',
+                                       is_string: true)
         ]
       end
 

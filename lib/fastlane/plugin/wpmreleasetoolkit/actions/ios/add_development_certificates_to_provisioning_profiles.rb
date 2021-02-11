@@ -43,17 +43,17 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :app_identifier,
-                             description: 'List of App Identifiers that should contain the new device identifier',
-                             is_string: false,
-                             verify_block: proc do |value|
+                                       description: 'List of App Identifiers that should contain the new device identifier',
+                                       is_string: false,
+                                       verify_block: proc do |value|
                                UI.user_error!('You must provide an array of bundle identifiers in `app_identifier`') unless not value.empty?
-                             end),
+                                                     end),
           FastlaneCore::ConfigItem.new(key: :team_id,
-                             description: 'The team_id for the provisioning profiles',
-                             is_string: true,
-                             verify_block: proc do |value|
+                                       description: 'The team_id for the provisioning profiles',
+                                       is_string: true,
+                                       verify_block: proc do |value|
                                UI.user_error!('You must provide a team ID in `team_id`') unless (value and not value.empty?)
-                             end),
+                                                     end),
         ]
       end
 
