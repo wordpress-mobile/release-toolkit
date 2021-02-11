@@ -5,7 +5,6 @@ module Fastlane
     # Helper methods to execute git-related operations
     #
     module GitHelper
-
       # Checks if the current directory is (inside) a git repo
       #
       # @return [Bool] True if the current directory is the root of a git repo (i.e. a local working copy) or a subdirectory of one.

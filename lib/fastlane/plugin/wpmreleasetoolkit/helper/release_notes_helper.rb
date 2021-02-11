@@ -1,7 +1,6 @@
 module Fastlane
   module Helper
     module ReleaseNotesHelper
-
       # Update the release notes file (typycally RELEASE-NOTES.txt) to add a new entry.
       #
       # @param [String] path The path to the release notes text file.
@@ -17,7 +16,6 @@ module Fastlane
 
         File.write(path, new_lines.join)
       end
-
     end
   end
 end

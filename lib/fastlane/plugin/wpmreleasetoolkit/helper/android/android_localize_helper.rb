@@ -8,7 +8,6 @@ module Fastlane
   module Helper
     module Android
       module LocalizeHelper
-
         # Checks if string_line has the content_override flag set
         def self.skip_string_by_tag(string_line)
           skip = string_line.attr('content_override') == 'true' unless string_line.attr('content_override').nil?
