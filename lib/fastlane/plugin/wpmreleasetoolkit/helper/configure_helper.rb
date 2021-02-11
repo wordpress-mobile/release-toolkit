@@ -192,7 +192,6 @@ module Fastlane
 
         # Allows support for specifying directories – they'll be expanded recursively
         expanded_file_dependencies = file_dependencies.map { |path|
-
           abs_path = self.mobile_secrets_path(path)
 
           if File.directory?(abs_path)

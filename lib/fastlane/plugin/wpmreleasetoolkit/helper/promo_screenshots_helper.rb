@@ -414,7 +414,6 @@ module Fastlane
           Fastlane::Helper::FilesystemHelper.plugin_root + 'spec/test-data/' + path,    # Path Relative to the test data
         ]
           .each { |resolved_path|
-
           if resolved_path != nil && resolved_path.exist?
             return resolved_path
           end
