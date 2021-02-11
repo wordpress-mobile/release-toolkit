@@ -66,6 +66,7 @@ module Fastlane
       end
 
       private
+
       def self.create_config(previous_version, new_short_version)
         @current_version = previous_version
         @current_version_internal = Fastlane::Helper::Ios::VersionHelper.get_internal_version() unless ENV['INTERNAL_CONFIG_FILE'].nil?

@@ -6,22 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 9
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: around, only_before
-Layout/EmptyLinesAroundAccessModifier:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_bump_version_beta.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_bump_version_final_release.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_bump_version_hotfix.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_bump_version_release.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_bump_version_beta.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_bump_version_hotfix.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_bump_version_release.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_version_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_version_helper.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 Layout/EmptyLinesAroundArguments:
