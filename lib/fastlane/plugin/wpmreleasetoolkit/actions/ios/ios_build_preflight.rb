@@ -2,7 +2,6 @@ module Fastlane
   module Actions
     class IosBuildPreflightAction < Action
       def self.run(params)
-
         # Validate mobile configuration secrets
         other_action.configure_apply
 
@@ -62,11 +61,9 @@ module Fastlane
       end
 
       def self.output
-
       end
 
       def self.return_value
-
       end
 
       def self.authors

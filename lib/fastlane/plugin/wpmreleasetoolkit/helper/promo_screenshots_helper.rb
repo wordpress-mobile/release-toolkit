@@ -20,7 +20,6 @@ include Magick unless $skip_magick
 module Fastlane
   module Helper
     class PromoScreenshots
-
       def initialize
         if ($skip_magick)
           message = "PromoScreenshots feature is currently disabled.\n"
@@ -46,7 +45,6 @@ module Fastlane
       end
 
       def draw_caption_to_canvas(entry, canvas, device, stylesheet_path = '')
-
         # If no caption is provided, it's ok to skip the body of this method
         if entry['text'] == nil
           return canvas
@@ -85,14 +83,13 @@ module Fastlane
       end
 
       def draw_background_to_canvas(canvas, entry)
-
         if entry['background'] != nil
 
           # If we're passed an image path, let's open it and paint it to the canvas
           if can_resolve_path(entry['background'])
             background_image = open_image(entry['background'])
             return composite_image(canvas, background_image, 0, 0)
-          else  # Otherwise, let's assume this is a colour code
+          else # Otherwise, let's assume this is a colour code
             background_image = create_image(canvas.columns, canvas.rows, entry['background'])
             canvas = composite_image(canvas, background_image, 0, 0)
           end
@@ -102,7 +99,6 @@ module Fastlane
       end
 
       def draw_device_frame_to_canvas(device, canvas)
-
         # Apply the device frame to the canvas, but only if one is provided
         unless device['device_frame_size'] != nil
           return canvas
@@ -125,7 +121,6 @@ module Fastlane
       end
 
       def draw_screenshot_to_canvas(entry, canvas, device)
-
         # Don't require a screenshot to be present – we can just skip
         # this function if one doesn't exist.
         unless entry['screenshot'] != nil
@@ -149,7 +144,6 @@ module Fastlane
       end
 
       def draw_attachments_to_canvas(entry, canvas)
-
         entry['attachments'].each { |attachment|
           if attachment['file'] != nil
             canvas = draw_file_attachment_to_canvas(attachment, canvas, entry)
@@ -162,7 +156,6 @@ module Fastlane
       end
 
       def draw_file_attachment_to_canvas(attachment, canvas, entry)
-
         file = resolve_path(attachment['file'])
 
         image = open_image(file)
@@ -190,7 +183,6 @@ module Fastlane
       end
 
       def draw_text_attachment_to_canvas(attachment, canvas, locale)
-
         text = resolve_text_into_path(attachment['text'], locale)
         font_size = attachment['font-size'] ||= 12
 
@@ -219,7 +211,6 @@ module Fastlane
       end
 
       def apply_operation(image, operation, canvas)
-
         case operation['type']
         when 'crop'
           x_pos = operation['at'][0]
@@ -305,7 +296,6 @@ module Fastlane
       #
       # @return [Magick::Image] The resized image
       def resize_image(original, width, height)
-
         if !original.is_a?(Magick::Image)
           UI.user_error!('You must pass an image object to `resize_image`.')
         end
@@ -328,7 +318,6 @@ module Fastlane
       #
       # @return [Magick::Image] The resized image
       def composite_image(original, child, x_position, y_position, starting_position = NorthWestGravity)
-
         if !original.is_a?(Magick::Image)
           UI.user_error!('You must pass an image object as the first argument to `composite_image`.')
         end
@@ -367,7 +356,6 @@ module Fastlane
       #
       # @return [Magick::Image] The resized image
       def crop_image(original, x_position, y_position, width, height)
-
         if !original.is_a?(Magick::Image)
           UI.user_error!('You must pass an image object to `crop_image`.')
         end
@@ -384,7 +372,6 @@ module Fastlane
       end
 
       def create_image(width, height, background = 'transparent')
-
         background_color = background.paint.to_hex
 
         Image.new(width, height) {
@@ -402,7 +389,6 @@ module Fastlane
       end
 
       def resolve_path(path)
-
         if path == nil
           UI.crash!('Path not provided – you must provide one to continue')
         end
@@ -414,7 +400,6 @@ module Fastlane
           Fastlane::Helper::FilesystemHelper.plugin_root + 'spec/test-data/' + path,    # Path Relative to the test data
         ]
           .each { |resolved_path|
-
           if resolved_path != nil && resolved_path.exist?
             return resolved_path
           end
@@ -425,7 +410,6 @@ module Fastlane
       end
 
       def resolve_text_into_path(text, locale)
-
         localizedFile = sprintf(text, locale)
 
         if File.exist?(localizedFile)

@@ -8,7 +8,6 @@ module Fastlane
 
   module Helper
     class ConfigureHelper
-
       ### Returns the contents of the project's `.configure` file.
       ### If the file doesn't exist, it'll return an empty Configuration
       ### that can later be saved to `.configure`.
@@ -192,7 +191,6 @@ module Fastlane
 
         # Allows support for specifying directories – they'll be expanded recursively
         expanded_file_dependencies = file_dependencies.map { |path|
-
           abs_path = self.mobile_secrets_path(path)
 
           if File.directory?(abs_path)
@@ -233,7 +231,6 @@ module Fastlane
       # Adds a file to the `.configure` file's `files_to_copy` hash.
       # The hash for this method must contain the `source` and `destination` keys
       def self.add_file(params)
-
         unless (params[:source])
           UI.user_error!('You must pass a `source` to `add_file`')
         end
@@ -255,6 +252,7 @@ module Fastlane
       ## Contents of ~/.mobile-secrets/keys.json as a hash
       def self.mobile_secrets_keys_json
         return {} unless File.file?(Fastlane::Helper::FilesystemHelper.secret_store_keys_path)
+
         JSON.parse(File.read(Fastlane::Helper::FilesystemHelper.secret_store_keys_path))
       end
 
@@ -262,6 +260,7 @@ module Fastlane
       ## Uses the project encryption key or the CONFIGURE_ENCRYPTION_KEY env variable, if present
       def self.encryption_key
         return Base64.decode64(ENV['CONFIGURE_ENCRYPTION_KEY']) if ENV.key?('CONFIGURE_ENCRYPTION_KEY')
+
         project_encryption_key
       end
 
@@ -269,6 +268,7 @@ module Fastlane
       def self.project_encryption_key
         keys_json = mobile_secrets_keys_json
         return nil unless keys_json.key?(configuration.project_name)
+
         base64_key = keys_json[configuration.project_name]
         Base64.decode64(base64_key)
       end

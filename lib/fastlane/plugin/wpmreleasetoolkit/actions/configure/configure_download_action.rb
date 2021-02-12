@@ -6,7 +6,6 @@ module Fastlane
   module Actions
     class ConfigureDownloadAction < Action
       def self.run(params = {})
-
         UI.message 'Running Configure Download'
 
         # If the `~/.mobile-secrets` repository doesn't exist

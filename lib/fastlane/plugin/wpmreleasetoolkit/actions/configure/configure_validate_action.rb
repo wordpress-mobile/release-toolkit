@@ -7,9 +7,7 @@ require_relative '../../helper/configure_helper'
 module Fastlane
   module Actions
     class ConfigureValidateAction < Action
-
       def self.run(params = {})
-
         # Start by ensuring that we've set up the project for configuration
         validate_that_configure_file_exists
 
@@ -39,7 +37,6 @@ module Fastlane
       ### Validate that the branch specified in .configure matches the branch
       ### checked out in ~/.mobile-secrets.
       def self.validate_that_branches_match
-
         repo_branch_name = Fastlane::Helper::ConfigureHelper.repo_branch_name
         file_branch_name = Fastlane::Helper::ConfigureHelper.configure_file_branch_name
 
@@ -97,7 +94,6 @@ module Fastlane
 
       def self.validate_that_all_copied_files_match
         Fastlane::Helper::ConfigureHelper.files_to_copy.each { |x|
-
           source = absolute_secret_store_path(x.file)
           destination = absolute_project_path(x.destination)
 

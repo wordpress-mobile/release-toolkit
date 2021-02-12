@@ -20,7 +20,7 @@ module Fastlane
           # Check if the state needs changes
           if (is_frozen(milestone))
             UI.message("Milestone #{mile_title} is already frozen. Nothing to do")
-            return  # Already frozen: nothing to do
+            return # Already frozen: nothing to do
           end
 
           mile_title = mile_title + ' ❄️'

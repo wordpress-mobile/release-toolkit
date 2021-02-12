@@ -98,7 +98,6 @@ module Fastlane
 
       def self.output
         # Define the shared values you are going to provide
-
       end
 
       def self.return_type

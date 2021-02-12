@@ -51,9 +51,7 @@ module Fastlane
 
         entries = config['entries']
                   .flat_map { |entry|
-
                     languages.map { |language|
-
                       newEntry = entry.deep_dup
 
                       # Not every output file will have a screenshot, so handle cases where no
@@ -105,7 +103,6 @@ module Fastlane
         Parallel.map(entries, finish: ->(item, i, result) {
           bar.increment!
         }) do |entry|
-
           device = devices[entry['device']]
 
           if device == nil
@@ -136,7 +133,6 @@ module Fastlane
 
           # Run the GC in the same thread to clean up after RMagick
           GC.start
-
         end
       end
 
@@ -154,7 +150,6 @@ module Fastlane
       end
 
       def self.subdirectories_for_path(path)
-
         subdirectories = []
 
         unless helper.can_resolve_path(path) then

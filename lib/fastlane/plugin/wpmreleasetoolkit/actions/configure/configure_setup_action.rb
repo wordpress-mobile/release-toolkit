@@ -9,9 +9,7 @@ require_relative '../../helper/configure_helper'
 module Fastlane
   module Actions
     class ConfigureSetupAction < Action
-
       def self.run(params = {})
-
         # Check to see if the local secret storage is set up at ~/.mobile-secrets.
         unless File.directory?(repository_path)
           UI.user_error!('The local secrets store does not exist. Please clone it to ~/.mobile-secrets before continuing.')

@@ -7,12 +7,10 @@ module Fastlane
 
   module Helper
     class FilesystemHelper
-
       ### Traverse the file system to find the root project directory.
       ### For the purposes of this function, we're assuming the root project
       ### directory is the one with the `.git` file in it.
       def self.project_path
-
         continue = true
         dir = Pathname.new(Dir.pwd)
 
@@ -34,7 +32,6 @@ module Fastlane
       end
 
       def self.plugin_root
-
         continue = true
         dir = Pathname.new(__FILE__).dirname
 
@@ -91,7 +88,6 @@ module Fastlane
 
       ### Returns the `sha1` hash of a file, given the absolute path.
       def self.file_hash(absolute_path)
-
         unless File.file?(absolute_path)
           UI.user_error!("Unable to hash #{absolute_path} – the file does not exist")
         end

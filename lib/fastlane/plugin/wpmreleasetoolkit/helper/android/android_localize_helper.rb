@@ -8,7 +8,6 @@ module Fastlane
   module Helper
     module Android
       module LocalizeHelper
-
         # Checks if string_line has the content_override flag set
         def self.skip_string_by_tag(string_line)
           skip = string_line.attr('content_override') == 'true' unless string_line.attr('content_override').nil?
@@ -153,7 +152,6 @@ module Fastlane
 
           verify_local_diff(main, library, main_strings, lib_strings)
           verify_pr_diff(main, library, main_strings, lib_strings, source_diff) unless source_diff.nil?
-
         end
 
         def self.verify_local_diff(main, library, main_strings, lib_strings)
@@ -189,19 +187,25 @@ class Nokogiri::XML::Node
   def =~(other)
     return true if self == other
     return false unless name == other.name
+
     stype = node_type; otype = other.node_type
     return false unless stype == otype
+
     sa = attributes; oa = other.attributes
     return false unless sa.length == oa.length
+
     sa = sa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
     oa = oa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
     return false unless sa == oa
+
     skids = children; okids = other.children
     return false unless skids.length == okids.length
     return false if stype == TEXT_NODE && (content != other.content)
+
     sns = namespace; ons = other.namespace
     return false if !sns ^ !ons
     return false if sns && (sns.href != ons.href)
+
     skids.to_enum.with_index.all? { |ski, i| ski =~ okids[i] }
   end
 end

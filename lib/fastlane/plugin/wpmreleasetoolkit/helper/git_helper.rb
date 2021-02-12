@@ -5,7 +5,6 @@ module Fastlane
     # Helper methods to execute git-related operations
     #
     module GitHelper
-
       # Checks if the current directory is (inside) a git repo
       #
       # @return [Bool] True if the current directory is the root of a git repo (i.e. a local working copy) or a subdirectory of one.
@@ -20,6 +19,7 @@ module Fastlane
       #
       def self.has_git_lfs?
         return false unless is_git_repo?
+
         `git config --get-regex lfs`.length > 0
       end
 

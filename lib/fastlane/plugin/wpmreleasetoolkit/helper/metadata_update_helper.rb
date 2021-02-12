@@ -1,6 +1,5 @@
 module Fastlane
   module Helper
-
     # Basic line handler
     class MetadataBlock
       attr_reader :block_key
@@ -187,6 +186,5 @@ module Fastlane
         fw.puts('')
       end
     end
-
   end
 end

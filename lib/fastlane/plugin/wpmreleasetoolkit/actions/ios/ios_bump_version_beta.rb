@@ -31,15 +31,12 @@ module Fastlane
       end
 
       def self.available_options
-
       end
 
       def self.output
-
       end
 
       def self.return_value
-
       end
 
       def self.authors
@@ -51,6 +48,7 @@ module Fastlane
       end
 
       private
+
       def self.create_config()
         @current_version = Fastlane::Helper::Ios::VersionHelper.get_build_version()
         @current_version_internal = Fastlane::Helper::Ios::VersionHelper.get_internal_version() unless ENV['INTERNAL_CONFIG_FILE'].nil?
