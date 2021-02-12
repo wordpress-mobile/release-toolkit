@@ -29,7 +29,7 @@ module Fastlane
 
         validate_that_all_copied_files_match
 
-        UI.success "Configuration is valid"
+        UI.success 'Configuration is valid'
       end
 
       ###
@@ -46,7 +46,7 @@ module Fastlane
         unless repo_branch_name == file_branch_name
 
           UI.user_error!([
-            "The branch specified in `.configure` is not the currently checked out branch in the secrets repository.",
+            'The branch specified in `.configure` is not the currently checked out branch in the secrets repository.',
             "To fix this issue, switch back to the `#{file_branch_name}` branch in the mobile secrets repository.",
           ].join("\n"))
         end
@@ -61,7 +61,7 @@ module Fastlane
         unless repo_hash == file_hash
 
           UI.user_error!([
-            "The pinned_hash specified in `.configure` is not the currently checked out hash in the secrets repository.",
+            'The pinned_hash specified in `.configure` is not the currently checked out hash in the secrets repository.',
             "To fix this issue, check out the `#{file_hash}` hash in the mobile secrets repository.",
           ].join("\n"))
         end
@@ -80,39 +80,39 @@ module Fastlane
         changed_dependencies = changed_files & dependencies # calculate array intersection
 
         unless changed_dependencies.empty?
-            UI.user_error!("The following files are out of date. Please run `bundle exec fastlane run configure_update` before continuing:\n\n#{changed_dependencies.to_s}")
+          UI.user_error!("The following files are out of date. Please run `bundle exec fastlane run configure_update` before continuing:\n\n#{changed_dependencies.to_s}")
         end
 
         unless new_files.empty?
-            UI.user_error!("The following files are in the secrets repository, but aren't available for your project. Please run `bundle exec fastlane run configure_update` before continuing:\n\n#{new_files}")
+          UI.user_error!("The following files are in the secrets repository, but aren't available for your project. Please run `bundle exec fastlane run configure_update` before continuing:\n\n#{new_files}")
         end
       end
 
       ### Validate that the secrets repo doesn't have any local changes
       def self.validate_that_secrets_repo_is_clean
         unless Fastlane::Helper::ConfigureHelper.repo_has_changes
-            UI.user_error!("The secrets repository has uncommitted changes. Please commit or discard them before continuing.")
+          UI.user_error!('The secrets repository has uncommitted changes. Please commit or discard them before continuing.')
         end
       end
 
       def self.validate_that_all_copied_files_match
         Fastlane::Helper::ConfigureHelper.files_to_copy.each { |x|
 
-            source = absolute_secret_store_path(x.file)
-            destination = absolute_project_path(x.destination)
+          source = absolute_secret_store_path(x.file)
+          destination = absolute_project_path(x.destination)
 
-            sourceHash = file_hash(source)
-            destinationHash = file_hash(destination)
+          sourceHash = file_hash(source)
+          destinationHash = file_hash(destination)
 
-            unless sourceHash == destinationHash
-                UI.user_error!("`#{x.destination} doesn't match the file in the secrets repository (#{x.file}) – unable to continue")
-            end
+          unless sourceHash == destinationHash
+            UI.user_error!("`#{x.destination} doesn't match the file in the secrets repository (#{x.file}) – unable to continue")
+          end
         }
       end
 
       def self.validate_that_configure_file_exists
         unless Fastlane::Helper::ConfigureHelper.configuration_path_exists
-            UI.user_error!("Couldn't find `.configure` file. Please set up this project for `configure` by running `bundle exec fastlane run configure_setup`")
+          UI.user_error!("Couldn't find `.configure` file. Please set up this project for `configure` by running `bundle exec fastlane run configure_setup`")
         end
       end
 
@@ -129,15 +129,15 @@ module Fastlane
       end
 
       def self.description
-        "Ensure that the configuration is valid"
+        'Ensure that the configuration is valid'
       end
 
       def self.authors
-        ["Jeremy Massel"]
+        ['Jeremy Massel']
       end
 
       def self.details
-        "Ensure that the configuration is valid"
+        'Ensure that the configuration is valid'
       end
 
       def self.is_supported?(platform)

@@ -12,15 +12,15 @@ module Fastlane
         params[:app_identifier].each { |identifier|
           Spaceship.provisioning_profile.find_by_bundle_id(bundle_id: identifier)
                    .select { |profile|
-              profile.kind_of? Spaceship::Portal::ProvisioningProfile::Development
+            profile.kind_of? Spaceship::Portal::ProvisioningProfile::Development
           }
                    .tap { |profiles|
-              UI.important "Warning: Unable to find any profiles associated with #{identifier}" unless profiles.length > 0
+            UI.important "Warning: Unable to find any profiles associated with #{identifier}" unless profiles.length > 0
           }
                    .each { |profile|
-              profile.devices = devices
-              profile.update!
-              UI.success "Applied #{devices.length} devices to #{profile.name}"
+            profile.devices = devices
+            profile.update!
+            UI.success "Applied #{devices.length} devices to #{profile.name}"
           }
         }
       end
@@ -30,29 +30,29 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Add devices to provisioning profiles"
+        'Add devices to provisioning profiles'
       end
 
       def self.details
-        "Add all iOS devices to any profiles associated with the provided bundle identifiers"
+        'Add all iOS devices to any profiles associated with the provided bundle identifiers'
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(
             key: :app_identifier,
-            description: "List of App Identifiers that should contain the new device identifier",
+            description: 'List of App Identifiers that should contain the new device identifier',
             is_string: false,
             verify_block: proc do |value|
-              UI.user_error!("You must provide an array of bundle identifiers in `app_identifier`") unless not value.empty?
+              UI.user_error!('You must provide an array of bundle identifiers in `app_identifier`') unless not value.empty?
             end
           ),
           FastlaneCore::ConfigItem.new(
             key: :team_id,
-            description: "The team_id for the provisioning profiles",
+            description: 'The team_id for the provisioning profiles',
             is_string: true,
             verify_block: proc do |value|
-              UI.user_error!("You must provide a team ID in `team_id`") unless (value and not value.empty?)
+              UI.user_error!('You must provide a team ID in `team_id`') unless (value and not value.empty?)
             end
           ),
         ]
@@ -68,7 +68,7 @@ module Fastlane
 
       def self.authors
         # So no one will ever forget your contribution to fastlane :) You are awesome btw!
-        ["jkmassel"]
+        ['jkmassel']
       end
 
       def self.is_supported?(platform)

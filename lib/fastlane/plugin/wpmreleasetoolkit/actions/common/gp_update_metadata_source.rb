@@ -41,8 +41,8 @@ module Fastlane
 
         # Create the new one
         begin
-          File.open(target, "a") do |fw|
-            File.open(orig, "r").each do |fr|
+          File.open(target, 'a') do |fw|
+            File.open(orig, 'r').each do |fr|
               write_target_block(fw, fr)
             end
           end
@@ -112,18 +112,16 @@ module Fastlane
         line.start_with?('#')
       end
 
-
-
       #####################################################
       # @!group Documentation
       #####################################################
 
       def self.description
-        "Updates a .po file with new data from .txt files"
+        'Updates a .po file with new data from .txt files'
       end
 
       def self.details
-        "You can use this action to update the .po file that contains the string to load to GlotPress for localization."
+        'You can use this action to update the .po file that contains the string to load to GlotPress for localization.'
       end
 
       def self.available_options
@@ -132,25 +130,25 @@ module Fastlane
         # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :po_file_path,
-                                       env_name: "FL_UPDATE_METADATA_SOURCE_PO_FILE_PATH",
-                                       description: "The path of the .po file to update",
+                                       env_name: 'FL_UPDATE_METADATA_SOURCE_PO_FILE_PATH',
+                                       description: 'The path of the .po file to update',
                                        is_string: true,
                                        verify_block: proc do |value|
-                                          UI.user_error!("No .po file path for UpdateMetadataSourceAction given, pass using `po_file_path: 'file path'`") unless (value and not value.empty?)
-                                          UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
+                                         UI.user_error!("No .po file path for UpdateMetadataSourceAction given, pass using `po_file_path: 'file path'`") unless (value and not value.empty?)
+                                         UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :release_version,
-                                       env_name: "FL_UPDATE_METADATA_SOURCE_RELEASE_VERSION",
-                                       description: "The release version of the app (to use to mark the release notes)",
+                                       env_name: 'FL_UPDATE_METADATA_SOURCE_RELEASE_VERSION',
+                                       description: 'The release version of the app (to use to mark the release notes)',
                                        verify_block: proc do |value|
-                                        UI.user_error!("No relase version for UpdateMetadataSourceAction given, pass using `release_version: 'version'`") unless (value and not value.empty?)
-                                      end),
+                                         UI.user_error!("No relase version for UpdateMetadataSourceAction given, pass using `release_version: 'version'`") unless (value and not value.empty?)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :source_files,
-                                        env_name: "FL_UPDATE_METADATA_SOURCE_SOURCE_FILES",
-                                        description: "The hash with the path to the source files and the key to use to include their content",
-                                        is_string: false,
-                                        verify_block: proc do |value|
-                                          UI.user_error!("No source file hash for UpdateMetadataSourceAction given, pass using `source_files: 'source file hash'`") unless (value and not value.empty?)
+                                       env_name: 'FL_UPDATE_METADATA_SOURCE_SOURCE_FILES',
+                                       description: 'The hash with the path to the source files and the key to use to include their content',
+                                       is_string: false,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("No source file hash for UpdateMetadataSourceAction given, pass using `source_files: 'source file hash'`") unless (value and not value.empty?)
                                        end)
         ]
       end
@@ -164,11 +162,11 @@ module Fastlane
       end
 
       def self.authors
-        ["loremattei"]
+        ['loremattei']
       end
 
       def self.is_supported?(platform)
-         [:ios, :android].include?(platform)
+        [:ios, :android].include?(platform)
       end
     end
   end

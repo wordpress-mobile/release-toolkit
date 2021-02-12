@@ -12,7 +12,7 @@ module Fastlane
       def self.run(params = {})
 
         # Preflight
-        UI.user_error!("Decryption key could not be found") if Fastlane::Helper::ConfigureHelper.encryption_key.nil?
+        UI.user_error!('Decryption key could not be found') if Fastlane::Helper::ConfigureHelper.encryption_key.nil?
 
         # Checkout the right commit hash etc. before applying the configuration
         prepare_repository do
@@ -21,7 +21,7 @@ module Fastlane
             apply_file(file_reference, params[:force])
           end
         end
-        UI.success "Applied configuration"
+        UI.success 'Applied configuration'
       end
 
       def self.prepare_repository
@@ -68,30 +68,30 @@ module Fastlane
         end
 
         if UI.confirm("#{file_reference.destination} has changes that need to be merged. Would you like to see a diff?")
-            puts Diffy::Diff.new(file_reference.destination_contents, file_reference.source_contents)
+          puts Diffy::Diff.new(file_reference.destination_contents, file_reference.source_contents)
         end
 
         if UI.confirm("Would you like to make a backup of #{file_reference.destination}?")
-            extension = File.extname(file_reference.destination)
-            base = File.basename(Pathname.new(file_reference.destination), extension)
+          extension = File.extname(file_reference.destination)
+          base = File.basename(Pathname.new(file_reference.destination), extension)
 
-            date_string = Time.now.strftime('%m-%d-%Y--%H-%M-%S')
+          date_string = Time.now.strftime('%m-%d-%Y--%H-%M-%S')
 
-            backup_path = base
-                          .concat("-")            # Handy-dandy separator
-                          .concat(date_string)    # date string to allow multiple backups
-                          .concat(extension)      # and the original file extension
-                          .concat(".bak")        # add the .bak file extension - easier to .gitignore
+          backup_path = base
+                        .concat('-')            # Handy-dandy separator
+                        .concat(date_string)    # date string to allow multiple backups
+                        .concat(extension)      # and the original file extension
+                        .concat('.bak')        # add the .bak file extension - easier to .gitignore
 
-            # Create the destination directory if it doesn't exist
-            FileUtils.mkdir_p(Pathname.new(file_reference.destination).dirname)
-            FileUtils.cp(file_reference.destination, backup_path)
+          # Create the destination directory if it doesn't exist
+          FileUtils.mkdir_p(Pathname.new(file_reference.destination).dirname)
+          FileUtils.cp(file_reference.destination, backup_path)
         end
 
         if UI.confirm("Would you like to overwrite #{file_reference.destination}?")
-            file_reference.apply
+          file_reference.apply
         else
-            UI.message "Skipping #{file_reference.destination}"
+          UI.message "Skipping #{file_reference.destination}"
         end
       end
 
@@ -112,25 +112,25 @@ module Fastlane
       end
 
       def self.description
-        "Copy files specified in `.config` from the secrets repository to the project. Specify force:true to avoid confirmation"
+        'Copy files specified in `.config` from the secrets repository to the project. Specify force:true to avoid confirmation'
       end
 
       def self.authors
-        ["Jeremy Massel"]
+        ['Jeremy Massel']
       end
 
       def self.details
-        "Copy files specified in `.config` from the secrets repository to the project. Specify force:true to avoid confirmation"
+        'Copy files specified in `.config` from the secrets repository to the project. Specify force:true to avoid confirmation'
       end
 
       def self.available_options
         [
-            FastlaneCore::ConfigItem.new(key: :force,
-                             env_name: "FORCE_OVERWRITE",
-                             description: "Overwrite copied files without confirmation",
-                             optional: true,
-                             default_value: false,
-                             is_string: false),
+          FastlaneCore::ConfigItem.new(key: :force,
+                                       env_name: 'FORCE_OVERWRITE',
+                                       description: 'Overwrite copied files without confirmation',
+                                       optional: true,
+                                       default_value: false,
+                                       is_string: false),
         ]
       end
 

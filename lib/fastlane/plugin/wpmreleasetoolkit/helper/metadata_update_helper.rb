@@ -56,21 +56,21 @@ module Fastlane
           fw.puts("msgid \"#{File.open(@content_file_path, "r").read}\"")
         else
           # Multiple line output
-          fw.puts("msgid \"\"")
+          fw.puts('msgid ""')
 
           # insert content
-          sf = File.open(@content_file_path, "r").to_a
+          sf = File.open(@content_file_path, 'r').to_a
           sf.each do |line|
             l = "\"#{line.strip}"
-            l << "\\n" unless line == sf.last
-            l << "\""
+            l << '\\n' unless line == sf.last
+            l << '"'
             fw.puts(l)
           end
         end
 
         # close
-        fw.puts("msgstr \"\"")
-        fw.puts("")
+        fw.puts('msgstr ""')
+        fw.puts('')
       end
     end
 
@@ -79,7 +79,7 @@ module Fastlane
 
       def initialize(block_key, content_file_path, release_version)
         super(block_key, content_file_path)
-        @rel_note_key = "release_note"
+        @rel_note_key = 'release_note'
         @release_version = release_version
         generate_keys(release_version)
       end
@@ -120,17 +120,17 @@ module Fastlane
       def generate_block(fw)
         # init
         fw.puts("msgctxt \"#{@new_key}\"")
-        fw.puts("msgid \"\"")
+        fw.puts('msgid ""')
         fw.puts("\"#{@release_version}:\\n\"")
 
         # insert content
-        File.open(@content_file_path, "r").each do |line|
+        File.open(@content_file_path, 'r').each do |line|
           fw.puts("\"#{line.strip}\\n\"")
         end
 
         # close
-        fw.puts("msgstr \"\"")
-        fw.puts("")
+        fw.puts('msgstr ""')
+        fw.puts('')
       end
 
       def extract_key(line)
@@ -143,7 +143,7 @@ module Fastlane
 
       def initialize(block_key, content_file_path, release_version)
         super(block_key, content_file_path)
-        @rel_note_key = "whats_new"
+        @rel_note_key = 'whats_new'
         @release_version = release_version
         generate_keys(release_version)
       end
@@ -161,7 +161,7 @@ module Fastlane
       end
 
       def is_handler_for(key)
-        key.start_with?("v") && key.end_with?("-whats-new")
+        key.start_with?('v') && key.end_with?('-whats-new')
       end
 
       def handle_line(fw, line)
@@ -175,16 +175,16 @@ module Fastlane
       def generate_block(fw)
         # init
         fw.puts("msgctxt \"#{@new_key}\"")
-        fw.puts("msgid \"\"")
+        fw.puts('msgid ""')
 
         # insert content
-        File.open(@content_file_path, "r").each do |line|
+        File.open(@content_file_path, 'r').each do |line|
           fw.puts("\"#{line.strip}\\n\"")
         end
 
         # close
-        fw.puts("msgstr \"\"")
-        fw.puts("")
+        fw.puts('msgstr ""')
+        fw.puts('')
       end
     end
 

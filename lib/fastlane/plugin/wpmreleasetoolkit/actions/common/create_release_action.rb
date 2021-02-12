@@ -10,7 +10,7 @@ module Fastlane
         repository = params[:repository]
         version = params[:version]
         assets = params[:release_assets]
-        release_notes = params[:release_notes_file_path].nil? ? "" : IO.read(params[:release_notes_file_path])
+        release_notes = params[:release_notes_file_path].nil? ? '' : IO.read(params[:release_notes_file_path])
         prerelease = params[:prerelease]
 
         UI.message("Creating draft release #{version} in #{repository}.")
@@ -20,15 +20,15 @@ module Fastlane
         end
 
         Fastlane::Helper::GithubHelper.create_release(repository, version, release_notes, assets, prerelease)
-        UI.message("Done")
+        UI.message('Done')
       end
 
       def self.description
-        "Creates a release and uploads the provided assets"
+        'Creates a release and uploads the provided assets'
       end
 
       def self.authors
-        ["Lorenzo Mattei"]
+        ['Lorenzo Mattei']
       end
 
       def self.return_value
@@ -37,37 +37,37 @@ module Fastlane
 
       def self.details
         # Optional:
-        "Creates a release and uploads the provided assets"
+        'Creates a release and uploads the provided assets'
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :repository,
-                                        env_name: "GHHELPER_REPOSITORY",
-                                        description: "The remote path of the GH repository on which we work",
-                                        optional: false,
-                                        type: String),
+                                       env_name: 'GHHELPER_REPOSITORY',
+                                       description: 'The remote path of the GH repository on which we work',
+                                       optional: false,
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :version,
-                                        env_name: "GHHELPER_CREATE_RELEASE_VERSION",
-                                        description: "The version of the release",
-                                        optional: false,
-                                        is_string: true),
+                                       env_name: 'GHHELPER_CREATE_RELEASE_VERSION',
+                                       description: 'The version of the release',
+                                       optional: false,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :release_notes_file_path,
-                                        env_name: "GHHELPER_CREATE_RELEASE_NOTES",
-                                        description: "The path to the file that contains the release notes",
-                                        optional: true,
-                                        is_string: true),
+                                       env_name: 'GHHELPER_CREATE_RELEASE_NOTES',
+                                       description: 'The path to the file that contains the release notes',
+                                       optional: true,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :release_assets,
-                                        env_name: "GHHELPER_CREATE_RELEASE_ASSETS",
-                                        description: "Assets to upload",
-                                        type: Array,
-                                        optional: false),
+                                       env_name: 'GHHELPER_CREATE_RELEASE_ASSETS',
+                                       description: 'Assets to upload',
+                                       type: Array,
+                                       optional: false),
           FastlaneCore::ConfigItem.new(key: :prerelease,
-                                        env_name: "GHHELPER_CREATE_RELEASE_PRERELEASE",
-                                        description: "True if this is a pre-release",
-                                        optional: true,
-                                        default_value: false,
-                                        is_string: false),
+                                       env_name: 'GHHELPER_CREATE_RELEASE_PRERELEASE',
+                                       description: 'True if this is a pre-release',
+                                       optional: true,
+                                       default_value: false,
+                                       is_string: false),
         ]
       end
 

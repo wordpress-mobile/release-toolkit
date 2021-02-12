@@ -3,7 +3,7 @@ require 'fileutils'
 require 'nokogiri'
 
 module Fastlane
-  UI = FastlaneCore::UI unless Fastlane.const_defined?("UI")
+  UI = FastlaneCore::UI unless Fastlane.const_defined?('UI')
 
   module Helper
     module Android
@@ -11,7 +11,7 @@ module Fastlane
 
         # Checks if string_line has the content_override flag set
         def self.skip_string_by_tag(string_line)
-          skip = string_line.attr("content_override") == "true" unless string_line.attr("content_override").nil?
+          skip = string_line.attr('content_override') == 'true' unless string_line.attr('content_override').nil?
           if (skip)
             puts " - Skipping #{string_line.attr("name")} string"
             return true
@@ -35,7 +35,7 @@ module Fastlane
 
         # Merge string_line into main_string
         def self.merge_string(main_strings, library, string_line)
-          string_name = string_line.attr("name")
+          string_name = string_line.attr('name')
           string_content = string_line.content
 
           # Skip strings in the exclusions list
@@ -44,7 +44,7 @@ module Fastlane
           # Search for the string in the main file
           result = :added
           main_strings.xpath('//string').each do |this_string|
-            if (this_string.attr("name") == string_name) then
+            if (this_string.attr('name') == string_name) then
               # Skip if the string has the content_override tag
               return :skipped if skip_string_by_tag(this_string)
 
@@ -53,7 +53,7 @@ module Fastlane
 
               # The string needs an update
               result = :updated
-              if (this_string.attr("tools:ignore").nil?)
+              if (this_string.attr('tools:ignore').nil?)
                 # It can be updated, so remove the current one and move ahead
                 this_string.remove
                 break
@@ -72,7 +72,7 @@ module Fastlane
 
         # Verify a string
         def self.verify_string(main_strings, library, string_line)
-          string_name = string_line.attr("name")
+          string_name = string_line.attr('name')
           string_content = string_line.content
 
           # Skip strings in the exclusions list
@@ -80,7 +80,7 @@ module Fastlane
 
           # Search for the string in the main file
           main_strings.xpath('//string').each do |this_string|
-            if (this_string.attr("name") == string_name) then
+            if (this_string.attr('name') == string_name) then
               # Skip if the string has the content_override tag
               return if skip_string_by_tag(this_string)
 
@@ -106,22 +106,22 @@ module Fastlane
           lib_strings.xpath('//string').each do |string_line|
             res = merge_string(main_strings, library, string_line)
             case res
-              when :updated
-                puts "#{string_line.attr("name")} updated."
-                updated_count = updated_count + 1
-              when :found
-                untouched_count = untouched_count + 1
-              when :added
-                puts "#{string_line.attr("name")} added."
-                added_count = added_count + 1
-              when :skipped
-                skipped_count = skipped_count + 1
-              else
-                UI.user_error!("Internal Error! #{res}")
-              end
+            when :updated
+              puts "#{string_line.attr("name")} updated."
+              updated_count = updated_count + 1
+            when :found
+              untouched_count = untouched_count + 1
+            when :added
+              puts "#{string_line.attr("name")} added."
+              added_count = added_count + 1
+            when :skipped
+              skipped_count = skipped_count + 1
+            else
+              UI.user_error!("Internal Error! #{res}")
+            end
           end
 
-          File.open(main, "w:UTF-8") do |f|
+          File.open(main, 'w:UTF-8') do |f|
             f.write(main_strings.to_xml(:indent => 4))
           end
 
@@ -130,7 +130,7 @@ module Fastlane
         end
 
         def self.verify_diff(diff_string, main_strings, lib_strings, library)
-          if diff_string.start_with?("name=") then
+          if diff_string.start_with?('name=') then
             diff_string.slice!('name="')
 
             end_index = diff_string.index('"')
@@ -139,7 +139,7 @@ module Fastlane
             diff_string = diff_string.slice(0..(end_index - 1))
 
             lib_strings.xpath('//string').each do |string_line|
-              if (string_line.attr("name") == diff_string) then
+              if (string_line.attr('name') == diff_string) then
                 res = verify_string(main_strings, library, string_line)
               end
             end
@@ -158,8 +158,8 @@ module Fastlane
 
         def self.verify_local_diff(main, library, main_strings, lib_strings)
           `git diff #{main}`.each_line do |line|
-            if (line.start_with?("+ ") or line.start_with?("- ")) then
-              diffs = line.gsub(/\s+/m, ' ').strip.split(" ")
+            if (line.start_with?('+ ') or line.start_with?('- ')) then
+              diffs = line.gsub(/\s+/m, ' ').strip.split(' ')
               diffs.each do |diff|
                 verify_diff(diff, main_strings, lib_strings, library)
               end
@@ -169,8 +169,8 @@ module Fastlane
 
         def self.verify_pr_diff(main, library, main_strings, lib_strings, source_diff)
           source_diff.each_line do |line|
-            if (line.start_with?("+ ") or line.start_with?("- ")) then
-              diffs = line.gsub(/\s+/m, ' ').strip.split(" ")
+            if (line.start_with?('+ ') or line.start_with?('- ')) then
+              diffs = line.gsub(/\s+/m, ' ').strip.split(' ')
               diffs.each do |diff|
                 verify_diff(diff, main_strings, lib_strings, library)
               end

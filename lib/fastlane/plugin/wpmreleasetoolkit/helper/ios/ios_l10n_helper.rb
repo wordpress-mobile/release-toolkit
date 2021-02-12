@@ -85,18 +85,18 @@ module Fastlane
         # and for each, iterates on every entry found to print the key and the corresponding types parsed by SwiftGen from the placeholders found in that translation
         def template_content
           <<~TEMPLATE
-          {% macro recursiveBlock table item %}
-            {% for string in item.strings %}
-          "{{string.key}}" => [{{string.types|join:","}}]
-            {% endfor %}
-            {% for child in item.children %}
-            {% call recursiveBlock table child %}
-            {% endfor %}
-          {% endmacro %}
+            {% macro recursiveBlock table item %}
+              {% for string in item.strings %}
+            "{{string.key}}" => [{{string.types|join:","}}]
+              {% endfor %}
+              {% for child in item.children %}
+              {% call recursiveBlock table child %}
+              {% endfor %}
+            {% endmacro %}
 
-          {% for table in tables %}
-          {% call recursiveBlock table.name table.levels %}
-          {% endfor %}
+            {% for table in tables %}
+            {% call recursiveBlock table.name table.levels %}
+            {% endfor %}
           TEMPLATE
         end
 
@@ -111,7 +111,7 @@ module Fastlane
 
           # Dynamically create a SwiftGen config which will cover all supported languages
           langs = Dir.chdir(input_dir) do
-              Dir.glob('*.lproj/Localizable.strings').map { |loc_file| File.basename(File.dirname(loc_file), '.lproj') }
+            Dir.glob('*.lproj/Localizable.strings').map { |loc_file| File.basename(File.dirname(loc_file), '.lproj') }
           end.sort
           langs.select! { |lang| only_langs.include?(lang) } unless only_langs.nil?
 
@@ -120,14 +120,14 @@ module Fastlane
             'output_dir' => output_dir,
             'strings' => langs.map do |lang|
               {
-                  'inputs' => ["#{lang}.lproj/Localizable.strings"],
-                  # Choose an unlikely separator (instead of the default '.') to avoid creating needlessly complex Stencil Context nested
-                  # structure just because we have '.' in the English sentences we use (instead of structured reverse-dns notation) for the keys
-                  'options' => { 'separator' => "____" },
-                  'outputs' => [{
-                      'templatePath' => template_path,
-                      'output' => output_filename(lang)
-                  }]
+                'inputs' => ["#{lang}.lproj/Localizable.strings"],
+                # Choose an unlikely separator (instead of the default '.') to avoid creating needlessly complex Stencil Context nested
+                # structure just because we have '.' in the English sentences we use (instead of structured reverse-dns notation) for the keys
+                'options' => { 'separator' => '____' },
+                'outputs' => [{
+                  'templatePath' => template_path,
+                  'output' => output_filename(lang)
+                }]
               }
             end
           }

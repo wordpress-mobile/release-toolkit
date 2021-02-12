@@ -24,18 +24,18 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Cleans all the intermediate tags for the given version"
+        'Cleans all the intermediate tags for the given version'
       end
 
       def self.details
-        "Cleans all the intermediate tags for the given version"
+        'Cleans all the intermediate tags for the given version'
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :version,
-                                       env_name: "FL_IOS_CLEAN_INTERMEDIATE_TAGS_VERSION",
-                                       description: "The version of the tags to clear",
+                                       env_name: 'FL_IOS_CLEAN_INTERMEDIATE_TAGS_VERSION',
+                                       description: 'The version of the tags to clear',
                                        is_string: true)
         ]
       end
@@ -49,7 +49,7 @@ module Fastlane
       end
 
       def self.authors
-        ["loremattei"]
+        ['loremattei']
       end
 
       def self.is_supported?(platform)

@@ -33,7 +33,7 @@ module Fastlane
         if Fastlane::Helper::ConfigureHelper.project_encryption_key.nil?
           # If the user chose not to update the repo but there is no encryption key, throw an error
           if repo_is_behind_remote
-            UI.user_error!("The local secrets behind the remote but it is missing a keys.json entry for this project. Please update it to the latest commit.")
+            UI.user_error!('The local secrets behind the remote but it is missing a keys.json entry for this project. Please update it to the latest commit.')
           end
           Fastlane::Helper::ConfigureHelper.update_project_encryption_key
           # Update the configure file to the new hash
@@ -58,7 +58,7 @@ module Fastlane
           update_configure_file
         else
           if current_branch == nil
-            UI.user_error!("The local secrets store is in a deatched HEAD state.  Please check out a branch and try again.")
+            UI.user_error!('The local secrets store is in a deatched HEAD state.  Please check out a branch and try again.')
           end
         end
       end
@@ -111,8 +111,8 @@ module Fastlane
       def self.get_branches
         branches = sh("cd #{absolute_secret_store_path} && git branch -r")
         branches.split("\n")
-                .map { |s| s.strip!.split("/")[1] }
-                .reject { |s| s.include? "HEAD" }
+                .map { |s| s.strip!.split('/')[1] }
+                .reject { |s| s.include? 'HEAD' }
       end
 
       ### Switch to the given branch, but don't ensure that it's up-to-date – that's for another step
@@ -130,15 +130,15 @@ module Fastlane
       end
 
       def self.description
-        "Ensure that the local secrets repository is up to date."
+        'Ensure that the local secrets repository is up to date.'
       end
 
       def self.authors
-        ["Jeremy Massel"]
+        ['Jeremy Massel']
       end
 
       def self.details
-        "Ensure that the local secrets repository is up to date, and lets you test alternative branches."
+        'Ensure that the local secrets repository is up to date, and lets you test alternative branches.'
       end
 
       def self.is_supported?(platform)

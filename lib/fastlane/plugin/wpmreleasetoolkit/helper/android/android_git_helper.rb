@@ -13,8 +13,8 @@ module Fastlane
         #
         def self.commit_version_bump()
           Fastlane::Helper::GitHelper.commit(
-            message: "Bump version number",
-            files: File.join(ENV["PROJECT_ROOT_FOLDER"], ENV["PROJECT_NAME"], "build.gradle"),
+            message: 'Bump version number',
+            files: File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'build.gradle'),
             push: true
           )
         end
@@ -30,12 +30,12 @@ module Fastlane
         #       in the release-toolkit instead, and move this code away from `ios_git_helper`.
         #
         def self.update_metadata(validate_translation_command)
-          Action.sh("./tools/update-translations.sh")
-          Action.sh("git", "submodule", "update", "--init", "--recursive")
-          Action.sh("./gradlew", validate_translation_command)
+          Action.sh('./tools/update-translations.sh')
+          Action.sh('git', 'submodule', 'update', '--init', '--recursive')
+          Action.sh('./gradlew', validate_translation_command)
 
-          res_dir = File.join(ENV["PROJECT_ROOT_FOLDER"], ENV["PROJECT_NAME"], "src", "main", "res")
-          Fastlane::Helper::GitHelper.commit(message: "Update translations", files: res_dir, push: true)
+          res_dir = File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'src', 'main', 'res')
+          Fastlane::Helper::GitHelper.commit(message: 'Update translations', files: res_dir, push: true)
         end
       end
     end

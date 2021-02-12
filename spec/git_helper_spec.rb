@@ -38,7 +38,7 @@ describe Fastlane::Helper::GitHelper do
   context('commit(message:, files:, push:)') do
     before(:each) do
       allow_fastlane_action_sh()
-      @message = "Some commit message with spaces"
+      @message = 'Some commit message with spaces'
     end
 
     it 'commits without adding any file if none are provided' do

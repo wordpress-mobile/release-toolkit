@@ -4,8 +4,8 @@ describe Fastlane::Configuration do
   describe 'initialization' do
     it 'creates an empty config' do
       expect(subject.project_name).to eq(Fastlane::Helper::FilesystemHelper.project_path.basename.to_s)
-      expect(subject.branch).to eq("")
-      expect(subject.pinned_hash).to eq("")
+      expect(subject.branch).to eq('')
+      expect(subject.pinned_hash).to eq('')
       expect(subject.files_to_copy).to eq([])
       expect(subject.file_dependencies).to eq([])
     end
@@ -16,8 +16,8 @@ describe Fastlane::Configuration do
 
     let(:configure_json) do
       {
-        project_name: "MyProject",
-        branch: "a_branch",
+        project_name: 'MyProject',
+        branch: 'a_branch',
         pinned_hash: 'a_hash',
         files_to_copy: [{ file: 'a_file_to_copy', destination: 'a_destination', encrypt: true }],
         file_dependencies: ['a_file_dependencies'],

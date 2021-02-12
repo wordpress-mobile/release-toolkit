@@ -26,7 +26,7 @@ module Fastlane
           message = "PromoScreenshots feature is currently disabled.\n"
           message << "Please, install RMagick if you aim to generate the PromoScreenshots.\n"
           message << "\'bundle install --with screenshots\' should do it if your project is configured for PromoScreenshots.\n"
-          message << "Aborting."
+          message << 'Aborting.'
           UI.user_error!(message)
         end
       end
@@ -37,25 +37,25 @@ module Fastlane
         begin
           return JSON.parse(open(configFilePath).read)
         rescue
-            linter = JsonLint::Linter.new
-            linter.check(configFilePath)
-            linter.display_errors
+          linter = JsonLint::Linter.new
+          linter.check(configFilePath)
+          linter.display_errors
 
-            UI.user_error!("Invalid JSON configuration. See errors in log.")
+          UI.user_error!('Invalid JSON configuration. See errors in log.')
         end
       end
 
-      def draw_caption_to_canvas(entry, canvas, device, stylesheet_path = "")
+      def draw_caption_to_canvas(entry, canvas, device, stylesheet_path = '')
 
         # If no caption is provided, it's ok to skip the body of this method
-        if entry["text"] == nil
+        if entry['text'] == nil
           return canvas
         end
 
-        text = entry["text"]
-        text_size = device["text_size"]
-        font_size = device["font_size"]
-        locale = entry["locale"]
+        text = entry['text']
+        text_size = device['text_size']
+        font_size = device['font_size']
+        locale = entry['locale']
 
         text = resolve_text_into_path(text, locale)
 
@@ -69,9 +69,9 @@ module Fastlane
         x_position = 0
         y_position = 0
 
-        if device["text_offset"] != nil
-          x_position = device["text_offset"][0]
-          y_position = device["text_offset"][1]
+        if device['text_offset'] != nil
+          x_position = device['text_offset'][0]
+          y_position = device['text_offset'][1]
         end
 
         draw_text_to_canvas(canvas,
@@ -86,14 +86,14 @@ module Fastlane
 
       def draw_background_to_canvas(canvas, entry)
 
-        if entry["background"] != nil
+        if entry['background'] != nil
 
           # If we're passed an image path, let's open it and paint it to the canvas
-          if can_resolve_path(entry["background"])
-            background_image = open_image(entry["background"])
+          if can_resolve_path(entry['background'])
+            background_image = open_image(entry['background'])
             return composite_image(canvas, background_image, 0, 0)
           else  # Otherwise, let's assume this is a colour code
-            background_image = create_image(canvas.columns, canvas.rows, entry["background"])
+            background_image = create_image(canvas.columns, canvas.rows, entry['background'])
             canvas = composite_image(canvas, background_image, 0, 0)
           end
         end
@@ -104,22 +104,22 @@ module Fastlane
       def draw_device_frame_to_canvas(device, canvas)
 
         # Apply the device frame to the canvas, but only if one is provided
-        unless device["device_frame_size"] != nil
+        unless device['device_frame_size'] != nil
           return canvas
         end
 
-        w = device["device_frame_size"][0]
-        h = device["device_frame_size"][1]
+        w = device['device_frame_size'][0]
+        h = device['device_frame_size'][1]
 
         x = 0
         y = 0
 
-        if device["device_frame_size"] != nil
-          x = device["device_frame_offset"][0]
-          y = device["device_frame_offset"][1]
+        if device['device_frame_size'] != nil
+          x = device['device_frame_offset'][0]
+          y = device['device_frame_offset'][1]
         end
 
-        device_frame = open_image(device["device_frame"])
+        device_frame = open_image(device['device_frame'])
         device_frame = resize_image(device_frame, w, h)
         composite_image(canvas, device_frame, x, y)
       end
@@ -128,15 +128,15 @@ module Fastlane
 
         # Don't require a screenshot to be present – we can just skip
         # this function if one doesn't exist.
-        unless entry["screenshot"] != nil
+        unless entry['screenshot'] != nil
           return canvas
         end
 
-        device_mask = device["screenshot_mask"]
-        screenshot_size = device["screenshot_size"]
-        screenshot_offset = device["screenshot_offset"]
+        device_mask = device['screenshot_mask']
+        screenshot_size = device['screenshot_size']
+        screenshot_offset = device['screenshot_offset']
 
-        screenshot = entry["screenshot"]
+        screenshot = entry['screenshot']
 
         screenshot = open_image(screenshot)
 
@@ -150,11 +150,11 @@ module Fastlane
 
       def draw_attachments_to_canvas(entry, canvas)
 
-        entry["attachments"].each { |attachment|
-          if attachment["file"] != nil
+        entry['attachments'].each { |attachment|
+          if attachment['file'] != nil
             canvas = draw_file_attachment_to_canvas(attachment, canvas, entry)
-          elsif attachment["text"] != nil
-            canvas = draw_text_attachment_to_canvas(attachment, canvas, entry["locale"])
+          elsif attachment['text'] != nil
+            canvas = draw_text_attachment_to_canvas(attachment, canvas, entry['locale'])
           end
         }
 
@@ -163,49 +163,49 @@ module Fastlane
 
       def draw_file_attachment_to_canvas(attachment, canvas, entry)
 
-          file = resolve_path(attachment["file"])
+        file = resolve_path(attachment['file'])
 
-          image = open_image(file)
+        image = open_image(file)
 
-          if attachment.member?("operations")
+        if attachment.member?('operations')
 
-            attachment["operations"].each { |operation|
-              image = apply_operation(image, operation, canvas)
-            }
+          attachment['operations'].each { |operation|
+            image = apply_operation(image, operation, canvas)
+          }
 
-          end
+        end
 
-          size = attachment["size"]
+        size = attachment['size']
 
-          x_pos = attachment["position"][0]
-          y_pos = attachment["position"][1]
+        x_pos = attachment['position'][0]
+        y_pos = attachment['position'][1]
 
-          if attachment["offset"] != nil
-            x_pos += attachment["offset"][0]
-            y_pos += attachment["offset"][1]
-          end
+        if attachment['offset'] != nil
+          x_pos += attachment['offset'][0]
+          y_pos += attachment['offset'][1]
+        end
 
-          image = resize_image(image, size[0], size[1])
-          canvas = composite_image(canvas, image, x_pos, y_pos)
+        image = resize_image(image, size[0], size[1])
+        canvas = composite_image(canvas, image, x_pos, y_pos)
       end
 
       def draw_text_attachment_to_canvas(attachment, canvas, locale)
 
-        text = resolve_text_into_path(attachment["text"], locale)
-        font_size = attachment["font-size"] ||= 12
+        text = resolve_text_into_path(attachment['text'], locale)
+        font_size = attachment['font-size'] ||= 12
 
-        width  = attachment["size"][0]
-        height = attachment["size"][1]
+        width  = attachment['size'][0]
+        height = attachment['size'][1]
 
-        x_position = attachment["position"][0] ||= 0
-        y_position = attachment["position"][1] ||= 0
+        x_position = attachment['position'][0] ||= 0
+        y_position = attachment['position'][1] ||= 0
 
-        stylesheet_path = attachment["stylesheet"]
+        stylesheet_path = attachment['stylesheet']
         if can_resolve_path(stylesheet_path)
           stylesheet_path = resolve_path(stylesheet_path)
         end
 
-        alignment = attachment["alignment"] ||= 'center'
+        alignment = attachment['alignment'] ||= 'center'
 
         draw_text_to_canvas(canvas,
                             text,
@@ -220,34 +220,34 @@ module Fastlane
 
       def apply_operation(image, operation, canvas)
 
-        return case operation["type"]
-          when "crop"
-            x_pos = operation["at"][0]
-            y_pos = operation["at"][1]
+        case operation['type']
+        when 'crop'
+          x_pos = operation['at'][0]
+          y_pos = operation['at'][1]
 
-            width = operation["to"][0]
-            height = operation["to"][1]
+          width = operation['to'][0]
+          height = operation['to'][1]
 
-            crop_image(image, x_pos, y_pos, width, height)
+          crop_image(image, x_pos, y_pos, width, height)
 
-          when "resize"
-            width = operation["to"][0]
-            height = operation["to"][1]
+        when 'resize'
+          width = operation['to'][0]
+          height = operation['to'][1]
 
-            resize_image(image, width, height)
+          resize_image(image, width, height)
 
-          when "composite"
+        when 'composite'
 
-            x_pos = operation["at"][0]
-            y_pos = operation["at"][1]
+          x_pos = operation['at'][0]
+          y_pos = operation['at'][1]
 
-            if operation.member?("offset")
-              x_pos += operation["offset"][0]
-              y_pos += operation["offset"][1]
-            end
-
-            composite_image(canvas, image, x_pos, y_pos)
+          if operation.member?('offset')
+            x_pos += operation['offset'][0]
+            y_pos += operation['offset'][1]
           end
+
+          composite_image(canvas, image, x_pos, y_pos)
+        end
       end
 
       def draw_text_to_canvas(canvas, text, width, height, x_position, y_position, font_size, stylesheet_path, position = 'center')
@@ -257,16 +257,16 @@ module Fastlane
           command = "bundle exec drawText html=\"#{text}\" maxWidth=#{width} maxHeight=#{height} output=#{tempTextFile.path} fontSize=#{font_size} stylesheet=\"#{stylesheet_path}\" alignment=\"#{position}\""
 
           unless system(command)
-            UI.crash!("Unable to draw text")
+            UI.crash!('Unable to draw text')
           end
 
           text_content = open_image(tempTextFile.path).trim
           text_frame = create_image(width, height)
           text_frame = case position
-            when 'left' then composite_image_left(text_frame, text_content, 0, 0)
-            when 'center' then composite_image_center(text_frame, text_content, 0, 0)
-            when 'top' then composite_image_top(text_frame, text_content, 0, 0)
-            end
+                       when 'left' then composite_image_left(text_frame, text_content, 0, 0)
+                       when 'center' then composite_image_center(text_frame, text_content, 0, 0)
+                       when 'top' then composite_image_top(text_frame, text_content, 0, 0)
+                       end
         ensure
           tempTextFile.close
           tempTextFile.unlink
@@ -289,7 +289,7 @@ module Fastlane
       #
       # @return [Magick::Image] The masked image
       def mask_image(image, mask, offset_x = 0, offset_y = 0)
-          image.composite(mask, offset_x, offset_y, CopyAlphaCompositeOp)
+        image.composite(mask, offset_x, offset_y, CopyAlphaCompositeOp)
       end
 
       # resize_image
@@ -307,7 +307,7 @@ module Fastlane
       def resize_image(original, width, height)
 
         if !original.is_a?(Magick::Image)
-          UI.user_error!("You must pass an image object to `resize_image`.")
+          UI.user_error!('You must pass an image object to `resize_image`.')
         end
 
         original.adaptive_resize(width, height)
@@ -330,11 +330,11 @@ module Fastlane
       def composite_image(original, child, x_position, y_position, starting_position = NorthWestGravity)
 
         if !original.is_a?(Magick::Image)
-          UI.user_error!("You must pass an image object as the first argument to `composite_image`.")
+          UI.user_error!('You must pass an image object as the first argument to `composite_image`.')
         end
 
         if !child.is_a?(Magick::Image)
-          UI.user_error!("You must pass an image object as the second argument to `composite_image`.")
+          UI.user_error!('You must pass an image object as the second argument to `composite_image`.')
         end
 
         original.composite(child, starting_position, x_position, y_position, Magick::OverCompositeOp)
@@ -369,18 +369,18 @@ module Fastlane
       def crop_image(original, x_position, y_position, width, height)
 
         if !original.is_a?(Magick::Image)
-          UI.user_error!("You must pass an image object to `crop_image`.")
+          UI.user_error!('You must pass an image object to `crop_image`.')
         end
 
         original.crop(x_position, y_position, width, height)
       end
 
       def open_image(path)
-          path = resolve_path(path)
+        path = resolve_path(path)
 
-          Magick::Image.read(path)  {
-            self.background_color = 'transparent'
-          }.first
+        Magick::Image.read(path)  {
+          self.background_color = 'transparent'
+        }.first
       end
 
       def create_image(width, height, background = 'transparent')
@@ -404,14 +404,14 @@ module Fastlane
       def resolve_path(path)
 
         if path == nil
-          UI.crash!("Path not provided – you must provide one to continue")
+          UI.crash!('Path not provided – you must provide one to continue')
         end
 
         [
           Pathname.new(path),                                                           # Absolute Path
           Pathname.new(FastlaneCore::FastlaneFolder.fastfile_path).dirname + path,      # Path Relative to the fastfile
           Fastlane::Helper::FilesystemHelper.plugin_root + path,                        # Path Relative to the plugin
-          Fastlane::Helper::FilesystemHelper.plugin_root + "spec/test-data/" + path,    # Path Relative to the test data
+          Fastlane::Helper::FilesystemHelper.plugin_root + 'spec/test-data/' + path,    # Path Relative to the test data
         ]
           .each { |resolved_path|
 
@@ -433,7 +433,7 @@ module Fastlane
         elsif can_resolve_path(localizedFile)
           text = resolve_path(localizedFile).realpath.to_s
         else
-          text = sprintf(text, "source")
+          text = sprintf(text, 'source')
         end
       end
     end

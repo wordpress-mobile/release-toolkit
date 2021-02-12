@@ -41,8 +41,8 @@ end
 describe Fastlane::Configuration::FileReference do
   describe 'initialization' do
     it 'creates an empty file reference' do
-      expect(subject.file).to eq("")
-      expect(subject.destination).to eq("")
+      expect(subject.file).to eq('')
+      expect(subject.destination).to eq('')
       expect(subject.encrypt).to eq(false)
     end
   end

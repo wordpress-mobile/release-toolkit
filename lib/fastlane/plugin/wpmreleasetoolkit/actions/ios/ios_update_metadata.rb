@@ -12,11 +12,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Downloads translated metadata from the translation system"
+        'Downloads translated metadata from the translation system'
       end
 
       def self.details
-        "Downloads translated metadata from the translation system"
+        'Downloads translated metadata from the translation system'
       end
 
       def self.available_options
@@ -32,7 +32,7 @@ module Fastlane
       end
 
       def self.authors
-        ["loremattei"]
+        ['loremattei']
       end
 
       def self.is_supported?(platform)

@@ -23,7 +23,7 @@ module Fastlane
             return  # Already frozen: nothing to do
           end
 
-          mile_title = mile_title + " ❄️"
+          mile_title = mile_title + ' ❄️'
         else
           mile_title = milestone_title
         end
@@ -34,18 +34,18 @@ module Fastlane
 
       def self.is_frozen(milestone)
         unless (milestone.nil?)
-          return milestone[:title].include?("❄️")
+          return milestone[:title].include?('❄️')
         end
 
         return false
       end
 
       def self.description
-        "Sets the frozen tag for the specified milestone"
+        'Sets the frozen tag for the specified milestone'
       end
 
       def self.authors
-        ["Lorenzo Mattei"]
+        ['Lorenzo Mattei']
       end
 
       def self.return_value
@@ -54,26 +54,26 @@ module Fastlane
 
       def self.details
         # Optional:
-        "Sets the frozen tag for the specified milestone"
+        'Sets the frozen tag for the specified milestone'
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :repository,
-                                   env_name: "GHHELPER_REPOSITORY",
-                                description: "The remote path of the GH repository on which we work",
-                                   optional: false,
+                                       env_name: 'GHHELPER_REPOSITORY',
+                                       description: 'The remote path of the GH repository on which we work',
+                                       optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :milestone,
-                                   env_name: "GHHELPER_MILESTORE",
-                                description: "The GitHub milestone",
-                                   optional: false,
+                                       env_name: 'GHHELPER_MILESTORE',
+                                       description: 'The GitHub milestone',
+                                       optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :freeze,
-                                description: "The GitHub milestone",
-                                   optional: false,
-                              default_value: true,
-                                  is_string: false)
+                                       description: 'The GitHub milestone',
+                                       optional: false,
+                                       default_value: true,
+                                       is_string: false)
         ]
       end
 
