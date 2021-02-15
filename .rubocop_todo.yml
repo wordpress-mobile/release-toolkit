@@ -6,12 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 1
-# Configuration parameters: AllowSafeAssignment.
-Lint/AssignmentInCondition:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_l10n_helper.rb'
-
 # Offense count: 14
 # Cop supports --auto-correct.
 Lint/DeprecatedClassMethods:

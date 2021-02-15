@@ -196,7 +196,7 @@ module Fastlane
         # Returns true if the file only contains empty lines, i.e. lines that only contains whitespace (space, tab, CR, LF)
         def only_empty_lines?(file)
           File.open(file) do |f|
-            while line = f.gets
+            while (line = f.gets)
               return false if not line.strip.empty?
             end
           end
