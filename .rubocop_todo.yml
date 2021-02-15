@@ -38,16 +38,6 @@ Lint/ShadowingOuterLocalVariable:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/configure_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_adc_app_sizes_helper.rb'
 
-# Offense count: 6
-# Cop supports --auto-correct.
-# Configuration parameters: IgnoreEmptyBlocks, AllowUnusedKeywordArguments.
-Lint/UnusedBlockArgument:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_update_metadata_source.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/an_metadata_update_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_update_helper.rb'
-
 # Offense count: 44
 # Cop supports --auto-correct.
 # Configuration parameters: AllowUnusedKeywordArguments, IgnoreEmptyMethods.
