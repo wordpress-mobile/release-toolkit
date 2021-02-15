@@ -38,12 +38,6 @@ Lint/ShadowingOuterLocalVariable:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/configure_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_adc_app_sizes_helper.rb'
 
-# Offense count: 44
-# Cop supports --auto-correct.
-# Configuration parameters: AllowUnusedKeywordArguments, IgnoreEmptyMethods.
-Lint/UnusedMethodArgument:
-  Enabled: false
-
 # Offense count: 9
 # Configuration parameters: ContextCreatingMethods, MethodCreatingMethods.
 Lint/UselessAccessModifier:
