@@ -13,7 +13,7 @@ module Fastlane
                 )
 
                 res = ci_helper.trig_job(params[:branch], params[:job_params])
-                (res.code == 200) ? UI.message("Done!") : UI.user_error!("Failed to start job\nError: [#{res.code}] #{res.message}")
+                (res.code == "201") ? UI.message("Done!") : UI.user_error!("Failed to start job\nError: [#{res.code}] #{res.message}")
             end
   
             #####################################################
@@ -46,8 +46,8 @@ module Fastlane
                 FastlaneCore::ConfigItem.new(key: :job_params,
                                             env_name: "FL_CCI_JOB_PARAMS",
                                             description: "Parameters to send to the CircleCI pipeline",
-                                            is_string: true,
-                                            default_value: ""),                      
+                                            is_string: false,
+                                            default_value: nil),                      
             ]
             end
   
