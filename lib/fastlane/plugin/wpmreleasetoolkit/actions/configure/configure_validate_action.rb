@@ -77,7 +77,7 @@ module Fastlane
         changed_dependencies = changed_files & dependencies # calculate array intersection
 
         unless changed_dependencies.empty?
-          UI.user_error!("The following files are out of date. Please run `bundle exec fastlane run configure_update` before continuing:\n\n#{changed_dependencies.to_s}")
+          UI.user_error!("The following files are out of date. Please run `bundle exec fastlane run configure_update` before continuing:\n\n#{changed_dependencies}")
         end
 
         unless new_files.empty?

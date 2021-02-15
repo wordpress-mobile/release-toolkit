@@ -57,7 +57,7 @@ module Fastlane
           source = d[0].split(/\u0004/).last
 
           @alternates.each do |file|
-            puts "Data: #{file[0].to_s} - key: #{key}"
+            puts "Data: #{file[0]} - key: #{key}"
             if (file[0].to_s == key)
               puts "Alternate: #{key}"
               data = file[1]
