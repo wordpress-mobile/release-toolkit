@@ -194,8 +194,8 @@ module Fastlane
           abs_path = self.mobile_secrets_path(path)
 
           if File.directory?(abs_path)
-            Dir.glob("#{abs_path}**/*").map { |path|
-              path.gsub(repository_path + '/', '')
+            Dir.glob("#{abs_path}**/*").map { |sub_path|
+              sub_path.gsub(repository_path + '/', '')
             }
           else
             return path

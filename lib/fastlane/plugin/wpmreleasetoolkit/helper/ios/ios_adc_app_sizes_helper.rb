@@ -64,8 +64,8 @@ module Fastlane
             col_size = devices.map(&:length).max
             table = "| #{build_number.ljust(col_size)} | Download | Install  |\n"
             table += "|:#{'-' * col_size}-|---------:|---------:|\n"
-            sizes.each do |(device_name, sizes)|
-              table += "| #{device_name.ljust(col_size)} | #{sz_mb(sizes['compressed'])} | #{sz_mb(sizes['uncompressed'])} |\n"
+            sizes.each do |(device_name, size_info)|
+              table += "| #{device_name.ljust(col_size)} | #{sz_mb(size_info['compressed'])} | #{sz_mb(size_info['uncompressed'])} |\n"
             end
             table
           end
