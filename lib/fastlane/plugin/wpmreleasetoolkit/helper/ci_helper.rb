@@ -4,7 +4,7 @@ require 'uri'
 require 'json'
 
 module CIHelper
-    def trigger_job(branch, parameters=nil)
+    def trig_job(branch, parameters=nil)
       raise "Not implemented"
     end
 
@@ -50,7 +50,7 @@ module Fastlane
                     body = { "branch": branch, "parameters": parameters }
                     request.body = body.to_json
                     response = http.request(request)
-                    UI.message(response)
+                    return response
                 end
             end
         end
