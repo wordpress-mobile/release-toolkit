@@ -6,17 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 14
-# Cop supports --auto-correct.
-Lint/DeprecatedClassMethods:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/an_update_metadata_source_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_downloadmetadata_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_update_metadata_source.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_apply_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_l10n_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_download_helper.rb'
 
 # Offense count: 32
 Lint/IneffectiveAccessModifier:

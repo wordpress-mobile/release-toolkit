@@ -37,7 +37,7 @@ module Fastlane
         target = self.create_target_file_path(orig)
 
         # Clear if older exists
-        File.delete(target) if File.exists? target
+        File.delete(target) if File.exist? target
 
         # Create the new one
         begin
@@ -47,7 +47,7 @@ module Fastlane
             end
           end
         rescue
-          File.delete(target) if File.exists? target
+          File.delete(target) if File.exist? target
           raise
         end
 
@@ -57,7 +57,7 @@ module Fastlane
       # Deletes the old po and moves the temp one
       # to the final location
       def self.swap_po(orig_file_path, temp_file_path)
-        File.delete(orig_file_path) if File.exists? orig_file_path
+        File.delete(orig_file_path) if File.exist? orig_file_path
         File.rename(temp_file_path, orig_file_path)
       end
 

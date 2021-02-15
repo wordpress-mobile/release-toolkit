@@ -26,7 +26,7 @@ module Fastlane
         # Check if SwiftGen is installed in the provided `install_path` and if so if the installed version matches the expected `version`
         #
         def check_swiftgen_installed
-          return false unless File.exists?(swiftgen_bin)
+          return false unless File.exist?(swiftgen_bin)
 
           vers_string = `#{swiftgen_bin} --version`
           # The SwiftGen version string has this format:
@@ -49,7 +49,7 @@ module Fastlane
             extracted_dir = File.join(tmpdir, "swiftgen-#{version}")
             Action.sh('unzip', zipfile, '-d', extracted_dir)
 
-            FileUtils.rm_rf(install_path) if File.exists?(install_path)
+            FileUtils.rm_rf(install_path) if File.exist?(install_path)
             FileUtils.mkdir_p(install_path)
             FileUtils.cp_r("#{extracted_dir}/.", install_path)
           end
@@ -149,7 +149,7 @@ module Fastlane
         #
         def sort_file_lines!(dir, lang)
           file = File.join(dir, output_filename(lang))
-          return nil unless File.exists?(file)
+          return nil unless File.exist?(file)
 
           sorted_lines = File.readlines(file).sort
           File.write(file, sorted_lines.join)

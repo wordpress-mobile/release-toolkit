@@ -24,7 +24,7 @@ module Fastlane
       end
 
       def self.prepare_repository
-        secrets_respository_exists = File.exists?(repository_path)
+        secrets_respository_exists = File.exist?(repository_path)
 
         # If the secrets repo doesn't exist, just run the block
         unless secrets_respository_exists
