@@ -12,7 +12,7 @@ module Fastlane
           organization: params[:organization]
         )
 
-        res = ci_helper.trigger_job(branch: params[:branch], params: params[:job_params])
+        res = ci_helper.trigger_job(branch: params[:branch], parameters: params[:job_params])
         (res.code == "201") ? UI.message('Done!') : UI.user_error!("Failed to start job\nError: [#{res.code}] #{res.message}")
       end
 
