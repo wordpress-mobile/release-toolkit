@@ -7,12 +7,12 @@ module Fastlane
         UI.message "Triggering job #{params[:job_params]} on branch #{params[:branch]}"
 
         ci_helper = Fastlane::Helper::CircleCIHelper.new(
-          params[:circle_ci_token],
-          params[:repository],
-          params[:organization]
+          login: params[:circle_ci_token],
+          repository: params[:repository],
+          organization: params[:organization]
         )
 
-        res = ci_helper.trigger_job(params[:branch], params[:job_params])
+        res = ci_helper.trigger_job(branch: params[:branch], params: params[:job_params])
         (res.code == "201") ? UI.message('Done!') : UI.user_error!("Failed to start job\nError: [#{res.code}] #{res.message}")
       end
 
