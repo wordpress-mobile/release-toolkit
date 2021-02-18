@@ -37,7 +37,7 @@ module Fastlane
         target = self.create_target_file_path(orig)
 
         # Clear if older exists
-        File.delete(target) if File.exists? target
+        File.delete(target) if File.exist? target
 
         # Create the new one
         begin
@@ -47,7 +47,7 @@ module Fastlane
             end
           end
         rescue
-          File.delete(target) if File.exists? target
+          File.delete(target) if File.exist? target
           raise
         end
 
@@ -57,7 +57,7 @@ module Fastlane
       # Deletes the old po and moves the temp one
       # to the final location
       def self.swap_po(orig_file_path, temp_file_path)
-        File.delete(orig_file_path) if File.exists? orig_file_path
+        File.delete(orig_file_path) if File.exist? orig_file_path
         File.rename(temp_file_path, orig_file_path)
       end
 
@@ -71,16 +71,16 @@ module Fastlane
         @blocks = Array.new
 
         # Inits default handler
-        @blocks.push (Fastlane::Helper::UnknownMetadataBlock.new)
+        @blocks.push Fastlane::Helper::UnknownMetadataBlock.new
 
         # Init special handlers
         block_files.each do |key, file_path|
           if (key == :release_note)
-            @blocks.push (Fastlane::Helper::ReleaseNoteMetadataBlock.new(key, file_path, release_version))
+            @blocks.push Fastlane::Helper::ReleaseNoteMetadataBlock.new(key, file_path, release_version)
           elsif (key == :whats_new)
-            @blocks.push (Fastlane::Helper::WhatsNewMetadataBlock.new(key, file_path, release_version))
+            @blocks.push Fastlane::Helper::WhatsNewMetadataBlock.new(key, file_path, release_version)
           else
-            @blocks.push (Fastlane::Helper::StandardMetadataBlock.new(key, file_path))
+            @blocks.push Fastlane::Helper::StandardMetadataBlock.new(key, file_path)
           end
         end
 

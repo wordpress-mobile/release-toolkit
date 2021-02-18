@@ -57,7 +57,7 @@ module Fastlane
           source = d[0].split(/\u0004/).last
 
           @alternates.each do |file|
-            puts "Data: #{file[0].to_s} - key: #{key}"
+            puts "Data: #{file[0]} - key: #{key}"
             if (file[0].to_s == key)
               puts "Alternate: #{key}"
               data = file[1]
@@ -88,7 +88,7 @@ module Fastlane
         file_path = get_target_file_path(locale, file_name)
 
         dir_path = File.dirname(file_path)
-        FileUtils.mkdir_p(dir_path) unless File.exists?(dir_path)
+        FileUtils.mkdir_p(dir_path) unless File.exist?(dir_path)
 
         File.open(file_path, 'w') { |file| file.puts(content) }
       end
@@ -97,7 +97,7 @@ module Fastlane
       def delete_existing_metadata(target_locale)
         @target_files.each do |file|
           file_path = get_target_file_path(target_locale, file[1][:desc])
-          File.delete(file_path) if File.exists? file_path
+          File.delete(file_path) if File.exist? file_path
         end
       end
 

@@ -6,23 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 1
-# Configuration parameters: AllowSafeAssignment.
-Lint/AssignmentInCondition:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_l10n_helper.rb'
-
-# Offense count: 14
-# Cop supports --auto-correct.
-Lint/DeprecatedClassMethods:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/an_update_metadata_source_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_downloadmetadata_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_update_metadata_source.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_apply_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_l10n_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_download_helper.rb'
 
 # Offense count: 32
 Lint/IneffectiveAccessModifier:
@@ -42,41 +25,6 @@ Lint/NonLocalExitFromIterator:
   Exclude:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/extract_release_notes_for_version_action.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
-
-# Offense count: 8
-Lint/ParenthesesAsGroupedExpression:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/an_update_metadata_source_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_update_metadata_source.rb'
-
-# Offense count: 2
-Lint/ShadowingOuterLocalVariable:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/configure_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_adc_app_sizes_helper.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-Lint/StringConversionInInterpolation:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_validate_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_download_helper.rb'
-
-# Offense count: 6
-# Cop supports --auto-correct.
-# Configuration parameters: IgnoreEmptyBlocks, AllowUnusedKeywordArguments.
-Lint/UnusedBlockArgument:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_update_metadata_source.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/an_metadata_update_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_update_helper.rb'
-
-# Offense count: 44
-# Cop supports --auto-correct.
-# Configuration parameters: AllowUnusedKeywordArguments, IgnoreEmptyMethods.
-Lint/UnusedMethodArgument:
-  Enabled: false
 
 # Offense count: 9
 # Configuration parameters: ContextCreatingMethods, MethodCreatingMethods.

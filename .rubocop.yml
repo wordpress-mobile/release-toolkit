@@ -3,13 +3,20 @@ inherit_from: .rubocop_todo.yml
 require: 
 - rubocop-rspec
 
+########## Lint / CodeStyle
+
 # This gem is included as part of the `Pluginfile`, which is `required` separately,
 # so makes it hard to keep it ordered with the rest of the gems
 Gemspec/OrderedDependencies:
   Exclude:
     - 'fastlane-plugin-wpmreleasetoolkit.gemspec'
 
-########## Max Lengths Rules
+# Especially for actions and methods like `self.run(params)` it's common to have the argument unused; but that
+# comes with the parent class API / contract, so we feel it more readable to avoid the _ unused prefix for those.
+Lint/UnusedMethodArgument:
+  Enabled: false
+
+########## Metrics / Max Lengths Rules
 
 Metrics/LineLength:
   Max: 300
@@ -32,7 +39,7 @@ Metrics/ModuleLength:
 Metrics/ParameterLists:
   Max: 10
 
-########## Complexity
+########## Metrics / Complexity
 
 Metrics/CyclomaticComplexity:
   Max: 20
