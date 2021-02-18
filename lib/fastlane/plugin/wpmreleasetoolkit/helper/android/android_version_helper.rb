@@ -163,7 +163,7 @@ module Fastlane
         # @return [String] The version name for the next release
         #
         def self.calc_next_release_short_version(version)
-          v = self.calc_next_release_base_version({ VERSION_NAME => version, VERSION_CODE => nil })
+          v = self.calc_next_release_base_version(VERSION_NAME => version, VERSION_CODE => nil)
           return v[VERSION_NAME]
         end
 
@@ -201,7 +201,7 @@ module Fastlane
         # @return [Hash] The hash containing the version name and code to use after release cut
         #
         def self.calc_next_release_version(version, alpha_version = nil)
-          nv = calc_next_release_base_version({ VERSION_NAME => version[VERSION_NAME], VERSION_CODE => alpha_version.nil? ? version[VERSION_CODE] : [version[VERSION_CODE], alpha_version[VERSION_CODE]].max })
+          nv = calc_next_release_base_version(VERSION_NAME => version[VERSION_NAME], VERSION_CODE => alpha_version.nil? ? version[VERSION_CODE] : [version[VERSION_CODE], alpha_version[VERSION_CODE]].max)
           calc_next_beta_version(nv)
         end
 

@@ -15,7 +15,7 @@ module Fastlane
           UI.user_error!("Milestone #{milestone_title} not found.")
         end
 
-        Fastlane::Helper::GithubHelper.github_client().update_milestone(repository, milestone[:number], { :state => 'closed' })
+        Fastlane::Helper::GithubHelper.github_client().update_milestone(repository, milestone[:number], :state => 'closed')
       end
 
       def self.description

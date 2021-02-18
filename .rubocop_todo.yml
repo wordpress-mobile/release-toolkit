@@ -228,19 +228,6 @@ Style/AsciiComments:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
     - 'spec/ios_lint_localizations_spec.rb'
 
-# Offense count: 7
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: braces, no_braces, context_dependent
-Style/BracesAroundHashParameters:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/close_milestone_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/setfrozentag_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_version_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/models/configuration.rb'
-    - 'spec/android_merge_translators_strings_spec.rb'
-    - 'spec/ios_merge_translators_strings_spec.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: AutoCorrect, EnforcedStyle.

@@ -29,7 +29,7 @@ module Fastlane
         end
 
         UI.message("New milestone: #{mile_title}")
-        Fastlane::Helper::GithubHelper.github_client().update_milestone(repository, milestone[:number], { :title => mile_title })
+        Fastlane::Helper::GithubHelper.github_client().update_milestone(repository, milestone[:number], :title => mile_title)
       end
 
       def self.is_frozen(milestone)
