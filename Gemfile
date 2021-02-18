@@ -4,7 +4,7 @@ gemspec
 gem 'danger', '~> 8.0'
 
 group :test do
-  gem 'codecov', :require => false
+  gem 'codecov', require: false
   gem 'rspec'
   gem 'yard'
 end

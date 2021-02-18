@@ -255,19 +255,6 @@ Style/GuardClause:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_update_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
 
-# Offense count: 20
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, UseHashRocketsWithSymbolValues, PreferHashRocketsForNonAlnumEndingSymbols.
-# SupportedStyles: ruby19, hash_rockets, no_mixed_keys, ruby19_no_mixed_keys
-Style/HashSyntax:
-  Exclude:
-    - 'Gemfile'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/close_milestone_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/removebranchprotection_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/setbranchprotection_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/setfrozentag_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
-
 # Offense count: 2
 # Configuration parameters: AllowIfModifier.
 Style/IfInsideElse:

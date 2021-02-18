@@ -121,7 +121,7 @@ module Fastlane
           end
 
           File.open(main, 'w:UTF-8') do |f|
-            f.write(main_strings.to_xml(:indent => 4))
+            f.write(main_strings.to_xml(indent: 4))
           end
 
           UI.message("Done (#{added_count} added, #{updated_count} updated, #{untouched_count} untouched, #{skipped_count} skipped).")
