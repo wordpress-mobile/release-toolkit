@@ -27,15 +27,15 @@ module Fastlane
 
         ## If there are no translated screenshot images (whether it's because they haven't been generated yet,
         ##   or because we aren't using them), just use the translated directories.
-        if imageDirectories == []
-          languages = translationDirectories
-        ## And vice-versa.
-        elsif translationDirectories == []
-          languages = imageDirectories
-        ## If there are original screenshots and translations available, use only locales that exist in both.
-        else
-          languages = imageDirectories & translationDirectories
-        end
+        languages = if imageDirectories == []
+                      translationDirectories
+                    ## And vice-versa.
+                    elsif translationDirectories == []
+                      imageDirectories
+                    ## If there are original screenshots and translations available, use only locales that exist in both.
+                    else
+                      imageDirectories & translationDirectories
+                    end
 
         UI.message("💙 Creating Promo Screenshots for: #{languages.join(", ")}")
 

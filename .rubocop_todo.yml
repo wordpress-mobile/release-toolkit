@@ -228,15 +228,6 @@ Style/AsciiComments:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
     - 'spec/ios_lint_localizations_spec.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SingleLineConditionsOnly, IncludeTernaryExpressions.
-# SupportedStyles: assign_to_condition, assign_inside_condition
-Style/ConditionalAssignment:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
-
 # Offense count: 22
 # Cop supports --auto-correct.
 Style/DefWithParentheses:

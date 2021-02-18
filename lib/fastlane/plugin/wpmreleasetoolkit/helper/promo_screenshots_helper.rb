@@ -412,13 +412,13 @@ module Fastlane
       def resolve_text_into_path(text, locale)
         localizedFile = sprintf(text, locale)
 
-        if File.exist?(localizedFile)
-          text = localizedFile
-        elsif can_resolve_path(localizedFile)
-          text = resolve_path(localizedFile).realpath.to_s
-        else
-          text = sprintf(text, 'source')
-        end
+        text = if File.exist?(localizedFile)
+                 localizedFile
+               elsif can_resolve_path(localizedFile)
+                 resolve_path(localizedFile).realpath.to_s
+               else
+                 sprintf(text, 'source')
+               end
       end
     end
   end
