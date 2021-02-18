@@ -51,7 +51,7 @@ module Fastlane
                                        env_name: 'CHECK_LIBS_DIFF_URL',
                                        description: 'The url of the diff to check',
                                        optional: true,
-                                       is_string: true),
+                                       is_string: true)
         ]
       end
 

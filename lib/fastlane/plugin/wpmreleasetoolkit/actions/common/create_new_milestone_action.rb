@@ -47,7 +47,7 @@ module Fastlane
                                        description: 'True if the app needs to be submitted',
                                        optional: true,
                                        is_string: false,
-                                       default_value: false),
+                                       default_value: false)
         ]
       end
 

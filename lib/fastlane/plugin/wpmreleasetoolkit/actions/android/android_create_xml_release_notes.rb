@@ -47,7 +47,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :locales,
                                        env_name: 'FL_DOWNLOAD_METADATA_LOCALES',
                                        description: 'The hash with the GLotPress locale and the project locale association',
-                                       is_string: false),
+                                       is_string: false)
         ]
       end
 

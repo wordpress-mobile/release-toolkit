@@ -77,7 +77,7 @@ module Fastlane
                                        env_name: 'GHHELPER_EXTRACT_NOTES_EXTRACTED_FILE_PATH',
                                        description: 'The path to the file that will contain the extracted release notes',
                                        optional: true,
-                                       is_string: true),
+                                       is_string: true)
         ]
       end
 

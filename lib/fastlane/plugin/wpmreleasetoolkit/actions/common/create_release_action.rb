@@ -67,7 +67,7 @@ module Fastlane
                                        description: 'True if this is a pre-release',
                                        optional: true,
                                        default_value: false,
-                                       is_string: false),
+                                       is_string: false)
         ]
       end
 

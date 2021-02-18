@@ -52,7 +52,7 @@ module Fastlane
                                        is_string: true,
                                        verify_block: proc do |value|
                                                        UI.user_error!('You must provide a team ID in `team_id`') unless value && (!value.empty?)
-                                                     end),
+                                                     end)
         ]
       end
 

@@ -39,7 +39,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :podfile,
                                        env_name: 'FL_IOS_CHECKBETADEPS_PODFILE',
                                        description: 'Path to the Podfile to analyse',
-                                       is_string: true),
+                                       is_string: true)
         ]
       end
 
