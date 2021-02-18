@@ -10,13 +10,13 @@ module Fastlane
 
         message = ''
         beta_version = Fastlane::Helper::Android::VersionHelper.get_release_version() unless !params[:beta] && !params[:final]
-        alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version() unless !params[:alpha]
+        alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version() if params[:alpha]
 
         UI.user_error!("Can't build a final release out of this branch because it's configured as a beta release!") if params[:final] && Fastlane::Helper::Android::VersionHelper.is_beta_version?(beta_version)
 
-        message << "Building version #{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Release Channel)\n" unless !params[:final]
-        message << "Building version #{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Beta Channel)\n" unless !params[:beta]
-        message << "Building version #{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Alpha Channel)\n" unless !params[:alpha]
+        message << "Building version #{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Release Channel)\n" if params[:final]
+        message << "Building version #{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Beta Channel)\n" if params[:beta]
+        message << "Building version #{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Alpha Channel)\n" if params[:alpha]
 
         if !params[:skip_confirm]
           UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")

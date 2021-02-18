@@ -313,17 +313,6 @@ Style/MutableConstant:
 
 # Offense count: 9
 # Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: both, prefix, postfix
-Style/NegatedUnless:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_build_prechecks.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_development_certificates_to_provisioning_profiles.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_devices_to_provisioning_profiles.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_build_prechecks.rb'
-
-# Offense count: 9
-# Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, MinBodyLength.
 # SupportedStyles: skip_modifier_ifs, always
 Style/Next:
