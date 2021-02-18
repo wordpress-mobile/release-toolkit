@@ -314,7 +314,7 @@ module Fastlane
         #         The first element is always present and contains the version extracted from the public config file
         #         The second element is the version extracted from the internal config file, only present if one was provided.
         def self.get_version_strings
-          version_strings = Array.new
+          version_strings = []
           version_strings << read_long_version_from_config_file(ENV['PUBLIC_CONFIG_FILE'])
           version_strings << read_long_version_from_config_file(ENV['INTERNAL_CONFIG_FILE']) unless ENV['INTERNAL_CONFIG_FILE'].nil?
 

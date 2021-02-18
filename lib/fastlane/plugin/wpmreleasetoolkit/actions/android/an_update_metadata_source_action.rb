@@ -68,7 +68,7 @@ module Fastlane
 
       # Creates the block instances
       def self.create_block_parsers(release_version, block_files)
-        @blocks = Array.new
+        @blocks = []
 
         # Inits default handler
         @blocks.push Fastlane::Helper::UnknownMetadataBlock.new

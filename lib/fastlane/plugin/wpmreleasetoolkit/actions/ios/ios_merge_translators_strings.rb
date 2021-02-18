@@ -22,8 +22,8 @@ module Fastlane
         UI.message("Merging in: #{strings_folder}")
 
         join_files = Dir.glob(File.join("#{strings_folder}", 'Localizable_*.strings')) - [tmp_main_file]
-        extra_strings = Array.new
-        extra_keys = Array.new
+        extra_strings = []
+        extra_keys = []
         join_files.each do |join_strings|
           my_strings = File.read(join_strings).split("\n")
           my_strings.each do |string|

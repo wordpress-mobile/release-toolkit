@@ -25,8 +25,8 @@ module Fastlane
         FileUtils.cp(main_file, tmp_main_file)
 
         join_files = Dir.glob(File.join("#{strings_folder}", 'strings-*.xml'))
-        extra_strings = Array.new
-        extra_keys = Array.new
+        extra_strings = []
+        extra_keys = []
         join_files.each do |join_strings|
           my_strings = File.read(join_strings).split("\n")
           my_strings.each do |string|
