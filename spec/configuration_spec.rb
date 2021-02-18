@@ -20,7 +20,7 @@ describe Fastlane::Configuration do
         branch: 'a_branch',
         pinned_hash: 'a_hash',
         files_to_copy: [{ file: 'a_file_to_copy', destination: 'a_destination', encrypt: true }],
-        file_dependencies: ['a_file_dependencies'],
+        file_dependencies: ['a_file_dependencies']
       }
     end
     let(:configure_json_string) { JSON.pretty_generate(configure_json) }
