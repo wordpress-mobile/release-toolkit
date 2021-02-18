@@ -67,7 +67,7 @@ module Fastlane
         @new_release_branch = "release/#{@new_short_version}"
       end
 
-      def self.show_config()
+      def self.show_config
         UI.message("Current version: #{@current_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{@current_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]})")
         UI.message("New hotfix version: #{@new_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{@new_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]})")
         UI.message("Release branch: #{@new_release_branch}")

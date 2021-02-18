@@ -49,7 +49,7 @@ module Fastlane
 
       private
 
-      def self.create_config()
+      def self.create_config
         @current_version = Fastlane::Helper::Ios::VersionHelper.get_build_version()
         @current_version_internal = Fastlane::Helper::Ios::VersionHelper.get_internal_version() unless ENV['INTERNAL_CONFIG_FILE'].nil?
         @new_internal_version = Fastlane::Helper::Ios::VersionHelper.create_internal_version(@current_version) unless ENV['INTERNAL_CONFIG_FILE'].nil?
@@ -57,7 +57,7 @@ module Fastlane
         @short_version = Fastlane::Helper::Ios::VersionHelper.get_short_version_string(@new_beta_version)
       end
 
-      def self.show_config()
+      def self.show_config
         UI.message("Current build version: #{@current_version}")
         UI.message("Current internal version: #{@current_version_internal}") unless ENV['INTERNAL_CONFIG_FILE'].nil?
         UI.message("New beta version: #{@new_beta_version}")

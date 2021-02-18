@@ -20,7 +20,7 @@ module Fastlane
     class UnknownMetadataBlock < MetadataBlock
       attr_reader :content_file_path
 
-      def initialize()
+      def initialize
         super(nil)
       end
     end

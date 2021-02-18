@@ -42,7 +42,7 @@ end
 class IMTSTestUtils
   attr_accessor :test_folder_path
 
-  def initialize()
+  def initialize
     @test_folder_path = File.join(Dir.tmpdir(), 'imts_tests')
   end
 

@@ -228,25 +228,6 @@ Style/AsciiComments:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
     - 'spec/ios_lint_localizations_spec.rb'
 
-# Offense count: 22
-# Cop supports --auto-correct.
-Style/DefWithParentheses:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_bump_version_beta.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_bump_version_final_release.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_bump_version_hotfix.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_bump_version_release.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_bump_version_beta.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_bump_version_hotfix.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_bump_version_release.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/an_metadata_update_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_git_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/git_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_git_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_update_helper.rb'
-    - 'spec/android_merge_translators_strings_spec.rb'
-    - 'spec/ios_merge_translators_strings_spec.rb'
-
 # Offense count: 91
 Style/Documentation:
   Enabled: false

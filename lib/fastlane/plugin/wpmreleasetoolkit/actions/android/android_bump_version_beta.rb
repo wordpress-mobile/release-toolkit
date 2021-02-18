@@ -49,14 +49,14 @@ module Fastlane
 
       private
 
-      def self.create_config()
+      def self.create_config
         @current_version = Fastlane::Helper::Android::VersionHelper.get_release_version()
         @current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version()
         @new_version_beta = Fastlane::Helper::Android::VersionHelper.calc_next_beta_version(@current_version, @current_version_alpha)
         @new_version_alpha = ENV['HAS_ALPHA_VERSION'].nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(@new_version_beta, @current_version_alpha)
       end
 
-      def self.show_config()
+      def self.show_config
         vname = Fastlane::Helper::Android::VersionHelper::VERSION_NAME
         vcode = Fastlane::Helper::Android::VersionHelper::VERSION_CODE
         UI.message("Current version: #{@current_version[vname]}(#{@current_version[vcode]})")

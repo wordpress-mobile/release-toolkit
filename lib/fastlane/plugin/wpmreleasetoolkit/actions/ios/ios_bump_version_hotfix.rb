@@ -74,7 +74,7 @@ module Fastlane
         @new_release_branch = "release/#{@new_short_version}"
       end
 
-      def self.show_config()
+      def self.show_config
         UI.message("Current build version: #{@current_version}")
         UI.message("Current internal version: #{@current_version_internal}") unless ENV['INTERNAL_CONFIG_FILE'].nil?
         UI.message("New build version: #{@new_version}")

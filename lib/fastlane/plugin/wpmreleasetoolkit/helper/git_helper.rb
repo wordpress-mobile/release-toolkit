@@ -133,7 +133,7 @@ module Fastlane
 
       # Fetch all the tags from the remote.
       #
-      def self.fetch_all_tags()
+      def self.fetch_all_tags
         Action.sh('git', 'fetch', '--tags')
       end
 
