@@ -18,7 +18,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
 
           # First run: expect curl, unzip and cp_r to be called to install SwiftGen before running the action
           # See spec_helper.rb for documentation about `expect_shell_command`.
-          expect_shell_command('curl', any_args, /\/.*swiftgen-#{Fastlane::Helper::Ios::L10nHelper::SWIFTGEN_VERSION}.zip/)
+          expect_shell_command('curl', any_args, %r{/.*swiftgen-#{Fastlane::Helper::Ios::L10nHelper::SWIFTGEN_VERSION}.zip})
           expect_shell_command('unzip', any_args)
           expect(FileUtils).to receive(:cp_r)
           expect_shell_command("#{install_dir}/bin/swiftgen", 'config', 'run', '--config', anything)

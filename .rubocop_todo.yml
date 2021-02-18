@@ -375,14 +375,6 @@ Style/RedundantSelf:
     - 'spec/android_merge_translators_strings_spec.rb'
     - 'spec/ios_merge_translators_strings_spec.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, AllowInnerSlashes.
-# SupportedStyles: slashes, percent_r, mixed
-Style/RegexpLiteral:
-  Exclude:
-    - 'spec/ios_lint_localizations_spec.rb'
-
 # Offense count: 7
 # Cop supports --auto-correct.
 Style/RescueModifier:
