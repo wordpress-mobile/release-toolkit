@@ -37,7 +37,7 @@ module Fastlane
                       imageDirectories & translationDirectories
                     end
 
-        UI.message("💙 Creating Promo Screenshots for: #{languages.join(", ")}")
+        UI.message("💙 Creating Promo Screenshots for: #{languages.join(', ')}")
 
         confirm_directory_overwrite(params[:output_folder], 'the existing promo screenshots') unless params[:force]
 
@@ -56,7 +56,7 @@ module Fastlane
         }) do |entry|
           device = devices[entry['device']]
 
-          UI.message("Unable to find device #{entry["device"]}.") if device.nil?
+          UI.message("Unable to find device #{entry['device']}.") if device.nil?
 
           width = device['canvas_size'][0]
           height = device['canvas_size'][1]

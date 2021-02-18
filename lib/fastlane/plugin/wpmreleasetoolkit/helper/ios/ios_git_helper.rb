@@ -39,7 +39,7 @@ module Fastlane
         #       in the release-toolkit instead, and move this code away from `ios_git_helper`.
         #
         def self.localize_project
-          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && ./Scripts/localize.py")
+          Action.sh("cd #{ENV['PROJECT_ROOT_FOLDER']} && ./Scripts/localize.py")
 
           strings_files = Dir.chdir(File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'])) do
             Dir.glob('*.lproj/*.strings')
@@ -56,7 +56,7 @@ module Fastlane
         #       in the release-toolkit instead, and move this code away from `ios_git_helper`.
         #
         def self.update_metadata
-          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && ./Scripts/update-translations.rb")
+          Action.sh("cd #{ENV['PROJECT_ROOT_FOLDER']} && ./Scripts/update-translations.rb")
 
           strings_files = Dir.chdir(File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'])) do
             Dir.glob('*.lproj/*.strings')

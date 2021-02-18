@@ -12,7 +12,7 @@ module Fastlane
         def self.skip_string_by_tag(string_line)
           skip = string_line.attr('content_override') == 'true' unless string_line.attr('content_override').nil?
           if skip
-            puts " - Skipping #{string_line.attr("name")} string"
+            puts " - Skipping #{string_line.attr('name')} string"
             return true
           end
 
@@ -63,7 +63,7 @@ module Fastlane
           end
 
           # String not found, or removed because needing update and not in the exclusion list: add to the main file
-          main_strings.xpath('//string').last().add_next_sibling("\n#{" " * 4}#{string_line.to_xml().strip}")
+          main_strings.xpath('//string').last().add_next_sibling("\n#{' ' * 4}#{string_line.to_xml().strip}")
           return result
         end
 
@@ -104,12 +104,12 @@ module Fastlane
             res = merge_string(main_strings, library, string_line)
             case res
             when :updated
-              puts "#{string_line.attr("name")} updated."
+              puts "#{string_line.attr('name')} updated."
               updated_count = updated_count + 1
             when :found
               untouched_count = untouched_count + 1
             when :added
-              puts "#{string_line.attr("name")} added."
+              puts "#{string_line.attr('name')} added."
               added_count = added_count + 1
             when :skipped
               skipped_count = skipped_count + 1

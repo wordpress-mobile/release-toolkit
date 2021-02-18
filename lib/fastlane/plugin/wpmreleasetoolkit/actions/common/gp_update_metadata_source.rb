@@ -63,7 +63,7 @@ module Fastlane
 
       # Generates the temp file path
       def self.create_target_file_path(orig_file_path)
-        "#{File.dirname(orig_file_path)}/#{File.basename(orig_file_path, ".*")}.tmp"
+        "#{File.dirname(orig_file_path)}/#{File.basename(orig_file_path, '.*')}.tmp"
       end
 
       # Creates the block instances
