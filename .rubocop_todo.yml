@@ -323,14 +323,6 @@ Style/Next:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_download_helper.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedOctalStyle.
-# SupportedOctalStyles: zero_with_o, zero_only
-Style/NumericLiteralPrefix:
-  Exclude:
-    - 'spec/ios_lint_localizations_spec.rb'
-
 # Offense count: 23
 # Cop supports --auto-correct.
 # Configuration parameters: AutoCorrect, EnforcedStyle, IgnoredMethods.

@@ -37,7 +37,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
             fi
           SCRIPT
           FileUtils.mkdir_p File.join(install_dir, 'bin')
-          File.write(File.join(install_dir, 'bin/swiftgen'), script, perm: 0766)
+          File.write(File.join(install_dir, 'bin/swiftgen'), script, perm: 0o766)
 
           # Second run: ensure we only run SwiftGen directly, without a call to curl nor unzip beforehand
           expect_shell_command("#{install_dir}/bin/swiftgen", 'config', 'run', '--config', anything)
