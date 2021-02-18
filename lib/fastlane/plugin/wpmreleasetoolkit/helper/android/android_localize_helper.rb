@@ -186,21 +186,25 @@ module Nokogiri
         return true if self == other
         return false unless name == other.name
 
-        stype = node_type; otype = other.node_type
+        stype = node_type
+        otype = other.node_type
         return false unless stype == otype
 
-        sa = attributes; oa = other.attributes
+        sa = attributes
+        oa = other.attributes
         return false unless sa.length == oa.length
 
         sa = sa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
         oa = oa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
         return false unless sa == oa
 
-        skids = children; okids = other.children
+        skids = children
+        okids = other.children
         return false unless skids.length == okids.length
         return false if stype == TEXT_NODE && (content != other.content)
 
-        sns = namespace; ons = other.namespace
+        sns = namespace
+        ons = other.namespace
         return false if !sns ^ !ons
         return false if sns && (sns.href != ons.href)
 
