@@ -47,72 +47,7 @@ module Fastlane
 
         stylesheet_path = config['stylesheet']
 
-        entries = config['entries']
-                  .flat_map do |entry|
-                    languages.map do |language|
-                      newEntry = entry.deep_dup
-
-                      # Not every output file will have a screenshot, so handle cases where no
-                      # screenshot file is defined
-                      if !entry['screenshot'].nil? && !entry['filename'].nil?
-                        newEntry['screenshot'] = helper.resolve_path(params[:orig_folder]) + language + entry['screenshot']
-                        newEntry['filename'] = outputDirectory + language + entry['filename']
-                      elsif !entry['screenshot'].nil? && entry['filename'].nil?
-                        newEntry['screenshot'] = helper.resolve_path(params[:orig_folder]) + language + entry['screenshot']
-                        newEntry['filename'] =  outputDirectory + language + entry['screenshot']
-                      elsif entry['screenshot'].nil? && !entry['filename'].nil?
-                        newEntry['filename'] =  outputDirectory + language + entry['filename']
-                      else
-                        puts newEntry
-                        abort 'Unable to find output file names'
-                      end
-
-                      newEntry['locale'] = language
-
-                      # Localize file paths for text
-                      newEntry['text'].sub!('{locale}', language.dup) unless entry['text'].nil?
-
-                      # Map attachments paths to their localized versions
-                      newEntry['attachments'] = [] if newEntry['attachments'].nil?
-
-                      newEntry['attachments'].each do |attachment|
-                        ## If there are no translated screenshot images (whether it's because they haven't been generated yet,
-                        ##   or because we aren't using them), just use the translated directories.
-                        ## And vice-versa.
-                        ## If there are original screenshots and translations available, use only locales that exist in both.
-                        # Create a hash of devices, keyed by device name
-                        # Not every output file will have a screenshot, so handle cases where no
-                        # screenshot file is defined
-                        # Localize file paths for text
-                        # Map attachments paths to their localized versions
-                        # Automatically create intermediate directories for output
-                        # Run the GC in the same thread to clean up after RMagick
-                        # If your method provides a return value, you can describe here what it does
-                        # Optional:
-                        attachment['file']&.sub!('{locale}', language.dup)
-
-                        ## If there are no translated screenshot images (whether it's because they haven't been generated yet,
-                        ##   or because we aren't using them), just use the translated directories.
-                        ## And vice-versa.
-                        ## If there are original screenshots and translations available, use only locales that exist in both.
-                        # Create a hash of devices, keyed by device name
-                        # Not every output file will have a screenshot, so handle cases where no
-                        # screenshot file is defined
-                        # Localize file paths for text
-                        # Map attachments paths to their localized versions
-                        # Automatically create intermediate directories for output
-                        # Run the GC in the same thread to clean up after RMagick
-                        # If your method provides a return value, you can describe here what it does
-                        # Optional:
-                        attachment['text']&.sub!('{locale}', language.dup)
-                      end
-
-                      newEntry
-                    end
-                  end
-                  .sort do |x, y|
-          x['filename'] <=> y['filename']
-        end
+        entries = build_entries(config, languages, outputDirectory, params)
 
         bar = ProgressBar.new(entries.count, :bar, :counter, :eta, :rate)
 
@@ -237,6 +172,75 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.build_entries(config, languages, output_directory, params)
+        config['entries']
+          .flat_map do |entry|
+          languages.map do |language|
+            newEntry = entry.deep_dup
+
+            # Not every output file will have a screenshot, so handle cases where no
+            # screenshot file is defined
+            if !entry['screenshot'].nil? && !entry['filename'].nil?
+              newEntry['screenshot'] = helper.resolve_path(params[:orig_folder]) + language + entry['screenshot']
+              newEntry['filename'] = output_directory + language + entry['filename']
+            elsif !entry['screenshot'].nil? && entry['filename'].nil?
+              newEntry['screenshot'] = helper.resolve_path(params[:orig_folder]) + language + entry['screenshot']
+              newEntry['filename'] = output_directory + language + entry['screenshot']
+            elsif entry['screenshot'].nil? && !entry['filename'].nil?
+              newEntry['filename'] = output_directory + language + entry['filename']
+            else
+              puts newEntry
+              abort 'Unable to find output file names'
+            end
+
+            newEntry['locale'] = language
+
+            # Localize file paths for text
+            newEntry['text'].sub!('{locale}', language.dup) unless entry['text'].nil?
+
+            # Map attachments paths to their localized versions
+            newEntry['attachments'] = [] if newEntry['attachments'].nil?
+
+            newEntry['attachments'].each do |attachment|
+              ## If there are no translated screenshot images (whether it's because they haven't been generated yet,
+              ##   or because we aren't using them), just use the translated directories.
+              ## And vice-versa.
+              ## If there are original screenshots and translations available, use only locales that exist in both.
+              # Create a hash of devices, keyed by device name
+              # Not every output file will have a screenshot, so handle cases where no
+              # screenshot file is defined
+              # Localize file paths for text
+              # Map attachments paths to their localized versions
+              # Automatically create intermediate directories for output
+              # Run the GC in the same thread to clean up after RMagick
+              # If your method provides a return value, you can describe here what it does
+              # Optional:
+              attachment['file']&.sub!('{locale}', language.dup)
+
+              ## If there are no translated screenshot images (whether it's because they haven't been generated yet,
+              ##   or because we aren't using them), just use the translated directories.
+              ## And vice-versa.
+              ## If there are original screenshots and translations available, use only locales that exist in both.
+              # Create a hash of devices, keyed by device name
+              # Not every output file will have a screenshot, so handle cases where no
+              # screenshot file is defined
+              # Localize file paths for text
+              # Map attachments paths to their localized versions
+              # Automatically create intermediate directories for output
+              # Run the GC in the same thread to clean up after RMagick
+              # If your method provides a return value, you can describe here what it does
+              # Optional:
+              attachment['text']&.sub!('{locale}', language.dup)
+            end
+
+            newEntry
+          end
+        end
+          .sort do |x, y|
+          x['filename'] <=> y['filename']
+        end
       end
     end
   end
