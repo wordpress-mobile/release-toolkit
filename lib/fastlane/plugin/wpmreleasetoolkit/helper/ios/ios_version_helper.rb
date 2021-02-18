@@ -327,7 +327,7 @@ module Fastlane
           v_parts = get_version_parts(version)
 
           v_parts.each do |part|
-            UI.user_error!('Version value can only contains numbers.') if !is_int?(part)
+            UI.user_error!('Version value can only contains numbers.') unless is_int?(part)
           end
 
           "#{v_parts[MAJOR_NUMBER]}.#{v_parts[MINOR_NUMBER]}.#{v_parts[HOTFIX_NUMBER]}.#{v_parts[BUILD_NUMBER]}"

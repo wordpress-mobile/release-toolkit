@@ -19,7 +19,7 @@ module Fastlane
         message << "Building version #{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Alpha Channel)\n" unless !params[:alpha]
 
         if !params[:skip_confirm]
-          UI.user_error!('Aborted by user request') if !UI.confirm("#{message}Do you want to continue?")
+          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
         else
           UI.message(message)
         end

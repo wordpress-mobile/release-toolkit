@@ -29,7 +29,7 @@ module Fastlane
           my_strings.each do |string|
             if string[/^\"(.*)\" = \"(.*)\";$/]
               /^\"(?<string_key>.*)\" = \"/i =~ string
-              if !extra_keys.include?(string_key)
+              unless extra_keys.include?(string_key)
                 extra_strings << string
                 extra_keys << string_key
               end

@@ -282,7 +282,7 @@ module Fastlane
       #
       # @return [Magick::Image] The resized image
       def resize_image(original, width, height)
-        UI.user_error!('You must pass an image object to `resize_image`.') if !original.is_a?(Magick::Image)
+        UI.user_error!('You must pass an image object to `resize_image`.') unless original.is_a?(Magick::Image)
 
         original.adaptive_resize(width, height)
       end
@@ -302,9 +302,9 @@ module Fastlane
       #
       # @return [Magick::Image] The resized image
       def composite_image(original, child, x_position, y_position, starting_position = NorthWestGravity)
-        UI.user_error!('You must pass an image object as the first argument to `composite_image`.') if !original.is_a?(Magick::Image)
+        UI.user_error!('You must pass an image object as the first argument to `composite_image`.') unless original.is_a?(Magick::Image)
 
-        UI.user_error!('You must pass an image object as the second argument to `composite_image`.') if !child.is_a?(Magick::Image)
+        UI.user_error!('You must pass an image object as the second argument to `composite_image`.') unless child.is_a?(Magick::Image)
 
         original.composite(child, starting_position, x_position, y_position, Magick::OverCompositeOp)
       end
@@ -336,7 +336,7 @@ module Fastlane
       #
       # @return [Magick::Image] The resized image
       def crop_image(original, x_position, y_position, width, height)
-        UI.user_error!('You must pass an image object to `crop_image`.') if !original.is_a?(Magick::Image)
+        UI.user_error!('You must pass an image object to `crop_image`.') unless original.is_a?(Magick::Image)
 
         original.crop(x_position, y_position, width, height)
       end

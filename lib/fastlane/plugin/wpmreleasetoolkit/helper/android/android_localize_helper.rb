@@ -21,7 +21,7 @@ module Fastlane
 
         # Checks if string_name is in the excluesion list
         def self.skip_string_by_exclusion_list(library, string_name)
-          return false if !library.key?(:exclusions)
+          return false unless library.key?(:exclusions)
 
           skip = library[:exclusions].include?(string_name)
           if skip
