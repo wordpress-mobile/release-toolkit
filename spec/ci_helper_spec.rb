@@ -28,7 +28,10 @@ describe Fastlane::Helper::CircleCIHelper do
   context 'Main Commands' do
     describe Fastlane::Helper::CircleCIHelper.new(login: 'my_circleci_token', repository: 'test_repo') do
       it 'triggers a job' do
-        stub = stub_request(:post, 'https://circleci.com/api/v2/project/github/wordpress-mobile/test_repo/pipeline').with(body: { "branch": 'develop', "parameters": nil }, headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json', 'Circle-Token' => 'my_circleci_token' }).to_return(body: 'efg')
+        stub = stub_request(:post, 'https://circleci.com/api/v2/project/github/wordpress-mobile/test_repo/pipeline').with(
+          body: { "branch": 'develop', "parameters": nil },
+          headers: { 'Content-Type' => 'application/json', 'Accept' => 'application/json', 'Circle-Token' => 'my_circleci_token' }
+        ).to_return(body: 'efg')
         subject.trigger_job(branch: 'develop')
         expect(stub).to have_been_made.once
       end
