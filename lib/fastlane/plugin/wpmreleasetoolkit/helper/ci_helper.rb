@@ -10,7 +10,7 @@ module CIHelper
   # @param [Parameters] CI provider specific parameters
   #
   def trigger_job(branch:, parameters: nil)
-    raise "Not implemented"
+    raise 'Not implemented'
   end
 
   # Login
@@ -18,7 +18,7 @@ module CIHelper
   # @return [String] The CI login credentials
   #
   def login
-    raise "Not implemented"
+    raise 'Not implemented'
   end
 
   # Organization
@@ -26,36 +26,36 @@ module CIHelper
   # @return [String] The organization the repository belongs to
   #
   def organization
-    raise "Not implemented"
+    raise 'Not implemented'
   end
 
   # Repository
   #
   # @return [String] The repository name
   #
-  def repository 
-    raise "Not implemented"
+  def repository
+    raise 'Not implemented'
   end
 end
 
 module Fastlane
   module Helper
-    class CircleCIHelper 
+    class CircleCIHelper
       include CIHelper
 
       attr_accessor :login, :organization, :repository
-            
+
       # Initializes CircleCI helper.
       #
       # @param [String] login The CI login credentials. Usually a personal token on CircleCI
       # @param [String] repository The repository name
       # @param [String] organization The organization the repository belongs to
       #
-      def initialize(login:, repository:, organization: "wordpress-mobile")
+      def initialize(login:, repository:, organization: 'wordpress-mobile')
         @login = login
         @organization = organization
         @repository = repository
-      end 
+      end
 
       # Command URI
       #

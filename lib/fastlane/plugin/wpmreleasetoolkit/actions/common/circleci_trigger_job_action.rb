@@ -13,7 +13,7 @@ module Fastlane
         )
 
         res = ci_helper.trigger_job(branch: params[:branch], parameters: params[:job_params])
-        (res.code == "201") ? UI.message('Done!') : UI.user_error!("Failed to start job\nError: [#{res.code}] #{res.message}")
+        res.code == '201' ? UI.message('Done!') : UI.user_error!("Failed to start job\nError: [#{res.code}] #{res.message}")
       end
 
       #####################################################
@@ -21,38 +21,38 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Triggers a job on CircleCI"
+        'Triggers a job on CircleCI'
       end
 
       def self.available_options
-      [
-        FastlaneCore::ConfigItem.new(key: :circle_ci_token,
-                      env_name: "FL_CIRCLECI_TOKEN",
-                      description: "CircleCI token",
-                      type: String),
-        FastlaneCore::ConfigItem.new(key: :organization,
-                      env_name: "FL_CIRCLECI_ORGANIZATION",
-                      description: "The GitHub organization which hosts the repository you want to work on",
-                      type: String,
-                      default_value: "wordpress-mobile"),
-        FastlaneCore::ConfigItem.new(key: :repository,
-                      env_name: "FL_CIRCLECI_REPOSITORY",
-                      description: "The GitHub repository you want to work on",
-                      type: String),
-        FastlaneCore::ConfigItem.new(key: :branch,
-                      env_name: "FL_CIRCLECI_BRANCH",
-                      description: "The branch on which you want to work on",
-                      type: String),
-        FastlaneCore::ConfigItem.new(key: :job_params,
-                      env_name: "FL_CIRCLECI_JOB_PARAMS",
-                      description: "Parameters to send to the CircleCI pipeline",
-                      type: Hash,
-                      default_value: nil),
-      ]
+        [
+          FastlaneCore::ConfigItem.new(key: :circle_ci_token,
+                                       env_name: 'FL_CIRCLECI_TOKEN',
+                                       description: 'CircleCI token',
+                                       type: String),
+          FastlaneCore::ConfigItem.new(key: :organization,
+                                       env_name: 'FL_CIRCLECI_ORGANIZATION',
+                                       description: 'The GitHub organization which hosts the repository you want to work on',
+                                       type: String,
+                                       default_value: 'wordpress-mobile'),
+          FastlaneCore::ConfigItem.new(key: :repository,
+                                       env_name: 'FL_CIRCLECI_REPOSITORY',
+                                       description: 'The GitHub repository you want to work on',
+                                       type: String),
+          FastlaneCore::ConfigItem.new(key: :branch,
+                                       env_name: 'FL_CIRCLECI_BRANCH',
+                                       description: 'The branch on which you want to work on',
+                                       type: String),
+          FastlaneCore::ConfigItem.new(key: :job_params,
+                                       env_name: 'FL_CIRCLECI_JOB_PARAMS',
+                                       description: 'Parameters to send to the CircleCI pipeline',
+                                       type: Hash,
+                                       default_value: nil)
+        ]
       end
 
       def self.authors
-        ["loremattei"]
+        ['loremattei']
       end
     end
   end

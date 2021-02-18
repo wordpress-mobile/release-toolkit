@@ -7,7 +7,7 @@ gem 'danger', '~> 8.0'
 group :test do
   gem 'codecov', require: false
   gem 'rspec'
-  gem "webmock", :require => false, :group => :test
+  gem 'webmock', require: false, group: :test
   gem 'yard'
 end
 
