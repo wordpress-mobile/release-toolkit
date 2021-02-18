@@ -182,30 +182,34 @@ end
 
 # Source: https://stackoverflow.com/questions/7825258/determine-if-two-nokogiri-nodes-are-equivalent?rq=1
 # There may be better solutions now that Ruby supports canonicalization.
-class Nokogiri::XML::Node
-  # Return true if this node is content-equivalent to other, false otherwise
-  def =~(other)
-    return true if self == other
-    return false unless name == other.name
+module Nokogiri
+  module XML
+    class Node
+      # Return true if this node is content-equivalent to other, false otherwise
+      def =~(other)
+        return true if self == other
+        return false unless name == other.name
 
-    stype = node_type; otype = other.node_type
-    return false unless stype == otype
+        stype = node_type; otype = other.node_type
+        return false unless stype == otype
 
-    sa = attributes; oa = other.attributes
-    return false unless sa.length == oa.length
+        sa = attributes; oa = other.attributes
+        return false unless sa.length == oa.length
 
-    sa = sa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
-    oa = oa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
-    return false unless sa == oa
+        sa = sa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
+        oa = oa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
+        return false unless sa == oa
 
-    skids = children; okids = other.children
-    return false unless skids.length == okids.length
-    return false if stype == TEXT_NODE && (content != other.content)
+        skids = children; okids = other.children
+        return false unless skids.length == okids.length
+        return false if stype == TEXT_NODE && (content != other.content)
 
-    sns = namespace; ons = other.namespace
-    return false if !sns ^ !ons
-    return false if sns && (sns.href != ons.href)
+        sns = namespace; ons = other.namespace
+        return false if !sns ^ !ons
+        return false if sns && (sns.href != ons.href)
 
-    skids.to_enum.with_index.all? { |ski, i| ski =~ okids[i] }
+        skids.to_enum.with_index.all? { |ski, i| ski =~ okids[i] }
+      end
+    end
   end
 end
