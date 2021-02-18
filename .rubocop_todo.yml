@@ -232,12 +232,6 @@ Style/AsciiComments:
 Style/Documentation:
   Enabled: false
 
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/Encoding:
-  Exclude:
-    - 'fastlane-plugin-wpmreleasetoolkit.gemspec'
-
 # Offense count: 3
 # Cop supports --auto-correct.
 Style/ExpandPathArguments:
