@@ -7,7 +7,7 @@ module Fastlane
 
         beta_pods = []
         File.open(params[:podfile]).each do |li|
-          beta_pods << li if (li.match('^\s*\t*pod.*beta'))
+          beta_pods << li if li.match('^\s*\t*pod.*beta')
         end
 
         if beta_pods.count == 0

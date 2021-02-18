@@ -48,7 +48,7 @@ module Fastlane
         fw.puts("msgctxt \"#{@block_key}\"")
         line_count = File.foreach(@content_file_path).inject(0) { |c, _line| c + 1 }
 
-        if (line_count <= 1)
+        if line_count <= 1
           # Single line output
           fw.puts("msgid \"#{File.open(@content_file_path, "r").read}\"")
         else
@@ -100,10 +100,10 @@ module Fastlane
         if line.start_with?('msgctxt')
           key = extract_key(line)
           @is_copying = (key == @keep_key)
-          generate_block(fw) if (@is_copying)
+          generate_block(fw) if @is_copying
         end
 
-        fw.puts(line) if (@is_copying)
+        fw.puts(line) if @is_copying
       end
 
       def generate_block(fw)

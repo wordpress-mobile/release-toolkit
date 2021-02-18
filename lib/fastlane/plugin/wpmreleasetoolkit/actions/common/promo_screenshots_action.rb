@@ -123,7 +123,7 @@ module Fastlane
       end
 
       def self.confirm_directory_overwrite(path, description)
-        if (File.exist?(path)) then
+        if File.exist?(path) then
           if UI.confirm("Do you want to overwrite #{description}?") then
             FileUtils.rm_rf(path)
             Dir.mkdir(path)

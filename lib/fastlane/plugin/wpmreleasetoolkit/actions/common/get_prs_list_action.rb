@@ -16,7 +16,7 @@ module Fastlane
         # Extract PRs
         pr_list = []
         commit_list.split("\n").each do |commit|
-          if (commit.include?('Merge pull request #'))
+          if commit.include?('Merge pull request #')
             # PR found, so extract PR number
             pr_list.push(commit.partition('#').last.split(' ')[0])
           end

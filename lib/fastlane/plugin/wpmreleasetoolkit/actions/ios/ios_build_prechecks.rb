@@ -9,8 +9,8 @@ module Fastlane
         message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_build_version()} and uploading to App Center\n" unless !params[:internal_on_single_version]
         message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_build_version()} and uploading to TestFlight\n" unless !params[:external]
 
-        if (!params[:skip_confirm])
-          UI.user_error!('Aborted by user request') if (!UI.confirm("#{message}Do you want to continue?"))
+        if !params[:skip_confirm]
+          UI.user_error!('Aborted by user request') if !UI.confirm("#{message}Do you want to continue?")
         else
           UI.message(message)
         end

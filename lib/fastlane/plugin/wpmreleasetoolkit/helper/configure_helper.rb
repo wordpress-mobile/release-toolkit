@@ -221,9 +221,9 @@ module Fastlane
       # Adds a file to the `.configure` file's `files_to_copy` hash.
       # The hash for this method must contain the `source` and `destination` keys
       def self.add_file(params)
-        UI.user_error!('You must pass a `source` to `add_file`') unless (params[:source])
+        UI.user_error!('You must pass a `source` to `add_file`') unless params[:source]
 
-        UI.user_error!('You must pass a `destination` to `add_file`') unless (params[:destination])
+        UI.user_error!('You must pass a `destination` to `add_file`') unless params[:destination]
 
         new_config = self.configuration
         new_config.add_file_to_copy(params[:source], params[:destination], params[:encrypt])

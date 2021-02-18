@@ -9,7 +9,7 @@ module Fastlane
           params[:locales].each do |loc|
             puts "Looking for language: #{loc[1]}"
             complete_path = "#{params[:download_path]}/#{loc[1]}/changelogs/#{params[:build_number]}.txt"
-            if (File.exist?(complete_path))
+            if File.exist?(complete_path)
               f.puts("<#{loc[1]}>")
               f.puts(File.open(complete_path).read)
               f.puts("</#{loc[1]}>\n")

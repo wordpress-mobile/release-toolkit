@@ -16,8 +16,8 @@ module Fastlane
         message = "Requested Hotfix version: #{new_ver}\n"
         message << "Branching from: #{prev_ver}\n"
 
-        if (!params[:skip_confirm])
-          UI.user_error!('Aborted by user request') if (!UI.confirm("#{message}Do you want to continue?"))
+        if !params[:skip_confirm]
+          UI.user_error!('Aborted by user request') if !UI.confirm("#{message}Do you want to continue?")
         else
           UI.message(message)
         end

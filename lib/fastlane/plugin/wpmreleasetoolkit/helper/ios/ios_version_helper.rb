@@ -38,7 +38,7 @@ module Fastlane
         def self.calc_next_release_version(version)
           vp = get_version_parts(version)
           vp[MINOR_NUMBER] += 1
-          if (vp[MINOR_NUMBER] == 10)
+          if vp[MINOR_NUMBER] == 10
             vp[MAJOR_NUMBER] += 1
             vp[MINOR_NUMBER] = 0
           end
@@ -66,7 +66,7 @@ module Fastlane
         #
         def self.calc_prev_release_version(version)
           vp = get_version_parts(version)
-          if (vp[MINOR_NUMBER] == 0)
+          if vp[MINOR_NUMBER] == 0
             vp[MAJOR_NUMBER] -= 1
             vp[MINOR_NUMBER] = 9
           else
@@ -202,7 +202,7 @@ module Fastlane
         #
         def self.update_fastlane_deliver(new_version)
           fd_file = './fastlane/Deliverfile'
-          if (File.exist?(fd_file)) then
+          if File.exist?(fd_file) then
             Action.sh("sed -i '' \"s/app_version.*/app_version \\\"#{new_version}\\\"/\" #{fd_file}")
           else
             UI.user_error!("Can't find #{fd_file}.")
@@ -238,7 +238,7 @@ module Fastlane
             Action.sh("sed -i '' \"$(awk '/^VERSION_LONG/{ print NR; exit }' \"#{file_path}\")s/=.*/=#{new_version}/\" \"#{file_path}\"")
 
             build_number = read_build_number_from_config_file(file_path)
-            unless (build_number.nil?)
+            unless build_number.nil?
               new_build_number = bump_build_number(build_number)
               Action.sh("sed -i '' \"$(awk '/^BUILD_NUMBER/{ print NR; exit }' \"#{file_path}\")s/=.*/=#{new_build_number}/\" \"#{file_path}\"")
             end
@@ -260,7 +260,7 @@ module Fastlane
         def self.get_version_parts(version)
           parts = version.split('.')
           parts = parts.fill('0', parts.length...4).map { |chr| chr.to_i }
-          UI.user_error!("Bad version string: #{version}") if (parts.length > 4)
+          UI.user_error!("Bad version string: #{version}") if parts.length > 4
 
           return parts
         end
@@ -327,7 +327,7 @@ module Fastlane
           v_parts = get_version_parts(version)
 
           v_parts.each do |part|
-            UI.user_error!('Version value can only contains numbers.') if (!is_int?(part))
+            UI.user_error!('Version value can only contains numbers.') if !is_int?(part)
           end
 
           "#{v_parts[MAJOR_NUMBER]}.#{v_parts[MINOR_NUMBER]}.#{v_parts[HOTFIX_NUMBER]}.#{v_parts[BUILD_NUMBER]}"

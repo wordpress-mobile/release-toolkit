@@ -12,7 +12,7 @@ module Fastlane
       def self.run(params = {})
         continue = true
 
-        while (continue)
+        while continue
 
           confirmation = 'Do you want to specify a file that should be copied from the secrets repository into your project?'
 

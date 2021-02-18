@@ -11,7 +11,7 @@ module Fastlane
         # Checks if string_line has the content_override flag set
         def self.skip_string_by_tag(string_line)
           skip = string_line.attr('content_override') == 'true' unless string_line.attr('content_override').nil?
-          if (skip)
+          if skip
             puts " - Skipping #{string_line.attr("name")} string"
             return true
           end
@@ -21,10 +21,10 @@ module Fastlane
 
         # Checks if string_name is in the excluesion list
         def self.skip_string_by_exclusion_list(library, string_name)
-          return false if (!library.key?(:exclusions))
+          return false if !library.key?(:exclusions)
 
           skip = library[:exclusions].include?(string_name)
-          if (skip)
+          if skip
             puts " - Skipping #{string_name} string"
             return true
           end
@@ -41,16 +41,16 @@ module Fastlane
           # Search for the string in the main file
           result = :added
           main_strings.xpath('//string').each do |this_string|
-            if (this_string.attr('name') == string_name) then
+            if this_string.attr('name') == string_name then
               # Skip if the string has the content_override tag
               return :skipped if skip_string_by_tag(this_string)
 
               # If nodes are equivalent, skip
-              return :found if (string_line =~ this_string)
+              return :found if string_line =~ this_string
 
               # The string needs an update
               result = :updated
-              if (this_string.attr('tools:ignore').nil?)
+              if this_string.attr('tools:ignore').nil?
                 # It can be updated, so remove the current one and move ahead
                 this_string.remove
                 break
@@ -77,12 +77,12 @@ module Fastlane
 
           # Search for the string in the main file
           main_strings.xpath('//string').each do |this_string|
-            if (this_string.attr('name') == string_name) then
+            if this_string.attr('name') == string_name then
               # Skip if the string has the content_override tag
               return if skip_string_by_tag(this_string)
 
               # Update if needed
-              UI.user_error!("String #{string_name} [#{string_content}] has been updated in the main file but not in the library #{library[:library]}.") if (this_string.content != string_content)
+              UI.user_error!("String #{string_name} [#{string_content}] has been updated in the main file but not in the library #{library[:library]}.") if this_string.content != string_content
               return
             end
           end
@@ -136,7 +136,7 @@ module Fastlane
             diff_string = diff_string.slice(0..(end_index - 1))
 
             lib_strings.xpath('//string').each do |string_line|
-              res = verify_string(main_strings, library, string_line) if (string_line.attr('name') == diff_string)
+              res = verify_string(main_strings, library, string_line) if string_line.attr('name') == diff_string
             end
           end
         end
@@ -152,7 +152,7 @@ module Fastlane
 
         def self.verify_local_diff(main, library, main_strings, lib_strings)
           `git diff #{main}`.each_line do |line|
-            if (line.start_with?('+ ') || line.start_with?('- ')) then
+            if line.start_with?('+ ') || line.start_with?('- ') then
               diffs = line.gsub(/\s+/m, ' ').strip.split(' ')
               diffs.each do |diff|
                 verify_diff(diff, main_strings, lib_strings, library)
@@ -163,7 +163,7 @@ module Fastlane
 
         def self.verify_pr_diff(main, library, main_strings, lib_strings, source_diff)
           source_diff.each_line do |line|
-            if (line.start_with?('+ ') || line.start_with?('- ')) then
+            if line.start_with?('+ ') || line.start_with?('- ') then
               diffs = line.gsub(/\s+/m, ' ').strip.split(' ')
               diffs.each do |diff|
                 verify_diff(diff, main_strings, lib_strings, library)

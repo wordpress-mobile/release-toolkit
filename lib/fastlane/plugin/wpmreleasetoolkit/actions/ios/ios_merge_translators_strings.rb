@@ -17,7 +17,7 @@ module Fastlane
       def self.merge_folder(strings_folder)
         main_file = File.join(strings_folder, 'Localizable.strings')
         tmp_main_file = File.join(strings_folder, 'Localizable_current.strings')
-        return unless (File.exist?(main_file) && File.exist?(tmp_main_file))
+        return unless File.exist?(main_file) && File.exist?(tmp_main_file)
 
         UI.message("Merging in: #{strings_folder}")
 
@@ -29,7 +29,7 @@ module Fastlane
           my_strings.each do |string|
             if string[/^\"(.*)\" = \"(.*)\";$/]
               /^\"(?<string_key>.*)\" = \"/i =~ string
-              if (!extra_keys.include?(string_key))
+              if !extra_keys.include?(string_key)
                 extra_strings << string
                 extra_keys << string_key
               end
@@ -50,10 +50,10 @@ module Fastlane
       end
 
       def self.check_line(line, extra_keys)
-        return line unless (line[/^\"(.*)\" = \"(.*)\";$/])
+        return line unless line[/^\"(.*)\" = \"(.*)\";$/]
 
         /^\"(?<line_key>.*)\" = \"/i =~ line
-        return '' if (extra_keys.include?(line_key))
+        return '' if extra_keys.include?(line_key)
 
         return line
       end

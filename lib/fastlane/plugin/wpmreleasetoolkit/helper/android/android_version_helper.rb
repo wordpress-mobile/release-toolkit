@@ -180,7 +180,7 @@ module Fastlane
           version_name = remove_beta_suffix(version[VERSION_NAME])
           vp = get_version_parts(version_name)
           vp[MINOR_NUMBER] += 1
-          if (vp[MINOR_NUMBER] == 10)
+          if vp[MINOR_NUMBER] == 10
             vp[MAJOR_NUMBER] += 1
             vp[MINOR_NUMBER] = 0
           end
@@ -229,7 +229,7 @@ module Fastlane
         #
         def self.calc_prev_release_version(version)
           vp = get_version_parts(version)
-          if (vp[MINOR_NUMBER] == 0)
+          if vp[MINOR_NUMBER] == 0
             vp[MAJOR_NUMBER] -= 1
             vp[MINOR_NUMBER] = 9
           else
@@ -382,7 +382,7 @@ module Fastlane
           v_parts = get_version_parts(version)
 
           v_parts.each do |part|
-            UI.user_error!('Version value can only contains numbers.') if (!is_int?(part))
+            UI.user_error!('Version value can only contains numbers.') if !is_int?(part)
           end
 
           "#{v_parts[MAJOR_NUMBER]}.#{v_parts[MINOR_NUMBER]}"
@@ -428,16 +428,16 @@ module Fastlane
             file.each_line do |line|
               if !found_section
                 temp_file.puts line
-                found_section = true if (line.include? section)
+                found_section = true if line.include? section
               else
-                if (version_updated < 2)
+                if version_updated < 2
                   if line.include?('versionName') && !line.include?('"versionName"') && !line.include?('PversionName')
                     version_name = line.split(' ')[1].tr('\"', '')
                     line.sub!(version_name, version[VERSION_NAME].to_s)
                     version_updated = version_updated + 1
                   end
 
-                  if (line.include? 'versionCode')
+                  if line.include? 'versionCode'
                     version_code = line.split(' ')[1]
                     line.sub!(version_code, version[VERSION_CODE].to_s)
                     version_updated = version_updated + 1

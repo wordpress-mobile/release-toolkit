@@ -17,7 +17,7 @@ module Fastlane
 
         # Check branch
         app_version = Fastlane::Helper::Ios::VersionHelper.get_public_version
-        UI.user_error!("#{message}Release branch for version #{app_version} doesn't exist. Abort.") unless (!params[:base_version].nil? || Fastlane::Helper::GitHelper.checkout_and_pull(release: app_version))
+        UI.user_error!("#{message}Release branch for version #{app_version} doesn't exist. Abort.") unless !params[:base_version].nil? || Fastlane::Helper::GitHelper.checkout_and_pull(release: app_version)
 
         # Check user overwrite
         build_version = get_user_build_version(params[:base_version], message) unless params[:base_version].nil?
@@ -25,8 +25,8 @@ module Fastlane
 
         # Verify
         message << "Updating branch to version: #{next_version}.\n"
-        if (!params[:skip_confirm])
-          UI.user_error!('Aborted by user request') if (!UI.confirm("#{message}Do you want to continue?"))
+        if !params[:skip_confirm]
+          UI.user_error!('Aborted by user request') if !UI.confirm("#{message}Do you want to continue?")
         else
           UI.message(message)
         end

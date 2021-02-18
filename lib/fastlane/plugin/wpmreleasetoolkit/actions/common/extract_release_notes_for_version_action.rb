@@ -29,7 +29,7 @@ module Fastlane
           when :evaluating
             state = (line.match(/-/)) ? :extracting : :discarding
           when :extracting
-            if (line.match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/))
+            if line.match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/)
               state = :discarding
               return
             else

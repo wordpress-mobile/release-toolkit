@@ -13,7 +13,7 @@ module Fastlane
           (any_changes = Fastlane::Helper::AndroidLocalizeHelper.merge_lib(main_strings_path, lib)) || any_changes
         end
 
-        UI.message("Changes have been applied to #{main_strings_path}. Please, verify it!") if (any_changes)
+        UI.message("Changes have been applied to #{main_strings_path}. Please, verify it!") if any_changes
       end
 
       def self.description
