@@ -156,7 +156,7 @@ module Fastlane
 
         def self.verify_local_diff(main, library, main_strings, lib_strings)
           `git diff #{main}`.each_line do |line|
-            if (line.start_with?('+ ') or line.start_with?('- ')) then
+            if (line.start_with?('+ ') || line.start_with?('- ')) then
               diffs = line.gsub(/\s+/m, ' ').strip.split(' ')
               diffs.each do |diff|
                 verify_diff(diff, main_strings, lib_strings, library)
@@ -167,7 +167,7 @@ module Fastlane
 
         def self.verify_pr_diff(main, library, main_strings, lib_strings, source_diff)
           source_diff.each_line do |line|
-            if (line.start_with?('+ ') or line.start_with?('- ')) then
+            if (line.start_with?('+ ') || line.start_with?('- ')) then
               diffs = line.gsub(/\s+/m, ' ').strip.split(' ')
               diffs.each do |diff|
                 verify_diff(diff, main_strings, lib_strings, library)

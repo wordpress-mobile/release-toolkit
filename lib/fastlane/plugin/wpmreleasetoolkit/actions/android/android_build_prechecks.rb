@@ -4,17 +4,17 @@ module Fastlane
       def self.run(params)
         require_relative '../../helper/android/android_version_helper.rb'
 
-        if (params[:final] and params[:beta])
+        if (params[:final] && params[:beta])
           UI.user_error!("Can't build beta and final at the same time!")
         end
 
         Fastlane::Helper::GitHelper.ensure_on_branch!('release') unless other_action.is_ci()
 
         message = ''
-        beta_version = Fastlane::Helper::Android::VersionHelper.get_release_version() unless !params[:beta] and !params[:final]
+        beta_version = Fastlane::Helper::Android::VersionHelper.get_release_version() unless !params[:beta] && !params[:final]
         alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version() unless !params[:alpha]
 
-        if (params[:final] and Fastlane::Helper::Android::VersionHelper.is_beta_version?(beta_version))
+        if (params[:final] && Fastlane::Helper::Android::VersionHelper.is_beta_version?(beta_version))
           UI.user_error!("Can't build a final release out of this branch because it's configured as a beta release!")
         end
 
