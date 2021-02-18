@@ -63,7 +63,7 @@ module Fastlane
         x_position = 0
         y_position = 0
 
-        if device['text_offset'] != nil
+        unless device['text_offset'].nil?
           x_position = device['text_offset'][0]
           y_position = device['text_offset'][1]
         end
@@ -79,7 +79,7 @@ module Fastlane
       end
 
       def draw_background_to_canvas(canvas, entry)
-        if entry['background'] != nil
+        unless entry['background'].nil?
 
           # If we're passed an image path, let's open it and paint it to the canvas
           if can_resolve_path(entry['background'])
@@ -96,7 +96,7 @@ module Fastlane
 
       def draw_device_frame_to_canvas(device, canvas)
         # Apply the device frame to the canvas, but only if one is provided
-        return canvas unless device['device_frame_size'] != nil
+        return canvas if device['device_frame_size'].nil?
 
         w = device['device_frame_size'][0]
         h = device['device_frame_size'][1]
@@ -104,7 +104,7 @@ module Fastlane
         x = 0
         y = 0
 
-        if device['device_frame_size'] != nil
+        unless device['device_frame_size'].nil?
           x = device['device_frame_offset'][0]
           y = device['device_frame_offset'][1]
         end
@@ -117,7 +117,7 @@ module Fastlane
       def draw_screenshot_to_canvas(entry, canvas, device)
         # Don't require a screenshot to be present – we can just skip
         # this function if one doesn't exist.
-        return canvas unless entry['screenshot'] != nil
+        return canvas if entry['screenshot'].nil?
 
         device_mask = device['screenshot_mask']
         screenshot_size = device['screenshot_size']
@@ -127,7 +127,7 @@ module Fastlane
 
         screenshot = open_image(screenshot)
 
-        screenshot = mask_image(screenshot, open_image(device_mask)) if device_mask != nil
+        screenshot = mask_image(screenshot, open_image(device_mask)) unless device_mask.nil?
 
         screenshot = resize_image(screenshot, screenshot_size[0], screenshot_size[1])
         composite_image(canvas, screenshot, screenshot_offset[0], screenshot_offset[1])
@@ -135,9 +135,9 @@ module Fastlane
 
       def draw_attachments_to_canvas(entry, canvas)
         entry['attachments'].each do |attachment|
-          if attachment['file'] != nil
+          if !attachment['file'].nil?
             canvas = draw_file_attachment_to_canvas(attachment, canvas, entry)
-          elsif attachment['text'] != nil
+          elsif !attachment['text'].nil?
             canvas = draw_text_attachment_to_canvas(attachment, canvas, entry['locale'])
           end
         end
@@ -163,7 +163,7 @@ module Fastlane
         x_pos = attachment['position'][0]
         y_pos = attachment['position'][1]
 
-        if attachment['offset'] != nil
+        unless attachment['offset'].nil?
           x_pos += attachment['offset'][0]
           y_pos += attachment['offset'][1]
         end
@@ -376,7 +376,7 @@ module Fastlane
           Fastlane::Helper::FilesystemHelper.plugin_root + 'spec/test-data/' + path,    # Path Relative to the test data
         ]
           .each do |resolved_path|
-          return resolved_path if resolved_path != nil && resolved_path.exist?
+          return resolved_path if !resolved_path.nil? && resolved_path.exist?
         end
 
         message = "Unable to locate #{path}"

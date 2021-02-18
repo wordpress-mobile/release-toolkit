@@ -95,7 +95,7 @@ module Fastlane
 
       def is_handler_for(key)
         values = key.split('_')
-        key.start_with?(@rel_note_key) && values.length == 3 && (Integer(values[2]) != nil rescue false)
+        key.start_with?(@rel_note_key) && values.length == 3 && (!Integer(values[2]).nil? rescue false)
       end
 
       def handle_line(fw, line)

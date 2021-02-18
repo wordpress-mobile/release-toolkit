@@ -54,13 +54,13 @@ module Fastlane
 
                       # Not every output file will have a screenshot, so handle cases where no
                       # screenshot file is defined
-                      if entry['screenshot'] != nil && entry['filename'] != nil
+                      if !entry['screenshot'].nil? && !entry['filename'].nil?
                         newEntry['screenshot'] = helper.resolve_path(params[:orig_folder]) + language + entry['screenshot']
-                        newEntry['filename'] =  outputDirectory + language + entry['filename']
-                      elsif entry['screenshot'] != nil && entry['filename'].nil?
+                        newEntry['filename'] = outputDirectory + language + entry['filename']
+                      elsif !entry['screenshot'].nil? && entry['filename'].nil?
                         newEntry['screenshot'] = helper.resolve_path(params[:orig_folder]) + language + entry['screenshot']
                         newEntry['filename'] =  outputDirectory + language + entry['screenshot']
-                      elsif entry['screenshot'].nil? && entry['filename'] != nil
+                      elsif entry['screenshot'].nil? && !entry['filename'].nil?
                         newEntry['filename'] =  outputDirectory + language + entry['filename']
                       else
                         puts newEntry
@@ -70,15 +70,41 @@ module Fastlane
                       newEntry['locale'] = language
 
                       # Localize file paths for text
-                      newEntry['text'].sub!('{locale}', language.dup) if entry['text'] != nil
+                      newEntry['text'].sub!('{locale}', language.dup) unless entry['text'].nil?
 
                       # Map attachments paths to their localized versions
                       newEntry['attachments'] = [] if newEntry['attachments'].nil?
 
                       newEntry['attachments'].each do |attachment|
-                        attachment['file'].sub!('{locale}', language.dup) if attachment['file'] != nil
+                        ## If there are no translated screenshot images (whether it's because they haven't been generated yet,
+                        ##   or because we aren't using them), just use the translated directories.
+                        ## And vice-versa.
+                        ## If there are original screenshots and translations available, use only locales that exist in both.
+                        # Create a hash of devices, keyed by device name
+                        # Not every output file will have a screenshot, so handle cases where no
+                        # screenshot file is defined
+                        # Localize file paths for text
+                        # Map attachments paths to their localized versions
+                        # Automatically create intermediate directories for output
+                        # Run the GC in the same thread to clean up after RMagick
+                        # If your method provides a return value, you can describe here what it does
+                        # Optional:
+                        attachment['file']&.sub!('{locale}', language.dup)
 
-                        attachment['text'].sub!('{locale}', language.dup) if attachment['text'] != nil
+                        ## If there are no translated screenshot images (whether it's because they haven't been generated yet,
+                        ##   or because we aren't using them), just use the translated directories.
+                        ## And vice-versa.
+                        ## If there are original screenshots and translations available, use only locales that exist in both.
+                        # Create a hash of devices, keyed by device name
+                        # Not every output file will have a screenshot, so handle cases where no
+                        # screenshot file is defined
+                        # Localize file paths for text
+                        # Map attachments paths to their localized versions
+                        # Automatically create intermediate directories for output
+                        # Run the GC in the same thread to clean up after RMagick
+                        # If your method provides a return value, you can describe here what it does
+                        # Optional:
+                        attachment['text']&.sub!('{locale}', language.dup)
                       end
 
                       newEntry
