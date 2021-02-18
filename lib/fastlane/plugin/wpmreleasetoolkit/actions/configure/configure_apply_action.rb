@@ -41,9 +41,7 @@ module Fastlane
         original_repo_ref = Fastlane::Helper::ConfigureHelper.repo_branch_name
         original_repo_ref = repo_hash if original_repo_ref.nil?
 
-        unless repo_hash == file_hash
-          other_action.sh(command: "cd #{repository_path} && git fetch && git checkout #{file_hash}", log: false)
-        end
+        other_action.sh(command: "cd #{repository_path} && git fetch && git checkout #{file_hash}", log: false) unless repo_hash == file_hash
 
         # Run the provided block
         yield
@@ -66,9 +64,7 @@ module Fastlane
           return # Nothing to do if the files are identical
         end
 
-        if UI.confirm("#{file_reference.destination} has changes that need to be merged. Would you like to see a diff?")
-          puts Diffy::Diff.new(file_reference.destination_contents, file_reference.source_contents)
-        end
+        puts Diffy::Diff.new(file_reference.destination_contents, file_reference.source_contents) if UI.confirm("#{file_reference.destination} has changes that need to be merged. Would you like to see a diff?")
 
         if UI.confirm("Would you like to make a backup of #{file_reference.destination}?")
           extension = File.extname(file_reference.destination)

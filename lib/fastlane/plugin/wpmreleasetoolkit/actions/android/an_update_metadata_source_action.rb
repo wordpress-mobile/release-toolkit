@@ -98,9 +98,7 @@ module Fastlane
           end
         end
 
-        if (is_comment(line))
-          @current_block = @blocks.first
-        end
+        @current_block = @blocks.first if (is_comment(line))
 
         @current_block.handle_line(fw, line)
       end

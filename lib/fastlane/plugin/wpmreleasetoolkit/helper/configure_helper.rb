@@ -106,9 +106,7 @@ module Fastlane
         index_of_configure_hash = hashes.find_index(configure_file_commit_hash)
         index_of_repo_commit_hash = hashes.find_index(repo_commit_hash)
 
-        if index_of_configure_hash >= index_of_repo_commit_hash
-          return 0
-        end
+        return 0 if index_of_configure_hash >= index_of_repo_commit_hash
 
         index_of_repo_commit_hash - index_of_configure_hash
       end
@@ -129,9 +127,7 @@ module Fastlane
       def self.repo_commits_behind_remote
         matches = repo_status.match(/behind \d+/)
 
-        if matches == nil
-          return 0
-        end
+        return 0 if matches == nil
 
         parse_distance(matches[0])
       end
@@ -146,9 +142,7 @@ module Fastlane
       def self.repo_commits_ahead_of_remote
         matches = repo_status.match(/ahead \d+/)
 
-        if matches == nil
-          return 0
-        end
+        return 0 if matches == nil
 
         parse_distance(matches[0])
       end
@@ -158,9 +152,7 @@ module Fastlane
       def self.parse_distance(match)
         distance = match.to_s.scan(/\d+/).first
 
-        if distance == nil
-          return 0
-        end
+        return 0 if distance == nil
 
         distance.to_i
       end
@@ -219,9 +211,7 @@ module Fastlane
 
         files.each do |path|
           directory_dependencies.each do |directory_name|
-            if path.start_with?(directory_name)
-              new_files << path
-            end
+            new_files << path if path.start_with?(directory_name)
           end
         end
 
@@ -231,13 +221,9 @@ module Fastlane
       # Adds a file to the `.configure` file's `files_to_copy` hash.
       # The hash for this method must contain the `source` and `destination` keys
       def self.add_file(params)
-        unless (params[:source])
-          UI.user_error!('You must pass a `source` to `add_file`')
-        end
+        UI.user_error!('You must pass a `source` to `add_file`') unless (params[:source])
 
-        unless (params[:destination])
-          UI.user_error!('You must pass a `destination` to `add_file`')
-        end
+        UI.user_error!('You must pass a `destination` to `add_file`') unless (params[:destination])
 
         new_config = self.configuration
         new_config.add_file_to_copy(params[:source], params[:destination], params[:encrypt])

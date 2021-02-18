@@ -10,9 +10,7 @@ module Fastlane
         freeze = params[:freeze]
 
         milestone = Fastlane::Helper::GithubHelper.get_milestone(repository, milestone_title)
-        if (milestone.nil?)
-          UI.user_error!("Milestone #{milestone_title} not found.")
-        end
+        UI.user_error!("Milestone #{milestone_title} not found.") if (milestone.nil?)
 
         mile_title = milestone[:title]
         puts freeze
@@ -33,9 +31,7 @@ module Fastlane
       end
 
       def self.is_frozen(milestone)
-        unless (milestone.nil?)
-          return milestone[:title].include?('❄️')
-        end
+        return milestone[:title].include?('❄️') unless (milestone.nil?)
 
         return false
       end

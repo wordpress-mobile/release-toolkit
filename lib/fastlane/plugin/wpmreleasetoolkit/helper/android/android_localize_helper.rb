@@ -21,9 +21,7 @@ module Fastlane
 
         # Checks if string_name is in the excluesion list
         def self.skip_string_by_exclusion_list(library, string_name)
-          if (!library.key?(:exclusions))
-            return false
-          end
+          return false if (!library.key?(:exclusions))
 
           skip = library[:exclusions].include?(string_name)
           if (skip)
@@ -138,9 +136,7 @@ module Fastlane
             diff_string = diff_string.slice(0..(end_index - 1))
 
             lib_strings.xpath('//string').each do |string_line|
-              if (string_line.attr('name') == diff_string) then
-                res = verify_string(main_strings, library, string_line)
-              end
+              res = verify_string(main_strings, library, string_line) if (string_line.attr('name') == diff_string)
             end
           end
         end

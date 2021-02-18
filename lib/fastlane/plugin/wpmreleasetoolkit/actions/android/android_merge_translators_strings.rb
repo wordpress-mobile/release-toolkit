@@ -57,9 +57,7 @@ module Fastlane
 
         test_line = line.strip.split('>').first
         extra_strings.each do |overwrite_string|
-          if (overwrite_string.strip.split('>').first == test_line) then
-            return ''
-          end
+          return '' if (overwrite_string.strip.split('>').first == test_line)
         end
 
         return line

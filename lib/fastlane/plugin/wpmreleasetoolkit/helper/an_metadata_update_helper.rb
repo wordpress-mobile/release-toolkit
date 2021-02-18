@@ -40,9 +40,7 @@ module Fastlane
       def handle_line(fw, line)
         # put the new content on block start
         # and skip all the other content
-        if line.start_with?('msgctxt')
-          generate_block(fw)
-        end
+        generate_block(fw) if line.start_with?('msgctxt')
       end
 
       def generate_block(fw)
@@ -102,14 +100,10 @@ module Fastlane
         if line.start_with?('msgctxt')
           key = extract_key(line)
           @is_copying = (key == @keep_key)
-          if (@is_copying)
-            generate_block(fw)
-          end
+          generate_block(fw) if (@is_copying)
         end
 
-        if (@is_copying)
-          fw.puts(line)
-        end
+        fw.puts(line) if (@is_copying)
       end
 
       def generate_block(fw)

@@ -39,9 +39,7 @@ module Fastlane
 
         UI.message("💙 Creating Promo Screenshots for: #{languages.join(", ")}")
 
-        unless params[:force] then
-          confirm_directory_overwrite(params[:output_folder], 'the existing promo screenshots')
-        end
+        confirm_directory_overwrite(params[:output_folder], 'the existing promo screenshots') unless params[:force]
 
         # Create a hash of devices, keyed by device name
         devices = config['devices']
@@ -72,23 +70,15 @@ module Fastlane
                       newEntry['locale'] = language
 
                       # Localize file paths for text
-                      if entry['text'] != nil
-                        newEntry['text'].sub!('{locale}', language.dup)
-                      end
+                      newEntry['text'].sub!('{locale}', language.dup) if entry['text'] != nil
 
                       # Map attachments paths to their localized versions
-                      if newEntry['attachments'] == nil
-                        newEntry['attachments'] = []
-                      end
+                      newEntry['attachments'] = [] if newEntry['attachments'] == nil
 
                       newEntry['attachments'].each do |attachment|
-                        if attachment['file'] != nil
-                          attachment['file'].sub!('{locale}', language.dup)
-                        end
+                        attachment['file'].sub!('{locale}', language.dup) if attachment['file'] != nil
 
-                        if attachment['text'] != nil
-                          attachment['text'].sub!('{locale}', language.dup)
-                        end
+                        attachment['text'].sub!('{locale}', language.dup) if attachment['text'] != nil
                       end
 
                       newEntry
@@ -105,9 +95,7 @@ module Fastlane
         }) do |entry|
           device = devices[entry['device']]
 
-          if device == nil
-            UI.message("Unable to find device #{entry["device"]}.")
-          end
+          UI.message("Unable to find device #{entry["device"]}.") if device == nil
 
           width = device['canvas_size'][0]
           height = device['canvas_size'][1]
@@ -124,9 +112,7 @@ module Fastlane
           output_filename = entry['filename']
           dirname = File.dirname(output_filename)
 
-          unless File.directory?(dirname)
-            FileUtils.mkdir_p(dirname)
-          end
+          FileUtils.mkdir_p(dirname) unless File.directory?(dirname)
 
           canvas.write(output_filename)
           canvas.destroy!
@@ -152,9 +138,7 @@ module Fastlane
       def self.subdirectories_for_path(path)
         subdirectories = []
 
-        unless helper.can_resolve_path(path) then
-          return []
-        end
+        return [] unless helper.can_resolve_path(path)
 
         resolved_path = helper.resolve_path(path)
 

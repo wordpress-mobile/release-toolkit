@@ -4,9 +4,7 @@ module Fastlane
       def self.run(params)
         require_relative '../../helper/android/android_version_helper.rb'
 
-        if (params[:final] && params[:beta])
-          UI.user_error!("Can't build beta and final at the same time!")
-        end
+        UI.user_error!("Can't build beta and final at the same time!") if (params[:final] && params[:beta])
 
         Fastlane::Helper::GitHelper.ensure_on_branch!('release') unless other_action.is_ci()
 
@@ -14,18 +12,14 @@ module Fastlane
         beta_version = Fastlane::Helper::Android::VersionHelper.get_release_version() unless !params[:beta] && !params[:final]
         alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version() unless !params[:alpha]
 
-        if (params[:final] && Fastlane::Helper::Android::VersionHelper.is_beta_version?(beta_version))
-          UI.user_error!("Can't build a final release out of this branch because it's configured as a beta release!")
-        end
+        UI.user_error!("Can't build a final release out of this branch because it's configured as a beta release!") if (params[:final] && Fastlane::Helper::Android::VersionHelper.is_beta_version?(beta_version))
 
         message << "Building version #{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Release Channel)\n" unless !params[:final]
         message << "Building version #{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Beta Channel)\n" unless !params[:beta]
         message << "Building version #{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Alpha Channel)\n" unless !params[:alpha]
 
         if (!params[:skip_confirm])
-          if (!UI.confirm("#{message}Do you want to continue?"))
-            UI.user_error!('Aborted by user request')
-          end
+          UI.user_error!('Aborted by user request') if (!UI.confirm("#{message}Do you want to continue?"))
         else
           UI.message(message)
         end

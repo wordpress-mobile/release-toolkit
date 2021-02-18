@@ -20,9 +20,7 @@ module Fastlane
 
           UI.message 'Fetching the list of versions...'
           versions = app.app_store_versions.select { |v| v.version_string == only_version && !v.build.nil? }
-          if versions.empty?
-            versions = app.get_app_store_versions.reject { |v| v.build.nil? }
-          end
+          versions = app.get_app_store_versions.reject { |v| v.build.nil? } if versions.empty?
           UI.message "Found #{versions.count} versions." + (limit == 0 ? '' : " Limiting to last #{limit}")
           versions = versions.first(limit) unless limit == 0
 

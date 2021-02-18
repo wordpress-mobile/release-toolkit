@@ -15,9 +15,7 @@ module Fastlane
             Please fix this issue before continuing")
         end
 
-        if repo_is_behind_remote
-          prompt_to_update_to_most_recent_version
-        end
+        prompt_to_update_to_most_recent_version if repo_is_behind_remote
 
         if configure_file_is_behind_repo
           prompt_to_update_configure_file_to_most_recent_hash
@@ -30,9 +28,7 @@ module Fastlane
         # If there is no encryption key for the project, generate one
         if Fastlane::Helper::ConfigureHelper.project_encryption_key.nil?
           # If the user chose not to update the repo but there is no encryption key, throw an error
-          if repo_is_behind_remote
-            UI.user_error!('The local secrets behind the remote but it is missing a keys.json entry for this project. Please update it to the latest commit.')
-          end
+          UI.user_error!('The local secrets behind the remote but it is missing a keys.json entry for this project. Please update it to the latest commit.') if repo_is_behind_remote
           Fastlane::Helper::ConfigureHelper.update_project_encryption_key
           # Update the configure file to the new hash
           update_configure_file
@@ -55,9 +51,7 @@ module Fastlane
           checkout_branch(new_branch)
           update_configure_file
         else
-          if current_branch == nil
-            UI.user_error!('The local secrets store is in a deatched HEAD state.  Please check out a branch and try again.')
-          end
+          UI.user_error!('The local secrets store is in a deatched HEAD state.  Please check out a branch and try again.') if current_branch == nil
         end
       end
 
@@ -69,9 +63,7 @@ module Fastlane
       end
 
       def self.prompt_to_update_configure_file_to_most_recent_hash
-        if UI.confirm("The `.configure` file is #{configure_file_commits_behind_repo} commit hash(es) behind the repo. Would you like to update it?")
-          update_configure_file
-        end
+        update_configure_file if UI.confirm("The `.configure` file is #{configure_file_commits_behind_repo} commit hash(es) behind the repo. Would you like to update it?")
       end
 
       def self.current_branch

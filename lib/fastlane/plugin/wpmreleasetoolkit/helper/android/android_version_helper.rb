@@ -362,13 +362,9 @@ module Fastlane
           File.open(file_path, 'r') do |file|
             file.each_line do |line|
               if !found_section
-                if line.include?(section)
-                  found_section = true
-                end
+                found_section = true if line.include?(section)
               else
-                if line.include?(keyword) && !line.include?("\"#{keyword}\"") && !line.include?("P#{keyword}")
-                  return line.split(' ')[1]
-                end
+                return line.split(' ')[1] if line.include?(keyword) && !line.include?("\"#{keyword}\"") && !line.include?("P#{keyword}")
               end
             end
           end
@@ -386,9 +382,7 @@ module Fastlane
           v_parts = get_version_parts(version)
 
           v_parts.each do |part|
-            if (!is_int?(part)) then
-              UI.user_error!('Version value can only contains numbers.')
-            end
+            UI.user_error!('Version value can only contains numbers.') if (!is_int?(part))
           end
 
           "#{v_parts[MAJOR_NUMBER]}.#{v_parts[MINOR_NUMBER]}"
@@ -434,9 +428,7 @@ module Fastlane
             file.each_line do |line|
               if !found_section
                 temp_file.puts line
-                if (line.include? section)
-                  found_section = true
-                end
+                found_section = true if (line.include? section)
               else
                 if (version_updated < 2)
                   if line.include?('versionName') && !line.include?('"versionName"') && !line.include?('PversionName')

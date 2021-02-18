@@ -19,9 +19,7 @@ module Fastlane
         #
         def self.commit_version_bump(include_deliverfile: true, include_metadata: true)
           files_list = [File.join(ENV['PROJECT_ROOT_FOLDER'], 'config', '.')]
-          if include_deliverfile
-            files_list.append File.join('fastlane', 'Deliverfile')
-          end
+          files_list.append File.join('fastlane', 'Deliverfile') if include_deliverfile
           if include_metadata
             files_list.append File.join('fastlane', 'download_metadata.swift')
             files_list.append File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'Resources', ENV['APP_STORE_STRINGS_FILE_NAME'])

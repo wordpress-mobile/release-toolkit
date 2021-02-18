@@ -46,9 +46,7 @@ module Fastlane
 
       def draw_caption_to_canvas(entry, canvas, device, stylesheet_path = '')
         # If no caption is provided, it's ok to skip the body of this method
-        if entry['text'] == nil
-          return canvas
-        end
+        return canvas if entry['text'] == nil
 
         text = entry['text']
         text_size = device['text_size']
@@ -57,9 +55,7 @@ module Fastlane
 
         text = resolve_text_into_path(text, locale)
 
-        if can_resolve_path(stylesheet_path)
-          stylesheet_path = resolve_path(stylesheet_path)
-        end
+        stylesheet_path = resolve_path(stylesheet_path) if can_resolve_path(stylesheet_path)
 
         width = text_size[0]
         height = text_size[1]
@@ -100,9 +96,7 @@ module Fastlane
 
       def draw_device_frame_to_canvas(device, canvas)
         # Apply the device frame to the canvas, but only if one is provided
-        unless device['device_frame_size'] != nil
-          return canvas
-        end
+        return canvas unless device['device_frame_size'] != nil
 
         w = device['device_frame_size'][0]
         h = device['device_frame_size'][1]
@@ -123,9 +117,7 @@ module Fastlane
       def draw_screenshot_to_canvas(entry, canvas, device)
         # Don't require a screenshot to be present – we can just skip
         # this function if one doesn't exist.
-        unless entry['screenshot'] != nil
-          return canvas
-        end
+        return canvas unless entry['screenshot'] != nil
 
         device_mask = device['screenshot_mask']
         screenshot_size = device['screenshot_size']
@@ -135,9 +127,7 @@ module Fastlane
 
         screenshot = open_image(screenshot)
 
-        if device_mask != nil
-          screenshot = mask_image(screenshot, open_image(device_mask))
-        end
+        screenshot = mask_image(screenshot, open_image(device_mask)) if device_mask != nil
 
         screenshot = resize_image(screenshot, screenshot_size[0], screenshot_size[1])
         composite_image(canvas, screenshot, screenshot_offset[0], screenshot_offset[1])
@@ -193,9 +183,7 @@ module Fastlane
         y_position = attachment['position'][1] ||= 0
 
         stylesheet_path = attachment['stylesheet']
-        if can_resolve_path(stylesheet_path)
-          stylesheet_path = resolve_path(stylesheet_path)
-        end
+        stylesheet_path = resolve_path(stylesheet_path) if can_resolve_path(stylesheet_path)
 
         alignment = attachment['alignment'] ||= 'center'
 
@@ -247,9 +235,7 @@ module Fastlane
 
           command = "bundle exec drawText html=\"#{text}\" maxWidth=#{width} maxHeight=#{height} output=#{tempTextFile.path} fontSize=#{font_size} stylesheet=\"#{stylesheet_path}\" alignment=\"#{position}\""
 
-          unless system(command)
-            UI.crash!('Unable to draw text')
-          end
+          UI.crash!('Unable to draw text') unless system(command)
 
           text_content = open_image(tempTextFile.path).trim
           text_frame = create_image(width, height)
@@ -296,9 +282,7 @@ module Fastlane
       #
       # @return [Magick::Image] The resized image
       def resize_image(original, width, height)
-        if !original.is_a?(Magick::Image)
-          UI.user_error!('You must pass an image object to `resize_image`.')
-        end
+        UI.user_error!('You must pass an image object to `resize_image`.') if !original.is_a?(Magick::Image)
 
         original.adaptive_resize(width, height)
       end
@@ -318,13 +302,9 @@ module Fastlane
       #
       # @return [Magick::Image] The resized image
       def composite_image(original, child, x_position, y_position, starting_position = NorthWestGravity)
-        if !original.is_a?(Magick::Image)
-          UI.user_error!('You must pass an image object as the first argument to `composite_image`.')
-        end
+        UI.user_error!('You must pass an image object as the first argument to `composite_image`.') if !original.is_a?(Magick::Image)
 
-        if !child.is_a?(Magick::Image)
-          UI.user_error!('You must pass an image object as the second argument to `composite_image`.')
-        end
+        UI.user_error!('You must pass an image object as the second argument to `composite_image`.') if !child.is_a?(Magick::Image)
 
         original.composite(child, starting_position, x_position, y_position, Magick::OverCompositeOp)
       end
@@ -356,9 +336,7 @@ module Fastlane
       #
       # @return [Magick::Image] The resized image
       def crop_image(original, x_position, y_position, width, height)
-        if !original.is_a?(Magick::Image)
-          UI.user_error!('You must pass an image object to `crop_image`.')
-        end
+        UI.user_error!('You must pass an image object to `crop_image`.') if !original.is_a?(Magick::Image)
 
         original.crop(x_position, y_position, width, height)
       end
@@ -389,9 +367,7 @@ module Fastlane
       end
 
       def resolve_path(path)
-        if path == nil
-          UI.crash!('Path not provided – you must provide one to continue')
-        end
+        UI.crash!('Path not provided – you must provide one to continue') if path == nil
 
         [
           Pathname.new(path),                                                           # Absolute Path
@@ -400,9 +376,7 @@ module Fastlane
           Fastlane::Helper::FilesystemHelper.plugin_root + 'spec/test-data/' + path,    # Path Relative to the test data
         ]
           .each do |resolved_path|
-          if resolved_path != nil && resolved_path.exist?
-            return resolved_path
-          end
+          return resolved_path if resolved_path != nil && resolved_path.exist?
         end
 
         message = "Unable to locate #{path}"

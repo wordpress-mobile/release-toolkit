@@ -260,9 +260,7 @@ module Fastlane
         def self.get_version_parts(version)
           parts = version.split('.')
           parts = parts.fill('0', parts.length...4).map { |chr| chr.to_i }
-          if (parts.length > 4) then
-            UI.user_error!("Bad version string: #{version}")
-          end
+          UI.user_error!("Bad version string: #{version}") if (parts.length > 4)
 
           return parts
         end
@@ -296,9 +294,7 @@ module Fastlane
           File.open(filePath, 'r') do |f|
             f.each_line do |line|
               line = line.strip()
-              if line.start_with?("#{key}=")
-                return line.split('=')[1]
-              end
+              return line.split('=')[1] if line.start_with?("#{key}=")
             end
           end
 
@@ -331,9 +327,7 @@ module Fastlane
           v_parts = get_version_parts(version)
 
           v_parts.each do |part|
-            if (!is_int?(part)) then
-              UI.user_error!('Version value can only contains numbers.')
-            end
+            UI.user_error!('Version value can only contains numbers.') if (!is_int?(part))
           end
 
           "#{v_parts[MAJOR_NUMBER]}.#{v_parts[MINOR_NUMBER]}.#{v_parts[HOTFIX_NUMBER]}.#{v_parts[BUILD_NUMBER]}"

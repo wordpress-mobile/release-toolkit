@@ -35,9 +35,7 @@ module Fastlane
         message << "Updating branch to version: #{next_beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{next_beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) "
         message << "and #{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n" unless alpha_release_version.nil?
         if (!params[:skip_confirm])
-          if (!UI.confirm("#{message}Do you want to continue?"))
-            UI.user_error!('Aborted by user request')
-          end
+          UI.user_error!('Aborted by user request') if (!UI.confirm("#{message}Do you want to continue?"))
         else
           UI.message(message)
         end

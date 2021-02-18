@@ -23,9 +23,7 @@ module Fastlane
             dir = dir.parent
           end
 
-          if dir.root?
-            UI.user_error!("Unable to determine the project root directory – #{Dir.pwd} doesn't appear to reside within a git repository.")
-          end
+          UI.user_error!("Unable to determine the project root directory – #{Dir.pwd} doesn't appear to reside within a git repository.") if dir.root?
         end
 
         dir
@@ -44,9 +42,7 @@ module Fastlane
             dir = dir.parent
           end
 
-          if dir.root?
-            UI.user_error!('Unable to determine the plugin root directory.')
-          end
+          UI.user_error!('Unable to determine the plugin root directory.') if dir.root?
         end
 
         dir
@@ -88,9 +84,7 @@ module Fastlane
 
       ### Returns the `sha1` hash of a file, given the absolute path.
       def self.file_hash(absolute_path)
-        unless File.file?(absolute_path)
-          UI.user_error!("Unable to hash #{absolute_path} – the file does not exist")
-        end
+        UI.user_error!("Unable to hash #{absolute_path} – the file does not exist") unless File.file?(absolute_path)
 
         Digest::SHA1.file absolute_path
       end

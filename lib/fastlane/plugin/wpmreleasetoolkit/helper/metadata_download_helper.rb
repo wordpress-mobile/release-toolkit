@@ -17,9 +17,7 @@ module Fastlane
       def download(target_locale, glotpress_url, is_source)
         uri = URI(glotpress_url)
         response = Net::HTTP.get_response(uri)
-        if response.code == '301'
-          response = Net::HTTP.get_response(URI.parse(response.header['location']))
-        end
+        response = Net::HTTP.get_response(URI.parse(response.header['location'])) if response.code == '301'
 
         @alternates.clear
         loc_data = JSON.parse(response.body) rescue loc_data = nil

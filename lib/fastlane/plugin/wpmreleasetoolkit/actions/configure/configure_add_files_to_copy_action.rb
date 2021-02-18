@@ -16,9 +16,7 @@ module Fastlane
 
           confirmation = 'Do you want to specify a file that should be copied from the secrets repository into your project?'
 
-          if Fastlane::Helper::ConfigureHelper.has_files
-            confirmation = 'Do you want to specify additional files that should be copied from the secrets repository into your project?'
-          end
+          confirmation = 'Do you want to specify additional files that should be copied from the secrets repository into your project?' if Fastlane::Helper::ConfigureHelper.has_files
 
           if UI.confirm(confirmation)
             add_file

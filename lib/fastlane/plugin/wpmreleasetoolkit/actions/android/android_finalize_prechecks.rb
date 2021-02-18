@@ -16,9 +16,7 @@ module Fastlane
         version = Fastlane::Helper::Android::VersionHelper.get_public_version
         message = "Finalizing release: #{version}\n"
         if (!params[:skip_confirm])
-          if (!UI.confirm("#{message}Do you want to continue?"))
-            UI.user_error!('Aborted by user request')
-          end
+          UI.user_error!('Aborted by user request') if (!UI.confirm("#{message}Do you want to continue?"))
         else
           UI.message(message)
         end

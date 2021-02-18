@@ -25,9 +25,7 @@ module Fastlane
         File.open(release_notes_file_path).each do |line|
           case state
           when :discarding
-            if (line.match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/)) && (line.strip() == version)
-              state = :evaluating
-            end
+            state = :evaluating if (line.match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/)) && (line.strip() == version)
           when :evaluating
             state = (line.match(/-/)) ? :extracting : :discarding
           when :extracting

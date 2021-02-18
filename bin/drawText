@@ -3,9 +3,7 @@
 require 'rake'
 require 'os'
 
-unless OS.mac? then
-  abort 'Fatal Error: `drawText` can only be run on macOS.'
-end
+abort 'Fatal Error: `drawText` can only be run on macOS.' unless OS.mac?
 
 plugin_path = Pathname(__FILE__).dirname.parent
 executable_path = plugin_path + 'lib/drawText'

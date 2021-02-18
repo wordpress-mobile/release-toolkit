@@ -17,21 +17,15 @@ module Fastlane
         message << "Branching from: #{prev_ver}\n"
 
         if (!params[:skip_confirm])
-          if (!UI.confirm("#{message}Do you want to continue?"))
-            UI.user_error!('Aborted by user request')
-          end
+          UI.user_error!('Aborted by user request') if (!UI.confirm("#{message}Do you want to continue?"))
         else
           UI.message(message)
         end
 
         # Check tags
-        if other_action.git_tag_exists(tag: new_ver)
-          UI.crash!("Version #{new_ver} already exists! Abort!")
-        end
+        UI.crash!("Version #{new_ver} already exists! Abort!") if other_action.git_tag_exists(tag: new_ver)
 
-        if !other_action.git_tag_exists(tag: prev_ver)
-          UI.crash!("Version #{prev_ver} is not tagged! Can't branch. Abort!")
-        end
+        UI.crash!("Version #{prev_ver} is not tagged! Can't branch. Abort!") if !other_action.git_tag_exists(tag: prev_ver)
 
         # Check local repo status
         other_action.ensure_git_status_clean()

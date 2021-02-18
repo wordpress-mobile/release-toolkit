@@ -21,9 +21,7 @@ module Fastlane
         mile = nil
 
         miles&.each do |mm|
-          if mm[:title].start_with?(release)
-            mile = mm
-          end
+          mile = mm if mm[:title].start_with?(release)
         end
 
         return mile
@@ -34,9 +32,7 @@ module Fastlane
         options[:state] = 'open'
 
         milestones = github_client().list_milestones(repository, options)
-        if (milestones.nil?)
-          return nil
-        end
+        return nil if (milestones.nil?)
 
         last_stone = nil
         milestones.each do |mile|

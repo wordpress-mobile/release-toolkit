@@ -73,9 +73,7 @@ class AMTSTestUtils
     file_path = File.join(@test_folder_path, filename)
 
     dir = File.dirname(file_path)
-    unless File.directory?(dir)
-      FileUtils.mkdir_p(dir)
-    end
+    FileUtils.mkdir_p(dir) unless File.directory?(dir)
 
     File.open(file_path, 'w') { |f| f.write(content) }
   end

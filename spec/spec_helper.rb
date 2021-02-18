@@ -9,9 +9,7 @@ SimpleCov.start
 code_coverage_token = ENV['CODECOV_TOKEN'] || false
 
 # If the environment variable is present, format for Codecov
-if code_coverage_token
-  SimpleCov.formatter = SimpleCov::Formatter::Codecov
-end
+SimpleCov.formatter = SimpleCov::Formatter::Codecov if code_coverage_token
 
 # This module is only used to check the environment is currently a testing env
 module SpecHelper

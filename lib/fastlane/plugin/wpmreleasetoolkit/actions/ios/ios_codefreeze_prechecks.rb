@@ -18,9 +18,7 @@ module Fastlane
 
         # Ask user confirmation
         if (!params[:skip_confirm])
-          if (!UI.confirm("Building a new release branch starting from develop.\nCurrent version is #{current_version} (#{current_build_version}).\nAfter codefreeze the new version will be: #{next_version}.\nDo you want to continue?"))
-            UI.user_error!('Aborted by user request')
-          end
+          UI.user_error!('Aborted by user request') if (!UI.confirm("Building a new release branch starting from develop.\nCurrent version is #{current_version} (#{current_build_version}).\nAfter codefreeze the new version will be: #{next_version}.\nDo you want to continue?"))
         end
 
         # Check local repo status
