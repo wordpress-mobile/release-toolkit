@@ -41,7 +41,7 @@ module Fastlane
           # Search for the string in the main file
           result = :added
           main_strings.xpath('//string').each do |this_string|
-            if this_string.attr('name') == string_name then
+            if this_string.attr('name') == string_name
               # Skip if the string has the content_override tag
               return :skipped if skip_string_by_tag(this_string)
 
@@ -77,7 +77,7 @@ module Fastlane
 
           # Search for the string in the main file
           main_strings.xpath('//string').each do |this_string|
-            if this_string.attr('name') == string_name then
+            if this_string.attr('name') == string_name
               # Skip if the string has the content_override tag
               return if skip_string_by_tag(this_string)
 
@@ -127,7 +127,7 @@ module Fastlane
         end
 
         def self.verify_diff(diff_string, main_strings, lib_strings, library)
-          if diff_string.start_with?('name=') then
+          if diff_string.start_with?('name=')
             diff_string.slice!('name="')
 
             end_index = diff_string.index('"')
@@ -152,7 +152,7 @@ module Fastlane
 
         def self.verify_local_diff(main, library, main_strings, lib_strings)
           `git diff #{main}`.each_line do |line|
-            if line.start_with?('+ ') || line.start_with?('- ') then
+            if line.start_with?('+ ') || line.start_with?('- ')
               diffs = line.gsub(/\s+/m, ' ').strip.split(' ')
               diffs.each do |diff|
                 verify_diff(diff, main_strings, lib_strings, library)
@@ -163,7 +163,7 @@ module Fastlane
 
         def self.verify_pr_diff(main, library, main_strings, lib_strings, source_diff)
           source_diff.each_line do |line|
-            if line.start_with?('+ ') || line.start_with?('- ') then
+            if line.start_with?('+ ') || line.start_with?('- ')
               diffs = line.gsub(/\s+/m, ' ').strip.split(' ')
               diffs.each do |diff|
                 verify_diff(diff, main_strings, lib_strings, library)

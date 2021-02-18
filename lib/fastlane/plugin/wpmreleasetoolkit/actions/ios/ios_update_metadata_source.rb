@@ -16,7 +16,7 @@ module Fastlane
 
         repo_status = Actions.sh('git status --porcelain')
         repo_clean = repo_status.empty?
-        if !repo_clean then
+        if !repo_clean
           Action.sh('git commit -m "Update metadata strings"')
           Action.sh('git push')
         end

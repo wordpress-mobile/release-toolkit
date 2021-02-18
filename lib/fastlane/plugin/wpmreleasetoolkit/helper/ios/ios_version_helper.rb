@@ -202,7 +202,7 @@ module Fastlane
         #
         def self.update_fastlane_deliver(new_version)
           fd_file = './fastlane/Deliverfile'
-          if File.exist?(fd_file) then
+          if File.exist?(fd_file)
             Action.sh("sed -i '' \"s/app_version.*/app_version \\\"#{new_version}\\\"/\" #{fd_file}")
           else
             UI.user_error!("Can't find #{fd_file}.")
@@ -232,7 +232,7 @@ module Fastlane
         # @raise [UserError] If the xcconfig file was not found
         #
         def self.update_xc_config(file_path, new_version, new_version_short)
-          if File.exist?(file_path) then
+          if File.exist?(file_path)
             UI.message("Updating #{file_path} to version #{new_version_short}/#{new_version}")
             Action.sh("sed -i '' \"$(awk '/^VERSION_SHORT/{ print NR; exit }' \"#{file_path}\")s/=.*/=#{new_version_short}/\" \"#{file_path}\"")
             Action.sh("sed -i '' \"$(awk '/^VERSION_LONG/{ print NR; exit }' \"#{file_path}\")s/=.*/=#{new_version}/\" \"#{file_path}\"")

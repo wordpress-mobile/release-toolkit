@@ -78,7 +78,7 @@ module Fastlane
 
       def self.update_glotpress_key
         dm_file = ENV['DOWNLOAD_METADATA']
-        if File.exist?(dm_file) then
+        if File.exist?(dm_file)
           sh("sed -i '' \"s/let glotPressWhatsNewKey.*/let glotPressWhatsNewKey = \\\"v#{@new_short_version}-whats-new\\\"/\" #{dm_file}")
         else
           UI.user_error!("Can't find #{dm_file}.")

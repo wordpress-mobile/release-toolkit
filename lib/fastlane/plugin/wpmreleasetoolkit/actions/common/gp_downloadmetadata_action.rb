@@ -18,13 +18,13 @@ module Fastlane
         downloader = Fastlane::Helper::MetadataDownloader.new(params[:download_path], params[:target_files])
 
         params[:locales].each do |loc|
-          if loc.is_a?(Array) then
+          if loc.is_a?(Array)
             puts "Downloading language: #{loc[1]}"
             complete_url = "#{params[:project_url]}#{loc[0]}/default/export-translations?filters[status]=current&format=json"
             downloader.download(loc[1], complete_url, loc[1] == params[:source_locale])
           end
 
-          if loc.is_a?(String) then
+          if loc.is_a?(String)
             puts "Downloading language: #{loc}"
             complete_url = "#{params[:project_url]}#{loc}/default/export-translations?filters[status]=current&format=json"
             downloader.download(loc, complete_url, loc == params[:source_locale])
