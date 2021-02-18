@@ -127,7 +127,7 @@ module Fastlane
       def self.repo_commits_behind_remote
         matches = repo_status.match(/behind \d+/)
 
-        return 0 if matches == nil
+        return 0 if matches.nil?
 
         parse_distance(matches[0])
       end
@@ -142,7 +142,7 @@ module Fastlane
       def self.repo_commits_ahead_of_remote
         matches = repo_status.match(/ahead \d+/)
 
-        return 0 if matches == nil
+        return 0 if matches.nil?
 
         parse_distance(matches[0])
       end
@@ -152,7 +152,7 @@ module Fastlane
       def self.parse_distance(match)
         distance = match.to_s.scan(/\d+/).first
 
-        return 0 if distance == nil
+        return 0 if distance.nil?
 
         distance.to_i
       end

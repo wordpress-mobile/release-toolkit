@@ -29,7 +29,7 @@ module Fastlane
       def parse_data(target_locale, loc_data, is_source)
         delete_existing_metadata(target_locale)
 
-        if loc_data == nil
+        if loc_data.nil?
           UI.message "No translation available for #{target_locale}"
           return
         end

@@ -46,7 +46,7 @@ module Fastlane
 
       def draw_caption_to_canvas(entry, canvas, device, stylesheet_path = '')
         # If no caption is provided, it's ok to skip the body of this method
-        return canvas if entry['text'] == nil
+        return canvas if entry['text'].nil?
 
         text = entry['text']
         text_size = device['text_size']
@@ -367,7 +367,7 @@ module Fastlane
       end
 
       def resolve_path(path)
-        UI.crash!('Path not provided – you must provide one to continue') if path == nil
+        UI.crash!('Path not provided – you must provide one to continue') if path.nil?
 
         [
           Pathname.new(path),                                                           # Absolute Path

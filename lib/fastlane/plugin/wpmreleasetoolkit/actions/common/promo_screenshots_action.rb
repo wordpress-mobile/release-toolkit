@@ -57,10 +57,10 @@ module Fastlane
                       if entry['screenshot'] != nil && entry['filename'] != nil
                         newEntry['screenshot'] = helper.resolve_path(params[:orig_folder]) + language + entry['screenshot']
                         newEntry['filename'] =  outputDirectory + language + entry['filename']
-                      elsif entry['screenshot'] != nil && entry['filename'] == nil
+                      elsif entry['screenshot'] != nil && entry['filename'].nil?
                         newEntry['screenshot'] = helper.resolve_path(params[:orig_folder]) + language + entry['screenshot']
                         newEntry['filename'] =  outputDirectory + language + entry['screenshot']
-                      elsif entry['screenshot'] == nil && entry['filename'] != nil
+                      elsif entry['screenshot'].nil? && entry['filename'] != nil
                         newEntry['filename'] =  outputDirectory + language + entry['filename']
                       else
                         puts newEntry
@@ -73,7 +73,7 @@ module Fastlane
                       newEntry['text'].sub!('{locale}', language.dup) if entry['text'] != nil
 
                       # Map attachments paths to their localized versions
-                      newEntry['attachments'] = [] if newEntry['attachments'] == nil
+                      newEntry['attachments'] = [] if newEntry['attachments'].nil?
 
                       newEntry['attachments'].each do |attachment|
                         attachment['file'].sub!('{locale}', language.dup) if attachment['file'] != nil
@@ -95,7 +95,7 @@ module Fastlane
         }) do |entry|
           device = devices[entry['device']]
 
-          UI.message("Unable to find device #{entry["device"]}.") if device == nil
+          UI.message("Unable to find device #{entry["device"]}.") if device.nil?
 
           width = device['canvas_size'][0]
           height = device['canvas_size'][1]
