@@ -228,14 +228,6 @@ Style/AsciiComments:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
     - 'spec/ios_lint_localizations_spec.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: percent_q, bare_percent
-Style/BarePercentLiterals:
-  Exclude:
-    - 'Dangerfile'
-
 # Offense count: 24
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, ProceduralMethods, FunctionalMethods, IgnoredMethods, AllowBracesOnProceduralOneLiners.
