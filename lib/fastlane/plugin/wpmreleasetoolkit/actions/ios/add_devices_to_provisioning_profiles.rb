@@ -9,20 +9,20 @@ module Fastlane
 
         devices = Spaceship.device.all_ios_profile_devices
 
-        params[:app_identifier].each { |identifier|
+        params[:app_identifier].each do |identifier|
           Spaceship.provisioning_profile.find_by_bundle_id(bundle_id: identifier)
-                   .select { |profile|
+                   .select do |profile|
             profile.kind_of? Spaceship::Portal::ProvisioningProfile::Development
-          }
-                   .tap { |profiles|
+          end
+                   .tap do |profiles|
             UI.important "Warning: Unable to find any profiles associated with #{identifier}" unless profiles.length > 0
-          }
-                   .each { |profile|
+          end
+                   .each do |profile|
             profile.devices = devices
             profile.update!
             UI.success "Applied #{devices.length} devices to #{profile.name}"
-          }
-        }
+          end
+        end
       end
 
       #####################################################

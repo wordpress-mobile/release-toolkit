@@ -190,17 +190,17 @@ module Fastlane
         file_dependencies ||= []
 
         # Allows support for specifying directories – they'll be expanded recursively
-        expanded_file_dependencies = file_dependencies.map { |path|
+        expanded_file_dependencies = file_dependencies.map do |path|
           abs_path = self.mobile_secrets_path(path)
 
           if File.directory?(abs_path)
-            Dir.glob("#{abs_path}**/*").map { |sub_path|
+            Dir.glob("#{abs_path}**/*").map do |sub_path|
               sub_path.gsub(repository_path + '/', '')
-            }
+            end
           else
             return path
           end
-        }
+        end
 
         self.files_to_copy.map { |o| o.file } + expanded_file_dependencies
       end
@@ -211,9 +211,9 @@ module Fastlane
         file_dependencies = self.configuration.file_dependencies
         file_dependencies ||= []
 
-        directory_dependencies = file_dependencies.select { |path|
+        directory_dependencies = file_dependencies.select do |path|
           File.directory?(self.mobile_secrets_path(path))
-        }
+        end
 
         new_files = []
 

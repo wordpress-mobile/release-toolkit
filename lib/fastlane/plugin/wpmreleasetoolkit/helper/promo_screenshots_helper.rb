@@ -144,13 +144,13 @@ module Fastlane
       end
 
       def draw_attachments_to_canvas(entry, canvas)
-        entry['attachments'].each { |attachment|
+        entry['attachments'].each do |attachment|
           if attachment['file'] != nil
             canvas = draw_file_attachment_to_canvas(attachment, canvas, entry)
           elsif attachment['text'] != nil
             canvas = draw_text_attachment_to_canvas(attachment, canvas, entry['locale'])
           end
-        }
+        end
 
         return canvas
       end
@@ -162,9 +162,9 @@ module Fastlane
 
         if attachment.member?('operations')
 
-          attachment['operations'].each { |operation|
+          attachment['operations'].each do |operation|
             image = apply_operation(image, operation, canvas)
-          }
+          end
 
         end
 
@@ -366,17 +366,17 @@ module Fastlane
       def open_image(path)
         path = resolve_path(path)
 
-        Magick::Image.read(path)  {
+        Magick::Image.read(path)  do
           self.background_color = 'transparent'
-        }.first
+        end.first
       end
 
       def create_image(width, height, background = 'transparent')
         background_color = background.paint.to_hex
 
-        Image.new(width, height) {
+        Image.new(width, height) do
           self.background_color = background
-        }
+        end
       end
 
       def can_resolve_path(path)
@@ -399,11 +399,11 @@ module Fastlane
           Fastlane::Helper::FilesystemHelper.plugin_root + path,                        # Path Relative to the plugin
           Fastlane::Helper::FilesystemHelper.plugin_root + 'spec/test-data/' + path,    # Path Relative to the test data
         ]
-          .each { |resolved_path|
+          .each do |resolved_path|
           if resolved_path != nil && resolved_path.exist?
             return resolved_path
           end
-        }
+        end
 
         message = "Unable to locate #{path}"
         UI.crash!(message)

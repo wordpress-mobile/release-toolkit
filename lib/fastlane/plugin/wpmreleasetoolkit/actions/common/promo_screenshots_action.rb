@@ -50,8 +50,8 @@ module Fastlane
         stylesheet_path = config['stylesheet']
 
         entries = config['entries']
-                  .flat_map { |entry|
-                    languages.map { |language|
+                  .flat_map do |entry|
+                    languages.map do |language|
                       newEntry = entry.deep_dup
 
                       # Not every output file will have a screenshot, so handle cases where no
@@ -81,7 +81,7 @@ module Fastlane
                         newEntry['attachments'] = []
                       end
 
-                      newEntry['attachments'].each { |attachment|
+                      newEntry['attachments'].each do |attachment|
                         if attachment['file'] != nil
                           attachment['file'].sub!('{locale}', language.dup)
                         end
@@ -89,14 +89,14 @@ module Fastlane
                         if attachment['text'] != nil
                           attachment['text'].sub!('{locale}', language.dup)
                         end
-                      }
+                      end
 
                       newEntry
-                    }
-                  }
-                  .sort { |x, y|
+                    end
+                  end
+                  .sort do |x, y|
           x['filename'] <=> y['filename']
-        }
+        end
 
         bar = ProgressBar.new(entries.count, :bar, :counter, :eta, :rate)
 

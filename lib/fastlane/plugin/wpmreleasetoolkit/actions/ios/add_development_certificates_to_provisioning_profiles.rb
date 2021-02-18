@@ -7,24 +7,24 @@ module Fastlane
         Spaceship.login
         Spaceship.select_team(team_id: params[:team_id])
 
-        all_certificates = Spaceship.certificate.all(mac: false).select { |certificate|
+        all_certificates = Spaceship.certificate.all(mac: false).select do |certificate|
           certificate.owner_type == 'teamMember'
-        }
+        end
 
-        params[:app_identifier].each { |identifier|
+        params[:app_identifier].each do |identifier|
           Spaceship.provisioning_profile.find_by_bundle_id(bundle_id: identifier)
-                   .select { |profile|
+                   .select do |profile|
             profile.kind_of? Spaceship::Portal::ProvisioningProfile::Development
-          }
-                   .tap { |profiles|
+          end
+                   .tap do |profiles|
             UI.important "Warning: Unable to find any profiles associated with #{identifier}" unless profiles.length > 0
-          }
-                   .each { |profile|
+          end
+                   .each do |profile|
             profile.certificates = all_certificates
             profile.update!
             UI.success "Applied #{all_certificates.length} certificates to #{profile.name}"
-          }
-        }
+          end
+        end
       end
 
       #####################################################

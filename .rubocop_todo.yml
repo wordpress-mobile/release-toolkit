@@ -228,24 +228,6 @@ Style/AsciiComments:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
     - 'spec/ios_lint_localizations_spec.rb'
 
-# Offense count: 24
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, ProceduralMethods, FunctionalMethods, IgnoredMethods, AllowBracesOnProceduralOneLiners.
-# SupportedStyles: line_count_based, semantic, braces_for_chaining, always_braces
-# ProceduralMethods: benchmark, bm, bmbm, create, each_with_object, measure, new, realtime, tap, with_object
-# FunctionalMethods: let, let!, subject, watch
-# IgnoredMethods: lambda, proc, it
-Style/BlockDelimiters:
-  Exclude:
-    - 'bin/drawText'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_create_xml_release_notes.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_validate_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_development_certificates_to_provisioning_profiles.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_devices_to_provisioning_profiles.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/configure_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
-
 # Offense count: 7
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
