@@ -264,13 +264,6 @@ Style/IfInsideElse:
 
 # Offense count: 1
 # Cop supports --auto-correct.
-# Configuration parameters: InverseMethods, InverseBlocks.
-Style/InverseMethods:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
 # SupportedStyles: line_count_dependent, lambda, literal
 Style/Lambda:
