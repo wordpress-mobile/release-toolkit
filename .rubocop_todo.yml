@@ -232,13 +232,6 @@ Style/AsciiComments:
 Style/Documentation:
   Enabled: false
 
-# Offense count: 71
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: compact, expanded
-Style/EmptyMethod:
-  Enabled: false
-
 # Offense count: 1
 # Cop supports --auto-correct.
 Style/Encoding:

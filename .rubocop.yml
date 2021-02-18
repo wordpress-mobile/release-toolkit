@@ -16,6 +16,9 @@ Gemspec/OrderedDependencies:
 Lint/UnusedMethodArgument:
   Enabled: false
 
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+
 ########## Metrics / Max Lengths Rules
 
 Metrics/LineLength:
