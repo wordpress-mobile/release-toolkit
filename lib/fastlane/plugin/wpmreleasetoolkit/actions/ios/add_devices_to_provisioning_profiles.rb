@@ -12,7 +12,7 @@ module Fastlane
         params[:app_identifier].each do |identifier|
           Spaceship.provisioning_profile.find_by_bundle_id(bundle_id: identifier)
                    .select do |profile|
-            profile.kind_of? Spaceship::Portal::ProvisioningProfile::Development
+            profile.is_a? Spaceship::Portal::ProvisioningProfile::Development
           end
                    .tap do |profiles|
             UI.important "Warning: Unable to find any profiles associated with #{identifier}" unless profiles.length > 0

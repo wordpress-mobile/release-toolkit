@@ -228,16 +228,6 @@ Style/AsciiComments:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
     - 'spec/ios_lint_localizations_spec.rb'
 
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: is_a?, kind_of?
-Style/ClassCheck:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_downloadmetadata_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_development_certificates_to_provisioning_profiles.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_devices_to_provisioning_profiles.rb'
-
 # Offense count: 2
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SingleLineConditionsOnly, IncludeTernaryExpressions.
