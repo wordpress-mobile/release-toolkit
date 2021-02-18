@@ -232,13 +232,6 @@ Style/AsciiComments:
 Style/Documentation:
   Enabled: false
 
-# Offense count: 104
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: always, never
-Style/FrozenStringLiteralComment:
-  Enabled: false
-
 # Offense count: 4
 # Configuration parameters: AllowedVariables.
 Style/GlobalVars:
