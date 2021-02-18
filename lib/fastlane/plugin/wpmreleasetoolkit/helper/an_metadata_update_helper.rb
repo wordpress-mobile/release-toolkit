@@ -91,7 +91,7 @@ module Fastlane
 
       def is_handler_for(key)
         values = key.split('_')
-        key.start_with?(@rel_note_key) && values.length == 3 && (Integer(values[2].sub(/^[0]*/, '')) != nil rescue false)
+        key.start_with?(@rel_note_key) && values.length == 3 && is_int?(values[2].sub(/^[0]*/, ''))
       end
 
       def handle_line(fw, line)
@@ -137,11 +137,15 @@ module Fastlane
 
       def is_handler_for(key)
         values = key.split('_')
-        key.start_with?(@rel_note_key) && values.length == 4 && (Integer(values[3].sub(/^[0]*/, '')) != nil rescue false)
+        key.start_with?(@rel_note_key) && values.length == 4 && is_int?(values[3].sub(/^[0]*/, ''))
       end
 
       def generate_block(fw)
         super(fw) unless File.zero?(@content_file_path)
+      end
+
+      def is_int?(value)
+        true if Integer(string) rescue false
       end
     end
   end
