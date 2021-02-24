@@ -37,6 +37,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
             fi
           SCRIPT
           FileUtils.mkdir_p File.join(install_dir, 'bin')
+          # note: `0o` is octal notation, used to specify chmod-like flags
           File.write(File.join(install_dir, 'bin/swiftgen'), script, perm: 0o766)
 
           # Second run: ensure we only run SwiftGen directly, without a call to curl nor unzip beforehand
