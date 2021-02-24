@@ -9,7 +9,7 @@ module Fastlane
       def self.run(params)
         folder_path = File.expand_path(params[:strings_folder])
 
-        subfolders = Dir.entries("#{folder_path}")
+        subfolders = Dir.entries(folder_path.to_s)
         subfolders.each do |strings_folder|
           merge_folder(File.join(folder_path, strings_folder)) if strings_folder.start_with?('values')
         end
@@ -24,7 +24,7 @@ module Fastlane
         tmp_main_file = main_file + '.tmp'
         FileUtils.cp(main_file, tmp_main_file)
 
-        join_files = Dir.glob(File.join("#{strings_folder}", 'strings-*.xml'))
+        join_files = Dir.glob(File.join(strings_folder.to_s, 'strings-*.xml'))
         extra_strings = []
         extra_keys = []
         join_files.each do |join_strings|
