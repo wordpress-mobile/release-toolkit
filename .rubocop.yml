@@ -48,6 +48,7 @@ Metrics/AbcSize:
 
 Metrics/BlockLength:
   Max: 80
+  Exclude: ['spec/**/*_spec.rb']
 
 Metrics/ClassLength:
   Max: 300
@@ -60,6 +61,9 @@ Metrics/ModuleLength:
 
 Metrics/ParameterLists:
   Max: 10
+
+RSpec/ExampleLength:
+  Enabled: false
 
 ########## Metrics / Complexity
 

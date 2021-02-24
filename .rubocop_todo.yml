@@ -121,15 +121,6 @@ RSpec/DescribedClass:
     - 'spec/git_helper_spec.rb'
     - 'spec/ios_lint_localizations_spec.rb'
 
-# Offense count: 5
-# Configuration parameters: Max.
-RSpec/ExampleLength:
-  Exclude:
-    - 'spec/ci_helper_spec.rb'
-    - 'spec/configuration_spec.rb'
-    - 'spec/ios_lint_localizations_spec.rb'
-    - 'spec/release_notes_helper_spec.rb'
-
 # Offense count: 9
 # Configuration parameters: CustomTransform, IgnoreMethods, SpecSuffixOnly.
 RSpec/FilePath:
