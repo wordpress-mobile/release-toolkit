@@ -29,6 +29,9 @@ Style/TrailingCommaInArrayLiteral:
 Style/FrozenStringLiteralComment:
   Enabled: false
 
+Style/AsciiComments:
+  Enabled: false
+
 ########## Metrics / Max Lengths Rules
 
 Metrics/LineLength:

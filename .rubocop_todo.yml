@@ -218,21 +218,7 @@ Security/Open:
     - 'spec/android_merge_translators_strings_spec.rb'
     - 'spec/ios_merge_translators_strings_spec.rb'
 
-# Offense count: 12
-# Configuration parameters: AllowedChars.
-Style/AsciiComments:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_setup_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_update_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_validate_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/configure_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/git_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_git_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_l10n_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
-    - 'spec/ios_lint_localizations_spec.rb'
-
-# Offense count: 95
+# Offense count: 91
 Style/Documentation:
   Enabled: false
 
