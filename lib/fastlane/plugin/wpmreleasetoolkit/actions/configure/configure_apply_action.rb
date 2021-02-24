@@ -125,7 +125,7 @@ module Fastlane
                                        description: 'Overwrite copied files without confirmation',
                                        optional: true,
                                        default_value: false,
-                                       is_string: false)
+                                       is_string: false),
         ]
       end
 

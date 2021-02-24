@@ -44,7 +44,7 @@ module Fastlane
                                        env_name: 'GHHELPER_MILESTONE',
                                        description: 'The GitHub milestone',
                                        optional: false,
-                                       type: String)
+                                       type: String),
         ]
       end
 

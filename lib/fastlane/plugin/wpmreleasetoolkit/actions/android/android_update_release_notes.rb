@@ -34,7 +34,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :new_version,
                                        env_name: 'FL_ANDROID_UPDATE_RELEASE_NOTES_VERSION',
                                        description: 'The version we are currently freezing; An empty entry for the _next_ version after this one will be added to the release notes',
-                                       is_string: true)
+                                       is_string: true),
         ]
       end
 

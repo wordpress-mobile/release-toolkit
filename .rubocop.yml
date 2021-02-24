@@ -19,6 +19,9 @@ Lint/UnusedMethodArgument:
 Style/EmptyMethod:
   EnforcedStyle: expanded
 
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
 # Enabling the 'frozen_string_literal: true' comment is nice but should be done with extra care
 # because enabling it on code that accidentally mutates string literals will crash at runtime
 # (e.g. `name = 'Hello'` then later `name << ' world'` will crash if the comment is enabled)

@@ -41,7 +41,7 @@ module Fastlane
                                        env_name: 'LOCALIZE_LIBS_STRINGS_PATH',
                                        description: 'The list of libs to merge',
                                        optional: false,
-                                       is_string: false)
+                                       is_string: false),
         ]
       end
 

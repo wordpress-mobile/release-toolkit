@@ -73,7 +73,7 @@ module Fastlane
                                        env_name: 'GHHELPER_REPORTPATH',
                                        description: 'The path of the report file',
                                        optional: false,
-                                       is_string: true)
+                                       is_string: true),
         ]
       end
 

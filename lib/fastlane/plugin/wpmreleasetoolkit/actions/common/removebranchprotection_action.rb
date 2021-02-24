@@ -45,7 +45,7 @@ module Fastlane
                                        env_name: 'GHHELPER_BRANCH',
                                        description: 'The branch to unprotect',
                                        optional: false,
-                                       type: String)
+                                       type: String),
         ]
       end
 

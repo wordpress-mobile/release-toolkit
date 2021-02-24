@@ -52,7 +52,7 @@ module Fastlane
                                        env_name: 'FL_IOS_BUILD_PRECHECKS_INTERNAL_SV_BUILD',
                                        description: 'True if this is for an internal build that follows the same versioning of the external',
                                        is_string: false,
-                                       default_value: false)
+                                       default_value: false),
         ]
       end
 

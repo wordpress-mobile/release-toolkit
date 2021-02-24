@@ -47,7 +47,7 @@ module Fastlane
                                        env_name: 'FL_IOS_CODEFREEZE_PRECHECKS_SKIPCONFIRM',
                                        description: 'Skips confirmation before codefreeze',
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
-                                       default_value: false) # the default value if the user didn't provide one
+                                       default_value: false), # the default value if the user didn't provide one
         ]
       end
 

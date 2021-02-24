@@ -61,7 +61,7 @@ module Fastlane
                                        env_name: 'FL_ANDROID_BUILD_PRECHECKS_FINAL_BUILD',
                                        description: 'True if this is for a final build',
                                        is_string: false,
-                                       default_value: false)
+                                       default_value: false),
         ]
       end
 

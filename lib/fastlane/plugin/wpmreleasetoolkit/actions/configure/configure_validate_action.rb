@@ -44,7 +44,7 @@ module Fastlane
 
           UI.user_error!([
             'The branch specified in `.configure` is not the currently checked out branch in the secrets repository.',
-            "To fix this issue, switch back to the `#{file_branch_name}` branch in the mobile secrets repository."
+            "To fix this issue, switch back to the `#{file_branch_name}` branch in the mobile secrets repository.",
           ].join("\n"))
         end
       end
@@ -59,7 +59,7 @@ module Fastlane
 
           UI.user_error!([
             'The pinned_hash specified in `.configure` is not the currently checked out hash in the secrets repository.',
-            "To fix this issue, check out the `#{file_hash}` hash in the mobile secrets repository."
+            "To fix this issue, check out the `#{file_hash}` hash in the mobile secrets repository.",
           ].join("\n"))
         end
       end

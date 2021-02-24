@@ -63,7 +63,7 @@ module Fastlane
                                        env_name: 'FL_IOS_CODEFREEZE_BUMP_SKIPDELIVER',
                                        description: 'Skips Deliver key update',
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
-                                       default_value: false) # the default value if the user didn't provide one
+                                       default_value: false), # the default value if the user didn't provide one
 
         ]
       end

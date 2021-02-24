@@ -59,7 +59,7 @@ module Fastlane
                                        is_string: false,
                                        verify_block: proc do |value|
                                                        UI.user_error!("No source file hash for UpdateMetadataSourceAction given, pass using `source_files: 'source file hash'`") unless value && (!value.empty?)
-                                                     end)
+                                                     end),
         ]
       end
 

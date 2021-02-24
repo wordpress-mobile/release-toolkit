@@ -166,7 +166,7 @@ module Fastlane
                                        description: 'Overwrite existing promo screenshots without asking first?',
                                        optional: true,
                                        is_string: false,
-                                       default_value: false)
+                                       default_value: false),
         ]
       end
 

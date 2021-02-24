@@ -373,7 +373,7 @@ module Fastlane
           Pathname.new(path),                                                           # Absolute Path
           Pathname.new(FastlaneCore::FastlaneFolder.fastfile_path).dirname + path,      # Path Relative to the fastfile
           Fastlane::Helper::FilesystemHelper.plugin_root + path,                        # Path Relative to the plugin
-          Fastlane::Helper::FilesystemHelper.plugin_root + 'spec/test-data/' + path # Path Relative to the test data
+          Fastlane::Helper::FilesystemHelper.plugin_root + 'spec/test-data/' + path, # Path Relative to the test data
         ]
           .each do |resolved_path|
           return resolved_path if !resolved_path.nil? && resolved_path.exist?

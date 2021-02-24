@@ -86,7 +86,7 @@ module Fastlane
                                        env_name: 'AMTS_STRING_FOLDER',
                                        description: 'The folder that contains all the translations',
                                        optional: false,
-                                       type: String)
+                                       type: String),
         ]
       end
 

@@ -139,7 +139,7 @@ module Fastlane
             optional: true,
             default_value: false,
             is_string: false # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
-          )
+          ),
         ]
       end
 

@@ -69,7 +69,7 @@ module Fastlane
                                        description: 'The GitHub milestone',
                                        optional: false,
                                        default_value: true,
-                                       is_string: false)
+                                       is_string: false),
         ]
       end
 

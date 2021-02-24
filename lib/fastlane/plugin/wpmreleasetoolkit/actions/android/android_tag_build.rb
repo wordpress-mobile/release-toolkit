@@ -29,7 +29,7 @@ module Fastlane
                                        env_name: 'FL_ANDROID_TAG_BUILD_ALPHA',
                                        description: 'True to skip tagging the alpha version',
                                        is_string: false,
-                                       default_value: true)
+                                       default_value: true),
         ]
       end
 

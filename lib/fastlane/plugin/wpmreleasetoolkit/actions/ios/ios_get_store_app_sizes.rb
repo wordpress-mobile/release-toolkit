@@ -92,7 +92,7 @@ module Fastlane
             description: "The output format used to print the result. Can be one of 'csv' or 'markdown', or nil to print nothing (raw data will always be available as the the action's return value)",
             type: String,
             optional: true
-          )
+          ),
         ]
       end
 
