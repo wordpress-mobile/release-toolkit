@@ -56,7 +56,7 @@ module Fastlane
             description: "The path to the DerivedData directory for the project. Should match what's used in the `gym` action",
             is_string: true,
             default_value: '~/Library/Developer/Xcode/DerivedData'
-          )
+          ),
         ]
       end
 

@@ -22,9 +22,7 @@ module Fastlane
       def self.update_repository
         secrets_repo_branch = Fastlane::Helper::ConfigureHelper.repo_branch_name
 
-        unless secrets_repo_branch == nil
-          sh("cd #{secrets_dir} && git pull")
-        end
+        sh("cd #{secrets_dir} && git pull") unless secrets_repo_branch.nil?
       end
 
       def self.secrets_dir

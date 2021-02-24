@@ -16,6 +16,19 @@ Gemspec/OrderedDependencies:
 Lint/UnusedMethodArgument:
   Enabled: false
 
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+# Enabling the 'frozen_string_literal: true' comment is nice but should be done with extra care
+# because enabling it on code that accidentally mutates string literals will crash at runtime
+# (e.g. `name = 'Hello'` then later `name << ' world'` will crash if the comment is enabled)
+# So we might enable it at some point, be we will need very careful review that this doesn't break everything.
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
 ########## Metrics / Max Lengths Rules
 
 Metrics/LineLength:

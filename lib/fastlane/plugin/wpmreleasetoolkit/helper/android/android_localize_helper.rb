@@ -11,8 +11,8 @@ module Fastlane
         # Checks if string_line has the content_override flag set
         def self.skip_string_by_tag(string_line)
           skip = string_line.attr('content_override') == 'true' unless string_line.attr('content_override').nil?
-          if (skip)
-            puts " - Skipping #{string_line.attr("name")} string"
+          if skip
+            puts " - Skipping #{string_line.attr('name')} string"
             return true
           end
 
@@ -21,12 +21,10 @@ module Fastlane
 
         # Checks if string_name is in the excluesion list
         def self.skip_string_by_exclusion_list(library, string_name)
-          if (!library.key?(:exclusions))
-            return false
-          end
+          return false unless library.key?(:exclusions)
 
           skip = library[:exclusions].include?(string_name)
-          if (skip)
+          if skip
             puts " - Skipping #{string_name} string"
             return true
           end
@@ -43,16 +41,16 @@ module Fastlane
           # Search for the string in the main file
           result = :added
           main_strings.xpath('//string').each do |this_string|
-            if (this_string.attr('name') == string_name) then
+            if this_string.attr('name') == string_name
               # Skip if the string has the content_override tag
               return :skipped if skip_string_by_tag(this_string)
 
               # If nodes are equivalent, skip
-              return :found if (string_line =~ this_string)
+              return :found if string_line =~ this_string
 
               # The string needs an update
               result = :updated
-              if (this_string.attr('tools:ignore').nil?)
+              if this_string.attr('tools:ignore').nil?
                 # It can be updated, so remove the current one and move ahead
                 this_string.remove
                 break
@@ -65,7 +63,7 @@ module Fastlane
           end
 
           # String not found, or removed because needing update and not in the exclusion list: add to the main file
-          main_strings.xpath('//string').last().add_next_sibling("\n#{" " * 4}#{string_line.to_xml().strip}")
+          main_strings.xpath('//string').last().add_next_sibling("\n#{' ' * 4}#{string_line.to_xml().strip}")
           return result
         end
 
@@ -79,12 +77,12 @@ module Fastlane
 
           # Search for the string in the main file
           main_strings.xpath('//string').each do |this_string|
-            if (this_string.attr('name') == string_name) then
+            if this_string.attr('name') == string_name
               # Skip if the string has the content_override tag
               return if skip_string_by_tag(this_string)
 
               # Update if needed
-              UI.user_error!("String #{string_name} [#{string_content}] has been updated in the main file but not in the library #{library[:library]}.") if (this_string.content != string_content)
+              UI.user_error!("String #{string_name} [#{string_content}] has been updated in the main file but not in the library #{library[:library]}.") if this_string.content != string_content
               return
             end
           end
@@ -106,12 +104,12 @@ module Fastlane
             res = merge_string(main_strings, library, string_line)
             case res
             when :updated
-              puts "#{string_line.attr("name")} updated."
+              puts "#{string_line.attr('name')} updated."
               updated_count = updated_count + 1
             when :found
               untouched_count = untouched_count + 1
             when :added
-              puts "#{string_line.attr("name")} added."
+              puts "#{string_line.attr('name')} added."
               added_count = added_count + 1
             when :skipped
               skipped_count = skipped_count + 1
@@ -121,7 +119,7 @@ module Fastlane
           end
 
           File.open(main, 'w:UTF-8') do |f|
-            f.write(main_strings.to_xml(:indent => 4))
+            f.write(main_strings.to_xml(indent: 4))
           end
 
           UI.message("Done (#{added_count} added, #{updated_count} updated, #{untouched_count} untouched, #{skipped_count} skipped).")
@@ -129,7 +127,7 @@ module Fastlane
         end
 
         def self.verify_diff(diff_string, main_strings, lib_strings, library)
-          if diff_string.start_with?('name=') then
+          if diff_string.start_with?('name=')
             diff_string.slice!('name="')
 
             end_index = diff_string.index('"')
@@ -138,9 +136,7 @@ module Fastlane
             diff_string = diff_string.slice(0..(end_index - 1))
 
             lib_strings.xpath('//string').each do |string_line|
-              if (string_line.attr('name') == diff_string) then
-                res = verify_string(main_strings, library, string_line)
-              end
+              res = verify_string(main_strings, library, string_line) if string_line.attr('name') == diff_string
             end
           end
         end
@@ -156,7 +152,7 @@ module Fastlane
 
         def self.verify_local_diff(main, library, main_strings, lib_strings)
           `git diff #{main}`.each_line do |line|
-            if (line.start_with?('+ ') or line.start_with?('- ')) then
+            if line.start_with?('+ ') || line.start_with?('- ')
               diffs = line.gsub(/\s+/m, ' ').strip.split(' ')
               diffs.each do |diff|
                 verify_diff(diff, main_strings, lib_strings, library)
@@ -167,7 +163,7 @@ module Fastlane
 
         def self.verify_pr_diff(main, library, main_strings, lib_strings, source_diff)
           source_diff.each_line do |line|
-            if (line.start_with?('+ ') or line.start_with?('- ')) then
+            if line.start_with?('+ ') || line.start_with?('- ')
               diffs = line.gsub(/\s+/m, ' ').strip.split(' ')
               diffs.each do |diff|
                 verify_diff(diff, main_strings, lib_strings, library)
@@ -182,30 +178,38 @@ end
 
 # Source: https://stackoverflow.com/questions/7825258/determine-if-two-nokogiri-nodes-are-equivalent?rq=1
 # There may be better solutions now that Ruby supports canonicalization.
-class Nokogiri::XML::Node
-  # Return true if this node is content-equivalent to other, false otherwise
-  def =~(other)
-    return true if self == other
-    return false unless name == other.name
+module Nokogiri
+  module XML
+    class Node
+      # Return true if this node is content-equivalent to other, false otherwise
+      def =~(other)
+        return true if self == other
+        return false unless name == other.name
 
-    stype = node_type; otype = other.node_type
-    return false unless stype == otype
+        stype = node_type
+        otype = other.node_type
+        return false unless stype == otype
 
-    sa = attributes; oa = other.attributes
-    return false unless sa.length == oa.length
+        sa = attributes
+        oa = other.attributes
+        return false unless sa.length == oa.length
 
-    sa = sa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
-    oa = oa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
-    return false unless sa == oa
+        sa = sa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
+        oa = oa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
+        return false unless sa == oa
 
-    skids = children; okids = other.children
-    return false unless skids.length == okids.length
-    return false if stype == TEXT_NODE && (content != other.content)
+        skids = children
+        okids = other.children
+        return false unless skids.length == okids.length
+        return false if stype == TEXT_NODE && (content != other.content)
 
-    sns = namespace; ons = other.namespace
-    return false if !sns ^ !ons
-    return false if sns && (sns.href != ons.href)
+        sns = namespace
+        ons = other.namespace
+        return false if !sns ^ !ons
+        return false if sns && (sns.href != ons.href)
 
-    skids.to_enum.with_index.all? { |ski, i| ski =~ okids[i] }
+        skids.to_enum.with_index.all? { |ski, i| ski =~ okids[i] }
+      end
+    end
   end
 end

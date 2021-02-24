@@ -5,11 +5,11 @@ module Fastlane
         require_relative '../../helper/android/android_git_helper.rb'
 
         release_notes_path = params[:download_path] + '/release_notes.xml'
-        open(release_notes_path, 'w') { |f|
+        open(release_notes_path, 'w') do |f|
           params[:locales].each do |loc|
             puts "Looking for language: #{loc[1]}"
             complete_path = "#{params[:download_path]}/#{loc[1]}/changelogs/#{params[:build_number]}.txt"
-            if (File.exist?(complete_path))
+            if File.exist?(complete_path)
               f.puts("<#{loc[1]}>")
               f.puts(File.open(complete_path).read)
               f.puts("</#{loc[1]}>\n")
@@ -17,7 +17,7 @@ module Fastlane
               UI.message("File #{complete_path} not found. Skipping language #{loc[1]}")
             end
           end
-        }
+        end
       end
 
       #####################################################

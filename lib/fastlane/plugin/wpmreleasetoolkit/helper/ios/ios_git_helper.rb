@@ -19,9 +19,7 @@ module Fastlane
         #
         def self.commit_version_bump(include_deliverfile: true, include_metadata: true)
           files_list = [File.join(ENV['PROJECT_ROOT_FOLDER'], 'config', '.')]
-          if include_deliverfile
-            files_list.append File.join('fastlane', 'Deliverfile')
-          end
+          files_list.append File.join('fastlane', 'Deliverfile') if include_deliverfile
           if include_metadata
             files_list.append File.join('fastlane', 'download_metadata.swift')
             files_list.append File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'Resources', ENV['APP_STORE_STRINGS_FILE_NAME'])
@@ -40,8 +38,8 @@ module Fastlane
         # @todo Migrate the scripts, currently in each host repo and called by this method, to be helpers and actions
         #       in the release-toolkit instead, and move this code away from `ios_git_helper`.
         #
-        def self.localize_project()
-          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && ./Scripts/localize.py")
+        def self.localize_project
+          Action.sh("cd #{ENV['PROJECT_ROOT_FOLDER']} && ./Scripts/localize.py")
 
           strings_files = Dir.chdir(File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'])) do
             Dir.glob('*.lproj/*.strings')
@@ -57,8 +55,8 @@ module Fastlane
         # @todo Migrate the scripts, currently in each host repo and called by this method, to be helpers and actions
         #       in the release-toolkit instead, and move this code away from `ios_git_helper`.
         #
-        def self.update_metadata()
-          Action.sh("cd #{ENV["PROJECT_ROOT_FOLDER"]} && ./Scripts/update-translations.rb")
+        def self.update_metadata
+          Action.sh("cd #{ENV['PROJECT_ROOT_FOLDER']} && ./Scripts/update-translations.rb")
 
           strings_files = Dir.chdir(File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'])) do
             Dir.glob('*.lproj/*.strings')

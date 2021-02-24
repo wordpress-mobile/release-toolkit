@@ -38,7 +38,7 @@ module Fastlane
         def self.calc_next_release_version(version)
           vp = get_version_parts(version)
           vp[MINOR_NUMBER] += 1
-          if (vp[MINOR_NUMBER] == 10)
+          if vp[MINOR_NUMBER] == 10
             vp[MAJOR_NUMBER] += 1
             vp[MINOR_NUMBER] = 0
           end
@@ -66,7 +66,7 @@ module Fastlane
         #
         def self.calc_prev_release_version(version)
           vp = get_version_parts(version)
-          if (vp[MINOR_NUMBER] == 0)
+          if vp[MINOR_NUMBER] == 0
             vp[MAJOR_NUMBER] -= 1
             vp[MINOR_NUMBER] = 9
           else
@@ -202,7 +202,7 @@ module Fastlane
         #
         def self.update_fastlane_deliver(new_version)
           fd_file = './fastlane/Deliverfile'
-          if (File.exist?(fd_file)) then
+          if File.exist?(fd_file)
             Action.sh("sed -i '' \"s/app_version.*/app_version \\\"#{new_version}\\\"/\" #{fd_file}")
           else
             UI.user_error!("Can't find #{fd_file}.")
@@ -232,13 +232,13 @@ module Fastlane
         # @raise [UserError] If the xcconfig file was not found
         #
         def self.update_xc_config(file_path, new_version, new_version_short)
-          if File.exist?(file_path) then
+          if File.exist?(file_path)
             UI.message("Updating #{file_path} to version #{new_version_short}/#{new_version}")
             Action.sh("sed -i '' \"$(awk '/^VERSION_SHORT/{ print NR; exit }' \"#{file_path}\")s/=.*/=#{new_version_short}/\" \"#{file_path}\"")
             Action.sh("sed -i '' \"$(awk '/^VERSION_LONG/{ print NR; exit }' \"#{file_path}\")s/=.*/=#{new_version}/\" \"#{file_path}\"")
 
             build_number = read_build_number_from_config_file(file_path)
-            unless (build_number.nil?)
+            unless build_number.nil?
               new_build_number = bump_build_number(build_number)
               Action.sh("sed -i '' \"$(awk '/^BUILD_NUMBER/{ print NR; exit }' \"#{file_path}\")s/=.*/=#{new_build_number}/\" \"#{file_path}\"")
             end
@@ -260,9 +260,7 @@ module Fastlane
         def self.get_version_parts(version)
           parts = version.split('.')
           parts = parts.fill('0', parts.length...4).map { |chr| chr.to_i }
-          if (parts.length > 4) then
-            UI.user_error!("Bad version string: #{version}")
-          end
+          UI.user_error!("Bad version string: #{version}") if parts.length > 4
 
           return parts
         end
@@ -296,9 +294,7 @@ module Fastlane
           File.open(filePath, 'r') do |f|
             f.each_line do |line|
               line = line.strip()
-              if line.start_with?("#{key}=")
-                return line.split('=')[1]
-              end
+              return line.split('=')[1] if line.start_with?("#{key}=")
             end
           end
 
@@ -314,7 +310,7 @@ module Fastlane
         #         The first element is always present and contains the version extracted from the public config file
         #         The second element is the version extracted from the internal config file, only present if one was provided.
         def self.get_version_strings
-          version_strings = Array.new
+          version_strings = []
           version_strings << read_long_version_from_config_file(ENV['PUBLIC_CONFIG_FILE'])
           version_strings << read_long_version_from_config_file(ENV['INTERNAL_CONFIG_FILE']) unless ENV['INTERNAL_CONFIG_FILE'].nil?
 
@@ -331,9 +327,7 @@ module Fastlane
           v_parts = get_version_parts(version)
 
           v_parts.each do |part|
-            if (!is_int?(part)) then
-              UI.user_error!('Version value can only contains numbers.')
-            end
+            UI.user_error!('Version value can only contains numbers.') unless is_int?(part)
           end
 
           "#{v_parts[MAJOR_NUMBER]}.#{v_parts[MINOR_NUMBER]}.#{v_parts[HOTFIX_NUMBER]}.#{v_parts[BUILD_NUMBER]}"

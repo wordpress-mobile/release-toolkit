@@ -21,9 +21,7 @@ module Fastlane
         mile = nil
 
         miles&.each do |mm|
-          if mm[:title].start_with?(release)
-            mile = mm
-          end
+          mile = mm if mm[:title].start_with?(release)
         end
 
         return mile
@@ -34,19 +32,17 @@ module Fastlane
         options[:state] = 'open'
 
         milestones = github_client().list_milestones(repository, options)
-        if (milestones.nil?)
-          return nil
-        end
+        return nil if milestones.nil?
 
         last_stone = nil
         milestones.each do |mile|
-          if (last_stone.nil?)
+          if last_stone.nil?
             last_stone = mile unless mile[:title].split(' ')[0].split('.').length < 2
           else
             begin
-              if (mile[:title].split(' ')[0].split('.')[0] > last_stone[:title].split(' ')[0].split('.')[0])
+              if mile[:title].split(' ')[0].split('.')[0] > last_stone[:title].split(' ')[0].split('.')[0]
                 last_stone = mile
-              elsif (mile[:title].split(' ')[0].split('.')[1] > last_stone[:title].split(' ')[0].split('.')[1])
+              elsif mile[:title].split(' ')[0].split('.')[1] > last_stone[:title].split(' ')[0].split('.')[1]
                 last_stone = mile
               end
             rescue StandardError

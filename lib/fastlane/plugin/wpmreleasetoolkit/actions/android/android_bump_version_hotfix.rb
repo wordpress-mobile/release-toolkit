@@ -45,7 +45,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :previous_version_name,
                                        env_name: 'FL_ANDROID_BUMP_VERSION_HOTFIX_PREVIOUS_VERSION',
                                        description: 'The version to branch from',
-                                       is_string: true) # the default value if the user didn't provide one
+                                       is_string: true), # the default value if the user didn't provide one
         ]
       end
 
@@ -67,7 +67,7 @@ module Fastlane
         @new_release_branch = "release/#{@new_short_version}"
       end
 
-      def self.show_config()
+      def self.show_config
         UI.message("Current version: #{@current_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{@current_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]})")
         UI.message("New hotfix version: #{@new_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{@new_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]})")
         UI.message("Release branch: #{@new_release_branch}")

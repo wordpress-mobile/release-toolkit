@@ -214,22 +214,6 @@ Security/Open:
     - 'spec/android_merge_translators_strings_spec.rb'
     - 'spec/ios_merge_translators_strings_spec.rb'
 
-# Offense count: 18
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: always, conditionals
-Style/AndOr:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/an_localize_libs_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/an_update_metadata_source_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_build_prechecks.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/extract_release_notes_for_version_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_update_metadata_source.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_development_certificates_to_provisioning_profiles.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_devices_to_provisioning_profiles.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_update_metadata_source.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
-
 # Offense count: 12
 # Configuration parameters: AllowedChars.
 Style/AsciiComments:
@@ -244,139 +228,8 @@ Style/AsciiComments:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
     - 'spec/ios_lint_localizations_spec.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: percent_q, bare_percent
-Style/BarePercentLiterals:
-  Exclude:
-    - 'Dangerfile'
-
-# Offense count: 24
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, ProceduralMethods, FunctionalMethods, IgnoredMethods, AllowBracesOnProceduralOneLiners.
-# SupportedStyles: line_count_based, semantic, braces_for_chaining, always_braces
-# ProceduralMethods: benchmark, bm, bmbm, create, each_with_object, measure, new, realtime, tap, with_object
-# FunctionalMethods: let, let!, subject, watch
-# IgnoredMethods: lambda, proc, it
-Style/BlockDelimiters:
-  Exclude:
-    - 'bin/drawText'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_create_xml_release_notes.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_validate_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_development_certificates_to_provisioning_profiles.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_devices_to_provisioning_profiles.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/configure_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
-
-# Offense count: 7
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: braces, no_braces, context_dependent
-Style/BracesAroundHashParameters:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/close_milestone_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/setfrozentag_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_version_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/models/configuration.rb'
-    - 'spec/android_merge_translators_strings_spec.rb'
-    - 'spec/ios_merge_translators_strings_spec.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: AutoCorrect, EnforcedStyle.
-# SupportedStyles: nested, compact
-Style/ClassAndModuleChildren:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
-
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: is_a?, kind_of?
-Style/ClassCheck:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_downloadmetadata_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_development_certificates_to_provisioning_profiles.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_devices_to_provisioning_profiles.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SingleLineConditionsOnly, IncludeTernaryExpressions.
-# SupportedStyles: assign_to_condition, assign_inside_condition
-Style/ConditionalAssignment:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
-
-# Offense count: 22
-# Cop supports --auto-correct.
-Style/DefWithParentheses:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_bump_version_beta.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_bump_version_final_release.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_bump_version_hotfix.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_bump_version_release.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_bump_version_beta.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_bump_version_hotfix.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_bump_version_release.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/an_metadata_update_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_git_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/git_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_git_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_update_helper.rb'
-    - 'spec/android_merge_translators_strings_spec.rb'
-    - 'spec/ios_merge_translators_strings_spec.rb'
-
 # Offense count: 91
 Style/Documentation:
-  Enabled: false
-
-# Offense count: 7
-# Cop supports --auto-correct.
-Style/EmptyLiteral:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/an_update_metadata_source_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_merge_translators_strings.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_update_metadata_source.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_merge_translators_strings.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_version_helper.rb'
-
-# Offense count: 71
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: compact, expanded
-Style/EmptyMethod:
-  Enabled: false
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/Encoding:
-  Exclude:
-    - 'fastlane-plugin-wpmreleasetoolkit.gemspec'
-
-# Offense count: 3
-# Cop supports --auto-correct.
-Style/ExpandPathArguments:
-  Exclude:
-    - 'Dangerfile'
-    - 'fastlane-plugin-wpmreleasetoolkit.gemspec'
-    - 'spec/spec_helper.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: format, sprintf, percent
-Style/FormatString:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
-
-# Offense count: 104
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: always, never
-Style/FrozenStringLiteralComment:
   Enabled: false
 
 # Offense count: 4
@@ -402,37 +255,12 @@ Style/GuardClause:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_update_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
 
-# Offense count: 20
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, UseHashRocketsWithSymbolValues, PreferHashRocketsForNonAlnumEndingSymbols.
-# SupportedStyles: ruby19, hash_rockets, no_mixed_keys, ruby19_no_mixed_keys
-Style/HashSyntax:
-  Exclude:
-    - 'Gemfile'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/close_milestone_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/removebranchprotection_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/setbranchprotection_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/setfrozentag_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
-
 # Offense count: 2
 # Configuration parameters: AllowIfModifier.
 Style/IfInsideElse:
   Exclude:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_update_action.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_version_helper.rb'
-
-# Offense count: 99
-# Cop supports --auto-correct.
-Style/IfUnlessModifier:
-  Enabled: false
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: InverseMethods, InverseBlocks.
-Style/InverseMethods:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -469,24 +297,6 @@ Style/MultilineBlockChain:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_development_certificates_to_provisioning_profiles.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_devices_to_provisioning_profiles.rb'
 
-# Offense count: 28
-# Cop supports --auto-correct.
-Style/MultilineIfThen:
-  Exclude:
-    - 'bin/drawText'
-    - 'ext/drawText/extconf.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/an_validate_lib_strings_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_bump_version_release.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_merge_translators_strings.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_downloadmetadata_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_bump_version_release.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_update_metadata_source.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_version_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_version_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_download_helper.rb'
-
 # Offense count: 15
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
@@ -501,24 +311,6 @@ Style/MutableConstant:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/version.rb'
     - 'spec/release_notes_helper_spec.rb'
 
-# Offense count: 27
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: both, prefix, postfix
-Style/NegatedIf:
-  Enabled: false
-
-# Offense count: 9
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: both, prefix, postfix
-Style/NegatedUnless:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_build_prechecks.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_development_certificates_to_provisioning_profiles.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_devices_to_provisioning_profiles.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_build_prechecks.rb'
-
 # Offense count: 9
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, MinBodyLength.
@@ -530,49 +322,6 @@ Style/Next:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_merge_translators_strings.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_download_helper.rb'
-
-# Offense count: 13
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: predicate, comparison
-Style/NilComparison:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_download_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_update_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/configure_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_download_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
-
-# Offense count: 20
-# Cop supports --auto-correct.
-# Configuration parameters: IncludeSemanticChanges.
-Style/NonNilCheck:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/an_metadata_update_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_update_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
-
-# Offense count: 15
-# Cop supports --auto-correct.
-Style/Not:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/an_update_metadata_source_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_update_metadata_source.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_development_certificates_to_provisioning_profiles.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_devices_to_provisioning_profiles.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_update_metadata_source.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_l10n_helper.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedOctalStyle.
-# SupportedOctalStyles: zero_with_o, zero_only
-Style/NumericLiteralPrefix:
-  Exclude:
-    - 'spec/ios_lint_localizations_spec.rb'
 
 # Offense count: 23
 # Cop supports --auto-correct.
@@ -592,19 +341,6 @@ Style/NumericPredicate:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_version_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_download_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_update_helper.rb'
-
-# Offense count: 111
-# Cop supports --auto-correct.
-# Configuration parameters: AllowSafeAssignment, AllowInMultilineConditions.
-Style/ParenthesesAroundCondition:
-  Enabled: false
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: PreferredDelimiters.
-Style/PercentLiteralDelimiters:
-  Exclude:
-    - 'fastlane-plugin-wpmreleasetoolkit.gemspec'
 
 # Offense count: 2
 # Cop supports --auto-correct.
@@ -638,14 +374,6 @@ Style/RedundantSelf:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/models/file_reference.rb'
     - 'spec/android_merge_translators_strings_spec.rb'
     - 'spec/ios_merge_translators_strings_spec.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, AllowInnerSlashes.
-# SupportedStyles: slashes, percent_r, mixed
-Style/RegexpLiteral:
-  Exclude:
-    - 'spec/ios_lint_localizations_spec.rb'
 
 # Offense count: 7
 # Cop supports --auto-correct.
@@ -691,13 +419,6 @@ Style/SelfAssignment:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_version_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_update_helper.rb'
 
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: AllowAsExpressionSeparator.
-Style/Semicolon:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
@@ -713,20 +434,6 @@ Style/SignalException:
 Style/SpecialGlobalVars:
   Exclude:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/configure_helper.rb'
-
-# Offense count: 12
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: single_quotes, double_quotes
-Style/StringLiteralsInInterpolation:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/an_update_metadata_source_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_update_metadata_source.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/an_metadata_update_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_git_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_update_helper.rb'
 
 # Offense count: 4
 # Cop supports --auto-correct.
@@ -756,29 +463,6 @@ Style/TernaryParentheses:
   Exclude:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/extract_release_notes_for_version_action.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/configure_helper.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleForMultiline.
-# SupportedStylesForMultiline: comma, consistent_comma, no_comma
-Style/TrailingCommaInArguments:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_get_store_app_sizes.rb'
-
-# Offense count: 20
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleForMultiline.
-# SupportedStylesForMultiline: comma, consistent_comma, no_comma
-Style/TrailingCommaInArrayLiteral:
-  Enabled: false
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleForMultiline.
-# SupportedStylesForMultiline: comma, consistent_comma, no_comma
-Style/TrailingCommaInHashLiteral:
-  Exclude:
-    - 'spec/configuration_spec.rb'
 
 # Offense count: 3
 # Cop supports --auto-correct.

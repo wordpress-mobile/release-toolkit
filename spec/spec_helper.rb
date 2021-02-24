@@ -1,4 +1,4 @@
-$LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
+$LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 
 require 'simplecov'
 require 'codecov'
@@ -9,9 +9,7 @@ SimpleCov.start
 code_coverage_token = ENV['CODECOV_TOKEN'] || false
 
 # If the environment variable is present, format for Codecov
-if code_coverage_token
-  SimpleCov.formatter = SimpleCov::Formatter::Codecov
-end
+SimpleCov.formatter = SimpleCov::Formatter::Codecov if code_coverage_token
 
 # This module is only used to check the environment is currently a testing env
 module SpecHelper
@@ -29,7 +27,7 @@ end
 def set_circle_env(define_ci)
   is_ci = ENV.key?('CIRCLECI')
   orig_circle_ci = ENV['CIRCLECI']
-  if (define_ci)
+  if define_ci
     ENV['CIRCLECI'] = 'true'
   else
     ENV.delete 'CIRCLECI'
@@ -37,7 +35,7 @@ def set_circle_env(define_ci)
 
   yield
 ensure
-  if (is_ci)
+  if is_ci
     ENV['CIRCLECI'] = orig_circle_ci
   else
     ENV.delete 'CIRCLECI'

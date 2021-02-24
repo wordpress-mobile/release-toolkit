@@ -12,9 +12,7 @@ module Fastlane
         version = Fastlane::Helper::Android::VersionHelper.get_public_version
         message = "Completing code freeze for: #{version}\n"
         unless params[:skip_confirm]
-          unless UI.confirm("#{message}Do you want to continue?")
-            UI.user_error!('Aborted by user request')
-          end
+          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
         else
           UI.message(message)
         end
@@ -43,7 +41,7 @@ module Fastlane
                                        env_name: 'FL_ANDROID_COMPLETECODEFREEZE_PRECHECKS_SKIPCONFIRM',
                                        description: 'Skips confirmation',
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
-                                       default_value: false) # the default value if the user didn't provide one
+                                       default_value: false), # the default value if the user didn't provide one
         ]
       end
 

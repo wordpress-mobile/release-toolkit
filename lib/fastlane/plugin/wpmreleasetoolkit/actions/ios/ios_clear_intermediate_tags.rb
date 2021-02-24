@@ -36,7 +36,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: 'FL_IOS_CLEAN_INTERMEDIATE_TAGS_VERSION',
                                        description: 'The version of the tags to clear',
-                                       is_string: true)
+                                       is_string: true),
         ]
       end
 

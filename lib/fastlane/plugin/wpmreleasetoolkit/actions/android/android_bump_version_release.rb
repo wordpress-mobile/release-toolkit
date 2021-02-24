@@ -57,7 +57,7 @@ module Fastlane
 
       private
 
-      def self.create_config()
+      def self.create_config
         @current_version = Fastlane::Helper::Android::VersionHelper.get_release_version()
         @current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version()
         @new_version_beta = Fastlane::Helper::Android::VersionHelper.calc_next_release_version(@current_version, @current_version_alpha)
@@ -65,7 +65,7 @@ module Fastlane
         @new_release_branch = "release/#{@new_short_version}"
       end
 
-      def self.show_config()
+      def self.show_config
         vname = Fastlane::Helper::Android::VersionHelper::VERSION_NAME
         vcode = Fastlane::Helper::Android::VersionHelper::VERSION_CODE
         UI.message("Current version: #{@current_version[vname]}(#{@current_version[vcode]})")
@@ -76,9 +76,9 @@ module Fastlane
         UI.message("Release branch: #{@new_release_branch}")
       end
 
-      def self.update_glotpress_key()
+      def self.update_glotpress_key
         dm_file = ENV['DOWNLOAD_METADATA']
-        if (File.exist?(dm_file)) then
+        if File.exist?(dm_file)
           sh("sed -i '' \"s/let glotPressWhatsNewKey.*/let glotPressWhatsNewKey = \\\"v#{@new_short_version}-whats-new\\\"/\" #{dm_file}")
         else
           UI.user_error!("Can't find #{dm_file}.")

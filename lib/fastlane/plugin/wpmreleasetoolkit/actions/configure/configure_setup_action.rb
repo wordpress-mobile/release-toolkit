@@ -11,9 +11,7 @@ module Fastlane
     class ConfigureSetupAction < Action
       def self.run(params = {})
         # Check to see if the local secret storage is set up at ~/.mobile-secrets.
-        unless File.directory?(repository_path)
-          UI.user_error!('The local secrets store does not exist. Please clone it to ~/.mobile-secrets before continuing.')
-        end
+        UI.user_error!('The local secrets store does not exist. Please clone it to ~/.mobile-secrets before continuing.') unless File.directory?(repository_path)
 
         # Checks to see if .configure exists. If so, exit – there’s no need to continue as everything is set up.
         if configuration_file_exists
@@ -22,9 +20,7 @@ module Fastlane
         end
 
         # The mobile secrets repo must be up to date in order to generate and save the encryption key
-        if Fastlane::Helper::ConfigureHelper.repo_is_behind_remote
-          prompt_to_update_to_most_recent_version
-        end
+        prompt_to_update_to_most_recent_version if Fastlane::Helper::ConfigureHelper.repo_is_behind_remote
 
         # Generate an encryption key for the new project, if needed
         Fastlane::Helper::ConfigureHelper.update_project_encryption_key if Fastlane::Helper::ConfigureHelper.project_encryption_key.nil?

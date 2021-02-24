@@ -197,7 +197,7 @@ module Fastlane
         def only_empty_lines?(file)
           File.open(file) do |f|
             while (line = f.gets)
-              return false if not line.strip.empty?
+              return false unless line.strip.empty?
             end
           end
           return true

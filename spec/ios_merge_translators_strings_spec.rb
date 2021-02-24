@@ -35,14 +35,14 @@ end
 def imts_run_test(script)
   test_script = @imtsTestUtils.get_test_from_file(script)
   @imtsTestUtils.create_test_data(test_script)
-  Fastlane::Actions::IosMergeTranslatorsStringsAction.run({ strings_folder: @imtsTestUtils.test_folder_path })
+  Fastlane::Actions::IosMergeTranslatorsStringsAction.run(strings_folder: @imtsTestUtils.test_folder_path)
   expect(@imtsTestUtils.read_result_data(test_script)).to eq(test_script['result']['content'])
 end
 
 class IMTSTestUtils
   attr_accessor :test_folder_path
 
-  def initialize()
+  def initialize
     @test_folder_path = File.join(Dir.tmpdir(), 'imts_tests')
   end
 
@@ -73,9 +73,7 @@ class IMTSTestUtils
     file_path = File.join(@test_folder_path, filename)
 
     dir = File.dirname(file_path)
-    unless File.directory?(dir)
-      FileUtils.mkdir_p(dir)
-    end
+    FileUtils.mkdir_p(dir) unless File.directory?(dir)
 
     File.open(file_path, 'w') { |f| f.write(content) }
   end

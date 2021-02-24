@@ -63,12 +63,12 @@ module Fastlane
 
       # Generates the temp file path
       def self.create_target_file_path(orig_file_path)
-        "#{File.dirname(orig_file_path)}/#{File.basename(orig_file_path, ".*")}.tmp"
+        "#{File.dirname(orig_file_path)}/#{File.basename(orig_file_path, '.*')}.tmp"
       end
 
       # Creates the block instances
       def self.create_block_parsers(release_version, block_files)
-        @blocks = Array.new
+        @blocks = []
 
         # Inits default handler
         @blocks.push Fastlane::Helper::UnknownMetadataBlock.new
@@ -91,16 +91,14 @@ module Fastlane
 
       # Manages tags depending on the type
       def self.write_target_block(fw, line)
-        if (is_block_id(line))
+        if is_block_id(line)
           key = line.split(' ')[1].tr('\"', '')
           @blocks.each do |block|
             @current_block = block if block.is_handler_for(key)
           end
         end
 
-        if (is_comment(line))
-          @current_block = @blocks.first
-        end
+        @current_block = @blocks.first if is_comment(line)
 
         @current_block.handle_line(fw, line)
       end
@@ -135,22 +133,22 @@ module Fastlane
                                        description: 'The path of the .po file to update',
                                        is_string: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("No .po file path for UpdateMetadataSourceAction given, pass using `po_file_path: 'file path'`") unless (value and not value.empty?)
+                                         UI.user_error!("No .po file path for UpdateMetadataSourceAction given, pass using `po_file_path: 'file path'`") unless value && (!value.empty?)
                                          UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :release_version,
                                        env_name: 'FL_UPDATE_METADATA_SOURCE_RELEASE_VERSION',
                                        description: 'The release version of the app (to use to mark the release notes)',
                                        verify_block: proc do |value|
-                                         UI.user_error!("No relase version for UpdateMetadataSourceAction given, pass using `release_version: 'version'`") unless (value and not value.empty?)
+                                         UI.user_error!("No relase version for UpdateMetadataSourceAction given, pass using `release_version: 'version'`") unless value && (!value.empty?)
                                        end),
           FastlaneCore::ConfigItem.new(key: :source_files,
                                        env_name: 'FL_UPDATE_METADATA_SOURCE_SOURCE_FILES',
                                        description: 'The hash with the path to the source files and the key to use to include their content',
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         UI.user_error!("No source file hash for UpdateMetadataSourceAction given, pass using `source_files: 'source file hash'`") unless (value and not value.empty?)
-                                       end)
+                                         UI.user_error!("No source file hash for UpdateMetadataSourceAction given, pass using `source_files: 'source file hash'`") unless value && (!value.empty?)
+                                       end),
         ]
       end
 

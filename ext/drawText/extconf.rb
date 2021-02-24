@@ -10,9 +10,7 @@ libDirectory = File.join(File.dirname(File.dirname(drawTextDirectory)), '/lib')
 FileUtils.cp(File.join(drawTextDirectory, 'makefile.example'), File.join(compilationDirectory, 'Makefile'))
 
 # Only compile drawText on macOS
-unless OS.mac? then
-  exit 0
-end
+exit 0 unless OS.mac?
 
 # Swift is needed to compile the extension
 find_executable('swift')

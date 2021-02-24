@@ -9,9 +9,7 @@ module Fastlane
           break unless !violations.empty? && params[:allow_retry] && UI.confirm(RETRY_MESSAGE)
         end
 
-        if !violations.empty? && params[:abort_on_violations]
-          UI.abort_with_message!(ABORT_MESSAGE)
-        end
+        UI.abort_with_message!(ABORT_MESSAGE) if !violations.empty? && params[:abort_on_violations]
 
         violations
       end

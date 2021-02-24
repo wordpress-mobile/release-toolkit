@@ -14,7 +14,7 @@ module Fastlane
     end
 
     def self.from_file(path)
-      json = JSON.parse(File.read(path), { symbolize_names: true })
+      json = JSON.parse(File.read(path), symbolize_names: true)
       self.new(json)
     end
 

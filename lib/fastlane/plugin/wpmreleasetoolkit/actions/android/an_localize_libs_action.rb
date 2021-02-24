@@ -10,12 +10,10 @@ module Fastlane
 
         any_changes = false
         libraries_strings_path.each do |lib|
-          any_changes = Fastlane::Helper::AndroidLocalizeHelper.merge_lib(main_strings_path, lib) or any_changes
+          (any_changes = Fastlane::Helper::AndroidLocalizeHelper.merge_lib(main_strings_path, lib)) || any_changes
         end
 
-        if (any_changes)
-          UI.message("Changes have been applied to #{main_strings_path}. Please, verify it!")
-        end
+        UI.message("Changes have been applied to #{main_strings_path}. Please, verify it!") if any_changes
       end
 
       def self.description
@@ -43,7 +41,7 @@ module Fastlane
                                        env_name: 'LOCALIZE_LIBS_STRINGS_PATH',
                                        description: 'The list of libs to merge',
                                        optional: false,
-                                       is_string: false)
+                                       is_string: false),
         ]
       end
 

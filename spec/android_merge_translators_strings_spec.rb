@@ -35,14 +35,14 @@ end
 def amts_run_test(script)
   test_script = @amtsTestUtils.get_test_from_file(script)
   @amtsTestUtils.create_test_data(test_script)
-  Fastlane::Actions::AndroidMergeTranslatorsStringsAction.run({ strings_folder: @amtsTestUtils.test_folder_path })
+  Fastlane::Actions::AndroidMergeTranslatorsStringsAction.run(strings_folder: @amtsTestUtils.test_folder_path)
   expect(@amtsTestUtils.read_result_data(test_script)).to eq(test_script['result']['content'])
 end
 
 class AMTSTestUtils
   attr_accessor :test_folder_path
 
-  def initialize()
+  def initialize
     @test_folder_path = File.join(Dir.tmpdir(), 'amts_tests')
   end
 
@@ -73,9 +73,7 @@ class AMTSTestUtils
     file_path = File.join(@test_folder_path, filename)
 
     dir = File.dirname(file_path)
-    unless File.directory?(dir)
-      FileUtils.mkdir_p(dir)
-    end
+    FileUtils.mkdir_p(dir) unless File.directory?(dir)
 
     File.open(file_path, 'w') { |f| f.write(content) }
   end

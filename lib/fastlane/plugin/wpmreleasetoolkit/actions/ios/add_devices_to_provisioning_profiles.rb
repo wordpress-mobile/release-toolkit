@@ -9,20 +9,20 @@ module Fastlane
 
         devices = Spaceship.device.all_ios_profile_devices
 
-        params[:app_identifier].each { |identifier|
+        params[:app_identifier].each do |identifier|
           Spaceship.provisioning_profile.find_by_bundle_id(bundle_id: identifier)
-                   .select { |profile|
-            profile.kind_of? Spaceship::Portal::ProvisioningProfile::Development
-          }
-                   .tap { |profiles|
+                   .select do |profile|
+            profile.is_a? Spaceship::Portal::ProvisioningProfile::Development
+          end
+                   .tap do |profiles|
             UI.important "Warning: Unable to find any profiles associated with #{identifier}" unless profiles.length > 0
-          }
-                   .each { |profile|
+          end
+                   .each do |profile|
             profile.devices = devices
             profile.update!
             UI.success "Applied #{devices.length} devices to #{profile.name}"
-          }
-        }
+          end
+        end
       end
 
       #####################################################
@@ -44,7 +44,7 @@ module Fastlane
             description: 'List of App Identifiers that should contain the new device identifier',
             is_string: false,
             verify_block: proc do |value|
-              UI.user_error!('You must provide an array of bundle identifiers in `app_identifier`') unless not value.empty?
+              UI.user_error!('You must provide an array of bundle identifiers in `app_identifier`') if value.empty?
             end
           ),
           FastlaneCore::ConfigItem.new(
@@ -52,7 +52,7 @@ module Fastlane
             description: 'The team_id for the provisioning profiles',
             is_string: true,
             verify_block: proc do |value|
-              UI.user_error!('You must provide a team ID in `team_id`') unless (value and not value.empty?)
+              UI.user_error!('You must provide a team ID in `team_id`') unless value && (!value.empty?)
             end
           ),
         ]

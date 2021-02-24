@@ -11,10 +11,8 @@ module Fastlane
 
         version = Fastlane::Helper::Ios::VersionHelper.get_public_version
         message = "Finalizing release: #{version}\n"
-        if (!params[:skip_confirm])
-          if (!UI.confirm("#{message}Do you want to continue?"))
-            UI.user_error!('Aborted by user request')
-          end
+        if !params[:skip_confirm]
+          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
         else
           UI.message(message)
         end
@@ -43,7 +41,7 @@ module Fastlane
                                        env_name: 'FL_IOS_FINALIZE_PRECHECKS_SKIPCONFIRM',
                                        description: 'Skips confirmation',
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
-                                       default_value: false) # the default value if the user didn't provide one
+                                       default_value: false), # the default value if the user didn't provide one
         ]
       end
 

@@ -10,9 +10,9 @@ module Fastlane
         branch_prot = {}
 
         branch_url = "https://api.github.com/repos/#{repository}/branches/" + branch_name
-        branch_prot[:restrictions] = { :url => branch_url + '/protection/restrictions', :users_url => branch_url + '/protection/restrictions/users', :teams_url => branch_url + '/protection/restrictions/teams', :users => [], :teams => [] }
+        branch_prot[:restrictions] = { url: branch_url + '/protection/restrictions', users_url: branch_url + '/protection/restrictions/users', teams_url: branch_url + '/protection/restrictions/teams', users: [], teams: [] }
         branch_prot[:enforce_admins] = nil
-        branch_prot[:required_pull_request_reviews] = { :url => branch_url + '/protection/required_pull_request_reviews', :dismiss_stale_reviews => false, :require_code_owner_reviews => false }
+        branch_prot[:required_pull_request_reviews] = { url: branch_url + '/protection/required_pull_request_reviews', dismiss_stale_reviews: false, require_code_owner_reviews: false }
 
         Fastlane::Helper::GithubHelper.github_client().unprotect_branch(repository, branch_name, branch_prot)
       end
@@ -45,7 +45,7 @@ module Fastlane
                                        env_name: 'GHHELPER_BRANCH',
                                        description: 'The branch to unprotect',
                                        optional: false,
-                                       type: String)
+                                       type: String),
         ]
       end
 

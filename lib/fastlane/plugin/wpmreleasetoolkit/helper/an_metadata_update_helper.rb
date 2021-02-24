@@ -20,7 +20,7 @@ module Fastlane
     class UnknownMetadataBlock < MetadataBlock
       attr_reader :content_file_path
 
-      def initialize()
+      def initialize
         super(nil)
       end
     end
@@ -40,9 +40,7 @@ module Fastlane
       def handle_line(fw, line)
         # put the new content on block start
         # and skip all the other content
-        if line.start_with?('msgctxt')
-          generate_block(fw)
-        end
+        generate_block(fw) if line.start_with?('msgctxt')
       end
 
       def generate_block(fw)
@@ -50,9 +48,9 @@ module Fastlane
         fw.puts("msgctxt \"#{@block_key}\"")
         line_count = File.foreach(@content_file_path).inject(0) { |c, _line| c + 1 }
 
-        if (line_count <= 1)
+        if line_count <= 1
           # Single line output
-          fw.puts("msgid \"#{File.open(@content_file_path, "r").read}\"")
+          fw.puts("msgid \"#{File.open(@content_file_path, 'r').read}\"")
         else
           # Multiple line output
           fw.puts('msgid ""')
@@ -93,7 +91,7 @@ module Fastlane
 
       def is_handler_for(key)
         values = key.split('_')
-        key.start_with?(@rel_note_key) && values.length == 3 && (Integer(values[2].sub(/^[0]*/, '')) != nil rescue false)
+        key.start_with?(@rel_note_key) && values.length == 3 && is_int?(values[2].sub(/^[0]*/, ''))
       end
 
       def handle_line(fw, line)
@@ -102,14 +100,10 @@ module Fastlane
         if line.start_with?('msgctxt')
           key = extract_key(line)
           @is_copying = (key == @keep_key)
-          if (@is_copying)
-            generate_block(fw)
-          end
+          generate_block(fw) if @is_copying
         end
 
-        if (@is_copying)
-          fw.puts(line)
-        end
+        fw.puts(line) if @is_copying
       end
 
       def generate_block(fw)
@@ -143,11 +137,15 @@ module Fastlane
 
       def is_handler_for(key)
         values = key.split('_')
-        key.start_with?(@rel_note_key) && values.length == 4 && (Integer(values[3].sub(/^[0]*/, '')) != nil rescue false)
+        key.start_with?(@rel_note_key) && values.length == 4 && is_int?(values[3].sub(/^[0]*/, ''))
       end
 
       def generate_block(fw)
         super(fw) unless File.zero?(@content_file_path)
+      end
+
+      def is_int?(value)
+        true if Integer(string) rescue false
       end
     end
   end

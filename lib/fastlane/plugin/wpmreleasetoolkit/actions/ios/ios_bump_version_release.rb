@@ -84,7 +84,7 @@ module Fastlane
 
       private
 
-      def self.create_config()
+      def self.create_config
         @current_version = Fastlane::Helper::Ios::VersionHelper.get_build_version()
         @current_version_internal = Fastlane::Helper::Ios::VersionHelper.get_internal_version() unless ENV['INTERNAL_CONFIG_FILE'].nil?
         @new_version_internal = Fastlane::Helper::Ios::VersionHelper.create_internal_version(@new_version) unless ENV['INTERNAL_CONFIG_FILE'].nil?
@@ -92,7 +92,7 @@ module Fastlane
         @new_release_branch = "release/#{@new_short_version}"
       end
 
-      def self.show_config()
+      def self.show_config
         UI.message("Current build version: #{@current_version}")
         UI.message("Current internal version: #{@current_version_internal}") unless ENV['INTERNAL_CONFIG_FILE'].nil?
         UI.message("New build version: #{@new_version}")
@@ -101,9 +101,9 @@ module Fastlane
         UI.message("Release branch: #{@new_release_branch}")
       end
 
-      def self.update_glotpress_key()
+      def self.update_glotpress_key
         dm_file = ENV['DOWNLOAD_METADATA']
-        if (File.exist?(dm_file)) then
+        if File.exist?(dm_file)
           sh("sed -i '' \"s/let glotPressWhatsNewKey.*/let glotPressWhatsNewKey = \\\"v#{@new_short_version}-whats-new\\\"/\" #{dm_file}")
         else
           UI.user_error!("Can't find #{dm_file}.")

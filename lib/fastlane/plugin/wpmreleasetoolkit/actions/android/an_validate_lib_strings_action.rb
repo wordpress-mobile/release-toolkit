@@ -10,7 +10,7 @@ module Fastlane
         diff_url = params[:diff_url]
 
         source_diff = nil
-        if (diff_url.nil? == false) then
+        if diff_url.nil? == false
           data = open(params[:diff_url])
           source_diff = data.read()
         end

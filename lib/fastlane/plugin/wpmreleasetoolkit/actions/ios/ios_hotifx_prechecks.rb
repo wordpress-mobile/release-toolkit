@@ -16,22 +16,16 @@ module Fastlane
         message = "Requested Hotfix version: #{new_ver}\n"
         message << "Branching from: #{prev_ver}\n"
 
-        if (!params[:skip_confirm])
-          if (!UI.confirm("#{message}Do you want to continue?"))
-            UI.user_error!('Aborted by user request')
-          end
+        if !params[:skip_confirm]
+          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
         else
           UI.message(message)
         end
 
         # Check tags
-        if other_action.git_tag_exists(tag: new_ver)
-          UI.crash!("Version #{new_ver} already exists! Abort!")
-        end
+        UI.crash!("Version #{new_ver} already exists! Abort!") if other_action.git_tag_exists(tag: new_ver)
 
-        if !other_action.git_tag_exists(tag: prev_ver)
-          UI.crash!("Version #{prev_ver} is not tagged! Can't branch. Abort!")
-        end
+        UI.crash!("Version #{prev_ver} is not tagged! Can't branch. Abort!") unless other_action.git_tag_exists(tag: prev_ver)
 
         # Check local repo status
         other_action.ensure_git_status_clean()
@@ -62,7 +56,7 @@ module Fastlane
                                        env_name: 'FL_IOS_HOTFIX_PRECHECKS_SKIPCONFIRM',
                                        description: 'Skips confirmation',
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
-                                       default_value: false) # the default value if the user didn't provide one
+                                       default_value: false), # the default value if the user didn't provide one
         ]
       end
 
