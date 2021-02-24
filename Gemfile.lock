@@ -63,6 +63,8 @@ GEM
     concurrent-ruby (1.1.8)
     cork (0.3.0)
       colored2 (~> 3.1)
+    crack (0.4.5)
+      rexml
     danger (8.2.1)
       claide (~> 1.0)
       claide-plugins (>= 0.9.2)
@@ -166,6 +168,7 @@ GEM
       multi_json (~> 1.11)
       os (>= 0.9, < 2.0)
       signet (~> 0.14)
+    hashdiff (1.0.1)
     highline (1.7.10)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
@@ -293,6 +296,10 @@ GEM
       unf_ext
     unf_ext (0.0.7.7)
     unicode-display_width (1.6.1)
+    webmock (3.11.1)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
     word_wrap (1.0.0)
     xcodeproj (1.19.0)
       CFPropertyList (>= 2.3.3, < 4.0)
@@ -323,6 +330,7 @@ DEPENDENCIES
   rubocop-require_tools (~> 0.1.2)
   rubocop-rspec
   simplecov (~> 0.16.1)
+  webmock
   yard
 
 BUNDLED WITH
