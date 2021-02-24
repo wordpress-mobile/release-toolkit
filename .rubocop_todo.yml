@@ -248,14 +248,6 @@ Style/IfInsideElse:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_update_action.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_version_helper.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: line_count_dependent, lambda, literal
-Style/Lambda:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
-
 # Offense count: 92
 # Cop supports --auto-correct.
 # Configuration parameters: IgnoredMethods.
