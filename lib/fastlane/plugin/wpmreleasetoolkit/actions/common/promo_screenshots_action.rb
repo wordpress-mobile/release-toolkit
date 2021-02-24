@@ -47,7 +47,7 @@ module Fastlane
 
         stylesheet_path = config['stylesheet']
 
-        entries = build_entries(config, languages, outputDirectory, params)
+        entries = build_entries(config['entries'], languages, outputDirectory, params)
 
         bar = ProgressBar.new(entries.count, :bar, :counter, :eta, :rate)
 
@@ -174,8 +174,8 @@ module Fastlane
         true
       end
 
-      def self.build_entries(config, languages, output_directory, params)
-        config['entries']
+      def self.build_entries(config_entries, languages, output_directory, params)
+        config_entries
           .flat_map do |entry|
           languages.map do |language|
             newEntry = entry.deep_dup
