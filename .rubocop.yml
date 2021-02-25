@@ -16,9 +16,13 @@ Gemspec/OrderedDependencies:
 Lint/UnusedMethodArgument:
   Enabled: false
 
+# We have a couple of empty methods especially when we implement an API contract on our Action subclasses
+# and those look nicer to us when still written as expended (in separate lines) to suggest us to fill them at some point
+# rather than the compact representation of having them one-liner `def foo; end` that is rubocop's default.
 Style/EmptyMethod:
   EnforcedStyle: expanded
 
+# Trailing commas in array literals helps having smaller diffs when we want to add additional parameters
 Style/TrailingCommaInArrayLiteral:
   EnforcedStyleForMultiline: consistent_comma
 
@@ -29,6 +33,8 @@ Style/TrailingCommaInArrayLiteral:
 Style/FrozenStringLiteralComment:
   Enabled: false
 
+# Unicode is pretty standard by now, and we want to be able to use em-dash, ellipsis, and unicode characters
+# to provide nice Monodraw.app graphs and similar, without being limited only by ascii.
 Style/AsciiComments:
   Enabled: false
 
