@@ -8,7 +8,7 @@ module Fastlane
       def self.run(params)
         folder_path = File.expand_path(params[:strings_folder])
 
-        subfolders = Dir.entries("#{folder_path}")
+        subfolders = Dir.entries(folder_path)
         subfolders.each do |strings_folder|
           merge_folder(File.join(folder_path, strings_folder)) if strings_folder.ends_with?('.lproj')
         end
@@ -21,7 +21,7 @@ module Fastlane
 
         UI.message("Merging in: #{strings_folder}")
 
-        join_files = Dir.glob(File.join("#{strings_folder}", 'Localizable_*.strings')) - [tmp_main_file]
+        join_files = Dir.glob(File.join(strings_folder, 'Localizable_*.strings')) - [tmp_main_file]
         extra_strings = []
         extra_keys = []
         join_files.each do |join_strings|

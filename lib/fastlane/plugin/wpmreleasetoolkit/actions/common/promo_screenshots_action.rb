@@ -51,7 +51,7 @@ module Fastlane
 
         bar = ProgressBar.new(entries.count, :bar, :counter, :eta, :rate)
 
-        Parallel.map(entries, finish: ->(_item, _i, _result) {
+        Parallel.map(entries, finish: lambda { |_item, _i, _result|
           bar.increment!
         }) do |entry|
           device = devices[entry['device']]

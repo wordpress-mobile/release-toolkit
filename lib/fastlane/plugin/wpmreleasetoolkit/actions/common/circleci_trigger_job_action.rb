@@ -47,7 +47,7 @@ module Fastlane
                                        env_name: 'FL_CIRCLECI_JOB_PARAMS',
                                        description: 'Parameters to send to the CircleCI pipeline',
                                        type: Hash,
-                                       default_value: nil)
+                                       default_value: nil),
         ]
       end
 
