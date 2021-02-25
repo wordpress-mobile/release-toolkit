@@ -41,8 +41,8 @@ end
 describe Fastlane::Configuration::FileReference do
   describe 'initialization' do
     it 'creates an empty file reference' do
-      expect(subject.file).to eq("")
-      expect(subject.destination).to eq("")
+      expect(subject.file).to eq('')
+      expect(subject.destination).to eq('')
       expect(subject.encrypt).to eq(false)
     end
   end
@@ -94,7 +94,7 @@ describe Fastlane::Configuration::FileReference do
         expect(Fastlane::Helper::EncryptionHelper).to receive(:decrypt).with('encrypted contents', 'key').and_return('decrypted contents')
         expect(subject.source_contents).to eq('decrypted contents')
       end
-  
+
       it 'gives nil if the encrypted does not exist' do
         allow(File).to receive(:file?).with(subject.encrypted_file_path).and_return(false)
         expect(subject.source_contents).to eq(nil)

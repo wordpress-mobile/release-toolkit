@@ -1,6 +1,6 @@
 require 'fastlane/action'
 require 'date'
-require_relative '../../helper/ghhelper_helper'
+require_relative '../../helper/github_helper'
 require_relative '../../helper/ios/ios_version_helper'
 require_relative '../../helper/android/android_version_helper'
 module Fastlane
@@ -10,20 +10,18 @@ module Fastlane
         repository = params[:repository]
         milestone_title = params[:milestone]
 
-        milestone = Fastlane::Helper::GhhelperHelper.get_milestone(repository, milestone_title)
-        if (milestone.nil?)
-          UI.user_error!("Milestone #{milestone_title} not found.")
-        end
+        milestone = Fastlane::Helper::GithubHelper.get_milestone(repository, milestone_title)
+        UI.user_error!("Milestone #{milestone_title} not found.") if milestone.nil?
 
-        Fastlane::Helper::GhhelperHelper.GHClient().update_milestone(repository, milestone[:number], {:state => "closed"})
+        Fastlane::Helper::GithubHelper.github_client().update_milestone(repository, milestone[:number], state: 'closed')
       end
 
       def self.description
-        "Closes an existing milestone in the project"
+        'Closes an existing milestone in the project'
       end
 
       def self.authors
-        ["Lorenzo Mattei"]
+        ['Lorenzo Mattei']
       end
 
       def self.return_value
@@ -32,21 +30,21 @@ module Fastlane
 
       def self.details
         # Optional:
-        "Closes an existing milestone in the project"
+        'Closes an existing milestone in the project'
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :repository,
-                                   env_name: "GHHELPER_REPOSITORY",
-                                description: "The remote path of the GH repository on which we work",
-                                   optional: false,
+                                       env_name: 'GHHELPER_REPOSITORY',
+                                       description: 'The remote path of the GH repository on which we work',
+                                       optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :milestone,
-                                        env_name: "GHHELPER_MILESTONE",
-                                     description: "The GitHub milestone",
-                                        optional: false,
-                                            type: String),
+                                       env_name: 'GHHELPER_MILESTONE',
+                                       description: 'The GitHub milestone',
+                                       optional: false,
+                                       type: String),
         ]
       end
 

@@ -2,7 +2,7 @@ require 'openssl'
 
 module Fastlane
   module Helper
-    class EncryptionHelper    
+    class EncryptionHelper
       module OperationType
         ENCRYPT = 1
         DECRYPT = 2

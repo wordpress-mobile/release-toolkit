@@ -18,10 +18,10 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
 
           # First run: expect curl, unzip and cp_r to be called to install SwiftGen before running the action
           # See spec_helper.rb for documentation about `expect_shell_command`.
-          expect_shell_command("curl", any_args, /\/.*swiftgen-#{Fastlane::Helpers::IosL10nHelper::SWIFTGEN_VERSION}.zip/)
-          expect_shell_command("unzip", any_args)
+          expect_shell_command('curl', any_args, %r{/.*swiftgen-#{Fastlane::Helper::Ios::L10nHelper::SWIFTGEN_VERSION}.zip})
+          expect_shell_command('unzip', any_args)
           expect(FileUtils).to receive(:cp_r)
-          expect_shell_command("#{install_dir}/bin/swiftgen", "config", "run", "--config", anything)
+          expect_shell_command("#{install_dir}/bin/swiftgen", 'config', 'run', '--config', anything)
 
           Fastlane::Actions::IosLintLocalizationsAction.run(
             install_path: install_dir,
@@ -33,14 +33,15 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
           script = <<~SCRIPT
             #!/bin/sh
             if [[ "$1" == "--version" ]]; then
-              echo "SwiftGen v#{Fastlane::Helpers::IosL10nHelper::SWIFTGEN_VERSION} (Fake binstub)"
+              echo "SwiftGen v#{Fastlane::Helper::Ios::L10nHelper::SWIFTGEN_VERSION} (Fake binstub)"
             fi
           SCRIPT
           FileUtils.mkdir_p File.join(install_dir, 'bin')
-          File.write(File.join(install_dir, 'bin/swiftgen'), script, perm: 0766)
+          # note: `0o` is octal notation, used to specify chmod-like flags
+          File.write(File.join(install_dir, 'bin/swiftgen'), script, perm: 0o766)
 
           # Second run: ensure we only run SwiftGen directly, without a call to curl nor unzip beforehand
-          expect_shell_command("#{install_dir}/bin/swiftgen", "config", "run", "--config", anything)
+          expect_shell_command("#{install_dir}/bin/swiftgen", 'config', 'run', '--config', anything)
 
           Fastlane::Actions::IosLintLocalizationsAction.run(
             install_path: install_dir,
@@ -101,13 +102,13 @@ def run_l10n_linter_test(data_file)
   # Note: We will install SwiftGen in vendor/swiftgen if it's not already installed yet, and intentionally won't
   #       remove this after the test ends, so that further executions of the test run faster.
   #       Only the first execution of the tests might take longer if it needs to install SwiftGen first to be able to run the tests.
-  install_dir = "vendor/swiftgen/#{Fastlane::Helpers::IosL10nHelper::SWIFTGEN_VERSION}"
+  install_dir = "vendor/swiftgen/#{Fastlane::Helper::Ios::L10nHelper::SWIFTGEN_VERSION}"
   result = Fastlane::Actions::IosLintLocalizationsAction.run(
     install_path: install_dir,
     input_dir: @test_data_dir,
     base_lang: 'en'
   )
-  
+
   # Assert
-  expect(result).to eq(yml["result"])
+  expect(result).to eq(yml['result'])
 end

@@ -2,8 +2,9 @@ require 'yaml'
 require 'tmpdir'
 
 module Fastlane
-    module Helpers
-      class IosL10nHelper
+  module Helper
+    module Ios
+      class L10nHelper
         SWIFTGEN_VERSION = '6.4.0'
         DEFAULT_BASE_LANG = 'en'
         CONFIG_FILE_NAME = 'swiftgen-stringtypes.yml'
@@ -11,7 +12,7 @@ module Fastlane
         attr_reader :install_path
         attr_reader :version
 
-        # @param [String] install_path The path to install SwiftGen to. Usually something like "#{PROJECT_DIR}/vendor/swiftgen/#{SWIFTGEN_VERSION}".
+        # @param [String] install_path The path to install SwiftGen to. Usually something like "$PROJECT_DIR/vendor/swiftgen/#{SWIFTGEN_VERSION}".
         #        It's recommended to provide an absolute path here rather than a relative one, to ensure it's not dependant on where the action is run from.
         # @param [String] version The version of SwiftGen to use. This will be used both:
         #        - to check if the current version located in `install_path`, if it already exists, is the expected one
@@ -25,7 +26,8 @@ module Fastlane
         # Check if SwiftGen is installed in the provided `install_path` and if so if the installed version matches the expected `version`
         #
         def check_swiftgen_installed
-          return false unless File.exists?(swiftgen_bin)
+          return false unless File.exist?(swiftgen_bin)
+
           vers_string = `#{swiftgen_bin} --version`
           # The SwiftGen version string has this format:
           #
@@ -37,7 +39,7 @@ module Fastlane
 
         # Download the ZIP of SwiftGen for the requested `version` and install it in the `install_path`
         #
-        # @warning This action nukes anything at `install_path` – if something already exists – prior to install SwiftGen there
+        # @note This action nukes anything at `install_path` – if something already exists – prior to install SwiftGen there
         #
         def install_swiftgen!
           UI.message "Installing SwiftGen #{version} into #{install_path}"
@@ -47,7 +49,7 @@ module Fastlane
             extracted_dir = File.join(tmpdir, "swiftgen-#{version}")
             Action.sh('unzip', zipfile, '-d', extracted_dir)
 
-            FileUtils.rm_rf(install_path) if File.exists?(install_path)
+            FileUtils.rm_rf(install_path) if File.exist?(install_path)
             FileUtils.mkdir_p(install_path)
             FileUtils.cp_r("#{extracted_dir}/.", install_path)
           end
@@ -68,7 +70,7 @@ module Fastlane
         ##################
 
         private
-        
+
         # Path to the swiftgen binary installed at install_path
         def swiftgen_bin
           "#{install_path}/bin/swiftgen"
@@ -78,24 +80,24 @@ module Fastlane
         def output_filename(lang)
           "L10nParamsList.#{lang}.txt"
         end
-        
+
         # The Stencil template that we want SwiftGen to use to generate the output.
         # It iterates on every "table" (`.strings` file, in most cases there's only one, `Localizable.strings`),
         # and for each, iterates on every entry found to print the key and the corresponding types parsed by SwiftGen from the placeholders found in that translation
         def template_content
           <<~TEMPLATE
-          {% macro recursiveBlock table item %}
-            {% for string in item.strings %}
-          "{{string.key}}" => [{{string.types|join:","}}]
-            {% endfor %}
-            {% for child in item.children %}
-            {% call recursiveBlock table child %}
-            {% endfor %}
-          {% endmacro %}
+            {% macro recursiveBlock table item %}
+              {% for string in item.strings %}
+            "{{string.key}}" => [{{string.types|join:","}}]
+              {% endfor %}
+              {% for child in item.children %}
+              {% call recursiveBlock table child %}
+              {% endfor %}
+            {% endmacro %}
 
-          {% for table in tables %}
-          {% call recursiveBlock table.name table.levels %}
-          {% endfor %}
+            {% for table in tables %}
+            {% call recursiveBlock table.name table.levels %}
+            {% endfor %}
           TEMPLATE
         end
 
@@ -110,31 +112,31 @@ module Fastlane
 
           # Dynamically create a SwiftGen config which will cover all supported languages
           langs = Dir.chdir(input_dir) do
-              Dir.glob('*.lproj/Localizable.strings').map { |loc_file| File.basename(File.dirname(loc_file), '.lproj') }
+            Dir.glob('*.lproj/Localizable.strings').map { |loc_file| File.basename(File.dirname(loc_file), '.lproj') }
           end.sort
           langs.select! { |lang| only_langs.include?(lang) } unless only_langs.nil?
-      
+
           config = {
             'input_dir' => input_dir,
             'output_dir' => output_dir,
             'strings' => langs.map do |lang|
               {
-                  'inputs' => ["#{lang}.lproj/Localizable.strings"],
-                  # Choose an unlikely separator (instead of the default '.') to avoid creating needlessly complex Stencil Context nested
-                  # structure just because we have '.' in the English sentences we use (instead of structured reverse-dns notation) for the keys 
-                  'options' => { 'separator' => "____" },
-                  'outputs' => [{
-                      'templatePath' => template_path,
-                      'output' => output_filename(lang)
-                  }]
+                'inputs' => ["#{lang}.lproj/Localizable.strings"],
+                # Choose an unlikely separator (instead of the default '.') to avoid creating needlessly complex Stencil Context nested
+                # structure just because we have '.' in the English sentences we use (instead of structured reverse-dns notation) for the keys
+                'options' => { 'separator' => '____' },
+                'outputs' => [{
+                  'templatePath' => template_path,
+                  'output' => output_filename(lang)
+                }]
               }
             end
           }
-      
+
           # Write SwiftGen config file
           config_file = File.join(output_dir, CONFIG_FILE_NAME)
           File.write(config_file, config.to_yaml)
-      
+
           return [config_file, langs]
         end
 
@@ -147,7 +149,8 @@ module Fastlane
         #
         def sort_file_lines!(dir, lang)
           file = File.join(dir, output_filename(lang))
-          return nil unless File.exists?(file)
+          return nil unless File.exist?(file)
+
           sorted_lines = File.readlines(file).sort
           File.write(file, sorted_lines.join)
           return file
@@ -164,11 +167,11 @@ module Fastlane
         #
         def find_diffs(input_dir:, base_lang:, only_langs: nil)
           Dir.mktmpdir('a8c-lint-translations-') do |tmpdir|
-            # Run SwiftGen 
+            # Run SwiftGen
             langs = only_langs.nil? ? nil : (only_langs + [base_lang]).uniq
             (config_file, langs) = generate_swiftgen_config!(input_dir, tmpdir, only_langs: langs)
             Action.sh(swiftgen_bin, 'config', 'run', '--config', config_file)
-            
+
             # Run diffs
             base_file = sort_file_lines!(tmpdir, base_lang)
             langs.delete(base_lang)
@@ -176,6 +179,7 @@ module Fastlane
               file = sort_file_lines!(tmpdir, lang)
               # If the lang ends up not having any translation at all (e.g. a `.lproj` without any `.strings` file in it but maybe just a storyboard or assets catalog), ignore it
               next nil if file.nil? || only_empty_lines?(file)
+
               # Compute the diff
               diff = `diff -U0 "#{base_file}" "#{file}"`
               # Remove the lines starting with `---`/`+++` which contains the file names (which are temp files we don't want to expose in the final diff to users)
@@ -191,13 +195,14 @@ module Fastlane
 
         # Returns true if the file only contains empty lines, i.e. lines that only contains whitespace (space, tab, CR, LF)
         def only_empty_lines?(file)
-          File.open(file) do |f|  
-            while line = f.gets
-              return false if not line.strip.empty?
-            end  
-          end  
+          File.open(file) do |f|
+            while (line = f.gets)
+              return false unless line.strip.empty?
+            end
+          end
           return true
         end
       end
     end
+  end
 end
