@@ -46,7 +46,7 @@ describe ReleaseToolkit::Models::Android::VersionSet do
       end
     end
 
-    it 'does not update any unknown flavor' do
+    it 'does not update any version-less flavor' do
       using_gradle_fixture('wp') do |gradle_file_path|
         version_set = described_class.new(
           wasabi: ReleaseToolkit::Models::Android::Version.new(name: 'alpha-123', code: 1234)

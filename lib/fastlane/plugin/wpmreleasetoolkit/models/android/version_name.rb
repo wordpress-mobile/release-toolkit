@@ -3,23 +3,31 @@ module ReleaseToolkit
     module Android
       # A model representing an Android VersionName
       #
-      # Can represent an alpha, beta or final version, with or without a hotfix number
-      # Provide utility methods to inspect the type of version it represents and to bump versions
+      # Can represent an alpha, beta or final version, with or without a hotfix number.
+      # Provides utility methods to inspect the type of version it represents and to bump versions.
       #
       class VersionName
         attr_reader :major, :minor, :hotfix
         attr_reader :prerelease_num
 
+        ####################
+        # @!group Initializers
+
+        # This initializer is private. You should use the `new_*` methods to create new instances instead
+        #
         # Creates a new version name of one of the following form:
-        # - final version (`"1.2"` or `"1.2.3"`) if `prerelease_num` is `nil`.
+        # - final version (`"1.2"` or `"1.2.3"`) if `prerelease_num` is `nil` but at least major and minor are provided.
         # - beta version (`"1.2-rc-4"` or `"1.2.3-rc-4"`) if `prerelease_num` is non-nil but at least major and minor are provided.
         # - alpha version (`"alpha-4"`) if `prerelease_num` is non-nil but neither major, minor and hotfix are provided.
+        #
+        # @raise RuntimeError if called with an inconsistent set of parameters, eg. all nil params, or a major but no minor
         #
         # @param [Integer, NilClass] major The major version number, or nil for an alpha version
         # @param [Integer, NilClass] minor The minor version number, or nil for an alpha version
         # @param [Integer, NilClass] hotfix The hotfix/patch version number, or nil for an alpha version or if not a hotfix
         # @param [Integer, NilClass] prerelease_num The alpha or beta version number, or nil if it's a final version
         #
+        # @private
         def initialize(major:, minor:, hotfix: nil, prerelease_num: nil)
           raise 'if you provide major, you should also provide minor' if !major.nil? && minor.nil?
           raise 'if you provide minor, you should also provide major' if major.nil? && !minor.nil?
@@ -27,7 +35,7 @@ module ReleaseToolkit
 
           @major = major.nil? ? nil : Integer(major)
           @minor = minor.nil? ? nil : Integer(minor)
-          @hotfix = hotfix.nil? ? nil : Integer(hotfix)
+          @hotfix = (hotfix.nil? || hotfix == 0) ? nil : Integer(hotfix)
           @prerelease_num = prerelease_num.nil? ? nil : Integer(prerelease_num)
         end
         private_class_method :new # You should use one of the new_* methods below instead.
@@ -76,6 +84,7 @@ module ReleaseToolkit
         #
         def self.from_string(string)
           return nil if string.nil?
+
           parts = string.split('-')
           if parts.count == 2 && parts[0] == 'alpha'
             new_alpha(number: parts[1].to_i || 0)
@@ -90,6 +99,12 @@ module ReleaseToolkit
             end
           end
         end
+
+        # @!endgroup
+        ####################
+
+        ####################
+        # @@!group Version type checks
 
         # Checks if this represents an alpha version, e.g. `"alpha-1234"`
         #
@@ -119,7 +134,22 @@ module ReleaseToolkit
           !hotfix.nil? && hotfix != 0
         end
 
-        # @return [String] The string representation of the VersionName
+        # @!endgroup
+        ####################
+
+        ####################
+        # @!group Conversion helpers
+
+        # Transforms a beta version into a final one by dropping the beta information
+        # @raise RuntimeError if the receiver is an alpha version
+        # @return [VersionName] The same version as the receiver, but without a prerelease_num
+        def to_final
+          raise "Cannot transform an alpha version #{self} to a final version" if is_alpha?
+
+          self.class.new_final(major: major, minor: minor, hotfix: hotfix)
+        end
+
+        # @return [String] The string representation of the `VersionName`, e.g. `"1.2"`, `"1.2.3-rc-4"` or `"alpha-123"`.
         #
         def to_s
           if is_alpha?
@@ -132,6 +162,13 @@ module ReleaseToolkit
               base
             end
           end
+        end
+
+        # @!endgroup
+        ####################
+
+        def ==(other)
+          [major, minor, hotfix, prerelease_num] == [other.major, other.minor, other.hotfix, other.prerelease_num]
         end
       end
     end

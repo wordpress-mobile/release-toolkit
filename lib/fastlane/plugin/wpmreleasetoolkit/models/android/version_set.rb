@@ -3,13 +3,16 @@ module ReleaseToolkit
     module Android
       # A pair of Version instances going together, one for alpha channel and one for standard channel.
       class VersionSet
+        # @return [Hash{Symbol=>Version}]
         attr_reader :flavors
 
-        # @param [Hash<Symbol,Version>] flavors The hash containing a list of flavors and their corresponding `Version`
+        # @param [Hash{Symbol=>Version}] flavors The hash containing a list of flavors and their corresponding `Version`
         def initialize(**flavors)
           @flavors = flavors
         end
 
+        # @param [Symbol] key The name of the flavor to get the `Version` for
+        # @return [Version] The version (name & code) for that flavor
         def [](key)
           flavors[key]
         end
@@ -18,12 +21,13 @@ module ReleaseToolkit
         #
         # @param [String] path The path to the `build.gradle` file to read the versions from.
         #        If nil (the default), will guess it as `<project root>/$PROJECT_NAME/build.gradle`
-        # @param [Array<Symbol>] flavors The list of flavors to read from the gradle file
+        # @param [Array(Symbol)] flavors The list of flavors to read from the gradle file
         #
         # @return [VersionSet] A version set containing the flavors found (amongst the ones requested),
         #         associated with their respective `Version` instances ()containing the name and code for that flavor).
         #
-        def self.from_gradle_file(path:, flavors: [:defaultConfig, :vanilla])
+        def self.from_gradle_file(path: nil, flavors: [:defaultConfig, :vanilla])
+          path ||= default_gradle_path
           current_flavor = nil
           found_versions = {} # Will be a Hash keyed by flavor, with values being a {:name, :code} Hash
           File.readlines(path).each do |line|
@@ -53,7 +57,7 @@ module ReleaseToolkit
         #        If nil (the default), will guess it as `<project root>/$PROJECT_NAME/build.gradle`
         #
         def apply_to_gradle_file(path: nil)
-          path ||= gradle_path
+          path ||= self.class.default_gradle_path
           temp_file = Tempfile.new('fastlaneIncrementVersion')
           current_flavor = nil
           updated_keys = []
@@ -62,16 +66,13 @@ module ReleaseToolkit
             if strip_line =~ /^([a-zA-Z]+)\s*\{$/ && flavors.keys.include?(Regexp.last_match(1).to_sym)
               current_flavor = Regexp.last_match(1).to_sym
               updated_keys = []
-              puts "Entering #{current_flavor}..."
               temp_file.puts line
             elsif current_flavor && strip_line =~ /^versionName\s+"(.*)"$/ && !updated_keys.include?(:name)
               new_value = flavors[current_flavor].name
-              puts "Updating versionName of #{current_flavor} to #{new_value}..."
               temp_file.puts line.gsub(/versionName\s+"(.*)"/, %{versionName "#{new_value}"})
               updated_keys.append(:name)
             elsif current_flavor && strip_line =~ /^versionCode\s+([0-9]+)$/ && !updated_keys.include?(:code)
               new_value = flavors[current_flavor].code
-              puts "Updating versionCode of #{current_flavor} to #{new_value}..."
               temp_file.puts line.gsub(/versionCode\s+([0-9]+)/, %{versionCode #{new_value}})
               updated_keys.append(:code)
             else
@@ -87,8 +88,10 @@ module ReleaseToolkit
         # Private Helpers
 
         class << self
-          private
+          # private
 
+          # @return [String] The path to the default `build.gradle`, i.e `$PROJECT_NAME/build.gradle` relative to repo root
+          # @env PROJECT_NAME Name of the subdirectory containing the project source, relative to the repo root.
           def default_gradle_path
             UI.user_error!("You need to set the \`PROJECT_NAME\` environment variable to the relative path to the project subfolder name") if ENV['PROJECT_NAME'].nil?
             project_root = `git rev-parse --top-level`
