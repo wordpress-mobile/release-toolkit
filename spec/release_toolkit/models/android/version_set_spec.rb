@@ -79,6 +79,29 @@ describe ReleaseToolkit::Models::Android::VersionSet do
     end
   end
 
+  context 'when finding the max version code' do
+    it 'returns nil if  there is no flavor in the set' do
+      empty_set = described_class.new
+      expect(empty_set.max_version_code).to be_nil
+    end
+
+    it 'returns the single code if there is only one flavor in the set' do
+      version_set = described_class.new(
+        defaultConfig: ReleaseToolkit::Models::Android::Version.new(name: '1.2.3-rc-4', code: 1234)
+      )
+      expect(version_set.max_version_code).to eq(1234)
+    end
+
+    it 'returns the maximum code when there are multiple flavors in the set' do
+      version_set = described_class.new(
+        defaultConfig: ReleaseToolkit::Models::Android::Version.new(name: 'alpha-9999', code: 1234),
+        vanilla: ReleaseToolkit::Models::Android::Version.new(name: '1.2.3', code: 1236),
+        wasabi: ReleaseToolkit::Models::Android::Version.new(name: '1.2.3-rc-4', code: 1235)
+      )
+      expect(version_set.max_version_code).to eq(1236)
+    end
+  end
+
   ###############
 
   private

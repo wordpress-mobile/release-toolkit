@@ -8,7 +8,7 @@ module ReleaseToolkit
 
         # @param [Hash{Symbol=>Version}] flavors The hash containing a list of flavors and their corresponding `Version`
         def initialize(**flavors)
-          @flavors = flavors
+          @flavors = flavors || {}
         end
 
         # @param [Symbol] key The name of the flavor to get the `Version` for
@@ -82,6 +82,11 @@ module ReleaseToolkit
           temp_file.close
           FileUtils.mv(temp_file.path, path)
           temp_file.unlink
+        end
+
+        # @return [Integer] Maximum value of version codes across all flavors. Useful to find the next value
+        def max_version_code
+          flavors.values.compact.map(&:code).max
         end
 
         #########################
