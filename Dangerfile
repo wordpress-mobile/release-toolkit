@@ -1,5 +1,5 @@
 def version
-  lib = File.expand_path("../lib", __FILE__)
+  lib = File.expand_path('lib', __dir__)
   $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
   require 'fastlane/plugin/wpmreleasetoolkit/version'
   Fastlane::Wpmreleasetoolkit::VERSION
@@ -15,7 +15,7 @@ end
 `git checkout Gemfile.lock &> /dev/null`
 
 if version.to_s != gemfile_lock_version.to_s
-  message = %Q{
+  message = %{
 The version in the `Gemfile.lock` (`#{gemfile_lock_version}`) doesn't match the one in `version.rb` (`#{version}`).
 
 Please run `bundle install` to make sure they match.

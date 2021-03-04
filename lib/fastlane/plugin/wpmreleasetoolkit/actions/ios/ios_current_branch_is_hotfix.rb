@@ -3,7 +3,7 @@ module Fastlane
     class IosCurrentBranchIsHotfixAction < Action
       def self.run(params)
         require_relative '../../helper/ios/ios_version_helper.rb'
-        Fastlane::Helpers::IosVersionHelper::is_hotfix(Fastlane::Helpers::IosVersionHelper::get_public_version)
+        Fastlane::Helper::Ios::VersionHelper.is_hotfix?(Fastlane::Helper::Ios::VersionHelper.get_public_version)
       end
 
       #####################################################
@@ -11,27 +11,25 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Checks if the current branch is for a hotfix"
+        'Checks if the current branch is for a hotfix'
       end
 
       def self.details
-        "Checks if the current branch is for a hotfix"
+        'Checks if the current branch is for a hotfix'
       end
 
       def self.available_options
-        
       end
 
       def self.output
-        
       end
 
       def self.return_value
-        "True if the branch is for a hotfix, false otherwise"
+        'True if the branch is for a hotfix, false otherwise'
       end
 
       def self.authors
-        ["loremattei"]
+        ['loremattei']
       end
 
       def self.is_supported?(platform)

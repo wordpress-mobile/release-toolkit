@@ -18,6 +18,8 @@ More details about the actions can be found [here](lib/fastlane/plugin/wpmreleas
 
 Read our [Contributing Guide](CONTRIBUTING.md) to learn about reporting issues, contributing code, and more ways to contribute.
 
+This guide also includes some tips about configuring your environment and IDE (e.g. VSCode) and how to run tests and documentation.
+
 ## Security
 
 If you happen to find a security vulnerability, we would appreciate you letting us know at https://hackerone.com/automattic and allowing us to respond before disclosing the issue publicly.

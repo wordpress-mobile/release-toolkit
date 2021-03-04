@@ -1,6 +1,70 @@
+inherit_from: .rubocop_todo.yml
+
 require: 
 - rubocop-rspec
 
-Metrics/BlockLength:
+########## Lint / CodeStyle
+
+# This gem is included as part of the `Pluginfile`, which is `required` separately,
+# so makes it hard to keep it ordered with the rest of the gems
+Gemspec/OrderedDependencies:
   Exclude:
-    - 'spec/**/*.rb'
+    - 'fastlane-plugin-wpmreleasetoolkit.gemspec'
+
+# Especially for actions and methods like `self.run(params)` it's common to have the argument unused; but that
+# comes with the parent class API / contract, so we feel it more readable to avoid the _ unused prefix for those.
+Lint/UnusedMethodArgument:
+  Enabled: false
+
+# We have a couple of empty methods especially when we implement an API contract on our Action subclasses
+# and those look nicer to us when still written as expended (in separate lines) to suggest us to fill them at some point
+# rather than the compact representation of having them one-liner `def foo; end` that is rubocop's default.
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+
+# Trailing commas in array literals helps having smaller diffs when we want to add additional parameters
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+# Enabling the 'frozen_string_literal: true' comment is nice but should be done with extra care
+# because enabling it on code that accidentally mutates string literals will crash at runtime
+# (e.g. `name = 'Hello'` then later `name << ' world'` will crash if the comment is enabled)
+# So we might enable it at some point, be we will need very careful review that this doesn't break everything.
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# Unicode is pretty standard by now, and we want to be able to use em-dash, ellipsis, and unicode characters
+# to provide nice Monodraw.app graphs and similar, without being limited only by ascii.
+Style/AsciiComments:
+  Enabled: false
+
+########## Metrics / Max Lengths Rules
+
+Metrics/LineLength:
+  Max: 300
+
+Metrics/AbcSize:
+  Max: 140
+
+Metrics/BlockLength:
+  Max: 80
+
+Metrics/ClassLength:
+  Max: 300
+
+Metrics/MethodLength:
+  Max: 100
+
+Metrics/ModuleLength:
+  Max: 300
+
+Metrics/ParameterLists:
+  Max: 10
+
+########## Metrics / Complexity
+
+Metrics/CyclomaticComplexity:
+  Max: 20
+
+Metrics/PerceivedComplexity:
+  Max: 20

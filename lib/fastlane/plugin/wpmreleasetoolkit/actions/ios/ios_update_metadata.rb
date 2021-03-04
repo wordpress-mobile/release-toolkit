@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         require_relative '../../helper/ios/ios_git_helper.rb'
 
-        Fastlane::Helpers::IosGitHelper.update_metadata()
+        Fastlane::Helper::Ios::GitHelper.update_metadata()
       end
 
       #####################################################
@@ -12,27 +12,24 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Downloads translated metadata from the translation system"
+        'Downloads translated metadata from the translation system'
       end
 
       def self.details
-        "Downloads translated metadata from the translation system"
+        'Downloads translated metadata from the translation system'
       end
 
       def self.available_options
-    
       end
 
       def self.output
-        
       end
 
       def self.return_value
-        
       end
 
       def self.authors
-        ["loremattei"]
+        ['loremattei']
       end
 
       def self.is_supported?(platform)

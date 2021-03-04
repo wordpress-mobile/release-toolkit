@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane-plugin-wpmreleasetoolkit (0.14.0)
+    fastlane-plugin-wpmreleasetoolkit (0.15.0)
       activesupport (~> 5)
       bigdecimal (~> 1.4)
       chroma (= 0.2.0)
@@ -19,7 +19,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     CFPropertyList (3.0.3)
-    activesupport (5.2.4.4)
+    activesupport (5.2.4.5)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
@@ -63,6 +63,8 @@ GEM
     concurrent-ruby (1.1.8)
     cork (0.3.0)
       colored2 (~> 3.1)
+    crack (0.4.5)
+      rexml
     danger (8.2.1)
       claide (~> 1.0)
       claide-plugins (>= 0.9.2)
@@ -166,11 +168,12 @@ GEM
       multi_json (~> 1.11)
       os (>= 0.9, < 2.0)
       signet (~> 0.14)
+    hashdiff (1.0.1)
     highline (1.7.10)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     httpclient (2.8.3)
-    i18n (1.8.7)
+    i18n (1.8.9)
       concurrent-ruby (~> 1.0)
     jaro_winkler (1.5.4)
     jmespath (1.4.0)
@@ -188,7 +191,7 @@ GEM
     mini_magick (4.11.0)
     mini_mime (1.0.2)
     mini_portile2 (2.5.0)
-    minitest (5.14.3)
+    minitest (5.14.4)
     multi_json (1.15.0)
     multipart-post (2.0.0)
     nanaimo (0.3.0)
@@ -293,6 +296,10 @@ GEM
       unf_ext
     unf_ext (0.0.7.7)
     unicode-display_width (1.6.1)
+    webmock (3.11.1)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
     word_wrap (1.0.0)
     xcodeproj (1.19.0)
       CFPropertyList (>= 2.3.3, < 4.0)
@@ -304,6 +311,7 @@ GEM
       rouge (~> 2.0.7)
     xcpretty-travis-formatter (1.0.0)
       xcpretty (~> 0.2, >= 0.0.7)
+    yard (0.9.26)
 
 PLATFORMS
   ruby
@@ -316,12 +324,14 @@ DEPENDENCIES
   fastlane-plugin-wpmreleasetoolkit!
   pry (~> 0.12.2)
   rmagick (~> 4.1)
-  rspec (~> 3.8)
+  rspec
   rspec_junit_formatter (~> 0.4.1)
   rubocop (= 0.75)
   rubocop-require_tools (~> 0.1.2)
   rubocop-rspec
   simplecov (~> 0.16.1)
+  webmock
+  yard
 
 BUNDLED WITH
    2.1.4
