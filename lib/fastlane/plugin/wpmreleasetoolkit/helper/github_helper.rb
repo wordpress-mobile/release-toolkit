@@ -1,5 +1,6 @@
 require 'fastlane_core/ui/ui'
 require 'octokit'
+require 'open-uri'
 
 module Fastlane
   UI = FastlaneCore::UI unless Fastlane.const_defined?('UI')
@@ -70,6 +71,26 @@ module Fastlane
         assets.each do |file_path|
           github_client().upload_asset(release[:url], file_path, content_type: 'application/octet-stream')
         end
+      end
+
+      def self.download_file_from_release(repository:, release:, file_path:, download_folder:)
+        repository = repository.delete_prefix('/').chomp('/').concat('/')
+        file_path = file_path.delete_prefix('/').chomp('/').concat('/')
+        release = release.concat('/')
+        file_name = File.basename(file_path)
+        download_path = File.join(download_folder, file_name)
+
+        begin
+          open(URI.join('https://raw.githubusercontent.com/', repository, release, file_path).to_s.chomp('/')) do |remote_file|
+            open(download_path, 'wb') do |file|
+              file.write(remote_file.read)
+            end
+          end
+        rescue OpenURI::HTTPError => ex
+          return nil
+        end
+
+        download_path
       end
     end
   end
