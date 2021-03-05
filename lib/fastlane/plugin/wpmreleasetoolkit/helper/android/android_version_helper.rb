@@ -4,68 +4,48 @@ module Fastlane
       # A module containing helper methods to manipulate/extract/bump Android version strings in gradle files
       #
       module VersionHelper
-        # The key used in internal version Hash objects to hold the versionName value
-        VERSION_NAME = 'name'
-        # The key used in internal version Hash objects to hold the versionCode value
-        VERSION_CODE = 'code'
-        # The index for the major version number part
-        MAJOR_NUMBER = 0
-        # The index for the minor version number part
-        MINOR_NUMBER = 1
-        # The index for the hotfix version number part
-        HOTFIX_NUMBER = 2
-        # The prefix used in front of the versionName for alpha versions
-        ALPHA_PREFIX = 'alpha-'
-        # The suffix used in the versionName for RC (beta) versions
-        RC_SUFFIX = '-rc'
+        include ReleaseToolkit::Models::Android
 
-        # Returns the public-facing version string.
+        # Returns the public-facing version string, aka the release (non-alpha) versionName, guaranteed to be without any beta/rc suffix.
         #
         # @example
-        #    "1.2" # Assuming build.gradle contains versionName "1.2"
-        #    "1.2" # Assuming build.gradle contains versionName "1.2.0"
-        #    "1.2.3" # Assuming build.gradle contains versionName "1.2.3"
+        #    "1.2" # Assuming build.gradle contains versionName "1.2" or "1.2-rc-3"
+        #    "1.2" # Assuming build.gradle contains versionName "1.2.0" or "1.2.0-rc-4"
+        #    "1.2.3" # Assuming build.gradle contains versionName "1.2.3" or "1.2.3-rc-5"
         #
         # @return [String] The public-facing version number, extracted from the `versionName` of the `build.gradle` file.
         #         - If this version is a hotfix (more than 2 parts and 3rd part is non-zero), returns the "X.Y.Z" formatted string
         #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
         #
         def self.get_public_version
-          version = get_release_version
-          vp = get_version_parts(version[VERSION_NAME])
-          return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
-
-          "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}"
+          get_release_version.name.to_final.to_s
         end
 
         # Extract the version name and code from the `vanilla` flavor of the `$PROJECT_NAME/build.gradle file`
-        #   or for the defaultConfig if `HAS_ALPHA_VERSION` is not defined.
+        #   or for the `defaultConfig` if `HAS_ALPHA_VERSION` is not defined.
         #
-        # @env HAS_ALPHA_VERSION If set (with any value), indicates that the project uses `vanilla` flavor.
+        # @env HAS_ALPHA_VERSION If set (with any value), indicates that the release version should be extracted from
+        #      the `vanilla` flavor instead of the `defaultConfig` (which contains the alpha version if that is set).
         #
-        # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
+        # @return [Version] A `Version` instance containing both the versionName and versionCode.
         #
         def self.get_release_version
-          section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
-          gradle_path = self.gradle_path
-          name = get_version_name_from_gradle_file(gradle_path, section)
-          code = get_version_build_from_gradle_file(gradle_path, section)
-          return { VERSION_NAME => name, VERSION_CODE => code }
+          # If HAS_ALPHA_VERSION is set, then alpha is on defaultConfig and release is on vanilla
+          # If HAS_ALPHA_VERSION is not set, then release is on defaultConfig (and vanilla doesn't have version info)
+          flavor = ENV['HAS_ALPHA_VERSION'].nil? ? :defaultConfig : :vanilla
+          Version.from_gradle_file(flavor: flavor)
         end
 
-        # Extract the version name and code from the `defaultConfig` of the `$PROJECT_NAME/build.gradle` file
+        # Extract the version name and code from the `defaultConfig` of the `$PROJECT_NAME/build.gradle` file, assuming
+        # the project uses alpha version (i.e. $HAS_ALPHA_VERSION` is set)
         #
-        # @return [Hash] A hash with 2 keys `"name"` and `"code"` containing the extracted version name and code, respectively,
-        #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
+        # @return [Version, NilClass] A `Version` instance containing the `versionName` and `versionCode`
+        #         or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
         def self.get_alpha_version
           return nil if ENV['HAS_ALPHA_VERSION'].nil?
 
-          section = 'defaultConfig'
-          gradle_path = self.gradle_path
-          name = get_version_name_from_gradle_file(gradle_path, section)
-          code = get_version_build_from_gradle_file(gradle_path, section)
-          return { VERSION_NAME => name, VERSION_CODE => code }
+          Version.from_gradle_file(flavor: :defaultConfig)
         end
 
         # Determines if a version name corresponds to an alpha version (starts with `"alpha-"`` prefix)
@@ -77,7 +57,7 @@ module Fastlane
         # @private
         #
         def self.is_alpha_version?(version)
-          version[VERSION_NAME].start_with?(ALPHA_PREFIX)
+          VersionName.from_string(version).is_alpha?
         end
 
         # Check if this versionName corresponds to a beta, i.e. contains some `-rc` suffix
@@ -87,7 +67,7 @@ module Fastlane
         # @return [Bool] True if the version string contains `-rc`, indicating it is a beta version.
         #
         def self.is_beta_version?(version)
-          version[VERSION_NAME].include?(RC_SUFFIX)
+          VersionName.from_string(version).is_beta?
         end
 
         # Returns the version name and code to use for the final release.
@@ -102,10 +82,10 @@ module Fastlane
         # @return [Hash] A version hash with keys "name" and "code", containing the version name and code to use for final release.
         #
         def self.calc_final_release_version(beta_version, alpha_version)
-          version_name = beta_version[VERSION_NAME].split('-')[0]
-          version_code = alpha_version.nil? ? beta_version[VERSION_CODE] + 1 : alpha_version[VERSION_CODE] + 1
-
-          { VERSION_NAME => version_name, VERSION_CODE => version_code }
+          Version.new(
+            name: beta_version&.name&.to_final,
+            code: [alpha_version, beta_version].compact.map(&:code).max + 1
+          )
         end
 
         # Returns the version name and code to use for the next alpha.
