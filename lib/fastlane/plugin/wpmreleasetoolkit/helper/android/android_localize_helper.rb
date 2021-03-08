@@ -173,8 +173,10 @@ module Fastlane
         end
 
 
-        def self.get_library_version_from_gradle_config(import_key)
+        def self.get_library_version_from_gradle_config(import_key:)
           gradle_file_path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'build.gradle')
+
+          return nil unless File.exists?(gradle_file_path)
 
           File.open(gradle_file_path, 'r') do | f |
             text = f.read
