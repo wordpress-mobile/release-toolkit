@@ -73,7 +73,7 @@ module Fastlane
         end
       end
 
-      def self.download_file_from_release(repository:, release:, file_path:, download_folder:)
+      def download_file_from_release(repository:, release:, file_path:, download_folder:)
         repository = repository.delete_prefix('/').chomp('/').concat('/')
         file_path = file_path.delete_prefix('/').chomp('/').concat('/')
         release = release.concat('/')
