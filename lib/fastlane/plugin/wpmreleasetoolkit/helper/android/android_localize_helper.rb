@@ -172,7 +172,11 @@ module Fastlane
           end
         end
 
-
+        # Extract the value of a import key from build.gradle
+        #
+        # @param [String] import_key The key to look for
+        # @return [String] The value of the key, or nil if not found
+        #
         def self.get_library_version_from_gradle_config(import_key:)
           gradle_file_path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'build.gradle')
 
@@ -183,7 +187,6 @@ module Fastlane
             text.match(/#{import_key}\s?=\s?'(.*?)'/m)&.captures&.first
           end
         end
-
       end
     end
   end
