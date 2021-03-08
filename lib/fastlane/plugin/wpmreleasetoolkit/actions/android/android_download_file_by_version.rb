@@ -5,7 +5,7 @@ module Fastlane
         require_relative '../../helper/android/android_localize_helper.rb'
         require_relative '../../helper/github_helper'
 
-        version = Fastlane::Helper::Android::LocalizeHelper.get_library_version_from_gradle_config(params[:import_key])
+        version = Fastlane::Helper::Android::LocalizeHelper.get_library_version_from_gradle_config(import_key: params[:import_key])
         UI.user_error!("Can't find any reference for key #{params[:import_key]}") if version.nil?
         UI.message "Downloading #{params[:file_path]} from #{params[:repository]} at version #{version} to #{params[:download_folder]}"
 
