@@ -184,7 +184,7 @@ module Fastlane
 
           File.open(gradle_file_path, 'r') do | f |
             text = f.read
-            text.match(/#{import_key}\s?=\s?'(.*?)'/m)&.captures&.first
+            text.match(/#{Regexp.escape(import_key)}\s?=\s?'(.*?)'/m)&.captures&.first
           end
         end
       end
