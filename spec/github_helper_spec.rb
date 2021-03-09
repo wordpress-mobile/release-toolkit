@@ -11,10 +11,11 @@ describe Fastlane::Helper::GithubHelper do
 
     it 'writes the raw content to a file' do
       stub = stub_request(:get, 'https://raw.githubusercontent.com/repo-test/project-test/1.0/test-file.xml').to_return(:status => 200, body: 'my-test-content')
-      allow(File).to receive(:open).with('./test-file.xml', 'wb') do | file |
-        expect(Fastlane::Helper::GithubHelper.download_file_from_release(repository: 'repo-test/project-test', release: '1.0', file_path: 'test-file.xml', download_folder: './')).to eq('./test-file.xml')
-        expect(file).to receive(:write).with('my-test-content')
+      Dir.mktmpdir('a8c-download-repo-file-') do |tmpdir|
+        dst_file = File.join(tmpdir, 'test-file.xml')
+        expect(Fastlane::Helper::GithubHelper.download_file_from_release(repository: 'repo-test/project-test', release: '1.0', file_path: 'test-file.xml', download_folder: tmpdir)).to eq(dst_file)
         expect(stub).to have_been_made.once
+        expect(File.read(dst_file)).to eq('my-test-content')
       end
     end
   end
