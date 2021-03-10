@@ -11,7 +11,7 @@ module Fastlane
 
         Fastlane::Helper::GithubHelper.download_file_from_release(
           repository: params[:repository],
-          release: "v#{version}",
+          release: "#{params[:github_release_prefix]}#{version}",
           file_path: params[:file_path],
           download_folder: params[:download_folder]
         )
@@ -53,6 +53,10 @@ module Fastlane
                         type: String,
                         optional: true,
                         default_value: Dir.tmpdir()),
+          FastlaneCore::ConfigItem.new(key: :github_release_prefix,
+                        description: "The prefix which is used in the GitHub release title",
+                        type: String,
+                        optional: true),
         ]
       end
 
