@@ -76,7 +76,7 @@ module Fastlane
       # Downloads a file from the given GitHub release
       #
       # @param [String] repository The repository name (including the organization)
-      # @param [String] relase The title of the GitHub release
+      # @param [String] release The title of the GitHub release
       # @param [String] file_path The path, inside the project folder, of the file to download
       # @param [Striog] download_folder The folder which the file should be downloaded into
       # @return [String] The path of the downloaded file, or nil if something went wrong
