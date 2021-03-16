@@ -82,8 +82,9 @@ module Fastlane
       # @return [String] The path of the downloaded file, or nil if something went wrong
       #
       def self.download_file_from_release(repository:, release:, file_path:, download_folder:)
-        repository = repository.delete_prefix('/')
-        file_path = file_path.delete_prefix('/')
+        repository = repository.delete_prefix('/').chomp('/').concat('/')
+        file_path = file_path.delete_prefix('/').chomp('/').concat('/')
+        release = release.concat('/')
         file_name = File.basename(file_path)
         download_path = File.join(download_folder, file_name)
 
