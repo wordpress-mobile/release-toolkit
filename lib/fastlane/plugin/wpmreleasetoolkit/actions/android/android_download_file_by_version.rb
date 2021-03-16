@@ -37,7 +37,7 @@ module Fastlane
                         type: String,
                         optional: false),
           FastlaneCore::ConfigItem.new(key: :import_key,
-                        description: "The key which is used in gradle.build to reference the version of the library to import",
+                        description: "The key which is used in build.gradle to reference the version of the library to import",
                         type: String,
                         optional: false),
           FastlaneCore::ConfigItem.new(key: :repository,
