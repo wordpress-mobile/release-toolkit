@@ -41,6 +41,19 @@ describe Fastlane::Helper::Android::LocalizeHelper do
       allow(File).to receive(:exists?).and_return(true)
       allow(File).to receive(:open).with('./build.gradle', 'r').and_yield(StringIO.new(test_file_content))
       expect(subject.get_library_version_from_gradle_config(import_key: 'my-test-key')).to eq('my_test_value')
+
+      # Make sure it works with prefixes
+      test_file_content = <<~CONTENT
+        my-test-key-foo = 'foo'
+        my-test-key-bad = "extbad"
+        ext.my-test-key = 'my_test_value'
+        ext..my_test_key_double = 'foo'
+      CONTENT
+
+      allow(File).to receive(:exists?).and_return(true)
+      allow(File).to receive(:open).with('./build.gradle', 'r').and_yield(StringIO.new(test_file_content))
+      expect(subject.get_library_version_from_gradle_config(import_key: 'my-test-key')).to eq('my_test_value')
+      expect(subject.get_library_version_from_gradle_config(import_key: 'my_test_key_double')).to be_nil
     end
   end
 end
