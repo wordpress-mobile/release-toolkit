@@ -1,6 +1,6 @@
 require 'spec_helper.rb'
 
-describe Fastlane::Helper::Android::LocalizeHelper do
+describe Fastlane::Helper::Android::VersionHelper do
   describe 'get_library_version_from_gradle_config' do
     it 'returns nil when gradle file is not present' do
       allow(File).to receive(:exists?).and_return(false)
