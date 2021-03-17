@@ -64,7 +64,7 @@ module Fastlane
       end
 
       def self.return_value
-        'The location of the downloaded file'
+        'The path where the file was downloaded to (typically <download_folder>/<basename(file_path)>), or nil if there was an issue downloading the file'
       end
 
       def self.authors
