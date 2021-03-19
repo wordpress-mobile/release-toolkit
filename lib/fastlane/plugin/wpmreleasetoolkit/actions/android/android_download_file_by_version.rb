@@ -41,7 +41,7 @@ module Fastlane
                         type: String,
                         optional: false),
           FastlaneCore::ConfigItem.new(key: :repository,
-                        description: "The GitHub repository which hosts the library project",
+                        description: "The GitHub repository slug ('<orgname>/<reponame>') which hosts the library project",
                         type: String,
                         optional: false),
           FastlaneCore::ConfigItem.new(key: :file_path,
