@@ -31,14 +31,14 @@ module Fastlane
         return mile
       end
 
-      # Downloads a file from the given GitHub tag
+      # Fetch all the PRs for a given milestone
       #
       # @param String repository The repository name (including the organization) [ex: wordpress-mobile/wordpress-ios]
-      # @param String tag The name of the tag we're downloading from [ex: 16.9]
+      # @param String milestone The name of the tag we're downloading from [ex: 16.9]
       # @return [<Sawyer::Resource>] A list of the PRs for the given milestone, sorted by number
       #
-      def self.get_prs_for_milestone(repository, release)
-        github_client().search_issues("type:pr milestone:16.9 repo:wordpress-mobile/wordpress-ios")[:items].sort_by(&:number)
+      def self.get_prs_for_milestone(repository, milestone)
+        github_client().search_issues("type:pr milestone:#{milestone} repo:#{repository}")[:items].sort_by(&:number)
       end
 
       def self.get_last_milestone(repository)

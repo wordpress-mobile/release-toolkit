@@ -50,9 +50,8 @@ module Fastlane
                                        description: 'The path of the report file',
                                        optional: false,
                                        is_string: true),
-          FastlaneCore::ConfigItem.new(key: :tag,
-                                       env_name: 'GHHELPER_CURRENT_VERSION',
-                                       description: 'The version number to fetch PRs for',
+          FastlaneCore::ConfigItem.new(key: :milestone,
+                                       description: 'The milestone to fetch PRs for',
                                        optional: false,
                                        is_string: true),
         ]
