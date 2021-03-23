@@ -14,6 +14,9 @@ module Fastlane
         user = client.user
         UI.message("Logged in as: #{user.name}")
 
+        # Auto-paginate to ensure we're not missing data
+        client.auto_paginate = true
+
         client
       end
 
@@ -26,6 +29,16 @@ module Fastlane
         end
 
         return mile
+      end
+
+      # Downloads a file from the given GitHub tag
+      #
+      # @param String repository The repository name (including the organization) [ex: wordpress-mobile/wordpress-ios]
+      # @param String tag The name of the tag we're downloading from [ex: 16.9]
+      # @return [<Sawyer::Resource>] A list of the PRs for the given milestone, sorted by number
+      #
+      def self.get_prs_for_milestone(repository, release)
+        github_client().search_issues("type:pr milestone:16.9 repo:wordpress-mobile/wordpress-ios")[:items].sort_by(&:number)
       end
 
       def self.get_last_milestone(repository)
