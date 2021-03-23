@@ -1,5 +1,6 @@
 require 'fastlane_core/ui/ui'
 require 'octokit'
+require 'open-uri'
 
 module Fastlane
   UI = FastlaneCore::UI unless Fastlane.const_defined?('UI')
@@ -70,6 +71,32 @@ module Fastlane
         assets.each do |file_path|
           github_client().upload_asset(release[:url], file_path, content_type: 'application/octet-stream')
         end
+      end
+
+      # Downloads a file from the given GitHub tag
+      #
+      # @param [String] repository The repository name (including the organization)
+      # @param [String] tag The name of the tag we're downloading from
+      # @param [String] file_path The path, inside the project folder, of the file to download
+      # @param [String] download_folder The folder which the file should be downloaded into
+      # @return [String] The path of the downloaded file, or nil if something went wrong
+      #
+      def self.download_file_from_tag(repository:, tag:, file_path:, download_folder:)
+        repository = repository.delete_prefix('/').chomp('/').concat('/')
+        file_path = file_path.delete_prefix('/').chomp('/').concat('/')
+        tag = tag.concat('/')
+        file_name = File.basename(file_path)
+        download_path = File.join(download_folder, file_name)
+
+        begin
+          open(URI.join('https://raw.githubusercontent.com/', repository, tag, file_path).to_s.chomp('/')) do |remote_file|
+            File.write(download_path, remote_file.read)
+          end
+        rescue OpenURI::HTTPError => ex
+          return nil
+        end
+
+        download_path
       end
     end
   end
