@@ -33,8 +33,8 @@ module Fastlane
 
       # Fetch all the PRs for a given milestone
       #
-      # @param String repository The repository name (including the organization) [ex: wordpress-mobile/wordpress-ios]
-      # @param String milestone The name of the tag we're downloading from [ex: 16.9]
+      # @param [String] repository The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`)
+      # @param [String] milestone The name of the milestone we want to fetch the list of PRs for (e.g.: `16.9`)
       # @return [<Sawyer::Resource>] A list of the PRs for the given milestone, sorted by number
       #
       def self.get_prs_for_milestone(repository, milestone)
