@@ -46,7 +46,7 @@ module Fastlane
                                        optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :report_path,
-                                       description: 'The path that the list of PRs should be written to',
+                                       description: 'The path where the list of PRs should be written to',
                                        optional: false,
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :milestone,
