@@ -38,7 +38,7 @@ module Fastlane
       # @return [<Sawyer::Resource>] A list of the PRs for the given milestone, sorted by number
       #
       def self.get_prs_for_milestone(repository, milestone)
-        github_client().search_issues("type:pr milestone:#{milestone} repo:#{repository}")[:items].sort_by(&:number)
+        github_client.search_issues(%(type:pr milestone:"#{milestone}" repo:#{repository}))[:items].sort_by(&:number)
       end
 
       def self.get_last_milestone(repository)
