@@ -22,7 +22,7 @@ module Fastlane
       end
 
       def self.description
-        'Generate the list of the PRs in the given `repository` for the given `milestone` at the given `report_path'
+        'Generate the list of the PRs in the given `repository` for the given `milestone` at the given `report_path`'
       end
 
       def self.authors
@@ -35,7 +35,7 @@ module Fastlane
 
       def self.details
         # Optional:
-        'Generate the list of the PRs in the given `repository` for the given `milestone` at the given `report_path'
+        description
       end
 
       def self.available_options
