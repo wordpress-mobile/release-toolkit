@@ -171,6 +171,79 @@ module Fastlane
             end
           end
         end
+
+        ########
+        # @group Downloading translations from GlotPress
+        ########
+
+        # Create the `available_languages.xml` file.
+        #
+        # @param [String] res_dir The relative path to the `…/src/main/res` directory
+        # @param [Array<String>] locale_codes The list of locale codes to include in the available_languages.xml file
+        #
+        def self.create_available_languages_file(res_dir:, locale_codes:)
+          doc = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
+            xml.comment('Warning: Auto-generated file, do not edit.')
+            xml.resources do
+              xml.send(:'string-array', name: 'available_languages', translatable: 'false') do
+                locale_codes.each { |code| xml.item(code.gsub('-r', '_')) }
+              end
+            end
+          end
+          File.write(File.join(res_dir, 'values', 'available_languages.xml'), doc.to_xml)
+        end
+
+        # Perform some quick basic checks about an individual `<string>` tag and print warnings accordingly
+        #
+        # @param [Nokogiri::XML::Node] string_tag The XML tag/node to check
+        #
+        def self.quick_lint(string_tag)
+          if string_tag['formatted'] == 'false' && string_tag.content.include?('%%')
+            UI.important "Warning: translation for '#{string_tag['name']}' has attribute formatted=false, but still contains escaped '%%' in translation."
+          end
+        end
+        private_class_method :quick_lint
+
+        # Download translations from GlotPress
+        #
+        # @param [String] res_dir The relative path to the `…/src/main/res` directory
+        # @param [String] glotpress_project_url The base URL to the glotpress project to download the strings from
+        # @param [Array<Hash{Symbol=>String}>] locales_map An array of locales to download. Each item in the array must be a
+        #                                      Hash with keys `:glotpress` and `:android` containing the respective locale codes.
+        #
+        def self.download_from_glotpress(res_dir:, glotpress_project_url:, locales_map:)
+          en_file = File.join(res_dir, 'values', 'strings.xml')
+          en_xml = File.open(en_file) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+          exclude_attrs = %w[name content_override] # Attributes that we don't want to replicate into translated XMLs
+          orig_attributes = en_xml.xpath('//string').map { |tag| [tag['name'], tag.attributes.reject { |k, _| exclude_attrs.include?(k) }] }.to_h
+
+          locales_map.each do |lang_codes|
+            next if lang_codes[:glotpress] == 'en-us' # en-us is our base locale, no translations to download for it!
+
+            puts "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]})..."
+            lang_dir = File.join(res_dir, "values-#{lang_codes[:android]}")
+            lang_file = File.join(lang_dir, 'strings.xml')
+            uri = URI.parse("#{glotpress_project_url}/#{lang_codes[:glotpress]}/default/export-translations?filters[status]=current&format=android")
+            begin
+              # Download XML
+              xml = uri.open { |f| Nokogiri::XML(f.read.gsub("\t", '    '), nil, Encoding::UTF_8.to_s) }
+              # Process XML (text substitutions, replicate attributes, quick-lint string)
+              xml.xpath('//string').each do |string_tag|
+                string_tag.content = string_tag.content.gsub('...', '…')
+                orig_attributes[string_tag['name']]&.each { |k, v| string_tag[k] = v }
+                quick_lint(string_tag)
+              end
+              # Save
+              FileUtils.mkdir(lang_dir) unless Dir.exist?(lang_dir)
+              File.open(lang_file, 'w') { |f| xml.write_to(f, encoding: Encoding::UTF_8.to_s, indent: 4) }
+            rescue StandardError => e
+              puts "Error downloading #{lang_codes[:name]} (#{lang_codes[:glotpress]}) - #{e.message}"
+              FileUtils.rm_rf(File.join(res_dir, "values-#{lang_codes[:android]}"))
+            end
+          end
+        end
+
+        # @endgroup
       end
     end
   end

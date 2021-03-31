@@ -21,13 +21,14 @@ module Fastlane
 
         # Calls the `tools/update-translations.sh` script from the project repo, then lint them using the provided gradle task
         #
+        # Deprecated. Use the `android_download_translations` action instead.
+        #
         # @env PROJECT_ROOT_FOLDER The path to the git root of the project
         # @env PROJECT_NAME The name of the directory containing the project code (especially containing the `build.gradle` file)
         #
         # @param [String] validate_translation_command The name of the gradle task to run to validate the translations
         #
-        # @todo Migrate the scripts, currently in each host repo and called by this method, to be helpers and actions
-        #       in the release-toolkit instead, and move this code away from `ios_git_helper`.
+        # @todo Remove this once every client has migrated to `android_download_translations` and we got rid of that legacy action.
         #
         def self.update_metadata(validate_translation_command)
           Action.sh('./tools/update-translations.sh')

@@ -40,6 +40,12 @@ module Fastlane
         return false
       end
 
+      # Update every submodule in the current git repository
+      #
+      def self.update_submodules
+        Action.sh('git', 'submodule', 'update', '--init', '--recursive')
+      end
+
       # Create a new branch named `branch_name`, cutting it from branch/commit/tag `from`, and push it
       #
       # If the branch with that name already exists, it will instead switch to it and pull new commits.
