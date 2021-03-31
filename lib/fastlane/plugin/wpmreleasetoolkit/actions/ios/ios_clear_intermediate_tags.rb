@@ -6,9 +6,6 @@ module Fastlane
 
         require_relative '../../helper/git_helper.rb'
 
-        # Download all the remote tags prior to starting – that way we don't miss any on the server
-        Fastlane::Helper::GitHelper::fetch_all_tags
-
         # Delete 4-parts version names starting with our version number
         parts = params[:version].split('.')
         pattern = parts.fill('*', parts.length...4).join('.') # "1.2.*.*" or "1.2.3.*"
