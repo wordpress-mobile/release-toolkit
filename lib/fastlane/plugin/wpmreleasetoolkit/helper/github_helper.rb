@@ -105,7 +105,7 @@ module Fastlane
           open(URI.join('https://raw.githubusercontent.com/', repository, tag, file_path).to_s.chomp('/')) do |remote_file|
             File.write(download_path, remote_file.read)
           end
-        rescue OpenURI::HTTPError => ex
+        rescue OpenURI::HTTPError
           return nil
         end
 
