@@ -124,7 +124,6 @@ module Fastlane
       # @param [Bool] delete_on_remote If true, will also delete the tag from the remote. Otherwise, it will only be deleted locally.
       #
       def self.delete_tags(tags_to_delete, delete_on_remote: false)
-
         g = Git.open(Dir.pwd)
         local_tag_names = g.tags.map(&:name)
 
