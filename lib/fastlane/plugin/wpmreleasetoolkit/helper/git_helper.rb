@@ -131,8 +131,8 @@ module Fastlane
         g = Git.open(Dir.pwd)
         local_tag_names = g.tags.map(&:name)
 
-        Array(tags_to_delete).select { |tag| local_tag_names.include? tag }.each do |tag|
-          g.delete_tag(tag)
+        Array(tags_to_delete).each do |tag|
+          g.delete_tag(tag) if local_tag_names.include?(tag)
           g.push('origin', ":refs/tags/#{tag}") if delete_on_remote 
         end
       end
