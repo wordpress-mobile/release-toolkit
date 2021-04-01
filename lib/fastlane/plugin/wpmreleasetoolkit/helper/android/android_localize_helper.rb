@@ -174,7 +174,7 @@ module Fastlane
         end
 
         ########
-        # @group Downloading translations from GlotPress
+        # @!group Downloading translations from GlotPress
         ########
 
         # Create the `available_languages.xml` file.
@@ -244,7 +244,7 @@ module Fastlane
           end
         end
 
-        # @endgroup
+        # @!endgroup
       end
     end
   end
