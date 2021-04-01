@@ -221,7 +221,7 @@ module Fastlane
           locales_map.each do |lang_codes|
             next if lang_codes[:glotpress] == 'en-us' # en-us is our base locale, no translations to download for it!
 
-            puts "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]})..."
+            UI.message "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]})..."
             lang_dir = File.join(res_dir, "values-#{lang_codes[:android]}")
             lang_file = File.join(lang_dir, 'strings.xml')
             uri = URI.parse("#{glotpress_project_url}/#{lang_codes[:glotpress]}/default/export-translations?filters[status]=current&format=android")
@@ -238,7 +238,7 @@ module Fastlane
               FileUtils.mkdir(lang_dir) unless Dir.exist?(lang_dir)
               File.open(lang_file, 'w') { |f| xml.write_to(f, encoding: Encoding::UTF_8.to_s, indent: 4) }
             rescue StandardError => e
-              puts "Error downloading #{lang_codes[:name]} (#{lang_codes[:glotpress]}) - #{e.message}"
+              UI.error "Error downloading #{lang_codes[:glotpress]} - #{e.message}"
               FileUtils.rm_rf(File.join(res_dir, "values-#{lang_codes[:android]}"))
             end
           end
