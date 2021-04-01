@@ -219,8 +219,6 @@ module Fastlane
           orig_attributes = en_xml.xpath('//string').map { |tag| [tag['name'], tag.attributes.reject { |k, _| exclude_attrs.include?(k) }] }.to_h
 
           locales_map.each do |lang_codes|
-            next if lang_codes[:glotpress] == 'en-us' # en-us is our base locale, no translations to download for it!
-
             UI.message "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]})..."
             lang_dir = File.join(res_dir, "values-#{lang_codes[:android]}")
             lang_file = File.join(lang_dir, 'strings.xml')
