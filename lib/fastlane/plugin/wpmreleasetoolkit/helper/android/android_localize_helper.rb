@@ -194,6 +194,15 @@ module Fastlane
           File.write(File.join(res_dir, 'values', 'available_languages.xml'), doc.to_xml)
         end
 
+        # Apply some common text substitutions to tag contents
+        #
+        # @param [Nokogiri::XML::Node] tag The XML tag/node to apply substitutions to
+        #
+        def self.apply_substitutions(tag)
+          tag.content = tag.content.gsub('...', '…')
+        end
+        private_class_method :apply_substitutions
+
         # Perform some quick basic checks about an individual `<string>` tag and print warnings accordingly
         #
         # @param [Nokogiri::XML::Node] string_tag The XML tag/node to check
@@ -228,10 +237,12 @@ module Fastlane
               xml = uri.open { |f| Nokogiri::XML(f.read.gsub("\t", '    '), nil, Encoding::UTF_8.to_s) }
               # Process XML (text substitutions, replicate attributes, quick-lint string)
               xml.xpath('//string').each do |string_tag|
-                string_tag.content = string_tag.content.gsub('...', '…')
+                apply_substitutions(string_tag)
                 orig_attributes[string_tag['name']]&.each { |k, v| string_tag[k] = v }
                 quick_lint(string_tag)
               end
+              xml.xpath('//string-array/item').each { |item_tag| apply_substitutions(item_tag) }
+              
               # Save
               FileUtils.mkdir(lang_dir) unless Dir.exist?(lang_dir)
               File.open(lang_file, 'w') { |f| xml.write_to(f, encoding: Encoding::UTF_8.to_s, indent: 4) }
