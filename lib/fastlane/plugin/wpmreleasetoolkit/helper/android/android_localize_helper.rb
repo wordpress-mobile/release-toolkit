@@ -213,10 +213,10 @@ module Fastlane
         #                                      Hash with keys `:glotpress` and `:android` containing the respective locale codes.
         #
         def self.download_from_glotpress(res_dir:, glotpress_project_url:, locales_map:)
-          en_file = File.join(res_dir, 'values', 'strings.xml')
-          en_xml = File.open(en_file) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-          exclude_attrs = %w[name content_override] # Attributes that we don't want to replicate into translated XMLs
-          orig_attributes = en_xml.xpath('//string').map { |tag| [tag['name'], tag.attributes.reject { |k, _| exclude_attrs.include?(k) }] }.to_h
+          attributes_to_copy = %w[formatted] # Attributes that we want to replicate into translated `string.xml` files
+          orig_file = File.join(res_dir, 'values', 'strings.xml')
+          orig_xml = File.open(orig_file) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+          orig_attributes = orig_xml.xpath('//string').map { |tag| [tag['name'], tag.attributes.select { |k, _| attributes_to_copy.include?(k) }] }.to_h
 
           locales_map.each do |lang_codes|
             UI.message "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]})..."
