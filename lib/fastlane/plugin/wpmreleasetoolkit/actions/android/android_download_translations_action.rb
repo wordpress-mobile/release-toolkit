@@ -7,7 +7,7 @@ module Fastlane
         require_relative '../../helper/android/android_localize_helper.rb'
         require_relative '../../helper/git_helper.rb'
 
-        res_dir = File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'src', 'main', 'res')
+        res_dir = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', params[:project_name], 'src', 'main', 'res')
 
         Fastlane::Helper::Android::LocalizeHelper.create_available_languages_file(
           res_dir: res_dir,
@@ -41,8 +41,14 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(
+            key: :project_name,
+            env_name: 'PROJECT_NAME',
+            description: 'The name of the Android project (i.e. the name of the parent folder containing `src/main/res`)',
+            type: String
+          ),
+          FastlaneCore::ConfigItem.new(
             key: :project_url,
-            env_name: 'FL_DOWNLOAD_TRANSLATIONS_PROJECT_URL', # The name of the environment variable
+            env_name: 'FL_DOWNLOAD_TRANSLATIONS_PROJECT_URL',
             description: 'GlotPress project URL',
             type: String
           ),
