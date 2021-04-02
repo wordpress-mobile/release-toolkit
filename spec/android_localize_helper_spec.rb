@@ -40,6 +40,26 @@ describe Fastlane::Helper::Android::LocalizeHelper do
       @expected_dir = File.join(fixtures_dir, 'expected')
     end
 
+    LOCALES_MAP = [
+      { glotpress: 'pt-br', android: 'pt-rBR'},
+      { glotpress: 'zh-cn', android: 'zh-rCN'},
+      { glotpress: 'fr', android: 'fr' },
+    ]
+
+    def stub_file(code)
+      File.join(@stubs_dir, "#{code}.xml")
+    end
+
+    def expected_file(code)
+      File.join(@expected_dir, code.nil? ? 'values' : "values-#{code}", 'strings.xml')
+    end
+
+    it 'tests all locales' do
+      # Ensure we don't forget to update the locales map if we add more stubs in the future, and vice-versa
+      expect(LOCALES_MAP.map { |h| "#{h[:glotpress]}.xml" }.sort).to eq(Dir.children(@stubs_dir).sort)
+      expect(LOCALES_MAP.map { |h| "values-#{h[:android]}" }.sort).to eq(Dir.children(@expected_dir).reject { |d| d == 'values' }.sort)
+    end
+
     it 'generates expected files' do      
       Dir.mktmpdir('a8c-android-localize-helper-spec-') do |tmpdir|
         # Arrange: Configure stubs for GlotPress network requests for each locale
@@ -53,23 +73,15 @@ describe Fastlane::Helper::Android::LocalizeHelper do
 
         # Arrange: copy original values/strings.xml file to tmpdir
         FileUtils.mkdir_p(File.join(tmpdir, 'values'))
-        FileUtils.cp(File.join(@expected_dir, 'values', 'strings.xml'), File.join(tmpdir, 'values', 'strings.xml'))
+        FileUtils.cp(expected_file(nil), File.join(tmpdir, 'values', 'strings.xml'))
 
         # Act
-        locales = [
-          { glotpress: 'pt-br', android: 'pt-rBR'},
-          { glotpress: 'zh-cn', android: 'zh-rCN'},
-        ]
         described_class.download_from_glotpress(
           res_dir: tmpdir,
           glotpress_project_url: gp_fake_url,
-          locales_map: locales
+          locales_map: LOCALES_MAP
         )
       
-        # Assert: Ensure we don't forget to update the locales map if we add more stubs in the future
-        expect(locales.map { |h| "#{h[:glotpress]}.xml" }.sort).to eq(Dir.children(@stubs_dir).sort)
-        expect(locales.map { |h| "values-#{h[:android]}" }).to eq(Dir.children(@expected_dir).reject { |d| d == 'values' }.sort)
-
         # Assert: The entry containing formatted=false with '%%' in text does generate a warning
         # @todo: expect(Fastlane::UI).to receive(:important).with('…the message…')
 
@@ -84,14 +96,14 @@ describe Fastlane::Helper::Android::LocalizeHelper do
     end
 
     def check_substitutions_in_node(xpath)
-      # Check that the XML returned by GlotPress has a node with '...' that needs being substituted
-      gp_xml = File.open(File.join(@stubs_dir, 'pt-br.xml')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+      # Check that at least one (pt-br) stub of the XMLs returned by GlotPress has a node with '...' that needs being substituted
+      gp_xml = File.open(stub_file('pt-br')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
       gp_node = gp_xml.xpath(xpath).first
       expect(gp_node.content).to include('...')
 
-      # Check that the same string in the final, generated XML has every '...' substituted to '…'
-      Dir[File.join(@expected_dir, 'values-*', 'strings.xml')].each do |path|
-        final_xml = File.open(path) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+      # Check that the same string in all the final, generated XMLs has that '...' substituted to '…'
+      LOCALES_MAP.each do |h|
+        final_xml = File.open(expected_file(h[:android])) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
         final_node = final_xml.xpath(xpath).first
         expect(final_node.content).to include('…')
         expect(final_node.content).not_to include('...')
@@ -108,34 +120,30 @@ describe Fastlane::Helper::Android::LocalizeHelper do
       check_substitutions_in_node(item_node_xpath)
     end
 
-    # @todo Add a locale other than pt-rBR and introduce %% in translation for it
-
     it 'has a fixture with formatted=false tag containing accidentally escaped %%' do
-      path = File.join(@expected_dir, 'values-pt-rBR', 'strings.xml')
-      xpath = "/resources/string[@name='shipping_label_woo_discount_bottomsheet_message']"
+      path = expected_file('fr')
+      xpath = "/resources/string[@formatted='false']"
 
       xml = File.open(path) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
       node = xml.xpath(xpath).first
       
-      expect(node['formatted']).to eq('false')
+      expect(node).not_to be_nil
       expect(node.content).to include('%%')
       # The fact that we will trigger a warning during generation is tested by the "generates expected files" example
     end
 
     it 'replicates formatted=false attribute to generated files' do
-      orig_xml = File.open(File.join(@expected_dir, 'values', 'strings.xml')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-      final_xml = File.open(File.join(@expected_dir, 'values-pt-rBR', 'strings.xml')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+      orig_xml = File.open(expected_file(nil)) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+      final_xml = File.open(expected_file('pt-rBR')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
 
-      orig_node = orig_xml.xpath("/resources/string[@name='shipping_label_woo_discount_bottomsheet_message']").first
-      final_node = final_xml.xpath("/resources/string[@name='shipping_label_woo_discount_bottomsheet_message']").first
-
+      orig_node = orig_xml.xpath("/resources/string[@formatted='false']").first
       expect(orig_node).not_to be_nil
+
+      final_node = final_xml.xpath("/resources/string[@name='#{orig_node['name']}']").first
       expect(final_node).not_to be_nil
-      expect(orig_node['formatted']).to eq('false')
       expect(final_node['formatted']).to eq(orig_node['formatted'])
     end
 
-    # @todo Add more translations than just pt-rBR
     # @todo Tweak one of the stubs and expected to have a formatted=false but also '%%', then enable `expect(Fastlane::UI)…` line below
   end
 end
