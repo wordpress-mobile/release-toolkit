@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Translation-Revision-Date: 2021-03-31 09:54:04+0000
+Plural-Forms: nplurals=2; plural=n > 1;
+Generator: GlotPress/2.4.0-alpha
+Language: fr
+-->
+<resources>
+	<string name="product_attributes_error_saving">Erreur lors de l’enregistrement de vos attributs</string>
+	<string name="shipping_label_payments_cant_edit_warning">Seul le propriétaire du site peut gérer les moyens de paiement des étiquettes d’expédition. Veuillez contacter le propriétaire de la boutique %1$s (%2$s) pour gérer les moyens de paiement.</string>
+	<string name="shipping_label_shipping_method_free_shipping">Livraison gratuite</string>
+	<string name="shipping_label_shipping_method_local_pickup">Point de vente</string>
+	<string name="shipping_label_shipping_method_flat_rate">Forfait</string>
+	<string name="shipping_label_shipping_carrier_flat_fee_banner_message">Le client a payé %1$s (%2$s) pour la livraison</string>
+	<string name="shipping_label_woo_discount_bottomsheet_message" formatted="false">Lors de l’achat d’étiquettes d’expédition avec WooCommerce, vous bénéficiez de 5 à 40 %% de réduction par rapport aux tarifs de la Poste.</string>
+	<string name="shipping_label_woo_discount_bottomsheet_title">Qu’est-ce que la remise WooCommerce  Services ?</string>
+	<string name="shipping_label_payments_saving_dialog_message">Veuillez patienter...</string>
+	<string name="shipping_label_payments_saving_dialog_title">Enregistrement des paramètres</string>
+	<string name="shipping_label_shipping_carrier_rates_generic_error">Une erreur est survenue lors du chargement des options de livraison</string>
+	<string name="shipping_label_shipping_carrier_rates_unavailable">Il n’y a pas d’options de livraison pour l’adresse et les colis sélectionnés</string>
+	<string name="shipping_label_shipping_carriers_title">Transporteurs et frais de port</string>
+	<string name="shipping_label_create_purchase">Acheter une étiquette d’expédition</string>
+	<string name="shipping_label_create_mark_order_complete">Marquer cette commande comme terminée et informer le client</string>
+	<string name="shipping_label_create_price_total">Total de la commande</string>
+	<string name="shipping_label_create_price_woo_discount_content_description">En savoir plus sur la remise WooCommerce Services</string>
+	<string name="shipping_label_create_price_woo_discount">Remise WooCommerce Services</string>
+	<string name="shipping_label_create_price_subtotal">Sous-total</string>
+	<string name="shipping_label_create_order_summary">Récapitulatif de la commande d’étiquettes d’expédition</string>
+	<string-array name="order_list_tabs">
+		<item>En cours…</item>
+		<item>Toutes les commandes...</item>
+	</string-array>
+</resources>
