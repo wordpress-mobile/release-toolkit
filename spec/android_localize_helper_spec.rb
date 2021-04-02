@@ -1,7 +1,6 @@
 require 'spec_helper.rb'
 require 'fileutils'
 require 'tmpdir'
-require 'yaml'
 require 'nokogiri'
 
 describe Fastlane::Helper::Android::LocalizeHelper do
