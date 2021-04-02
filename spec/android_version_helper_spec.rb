@@ -54,6 +54,17 @@ describe Fastlane::Helper::Android::VersionHelper do
       allow(File).to receive(:open).with('./build.gradle', 'r').and_yield(StringIO.new(test_file_content))
       expect(subject.get_library_version_from_gradle_config(import_key: 'my-test-key')).to eq('my_test_value')
       expect(subject.get_library_version_from_gradle_config(import_key: 'my_test_key_double')).to be_nil
+
+      # Make sure it works with spaces starting the line
+      test_file_content = <<~CONTENT
+        my-test-key-foo = 'foo'
+        my-test-key-bad = "extbad"
+              ext.my-test-key = 'my_test_value'
+      CONTENT
+
+      allow(File).to receive(:exists?).and_return(true)
+      allow(File).to receive(:open).with('./build.gradle', 'r').and_yield(StringIO.new(test_file_content))
+      expect(subject.get_library_version_from_gradle_config(import_key: 'my-test-key')).to eq('my_test_value')
     end
   end
 end
