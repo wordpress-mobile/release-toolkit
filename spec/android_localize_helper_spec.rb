@@ -75,6 +75,11 @@ describe Fastlane::Helper::Android::LocalizeHelper do
         FileUtils.mkdir_p(File.join(tmpdir, 'values'))
         FileUtils.cp(expected_file(nil), File.join(tmpdir, 'values', 'strings.xml'))
 
+        warning_messages = []
+        allow(FastlaneCore::UI).to receive(:important) do |message|
+          warning_messages << message
+        end
+
         # Act
         described_class.download_from_glotpress(
           res_dir: tmpdir,
@@ -83,7 +88,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
         )
       
         # Assert: The entry containing formatted=false with '%%' in text does generate a warning
-        # @todo: expect(Fastlane::UI).to receive(:important).with('…the message…')
+        expect(warning_messages).to include(%(Warning: [fr] translation for 'shipping_label_woo_discount_bottomsheet_message' has attribute formatted=false, but still contains escaped '%%' in translation.))
 
         # Assert: Content of generated files matches the expectated files
         Dir.children(@expected_dir).each do |dir_name|

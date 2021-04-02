@@ -207,9 +207,9 @@ module Fastlane
         #
         # @param [Nokogiri::XML::Node] string_tag The XML tag/node to check
         #
-        def self.quick_lint(string_tag)
+        def self.quick_lint(string_tag, lang)
           if string_tag['formatted'] == 'false' && string_tag.content.include?('%%')
-            UI.important "Warning: translation for '#{string_tag['name']}' has attribute formatted=false, but still contains escaped '%%' in translation."
+            UI.important "Warning: [#{lang}] translation for '#{string_tag['name']}' has attribute formatted=false, but still contains escaped '%%' in translation."
           end
         end
         private_class_method :quick_lint
@@ -239,10 +239,10 @@ module Fastlane
               xml.xpath('//string').each do |string_tag|
                 apply_substitutions(string_tag)
                 orig_attributes[string_tag['name']]&.each { |k, v| string_tag[k] = v }
-                quick_lint(string_tag)
+                quick_lint(string_tag, lang_codes[:android])
               end
               xml.xpath('//string-array/item').each { |item_tag| apply_substitutions(item_tag) }
-              
+
               # Save
               FileUtils.mkdir(lang_dir) unless Dir.exist?(lang_dir)
               File.open(lang_file, 'w') { |f| xml.write_to(f, encoding: Encoding::UTF_8.to_s, indent: 4) }
