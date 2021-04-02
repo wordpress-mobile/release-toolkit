@@ -27,6 +27,8 @@ describe Fastlane::Helper::Android::LocalizeHelper do
     File.join(tmpdir, code.nil? ? 'values' : "values-#{code}", 'strings.xml')
   end
 
+  ### Unit Tests
+
   describe 'create_available_languages_file' do
     it 'contains the proper locale codes' do
       FileUtils.mkdir_p(File.join(tmpdir, 'values'))
@@ -35,10 +37,10 @@ describe Fastlane::Helper::Android::LocalizeHelper do
         locale_codes: %w[en-rUS es pt-rBR it zh-rCN zh-rTW fr]
       )
 
-      path = File.join(tmpdir, 'values', 'available_languages.xml')
+      generated_file = File.join(tmpdir, 'values', 'available_languages.xml')
       expected_file = File.join(expected_dir, 'values', 'available_languages.xml')
-      expect(File.exist?(path)).to be(true)
-      expect(File.read(path).strip).to eq(File.read(expected_file).strip)
+      expect(File.exist?(generated_file)).to be(true)
+      expect(File.read(generated_file).strip).to eq(File.read(expected_file).strip)
     end
   end
 
@@ -76,8 +78,6 @@ describe Fastlane::Helper::Android::LocalizeHelper do
         locales_map: LOCALES_MAP
       )
     end
-
-    ### Unit Tests
 
     it 'tests all the locales we have fixtures for' do
       # Ensure we don't forget to update the locales map if we add more stubs in the future, and vice-versa
@@ -126,14 +126,14 @@ describe Fastlane::Helper::Android::LocalizeHelper do
 
     it 'replicates formatted="false" attribute to generated files' do
       orig_xml = File.open(generated_file(nil)) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-      final_xml = File.open(generated_file('pt-rBR')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+      pt_xml = File.open(generated_file('pt-rBR')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
 
       orig_node = orig_xml.xpath("/resources/string[@formatted='false']").first
       expect(orig_node).not_to be_nil
 
-      final_node = final_xml.xpath("/resources/string[@name='#{orig_node['name']}']").first
-      expect(final_node).not_to be_nil
-      expect(final_node['formatted']).to eq(orig_node['formatted'])
+      pt_node = pt_xml.xpath("/resources/string[@name='#{orig_node['name']}']").first
+      expect(pt_node).not_to be_nil
+      expect(pt_node['formatted']).to eq(orig_node['formatted'])
     end
 
     it 'warns about %% usage on tags with formatted="false"' do

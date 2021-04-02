@@ -206,6 +206,7 @@ module Fastlane
         # Perform some quick basic checks about an individual `<string>` tag and print warnings accordingly
         #
         # @param [Nokogiri::XML::Node] string_tag The XML tag/node to check
+        # @param [String] lang The language we are currently processing. Used for providing context during logging / warning message
         #
         def self.quick_lint(string_tag, lang)
           if string_tag['formatted'] == 'false' && string_tag.content.include?('%%')
