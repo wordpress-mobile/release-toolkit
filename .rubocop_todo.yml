@@ -129,6 +129,7 @@ RSpec/ExampleLength:
     - 'spec/configuration_spec.rb'
     - 'spec/ios_lint_localizations_spec.rb'
     - 'spec/release_notes_helper_spec.rb'
+    - 'spec/android_localize_helper_spec.rb'
 
 # Offense count: 9
 # Configuration parameters: CustomTransform, IgnoreMethods, SpecSuffixOnly.
@@ -143,6 +144,7 @@ RSpec/FilePath:
     - 'spec/ios_lint_localizations_spec.rb'
     - 'spec/ios_merge_translators_strings_spec.rb'
     - 'spec/release_notes_helper_spec.rb'
+    - 'spec/android_localize_helper_spec.rb'
 
 # Offense count: 8
 # Cop supports --auto-correct.
@@ -196,6 +198,9 @@ RSpec/NamedSubject:
     - 'spec/ci_helper_spec.rb'
     - 'spec/configuration_spec.rb'
     - 'spec/file_reference_spec.rb'
+
+RSpec/NestedGroups:
+  Max: 5
 
 # Offense count: 5
 RSpec/SubjectStub:

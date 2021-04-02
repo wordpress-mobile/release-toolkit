@@ -16,6 +16,12 @@ Gemspec/OrderedDependencies:
 Lint/UnusedMethodArgument:
   Enabled: false
 
+# Using trailing if/unless when the body is a one-liner is nice. But usually when we choose to use the if/unless
+# as a control-flow construct rather than trailing modifier, it's because the line length of the body is long already;
+# so in those cases it's still nice to avoid making even longer lines if we were using the trailing modifier construct.
+Style/IfUnlessModifier:
+  Enabled: false
+
 # We have a couple of empty methods especially when we implement an API contract on our Action subclasses
 # and those look nicer to us when still written as expended (in separate lines) to suggest us to fill them at some point
 # rather than the compact representation of having them one-liner `def foo; end` that is rubocop's default.
@@ -48,6 +54,8 @@ Metrics/AbcSize:
 
 Metrics/BlockLength:
   Max: 80
+  Exclude:
+   - spec/**/*_spec.rb
 
 Metrics/ClassLength:
   Max: 300
