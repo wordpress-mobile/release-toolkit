@@ -16,11 +16,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Downloads translated metadata from the translation system (deprecated)'
+        'Downloads translated metadata from the translation system'
       end
 
       def self.details
-        'Downloads translated metadata from the translation system. This action is deprecated in favor of android_download_translations(…)'
+        'Downloads translated metadata from the translation system. This action is deprecated in favor of android_download_translations'
       end
 
       def self.available_options
@@ -38,6 +38,14 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :android
+      end
+
+      def self.category
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        'This action is deprecated in favor of `android_download_translations`'
       end
     end
   end
