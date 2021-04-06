@@ -35,7 +35,7 @@ module Fastlane
       end
 
       def self.details
-        'Download translations from GlotPress, update local strings.xml files accordingly, lint, and commit the changes'
+        'Download translations from GlotPress, update local strings.xml files accordingly, lint, commit the changes, and push to the remote'
       end
 
       def self.available_options
@@ -55,7 +55,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :source_locale,
             env_name: 'FL_DOWNLOAD_TRANSLATIONS_SOURCE_LOCALE',
-            description: 'The android locale code for the source locale (the one serving as original/reference)',
+            description: 'The Android locale code for the source locale (the one serving as original/reference)',
             type: String,
             default_value: 'en_US'
           ),
@@ -67,7 +67,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :lint_task,
             env_name: 'FL_DOWNLOAD_TRANSLATIONS_LINT_TASK',
-            description: 'The name of the gradle task to run to lint the translations (after this action have updated them)',
+            description: 'The name of the Gradle task to run to lint the translations (after this action have updated them)',
             type: String,
             default_value: 'lintVanillaRelease'
           ),

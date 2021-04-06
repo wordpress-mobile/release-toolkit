@@ -249,7 +249,7 @@ module Fastlane
               File.open(lang_file, 'w') { |f| xml.write_to(f, encoding: Encoding::UTF_8.to_s, indent: 4) }
             rescue StandardError => e
               UI.error "Error downloading #{lang_codes[:glotpress]} - #{e.message}"
-              FileUtils.rm_rf(File.join(res_dir, "values-#{lang_codes[:android]}"))
+              FileUtils.rm_rf(lang_dir)
             end
           end
         end
