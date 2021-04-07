@@ -45,105 +45,173 @@ describe Fastlane::Helper::Android::LocalizeHelper do
   end
 
   describe 'download_from_glotpress' do
+    let(:gp_fake_url) { 'https://stub.glotpress.com/rspec-fake-project/' }
+
     LOCALES_MAP = [
       { glotpress: 'pt-br', android: 'pt-rBR' },
       { glotpress: 'zh-cn', android: 'zh-rCN' },
       { glotpress: 'fr', android: 'fr' },
     ].freeze
 
-    let(:warning_messages) { [] }
+    context 'with default filter and file name' do
+      let(:warning_messages) { [] }
 
-    before do
-      # Arrange: Configure stubs for GlotPress network requests for each locale
-      gp_fake_url = 'https://stub.glotpress.com/rspec-fake-project/'
-      Dir[File.join(stubs_dir, '*.xml')].each do |path|
-        # Each file in stubs_dir is a `{locale_code}.xml` whose content is what we want to use as stub for glotpress requests to `locale_code`
-        locale_code = File.basename(path, '.xml')
-        url = "#{gp_fake_url.chomp('/')}/#{locale_code}/default/export-translations?filters%5Bstatus%5D=current&format=android"
-        stub_request(:get, url).to_return(status: 200, body: File.read(path))
-      end
-
-      # Arrange: copy original values/strings.xml file to tmpdir
-      FileUtils.mkdir_p(File.dirname(generated_file(nil)))
-      FileUtils.cp(expected_file(nil), generated_file(nil))
-
-      allow(FastlaneCore::UI).to receive(:important) do |message|
-        warning_messages << message
-      end
-
-      # Act
-      described_class.download_from_glotpress(
-        res_dir: tmpdir,
-        glotpress_project_url: gp_fake_url,
-        locales_map: LOCALES_MAP
-      )
-    end
-
-    it 'tests all the locales we have fixtures for' do
-      # Ensure we don't forget to update the locales map if we add more stubs in the future, and vice-versa
-      expect(LOCALES_MAP.map { |h| "#{h[:glotpress]}.xml" }.sort).to eq(Dir.children(stubs_dir).sort)
-      expect(LOCALES_MAP.map { |h| "values-#{h[:android]}" }.sort).to eq(Dir.children(expected_dir).reject { |d| d == 'values' }.sort)
-    end
-
-    describe 'generates the expected files' do
-      LOCALES_MAP.each do |h|
-        it "for #{h[:android]}" do
-          expected_file = expected_file(h[:android])
-          generated_file = generated_file(h[:android])
-          expect(File.exist?(generated_file)).to be(true)
-          expect(File.read(generated_file).chomp).to eq(File.read(expected_file).chomp)
-        end
-      end
-    end
-
-    describe 'applies content substitutions' do
-      shared_examples 'substitutions' do |xpath|
-        it 'has at least one fixture with text to be substituted' do
-          # This ensures that even if we modify the fixtures in the future, we will still have a case which tests this
-          gp_xml = File.open(stub_file('pt-br')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-          gp_node = gp_xml.xpath(xpath).first
-          expect(gp_node.content).to include('...')
+      before do
+        # Arrange: Configure stubs for GlotPress network requests for each locale
+        Dir[File.join(stubs_dir, '*.xml')].each do |path|
+          # Each file in stubs_dir is a `{locale_code}.xml` whose content is what we want to use as stub for glotpress requests to `locale_code`
+          locale_code = File.basename(path, '.xml')
+          url = "#{gp_fake_url.chomp('/')}/#{locale_code}/default/export-translations?filters%5Bstatus%5D=current&format=android"
+          stub_request(:get, url).to_return(status: 200, body: File.read(path))
         end
 
+        # Arrange: copy original values/strings.xml file to tmpdir
+        FileUtils.mkdir_p(File.dirname(generated_file(nil)))
+        FileUtils.cp(expected_file(nil), generated_file(nil))
+
+        allow(FastlaneCore::UI).to receive(:important) do |message|
+          warning_messages << message
+        end
+
+        # Act
+        described_class.download_from_glotpress(
+          res_dir: tmpdir,
+          glotpress_project_url: gp_fake_url,
+          locales_map: LOCALES_MAP
+        )
+      end
+
+      it 'tests all the locales we have fixtures for' do
+        # Ensure we don't forget to update the locales map if we add more stubs in the future, and vice-versa
+        expect(LOCALES_MAP.map { |h| "#{h[:glotpress]}.xml" }.sort).to eq(Dir.children(stubs_dir).sort)
+        expect(LOCALES_MAP.map { |h| "values-#{h[:android]}" }.sort).to eq(Dir.children(expected_dir).reject { |d| d == 'values' }.sort)
+      end
+
+      describe 'generates the expected files' do
         LOCALES_MAP.each do |h|
-          it "has the text substituted in #{h[:android]}" do
-            final_xml = File.open(generated_file(h[:android])) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-            final_node = final_xml.xpath(xpath).first
-            expect(final_node.content).to include('…')
-            expect(final_node.content).not_to include('...')
+          it "for #{h[:android]}" do
+            expected_file = expected_file(h[:android])
+            generated_file = generated_file(h[:android])
+            expect(File.exist?(generated_file)).to be(true)
+            expect(File.read(generated_file).chomp).to eq(File.read(expected_file).chomp)
           end
         end
       end
 
-      context 'with //string tags' do
-        include_examples 'substitutions', "/resources/string[@name='shipping_label_payments_saving_dialog_message']"
+      describe 'applies content substitutions' do
+        shared_examples 'substitutions' do |xpath|
+          it 'has at least one fixture with text to be substituted' do
+            # This ensures that even if we modify the fixtures in the future, we will still have a case which tests this
+            gp_xml = File.open(stub_file('pt-br')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+            gp_node = gp_xml.xpath(xpath).first
+            expect(gp_node.content).to include('...')
+          end
+
+          LOCALES_MAP.each do |h|
+            it "has the text substituted in #{h[:android]}" do
+              final_xml = File.open(generated_file(h[:android])) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+              final_node = final_xml.xpath(xpath).first
+              expect(final_node.content).to include('…')
+              expect(final_node.content).not_to include('...')
+            end
+          end
+        end
+
+        context 'with //string tags' do
+          include_examples 'substitutions', "/resources/string[@name='shipping_label_payments_saving_dialog_message']"
+        end
+
+        context 'with //string-array/item tags' do
+          include_examples 'substitutions', "/resources/string-array[@name='order_list_tabs']/item[1]"
+        end
       end
 
-      context 'with //string-array/item tags' do
-        include_examples 'substitutions', "/resources/string-array[@name='order_list_tabs']/item[1]"
+      it 'replicates formatted="false" attribute to generated files' do
+        orig_xml = File.open(generated_file(nil)) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+        pt_xml = File.open(generated_file('pt-rBR')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+
+        orig_node = orig_xml.xpath("/resources/string[@formatted='false']").first
+        expect(orig_node).not_to be_nil
+
+        pt_node = pt_xml.xpath("/resources/string[@name='#{orig_node['name']}']").first
+        expect(pt_node).not_to be_nil
+        expect(pt_node['formatted']).to eq(orig_node['formatted'])
+      end
+
+      it 'warns about %% usage on tags with formatted="false"' do
+        fr_xml = File.open(generated_file('fr')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+        node = fr_xml.xpath("/resources/string[@formatted='false']").first
+
+        expect(node).not_to be_nil
+        expect(node.content).to include('%%')
+        expect(node['name']).not_to be_nil
+        expect(warning_messages).to include(%(Warning: [fr] translation for '#{node['name']}' has attribute formatted=false, but still contains escaped '%%' in translation.))
       end
     end
 
-    it 'replicates formatted="false" attribute to generated files' do
-      orig_xml = File.open(generated_file(nil)) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-      pt_xml = File.open(generated_file('pt-rBR')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+    context 'with custom parameters' do
+      it 'uses filters during export when custom ones are provided' do
+        # Arrange: copy original values/strings.xml file to tmpdir
+        FileUtils.mkdir_p(File.dirname(generated_file(nil)))
+        FileUtils.cp(expected_file(nil), generated_file(nil))
 
-      orig_node = orig_xml.xpath("/resources/string[@formatted='false']").first
-      expect(orig_node).not_to be_nil
+        # Arrange: Prepare request stubs
+        custom_gp_urls = LOCALES_MAP.map do |locale|
+          "#{gp_fake_url.chomp('/')}/#{locale[:glotpress]}/default/export-translations?filters%5Bstatus%5D=custom-status&filters%5Bwarnings%5D=yes&format=android"
+        end
+        custom_gp_urls.each do |url|
+          stub_request(:get, url)
+        end
 
-      pt_node = pt_xml.xpath("/resources/string[@name='#{orig_node['name']}']").first
-      expect(pt_node).not_to be_nil
-      expect(pt_node['formatted']).to eq(orig_node['formatted'])
-    end
+        # Act
+        described_class.download_from_glotpress(
+          res_dir: tmpdir,
+          glotpress_project_url: gp_fake_url,
+          glotpress_filters: { status: 'custom-status', warnings: 'yes' },
+          locales_map: LOCALES_MAP
+        )
 
-    it 'warns about %% usage on tags with formatted="false"' do
-      fr_xml = File.open(generated_file('fr')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-      node = fr_xml.xpath("/resources/string[@formatted='false']").first
+        # Assert: Check requests were done
+        custom_gp_urls.each do |url|
+          assert_requested(:get, url, times: 1)
+        end
+      end
 
-      expect(node).not_to be_nil
-      expect(node.content).to include('%%')
-      expect(node['name']).not_to be_nil
-      expect(warning_messages).to include(%(Warning: [fr] translation for '#{node['name']}' has attribute formatted=false, but still contains escaped '%%' in translation.))
+      it 'generates the output files with the custom filename when one is provided' do
+        # Arrange: copy original values/strings.xml file to tmpdir
+        FileUtils.mkdir_p(File.dirname(generated_file(nil)))
+        FileUtils.cp(expected_file(nil), generated_file(nil))
+
+        # Arrange: Prepare request stubs
+        LOCALES_MAP.each do |h|
+          stub_request(:get, "#{gp_fake_url.chomp('/')}/#{h[:glotpress]}/default/export-translations?format=android")
+            .to_return(status: 200, body: "<resources><string name='gp_locale'>#{h[:glotpress]}</string></resources")
+        end
+
+        # Act
+        described_class.download_from_glotpress(
+          res_dir: tmpdir,
+          glotpress_project_url: gp_fake_url,
+          glotpress_filters: {},
+          locales_map: LOCALES_MAP,
+          generated_strings_filename: 'custom.xml'
+        )
+
+        # Assert: Check custom file names were generated
+        LOCALES_MAP.each do |h|
+          default_path = generated_file(h[:android])
+          expect(File.exist?(default_path)).to be(false)
+          custom_path = File.join(tmpdir, "values-#{h[:android]}", 'custom.xml')
+          expect(File.exist?(custom_path)).to be(true)
+          expected_content = <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <resources>
+                <string name="gp_locale">#{h[:glotpress]}</string>
+            </resources>
+          XML
+          expect(File.read(custom_path)).to eq(expected_content)
+        end
+      end
     end
   end
 end
