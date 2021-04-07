@@ -16,16 +16,18 @@ module Fastlane
         Fastlane::Helper::Android::LocalizeHelper.download_from_glotpress(
           res_dir: res_dir,
           glotpress_project_url: params[:glotpress_url],
-          glotpress_filters: { 'status': params[:status_filter] },
+          glotpress_filters: { status: params[:status_filter] },
           locales_map: params[:locales],
           generated_strings_filename: params[:generated_strings_filename]
         )
 
         # Update submodules then lint translations
-        Fastlane::Helper::GitHelper.update_submodules()
-        Action.sh('./gradlew', params[:lint_task])
+        unless params[:lint_task].nil? || params[:lint_task].empty?
+          Fastlane::Helper::GitHelper.update_submodules()
+          Action.sh('./gradlew', params[:lint_task])
+        end
 
-        Fastlane::Helper::GitHelper.commit(message: 'Update translations', files: res_dir, push: true)
+        Fastlane::Helper::GitHelper.commit(message: 'Update translations', files: res_dir, push: true) unless params[:skip_commit]
       end
 
       #####################################################
@@ -84,9 +86,16 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :lint_task,
             env_name: 'FL_DOWNLOAD_TRANSLATIONS_LINT_TASK',
-            description: 'The name of the Gradle task to run to lint the translations (after this action have updated them)',
+            description: 'The name of the Gradle task to run to lint the translations (after this action have updated them). Set to nil or empty string to skip the lint',
             type: String,
             default_value: 'lintVanillaRelease'
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :skip_commit,
+            env_name: 'FL_DOWNLOAD_TRANSLATIONS_SKIP_COMMIT',
+            description: 'If set to true, will skip the commit/push step. Otherwise, it will commit the changes and push them (the default)',
+            is_string: false, # Boolean
+            default_value: false
           ),
         ]
       end
