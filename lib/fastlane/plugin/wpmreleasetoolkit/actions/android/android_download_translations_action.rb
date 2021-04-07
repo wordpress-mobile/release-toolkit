@@ -16,7 +16,9 @@ module Fastlane
         Fastlane::Helper::Android::LocalizeHelper.download_from_glotpress(
           res_dir: res_dir,
           glotpress_project_url: params[:glotpress_url],
-          locales_map: params[:locales]
+          glotpress_filters: { 'status': params[:status_filter] },
+          locales_map: params[:locales],
+          generated_strings_filename: params[:generated_strings_filename]
         )
 
         # Update submodules then lint translations
@@ -54,6 +56,13 @@ module Fastlane
             type: String
           ),
           FastlaneCore::ConfigItem.new(
+            key: :status_filter,
+            env_name: 'FL_DOWNLOAD_TRANSLATIONS_STATUS_FILTER',
+            description: 'The GlotPress filter to use when downloading the translations',
+            type: String,
+            default_value: 'current'
+          ),
+          FastlaneCore::ConfigItem.new(
             key: :source_locale,
             env_name: 'FL_DOWNLOAD_TRANSLATIONS_SOURCE_LOCALE',
             description: 'The Android locale code for the source locale (the one serving as original/reference). This will be included into the `available_languages.xml` file',
@@ -64,6 +73,13 @@ module Fastlane
             key: :locales,
             description: 'An array of hashes – each with the :glotpress and :android keys – listing the locale codes to download and update',
             type: Array
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :generated_strings_filename,
+            env_name: 'FL_DOWNLOAD_TRANSLATIONS_GENERATED_STRINGS_FILENAME',
+            description: 'The name of the XML files to generate inside `values-*/` subfolders to contain the translated strings',
+            type: String,
+            default_value: 'strings.xml'
           ),
           FastlaneCore::ConfigItem.new(
             key: :lint_task,

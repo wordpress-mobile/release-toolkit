@@ -217,22 +217,26 @@ module Fastlane
 
         # Download translations from GlotPress
         #
-        # @param [String] res_dir The relative path to the `…/src/main/res` directory
-        # @param [String] glotpress_project_url The base URL to the glotpress project to download the strings from
+        # @param [String] res_dir The relative path to the `…/src/main/res` directory.
+        # @param [String] glotpress_project_url The base URL to the glotpress project to download the strings from.
+        # @param [Hash{String=>String}] glotpress_project_filters The list of filters to apply when exporting strings from GlotPress.
+        #                               Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
         # @param [Array<Hash{Symbol=>String}>] locales_map An array of locales to download. Each item in the array must be a
         #                                      Hash with keys `:glotpress` and `:android` containing the respective locale codes.
+        # @param [String] generated_strings_filename The name of the XML strings file to use when saving the exported translations.
         #
-        def self.download_from_glotpress(res_dir:, glotpress_project_url:, locales_map:)
+        def self.download_from_glotpress(res_dir:, glotpress_project_url:, glotpress_filters: { status: 'current' }, locales_map:, generated_strings_filename: 'strings.xml')
           attributes_to_copy = %w[formatted] # Attributes that we want to replicate into translated `string.xml` files
-          orig_file = File.join(res_dir, 'values', 'strings.xml')
+          orig_file = File.join(res_dir, 'values', 'strings.xml') # Original is 'strings.xml' even if generated_strings_filename provided
           orig_xml = File.open(orig_file) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
           orig_attributes = orig_xml.xpath('//string').map { |tag| [tag['name'], tag.attributes.select { |k, _| attributes_to_copy.include?(k) }] }.to_h
-
+          
           locales_map.each do |lang_codes|
             UI.message "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]})..."
             lang_dir = File.join(res_dir, "values-#{lang_codes[:android]}")
-            lang_file = File.join(lang_dir, 'strings.xml')
-            uri = URI.parse("#{glotpress_project_url.chomp('/')}/#{lang_codes[:glotpress]}/default/export-translations?filters[status]=current&format=android")
+            lang_file = File.join(lang_dir, generated_strings_filename)
+            query_params = glotpress_filters.transform_keys { |k| "filters[#{k}]" }.merge(format: 'android')
+            uri = URI.parse("#{glotpress_project_url.chomp('/')}/#{lang_codes[:glotpress]}/default/export-translations?#{URI.encode_www_form(query_params)}")
             begin
               # Download XML
               xml = uri.open { |f| Nokogiri::XML(f.read.gsub("\t", '    '), nil, Encoding::UTF_8.to_s) }
