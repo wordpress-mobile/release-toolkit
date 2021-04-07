@@ -14,6 +14,9 @@ module Fastlane
         user = client.user
         UI.message("Logged in as: #{user.name}")
 
+        # Auto-paginate to ensure we're not missing data
+        client.auto_paginate = true
+
         client
       end
 
@@ -26,6 +29,16 @@ module Fastlane
         end
 
         return mile
+      end
+
+      # Fetch all the PRs for a given milestone
+      #
+      # @param [String] repository The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`)
+      # @param [String] milestone The name of the milestone we want to fetch the list of PRs for (e.g.: `16.9`)
+      # @return [<Sawyer::Resource>] A list of the PRs for the given milestone, sorted by number
+      #
+      def self.get_prs_for_milestone(repository, milestone)
+        github_client.search_issues(%(type:pr milestone:"#{milestone}" repo:#{repository}))[:items].sort_by(&:number)
       end
 
       def self.get_last_milestone(repository)
