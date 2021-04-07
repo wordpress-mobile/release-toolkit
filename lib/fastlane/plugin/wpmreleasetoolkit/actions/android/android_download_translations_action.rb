@@ -7,7 +7,7 @@ module Fastlane
         require_relative '../../helper/android/android_localize_helper.rb'
         require_relative '../../helper/git_helper.rb'
 
-        res_dir = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', params[:project_dir_name], 'src', 'main', 'res')
+        res_dir = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', params[:res_dir])
 
         Fastlane::Helper::Android::LocalizeHelper.create_available_languages_file(
           res_dir: res_dir,
@@ -41,10 +41,11 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(
-            key: :project_dir_name,
-            env_name: 'PROJECT_NAME',
-            description: 'The name of the Android project (i.e. the name of the parent folder containing `src/main/res`)',
-            type: String
+            key: :res_dir,
+            env_name: 'FL_DOWNLOAD_TRANSLATIONS_RES_DIR',
+            description: "The path to the Android project's `res` dir (typically the `<project name>/src/main/res` directory) containing the `values-*` subdirs",
+            type: String,
+            default_value: "#{ENV['PROJECT_NAME']}/src/main/res"
           ),
           FastlaneCore::ConfigItem.new(
             key: :glotpress_url,
@@ -55,7 +56,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :source_locale,
             env_name: 'FL_DOWNLOAD_TRANSLATIONS_SOURCE_LOCALE',
-            description: 'The Android locale code for the source locale (the one serving as original/reference)',
+            description: 'The Android locale code for the source locale (the one serving as original/reference). This will be included into the `available_languages.xml` file',
             type: String,
             default_value: 'en_US'
           ),
