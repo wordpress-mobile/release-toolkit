@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane-plugin-wpmreleasetoolkit (0.16.0)
+    fastlane-plugin-wpmreleasetoolkit (0.17.0)
       activesupport (~> 5)
       bigdecimal (~> 1.4)
       chroma (= 0.2.0)
@@ -19,7 +19,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     CFPropertyList (3.0.3)
-    activesupport (5.2.4.5)
+    activesupport (5.2.5)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
@@ -173,7 +173,7 @@ GEM
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     httpclient (2.8.3)
-    i18n (1.8.9)
+    i18n (1.8.10)
       concurrent-ruby (~> 1.0)
     jaro_winkler (1.5.4)
     jmespath (1.4.0)
@@ -334,4 +334,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   2.2.5
+   2.2.10
