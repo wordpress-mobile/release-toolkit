@@ -223,18 +223,17 @@ module Fastlane
         #                               Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
         # @param [Array<Hash{Symbol=>String}>] locales_map An array of locales to download. Each item in the array must be a
         #                                      Hash with keys `:glotpress` and `:android` containing the respective locale codes.
-        # @param [String] generated_strings_filename The name of the XML strings file to use when saving the exported translations.
         #
-        def self.download_from_glotpress(res_dir:, glotpress_project_url:, glotpress_filters: { status: 'current' }, locales_map:, generated_strings_filename: 'strings.xml')
+        def self.download_from_glotpress(res_dir:, glotpress_project_url:, glotpress_filters: { status: 'current' }, locales_map:)
           attributes_to_copy = %w[formatted] # Attributes that we want to replicate into translated `string.xml` files
-          orig_file = File.join(res_dir, 'values', 'strings.xml') # Original is 'strings.xml' even if generated_strings_filename provided
+          orig_file = File.join(res_dir, 'values', 'strings.xml')
           orig_xml = File.open(orig_file) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
           orig_attributes = orig_xml.xpath('//string').map { |tag| [tag['name'], tag.attributes.select { |k, _| attributes_to_copy.include?(k) }] }.to_h
           
           locales_map.each do |lang_codes|
             UI.message "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]})..."
             lang_dir = File.join(res_dir, "values-#{lang_codes[:android]}")
-            lang_file = File.join(lang_dir, generated_strings_filename)
+            lang_file = File.join(lang_dir, 'strings.xml')
             query_params = glotpress_filters.transform_keys { |k| "filters[#{k}]" }.merge(format: 'android')
             uri = URI.parse("#{glotpress_project_url.chomp('/')}/#{lang_codes[:glotpress]}/default/export-translations?#{URI.encode_www_form(query_params)}")
             begin

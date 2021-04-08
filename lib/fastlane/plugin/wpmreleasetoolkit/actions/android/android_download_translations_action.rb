@@ -17,8 +17,7 @@ module Fastlane
           res_dir: res_dir,
           glotpress_project_url: params[:glotpress_url],
           glotpress_filters: { status: params[:status_filter] },
-          locales_map: params[:locales],
-          generated_strings_filename: params[:generated_strings_filename]
+          locales_map: params[:locales]
         )
 
         # Update submodules then lint translations
@@ -75,13 +74,6 @@ module Fastlane
             key: :locales,
             description: 'An array of hashes – each with the :glotpress and :android keys – listing the locale codes to download and update',
             type: Array
-          ),
-          FastlaneCore::ConfigItem.new(
-            key: :generated_strings_filename,
-            env_name: 'FL_DOWNLOAD_TRANSLATIONS_GENERATED_STRINGS_FILENAME',
-            description: 'The name of the XML files to generate inside `values-*/` subfolders to contain the translated strings',
-            type: String,
-            default_value: 'strings.xml'
           ),
           FastlaneCore::ConfigItem.new(
             key: :lint_task,
