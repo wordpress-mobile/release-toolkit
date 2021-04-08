@@ -274,6 +274,8 @@ module Fastlane
         #       If a string/resource with a given `name` is present in multiple documents, the node of the last one wins.
         #
         def self.merge_xml_documents(all_xmls)
+          return all_xmls.first if all_xmls.count <= 1
+
           merged_xml = all_xmls.first.dup # Use the first XML as starting point
           resources_node = merged_xml.xpath('/resources').first
           # For each other XML, find all the nodes with a name attribute, and merge them in
