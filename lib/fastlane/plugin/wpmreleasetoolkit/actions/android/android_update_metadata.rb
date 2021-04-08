@@ -20,7 +20,7 @@ module Fastlane
       end
 
       def self.details
-        'Downloads translated metadata from the translation system. This action is deprecated in favor of android_download_translations'
+        'Downloads translated metadata from the translation system. This action is deprecated in favor of `android_download_translations`'
       end
 
       def self.available_options
