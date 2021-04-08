@@ -16,7 +16,7 @@ module Fastlane
         Fastlane::Helper::Android::LocalizeHelper.download_from_glotpress(
           res_dir: res_dir,
           glotpress_project_url: params[:glotpress_url],
-          glotpress_filters: { status: params[:status_filter] },
+          glotpress_filters: params[:status_filter].map { |s| { status: s } },
           locales_map: params[:locales]
         )
 
@@ -59,8 +59,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :status_filter,
             env_name: 'FL_DOWNLOAD_TRANSLATIONS_STATUS_FILTER',
-            description: 'The GlotPress filter to use when downloading the translations',
-            type: String,
+            description: 'The GlotPress status(es) to filter on when downloading the translations',
+            type: Array,
             default_value: 'current'
           ),
           FastlaneCore::ConfigItem.new(
