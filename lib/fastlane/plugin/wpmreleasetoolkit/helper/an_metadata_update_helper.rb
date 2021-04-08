@@ -125,6 +125,10 @@ module Fastlane
       def extract_key(line)
         line.split(' ')[1].tr('\"', '')
       end
+
+      def is_int?(value)
+        true if Integer(string) rescue false
+      end
     end
 
     class ReleaseNoteShortMetadataBlock < ReleaseNoteMetadataBlock
@@ -142,10 +146,6 @@ module Fastlane
 
       def generate_block(fw)
         super(fw) unless File.zero?(@content_file_path)
-      end
-
-      def is_int?(value)
-        true if Integer(string) rescue false
       end
     end
   end
