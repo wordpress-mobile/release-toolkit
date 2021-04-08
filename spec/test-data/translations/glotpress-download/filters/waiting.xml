@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Translation-Revision-Date: 2021-03-31 09:54:04+0000
+Plural-Forms: nplurals=2; plural=n > 1;
+Generator: GlotPress/2.4.0-alpha
+Language: fr
+-->
+<resources>
+	<string name='gp_locale'>fr</string>
+	<string name='in_multiple_exports'>waiting</string>
+	<string name='only_in_waiting'>This is only in "waiting" export</string>
+	<string name="shipping_label_woo_discount_bottomsheet_message">Get 5% to 40% off compared to post office rates!</string>
+</resources>

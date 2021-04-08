@@ -149,7 +149,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
       end
     end
 
-    context 'with custom parameters' do
+    context 'with filters' do
       it 'uses filters during export when custom ones are provided' do
         # Arrange: copy original values/strings.xml file to tmpdir
         FileUtils.mkdir_p(File.dirname(generated_file(nil)))
@@ -177,40 +177,33 @@ describe Fastlane::Helper::Android::LocalizeHelper do
         end
       end
 
-      it 'generates the output files with the custom filename when one is provided' do
+      it 'merges the various exports with different filters together' do
         # Arrange: copy original values/strings.xml file to tmpdir
         FileUtils.mkdir_p(File.dirname(generated_file(nil)))
         FileUtils.cp(expected_file(nil), generated_file(nil))
 
         # Arrange: Prepare request stubs
-        LOCALES_MAP.each do |h|
-          stub_request(:get, "#{gp_fake_url.chomp('/')}/#{h[:glotpress]}/default/export-translations?format=android")
-            .to_return(status: 200, body: "<resources><string name='gp_locale'>#{h[:glotpress]}</string></resources")
+        statuses = %w[current waiting fuzzy]
+        statuses.each do |status|
+          stub_path = File.join(fixtures_dir, 'filters', "#{status}.xml")
+          stub_request(:get, "#{gp_fake_url.chomp('/')}/fakegploc/default/export-translations?filters%5Bstatus%5D=#{status}&format=android")
+            .to_return(status: 200, body: File.read(stub_path))
         end
 
         # Act
+        filters = statuses.map { |s| { status: s } }
         described_class.download_from_glotpress(
           res_dir: tmpdir,
           glotpress_project_url: gp_fake_url,
-          glotpress_filters: {},
-          locales_map: LOCALES_MAP,
-          generated_strings_filename: 'custom.xml'
+          glotpress_filters: filters,
+          locales_map: [{ glotpress: 'fakegploc', android: 'fakeanloc' }]
         )
 
-        # Assert: Check custom file names were generated
-        LOCALES_MAP.each do |h|
-          default_path = generated_file(h[:android])
-          expect(File.exist?(default_path)).to be(false)
-          custom_path = File.join(tmpdir, "values-#{h[:android]}", 'custom.xml')
-          expect(File.exist?(custom_path)).to be(true)
-          expected_content = <<~XML
-            <?xml version="1.0" encoding="UTF-8"?>
-            <resources>
-                <string name="gp_locale">#{h[:glotpress]}</string>
-            </resources>
-          XML
-          expect(File.read(custom_path)).to eq(expected_content)
-        end
+        # Assert: Check generated merged file
+        generated_file_path = generated_file('fakeanloc')
+        expected_merged_content = File.read(File.join(fixtures_dir, 'filters', 'merged.xml'))
+        expect(File.exist?(generated_file_path)).to be(true)
+        expect(File.read(generated_file_path)).to eq(expected_merged_content)
       end
     end
   end

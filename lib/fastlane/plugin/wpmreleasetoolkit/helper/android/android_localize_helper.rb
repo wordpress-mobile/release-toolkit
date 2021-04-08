@@ -194,6 +194,25 @@ module Fastlane
           File.write(File.join(res_dir, 'values', 'available_languages.xml'), doc.to_xml)
         end
 
+        # Downloads the export from GlotPress for a given locale and given filters
+        #
+        # @param [String] project_url The URL to the GlotPress project to export from.
+        # @param [String] locale The GlotPress locale code to download strings for.
+        # @param [Hash{Symbol=>String}] filters The hash of filters to apply when exporting from GlotPress.
+        #                               Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
+        #              
+        def self.download_glotpress_export_file(project_url:, locale:, filters:)
+          query_params = filters.transform_keys { |k| "filters[#{k}]" }.merge(format: 'android')
+          uri = URI.parse("#{project_url.chomp('/')}/#{locale}/default/export-translations?#{URI.encode_www_form(query_params)}")
+          begin
+            uri.open { |f| Nokogiri::XML(f.read.gsub("\t", '    '), nil, Encoding::UTF_8.to_s) }
+          rescue StandardError => e
+            UI.error "Error downloading #{lang_codes[:glotpress]} - #{e.message}"
+            return nil
+          end  
+        end
+        private_class_method :download_glotpress_export_file
+
         # Apply some common text substitutions to tag contents
         #
         # @param [Nokogiri::XML::Node] tag The XML tag/node to apply substitutions to
@@ -219,41 +238,45 @@ module Fastlane
         #
         # @param [String] res_dir The relative path to the `…/src/main/res` directory.
         # @param [String] glotpress_project_url The base URL to the glotpress project to download the strings from.
-        # @param [Hash{String=>String}] glotpress_project_filters The list of filters to apply when exporting strings from GlotPress.
-        #                               Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
-        # @param [Array<Hash{Symbol=>String}>] locales_map An array of locales to download. Each item in the array must be a
-        #                                      Hash with keys `:glotpress` and `:android` containing the respective locale codes.
+        # @param [Hash{String=>String}, Array] glotpress_project_filters
+        #        The filters to apply when exporting strings from GlotPress.
+        #        Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
+        #        If an array of Hashes is provided instead of a single Hash, this method will perform as many
+        #        export requests as items in this parameter, then merge all the results. Useful for OR-ing filter results.
+        # @param [Array<Hash{Symbol=>String}>] locales_map
+        #        An array of locales to download. Each item in the array must be a Hash
+        #        with keys `:glotpress` and `:android` containing the respective locale codes.
         #
         def self.download_from_glotpress(res_dir:, glotpress_project_url:, glotpress_filters: { status: 'current' }, locales_map:)
+          glotpress_filters = [glotpress_filters] unless glotpress_filters.is_a?(Array)
+
           attributes_to_copy = %w[formatted] # Attributes that we want to replicate into translated `string.xml` files
           orig_file = File.join(res_dir, 'values', 'strings.xml')
           orig_xml = File.open(orig_file) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
           orig_attributes = orig_xml.xpath('//string').map { |tag| [tag['name'], tag.attributes.select { |k, _| attributes_to_copy.include?(k) }] }.to_h
-          
-          locales_map.each do |lang_codes|
-            UI.message "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]})..."
-            lang_dir = File.join(res_dir, "values-#{lang_codes[:android]}")
-            lang_file = File.join(lang_dir, 'strings.xml')
-            query_params = glotpress_filters.transform_keys { |k| "filters[#{k}]" }.merge(format: 'android')
-            uri = URI.parse("#{glotpress_project_url.chomp('/')}/#{lang_codes[:glotpress]}/default/export-translations?#{URI.encode_www_form(query_params)}")
-            begin
-              # Download XML
-              xml = uri.open { |f| Nokogiri::XML(f.read.gsub("\t", '    '), nil, Encoding::UTF_8.to_s) }
-              # Process XML (text substitutions, replicate attributes, quick-lint string)
-              xml.xpath('//string').each do |string_tag|
-                apply_substitutions(string_tag)
-                orig_attributes[string_tag['name']]&.each { |k, v| string_tag[k] = v }
-                quick_lint(string_tag, lang_codes[:android])
-              end
-              xml.xpath('//string-array/item').each { |item_tag| apply_substitutions(item_tag) }
 
-              # Save
-              FileUtils.mkdir(lang_dir) unless Dir.exist?(lang_dir)
-              File.open(lang_file, 'w') { |f| xml.write_to(f, encoding: Encoding::UTF_8.to_s, indent: 4) }
-            rescue StandardError => e
-              UI.error "Error downloading #{lang_codes[:glotpress]} - #{e.message}"
-              FileUtils.rm_rf(lang_dir)
+          locales_map.each do |lang_codes|
+            all_xmls = Array(glotpress_filters || {}).map do |filters|
+              UI.message "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]}) [#{filters}]..."
+              download_glotpress_export_file(project_url: glotpress_project_url, locale: lang_codes[:glotpress], filters: filters)
+            end.compact
+
+            # @todo handle multiple xmls
+            xml = all_xmls.first
+
+            # Process XML (text substitutions, replicate attributes, quick-lint string)
+            xml.xpath('//string').each do |string_tag|
+              apply_substitutions(string_tag)
+              orig_attributes[string_tag['name']]&.each { |k, v| string_tag[k] = v }
+              quick_lint(string_tag, lang_codes[:android])
             end
+            xml.xpath('//string-array/item').each { |item_tag| apply_substitutions(item_tag) }
+
+            # Save
+            lang_dir = File.join(res_dir, "values-#{lang_codes[:android]}")
+            FileUtils.mkdir(lang_dir) unless Dir.exist?(lang_dir)
+            lang_file = File.join(lang_dir, 'strings.xml')
+            File.open(lang_file, 'w') { |f| xml.write_to(f, encoding: Encoding::UTF_8.to_s, indent: 4) }
           end
         end
 

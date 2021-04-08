@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Translation-Revision-Date: 2021-03-31 09:54:04+0000
+Plural-Forms: nplurals=2; plural=n > 1;
+Generator: GlotPress/2.4.0-alpha
+Language: fr
+-->
+<resources>
+	<string name='gp_locale'>fr</string>
+	<string name='only_in_current'>This is only in "current" export</string>
+	<string name='in_multiple_exports'>current</string>
+	<string name="shipping_label_woo_discount_bottomsheet_message">When purchasing shipping labels with WooCommerce, you get 5% to 40% off compared to post office rates.</string>
+	<string-array name='list'>
+		<item>list_item_1</item>
+		<item>list_item_2</item>
+	</string-array>
+</resources>
