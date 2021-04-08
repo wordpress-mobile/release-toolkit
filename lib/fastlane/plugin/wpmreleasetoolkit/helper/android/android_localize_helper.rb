@@ -265,11 +265,11 @@ module Fastlane
         #
         # @param [String] res_dir The relative path to the `…/src/main/res` directory.
         # @param [String] glotpress_project_url The base URL to the glotpress project to download the strings from.
-        # @param [Hash{String=>String}, Array] glotpress_project_filters
+        # @param [Hash{String=>String}, Array] glotpress_filters
         #        The filters to apply when exporting strings from GlotPress.
         #        Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
         #        If an array of Hashes is provided instead of a single Hash, this method will perform as many
-        #        export requests as items in this array, then merge all the results. Useful for OR-ing multiple filters.
+        #        export requests as items in this array, then merge all the results – useful for OR-ing multiple filters.
         # @param [Array<Hash{Symbol=>String}>] locales_map
         #        An array of locales to download. Each item in the array must be a Hash
         #        with keys `:glotpress` and `:android` containing the respective locale codes.
