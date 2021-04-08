@@ -200,6 +200,7 @@ module Fastlane
         # @param [String] locale The GlotPress locale code to download strings for.
         # @param [Hash{Symbol=>String}] filters The hash of filters to apply when exporting from GlotPress.
         #                               Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
+        # @return [Nokogiri::XML] the download XML document, parsed as a Nokogiri::XML object
         #              
         def self.download_glotpress_export_file(project_url:, locale:, filters:)
           query_params = filters.transform_keys { |k| "filters[#{k}]" }.merge(format: 'android')
@@ -212,6 +213,32 @@ module Fastlane
           end  
         end
         private_class_method :download_glotpress_export_file
+
+        # Merge multiple Nokogiri::XML `strings.xml` documents together
+        #
+        # @param [Array<Nokogiri::XML::Document>] all_xmls Array of the Nokogiri XML documents to merge together
+        # @return [Nokogiri::XML::Document] The merged document.
+        #
+        # @note The first document in the array is used as starting point. Then string/resources from other docs are merged into it.
+        #       If a string/resource with a given `name` is present in multiple documents, the node of the last one wins.
+        #
+        def self.merge_xml_documents(all_xmls)
+          merged_xml = all_xmls.first.dup # Use the first XML as starting point
+          resources_node = merged_xml.xpath('/resources').first
+          # For each other XML, find all the nodes with a name attribute, and merge them in
+          all_xmls.drop(1).each do |other_xml|
+            other_xml.xpath('/resources/*[@name]').each do |other_node|
+              existing_node = merged_xml.xpath("//#{other_node.name}[@name='#{other_node['name']}']").first
+              if existing_node.nil?
+                resources_node << '    ' << other_node << "\n"
+              else
+                existing_node.replace(other_node)
+              end
+            end
+          end
+          merged_xml
+        end
+        private_class_method :merge_xml_documents
 
         # Apply some common text substitutions to tag contents
         #
@@ -242,7 +269,7 @@ module Fastlane
         #        The filters to apply when exporting strings from GlotPress.
         #        Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
         #        If an array of Hashes is provided instead of a single Hash, this method will perform as many
-        #        export requests as items in this parameter, then merge all the results. Useful for OR-ing filter results.
+        #        export requests as items in this array, then merge all the results. Useful for OR-ing multiple filters.
         # @param [Array<Hash{Symbol=>String}>] locales_map
         #        An array of locales to download. Each item in the array must be a Hash
         #        with keys `:glotpress` and `:android` containing the respective locale codes.
@@ -256,27 +283,28 @@ module Fastlane
           orig_attributes = orig_xml.xpath('//string').map { |tag| [tag['name'], tag.attributes.select { |k, _| attributes_to_copy.include?(k) }] }.to_h
 
           locales_map.each do |lang_codes|
-            all_xmls = Array(glotpress_filters || {}).map do |filters|
+            all_xml_documents = Array(glotpress_filters || {}).map do |filters|
               UI.message "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]}) [#{filters}]..."
               download_glotpress_export_file(project_url: glotpress_project_url, locale: lang_codes[:glotpress], filters: filters)
             end.compact
-
-            # @todo handle multiple xmls
-            xml = all_xmls.first
+            next if all_xml_documents.empty?
+            
+            # Merge all XMLs together
+            merged_xml = merge_xml_documents(all_xml_documents)
 
             # Process XML (text substitutions, replicate attributes, quick-lint string)
-            xml.xpath('//string').each do |string_tag|
+            merged_xml.xpath('//string').each do |string_tag|
               apply_substitutions(string_tag)
               orig_attributes[string_tag['name']]&.each { |k, v| string_tag[k] = v }
               quick_lint(string_tag, lang_codes[:android])
             end
-            xml.xpath('//string-array/item').each { |item_tag| apply_substitutions(item_tag) }
+            merged_xml.xpath('//string-array/item').each { |item_tag| apply_substitutions(item_tag) }
 
             # Save
             lang_dir = File.join(res_dir, "values-#{lang_codes[:android]}")
             FileUtils.mkdir(lang_dir) unless Dir.exist?(lang_dir)
             lang_file = File.join(lang_dir, 'strings.xml')
-            File.open(lang_file, 'w') { |f| xml.write_to(f, encoding: Encoding::UTF_8.to_s, indent: 4) }
+            File.open(lang_file, 'w') { |f| merged_xml.write_to(f, encoding: Encoding::UTF_8.to_s, indent: 4) }
           end
         end
 

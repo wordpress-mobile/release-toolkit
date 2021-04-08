@@ -8,5 +8,9 @@ Language: fr
 <resources>
 	<string name='gp_locale'>fr</string>
 	<string name='only_in_fuzzy'>This is only in "fuzzy" export</string>
+	<string-array name='list'>
+		<item>list_item_1_fuzzy</item>
+		<item>list_item_2_fuzzy</item>
+	</string-array>
 	<string name='in_multiple_exports'>fuzzy</string>
 </resources>
