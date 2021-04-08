@@ -259,7 +259,7 @@ module Fastlane
           begin
             uri.open { |f| Nokogiri::XML(f.read.gsub("\t", '    '), nil, Encoding::UTF_8.to_s) }
           rescue StandardError => e
-            UI.error "Error downloading #{lang_codes[:glotpress]} - #{e.message}"
+            UI.error "Error downloading #{locale} - #{e.message}"
             return nil
           end
         end
