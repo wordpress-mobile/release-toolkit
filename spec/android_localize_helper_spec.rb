@@ -53,7 +53,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
       { glotpress: 'fr', android: 'fr' },
     ].freeze
 
-    context 'with default filter and file name' do
+    context 'with default filter' do
       let(:warning_messages) { [] }
 
       before do
@@ -149,7 +149,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
       end
     end
 
-    context 'with filters' do
+    context 'with custom filters' do
       it 'uses filters during export when custom ones are provided' do
         # Arrange: copy original values/strings.xml file to tmpdir
         FileUtils.mkdir_p(File.dirname(generated_file(nil)))
