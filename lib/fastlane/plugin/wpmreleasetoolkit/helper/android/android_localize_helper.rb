@@ -283,7 +283,7 @@ module Fastlane
           orig_attributes = orig_xml.xpath('//string').map { |tag| [tag['name'], tag.attributes.select { |k, _| attributes_to_copy.include?(k) }] }.to_h
 
           locales_map.each do |lang_codes|
-            all_xml_documents = Array(glotpress_filters || {}).map do |filters|
+            all_xml_documents = glotpress_filters.map do |filters|
               UI.message "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]}) [#{filters}]..."
               download_glotpress_export_file(project_url: glotpress_project_url, locale: lang_codes[:glotpress], filters: filters)
             end.compact
