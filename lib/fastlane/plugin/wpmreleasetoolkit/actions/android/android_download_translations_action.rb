@@ -80,7 +80,7 @@ module Fastlane
             env_name: 'FL_DOWNLOAD_TRANSLATIONS_LINT_TASK',
             description: 'The name of the Gradle task to run to lint the translations (after this action have updated them). Set to nil or empty string to skip the lint',
             type: String,
-            default_value: 'lintVanillaRelease'
+            optional: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :skip_commit,
