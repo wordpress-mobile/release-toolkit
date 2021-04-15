@@ -73,7 +73,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :locales,
             description: 'An array of hashes – each with the :glotpress and :android keys – listing the locale codes to download and update',
-            type: Array
+            type: Array,
+            verify_block: proc do |value|
+              unless value.is_a?(Array) && value.all? { |e| e.is_a?(Hash) && e.has_key?(:glotpress) && e.has_key?(:android) }
+                UI.user_error!('The value for the `locales` parameter must be an Array of Hashes, and each Hash must have at least `:glotpress` and `:android` keys.')
+              end
+            end
           ),
           FastlaneCore::ConfigItem.new(
             key: :lint_task,
