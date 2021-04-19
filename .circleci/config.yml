@@ -2,7 +2,6 @@ version: 2.1
 
 orbs:
   ios: wordpress-mobile/ios@1.0
-  codecov: codecov/codecov@1.0.2
 
 jobs:
   test:
