@@ -41,7 +41,7 @@ module Fastlane
 
         # Create the new one
         begin
-          File.open(target, 'a') do |fw|
+          File.open(target, 'w') do |fw|
             File.open(orig, 'r').each do |fr|
               write_target_block(fw, fr)
             end
