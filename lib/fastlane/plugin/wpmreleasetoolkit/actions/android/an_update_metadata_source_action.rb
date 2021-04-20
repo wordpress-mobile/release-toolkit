@@ -15,8 +15,7 @@ module Fastlane
         # Do
         check_source_files(params[:source_files])
         temp_po_name = create_temp_po(params)
-        UI.message "Temp #{temp_po_name} updated!"
-        # swap_po(params[:po_file_path], temp_po_name)
+        swap_po(params[:po_file_path], temp_po_name)
 
         UI.message "File #{params[:po_file_path]} updated!"
       end
@@ -42,7 +41,7 @@ module Fastlane
 
         # Create the new one
         begin
-          File.open(target, 'w') do |fw|
+          File.open(target, 'a') do |fw|
             File.open(orig, 'r').each do |fr|
               write_target_block(fw, fr)
             end
