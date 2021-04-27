@@ -16,7 +16,6 @@ Language: pt_BR
     <string name="shipping_label_payments_add_credit_card">Adicionar outro cartão de crédito</string>
     <string name="shipping_label_payments_selected_payment_method">Método de pagamento selecionado</string>
     <string name="shipping_label_woo_discount_bottomsheet_message" formatted="false">Ao comprar etiquetas de envio com o WooCommerce, você recebe de 5% a 40% de desconto se comparado às tarifas do correio.</string>
-    <string name="shipping_label_woo_discount_bottomsheet_title">O que é o desconto do  WooCommerce Services?</string>
     <string-array name="order_list_tabs">
         <item>Processando…</item>
         <item>Todos os pedidos…</item>
