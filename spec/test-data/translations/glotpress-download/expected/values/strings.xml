@@ -18,6 +18,7 @@
     -->
     <string name="all">All</string>
   
+    <string name="shipping_label_woo_discount_bottomsheet_title">What is WooCommerce  Services discount?</string>
     <string name="shipping_label_woo_discount_bottomsheet_message" formatted="false">When purchasing shipping labels with WooCommerce, you get 5% to 40% off compared to post office rates.</string>
 
     <string name="shipping_label_payments_selected_payment_method">Payment method selected</string>
@@ -35,7 +36,7 @@
         <item quantity="one">%d business day</item>
         <item quantity="other">%d business days</item>
     </plurals>
-
+    
     <!--
     Order List Tab Labels
     -->
@@ -44,6 +45,6 @@
         <item>All Orders</item>
     </string-array>
 
-
+    
     <string name="shipping_label_payments_cant_edit_warning">Only the site owner can manage the shipping label payment methods. Please contact Store Owner %1$s (%2$s) to manage payment methods.</string>
 </resources>
