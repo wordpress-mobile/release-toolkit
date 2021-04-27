@@ -93,7 +93,7 @@ describe Fastlane::Helper::GitHelper do
     it 'checks if a file path results ignored by Git using check-ignore' do
       path = 'path/to/file'
       expect_shell_command('git', 'check-ignore', path)
-      Fastlane::Helper::GitHelper.is_ignored(path: path)
+      Fastlane::Helper::GitHelper.is_ignored?(path: path)
     end
   end
 end

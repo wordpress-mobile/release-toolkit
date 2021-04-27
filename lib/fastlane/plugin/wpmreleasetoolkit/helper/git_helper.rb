@@ -172,7 +172,7 @@ module Fastlane
       # @param [String] path The path to check against the the `.gitignore`
       #
       # @return [Bool] True if the given path is ignored, false otherwise.
-      def self.is_ignored(path:)
+      def self.is_ignored?(path:)
         begin
           Action.sh('git', 'check-ignore', path)
         rescue
