@@ -1,6 +1,7 @@
 require 'fastlane_core/ui/ui'
 require 'fileutils'
 require 'nokogiri'
+require 'open-uri'
 
 module Fastlane
   UI = FastlaneCore::UI unless Fastlane.const_defined?('UI')
@@ -171,6 +172,149 @@ module Fastlane
             end
           end
         end
+
+        ########
+        # @!group Downloading translations from GlotPress
+        ########
+
+        # Create the `available_languages.xml` file.
+        #
+        # @param [String] res_dir The relative path to the `…/src/main/res` directory
+        # @param [Array<String>] locale_codes The list of locale codes to include in the available_languages.xml file
+        #
+        def self.create_available_languages_file(res_dir:, locale_codes:)
+          doc = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
+            xml.comment('Warning: Auto-generated file, do not edit.')
+            xml.resources do
+              xml.send(:'string-array', name: 'available_languages', translatable: 'false') do
+                locale_codes.each { |code| xml.item(code.gsub('-r', '_')) }
+              end
+            end
+          end
+          File.write(File.join(res_dir, 'values', 'available_languages.xml'), doc.to_xml)
+        end
+
+        # Download translations from GlotPress
+        #
+        # @param [String] res_dir The relative path to the `…/src/main/res` directory.
+        # @param [String] glotpress_project_url The base URL to the glotpress project to download the strings from.
+        # @param [Hash{String=>String}, Array] glotpress_filters
+        #        The filters to apply when exporting strings from GlotPress.
+        #        Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
+        #        If an array of Hashes is provided instead of a single Hash, this method will perform as many
+        #        export requests as items in this array, then merge all the results – useful for OR-ing multiple filters.
+        # @param [Array<Hash{Symbol=>String}>] locales_map
+        #        An array of locales to download. Each item in the array must be a Hash
+        #        with keys `:glotpress` and `:android` containing the respective locale codes.
+        #
+        def self.download_from_glotpress(res_dir:, glotpress_project_url:, glotpress_filters: { status: 'current' }, locales_map:)
+          glotpress_filters = [glotpress_filters] unless glotpress_filters.is_a?(Array)
+
+          attributes_to_copy = %w[formatted] # Attributes that we want to replicate into translated `string.xml` files
+          orig_file = File.join(res_dir, 'values', 'strings.xml')
+          orig_xml = File.open(orig_file) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+          orig_attributes = orig_xml.xpath('//string').map { |tag| [tag['name'], tag.attributes.select { |k, _| attributes_to_copy.include?(k) }] }.to_h
+
+          locales_map.each do |lang_codes|
+            all_xml_documents = glotpress_filters.map do |filters|
+              UI.message "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]}) [#{filters}]..."
+              download_glotpress_export_file(project_url: glotpress_project_url, locale: lang_codes[:glotpress], filters: filters)
+            end.compact
+            next if all_xml_documents.empty?
+
+            # Merge all XMLs together
+            merged_xml = merge_xml_documents(all_xml_documents)
+
+            # Process XML (text substitutions, replicate attributes, quick-lint string)
+            merged_xml.xpath('//string').each do |string_tag|
+              apply_substitutions(string_tag)
+              orig_attributes[string_tag['name']]&.each { |k, v| string_tag[k] = v }
+              quick_lint(string_tag, lang_codes[:android])
+            end
+            merged_xml.xpath('//string-array/item').each { |item_tag| apply_substitutions(item_tag) }
+
+            # Save
+            lang_dir = File.join(res_dir, "values-#{lang_codes[:android]}")
+            FileUtils.mkdir(lang_dir) unless Dir.exist?(lang_dir)
+            lang_file = File.join(lang_dir, 'strings.xml')
+            File.open(lang_file, 'w') { |f| merged_xml.write_to(f, encoding: Encoding::UTF_8.to_s, indent: 4) }
+          end
+        end
+
+        #####################
+        # Private Helpers
+        #####################
+
+        # Downloads the export from GlotPress for a given locale and given filters
+        #
+        # @param [String] project_url The URL to the GlotPress project to export from.
+        # @param [String] locale The GlotPress locale code to download strings for.
+        # @param [Hash{Symbol=>String}] filters The hash of filters to apply when exporting from GlotPress.
+        #                               Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
+        # @return [Nokogiri::XML] the download XML document, parsed as a Nokogiri::XML object
+        #
+        def self.download_glotpress_export_file(project_url:, locale:, filters:)
+          query_params = filters.transform_keys { |k| "filters[#{k}]" }.merge(format: 'android')
+          uri = URI.parse("#{project_url.chomp('/')}/#{locale}/default/export-translations?#{URI.encode_www_form(query_params)}")
+          begin
+            uri.open { |f| Nokogiri::XML(f.read.gsub("\t", '    '), nil, Encoding::UTF_8.to_s) }
+          rescue StandardError => e
+            UI.error "Error downloading #{locale} - #{e.message}"
+            return nil
+          end
+        end
+        private_class_method :download_glotpress_export_file
+
+        # Merge multiple Nokogiri::XML `strings.xml` documents together
+        #
+        # @param [Array<Nokogiri::XML::Document>] all_xmls Array of the Nokogiri XML documents to merge together
+        # @return [Nokogiri::XML::Document] The merged document.
+        #
+        # @note The first document in the array is used as starting point. Then string/resources from other docs are merged into it.
+        #       If a string/resource with a given `name` is present in multiple documents, the node of the last one wins.
+        #
+        def self.merge_xml_documents(all_xmls)
+          return all_xmls.first if all_xmls.count <= 1
+
+          merged_xml = all_xmls.first.dup # Use the first XML as starting point
+          resources_node = merged_xml.xpath('/resources').first
+          # For each other XML, find all the nodes with a name attribute, and merge them in
+          all_xmls.drop(1).each do |other_xml|
+            other_xml.xpath('/resources/*[@name]').each do |other_node|
+              existing_node = merged_xml.xpath("//#{other_node.name}[@name='#{other_node['name']}']").first
+              if existing_node.nil?
+                resources_node << '    ' << other_node << "\n"
+              else
+                existing_node.replace(other_node)
+              end
+            end
+          end
+          merged_xml
+        end
+        private_class_method :merge_xml_documents
+
+        # Apply some common text substitutions to tag contents
+        #
+        # @param [Nokogiri::XML::Node] tag The XML tag/node to apply substitutions to
+        #
+        def self.apply_substitutions(tag)
+          tag.content = tag.content.gsub('...', '…')
+        end
+        private_class_method :apply_substitutions
+
+        # Perform some quick basic checks about an individual `<string>` tag and print warnings accordingly
+        #
+        # @param [Nokogiri::XML::Node] string_tag The XML tag/node to check
+        # @param [String] lang The language we are currently processing. Used for providing context during logging / warning message
+        #
+        def self.quick_lint(string_tag, lang)
+          if string_tag['formatted'] == 'false' && string_tag.content.include?('%%')
+            UI.important "Warning: [#{lang}] translation for '#{string_tag['name']}' has attribute formatted=false, but still contains escaped '%%' in translation."
+          end
+        end
+        private_class_method :quick_lint
+
+        # @!endgroup
       end
     end
   end

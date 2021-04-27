@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Translation-Revision-Date: 2021-03-30 14:54:04+0000
+Plural-Forms: nplurals=2; plural=(n > 1);
+Generator: GlotPress/2.4.0-alpha
+Language: pt_BR
+-->
+<resources>
+    <string name="shipping_label_payments_saving_error">Ocorreu um erro ao salvar suas configurações</string>
+    <string name="shipping_label_payments_saving_dialog_message">Aguarde…</string>
+    <string name="shipping_label_payments_saving_dialog_title">Salvando suas configurações</string>
+    <string name="shipping_label_payments_expiration_date">Expira em %1$s</string>
+    <string name="shipping_label_payments_email_receipts_checkbox">Enviar os recibos de compra da etiqueta por e-mail para %1$s (%2$s) em %3$s</string>
+    <string name="shipping_label_payments_account_info">Os cartões de crédito foram recuperados da seguinte conta do WordPress.com: %1$s &lt;%2$s&gt;</string>
+    <string name="shipping_label_payments_type_digits">%1$s****%2$s</string>
+    <string name="shipping_label_payments_add_credit_card">Adicionar outro cartão de crédito</string>
+    <string name="shipping_label_payments_selected_payment_method">Método de pagamento selecionado</string>
+    <string name="shipping_label_woo_discount_bottomsheet_message" formatted="false">Ao comprar etiquetas de envio com o WooCommerce, você recebe de 5% a 40% de desconto se comparado às tarifas do correio.</string>
+    <string name="shipping_label_woo_discount_bottomsheet_title">O que é o desconto do  WooCommerce Services?</string>
+    <string-array name="order_list_tabs">
+        <item>Processando…</item>
+        <item>Todos os pedidos…</item>
+    </string-array>
+</resources>

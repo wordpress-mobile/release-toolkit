@@ -77,7 +77,7 @@ module Fastlane
 
       def self.details
         # Optional:
-        'Merges waiting and fuzzy strings into the main file for translators'
+        'Merges waiting and fuzzy strings into the main file for translators. This action is deprecated in favor of `android_download_translations`'
       end
 
       def self.available_options
@@ -92,6 +92,14 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.category
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        'This action is deprecated in favor of `android_download_translations` (using an array for the status_filter parameter)'
       end
     end
   end

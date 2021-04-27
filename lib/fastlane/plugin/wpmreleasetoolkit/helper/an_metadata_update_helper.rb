@@ -127,7 +127,7 @@ module Fastlane
       end
 
       def is_int?(value)
-        true if Integer(string) rescue false
+        true if Integer(value) rescue false
       end
     end
 

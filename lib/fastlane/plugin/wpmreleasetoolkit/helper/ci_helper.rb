@@ -6,8 +6,8 @@ require 'json'
 module CIHelper
   # Triggers a job on CI
   #
-  # @param [String] The branch on which the job should run
-  # @param [Parameters] CI provider specific parameters
+  # @param [String] branch The branch on which the job should run
+  # @param [Hash] parameters CI provider specific parameters
   #
   def trigger_job(branch:, parameters: nil)
     raise 'Not implemented'
@@ -67,8 +67,8 @@ module Fastlane
 
       # Triggers a job on CI
       #
-      # @param [String] The branch on which the job should run
-      # @param [Parameters] CI provider specific parameters
+      # @param [String] branch The branch on which the job should run
+      # @param [Hash] parameters CI provider specific parameters
       # @return [Net::HTTPResponse] The HTTP response
       #
       def trigger_job(branch:, parameters: nil)
