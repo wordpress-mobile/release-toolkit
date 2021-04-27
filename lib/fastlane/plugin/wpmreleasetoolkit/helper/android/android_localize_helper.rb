@@ -299,7 +299,6 @@ module Fastlane
         #
         def self.apply_substitutions(tag)
           tag.content = tag.content.gsub('...', '…')
-          tag.content = tag.content.gsub('-', '&#8211;')
         end
         private_class_method :apply_substitutions
 
