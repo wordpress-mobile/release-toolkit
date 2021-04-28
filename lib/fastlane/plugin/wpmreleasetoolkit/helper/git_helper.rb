@@ -173,15 +173,8 @@ module Fastlane
       #
       # @return [Bool] True if the given path is ignored, false otherwise.
       def self.is_ignored?(path:)
-        begin
-          Action.sh('git', 'check-ignore', path)
-          return true
-        rescue
-          # if there was an error, either the given path doesn't result as
-          # ignored or the command was called outside of a Git repo (as per the
-          # manpage). In both cases, we want to fail
-          false
-        end
+        system("git check-ignore #{path}")
+        $CHILD_STATUS.exitstatus == 0
       end
     end
   end
