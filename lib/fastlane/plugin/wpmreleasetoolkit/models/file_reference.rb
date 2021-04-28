@@ -42,7 +42,18 @@ module Fastlane
         File.write(encrypted_file_path, encrypted)
       end
 
+      # "Applies" the instruction described in the instance to the file system.
+      # That is, copies the content of the source `file` to the `destination`
+      # path.
+      #
+      # @raise [StandardError] For security reasons, it will raise if
+      # `destination` is not ignored under Git.
       def apply
+        # Only decrypt the file if the destination is ignored in Git
+        unless Fastlane::Helper::GitHelper.is_ignored?(path: destination_file_path)
+          raise StandardError.new "Attempted to decrypt #{file} to #{destination_file_path} which is not ignored under Git"
+        end
+
         # Create the destination directory if it doesn't exist
         FileUtils.mkdir_p(Pathname.new(destination_file_path).dirname)
         # Copy/decrypt the file
