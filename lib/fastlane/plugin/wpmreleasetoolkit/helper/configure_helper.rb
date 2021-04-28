@@ -225,6 +225,10 @@ module Fastlane
 
         UI.user_error!('You must pass a `destination` to `add_file`') unless params[:destination]
 
+        unless Fastlane::Helper::GitHelper.is_ignored?(path: params[:destination])
+          UI.user_error! "Attempted to add a file to a location which is not ignored under Git (#{params[:destination]})"
+        end
+
         new_config = self.configuration
         new_config.add_file_to_copy(params[:source], params[:destination], params[:encrypt])
         update_configuration(new_config)
