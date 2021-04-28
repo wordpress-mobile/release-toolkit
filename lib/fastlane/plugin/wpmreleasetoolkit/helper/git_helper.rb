@@ -175,6 +175,7 @@ module Fastlane
       def self.is_ignored?(path:)
         begin
           Action.sh('git', 'check-ignore', path)
+          return true
         rescue
           # if there was an error, either the given path doesn't result as
           # ignored or the command was called outside of a Git repo (as per the

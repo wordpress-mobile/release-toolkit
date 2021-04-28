@@ -90,10 +90,60 @@ describe Fastlane::Helper::GitHelper do
       Fastlane::Helper::GitHelper.commit(message: @message, push: true)
     end
 
-    it 'checks if a file path results ignored by Git using check-ignore' do
-      path = 'path/to/file'
-      expect_shell_command('git', 'check-ignore', path)
-      Fastlane::Helper::GitHelper.is_ignored?(path: path)
+    describe '#is_ignored?' do
+      context 'when the path is not ignored' do
+        it 'returns false' do
+          path = 'dummy.txt'
+          setup_git_repo(
+            dummy_file_path: path,
+            in_gitignore: false
+          )
+          expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be false
+        end
+      end
+
+      context 'when the path is in the .gitignore' do
+        context "but the .gitignore change hasn't been committed" do
+          # For some reason, I was expecting the underlying `git check-ignore`
+          # command to fail in this case, but I'm clearly wrong.
+          #
+          # I think there's value in keeping this behavior explicity documented
+          # and verified here. – Gio
+          it 'returns true' do
+            path = 'dummy.txt'
+            setup_git_repo(
+              dummy_file_path: path,
+              in_gitignore: true,
+              gitignore_committed: false
+            )
+            expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be false
+          end
+        end
+
+        it 'returns true' do
+          path = 'dummy.txt'
+          setup_git_repo(
+            dummy_file_path: path,
+            in_gitignore: true,
+            gitignore_committed: true
+          )
+          expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be true
+        end
+      end
     end
   end
+end
+
+private
+def setup_git_repo(dummy_file_path:, in_gitignore:, gitignore_committed: false)
+  `git init`
+  `echo abc > #{dummy_file_path}`
+
+  # no point in commiting the gitignore if the file shouldn't be in it
+  return unless in_gitignore
+
+  `echo #{dummy_file_path} > .gitignore`
+  `git add .gitignore && git commit -m 'Add .gitignore'` if gitignore_committed
+
+  puts `git check-ignore #{dummy_file_path}`
 end
