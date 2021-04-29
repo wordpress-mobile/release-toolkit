@@ -1,4 +1,5 @@
 rubocop:
+  config_file: .rubocop.yml
   # This should stay in line with the version resolved in the Gemfile.lock,
   # which you can verify with `bundle info rubocop`.
   #
@@ -6,4 +7,3 @@ rubocop:
   # find the list of supported versions here:
   # http://help.houndci.com/en/articles/2461415-supported-linters
   version: 0.75.0
-  config_file: .rubocop.yml
