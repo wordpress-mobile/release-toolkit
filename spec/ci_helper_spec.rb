@@ -3,7 +3,6 @@ require 'webmock/rspec'
 
 describe Fastlane::Helper::CircleCIHelper do
   it 'does something' do
-    foo = 1
   end
 end
 
