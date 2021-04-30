@@ -78,6 +78,9 @@ GEM
       no_proxy_fix
       octokit (~> 4.7)
       terminal-table (>= 1, < 4)
+    danger-rubocop (0.8.1)
+      danger
+      rubocop
     declarative (0.0.20)
     declarative-option (0.1.0)
     diff-lcs (1.4.4)
@@ -326,6 +329,7 @@ DEPENDENCIES
   bundler (>= 1.17)
   codecov
   danger (~> 8.0)
+  danger-rubocop (~> 0.6)
   fastlane (~> 2)
   fastlane-plugin-wpmreleasetoolkit!
   pry (~> 0.12.2)
