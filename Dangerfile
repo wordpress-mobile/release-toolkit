@@ -27,5 +27,6 @@ end
 github.dismiss_out_of_range_messages # This way, fixed violations should go
 rubocop.lint(
   files: git.modified_files + git.added_files,
-  inline_comment: true
+  inline_comment: true,
+  fail_on_inline_comment: true # Make the inline comments failures
 )
