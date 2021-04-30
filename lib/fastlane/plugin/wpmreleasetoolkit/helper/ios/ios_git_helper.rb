@@ -61,14 +61,14 @@ module Fastlane
 
           Fastlane::Helper::GitHelper.commit(message: 'Update metadata translations', files: './fastlane/metadata/', push: true)
         end
-      end
-    end
 
-    private
-
-    def self.strings_files
-      Dir.chdir(File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'])) do
-        Dir.glob('*.lproj/*.strings')
+        def self.strings_files
+          Dir.glob(
+            File.join(
+              ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], '*.lproj', '*.strings'
+            )
+          )
+        end
       end
     end
   end
