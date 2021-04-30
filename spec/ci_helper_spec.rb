@@ -1,6 +1,12 @@
 require 'spec_helper.rb'
 require 'webmock/rspec'
 
+describe Fastlane::Helper::CircleCIHelper do
+  it 'does something' do
+    foo = 1
+  end
+end
+
 shared_examples 'a CI provider' do
   subject { model }
 
