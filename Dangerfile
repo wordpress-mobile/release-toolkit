@@ -22,3 +22,10 @@ Please run `bundle install` to make sure they match.
 }
   fail(message)
 end
+
+# Lint with Rubocop and report violations inline in GitHub
+github.dismiss_out_of_range_messages # This way, fixed violations should go
+rubocop.lint(
+  files: git.modified_files + git.added_files,
+  inline_comment: true
+)
