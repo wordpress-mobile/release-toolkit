@@ -41,9 +41,6 @@ module Fastlane
         def self.localize_project
           Action.sh("cd #{ENV['PROJECT_ROOT_FOLDER']} && ./Scripts/localize.py")
 
-          strings_files = Dir.chdir(File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'])) do
-            Dir.glob('*.lproj/*.strings')
-          end
           Fastlane::Helper::GitHelper.commit(message: 'Update strings for localization', files: strings_files, push: true) || UI.message('No new strings, skipping commit')
         end
 
@@ -58,15 +55,20 @@ module Fastlane
         def self.update_metadata
           Action.sh("cd #{ENV['PROJECT_ROOT_FOLDER']} && ./Scripts/update-translations.rb")
 
-          strings_files = Dir.chdir(File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'])) do
-            Dir.glob('*.lproj/*.strings')
-          end
           Fastlane::Helper::GitHelper.commit(message: 'Update translations', files: strings_files, push: false)
 
           Action.sh('cd fastlane && ./download_metadata.swift')
 
           Fastlane::Helper::GitHelper.commit(message: 'Update metadata translations', files: './fastlane/metadata/', push: true)
         end
+      end
+    end
+
+    private
+
+    def self.strings_files
+      Dir.chdir(File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'])) do
+        Dir.glob('*.lproj/*.strings')
       end
     end
   end
