@@ -33,7 +33,7 @@ jobs:
           paths:
             - vendor/
             - /usr/local/Cellar
-
+            
       - run: # Compile drawText
           name: Compile drawText
           command: bundle exec rake compile
@@ -50,14 +50,9 @@ jobs:
       # Save test results for timing analysis
       - store_test_results:
           path: test_results
-
+      
       # Coverage reports are sent to Codecov as part of running `rspec`, not as a CircleCI step.
       # We may wish to change this for consistency.
-
-      - run:
-          name: Rubocop via Danger
-          command: |
-            bundle exec danger --verbose
 
 workflows:
   test:
