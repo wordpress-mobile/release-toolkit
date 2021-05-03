@@ -65,7 +65,7 @@ module Fastlane
         def self.strings_files
           Dir.glob(
             File.join(
-              ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], '*.lproj', '*.strings'
+              ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], '**', '*.strings'
             )
           )
         end
