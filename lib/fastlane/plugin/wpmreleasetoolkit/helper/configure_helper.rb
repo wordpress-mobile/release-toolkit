@@ -226,7 +226,7 @@ module Fastlane
         UI.user_error!('You must pass a `destination` to `add_file`') unless params[:destination]
 
         unless Fastlane::Helper::GitHelper.is_ignored?(path: params[:destination])
-          UI.user_error! "Attempted to add a file to a location which is not ignored under Git (#{params[:destination]})"
+          UI.user_error! "Attempted to add a file to a location which is not ignored under Git (#{params[:destination]}). Please edit your `.gitignore` manually to fix this."
         end
 
         new_config = self.configuration
