@@ -70,9 +70,9 @@ module Fastlane
         end
 
         def self.get_from_env!(key:)
-          value = ENV[key]
-          UI.user_error! "Could not find value for \"#{key}\" in environment." if value.nil?
-          return value
+          ENV.fetch(key) do
+            UI.user_error! "Could not find value for \"#{key}\" in environment."
+          end
         end
       end
     end
