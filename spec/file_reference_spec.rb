@@ -30,13 +30,11 @@ RSpec.shared_examples 'shared examples' do
 
   describe '#apply' do
     context 'when the destination is not ignored in Git' do
-      before do
+      it 'raises' do
         allow(Fastlane::Helper::GitHelper).to receive(:is_ignored?)
           .with(path: subject.destination_file_path)
           .and_return(false)
-      end
 
-      it 'raises' do
         expect(FileUtils).not_to receive(:mkdir_p)
         expect(subject).not_to receive(:source_contents)
         expect(File).not_to receive(:write)
@@ -45,13 +43,11 @@ RSpec.shared_examples 'shared examples' do
     end
 
     context 'when the destination is ignored in Git' do
-      before do
+      it 'copies the source to the destination' do
         allow(Fastlane::Helper::GitHelper).to receive(:is_ignored?)
           .with(path: subject.destination_file_path)
           .and_return(true)
-      end
 
-      it 'copies the source to the destination' do
         allow(FileUtils).to receive(:mkdir_p)
         allow(subject).to receive(:source_contents).and_return('source contents')
         expect(File).to receive(:write).with(subject.destination_file_path, 'source contents')
