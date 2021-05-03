@@ -97,7 +97,7 @@ describe Fastlane::Helper::GitHelper do
     it 'returns false when the path is not ignored' do
       setup_git_repo(
         dummy_file_path: path,
-        in_gitignore: false
+        add_file_to_gitignore: false
       )
       expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be false
     end
@@ -112,8 +112,8 @@ describe Fastlane::Helper::GitHelper do
         # and verified here. – Gio
         setup_git_repo(
           dummy_file_path: path,
-          in_gitignore: true,
-          gitignore_committed: false
+          add_file_to_gitignore: true,
+          commit_gitignore: false
         )
         expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be true
       end
@@ -121,8 +121,8 @@ describe Fastlane::Helper::GitHelper do
       it 'returns true when the .gitignore has no uncommitted changes' do
         setup_git_repo(
           dummy_file_path: path,
-          in_gitignore: true,
-          gitignore_committed: true
+          add_file_to_gitignore: true,
+          commit_gitignore: true
         )
         expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be true
       end
@@ -131,7 +131,7 @@ describe Fastlane::Helper::GitHelper do
   end
 end
 
-def setup_git_repo(dummy_file_path:, in_gitignore:, gitignore_committed: false)
+def setup_git_repo(dummy_file_path:, add_file_to_gitignore:, commit_gitignore: false)
   `git init`
   `touch .gitignore`
   `git add .gitignore && git commit -m 'Add .gitignore'`
@@ -139,8 +139,8 @@ def setup_git_repo(dummy_file_path:, in_gitignore:, gitignore_committed: false)
   `echo abc > #{dummy_file_path}`
 
   # no point in commiting the gitignore if the file shouldn't be in it
-  return unless in_gitignore
+  return unless add_file_to_gitignore
 
   `echo #{dummy_file_path} > .gitignore`
-  `git add .gitignore && git commit -m 'Update .gitignore'` if gitignore_committed
+  `git add .gitignore && git commit -m 'Update .gitignore'` if commit_gitignore
 end
