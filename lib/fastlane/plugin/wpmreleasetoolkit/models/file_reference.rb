@@ -51,7 +51,7 @@ module Fastlane
       def apply
         # Only decrypt the file if the destination is ignored in Git
         unless Fastlane::Helper::GitHelper.is_ignored?(path: destination_file_path)
-          raise StandardError.new "Attempted to decrypt #{file} to #{destination_file_path} which is not ignored under Git"
+          raise "Attempted to decrypt #{file} to #{destination_file_path} which is not ignored under Git"
         end
 
         # Create the destination directory if it doesn't exist

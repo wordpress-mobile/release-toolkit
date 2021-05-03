@@ -38,7 +38,7 @@ RSpec.shared_examples 'shared examples' do
         expect(FileUtils).to_not receive(:mkdir_p)
         expect(subject).to_not receive(:source_contents)
         expect(File).to_not receive(:write)
-        expect { subject.apply }.to raise_error(StandardError)
+        expect { subject.apply }.to raise_error(RuntimeError)
       end
     end
 
