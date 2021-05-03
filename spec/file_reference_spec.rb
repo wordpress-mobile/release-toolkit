@@ -35,9 +35,9 @@ RSpec.shared_examples 'shared examples' do
           .with(path: subject.destination_file_path)
           .and_return(false)
 
-        expect(FileUtils).to_not receive(:mkdir_p)
-        expect(subject).to_not receive(:source_contents)
-        expect(File).to_not receive(:write)
+        expect(FileUtils).not_to receive(:mkdir_p)
+        expect(subject).not_to receive(:source_contents)
+        expect(File).not_to receive(:write)
         expect { subject.apply }.to raise_error(RuntimeError)
       end
     end
