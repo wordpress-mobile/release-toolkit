@@ -39,11 +39,8 @@ module Fastlane
         #       in the release-toolkit instead, and move this code away from `ios_git_helper`.
         #
         def self.localize_project
-          Action.sh("cd #{ENV['PROJECT_ROOT_FOLDER']} && ./Scripts/localize.py")
+          Action.sh("cd #{get_from_env!(key: 'PROJECT_ROOT_FOLDER')} && ./Scripts/localize.py")
 
-          strings_files = Dir.chdir(File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'])) do
-            Dir.glob('*.lproj/*.strings')
-          end
           Fastlane::Helper::GitHelper.commit(message: 'Update strings for localization', files: strings_files, push: true) || UI.message('No new strings, skipping commit')
         end
 
@@ -56,16 +53,26 @@ module Fastlane
         #       in the release-toolkit instead, and move this code away from `ios_git_helper`.
         #
         def self.update_metadata
-          Action.sh("cd #{ENV['PROJECT_ROOT_FOLDER']} && ./Scripts/update-translations.rb")
+          Action.sh("cd #{get_from_env!(key: 'PROJECT_ROOT_FOLDER')} && ./Scripts/update-translations.rb")
 
-          strings_files = Dir.chdir(File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'])) do
-            Dir.glob('*.lproj/*.strings')
-          end
           Fastlane::Helper::GitHelper.commit(message: 'Update translations', files: strings_files, push: false)
 
           Action.sh('cd fastlane && ./download_metadata.swift')
 
           Fastlane::Helper::GitHelper.commit(message: 'Update metadata translations', files: './fastlane/metadata/', push: true)
+        end
+
+        def self.strings_files
+          project_root = get_from_env!(key: 'PROJECT_ROOT_FOLDER')
+          project_name = get_from_env!(key: 'PROJECT_NAME')
+
+          Dir.glob(File.join(project_root, project_name, '**', '*.strings'))
+        end
+
+        def self.get_from_env!(key:)
+          ENV.fetch(key) do
+            UI.user_error! "Could not find value for \"#{key}\" in environment."
+          end
         end
       end
     end
