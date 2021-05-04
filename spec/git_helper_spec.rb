@@ -92,6 +92,10 @@ describe Fastlane::Helper::GitHelper do
   end
 
   describe '#is_ignored?' do
+    before do
+      allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true)
+    end
+
     let(:path) { 'dummy.txt' }
 
     it 'returns false when the path is not ignored' do

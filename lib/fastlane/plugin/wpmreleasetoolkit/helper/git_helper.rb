@@ -173,8 +173,7 @@ module Fastlane
       #
       # @return [Bool] True if the given path is ignored, false otherwise.
       def self.is_ignored?(path:)
-        system("git check-ignore #{path}")
-        $CHILD_STATUS.exitstatus == 0
+        Actions.sh('git', 'check-ignore', path) { |status, _, _| status.success? }
       end
     end
   end
