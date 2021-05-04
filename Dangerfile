@@ -23,6 +23,16 @@ Please run `bundle install` to make sure they match.
   fail(message)
 end
 
+warn %{
+  Danger Debug Info
+  <table>
+    <tr><td>modified files</td><td>#{git.modified_files.to_a}</td></tr>
+    <tr><td>added files</td><td>#{git.added_files.to_a}</td></tr>
+    <tr><td>deleted files</td><td>#{git.deleted_files.to_a}</td></tr>
+    <tr><td>renamed files</td><td>#{git.renamed_files.to_a}</td></tr>
+  </table>
+}
+
 # Lint with Rubocop and report violations inline in GitHub
 github.dismiss_out_of_range_messages # This way, fixed violations should go
 renaming_map = (git.renamed_files || []).map { |e| [e[:before], e[:after]] }.to_h # when files are renamed, git.modified_files contains old name, not new one, so we need to do the convertion
