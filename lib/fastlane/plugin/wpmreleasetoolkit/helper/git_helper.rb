@@ -165,6 +165,16 @@ module Fastlane
         current_branch_name = Action.sh('git', 'symbolic-ref', '-q', 'HEAD')
         UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)
       end
+
+      # Checks whether a given path is ignored by Git, relying on Git's
+      # `check-ignore` under the hood.
+      #
+      # @param [String] path The path to check against `.gitignore`
+      #
+      # @return [Bool] True if the given path is ignored, false otherwise.
+      def self.is_ignored?(path:)
+        Actions.sh('git', 'check-ignore', path) { |status, _, _| status.success? }
+      end
     end
   end
 end
