@@ -169,7 +169,7 @@ module Fastlane
       # Checks whether a given path is ignored by Git, relying on Git's
       # `check-ignore` under the hood.
       #
-      # @param [String] path The path to check against the the `.gitignore`
+      # @param [String] path The path to check against `.gitignore`
       #
       # @return [Bool] True if the given path is ignored, false otherwise.
       def self.is_ignored?(path:)
