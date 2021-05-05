@@ -31,9 +31,7 @@ RSpec.shared_examples 'shared examples' do
   describe '#apply' do
     context 'when the destination is not ignored in Git' do
       it 'raises' do
-        allow(Fastlane::Helper::GitHelper).to receive(:is_ignored?)
-          .with(path: subject.destination_file_path)
-          .and_return(false)
+        stub_path_as_ignored(path: subject.destination_file_path, ignored: false)
 
         expect(FileUtils).not_to receive(:mkdir_p)
         expect(subject).not_to receive(:source_contents)
@@ -44,9 +42,7 @@ RSpec.shared_examples 'shared examples' do
 
     context 'when the destination is ignored in Git' do
       it 'copies the source to the destination' do
-        allow(Fastlane::Helper::GitHelper).to receive(:is_ignored?)
-          .with(path: subject.destination_file_path)
-          .and_return(true)
+        stub_path_as_ignored(path: subject.destination_file_path, ignored: true)
 
         allow(FileUtils).to receive(:mkdir_p)
         allow(subject).to receive(:source_contents).and_return('source contents')
@@ -130,4 +126,10 @@ describe Fastlane::Configuration::FileReference do
       end
     end
   end
+end
+
+def stub_path_as_ignored(path:, ignored:)
+  allow(Fastlane::Helper::GitHelper).to receive(:is_ignored?)
+    .with(path: path)
+    .and_return(ignored)
 end
