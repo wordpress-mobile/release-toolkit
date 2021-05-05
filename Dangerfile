@@ -25,8 +25,9 @@ end
 
 # Lint with Rubocop and report violations inline in GitHub
 github.dismiss_out_of_range_messages # This way, fixed violations should go
+renaming_map = (git.renamed_files || []).map { |e| [e[:before], e[:after]] }.to_h # when files are renamed, git.modified_files contains old name, not new one, so we need to do the convertion
 rubocop.lint(
-  files: git.modified_files + git.added_files,
+  files: git.added_files + (git.modified_files.map { |f| renaming_map[f] || f }) - git.deleted_files,
   inline_comment: true,
   fail_on_inline_comment: true # Make the inline comments failures
 )
