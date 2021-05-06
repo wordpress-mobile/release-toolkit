@@ -132,6 +132,23 @@ describe Fastlane::Helper::GitHelper do
       end
       # rubocop:enable RSpec/ExampleLength
     end
+
+    it 'returns true when the path is outside the repository folder' do
+      # This path is in the parent directory, which is not a Git repo
+      path = File.join(@path, '..', 'dummy.txt')
+
+      setup_git_repo(dummy_file_path: path, add_file_to_gitignore: false)
+      expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be true
+    end
+
+    # This is sort of redundant given the previous example already ensures the
+    # same logic. But, we'll be using paths starting with `~` as part of our
+    # configurations, so it felt appopriate to explicitly ensure this important
+    # use case is respected.
+    it 'returns true when the path is in the home folder ' do
+      path = '~/a/path'
+      expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be true
+    end
   end
 end
 
