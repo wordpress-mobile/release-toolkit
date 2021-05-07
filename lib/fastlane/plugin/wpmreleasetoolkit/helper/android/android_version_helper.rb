@@ -30,8 +30,8 @@ module Fastlane
         #         - If this version is a hotfix (more than 2 parts and 3rd part is non-zero), returns the "X.Y.Z" formatted string
         #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
         #
-        def self.get_public_version
-          version = get_release_version
+        def self.get_public_version(section)
+          version = get_version_from_section(section)
           vp = get_version_parts(version[VERSION_NAME])
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
 
@@ -46,7 +46,15 @@ module Fastlane
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_release_version
-          section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
+          section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'wordpress {'
+          return get_version_from_section(section)
+        end
+
+        # Extract the version name and code from a given secion of the `$PROJECT_NAME/build.gradle file`
+        #
+        # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
+        #
+        def self.get_version_from_section(section)
           gradle_path = self.gradle_path
           name = get_version_name_from_gradle_file(gradle_path, section)
           code = get_version_build_from_gradle_file(gradle_path, section)
@@ -60,12 +68,7 @@ module Fastlane
         #
         def self.get_alpha_version
           return nil if ENV['HAS_ALPHA_VERSION'].nil?
-
-          section = 'defaultConfig'
-          gradle_path = self.gradle_path
-          name = get_version_name_from_gradle_file(gradle_path, section)
-          code = get_version_build_from_gradle_file(gradle_path, section)
-          return { VERSION_NAME => name, VERSION_CODE => code }
+          return get_version_from_section('defaultConfig')
         end
 
         # Determines if a version name corresponds to an alpha version (starts with `"alpha-"`` prefix)
@@ -258,7 +261,17 @@ module Fastlane
         #
         def self.bump_version_release
           # Bump release
-          current_version = get_release_version()
+          section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'wordpress {'
+          return bump_version_for_section(section)
+        end
+
+        # Prints the current and next version names for a given section to stdout, then returns the next version
+        #
+        # @return [String] The next version name to use after bumping the currently used version.
+        #
+        def self.bump_version_for_section(section)
+          # Bump release
+          current_version = get_version_from_section(section)
           UI.message("Current version: #{current_version[VERSION_NAME]}")
           new_version = calc_next_release_base_version(current_version)
           UI.message("New version: #{new_version[VERSION_NAME]}")
