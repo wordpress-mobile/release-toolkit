@@ -19,7 +19,7 @@ module Fastlane
         args += ['-C', File.file?(path) ? File.dirname(path) : path] unless path.nil?
         args += ['rev-parse']
 
-        Action.sh(args, print_command: true, print_command_output: true, error_callback: ->(e) { puts e }) do |status, _, _|
+        Action.sh(args, print_command_output: false) do |status, _, _|
           status.success?
         end
       end
