@@ -19,9 +19,22 @@ describe Fastlane::Helper::GitHelper do
     expect(Fastlane::Helper::GitHelper.is_git_repo?).to be false
   end
 
+  it 'can detect a missing git repository when given a path' do
+    Dir.mktmpdir do |dir|
+      expect(Fastlane::Helper::GitHelper.is_git_repo?(path: dir)).to be false
+    end
+  end
+
   it 'can detect a valid git repository' do
     `git init`
     expect(Fastlane::Helper::GitHelper.is_git_repo?).to be true
+  end
+
+  it 'can detect a valid git repository when given a path' do
+    Dir.mktmpdir do |dir|
+      `git -C #{dir} init`
+      expect(Fastlane::Helper::GitHelper.is_git_repo?(path: dir)).to be true
+    end
   end
 
   it 'can detect a repository with Git-lfs enabled' do

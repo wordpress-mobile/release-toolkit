@@ -5,12 +5,21 @@ module Fastlane
     # Helper methods to execute git-related operations
     #
     module GitHelper
-      # Checks if the current directory is (inside) a git repo
+      # Checks if the given path, or current directory if no path is given, is
+      # inside a Git repository
       #
-      # @return [Bool] True if the current directory is the root of a git repo (i.e. a local working copy) or a subdirectory of one.
+      # @param [String] path An optional path where to check if a Git repo
+      #        exists.
       #
-      def self.is_git_repo?
-        Action.sh('git', 'rev-parse', '--git-dir', print_command: false, print_command_output: false) do |status, _, _|
+      # @return [Bool] True if the current directory is the root of a git repo
+      #         (i.e. a local working copy) or a subdirectory of one.
+      #
+      def self.is_git_repo?(path: nil)
+        args = ['git']
+        args += ['-C', File.file?(path) ? File.dirname(path) : path] unless path.nil?
+        args += ['rev-parse']
+
+        Action.sh(args, print_command_output: false) do |status, _, _|
           status.success?
         end
       end
