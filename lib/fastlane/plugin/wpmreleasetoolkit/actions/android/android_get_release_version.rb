@@ -4,9 +4,8 @@ module Fastlane
       def self.run(params)
         require_relative '../../helper/android/android_version_helper.rb'
         app = params[:app]
-        if(!app.nil?) {
-          return Fastlane::Helper::Android::VersionHelper.get_version_from_section(params[:app])
-        }
+        return Fastlane::Helper::Android::VersionHelper.get_version_from_section(params[:app]) unless app.nil?
+
         Fastlane::Helper::Android::VersionHelper.get_release_version()
       end
 
