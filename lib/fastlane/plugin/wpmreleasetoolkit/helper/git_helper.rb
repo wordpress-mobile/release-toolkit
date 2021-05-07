@@ -10,7 +10,9 @@ module Fastlane
       # @return [Bool] True if the current directory is the root of a git repo (i.e. a local working copy) or a subdirectory of one.
       #
       def self.is_git_repo?
-        system 'git rev-parse --git-dir 1> /dev/null 2>/dev/null'
+        Action.sh('git', 'rev-parse', '--git-dir', print_command: false, print_command_output: false) do |status, _, _|
+          status.success?
+        end
       end
 
       # Check if the current directory has git-lfs enabled
