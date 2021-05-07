@@ -142,6 +142,14 @@ describe Fastlane::Helper::GitHelper do
       end
     end
 
+    # This test ensures we support the usecase of the `configure` tool, which
+    # can create new files by decrypting secrets. We need the ability to tell
+    # if a path result as ignored, regardless of whether it exists yet.
+    it 'returns false for files not yet created but part of the repository' do
+      setup_git_repo()
+      expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be false
+    end
+
     it 'returns true when the path is outside the repository folder' do
       # This path is in the parent directory, which is not a Git repo
       path = File.join(@path, '..', 'dummy.txt')
@@ -161,10 +169,14 @@ describe Fastlane::Helper::GitHelper do
   end
 end
 
-def setup_git_repo(dummy_file_path:, add_file_to_gitignore:, commit_gitignore: false)
+def setup_git_repo(dummy_file_path: nil, add_file_to_gitignore: false, commit_gitignore: false)
   `git init`
   `touch .gitignore`
   `git add .gitignore && git commit -m 'Add .gitignore'`
+
+  # If we don't have a path for the file, we don't care the values of the two
+  # flag arguments are irrelevant. We can just finish here.
+  return if dummy_file_path.nil?
 
   `echo abc > #{dummy_file_path}`
 
