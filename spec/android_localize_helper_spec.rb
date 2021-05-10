@@ -3,6 +3,12 @@ require 'fileutils'
 require 'tmpdir'
 require 'nokogiri'
 
+TEST_LOCALES_MAP = [
+  { glotpress: 'pt-br', android: 'pt-rBR' },
+  { glotpress: 'zh-cn', android: 'zh-rCN' },
+  { glotpress: 'fr', android: 'fr' },
+].freeze
+
 describe Fastlane::Helper::Android::LocalizeHelper do
   let(:fixtures_dir) { File.join(__dir__, 'test-data', 'translations', 'glotpress-download') }
   let(:stubs_dir) { File.join(fixtures_dir, 'stubs') }
@@ -47,12 +53,6 @@ describe Fastlane::Helper::Android::LocalizeHelper do
   describe 'download_from_glotpress' do
     let(:gp_fake_url) { 'https://stub.glotpress.com/rspec-fake-project/' }
 
-    LOCALES_MAP = [
-      { glotpress: 'pt-br', android: 'pt-rBR' },
-      { glotpress: 'zh-cn', android: 'zh-rCN' },
-      { glotpress: 'fr', android: 'fr' },
-    ].freeze
-
     context 'with default filter' do
       let(:warning_messages) { [] }
 
@@ -77,18 +77,18 @@ describe Fastlane::Helper::Android::LocalizeHelper do
         described_class.download_from_glotpress(
           res_dir: tmpdir,
           glotpress_project_url: gp_fake_url,
-          locales_map: LOCALES_MAP
+          locales_map: TEST_LOCALES_MAP
         )
       end
 
       it 'tests all the locales we have fixtures for' do
         # Ensure we don't forget to update the locales map if we add more stubs in the future, and vice-versa
-        expect(LOCALES_MAP.map { |h| "#{h[:glotpress]}.xml" }.sort).to eq(Dir.children(stubs_dir).sort)
-        expect(LOCALES_MAP.map { |h| "values-#{h[:android]}" }.sort).to eq(Dir.children(expected_dir).reject { |d| d == 'values' }.sort)
+        expect(TEST_LOCALES_MAP.map { |h| "#{h[:glotpress]}.xml" }.sort).to eq(Dir.children(stubs_dir).sort)
+        expect(TEST_LOCALES_MAP.map { |h| "values-#{h[:android]}" }.sort).to eq(Dir.children(expected_dir).reject { |d| d == 'values' }.sort)
       end
 
       describe 'generates the expected files' do
-        LOCALES_MAP.each do |h|
+        TEST_LOCALES_MAP.each do |h|
           it "for #{h[:android]}" do
             expected_file = expected_file(h[:android])
             generated_file = generated_file(h[:android])
@@ -107,7 +107,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
             expect(gp_node.content).to include('...')
           end
 
-          LOCALES_MAP.each do |h|
+          TEST_LOCALES_MAP.each do |h|
             it "has the text substituted in #{h[:android]}" do
               final_xml = File.open(generated_file(h[:android])) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
               final_node = final_xml.xpath(xpath).first
@@ -156,7 +156,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
         FileUtils.cp(expected_file(nil), generated_file(nil))
 
         # Arrange: Prepare request stubs
-        custom_gp_urls = LOCALES_MAP.map do |locale|
+        custom_gp_urls = TEST_LOCALES_MAP.map do |locale|
           "#{gp_fake_url.chomp('/')}/#{locale[:glotpress]}/default/export-translations?filters%5Bstatus%5D=custom-status&filters%5Bwarnings%5D=yes&format=android"
         end
         custom_gp_urls.each do |url|
@@ -168,7 +168,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
           res_dir: tmpdir,
           glotpress_project_url: gp_fake_url,
           glotpress_filters: { status: 'custom-status', warnings: 'yes' },
-          locales_map: LOCALES_MAP
+          locales_map: TEST_LOCALES_MAP
         )
 
         # Assert: Check requests were done
