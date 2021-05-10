@@ -44,6 +44,10 @@ Style/FrozenStringLiteralComment:
 Style/AsciiComments:
   Enabled: false
 
+# We are not strict to the point that we want to enforce super-short `it '…' do … end` blocks in our specs.
+RSpec/ExampleLength:
+  Enabled: false
+
 ########## Metrics / Max Lengths Rules
 
 Metrics/LineLength:

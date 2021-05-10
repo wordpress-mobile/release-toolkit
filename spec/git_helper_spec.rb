@@ -107,7 +107,6 @@ describe Fastlane::Helper::GitHelper do
     end
 
     context 'when the path is in the .gitignore' do
-      # rubocop:disable RSpec/ExampleLength
       it 'returns true when the .gitignore has uncommitted changes' do
         # For some reason, I was expecting the underlying `git check-ignore`
         # command to fail in this case, but I'm clearly wrong.
@@ -130,7 +129,6 @@ describe Fastlane::Helper::GitHelper do
         )
         expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be true
       end
-      # rubocop:enable RSpec/ExampleLength
     end
   end
 end
