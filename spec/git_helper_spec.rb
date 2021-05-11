@@ -153,8 +153,10 @@ describe Fastlane::Helper::GitHelper do
     end
 
     it 'returns true when the path is outside the repository folder' do
+      puts Dir.pwd
       # This path is in the parent directory, which is not a Git repo
       path = File.join(@path, '..', 'dummy.txt')
+      puts path
 
       setup_git_repo(dummy_file_path: path, add_file_to_gitignore: false)
       expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be true
