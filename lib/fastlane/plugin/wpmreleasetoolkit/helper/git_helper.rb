@@ -185,6 +185,7 @@ module Fastlane
       # @return [Bool] True if the given path is ignored, false otherwise.
       def self.is_ignored?(path:)
         Actions.sh('git', 'check-ignore', path) do |status, output, _|
+          puts "is_ignored? #{status} #{output}"
           return true if output.strip == NOT_A_REPO_ERROR
           return true if output.include? OUTSIDE_OF_REPO_ERROR
 
