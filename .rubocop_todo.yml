@@ -145,6 +145,7 @@ RSpec/FilePath:
     - 'spec/ios_merge_translators_strings_spec.rb'
     - 'spec/release_notes_helper_spec.rb'
     - 'spec/android_localize_helper_spec.rb'
+    - 'spec/configure_helper_spec.rb'
 
 # Offense count: 8
 # Cop supports --auto-correct.
