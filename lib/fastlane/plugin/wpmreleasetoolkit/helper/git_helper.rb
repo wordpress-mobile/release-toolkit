@@ -192,7 +192,7 @@ module Fastlane
         end
       end
 
-      OUTSIDE_OF_REPO_ERROR = 'is outside repository at'.freeze
+      OUTSIDE_OF_REPO_ERROR = 'is outside repository'.freeze
       NOT_A_REPO_ERROR = 'fatal: not a git repository (or any of the parent directories): .git'.freeze
     end
   end
