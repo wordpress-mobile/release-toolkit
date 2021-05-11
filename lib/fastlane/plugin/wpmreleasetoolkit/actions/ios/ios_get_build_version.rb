@@ -4,7 +4,10 @@ module Fastlane
       def self.run(params)
         require_relative '../../helper/ios/ios_version_helper.rb'
 
+        UI.user_error!('You need to set at least the PUBLIC_CONFIG_FILE env var to the path to the public xcconfig file') unless ENV['PUBLIC_CONFIG_FILE']
+
         if params[:internal]
+          UI.user_error!('You need to set the INTERNAL_CONFIG_FILE env var to the path to the internal xcconfig file') unless ENV['INTERNAL_CONFIG_FILE']
           Fastlane::Helper::Ios::VersionHelper.get_internal_version
         else
           Fastlane::Helper::Ios::VersionHelper.get_build_version
