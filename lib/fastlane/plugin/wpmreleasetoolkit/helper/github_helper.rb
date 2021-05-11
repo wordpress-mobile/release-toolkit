@@ -95,14 +95,14 @@ module Fastlane
       # @return [String] The path of the downloaded file, or nil if something went wrong
       #
       def self.download_file_from_tag(repository:, tag:, file_path:, download_folder:)
-        repository = repository.delete_prefix('/').chomp('/').concat('/')
-        file_path = file_path.delete_prefix('/').chomp('/').concat('/')
-        tag = tag.concat('/')
+        repository = repository.delete_prefix('/').chomp('/')
+        file_path = file_path.delete_prefix('/').chomp('/')
         file_name = File.basename(file_path)
         download_path = File.join(download_folder, file_name)
 
         begin
-          open(URI.join('https://raw.githubusercontent.com/', repository, tag, file_path).to_s.chomp('/')) do |remote_file|
+          uri = URI.parse("https://raw.githubusercontent.com/#{repository}/#{tag}/#{file_path}")
+          uri.open do |remote_file|
             File.write(download_path, remote_file.read)
           end
         rescue OpenURI::HTTPError

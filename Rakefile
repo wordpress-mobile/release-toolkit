@@ -16,7 +16,7 @@ task :test do
   sh('rspec')
 end
 
-desc "Generate the docs using YARD"
+desc 'Generate the docs using YARD'
 task :doc do
   sh('yard', 'doc')
   # Open generated doc in browser
@@ -24,7 +24,7 @@ task :doc do
 end
 
 desc "Print stats about undocumented methods. Provide an optional path relative to 'lib/fastlane/plugin/wpmreleasetoolkit' to only show stats for that subdirectory"
-task :docstats, [:path] do |_,args|
+task :docstats, [:path] do |_, args|
   path = File.join('lib/fastlane/plugin/wpmreleasetoolkit', args[:path] || '.')
   sh('yard', 'stats', '--list-undoc', path)
 end
