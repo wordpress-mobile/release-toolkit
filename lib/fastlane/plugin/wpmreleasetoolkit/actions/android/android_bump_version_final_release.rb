@@ -61,9 +61,9 @@ module Fastlane
       def self.show_config
         vname = Fastlane::Helper::Android::VersionHelper::VERSION_NAME
         vcode = Fastlane::Helper::Android::VersionHelper::VERSION_CODE
-        UI.message("Current version[#{{@flavor}}]: #{@current_version[vname]}(#{@current_version[vcode]})")
-        UI.message("Current alpha version[#{{@flavor}}]: #{@current_version_alpha[vname]}(#{@current_version_alpha[vcode]})") unless ENV['HAS_ALPHA_VERSION'].nil?
-        UI.message("New release version[#{{@flavor}}]: #{@final_version[vname]}(#{@final_version[vcode]})")
+        UI.message("Current version[#{@flavor}]: #{@current_version[vname]}(#{@current_version[vcode]})")
+        UI.message("Current alpha version[#{@flavor}]: #{@current_version_alpha[vname]}(#{@current_version_alpha[vcode]})") unless @current_version_alpha.nil?
+        UI.message("New release version[#{@flavor}]: #{@final_version[vname]}(#{@final_version[vcode]})")
       end
     end
   end

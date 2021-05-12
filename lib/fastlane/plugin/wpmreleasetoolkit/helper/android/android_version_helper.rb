@@ -31,7 +31,7 @@ module Fastlane
         #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
         #
         def self.get_public_version(app)
-          version = get_version_from_flavor(app)
+          version = get_version_from_flavor(app, false)
           vp = get_version_parts(version[VERSION_NAME])
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
 
@@ -46,7 +46,7 @@ module Fastlane
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_release_version(app)
-          return get_version_from_flavor(app, ENV['HAS_ALPHA_VERSION'].nil?)
+          return get_version_from_flavor(app, false)
         end
 
         # Extract the version name and code from a given secion of the `$PROJECT_NAME/build.gradle file`
@@ -57,7 +57,8 @@ module Fastlane
           version_name_key = "#{flavor}.#{isAlpha ? 'alpha.':''}versionName"
           version_code_key = "#{flavor}.#{isAlpha ? 'alpha.':''}versionCode"
           name = get_value_from_properties_file(version_name_key)
-          code = get_value_from_properties_file(version_code_key)
+          code = get_value_from_properties_file(version_code_key).to_i
+          return nil unless !(name.nil? || code.nil?)
           return { VERSION_NAME => name, VERSION_CODE => code }
         end
 
@@ -78,7 +79,6 @@ module Fastlane
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
         def self.get_alpha_version(app)
-          return nil if ENV['HAS_ALPHA_VERSION'].nil?
           return get_version_from_flavor(app, true)
         end
 
@@ -272,7 +272,7 @@ module Fastlane
         #
         def self.bump_version_release(app)
           # Bump release
-          return bump_version_for_app(app, ENV['HAS_ALPHA_VERSION'].nil?)
+          return bump_version_for_app(app, false)
         end
 
         # Prints the current and next version names for a given section to stdout, then returns the next version
@@ -297,10 +297,14 @@ module Fastlane
         # @env HAS_ALPHA_VERSION If set (with any value), indicates that the project uses `vanilla` flavor.
         #
         def self.update_versions(app, new_version_beta, new_version_alpha)
-          new_version_beta_key = "#{app}.versionName"
-          new_version_alpha_key = "#{app}.alpha.versionName"
-          Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_beta_key}", "-Pvalue=#{new_version_beta}")
-          Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_alpha_key}", "-Pvalue=#{new_version_alpha}") unless new_version_alpha.nil?
+          new_version_name_beta_key = "#{app}.versionName"
+          new_version_code_beta_key = "#{app}.versionCode"
+          new_version_name_alpha_key = "#{app}.alpha.versionName"
+          new_version_code_alpha_key = "#{app}.alpha.versionCode"
+          Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_name_beta_key}", "-Pvalue=#{new_version_beta[VERSION_NAME]}")
+          Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_code_beta_key}", "-Pvalue=#{new_version_beta[VERSION_CODE]}")
+          Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_name_alpha_key}", "-Pvalue=#{new_version_alpha[VERSION_NAME]}") unless new_version_alpha.nil?
+          Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_code_alpha_key}", "-Pvalue=#{new_version_alpha[VERSION_CODE]}") unless new_version_alpha.nil?
         end
 
         # Compute the name of the previous hotfix version.

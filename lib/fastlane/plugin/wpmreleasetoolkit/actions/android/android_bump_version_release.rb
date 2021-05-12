@@ -11,8 +11,8 @@ module Fastlane
         other_action.ensure_git_branch(branch: 'develop')
 
         # Create new configuration
-        @new_short_version = Fastlane::Helper::Android::VersionHelper.bump_version_release()
         @flavor = params[:app]
+        @new_short_version = Fastlane::Helper::Android::VersionHelper.bump_version_release(@flavor)
 
         create_config()
         show_config()

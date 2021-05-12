@@ -20,14 +20,14 @@ module Fastlane
         current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(app)
         current_alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
         next_version = Fastlane::Helper::Android::VersionHelper.calc_next_release_version(current_version, current_alpha_version)
-        next_alpha_version = ENV['HAS_ALPHA_VERSION'].nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(next_version, current_alpha_version)
+        next_alpha_version = current_alpha_version.nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(next_version, current_alpha_version)
 
         # Ask user confirmation
         unless params[:skip_confirm]
           confirm_message = "[#{params[:app]}]Building a new release branch starting from develop.\nCurrent version is #{current_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{current_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
-          confirm_message += ENV['HAS_ALPHA_VERSION'].nil? ? "No alpha version configured.\n" : "Current Alpha version is #{current_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{current_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
+          confirm_message += current_alpha_version.nil? ? "No alpha version configured. If you wish to configure an alpha version please update version.properties to include an alpha key for this flavor\n" : "Current Alpha version is #{current_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{current_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
           confirm_message += "After codefreeze the new version will be: #{next_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{next_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
-          confirm_message += ENV['HAS_ALPHA_VERSION'].nil? ? '' : "After codefreeze the new Alpha will be: #{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
+          confirm_message += current_alpha_version.nil? ? '' : "After codefreeze the new Alpha will be: #{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
           confirm_message += 'Do you want to continue?'
           UI.user_error!('Aborted by user request') unless UI.confirm(confirm_message)
         end
@@ -36,7 +36,7 @@ module Fastlane
         other_action.ensure_git_status_clean()
 
         # Return the current version
-        Fastlane::Helper::Android::VersionHelper.get_public_version
+        Fastlane::Helper::Android::VersionHelper.get_public_version(app)
       end
 
       #####################################################
