@@ -5,13 +5,18 @@ describe Fastlane::Helper::ConfigureHelper do
     let(:destination) { 'path/to/destination' }
 
     it 'shows the user an error when the destination is not ignored in Git' do
-      in_tmp_dir do |tmpdir_path|
+      in_tmp_dir do
         allow(Fastlane::Helper::GitHelper).to receive(:is_ignored?)
           .with(path: destination)
           .and_return(false)
 
-        allow(Fastlane::Helper::FilesystemHelper).to receive(:project_path)
-          .and_return(Pathname.new(tmpdir_path))
+        # Currently, we need a Git repository to exists in the hierarchy
+        # containing the call site otherwise the tests will end up stuck in
+        # some kind of loop (which I haven't fully inspected). That's a
+        # reasonable enough assumption to make for the real world usage of this
+        # tool. Still, it would be nice to have proper handling of that
+        # scenario at some point.
+        `git init`
 
         expect(Fastlane::UI).to receive(:user_error!)
 
