@@ -16,12 +16,32 @@ module Fastlane
       #
       def self.is_git_repo?(path: nil)
         args = ['git']
-        args += ['-C', File.file?(path) ? File.dirname(path) : path] unless path.nil?
+
+        unless path.nil?
+          # `path` might represent a file that doesn't yet exist but is in a
+          # valid Git repo. In such case, the `git rev-parse` we're currently
+          # building would fail. To avoid that, let's perform the check on the
+          # first existing ancestor of the given path – which will be the path
+          # itself if it exists.
+          path = first_existing_ancestor_of(path: path)
+          args += ['-C', File.file?(path) ? File.dirname(path) : path]
+        end
+
         args += ['rev-parse']
 
         Action.sh(args, print_command_output: false) do |status, _, _|
           status.success?
         end
+      end
+
+      # Travels back the hierarchy of the given path until it finds an existing ancestor, or it reaches the root of the file system.
+      #
+      # @param [String] path The path to inspect
+      #
+      # @return [String] The first existing ancestor, or `path` itself if it exists
+      def self.first_existing_ancestor_of(path:)
+        path = Pathname(path).expand_path.parent until File.exist?(path) || path == Pathname('/')
+        return path.to_s
       end
 
       # Check if the current directory has git-lfs enabled
