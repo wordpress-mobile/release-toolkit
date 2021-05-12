@@ -204,16 +204,12 @@ module Fastlane
       #
       # @return [Bool] True if the given path is ignored, false otherwise.
       def self.is_ignored?(path:)
-        Actions.sh('git', 'check-ignore', path) do |status, output, _|
-          return true if output.strip == NOT_A_REPO_ERROR
-          return true if output.include? OUTSIDE_OF_REPO_ERROR
+        return true unless is_git_repo?(path: path)
 
+        Actions.sh('git', 'check-ignore', path) do |status, _, _|
           status.success?
         end
       end
-
-      OUTSIDE_OF_REPO_ERROR = 'is outside repository'.freeze
-      NOT_A_REPO_ERROR = 'fatal: not a git repository (or any of the parent directories): .git'.freeze
     end
   end
 end
