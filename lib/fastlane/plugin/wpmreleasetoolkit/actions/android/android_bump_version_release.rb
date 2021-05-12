@@ -12,6 +12,8 @@ module Fastlane
 
         # Create new configuration
         @new_short_version = Fastlane::Helper::Android::VersionHelper.bump_version_release()
+        @flavor = params[:app]
+
         create_config()
         show_config()
 
@@ -21,7 +23,7 @@ module Fastlane
         UI.message 'Done!'
 
         UI.message 'Updating versions...'
-        Fastlane::Helper::Android::VersionHelper.update_versions(@new_version_beta, @new_version_alpha)
+        Fastlane::Helper::Android::VersionHelper.update_versions(params[:app], @new_version_beta, @new_version_alpha)
         Fastlane::Helper::Android::GitHelper.commit_version_bump()
         UI.message 'Done.'
       end
@@ -39,6 +41,14 @@ module Fastlane
       end
 
       def self.available_options
+        # Define all options your action supports.
+        [
+          FastlaneCore::ConfigItem.new(key: :app,
+                                       env_name: 'APP',
+                                       description: 'The app to get the release version for',
+                                       is_string: true, # true: verifies the input is a string, false: every kind of value
+                                       default_value: 'wordpress'), # the default value if the user didn't provide one
+        ]
       end
 
       def self.output
@@ -58,8 +68,8 @@ module Fastlane
       private
 
       def self.create_config
-        @current_version = Fastlane::Helper::Android::VersionHelper.get_release_version()
-        @current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version()
+        @current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(@flavor)
+        @current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version(@flavor)
         @new_version_beta = Fastlane::Helper::Android::VersionHelper.calc_next_release_version(@current_version, @current_version_alpha)
         @new_version_alpha = ENV['HAS_ALPHA_VERSION'].nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(@new_version_beta, @current_version_alpha)
         @new_release_branch = "release/#{@new_short_version}"
@@ -68,11 +78,11 @@ module Fastlane
       def self.show_config
         vname = Fastlane::Helper::Android::VersionHelper::VERSION_NAME
         vcode = Fastlane::Helper::Android::VersionHelper::VERSION_CODE
-        UI.message("Current version: #{@current_version[vname]}(#{@current_version[vcode]})")
-        UI.message("Current alpha version: #{@current_version_alpha[vname]}(#{@current_version_alpha[vcode]})") unless ENV['HAS_ALPHA_VERSION'].nil?
-        UI.message("New beta version: #{@new_version_beta[vname]}(#{@new_version_beta[vcode]})")
-        UI.message("New alpha version: #{@new_version_alpha[vname]}(#{@new_version_alpha[vcode]})") unless ENV['HAS_ALPHA_VERSION'].nil?
-        UI.message("New version: #{@new_short_version}")
+        UI.message("Current version[#{@flavor}]: #{@current_version[vname]}(#{@current_version[vcode]})")
+        UI.message("Current alpha version[#{@flavor}]: #{@current_version_alpha[vname]}(#{@current_version_alpha[vcode]})") unless ENV['HAS_ALPHA_VERSION'].nil?
+        UI.message("New beta version[#{@flavor}]: #{@new_version_beta[vname]}(#{@new_version_beta[vcode]})")
+        UI.message("New alpha version[#{@flavor}]: #{@new_version_alpha[vname]}(#{@new_version_alpha[vcode]})") unless ENV['HAS_ALPHA_VERSION'].nil?
+        UI.message("New version[#{@flavor}]: #{@new_short_version}")
         UI.message("Release branch: #{@new_release_branch}")
       end
 

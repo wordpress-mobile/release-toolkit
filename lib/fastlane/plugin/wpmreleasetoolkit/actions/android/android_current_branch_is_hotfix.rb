@@ -7,7 +7,7 @@ module Fastlane
     class AndroidCurrentBranchIsHotfixAction < Action
       def self.run(params)
         require_relative '../../helper/android/android_version_helper.rb'
-        Fastlane::Helper::Android::VersionHelper.is_hotfix?(Fastlane::Helper::Android::VersionHelper.get_release_version)
+        Fastlane::Helper::Android::VersionHelper.is_hotfix?(Fastlane::Helper::Android::VersionHelper.get_release_version(params[:app]))
       end
 
       #####################################################
@@ -23,6 +23,14 @@ module Fastlane
       end
 
       def self.available_options
+        # Define all options your action supports.
+        [
+          FastlaneCore::ConfigItem.new(key: :app,
+                                       env_name: 'APP',
+                                       description: 'The app to get the release version for',
+                                       is_string: true, # true: verifies the input is a string, false: every kind of value
+                                       default_value: 'wordpress'), # the default value if the user didn't provide one
+        ]
       end
 
       def self.output

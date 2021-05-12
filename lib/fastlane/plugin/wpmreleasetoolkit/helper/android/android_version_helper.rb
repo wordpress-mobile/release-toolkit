@@ -30,35 +30,46 @@ module Fastlane
         #         - If this version is a hotfix (more than 2 parts and 3rd part is non-zero), returns the "X.Y.Z" formatted string
         #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
         #
-        def self.get_public_version(section)
-          version = get_version_from_section(section)
+        def self.get_public_version(app)
+          version = get_version_from_flavor(app)
           vp = get_version_parts(version[VERSION_NAME])
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
 
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}"
         end
 
-        # Extract the version name and code from the `vanilla` flavor of the `$PROJECT_NAME/build.gradle file`
+        # Extract the version name and code from the flavor of the `$PROJECT_NAME/build.gradle file`
         #   or for the defaultConfig if `HAS_ALPHA_VERSION` is not defined.
         #
         # @env HAS_ALPHA_VERSION If set (with any value), indicates that the project uses `vanilla` flavor.
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
-        def self.get_release_version
-          section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'wordpress {'
-          return get_version_from_section(section)
+        def self.get_release_version(app)
+          return get_version_from_flavor(app, ENV['HAS_ALPHA_VERSION'].nil?)
         end
 
         # Extract the version name and code from a given secion of the `$PROJECT_NAME/build.gradle file`
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
-        def self.get_version_from_section(section)
-          gradle_path = self.gradle_path
-          name = get_version_name_from_gradle_file(gradle_path, section)
-          code = get_version_build_from_gradle_file(gradle_path, section)
+        def self.get_version_from_flavor(flavor, isAlpha)
+          version_name_key = "#{flavor}.#{isAlpha ? 'alpha.':''}versionName"
+          version_code_key = "#{flavor}.#{isAlpha ? 'alpha.':''}versionCode"
+          name = get_value_from_properties_file(version_name_key)
+          code = get_value_from_properties_file(version_code_key)
           return { VERSION_NAME => name, VERSION_CODE => code }
+        end
+
+        def self.get_value_from_properties_file(key)
+          properties_file_path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'version.properties')
+
+          return nil unless File.exists?(properties_file_path)
+
+          File.open(properties_file_path, 'r') do | f |
+            text = f.read
+            text.match(/#{key}=(\S*)/m)&.captures&.first
+          end
         end
 
         # Extract the version name and code from the `defaultConfig` of the `$PROJECT_NAME/build.gradle` file
@@ -66,9 +77,9 @@ module Fastlane
         # @return [Hash] A hash with 2 keys `"name"` and `"code"` containing the extracted version name and code, respectively,
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
-        def self.get_alpha_version
+        def self.get_alpha_version(app)
           return nil if ENV['HAS_ALPHA_VERSION'].nil?
-          return get_version_from_section('defaultConfig')
+          return get_version_from_flavor(app, true)
         end
 
         # Determines if a version name corresponds to an alpha version (starts with `"alpha-"`` prefix)
@@ -259,19 +270,18 @@ module Fastlane
         #
         # @return [String] The next release version name to use after bumping the currently used release version.
         #
-        def self.bump_version_release
+        def self.bump_version_release(app)
           # Bump release
-          section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'wordpress {'
-          return bump_version_for_section(section)
+          return bump_version_for_app(app, ENV['HAS_ALPHA_VERSION'].nil?)
         end
 
         # Prints the current and next version names for a given section to stdout, then returns the next version
         #
         # @return [String] The next version name to use after bumping the currently used version.
         #
-        def self.bump_version_for_section(section)
+        def self.bump_version_for_app(app, isAlpha)
           # Bump release
-          current_version = get_version_from_section(section)
+          current_version = get_version_from_flavor(app, isAlpha)
           UI.message("Current version: #{current_version[VERSION_NAME]}")
           new_version = calc_next_release_base_version(current_version)
           UI.message("New version: #{new_version[VERSION_NAME]}")
@@ -286,9 +296,11 @@ module Fastlane
         # @param [Hash] new_version_alpha The version hash for the alpha (defaultConfig), containing values for keys "name" and "code"
         # @env HAS_ALPHA_VERSION If set (with any value), indicates that the project uses `vanilla` flavor.
         #
-        def self.update_versions(new_version_beta, new_version_alpha)
-          self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
-          self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
+        def self.update_versions(app, new_version_beta, new_version_alpha)
+          new_version_beta_key = "#{app}.versionName"
+          new_version_alpha_key = "#{app}.alpha.versionName"
+          Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_beta_key}", "-Pvalue=#{new_version_beta}")
+          Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_alpha_key}", "-Pvalue=#{new_version_alpha}") unless new_version_alpha.nil?
         end
 
         # Compute the name of the previous hotfix version.
@@ -350,56 +362,6 @@ module Fastlane
           return parts
         end
 
-        # Extract the versionName from a build.gradle file
-        #
-        # @param [String] file_path The path to the `.gradle` file
-        # @param [String] section The name of the section we expect the keyword to be in, e.g. "defaultConfig" or "vanilla"
-        #
-        # @return [String] The value of the versionName attribute as found in the build.gradle file and for this section.
-        #
-        def self.get_version_name_from_gradle_file(file_path, section)
-          res = get_keyword_from_gradle_file(file_path, section, 'versionName')
-          res = res.tr('\"', '') unless res.nil?
-          return res
-        end
-
-        # Extract the versionCode rom a build.gradle file
-        #
-        # @param [String] file_path The path to the `.gradle` file
-        # @param [String] section The name of the section we expect the keyword to be in, e.g. "defaultConfig" or "vanilla"
-        #
-        # @return [String] The value of the versionCode attribute as found in the build.gradle file and for this section.
-        #
-        def self.get_version_build_from_gradle_file(file_path, section)
-          res = get_keyword_from_gradle_file(file_path, section, 'versionCode')
-          return res.to_i
-        end
-
-        # Extract the value for a specific keyword in a specific section of a `.gradle` file
-        #
-        # @todo: This implementation is very fragile. This should be done parsing the file in a proper way.
-        #        Leveraging gradle itself is probably the easiest way.
-        #
-        # @param [String] file_path The path of the `.gradle` file to extract the value from
-        # @param [String] section The name of the section from which we want to extract this keyword from. For example `defaultConfig` or `myFlavor`
-        # @param [String] keyword The keyword (key name) we want the value for
-        #
-        # @return [String] Returns the value for that keyword in the section of the `.gradle` file, or nil if not found.
-        #
-        def self.get_keyword_from_gradle_file(file_path, section, keyword)
-          found_section = false
-          File.open(file_path, 'r') do |file|
-            file.each_line do |line|
-              if !found_section
-                found_section = true if line.include?(section)
-              else
-                return line.split(' ')[1] if line.include?(keyword) && !line.include?("\"#{keyword}\"") && !line.include?("P#{keyword}")
-              end
-            end
-          end
-          return nil
-        end
-
         # Ensure that a version string is correctly formatted (that is, each of its parts is a number) and returns the 2-parts version number
         #
         # @param [String] version The version string to verify
@@ -425,62 +387,6 @@ module Fastlane
         #
         def self.is_int? string
           true if Integer(string) rescue false
-        end
-
-        # The path to the build.gradle file for the project.
-        #
-        # @env PROJECT_ROOT_FOLDER The path to the root of the project (the folder containing the `.git` directory).
-        # @env PROJECT_NAME The name of the project, i.e. the name of the subdirectory containing the project's `build.gradle` file.
-        #
-        # @return [String] The path of the `build.gradle` file inside the project subfolder in the project's repo
-        #
-        def self.gradle_path
-          UI.user_error!("You need to set the \`PROJECT_ROOT_FOLDER\` environment variable to the path to the project's root") if ENV['PROJECT_ROOT_FOLDER'].nil?
-          UI.user_error!("You need to set the \`PROJECT_NAME\` environment variable to the relative path to the project subfolder name") if ENV['PROJECT_NAME'].nil?
-          File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'build.gradle')
-        end
-
-        # Update both the versionName and versionCode of the build.gradle file to the specified version.
-        #
-        # @param [Hash] version The version hash, containing values for keys "name" and "code"
-        # @param [String] section The name of the section to update in the build.gradle file, e.g. "defaultConfig" or "vanilla"
-        #
-        # @todo This implementation is very fragile. This should be done parsing the file in a proper way.
-        #       Leveraging gradle itself is probably the easiest way.
-        #
-        def self.update_version(version, section)
-          gradle_path = self.gradle_path
-          temp_file = Tempfile.new('fastlaneIncrementVersion')
-          found_section = false
-          version_updated = 0
-          File.open(gradle_path, 'r') do |file|
-            file.each_line do |line|
-              if !found_section
-                temp_file.puts line
-                found_section = true if line.include? section
-              else
-                if version_updated < 2
-                  if line.include?('versionName') && !line.include?('"versionName"') && !line.include?('PversionName')
-                    version_name = line.split(' ')[1].tr('\"', '')
-                    line.sub!(version_name, version[VERSION_NAME].to_s)
-                    version_updated = version_updated + 1
-                  end
-
-                  if line.include? 'versionCode'
-                    version_code = line.split(' ')[1]
-                    line.sub!(version_code, version[VERSION_CODE].to_s)
-                    version_updated = version_updated + 1
-                  end
-                end
-                temp_file.puts line
-              end
-            end
-            file.close
-          end
-          temp_file.rewind
-          temp_file.close
-          FileUtils.mv(temp_file.path, gradle_path)
-          temp_file.unlink
         end
       end
     end
