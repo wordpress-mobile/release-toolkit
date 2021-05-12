@@ -21,7 +21,7 @@ jobs:
 
       - run:
           name: Install Homebrew dependencies, if neeeded
-          command: xargs brew install --verbose < .circleci/.brewfile
+          command: brew update && xargs brew install --verbose < .circleci/.brewfile
 
       - run:
           name: Install Ruby dependencies, if neeeded
