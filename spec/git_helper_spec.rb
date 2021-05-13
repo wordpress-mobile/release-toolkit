@@ -30,10 +30,26 @@ describe Fastlane::Helper::GitHelper do
     expect(Fastlane::Helper::GitHelper.is_git_repo?).to be true
   end
 
+  it 'can detect a valid git repository from a child folder' do
+    `git init`
+    `mkdir -p a/b`
+    Dir.chdir('./a/b')
+    expect(Fastlane::Helper::GitHelper.is_git_repo?).to be true
+  end
+
   it 'can detect a valid git repository when given a path' do
     Dir.mktmpdir do |dir|
       `git -C #{dir} init`
       expect(Fastlane::Helper::GitHelper.is_git_repo?(path: dir)).to be true
+    end
+  end
+
+  it 'can detect a valid git repository when given a child folder path' do
+    Dir.mktmpdir do |dir|
+      `git -C #{dir} init`
+      path = File.join(dir, 'a', 'b')
+      `mkdir -p #{path}`
+      expect(Fastlane::Helper::GitHelper.is_git_repo?(path: path)).to be true
     end
   end
 
