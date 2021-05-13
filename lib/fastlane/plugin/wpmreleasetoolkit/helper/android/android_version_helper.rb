@@ -58,7 +58,7 @@ module Fastlane
           version_code_key = "#{flavor}.#{is_alpha ? 'alpha.' : ''}versionCode"
           name = get_value_from_properties_file(version_name_key)
           code = get_value_from_properties_file(version_code_key).to_i
-          if (name.nil? || code.nil?) return nil
+          return nil if (name.nil? || code.nil?) 
 
           return { VERSION_NAME => name, VERSION_CODE => code }
         end

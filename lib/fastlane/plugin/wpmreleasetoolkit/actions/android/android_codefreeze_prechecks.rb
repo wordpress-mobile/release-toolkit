@@ -15,7 +15,7 @@ module Fastlane
         Fastlane::Helper::GitHelper.checkout_and_pull('develop')
 
         app = param[:app]
-        
+
         # Create versions
         current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(app)
         current_alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
