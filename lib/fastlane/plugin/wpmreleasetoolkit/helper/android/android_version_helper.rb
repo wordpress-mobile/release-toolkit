@@ -53,21 +53,21 @@ module Fastlane
         def self.get_version_from_properties(product_name, is_alpha)
           version_name_key = "#{product_name}.#{is_alpha ? 'alpha.' : ''}versionName"
           version_code_key = "#{product_name}.#{is_alpha ? 'alpha.' : ''}versionCode"
-          name = get_value_from_properties_file(version_name_key)
-          code = get_value_from_properties_file(version_code_key).to_i
-          return nil if name.nil? || code.nil?
 
-          return { VERSION_NAME => name, VERSION_CODE => code }
-        end
-
-        def self.get_value_from_properties_file(key)
           properties_file_path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'version.properties')
 
           return nil unless File.exist?(properties_file_path)
 
           File.open(properties_file_path, 'r') do |f|
             text = f.read
-            text.match(/#{key}=(\S*)/m)&.captures&.first
+            name = text.match(/#{version_name_key}=(\S*)/m)&.captures&.first
+            code = text.match(/#{version_code_key}=(\S*)/m)&.captures&.first
+
+            f.close
+
+            return nil if name.nil? || code.nil?
+
+            return { VERSION_NAME => name, VERSION_CODE => code.to_i }
           end
         end
 
