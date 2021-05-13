@@ -71,7 +71,7 @@ module Fastlane
         @current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(@flavor)
         @current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version(@flavor)
         @new_version_beta = Fastlane::Helper::Android::VersionHelper.calc_next_release_version(@current_version, @current_version_alpha)
-        @new_version_alpha = ENV['HAS_ALPHA_VERSION'].nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(@new_version_beta, @current_version_alpha)
+        @new_version_alpha = @current_version_alpha.nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(@new_version_beta, @current_version_alpha)
         @new_release_branch = "release/#{@new_short_version}"
       end
 
@@ -79,9 +79,9 @@ module Fastlane
         vname = Fastlane::Helper::Android::VersionHelper::VERSION_NAME
         vcode = Fastlane::Helper::Android::VersionHelper::VERSION_CODE
         UI.message("Current version[#{@flavor}]: #{@current_version[vname]}(#{@current_version[vcode]})")
-        UI.message("Current alpha version[#{@flavor}]: #{@current_version_alpha[vname]}(#{@current_version_alpha[vcode]})") unless ENV['HAS_ALPHA_VERSION'].nil?
+        UI.message("Current alpha version[#{@flavor}]: #{@current_version_alpha[vname]}(#{@current_version_alpha[vcode]})") unless @current_version_alpha.nil?
         UI.message("New beta version[#{@flavor}]: #{@new_version_beta[vname]}(#{@new_version_beta[vcode]})")
-        UI.message("New alpha version[#{@flavor}]: #{@new_version_alpha[vname]}(#{@new_version_alpha[vcode]})") unless ENV['HAS_ALPHA_VERSION'].nil?
+        UI.message("New alpha version[#{@flavor}]: #{@new_version_alpha[vname]}(#{@new_version_alpha[vcode]})") unless @current_version_alpha.nil?
         UI.message("New version[#{@flavor}]: #{@new_short_version}")
         UI.message("Release branch: #{@new_release_branch}")
       end

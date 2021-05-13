@@ -14,7 +14,7 @@ module Fastlane
         def self.commit_version_bump
           Fastlane::Helper::GitHelper.commit(
             message: 'Bump version number',
-            files: File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'build.gradle'),
+            files: File.join(ENV['PROJECT_ROOT_FOLDER'], 'version.properties'),
             push: true
           )
         end

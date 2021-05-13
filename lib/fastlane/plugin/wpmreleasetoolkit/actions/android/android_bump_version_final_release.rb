@@ -12,7 +12,7 @@ module Fastlane
         create_config()
         show_config()
 
-        UI.message 'Updating gradle.properties...'
+        UI.message 'Updating version.properties...'
         Fastlane::Helper::Android::VersionHelper.update_versions(@flavor, @final_version, @current_version_alpha)
         UI.message 'Done!'
 
