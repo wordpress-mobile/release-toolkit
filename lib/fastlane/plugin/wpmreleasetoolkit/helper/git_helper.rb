@@ -202,7 +202,7 @@ module Fastlane
       #
       # @param [String] path The path to check against `.gitignore`
       #
-      # @return [Bool] True if the given path is ignored or outside the Git repository, false otherwise.
+      # @return [Bool] True if the given path is ignored or outside a Git repository, false otherwise.
       def self.is_ignored?(path:)
         return true unless is_git_repo?(path: path)
 
