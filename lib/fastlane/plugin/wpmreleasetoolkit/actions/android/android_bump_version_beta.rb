@@ -8,7 +8,7 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper.rb'
 
         Fastlane::Helper::GitHelper.ensure_on_branch!('release')
-        @flavor = ENV['RELEASE_FLAVOR'].nil? ? params[:app] : ENV['RELEASE_FLAVOR']
+        @flavor = ENV['PRODUCT_NAME'].nil? ? params[:app] : ENV['PRODUCT_NAME']
 
         create_config()
         show_config()

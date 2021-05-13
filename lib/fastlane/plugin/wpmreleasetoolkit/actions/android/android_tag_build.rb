@@ -5,7 +5,7 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper.rb'
         require_relative '../../helper/android/android_git_helper.rb'
 
-        flavor = ENV['RELEASE_FLAVOR'].nil? ? params[:app] : ENV['RELEASE_FLAVOR']
+        flavor = ENV['PRODUCT_NAME'].nil? ? params[:app] : ENV['PRODUCT_NAME']
 
         release_ver = Fastlane::Helper::Android::VersionHelper.get_release_version(flavor)
         alpha_ver = Fastlane::Helper::Android::VersionHelper.get_alpha_version(flavor)

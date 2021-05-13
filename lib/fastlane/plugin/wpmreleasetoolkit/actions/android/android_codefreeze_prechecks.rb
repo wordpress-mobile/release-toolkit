@@ -14,7 +14,7 @@ module Fastlane
         # Checkout develop and update
         Fastlane::Helper::GitHelper.checkout_and_pull('develop')
 
-        app = ENV['RELEASE_FLAVOR'].nil? ? params[:app] : ENV['RELEASE_FLAVOR']
+        app = ENV['PRODUCT_NAME'].nil? ? params[:app] : ENV['PRODUCT_NAME']
 
         # Create versions
         current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(app)

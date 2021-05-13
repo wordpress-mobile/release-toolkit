@@ -7,7 +7,7 @@ module Fastlane
         require_relative '../../helper/android/android_git_helper.rb'
         Fastlane::Helper::GitHelper.create_branch("release/#{params[:version_name]}", from: params[:previous_version_name])
 
-        @flavor = ENV['RELEASE_FLAVOR'].nil? ? params[:app] : ENV['RELEASE_FLAVOR']
+        @flavor = ENV['PRODUCT_NAME'].nil? ? params[:app] : ENV['PRODUCT_NAME']
         create_config(params[:previous_version_name], params[:version_name], params[:version_code])
         show_config()
 

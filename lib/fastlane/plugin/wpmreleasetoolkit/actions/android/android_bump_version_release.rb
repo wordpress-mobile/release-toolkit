@@ -11,7 +11,7 @@ module Fastlane
         other_action.ensure_git_branch(branch: 'develop')
 
         # Create new configuration
-        @flavor = ENV['RELEASE_FLAVOR'].nil? ? params[:app] : ENV['RELEASE_FLAVOR']
+        @flavor = ENV['PRODUCT_NAME'].nil? ? params[:app] : ENV['PRODUCT_NAME']
         @new_short_version = Fastlane::Helper::Android::VersionHelper.bump_version_release(@flavor)
 
         create_config()
