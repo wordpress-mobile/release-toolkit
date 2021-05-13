@@ -53,21 +53,22 @@ module Fastlane
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
-        def self.get_version_from_flavor(flavor, isAlpha)
-          version_name_key = "#{flavor}.#{isAlpha ? 'alpha.':''}versionName"
-          version_code_key = "#{flavor}.#{isAlpha ? 'alpha.':''}versionCode"
+        def self.get_version_from_flavor(flavor, is_alpha)
+          version_name_key = "#{flavor}.#{is_alpha ? 'alpha.' : ''}versionName"
+          version_code_key = "#{flavor}.#{is_alpha ? 'alpha.' : ''}versionCode"
           name = get_value_from_properties_file(version_name_key)
           code = get_value_from_properties_file(version_code_key).to_i
-          return nil unless !(name.nil? || code.nil?)
+          if (name.nil? || code.nil?) return nil
+
           return { VERSION_NAME => name, VERSION_CODE => code }
         end
 
         def self.get_value_from_properties_file(key)
           properties_file_path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'version.properties')
 
-          return nil unless File.exists?(properties_file_path)
+          return nil unless File.exist?(properties_file_path)
 
-          File.open(properties_file_path, 'r') do | f |
+          File.open(properties_file_path, 'r') do |f|
             text = f.read
             text.match(/#{key}=(\S*)/m)&.captures&.first
           end
@@ -279,9 +280,9 @@ module Fastlane
         #
         # @return [String] The next version name to use after bumping the currently used version.
         #
-        def self.bump_version_for_app(app, isAlpha)
+        def self.bump_version_for_app(app, is_alpha)
           # Bump release
-          current_version = get_version_from_flavor(app, isAlpha)
+          current_version = get_version_from_flavor(app, is_alpha)
           UI.message("Current version: #{current_version[VERSION_NAME]}")
           new_version = calc_next_release_base_version(current_version)
           UI.message("New version: #{new_version[VERSION_NAME]}")
