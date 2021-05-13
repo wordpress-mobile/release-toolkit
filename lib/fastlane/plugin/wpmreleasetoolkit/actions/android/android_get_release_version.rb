@@ -3,7 +3,8 @@ module Fastlane
     class AndroidGetReleaseVersionAction < Action
       def self.run(params)
         require_relative '../../helper/android/android_version_helper.rb'
-        Fastlane::Helper::Android::VersionHelper.get_release_version(params[:app])
+        flavor = ENV['RELEASE_FLAVOR'].nil? ? params[:app] : ENV['RELEASE_FLAVOR']
+        Fastlane::Helper::Android::VersionHelper.get_release_version(flavor)
       end
 
       #####################################################

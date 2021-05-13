@@ -5,10 +5,10 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper.rb'
         require_relative '../../helper/android/android_git_helper.rb'
 
-        app = params[:app]
+        flavor = ENV['RELEASE_FLAVOR'].nil? ? params[:app] : ENV['RELEASE_FLAVOR']
 
-        release_ver = Fastlane::Helper::Android::VersionHelper.get_release_version(app)
-        alpha_ver = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
+        release_ver = Fastlane::Helper::Android::VersionHelper.get_release_version(flavor)
+        alpha_ver = Fastlane::Helper::Android::VersionHelper.get_alpha_version(flavor)
         Fastlane::Helper::GitHelper.create_tag(release_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME])
         Fastlane::Helper::GitHelper.create_tag(alpha_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]) unless alpha_ver.nil? || (params[:tag_alpha] == false)
       end

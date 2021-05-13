@@ -8,13 +8,13 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper.rb'
 
         Fastlane::Helper::GitHelper.ensure_on_branch!('release')
-        @flavor = params[:app]
+        @flavor = ENV['RELEASE_FLAVOR'].nil? ? params[:app] : ENV['RELEASE_FLAVOR']
 
         create_config()
         show_config()
 
         UI.message 'Updating build.gradle...'
-        Fastlane::Helper::Android::VersionHelper.update_versions(params[:app], @new_version_beta, @new_version_alpha)
+        Fastlane::Helper::Android::VersionHelper.update_versions(@flavor, @new_version_beta, @new_version_alpha)
         UI.message 'Done!'
 
         Fastlane::Helper::Android::GitHelper.commit_version_bump()

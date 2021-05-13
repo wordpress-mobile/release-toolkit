@@ -11,7 +11,7 @@ module Fastlane
         other_action.ensure_git_branch(branch: 'develop')
 
         # Create new configuration
-        @flavor = params[:app]
+        @flavor = ENV['RELEASE_FLAVOR'].nil? ? params[:app] : ENV['RELEASE_FLAVOR']
         @new_short_version = Fastlane::Helper::Android::VersionHelper.bump_version_release(@flavor)
 
         create_config()
@@ -23,7 +23,7 @@ module Fastlane
         UI.message 'Done!'
 
         UI.message 'Updating versions...'
-        Fastlane::Helper::Android::VersionHelper.update_versions(params[:app], @new_version_beta, @new_version_alpha)
+        Fastlane::Helper::Android::VersionHelper.update_versions(@flavor, @new_version_beta, @new_version_alpha)
         Fastlane::Helper::Android::GitHelper.commit_version_bump()
         UI.message 'Done.'
       end
