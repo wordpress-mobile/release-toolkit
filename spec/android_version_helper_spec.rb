@@ -8,11 +8,11 @@ describe Fastlane::Helper::Android::VersionHelper do
         wordpress.versionCode=123
         wordpress.alpha.versionName=alpha-222
         wordpress.alpha.versionCode=1234
-        CONTENT
+      CONTENT
 
         allow(File).to receive(:exist?).and_return(true)
         allow(File).to receive(:open).with('./version.properties', 'r').and_yield(StringIO.new(test_file_content))
-        expect(subject.get_version_from_properties('wordpress', false)).to eq({'name' => "17.0", 'code' => 123})
+        expect(subject.get_version_from_properties('wordpress', false)).to eq('name' => "17.0", 'code' => 123)
     end
 
     it 'returns alpha version name and code when present' do
@@ -21,18 +21,18 @@ describe Fastlane::Helper::Android::VersionHelper do
         wordpress.versionCode=123
         wordpress.alpha.versionName=alpha-222
         wordpress.alpha.versionCode=1234
-        CONTENT
+      CONTENT
 
         allow(File).to receive(:exist?).and_return(true)
         allow(File).to receive(:open).with('./version.properties', 'r').and_yield(StringIO.new(test_file_content))
-        expect(subject.get_version_from_properties('wordpress', true)).to eq({'name' => "alpha-222", 'code' => 1234})
+        expect(subject.get_version_from_properties('wordpress', true)).to eq('name' => "alpha-222", 'code' => 1234)
     end
 
     it 'returns nil when alpha version name and code when not present' do
       test_file_content = <<~CONTENT
         jetpack.versionName=17.0
         jetpack.versionCode=123
-        CONTENT
+      CONTENT
 
         allow(File).to receive(:exist?).and_return(true)
         allow(File).to receive(:open).with('./version.properties', 'r').and_yield(StringIO.new(test_file_content))
