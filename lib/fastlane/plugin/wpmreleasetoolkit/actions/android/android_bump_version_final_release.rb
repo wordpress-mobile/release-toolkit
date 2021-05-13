@@ -8,12 +8,12 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper.rb'
 
         Fastlane::Helper::GitHelper.ensure_on_branch!('release')
-        @flavor = ENV['PRODUCT_NAME'].nil? ? params[:app] : ENV['PRODUCT_NAME']
+        @app = ENV['APP'].nil? ? params[:app] : ENV['APP']
         create_config()
         show_config()
 
         UI.message 'Updating version.properties...'
-        Fastlane::Helper::Android::VersionHelper.update_versions(@flavor, @final_version, @current_version_alpha)
+        Fastlane::Helper::Android::VersionHelper.update_versions(@app, @final_version, @current_version_alpha)
         UI.message 'Done!'
 
         Fastlane::Helper::Android::GitHelper.commit_version_bump()
@@ -53,17 +53,17 @@ module Fastlane
       private
 
       def self.create_config
-        @current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(@flavor)
-        @current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version(@flavor)
+        @current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(@app)
+        @current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version(@app)
         @final_version = Fastlane::Helper::Android::VersionHelper.calc_final_release_version(@current_version, @current_version_alpha)
       end
 
       def self.show_config
         vname = Fastlane::Helper::Android::VersionHelper::VERSION_NAME
         vcode = Fastlane::Helper::Android::VersionHelper::VERSION_CODE
-        UI.message("Current version[#{@flavor}]: #{@current_version[vname]}(#{@current_version[vcode]})")
-        UI.message("Current alpha version[#{@flavor}]: #{@current_version_alpha[vname]}(#{@current_version_alpha[vcode]})") unless @current_version_alpha.nil?
-        UI.message("New release version[#{@flavor}]: #{@final_version[vname]}(#{@final_version[vcode]})")
+        UI.message("Current version[#{@app}]: #{@current_version[vname]}(#{@current_version[vcode]})")
+        UI.message("Current alpha version[#{@app}]: #{@current_version_alpha[vname]}(#{@current_version_alpha[vcode]})") unless @current_version_alpha.nil?
+        UI.message("New release version[#{@app}]: #{@final_version[vname]}(#{@final_version[vcode]})")
       end
     end
   end

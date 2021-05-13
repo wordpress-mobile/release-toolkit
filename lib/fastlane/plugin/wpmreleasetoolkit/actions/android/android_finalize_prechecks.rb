@@ -13,8 +13,8 @@ module Fastlane
 
         UI.user_error!('This is not a release branch. Abort.') unless other_action.git_branch.start_with?('release/')
 
-        flavor = ENV['PRODUCT_NAME'].nil? ? params[:app] : ENV['PRODUCT_NAME']
-        version = Fastlane::Helper::Android::VersionHelper.get_public_version(flavor)
+        app = ENV['APP'].nil? ? params[:app] : ENV['APP']
+        version = Fastlane::Helper::Android::VersionHelper.get_public_version(app)
         message = "Finalizing release: #{version}\n"
         if !params[:skip_confirm]
           UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")

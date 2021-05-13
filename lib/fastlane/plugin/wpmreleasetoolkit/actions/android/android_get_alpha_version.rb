@@ -3,8 +3,8 @@ module Fastlane
     class AndroidGetAlphaVersionAction < Action
       def self.run(params)
         require_relative '../../helper/android/android_version_helper.rb'
-        flavor = ENV['PRODUCT_NAME'].nil? ? params[:app] : ENV['PRODUCT_NAME']
-        Fastlane::Helper::Android::VersionHelper.get_alpha_version(flavor)
+        app = ENV['APP'].nil? ? params[:app] : ENV['APP']
+        Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
       end
 
       #####################################################

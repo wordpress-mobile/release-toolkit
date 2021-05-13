@@ -14,7 +14,7 @@ module Fastlane
         # Checkout develop and update
         Fastlane::Helper::GitHelper.checkout_and_pull('develop')
 
-        app = ENV['PRODUCT_NAME'].nil? ? params[:app] : ENV['PRODUCT_NAME']
+        app = ENV['APP'].nil? ? params[:app] : ENV['APP']
 
         # Create versions
         current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(app)
@@ -22,7 +22,7 @@ module Fastlane
         next_version = Fastlane::Helper::Android::VersionHelper.calc_next_release_version(current_version, current_alpha_version)
         next_alpha_version = current_alpha_version.nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(next_version, current_alpha_version)
 
-        no_alpha_version_message = "No alpha version configured. If you wish to configure an alpha version please update version.properties to include an alpha key for this flavor\n"
+        no_alpha_version_message = "No alpha version configured. If you wish to configure an alpha version please update version.properties to include an alpha key for this app\n"
         # Ask user confirmation
         unless params[:skip_confirm]
           confirm_message = "[#{app}]Building a new release branch starting from develop.\nCurrent version is #{current_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{current_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"

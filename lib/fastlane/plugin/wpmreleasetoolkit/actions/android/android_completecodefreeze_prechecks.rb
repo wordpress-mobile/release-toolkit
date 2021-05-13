@@ -9,7 +9,7 @@ module Fastlane
 
         UI.user_error!('This is not a release branch. Abort.') unless other_action.git_branch.start_with?('release/')
 
-        app = ENV['PRODUCT_NAME'].nil? ? params[:app] : ENV['PRODUCT_NAME']
+        app = ENV['APP'].nil? ? params[:app] : ENV['APP']
 
         version = Fastlane::Helper::Android::VersionHelper.get_public_version(app)
         message = "Completing code freeze for: [#{app}]#{version}\n"

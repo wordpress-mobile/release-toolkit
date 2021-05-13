@@ -31,31 +31,28 @@ module Fastlane
         #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
         #
         def self.get_public_version(app)
-          version = get_version_from_flavor(app, false)
+          version = get_version_from_properties(app, false)
           vp = get_version_parts(version[VERSION_NAME])
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
 
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}"
         end
 
-        # Extract the version name and code from the flavor of the `$PROJECT_NAME/build.gradle file`
-        #   or for the defaultConfig if `HAS_ALPHA_VERSION` is not defined.
-        #
-        # @env HAS_ALPHA_VERSION If set (with any value), indicates that the project uses `vanilla` flavor.
+        # Extract the version name and code from the release version of the app from `version.properties file`
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_release_version(app)
-          return get_version_from_flavor(app, false)
+          return get_version_from_properties(app, false)
         end
 
-        # Extract the version name and code from a given secion of the `$PROJECT_NAME/build.gradle file`
+        # Extract the version name and code from the `version.properties` file in the project root
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
-        def self.get_version_from_flavor(flavor, is_alpha)
-          version_name_key = "#{flavor}.#{is_alpha ? 'alpha.' : ''}versionName"
-          version_code_key = "#{flavor}.#{is_alpha ? 'alpha.' : ''}versionCode"
+        def self.get_version_from_properties(product_name, is_alpha)
+          version_name_key = "#{product_name}.#{is_alpha ? 'alpha.' : ''}versionName"
+          version_code_key = "#{product_name}.#{is_alpha ? 'alpha.' : ''}versionCode"
           name = get_value_from_properties_file(version_name_key)
           code = get_value_from_properties_file(version_code_key).to_i
           return nil if name.nil? || code.nil?
@@ -74,13 +71,13 @@ module Fastlane
           end
         end
 
-        # Extract the version name and code from the `defaultConfig` of the `$PROJECT_NAME/build.gradle` file
+        # Extract the version name and code from the `version.properties` file in the project root
         #
         # @return [Hash] A hash with 2 keys `"name"` and `"code"` containing the extracted version name and code, respectively,
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
         def self.get_alpha_version(app)
-          return get_version_from_flavor(app, true)
+          return get_version_from_properties(app, true)
         end
 
         # Determines if a version name corresponds to an alpha version (starts with `"alpha-"`` prefix)
@@ -110,8 +107,8 @@ module Fastlane
         # - The final version name corresponds to the beta's versionName, without the `-rc` suffix
         # - The final version code corresponds to the versionCode for the alpha (or for the beta if alpha_version is nil) incremented by one.
         #
-        # @param [Hash] beta_version The version hash for the beta (vanilla flavor), containing values for keys "name" and "code"
-        # @param [Hash] alpha_version The version hash for the alpha (defaultConfig), containing values for keys "name" and "code",
+        # @param [Hash] beta_version The version hash for the beta, containing values for keys "name" and "code"
+        # @param [Hash] alpha_version The version hash for the alpha, containing values for keys "name" and "code",
         #                             or `nil` if no alpha version to consider.
         #
         # @return [Hash] A version hash with keys "name" and "code", containing the version name and code to use for final release.
@@ -282,7 +279,7 @@ module Fastlane
         #
         def self.bump_version_for_app(app, is_alpha)
           # Bump release
-          current_version = get_version_from_flavor(app, is_alpha)
+          current_version = get_version_from_properties(app, is_alpha)
           UI.message("Current version: #{current_version[VERSION_NAME]}")
           new_version = calc_next_release_base_version(current_version)
           UI.message("New version: #{new_version[VERSION_NAME]}")
@@ -291,11 +288,10 @@ module Fastlane
           return verified_version
         end
 
-        # Update the `build.gradle` file with new `versionName` and `versionCode` values, both or the `defaultConfig` and `vanilla` flavors
+        # Update the `version.properties` file with new `versionName` and `versionCode` values
         #
-        # @param [Hash] new_version_beta The version hash for the beta (vanilla flavor), containing values for keys "name" and "code"
-        # @param [Hash] new_version_alpha The version hash for the alpha (defaultConfig), containing values for keys "name" and "code"
-        # @env HAS_ALPHA_VERSION If set (with any value), indicates that the project uses `vanilla` flavor.
+        # @param [Hash] new_version_beta The version hash for the beta, containing values for keys "name" and "code"
+        # @param [Hash] new_version_alpha The version hash for the alpha , containing values for keys "name" and "code"
         #
         def self.update_versions(app, new_version_beta, new_version_alpha)
           new_version_name_beta_key = "#{app}.versionName"

@@ -8,13 +8,13 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper.rb'
 
         Fastlane::Helper::GitHelper.ensure_on_branch!('release')
-        @flavor = ENV['PRODUCT_NAME'].nil? ? params[:app] : ENV['PRODUCT_NAME']
+        @app = ENV['APP'].nil? ? params[:app] : ENV['APP']
 
         create_config()
         show_config()
 
         UI.message 'Updating build.gradle...'
-        Fastlane::Helper::Android::VersionHelper.update_versions(@flavor, @new_version_beta, @new_version_alpha)
+        Fastlane::Helper::Android::VersionHelper.update_versions(@app, @new_version_beta, @new_version_alpha)
         UI.message 'Done!'
 
         Fastlane::Helper::Android::GitHelper.commit_version_bump()
@@ -60,8 +60,8 @@ module Fastlane
       private
 
       def self.create_config
-        @current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(@flavor)
-        @current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version(@flavor)
+        @current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(@app)
+        @current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version(@app)
         @new_version_beta = Fastlane::Helper::Android::VersionHelper.calc_next_beta_version(@current_version, @current_version_alpha)
         @new_version_alpha = @current_version_alpha.nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(@new_version_beta, @current_version_alpha)
       end
@@ -69,10 +69,10 @@ module Fastlane
       def self.show_config
         vname = Fastlane::Helper::Android::VersionHelper::VERSION_NAME
         vcode = Fastlane::Helper::Android::VersionHelper::VERSION_CODE
-        UI.message("Current version[#{@flavor}]: #{@current_version[vname]}(#{@current_version[vcode]})")
-        UI.message("Current alpha version[#{@flavor}]: #{@current_version_alpha[vname]}(#{@current_version_alpha[vcode]})") unless @current_version_alpha.nil?
-        UI.message("New beta version[#{@flavor}]: #{@new_version_beta[vname]}(#{@new_version_beta[vcode]})")
-        UI.message("New alpha version[#{@flavor}]: #{@new_version_alpha[vname]}(#{@new_version_alpha[vcode]})") unless @current_version_alpha.nil?
+        UI.message("Current version[#{@app}]: #{@current_version[vname]}(#{@current_version[vcode]})")
+        UI.message("Current alpha version[#{@app}]: #{@current_version_alpha[vname]}(#{@current_version_alpha[vcode]})") unless @current_version_alpha.nil?
+        UI.message("New beta version[#{@app}]: #{@new_version_beta[vname]}(#{@new_version_beta[vcode]})")
+        UI.message("New alpha version[#{@app}]: #{@new_version_alpha[vname]}(#{@new_version_alpha[vcode]})") unless @current_version_alpha.nil?
       end
     end
   end

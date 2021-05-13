@@ -9,7 +9,7 @@ module Fastlane
 
         Fastlane::Helper::GitHelper.ensure_on_branch!('release') unless other_action.is_ci()
 
-        app = ENV['PRODUCT_NAME'].nil? ? params[:app]: ENV['PRODUCT_NAME']
+        app = ENV['APP'].nil? ? params[:app]: ENV['APP']
         message = ''
         beta_version = Fastlane::Helper::Android::VersionHelper.get_release_version(app) unless !params[:beta] && !params[:final]
         alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app) if params[:alpha]
