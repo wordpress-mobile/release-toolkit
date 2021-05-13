@@ -15,22 +15,20 @@ module Fastlane
       #         (i.e. a local working copy) or a subdirectory of one.
       #
       def self.is_git_repo?(path: nil)
-        args = ['git']
+        working_path = path.nil? ? Dir.pwd : first_existing_ancestor_of(path: path)
+        current_dir = File.directory?(working_path) ? working_path : File.dirname(working_path)
 
-        unless path.nil?
-          # `path` might represent a file that doesn't yet exist but is in a
-          # valid Git repo. In such case, the `git rev-parse` we're currently
-          # building would fail. To avoid that, let's perform the check on the
-          # first existing ancestor of the given path – which will be the path
-          # itself if it exists.
-          path = first_existing_ancestor_of(path: path)
-          args += ['-C', File.file?(path) ? File.dirname(path) : path]
-        end
+        # Calling `expand_path` to get an absolute path and avoid and endless
+        # loop of adding ".." to the path without ever triggerting the "/"
+        # safeguard.
+        full_path = Pathname(current_dir).expand_path
 
-        args += ['rev-parse']
-
-        Action.sh(args, print_command_output: false) do |status, _, _|
-          status.success?
+        if full_path.children.map { |f| File.basename(f) }.include?('.git')
+          return true
+        elsif full_path == ROOT_FOLDER
+          return false
+        else
+          return is_git_repo?(path: full_path.parent)
         end
       end
 
@@ -210,6 +208,8 @@ module Fastlane
           status.success?
         end
       end
+
+      ROOT_FOLDER = Pathname('/')
     end
   end
 end
