@@ -23,11 +23,14 @@ module Fastlane
         return current_dir.root? == false
       end
 
-      # Travels back the hierarchy of the given path until it finds an existing ancestor, or it reaches the root of the file system.
+      # Travels back the hierarchy of the given path until it finds an existing
+      # ancestor, or it reaches the root of the file system.
       #
       # @param [String] path The path to inspect
       #
-      # @return [Pathname] The first existing ancestor, or `path` itself if it exists
+      # @return [Pathname] The first existing ancestor, or `path` itself if it
+      #         exists
+      #
       def self.first_existing_ancestor_of(path:)
         p = Pathname(path).expand_path
         p = p.parent until p.exist? || p.root?
