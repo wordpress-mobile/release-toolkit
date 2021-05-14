@@ -101,7 +101,7 @@ module Fastlane
       # @return [String] The commit SHA of the ref
       #
       def self.get_commit_sha(ref: 'HEAD')
-        Action.sh('git', 'rev-parse', ref).chomp
+        Git.open(Dir.pwd).revparse(ref)
       end
 
       # Creates a tag for the given version, and optionally push it to the remote.
