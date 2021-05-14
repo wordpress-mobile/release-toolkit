@@ -14,34 +14,34 @@ module Fastlane
       # @return [Bool] True if the current directory is the root of a git repo
       #         (i.e. a local working copy) or a subdirectory of one.
       #
-      def self.is_git_repo?(path: nil)
-        args = ['git']
+      def self.is_git_repo?(path: Dir.pwd)
+        # If the path doesn't exist, find its first ancestor.
+        path = first_existing_ancestor_of(path: path)
+        # Get the path's directory, so we can look in it for the Git folder
+        dir = path.directory? ? path : path.dirname
 
-        unless path.nil?
-          # `path` might represent a file that doesn't yet exist but is in a
-          # valid Git repo. In such case, the `git rev-parse` we're currently
-          # building would fail. To avoid that, let's perform the check on the
-          # first existing ancestor of the given path – which will be the path
-          # itself if it exists.
-          path = first_existing_ancestor_of(path: path)
-          args += ['-C', File.file?(path) ? File.dirname(path) : path]
-        end
+        # Recursively look for the Git folder until it's found or we read the
+        # the file system root
+        dir = dir.parent until Dir.entries(dir).include?('.git') || dir.root?
 
-        args += ['rev-parse']
-
-        Action.sh(args, print_command_output: false) do |status, _, _|
-          status.success?
-        end
+        # If we reached the root, we haven't found a repo. (Technically, there
+        # could be a repo in the root of the system, but that's a usecase that
+        # we don't need to support at this time)
+        return dir.root? == false
       end
 
-      # Travels back the hierarchy of the given path until it finds an existing ancestor, or it reaches the root of the file system.
+      # Travels back the hierarchy of the given path until it finds an existing
+      # ancestor, or it reaches the root of the file system.
       #
       # @param [String] path The path to inspect
       #
-      # @return [String] The first existing ancestor, or `path` itself if it exists
+      # @return [Pathname] The first existing ancestor, or `path` itself if it
+      #         exists
+      #
       def self.first_existing_ancestor_of(path:)
-        path = Pathname(path).expand_path.parent until File.exist?(path) || path == Pathname('/')
-        return path.to_s
+        p = Pathname(path).expand_path
+        p = p.parent until p.exist? || p.root?
+        return p
       end
 
       # Check if the current directory has git-lfs enabled
