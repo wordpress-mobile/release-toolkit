@@ -86,19 +86,19 @@ module Fastlane
       # @param [String?] target The commit SHA or branch name that this release will point to when it's published and creates the tag.
       #        If nil (the default), will use the repo's current HEAD commit at the time this method is called.
       #        Unused if the tag already exists.
-      # @param [String] body The text to use as the release's body / description (typically the release notes)
+      # @param [String] description The text to use as the release's body / description (typically the release notes)
       # @param [Array<String>] assets List of file paths to attach as assets to the release
       # @param [TrueClass|FalseClass] prerelease Indicates if this should be created as a pre-release (i.e. for alpha/beta)
       #
-      def self.create_release(repository:, version:, target: nil, body:, assets:, prerelease:)
+      def self.create_release(repository:, version:, target: nil, description:, assets:, prerelease:)
         release = github_client().create_release(
           repository,
           version, # tag name
           name: version, # release name
-          target_commitish: target || Fastlane::Helper::GitHelper.get_commit_sha,
+          target_commitish: target || Git.open(Dir.pwd).log.first.sha,
           draft: true,
           prerelease: prerelease,
-          body: body
+          body: description
         )
         assets.each do |file_path|
           github_client().upload_asset(release[:url], file_path, content_type: 'application/octet-stream')

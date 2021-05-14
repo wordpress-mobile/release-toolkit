@@ -23,7 +23,7 @@ module Fastlane
           repository: repository,
           version: version,
           target: params[:target],
-          body: release_notes,
+          description: release_notes,
           assets: assets,
           prerelease: prerelease
         )
