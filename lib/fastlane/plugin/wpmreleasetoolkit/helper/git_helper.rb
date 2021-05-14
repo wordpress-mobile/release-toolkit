@@ -95,10 +95,10 @@ module Fastlane
         end
       end
 
-      # Get the sha1 of a given git ref. Typically useful to get the sha1 of the current HEAD commit.
+      # Get the SHA of a given git ref. Typically useful to get the SHA of the current HEAD commit.
       #
-      # @param [String] ref The git ref (commit, branch name, 'HEAD', …) to resolve as a sha1
-      # @return [String] The commit sha1 of the ref
+      # @param [String] ref The git ref (commit, branch name, 'HEAD', …) to resolve as a SHA
+      # @return [String] The commit SHA of the ref
       #
       def self.get_commit_sha(ref: 'HEAD')
         Action.sh('git', 'rev-parse', ref).chomp

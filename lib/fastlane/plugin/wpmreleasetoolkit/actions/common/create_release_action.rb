@@ -61,7 +61,7 @@ module Fastlane
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :target,
                                        env_name: 'GHHELPER_TARGET_COMMITISH',
-                                       description: 'The branch name or commit sha1 the new tag should point to - if that tag does not exist yet when publishing the release. If omitted, will default to the current HEAD commit at the time of this call',
+                                       description: 'The branch name or commit SHA the new tag should point to - if that tag does not exist yet when publishing the release. If omitted, will default to the current HEAD commit at the time of this call',
                                        optional: true,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :release_notes_file_path,

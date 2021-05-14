@@ -83,7 +83,7 @@ module Fastlane
       #
       # @param [String] repository The repository to create the GitHub release on. Typically a repo slug (<org>/<repo>).
       # @param [String] version The version for which to create this release. Will be used both as the name of the tag and the name of the release.
-      # @param [String?] target The commit sha1 or branch name that this release will point to when it's published and creates the tag.
+      # @param [String?] target The commit SHA or branch name that this release will point to when it's published and creates the tag.
       #        If nil (the default), will use the repo's current HEAD commit at the time this method is called.
       #        Unused if the tag already exists.
       # @param [String] body The text to use as the release's body / description (typically the release notes)
