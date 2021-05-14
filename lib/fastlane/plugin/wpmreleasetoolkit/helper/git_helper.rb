@@ -15,12 +15,19 @@ module Fastlane
       #         (i.e. a local working copy) or a subdirectory of one.
       #
       def self.is_git_repo?(path: Dir.pwd)
-        working_path = first_existing_ancestor_of(path: path)
-        current_dir = working_path.directory? ? working_path : working_path.dirname
+        # If the path doesn't exist, find its first ancestor.
+        path = first_existing_ancestor_of(path: path)
+        # Get the path's directory, so we can look in it for the Git folder
+        dir = path.directory? ? path : path.dirname
 
-        current_dir = current_dir.parent until Dir.entries(current_dir).include?('.git') || current_dir.root?
+        # Recursively look for the Git folder until it's found or we read the
+        # the file system root
+        dir = dir.parent until Dir.entries(dir).include?('.git') || dir.root?
 
-        return current_dir.root? == false
+        # If we reached the root, we haven't found a repo. (Technically, there
+        # could be a repo in the root of the system, but that's a usecase that
+        # we don't need to support at this time)
+        return dir.root? == false
       end
 
       # Travels back the hierarchy of the given path until it finds an existing
