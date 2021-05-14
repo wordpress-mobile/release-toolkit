@@ -32,10 +32,11 @@ end
 Rake::ExtensionTask.new('drawText')
 
 desc 'Create a new version of the release-toolkit gem'
-task :release do
+task :new_release do
   version_file = File.join('lib', 'fastlane', 'plugin', 'wpmreleasetoolkit', 'version.rb')
   require_relative(version_file)
   puts ">>> Current version is: #{Fastlane::Wpmreleasetoolkit::VERSION}"
+  puts ">>> Pending CHANGELOG:\n" + get_changelog_section(file: 'CHANGELOG.md', section_title: 'Develop').map { |l| "| #{l}" }.join
 
   puts '>>> New version to use?'
   new_version = STDIN.gets.chomp
@@ -58,6 +59,8 @@ task :release do
 
   puts <<~INSTRUCTIONS
 
+    ---------------
+
     >>> WHAT'S NEXT
 
     Please check that the version bump and CHANGELOG.md updates looks ok.
@@ -79,12 +82,19 @@ def next_index(matching:, after: 0, in_lines:)
   idx + after + 1
 end
 
+def get_changelog_section(file:, section_title:)
+  lines = File.readlines(file)
+  section_start = next_index(matching: /^\#\# #{section_title}$/, in_lines: lines)
+  section_end = next_index(matching: /^\#\# /, after: section_start, in_lines: lines)
+  puts "#{section_start}...#{section_end}"
+  lines[section_start...section_end]
+end
+
 def update_changelog_sections(file:, wip_header_title:, placeholder_sections:, empty_section_text: '_None_', new_section_title:)
-  # Read current CHANGELOG
   lines = File.readlines(file)
 
   # Find on which line the WIP h2 section starts
-  wip_section_idx = next_index(matching: /\#\# #{wip_header_title}$/, in_lines: lines)
+  wip_section_idx = next_index(matching: /^\#\# #{wip_header_title}$/, in_lines: lines)
   raise "#{wip_header_title} section not found in current CHANGELOG!" if wip_section_idx.nil?
 
   # Update CHANGELOG
