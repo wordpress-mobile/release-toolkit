@@ -14,32 +14,24 @@ module Fastlane
       # @return [Bool] True if the current directory is the root of a git repo
       #         (i.e. a local working copy) or a subdirectory of one.
       #
-      def self.is_git_repo?(path: nil)
-        working_path = path.nil? ? Dir.pwd : first_existing_ancestor_of(path: path)
-        current_dir = File.directory?(working_path) ? working_path : File.dirname(working_path)
+      def self.is_git_repo?(path: Dir.pwd)
+        working_path = first_existing_ancestor_of(path: path)
+        current_dir = working_path.directory? ? working_path : working_path.dirname
 
-        # Calling `expand_path` to get an absolute path and avoid and endless
-        # loop of adding ".." to the path without ever triggerting the "/"
-        # safeguard.
-        full_path = Pathname(current_dir).expand_path
+        current_dir = current_dir.parent until Dir.entries(current_dir).include?('.git') || current_dir.root?
 
-        if full_path.children.map { |f| File.basename(f) }.include?('.git')
-          return true
-        elsif full_path == ROOT_FOLDER
-          return false
-        else
-          return is_git_repo?(path: full_path.parent)
-        end
+        return current_dir.root? == false
       end
 
       # Travels back the hierarchy of the given path until it finds an existing ancestor, or it reaches the root of the file system.
       #
       # @param [String] path The path to inspect
       #
-      # @return [String] The first existing ancestor, or `path` itself if it exists
+      # @return [Pathname] The first existing ancestor, or `path` itself if it exists
       def self.first_existing_ancestor_of(path:)
-        path = Pathname(path).expand_path.parent until File.exist?(path) || path == Pathname('/')
-        return path.to_s
+        p = Pathname(path).expand_path
+        p = p.parent until p.exist? || p.root?
+        return p
       end
 
       # Check if the current directory has git-lfs enabled
@@ -208,8 +200,6 @@ module Fastlane
           status.success?
         end
       end
-
-      ROOT_FOLDER = Pathname('/')
     end
   end
 end
