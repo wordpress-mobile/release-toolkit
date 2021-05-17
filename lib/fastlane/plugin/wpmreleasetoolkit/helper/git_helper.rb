@@ -95,6 +95,15 @@ module Fastlane
         end
       end
 
+      # Get the SHA of a given git ref. Typically useful to get the SHA of the current HEAD commit.
+      #
+      # @param [String] ref The git ref (commit, branch name, 'HEAD', …) to resolve as a SHA
+      # @return [String] The commit SHA of the ref
+      #
+      def self.get_commit_sha(ref: 'HEAD')
+        Git.open(Dir.pwd).revparse(ref)
+      end
+
       # Creates a tag for the given version, and optionally push it to the remote.
       #
       # @param [String] version The name of the tag to push, e.g. "1.2"

@@ -19,7 +19,14 @@ module Fastlane
           UI.user_error!("Can't find file #{file_path}!") unless File.exist?(file_path)
         end
 
-        Fastlane::Helper::GithubHelper.create_release(repository, version, release_notes, assets, prerelease)
+        Fastlane::Helper::GithubHelper.create_release(
+          repository: repository,
+          version: version,
+          target: params[:target],
+          description: release_notes,
+          assets: assets,
+          prerelease: prerelease
+        )
         UI.message('Done')
       end
 
@@ -44,19 +51,24 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :repository,
                                        env_name: 'GHHELPER_REPOSITORY',
-                                       description: 'The remote path of the GH repository on which we work',
+                                       description: 'The slug (`<org>/<repo>`) of the GitHub repository we want to create the release on',
                                        optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: 'GHHELPER_CREATE_RELEASE_VERSION',
                                        description: 'The version of the release',
                                        optional: false,
-                                       is_string: true),
+                                       type: String),
+          FastlaneCore::ConfigItem.new(key: :target,
+                                       env_name: 'GHHELPER_TARGET_COMMITISH',
+                                       description: 'The branch name or commit SHA the new tag should point to - if that tag does not exist yet when publishing the release. If omitted, will default to the current HEAD commit at the time of this call',
+                                       optional: true,
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :release_notes_file_path,
                                        env_name: 'GHHELPER_CREATE_RELEASE_NOTES',
                                        description: 'The path to the file that contains the release notes',
                                        optional: true,
-                                       is_string: true),
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :release_assets,
                                        env_name: 'GHHELPER_CREATE_RELEASE_ASSETS',
                                        description: 'Assets to upload',
