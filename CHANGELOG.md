@@ -4,8 +4,6 @@
 
 ## Develop
 
-This is our first official release.
-
 ### Breaking Changes
 
 _None_
@@ -19,5 +17,11 @@ _None_
 _None_
 
 ### Internal Changes
+
+_None_
+
+## 1.0.0
+
+This is our first official release.
 
 _None_
