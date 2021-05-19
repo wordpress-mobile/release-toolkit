@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+Updated the Gemspec's `bundler` and `rubocop` dependencies to fix a publishing warning.
 
 ## 1.0.0
 
