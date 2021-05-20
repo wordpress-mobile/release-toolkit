@@ -17,7 +17,7 @@ module Fastlane
       end
 
       def self.check_language(language_code, min_acceptable_translation_percentage, abort_on_violations)
-
+        
       end
       #####################################################
       # @!group Documentation
@@ -34,6 +34,10 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :glotpress_url,
+                                       env_name: 'FL_CHECK_TRANSLATION_PROGRESS_GLOTPRESS_URL',
+                                       description: 'URL to the GlotPress project',
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :language_codes,
                                        env_name: 'FL_CHECK_TRANSLATION_PROGRESS_LANGUAGE_CODES',
                                        description: 'The list of the codes of the languages to check.',
@@ -49,9 +53,15 @@ module Fastlane
                                        default_value: 100),
           FastlaneCore::ConfigItem.new(key: :abort_on_violations,
                                        env_name: 'FL_CHECK_TRANSLATION_ABORT_ON_VIOLATIONS',
-                                       description: 'Should we abort the rest of the lane with a global error if any violations are found?',
+                                       description: 'Should we abort with a global error if any violations are found?',
                                        optional: true,
                                        default_value: true,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :skip_confirm,
+                                       env_name: 'FL_CHECK_TRANSLATION_SKIP_CONFIRM',
+                                       description: 'Move ahead without requesting confirmation if violations are found. Only works if "abort_on_violations" is disabled.',
+                                       optional: true,
+                                       default_value: false,
                                        is_string: false),
         ]
       end
