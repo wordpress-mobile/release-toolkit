@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/wordpress-mobile/release-toolkit'
   spec.license       = 'MIT'
 
-  spec.files         = Dir['lib/**/*'] + %w[README.md LICENSE]
+  spec.files         = Dir['lib/**/*'] + Dir['ext/drawText/{makefile.example,drawText/**/*,drawText Tests/**/*,drawText.xcodeproj/**/*}'] + %w[README.md LICENSE]
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
 
   spec.files << 'ext/drawText/extconf.rb'
