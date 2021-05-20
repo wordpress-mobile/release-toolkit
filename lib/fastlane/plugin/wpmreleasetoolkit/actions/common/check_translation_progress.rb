@@ -2,9 +2,23 @@ module Fastlane
   module Actions
     class CheckTranslationProgressAction < Action
       def self.run(params)
+        under_threshold_langs = {}
 
+        UI.message('Check translations status...')
+
+        params[:language_codes].each do | language_code |
+          under_threshold_langs << self.check_language(
+                                      language_code, 
+                                      params[:min_acceptable_translation_percentage], 
+                                      params[:abort_on_violations])
+        end
+
+        
       end
 
+      def self.check_language(language_code, min_acceptable_translation_percentage, abort_on_violations)
+
+      end
       #####################################################
       # @!group Documentation
       #####################################################
@@ -14,14 +28,11 @@ module Fastlane
       end
 
       def self.details
-        'This actions checks the current state of the translation on GlotPress ' \
+        'This actions checks the current status of the translations on GlotPress ' \
         'and raises an error if it\'s below the provided threshold'
       end
 
       def self.available_options
-        # Define all options your action supports.
-
-        # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :language_codes,
                                        env_name: 'FL_CHECK_TRANSLATION_PROGRESS_LANGUAGE_CODES',
