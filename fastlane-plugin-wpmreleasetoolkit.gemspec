@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
 
   # These files are used to generate Makefile files which in turn are used
   # to build and install the C extension.
-  spec.extensions = ['ext/drawText/extconf.rb']
+  spec.extensions = ['ext/drawText/extconf.rb', 'ext/drawText/makefile.example']
 
   # Don't add a dependency to fastlane or fastlane_re
   # since this would cause a circular dependency
