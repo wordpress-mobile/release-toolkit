@@ -2,23 +2,44 @@ module Fastlane
   module Actions
     class CheckTranslationProgressAction < Action
       def self.run(params)
-        under_threshold_langs = {}
+        require_relative '../../helper/glotpress_helper.rb'
 
         UI.message('Check translations status...')
 
-        params[:language_codes].each do | language_code |
-          under_threshold_langs << self.check_language(
-                                      language_code, 
-                                      params[:min_acceptable_translation_percentage], 
-                                      params[:abort_on_violations])
+        under_threshold_langs = check_translations(
+                                  params[:glotpress_url], 
+                                  params[:language_codes],
+                                  params[:abort_on_violations],
+                                  params[:min_acceptable_translation_percentage])
+
+        check_results(under_threshold_langs, params[:skip_confirm])
+
+        UI.message('Done')
+      end
+
+      def self.check_translations(glotpress_url, language_codes, abort_on_violations, threshold)
+        under_threshold_langs = {}
+
+        language_codes.each do | language_code |
+          progress = Fastlane::Helper::GlotPressHelper.get_translation_status(
+                                      glotpress_url,
+                                      language_code) rescue -1
+          
+          if (abort_on_violations)
+            UI.user_error!("Can't get data for language #{language_code}") if (progress == -1) 
+            UI.user_error!("#{language_code} is translated #{progress}% which is under the required #{threshold}%.") \ 
+              if (progress < threshold) 
+          end
+          
+          under_threshold_langs << {:lang => language_code, :progress => progress }
         end
 
-        
+        under_threshold_langs
       end
 
-      def self.check_language(language_code, min_acceptable_translation_percentage, abort_on_violations)
-        
+      def self.check_results(under_threshold_langs, skip_confirm)
       end
+
       #####################################################
       # @!group Documentation
       #####################################################
