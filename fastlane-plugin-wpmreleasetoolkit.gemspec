@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/wordpress-mobile/release-toolkit'
   spec.license       = 'MIT'
 
-  spec.files         = Dir['lib/**/*'] + %w[README.md LICENSE]
+  spec.files         = Dir['lib/**/*'] + Dir['ext/drawText/{makefile.example,drawText/**/*,drawText Tests/**/*,drawText.xcodeproj/**/*}'] + %w[README.md LICENSE]
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
 
   spec.files << 'ext/drawText/extconf.rb'
@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
 
   # These files are used to generate Makefile files which in turn are used
   # to build and install the C extension.
-  spec.extensions = ['ext/drawText/extconf.rb', 'ext/drawText/makefile.example']
+  spec.extensions = ['ext/drawText/extconf.rb']
 
   # Don't add a dependency to fastlane or fastlane_re
   # since this would cause a circular dependency
