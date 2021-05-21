@@ -12,7 +12,7 @@ module Fastlane
                                   params[:abort_on_violations],
                                   params[:min_acceptable_translation_percentage])
 
-        check_results(under_threshold_langs, params[:skip_confirm])
+        check_results(under_threshold_langs, params[:skip_confirm]) unless under_threshold_langs.length == 0
 
         UI.message('Done')
       end
@@ -26,18 +26,25 @@ module Fastlane
                                       language_code) rescue -1
           
           if (abort_on_violations)
-            UI.user_error!("Can't get data for language #{language_code}") if (progress == -1) 
-            UI.user_error!("#{language_code} is translated #{progress}% which is under the required #{threshold}%.") \ 
+            UI.abort_with_message!("Can't get data for language #{language_code}") if (progress == -1) 
+            UI.abort_with_message!("#{language_code} is translated #{progress}% which is under the required #{threshold}%.") \ 
               if (progress < threshold) 
           end
           
-          under_threshold_langs << {:lang => language_code, :progress => progress }
+          under_threshold_langs << {:lang => language_code, :progress => progress } if (progress < threshold)
         end
 
         under_threshold_langs
       end
 
-      def self.check_results(under_threshold_langs, skip_confirm)
+      def self.check_results(under_threshold_langs, threshold, skip_confirm)
+        message = "The translations for the following languages are below the #{threshold}% threshold:\n"
+        
+        under_threshold_langs.each do | lang |
+          message << " - #{lang[lang]} is at #{lang[progress]}%.\n"
+        end
+
+        skip_confirm ? UI.important(message) : UI.interactive? UI.confirm("#{message}Do you want to continue?") : UI.abort_with_message!(message)
       end
 
       #####################################################
