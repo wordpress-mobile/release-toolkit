@@ -21,6 +21,15 @@ module Fastlane
         UI.message('Done')
       end
 
+      # Check the status of the translations and returns the list of violations
+      # 
+      # @param [String] URL to the GlotPress project.
+      # @param [String] The list of codes (in GlotPress format) of the languages to check.   
+      # @param [Bool] Whether to abort on the first found violation or not.
+      # @param [Integer] The minimum acceptable percentage of translated strings.
+      #
+      # @return [Array] The list of violations (array of hashes of "language code" and "current percentage")
+      #
       def self.check_translations(glotpress_url:, language_codes:, abort_on_violations:, threshold:)
         under_threshold_langs = []
 
@@ -43,6 +52,12 @@ module Fastlane
         under_threshold_langs
       end
 
+      # Report the status of the translations and verify whether to abort or not
+      # 
+      # @param [Array] The list of violations (array of hashes of "language code" and "current percentage")
+      # @param [Integer] The minimum acceptable percentage of translated strings.  
+      # @param [Bool] If true, continue after the report without asking the user. 
+      #
       def self.check_results(under_threshold_langs:, threshold:, skip_confirm:)
         message = "The translations for the following languages are below the #{threshold}% threshold:\n"
         
