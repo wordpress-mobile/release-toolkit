@@ -101,7 +101,7 @@ module Fastlane
                                        type: Array,
                                        optional: true,
                                        # Default to Mag16. 
-                                       default_value: "ar de es fr he id it ja ko nl pt-br ru sv tr zh-cn zh-tw".split()),
+                                       default_value: 'ar de es fr he id it ja ko nl pt-br ru sv tr zh-cn zh-tw'.split()),
           FastlaneCore::ConfigItem.new(key: :min_acceptable_translation_percentage,
                                        env_name: 'FL_CHECK_TRANSLATION_PROGRESS_MIN_ACCEPTABLE_TRANSLATION_PERCENTAGE',
                                        description: 'The threshold under which an error is raised',
