@@ -7,43 +7,58 @@ module Fastlane
         UI.message('Check translations status...')
 
         under_threshold_langs = check_translations(
-                                  params[:glotpress_url], 
-                                  params[:language_codes],
-                                  params[:abort_on_violations],
-                                  params[:min_acceptable_translation_percentage])
+                                  glotpress_url: params[:glotpress_url], 
+                                  language_codes: params[:language_codes],
+                                  abort_on_violations: params[:abort_on_violations],
+                                  threshold: params[:min_acceptable_translation_percentage])
 
-        check_results(under_threshold_langs, params[:skip_confirm]) unless under_threshold_langs.length == 0
+        check_results(
+          under_threshold_langs: under_threshold_langs, 
+          threshold: params[:min_acceptable_translation_percentage], 
+          skip_confirm: params[:skip_confirm]
+        ) unless under_threshold_langs.length == 0
 
         UI.message('Done')
       end
 
-      def self.check_translations(glotpress_url, language_codes, abort_on_violations, threshold)
-        under_threshold_langs = {}
+      def self.check_translations(glotpress_url:, language_codes:, abort_on_violations:, threshold:)
+        under_threshold_langs = []
+
+        data = Fastlane::Helper::GlotPressHelper.get_translation_status_data(glotpress_url: glotpress_url) rescue nil
+        UI.abort_with_message!("Can't retrieve data from #{glotpress_url}") if data.nil? || data.length == 0
 
         language_codes.each do | language_code |
           progress = Fastlane::Helper::GlotPressHelper.get_translation_status(
-                                      glotpress_url,
-                                      language_code) rescue -1
+                                      data: data,
+                                      language_code: language_code) rescue -1
           
           if (abort_on_violations)
             UI.abort_with_message!("Can't get data for language #{language_code}") if (progress == -1) 
             UI.abort_with_message!("#{language_code} is translated #{progress}% which is under the required #{threshold}%.") if (progress < threshold) 
           end
           
-          under_threshold_langs << {:lang => language_code, :progress => progress } if (progress < threshold)
+          under_threshold_langs.push({:lang => language_code, :progress => progress }) if (progress < threshold)
         end
 
         under_threshold_langs
       end
 
-      def self.check_results(under_threshold_langs, threshold, skip_confirm)
+      def self.check_results(under_threshold_langs:, threshold:, skip_confirm:)
         message = "The translations for the following languages are below the #{threshold}% threshold:\n"
         
         under_threshold_langs.each do | lang |
-          message << " - #{lang[lang]} is at #{lang[progress]}%.\n"
+          message << " - #{lang[:lang]} is at #{lang[:progress]}%.\n"
         end
 
-        skip_confirm ? UI.important(message) : UI.interactive? ? UI.confirm("#{message}Do you want to continue?") : UI.abort_with_message!(message)
+        if skip_confirm 
+          UI.important(message) 
+        else
+          if UI.interactive? 
+            UI.abort_with_message!("Aborted by user!") unless UI.confirm("#{message}Do you want to continue?") 
+          else 
+            UI.abort_with_message!(message)
+          end
+        end
       end
 
       #####################################################

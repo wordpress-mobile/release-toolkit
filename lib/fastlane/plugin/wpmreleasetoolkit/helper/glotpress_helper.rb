@@ -11,21 +11,24 @@ module Fastlane
       #
       # @return [Integer] The percentage of the translated strings.
       #
-      def self.get_translation_status(glotpress_url, language_code)
+      def self.get_translation_status(data:, language_code:)
+        current = extract_value_from_translation_info_data(data: data, language_code: language_code, status: 'current')
+        fuzzy = extract_value_from_translation_info_data(data: data, language_code: language_code, status: 'fuzzy')
+        untranslated = extract_value_from_translation_info_data(data: data, language_code: language_code, status: 'untranslated')
+        waiting = extract_value_from_translation_info_data(data: data, language_code: language_code, status: 'waiting')
+
+        (current * 100 / (current + fuzzy + untranslated + waiting)).round
+      end
+
+      def self.get_translation_status_data(glotpress_url:)
         uri = URI.parse(glotpress_url)
         response = Net::HTTP.get_response(uri)
         response = Net::HTTP.get_response(URI.parse(response.header['location'])) if response.code == '301'
 
-        data = response.split("\n")
-        current = extract_value_from_translation_info_data(data, language_code, 'current')
-        fuzzy = extract_value_from_translation_info_data(data, language_code, 'fuzzy')
-        untranslated = extract_value_from_translation_info_data(data, language_code, 'untranslated')
-        waiting = extract_value_from_translation_info_data(data, language_code, 'waiting')
-
-        (current / (current + fuzzy + untranslated + waiting)).round
+        response.body.split("\n")
       end
 
-      def self.extract_value_from_translation_info_data(data, language_code, status)
+      def self.extract_value_from_translation_info_data(data:, language_code:, status:)
         regex = "#{language_code}.*#{status}.*>([0-9,]+)"
         data.grep(/#{regex}/)[0].match(/#{regex}/)[1].gsub(/[,]/ ,"").to_i
       end
