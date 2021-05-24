@@ -17,7 +17,7 @@ jobs:
       - restore_cache:
           name: Restore Homebrew + Ruby Dependencies
           keys:
-            - &cache_key brew-dependencies-{{ checksum ".circleci/.brewfile" }}-{{ checksum "Gemfile.lock" }}
+            - &cache_key brew-dependencies-{{ checksum ".circleci/cache-version" }}-{{ checksum ".circleci/.brewfile" }}-{{ checksum "Gemfile.lock" }}
 
       - run:
           name: Install Homebrew dependencies, if neeeded
