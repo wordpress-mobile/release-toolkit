@@ -4,6 +4,7 @@ require 'webmock/rspec'
 describe Fastlane::Actions::CheckTranslationProgressAction do
   before(:each) do
     allow(FastlaneCore::UI).to receive(:'message')
+    allow(FastlaneCore::UI).to receive(:'interactive?').and_return(true)
   end
 
   it 'does not fail when all the languages are above the set threshold' do
