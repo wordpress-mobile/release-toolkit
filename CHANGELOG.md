@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+* Added a `check_translation_progress` action which checks the status of the translations on GlotPress. [#263]
 
 ### Bug Fixes
 
