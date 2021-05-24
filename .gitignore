@@ -29,3 +29,6 @@ default.profraw
 
 # L10n Linter
 vendor/swiftgen
+
+# Build Products
+*.gem
