@@ -7,20 +7,24 @@ orbs:
 commands:
   setup_tools:
     description: "Install Homebrew and Ruby dependencies"
+    parameters:
+      skip_brew_install:
+        type: boolean
+        default: false
     steps:
       - restore_cache:
           name: Restore Homebrew + Ruby Dependencies
           keys:
             - &cache_key brew-dependencies-{{ checksum ".circleci/.brewfile" }}-{{ checksum "Gemfile.lock" }}
-
-      - run:
-          name: Install Homebrew dependencies, if neeeded
-          command: brew update && xargs brew install --verbose < .circleci/.brewfile
-
+      - unless:
+          condition: <<parameters.skip_brew_install>>
+          steps:
+            - run:
+                name: Install Homebrew dependencies, if neeeded
+                command: brew update && xargs brew install --verbose < .circleci/.brewfile
       - run:
           name: Install Ruby dependencies, if neeeded
           command: bundle check --path vendor/bundle || bundle install --with screenshots
-
       - save_cache:
           name: Cache Homebrew + Ruby Dependencies
           key: *cache_key
@@ -61,18 +65,16 @@ jobs:
     executor:
       name: ios/default
       xcode-version: "11.2.1" # We need an Xcode-enabled CI image to build drawText during gem build
-    environment:
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      PKG_CONFIG_PATH: "/usr/local/opt/imagemagick@6/lib/pkgconfig"
     steps:
       - checkout
-      - setup_tools
+      - setup_tools:
+          skip_brew_install: true
       - run:
           name: Build gem
           command: gem build fastlane-plugin-wpmreleasetoolkit.gemspec
       - run:
           name: Check the gem is installable
-          command: gem install fastlane-plugin-wpmreleasetoolkit-*.gem
+          command: gem install --user-install fastlane-plugin-wpmreleasetoolkit-*.gem
       - run:
           name: Push to RubyGems
           command: gem push fastlane-plugin-wpmreleasetoolkit-*.gem
