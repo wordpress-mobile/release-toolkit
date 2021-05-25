@@ -68,7 +68,7 @@ Naming/PredicateName:
 # Offense count: 19
 # Configuration parameters: MinNameLength, AllowNamesEndingInNumbers, AllowedNames, ForbiddenNames.
 # AllowedNames: io, id, to, by, on, in, at, ip, db
-Naming/UncommunicativeMethodParamName:
+Naming/MethodParameterName:
   Exclude:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/an_update_metadata_source_action.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_update_metadata_source.rb'
@@ -121,26 +121,20 @@ RSpec/DescribedClass:
     - 'spec/git_helper_spec.rb'
     - 'spec/ios_lint_localizations_spec.rb'
 
-# Offense count: 5
-# Configuration parameters: Max.
-RSpec/ExampleLength:
-  Exclude:
-    - 'spec/ci_helper_spec.rb'
-    - 'spec/configuration_spec.rb'
-    - 'spec/ios_lint_localizations_spec.rb'
-    - 'spec/release_notes_helper_spec.rb'
-    - 'spec/android_localize_helper_spec.rb'
-
 # Offense count: 9
 # Configuration parameters: CustomTransform, IgnoreMethods, SpecSuffixOnly.
 RSpec/FilePath:
   Exclude:
     - 'spec/android_merge_translators_strings_spec.rb'
+    - 'spec/android_version_helper_spec.rb'
     - 'spec/ci_helper_spec.rb'
     - 'spec/configuration_spec.rb'
+    - 'spec/configure_helper_spec.rb'
     - 'spec/encryption_helper_spec.rb'
     - 'spec/file_reference_spec.rb'
     - 'spec/git_helper_spec.rb'
+    - 'spec/github_helper_spec.rb'
+    - 'spec/ios_git_helper_spec.rb'
     - 'spec/ios_lint_localizations_spec.rb'
     - 'spec/ios_merge_translators_strings_spec.rb'
     - 'spec/release_notes_helper_spec.rb'
@@ -195,6 +189,7 @@ RSpec/MultipleExpectations:
 # Configuration parameters: IgnoreSharedExamples.
 RSpec/NamedSubject:
   Exclude:
+    - 'spec/android_version_helper_spec.rb'
     - 'spec/ci_helper_spec.rb'
     - 'spec/configuration_spec.rb'
     - 'spec/file_reference_spec.rb'

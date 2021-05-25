@@ -75,15 +75,12 @@ struct CoreTextStack {
         textStorage.fixAttributes(in: range)
     }
 
-    func draw(inContext context: CGContext) throws -> CGImage {
-
+    func draw(inContext context: NSGraphicsContext) throws -> CGImage {
         NSGraphicsContext.saveGraphicsState()
-
-        let currentContext = NSGraphicsContext(cgContext: context, flipped: true)
-        NSGraphicsContext.current = currentContext
 
         /// Without the transform, text is drawn upside down and backwards because of
         /// macOS' flipped coordinate system.
+        NSGraphicsContext.current = NSGraphicsContext(cgContext: context.cgContext, flipped: true)
         let transform = NSAffineTransform()
         transform.scaleX(by: 1, yBy: -1)
         transform.translateX(by: 0, yBy: frameSize.height * -1)
@@ -91,11 +88,10 @@ struct CoreTextStack {
 
         layoutManager.drawGlyphs(forGlyphRange: range, at: .zero)
 
-        NSGraphicsContext.restoreGraphicsState()
-
-        guard let image = currentContext.cgContext.makeImage() else {
+        guard let image = context.cgContext.makeImage() else {
             throw TextImageProcessingError(kind: .unableToDrawImage)
         }
+        NSGraphicsContext.restoreGraphicsState()
 
         return image
     }

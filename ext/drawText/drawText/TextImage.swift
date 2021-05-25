@@ -57,7 +57,7 @@ class TextImage {
         return try String(contentsOfFile: path, encoding: .utf8)
     }
 
-    private func graphicsContext(forSize size: CGSize) throws -> CGContext {
+    private func graphicsContext(forSize size: CGSize) throws -> NSGraphicsContext {
 
         let canvas = NSBitmapImageRep(
             bitmapDataPlanes: nil,
@@ -78,7 +78,7 @@ class TextImage {
             throw TextImageProcessingError(kind: .unableToInitializeGraphicsContext)
         }
 
-        return context.cgContext
+        return context
     }
 }
 

@@ -5,12 +5,43 @@ module Fastlane
     # Helper methods to execute git-related operations
     #
     module GitHelper
-      # Checks if the current directory is (inside) a git repo
+      # Checks if the given path, or current directory if no path is given, is
+      # inside a Git repository
       #
-      # @return [Bool] True if the current directory is the root of a git repo (i.e. a local working copy) or a subdirectory of one.
+      # @param [String] path An optional path where to check if a Git repo
+      #        exists.
       #
-      def self.is_git_repo?
-        system 'git rev-parse --git-dir 1> /dev/null 2>/dev/null'
+      # @return [Bool] True if the current directory is the root of a git repo
+      #         (i.e. a local working copy) or a subdirectory of one.
+      #
+      def self.is_git_repo?(path: Dir.pwd)
+        # If the path doesn't exist, find its first ancestor.
+        path = first_existing_ancestor_of(path: path)
+        # Get the path's directory, so we can look in it for the Git folder
+        dir = path.directory? ? path : path.dirname
+
+        # Recursively look for the Git folder until it's found or we read the
+        # the file system root
+        dir = dir.parent until Dir.entries(dir).include?('.git') || dir.root?
+
+        # If we reached the root, we haven't found a repo. (Technically, there
+        # could be a repo in the root of the system, but that's a usecase that
+        # we don't need to support at this time)
+        return dir.root? == false
+      end
+
+      # Travels back the hierarchy of the given path until it finds an existing
+      # ancestor, or it reaches the root of the file system.
+      #
+      # @param [String] path The path to inspect
+      #
+      # @return [Pathname] The first existing ancestor, or `path` itself if it
+      #         exists
+      #
+      def self.first_existing_ancestor_of(path:)
+        p = Pathname(path).expand_path
+        p = p.parent until p.exist? || p.root?
+        return p
       end
 
       # Check if the current directory has git-lfs enabled
@@ -95,6 +126,15 @@ module Fastlane
         end
       end
 
+      # Get the SHA of a given git ref. Typically useful to get the SHA of the current HEAD commit.
+      #
+      # @param [String] ref The git ref (commit, branch name, 'HEAD', …) to resolve as a SHA
+      # @return [String] The commit SHA of the ref
+      #
+      def self.get_commit_sha(ref: 'HEAD')
+        Git.open(Dir.pwd).revparse(ref)
+      end
+
       # Creates a tag for the given version, and optionally push it to the remote.
       #
       # @param [String] version The name of the tag to push, e.g. "1.2"
@@ -164,6 +204,20 @@ module Fastlane
       def self.ensure_on_branch!(branch_name)
         current_branch_name = Action.sh('git', 'symbolic-ref', '-q', 'HEAD')
         UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)
+      end
+
+      # Checks whether a given path is ignored by Git, relying on Git's
+      # `check-ignore` under the hood.
+      #
+      # @param [String] path The path to check against `.gitignore`
+      #
+      # @return [Bool] True if the given path is ignored or outside a Git repository, false otherwise.
+      def self.is_ignored?(path:)
+        return true unless is_git_repo?(path: path)
+
+        Actions.sh('git', 'check-ignore', path) do |status, _, _|
+          status.success?
+        end
       end
     end
   end

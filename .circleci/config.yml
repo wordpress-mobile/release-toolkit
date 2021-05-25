@@ -3,17 +3,11 @@ version: 2.1
 orbs:
   ios: wordpress-mobile/ios@1.0
 
-jobs:
-  test:
-    executor:
-      name: ios/default
-      xcode-version: "11.2.1"
-    environment:
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      PKG_CONFIG_PATH: "/usr/local/opt/imagemagick@6/lib/pkgconfig"
+# Common steps reused on various jobs
+commands:
+  setup_tools:
+    description: "Install Homebrew and Ruby dependencies"
     steps:
-      - checkout
-
       - restore_cache:
           name: Restore Homebrew + Ruby Dependencies
           keys:
@@ -21,7 +15,7 @@ jobs:
 
       - run:
           name: Install Homebrew dependencies, if neeeded
-          command: xargs brew install --verbose < .circleci/.brewfile
+          command: brew update && xargs brew install --verbose < .circleci/.brewfile
 
       - run:
           name: Install Ruby dependencies, if neeeded
@@ -33,11 +27,21 @@ jobs:
           paths:
             - vendor/
             - /usr/local/Cellar
-            
+
+jobs:
+  test:
+    executor:
+      name: ios/default
+      xcode-version: "11.2.1"
+    environment:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      PKG_CONFIG_PATH: "/usr/local/opt/imagemagick@6/lib/pkgconfig"
+    steps:
+      - checkout
+      - setup_tools
       - run: # Compile drawText
           name: Compile drawText
           command: bundle exec rake compile
-
       - run:
           name: Run rspec and upload coverage report
           command: |
@@ -46,7 +50,6 @@ jobs:
                               --out test_results/rspec.xml \
                               --format progress \
                               $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
-
       # Save test results for timing analysis
       - store_test_results:
           path: test_results
@@ -54,7 +57,36 @@ jobs:
       # Coverage reports are sent to Codecov as part of running `rspec`, not as a CircleCI step.
       # We may wish to change this for consistency.
 
+  gem-push:
+    executor:
+      name: ios/default
+      xcode-version: "11.2.1" # We need an Xcode-enabled CI image to build drawText during gem build
+    environment:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      PKG_CONFIG_PATH: "/usr/local/opt/imagemagick@6/lib/pkgconfig"
+    steps:
+      - checkout
+      - setup_tools
+      - run:
+          name: Build gem
+          command: gem build fastlane-plugin-wpmreleasetoolkit.gemspec
+      - run:
+          name: Check the gem is installable
+          command: gem install fastlane-plugin-wpmreleasetoolkit-*.gem
+      - run:
+          name: Push to RubyGems
+          command: gem push fastlane-plugin-wpmreleasetoolkit-*.gem
+
 workflows:
   test:
     jobs:
       - test
+  release:
+    jobs:
+      - gem-push:
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
+

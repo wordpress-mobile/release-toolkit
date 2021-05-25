@@ -2,6 +2,7 @@
 
 require 'rake'
 require 'os'
+require 'pathname'
 
 abort 'Fatal Error: `drawText` can only be run on macOS.' unless OS.mac?
 

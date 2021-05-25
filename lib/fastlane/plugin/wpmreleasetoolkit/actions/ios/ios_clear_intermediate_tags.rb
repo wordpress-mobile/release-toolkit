@@ -7,7 +7,7 @@ module Fastlane
         require_relative '../../helper/git_helper.rb'
 
         # Download all the remote tags prior to starting – that way we don't miss any on the server
-        Fastlane::Helper::GitHelper::fetch_all_tags
+        Fastlane::Helper::GitHelper.fetch_all_tags
 
         # Delete 4-parts version names starting with our version number
         parts = params[:version].split('.')
@@ -16,9 +16,9 @@ module Fastlane
         intermediate_tags = Fastlane::Helper::GitHelper.list_local_tags(matching: pattern)
         tag_count = intermediate_tags.count
 
-        if tag_count > 0 && UI.confirm("Are you sure you want to delete #{tag_count} tags?")
-          Fastlane::Helper::GitHelper.delete_tags(intermediate_tags, delete_on_remote: true)
-        end
+        return unless tag_count.positive? && UI.confirm("Are you sure you want to delete #{tag_count} tags?")
+
+        Fastlane::Helper::GitHelper.delete_tags(intermediate_tags, delete_on_remote: true)
       end
 
       #####################################################
