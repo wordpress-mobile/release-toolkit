@@ -31,31 +31,52 @@ end
 
 Rake::ExtensionTask.new('drawText')
 
+
+GEM_NAME = 'fastlane-plugin-wpmreleasetoolkit'.freeze
+VERSION_FILE = File.join('lib', 'fastlane', 'plugin', 'wpmreleasetoolkit', 'version.rb')
+
+desc 'Try to build and install the gem to ensure it can be installed properly (with the native extension and all)'
+task :check_install_gem do
+  require_relative(VERSION_FILE)
+  version = Fastlane::Wpmreleasetoolkit::VERSION
+  sh('gem', 'build', "#{GEM_NAME}.gemspec")
+  sh('gem', 'uninstall', GEM_NAME, '-v', version)
+  sh('gem', 'install', "#{GEM_NAME}-#{version}.gem")
+end
+
 desc 'Create a new version of the release-toolkit gem'
 task :new_release do
-  version_file = File.join('lib', 'fastlane', 'plugin', 'wpmreleasetoolkit', 'version.rb')
-  require_relative(version_file)
+  require_relative(VERSION_FILE)
+
+  parser = ChangelogParser.new(file: 'CHANGELOG.md')
+  latest_version = parser.parse_pending_section
+
+  ## Print current info
   puts ">>> Current version is: #{Fastlane::Wpmreleasetoolkit::VERSION}"
-  puts ">>> Pending CHANGELOG:\n" + get_changelog_section(file: 'CHANGELOG.md', section_title: 'Develop').map { |l| "| #{l}" }.join
+  puts "Warning: Latest version number does not match latest version title in CHANGELOG (#{latest_version})!" unless Fastlane::Wpmreleasetoolkit::VERSION == latest_version
 
-  puts '>>> New version to use?'
+  puts ">>> Pending CHANGELOG:\n\n#{parser.cleaned_pending_changelog_lines.map { |l| "| #{l}"}.join}\n"
+
+  ## Prompt for next version number
+  guess = parser.guessed_next_semantic_version(current: Fastlane::Wpmreleasetoolkit::VERSION)
+  print ">>> New version to release [#{guess}]? "
   new_version = STDIN.gets.chomp
+  new_version = guess if new_version.empty?
 
-  ### VERSION constant
-  puts '>>> Updating `VERSION` constant in `version.rb`...'
-  content = File.read(version_file)
-  content.gsub!(/VERSION = .*/, "VERSION = '#{new_version}'")
-  File.write(version_file, content)
-  sh('bundle', 'install') # To update Gemfile.lock with new wpmreleasetoolkit version
+  ## Checkout branch, update files and commit
+  check_or_create_branch(new_version)
+  update_version_constant(VERSION_FILE, new_version)
+  parser.update_for_new_release(new_version: new_version)
+  sh('git', 'add', VERSION_FILE, 'Gemfile.lock', 'CHANGELOG.md')
+  sh('git', 'commit', '-m', "Bumped to version #{new_version}")
 
-  ### CHANGELOG.md
-  puts '>>> Updating the `CHANGELOG.md` file...'
-  update_changelog_sections(
-    file: 'CHANGELOG.md',
-    wip_header_title: 'Develop',
-    placeholder_sections: ['Breaking Changes', 'New Features', 'Bug Fixes', 'Internal Changes'],
-    new_section_title: new_version
-  )
+  ## Ensure the gem builds and is installable
+  puts ">>> Testing that the gem builds and installs..."
+  Rake::Task['check_install_gem'].invoke([new_version])
+
+  puts ">>> Opening PR drafts in your default browser..."
+  prepare_github_pr("release/#{new_version}", 'develop', "Release #{new_version} into develop", "New version #{new_version}")
+  prepare_github_pr("release/#{new_version}", 'trunk', "Release #{new_version} into trunk", "New version #{new_version}. Be sure to create a GitHub Release and tag once this PR gets merged.")
 
   puts <<~INSTRUCTIONS
 
@@ -63,11 +84,13 @@ task :new_release do
 
     >>> WHAT'S NEXT
 
-    Please check that the version bump and CHANGELOG.md updates looks ok.
-    Then, commit the changes in a new `release/#{new_version}` branch and create PRs to `develop` and `trunk`.
+    1. Create PRs to `develop` and `trunk`.
+    2. Once the PRs are merged, create a GH release for \`#{new_version}\` targeting \`trunk\`,
+       creating a new \`#{new_version} tag in the process.
 
-    Once the PRs are merged, create a GH release for `#{new_version}` targeting `trunk`,
-    then run `gem build` and `gem push` to upload the version to RubyGems.
+    The creation of the new tag will trigger a CI workflow that will take care of doing the
+    \`gem push\` of the new version to RubyGems.
+
   INSTRUCTIONS
 end
 
@@ -75,54 +98,30 @@ end
 # Helpers
 ########################
 
-def next_index(matching:, after: 0, in_lines:)
-  idx = in_lines[(after + 1)...].index { |l| l =~ matching }
-  return -1 if idx.nil?
-
-  idx + after + 1
-end
-
-def get_changelog_section(file:, section_title:)
-  lines = File.readlines(file)
-  section_start = next_index(matching: /^\#\# #{section_title}$/, in_lines: lines)
-  section_end = next_index(matching: /^\#\# /, after: section_start, in_lines: lines)
-  puts "#{section_start}...#{section_end}"
-  lines[section_start...section_end]
-end
-
-def update_changelog_sections(file:, wip_header_title:, placeholder_sections:, empty_section_text: '_None_', new_section_title:)
-  lines = File.readlines(file)
-
-  # Find on which line the WIP h2 section starts
-  wip_section_idx = next_index(matching: /^\#\# #{wip_header_title}$/, in_lines: lines)
-  raise "#{wip_header_title} section not found in current CHANGELOG!" if wip_section_idx.nil?
-
-  # Update CHANGELOG
-  File.open(file, 'w') do |f|
-    # Insert any preamble lines that exists before wip_header_title h2 section
-    f.puts lines[0...wip_section_idx]
-
-    # Insert the empty section placeholders for the next version
-    f.puts ["\#\# #{wip_header_title}", '']
-    placeholder_sections.each { |s| f.puts ["\#\#\# #{s}", '', empty_section_text, ''] }
-
-    # Insert h2 section title for the new version we're releasing (in place of the old wip_header_title that was used for that h2 section until now)
-    f.puts "\#\# #{new_section_title}"
-
-    # Then print any subsequent h3 section that was in that wip section before... but omitting the ones that are empty
-    current_idx = wip_section_idx + 1 # First line we start our analysis from, to iterate over each h3 subsection and prune the empty ones
-    next_idx = 0
-    loop do
-      next_idx = next_index(matching: /^\#\#/, after: current_idx, in_lines: lines) # Index of next h2 or h3 section to stop at
-      section_lines = lines[current_idx...next_idx] # lines from current_idx (aka subsection title) including, up to but non including next_idx (aka next section's title)
-      body_lines = section_lines.drop(1).reject { |l| l.chomp.empty? } # non-empty lines in the current h3 section
-      f.puts section_lines unless body_lines.empty? || body_lines.first.chomp == empty_section_text # only print section title+body if it wasn't empty
-      break if next_idx == -1 || lines[next_idx].start_with?('## ') # if next section is h2 and not h3 (or we reached end of file), we're finally done with the WIP h2 section and reached the next h2 (for the previous released version)
-
-      current_idx = next_idx
-    end
-
-    # Finally, print all the rest, i.e. everything that was after the WIP section, unprocessed.
-    f.puts lines[next_idx...]
+def check_or_create_branch(new_version)
+  current_branch = `git branch --show-current`.chomp
+  release_branch = "release/#{new_version}"
+  if current_branch == release_branch
+    puts "Already on release branch"
+  else
+    sh('git', 'checkout', '-b', release_branch)
   end
 end
+
+def prepare_github_pr(head, base, title, body)
+  require 'open-uri'
+  qtitle = title.gsub(' ', '%20')
+  qbody = body.gsub(' ', '%20')
+  uri = URI.parse("https://github.com/wordpress-mobile/release-toolkit/compare/#{base}...#{head}?expand=1&title=#{qtitle}&body=#{qbody}")
+  uri.open
+end
+
+def update_version_constant(version_file, new_version)
+  puts '>>> Updating `VERSION` constant in `version.rb`...'
+  content = File.read(version_file)
+  content.gsub!(/VERSION = .*/, "VERSION = '#{new_version}'")
+  File.write(version_file, content)
+
+  sh('bundle', 'install') # To update Gemfile.lock with new wpmreleasetoolkit version
+end
+
