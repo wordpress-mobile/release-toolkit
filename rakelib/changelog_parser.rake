@@ -48,8 +48,6 @@ class ChangelogParser
   def update_for_new_release(new_file: 'CHANGELOG.md', new_version:)
     raise 'You need to call #parse_pending_section first' if @pending_section.nil?
 
-    puts ">>> Updating CHANGELOG..."
-
     File.open(new_file, 'w') do |f|
       f.puts @pending_section[:lines_before]
       # Empty placeholder section for next version after this one

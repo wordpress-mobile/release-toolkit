@@ -52,40 +52,42 @@ task :new_release do
   latest_version = parser.parse_pending_section
 
   ## Print current info
-  puts ">>> Current version is: #{Fastlane::Wpmreleasetoolkit::VERSION}"
-  puts "Warning: Latest version number does not match latest version title in CHANGELOG (#{latest_version})!" unless Fastlane::Wpmreleasetoolkit::VERSION == latest_version
+  Console.header "Current version is: #{Fastlane::Wpmreleasetoolkit::VERSION}"
+  Console.warning "Warning: Latest version number does not match latest version title in CHANGELOG (#{latest_version})!" unless Fastlane::Wpmreleasetoolkit::VERSION == latest_version
 
-  puts ">>> Pending CHANGELOG:\n\n#{parser.cleaned_pending_changelog_lines.map { |l| "| #{l}"}.join}\n"
+  Console.header 'Pending CHANGELOG:'
+  Console.print_indented_lines(parser.cleaned_pending_changelog_lines)
 
   ## Prompt for next version number
   guess = parser.guessed_next_semantic_version(current: Fastlane::Wpmreleasetoolkit::VERSION)
-  print ">>> New version to release [#{guess}]? "
-  new_version = STDIN.gets.chomp
-  new_version = guess if new_version.empty?
+  new_version = Console.prompt('New version to release', guess)
 
-  ## Checkout branch, update files and commit
-  check_or_create_branch(new_version)
+  ## Checkout branch, update files
+  GitHelper.check_or_create_branch(new_version)
+  Console.header 'Update `VERSION` constant in `version.rb`...'
   update_version_constant(VERSION_FILE, new_version)
+  Console.header 'Updating CHANGELOG...'
   parser.update_for_new_release(new_version: new_version)
-  sh('git', 'add', VERSION_FILE, 'Gemfile.lock', 'CHANGELOG.md')
-  sh('git', 'commit', '-m', "Bumped to version #{new_version}")
 
   ## Ensure the gem builds and is installable
-  puts ">>> Testing that the gem builds and installs..."
+  Console.header 'Testing that the gem builds and installs...'
   Rake::Task['check_install_gem'].invoke([new_version])
 
-  puts ">>> Opening PR drafts in your default browser..."
-  prepare_github_pr("release/#{new_version}", 'develop', "Release #{new_version} into develop", "New version #{new_version}")
-  prepare_github_pr("release/#{new_version}", 'trunk', "Release #{new_version} into trunk", "New version #{new_version}. Be sure to create a GitHub Release and tag once this PR gets merged.")
+  # Commit and push
+  GitHelper.commit_files("Bumped to version #{new_version}", [VERSION_FILE, 'Gemfile.lock', 'CHANGELOG.md'])
 
-  puts <<~INSTRUCTIONS
+  Console.header 'Opening PR drafts in your default browser...'
+  GitHelper.prepare_github_pr("release/#{new_version}", 'develop', "Release #{new_version} into develop", "New version #{new_version}")
+  GitHelper.prepare_github_pr("release/#{new_version}", 'trunk', "Release #{new_version} into trunk", "New version #{new_version}. Be sure to create a GitHub Release and tag once this PR gets merged.")
+
+  Console.info <<~INSTRUCTIONS
 
     ---------------
 
     >>> WHAT'S NEXT
 
     1. Create PRs to `develop` and `trunk`.
-    2. Once the PRs are merged, create a GH release for \`#{new_version}\` targeting \`trunk\`,
+    2. Once the PRs are merged, publish a GitHub release for \`#{new_version}\`, targeting \`trunk\`,
        creating a new \`#{new_version} tag in the process.
 
     The creation of the new tag will trigger a CI workflow that will take care of doing the
@@ -94,30 +96,7 @@ task :new_release do
   INSTRUCTIONS
 end
 
-########################
-# Helpers
-########################
-
-def check_or_create_branch(new_version)
-  current_branch = `git branch --show-current`.chomp
-  release_branch = "release/#{new_version}"
-  if current_branch == release_branch
-    puts "Already on release branch"
-  else
-    sh('git', 'checkout', '-b', release_branch)
-  end
-end
-
-def prepare_github_pr(head, base, title, body)
-  require 'open-uri'
-  qtitle = title.gsub(' ', '%20')
-  qbody = body.gsub(' ', '%20')
-  uri = URI.parse("https://github.com/wordpress-mobile/release-toolkit/compare/#{base}...#{head}?expand=1&title=#{qtitle}&body=#{qbody}")
-  uri.open
-end
-
 def update_version_constant(version_file, new_version)
-  puts '>>> Updating `VERSION` constant in `version.rb`...'
   content = File.read(version_file)
   content.gsub!(/VERSION = .*/, "VERSION = '#{new_version}'")
   File.write(version_file, content)
