@@ -77,7 +77,10 @@ jobs:
           command: gem install --user-install fastlane-plugin-wpmreleasetoolkit-*.gem
       - run:
           name: Push to RubyGems
-          command: gem push fastlane-plugin-wpmreleasetoolkit-*.gem
+          command: |
+            echo ":rubygems_api_key: ${GEM_HOST_API_KEY}" >>"$HOME/.gem/credentials"
+            chmod 600 "$HOME/.gem/credentials"
+            gem push fastlane-plugin-wpmreleasetoolkit-*.gem
 
 workflows:
   test:
