@@ -68,7 +68,7 @@ Naming/PredicateName:
 # Offense count: 19
 # Configuration parameters: MinNameLength, AllowNamesEndingInNumbers, AllowedNames, ForbiddenNames.
 # AllowedNames: io, id, to, by, on, in, at, ip, db
-Naming/UncommunicativeMethodParamName:
+Naming/MethodParameterName:
   Exclude:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/an_update_metadata_source_action.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_update_metadata_source.rb'
