@@ -299,6 +299,21 @@ module Fastlane
         #
         def self.apply_substitutions(tag)
           tag.content = tag.content.gsub('...', '…')
+
+          # Typography en-dash
+          if tag.content.include?('-')
+            matcher = tag.content.match(/.*(\d+\s*)-(\s*\d+).*/)
+            index = 1
+            while index < matcher.length do
+              puts matcher.inspect
+              puts matcher[index + 1]
+              puts matcher[index]
+              isNegativeNumber = (matcher[index + 1][0] != ' ') && (matcher[index][matcher[index].length - 1] == ' ')
+              tag.content.gsub!("#{matcher[index]}-#{matcher[index + 1]}", "#{matcher[index]}\u2013#{matcher[index + 1]}") unless isNegativeNumber
+
+              index = index + 2
+            end unless matcher.nil?
+          end
         end
         private_class_method :apply_substitutions
 
