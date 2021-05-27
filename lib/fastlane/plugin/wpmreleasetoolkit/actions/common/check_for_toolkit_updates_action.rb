@@ -4,7 +4,8 @@ require 'rubygems/command_manager'
 module Fastlane
   module Actions
     class CheckForToolkitUpdatesAction < Action
-      TOOLKIT_SPEC_NAME = 'fastlane-plugin-wpmreleasetoolkit'.freeze
+      # TOOLKIT_SPEC_NAME = 'fastlane-plugin-wpmreleasetoolkit'.freeze
+      TOOLKIT_SPEC_NAME = 'nokogiri'.freeze
 
       def self.run(params)
         updater = Gem::CommandManager.instance[:update]
