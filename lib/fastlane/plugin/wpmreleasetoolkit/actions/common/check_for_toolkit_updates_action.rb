@@ -11,7 +11,7 @@ module Fastlane
         installed_gems = updater.highest_installed_gems.select { |spec| spec == TOOLKIT_SPEC_NAME }
         local_version = Gem::Version.new(installed_gems[TOOLKIT_SPEC_NAME].version)
         UI.message("Currently using release toolkit version #{local_version.to_s.yellow}.")
-        UI.message("Checking for updates now...")
+        UI.message('Checking for updates now...')
         updates_needed = updater.which_to_update(installed_gems, [TOOLKIT_SPEC_NAME])
 
         if updates_needed.empty?
