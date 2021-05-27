@@ -99,7 +99,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
       end
 
       describe 'applies content substitutions' do
-        shared_examples 'substitutions' do |xpath|
+        shared_examples 'ellipsis substitutions' do |xpath|
           it 'has at least one fixture with text to be substituted' do
             # This ensures that even if we modify the fixtures in the future, we will still have a case which tests this
             gp_xml = File.open(stub_file('pt-br')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
@@ -117,12 +117,32 @@ describe Fastlane::Helper::Android::LocalizeHelper do
           end
         end
 
+        shared_examples 'en-dash substitutions' do |xpath|
+          it 'has at least one fixture with text to be substituted' do
+            # This ensures that even if we modify the fixtures in the future, we will still have a case which tests this
+            gp_xml = File.open(stub_file('pt-br')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+            gp_node = gp_xml.xpath(xpath).first
+            expect(gp_node.content).to include('0-1')
+          end
+
+          TEST_LOCALES_MAP.each do |h|
+            it "has the text substituted in #{h[:android]}" do
+              final_xml = File.open(generated_file(h[:android])) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+              final_node = final_xml.xpath(xpath).first
+              expect(final_node.content).to include('0–1')
+              expect(final_node.content).not_to include('0-1')
+            end
+          end
+        end
+
         context 'with //string tags' do
-          include_examples 'substitutions', "/resources/string[@name='shipping_label_payments_saving_dialog_message']"
+          include_examples 'ellipsis substitutions', "/resources/string[@name='shipping_label_payments_saving_dialog_message']"
+          include_examples 'en-dash substitutions', "/resources/string[@name='threat_fix_current_not_fixable_description']"
         end
 
         context 'with //string-array/item tags' do
-          include_examples 'substitutions', "/resources/string-array[@name='order_list_tabs']/item[1]"
+          include_examples 'ellipsis substitutions', "/resources/string-array[@name='order_list_tabs']/item[1]"
+          include_examples 'en-dash substitutions', "/resources/string-array[@name='site_settings_jetpack_allowlist_description']/item[3]"
         end
       end
 

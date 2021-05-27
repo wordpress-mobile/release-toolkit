@@ -30,4 +30,10 @@ Language: fr
 		<item>En cours…</item>
 		<item>Toutes les commandes...</item>
 	</string-array>
+	<string name="threat_fix_current_not_fixable_description">Les prix vont de 70-120 $ par heure</string>
+    <string-array name="site_settings_jetpack_allowlist_description">
+        <item>Vous pouvez marquer une adresse IP (ou une série d’adresses IP) comme « Toujours autorisé »</item>
+        <item>pour empêcher leur blocage par Jetpack. IPv4 et IPv6 sont acceptables.</item>
+        <item>Pour spécifier une plage, entrez la valeur basse et la valeur haute en les séparant par un tiret. Exemple : 12.12.12.0-12.12.12.100</item>
+    </string-array>
 </resources>

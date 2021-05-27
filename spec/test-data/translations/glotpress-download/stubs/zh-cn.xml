@@ -31,4 +31,10 @@ Language: zh_CN
 		<item>正在处理...</item>
 		<item>所有订单…</item>
 	</string-array>
+	<string name="threat_fix_current_not_fixable_description">价格从 70–120 美元/小时不等</string>
+	<string-array name="site_settings_jetpack_allowlist_description">
+		<item>您可以将一个或多个 IP 地址加入白名单，以避免 Jetpack 将其屏蔽</item>
+		<item>IPv4 和 IPv6 都支持。如要按范围指定地址</item>
+		<item>请输入最小值和最大值，并用破折号隔开。示例：12.12.12.0-12.12.12.100</item>
+	</string-array>
 </resources>
