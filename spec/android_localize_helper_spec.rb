@@ -117,32 +117,52 @@ describe Fastlane::Helper::Android::LocalizeHelper do
           end
         end
 
-        shared_examples 'en-dash substitutions' do |xpath|
+        shared_examples 'en-dash substitutions' do |xpath, fixture_block, gp_block, final_block|
           it 'has at least one fixture with text to be substituted' do
             # This ensures that even if we modify the fixtures in the future, we will still have a case which tests this
             gp_xml = File.open(stub_file('pt-br')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
             gp_node = gp_xml.xpath(xpath).first
-            expect(gp_node.content).to include('0-1')
+            expect(gp_node.content).to include(fixture_block)
           end
 
           TEST_LOCALES_MAP.each do |h|
             it "has the text substituted in #{h[:android]}" do
               final_xml = File.open(generated_file(h[:android])) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
               final_node = final_xml.xpath(xpath).first
-              expect(final_node.content).to include('0–1')
-              expect(final_node.content).not_to include('0-1')
+              expect(final_node.content).to include(final_block)
+              expect(final_node.content).not_to include(gp_block)
             end
           end
         end
 
         context 'with //string tags' do
           include_examples 'ellipsis substitutions', "/resources/string[@name='shipping_label_payments_saving_dialog_message']"
-          include_examples 'en-dash substitutions', "/resources/string[@name='threat_fix_current_not_fixable_description']"
+
+          # en-dash: substitute ranges
+          include_examples 'en-dash substitutions', "/resources/string[@name='threat_fix_description']", '0-1', '0-1', '0–1'
+          include_examples 'en-dash substitutions', "/resources/string[@name='threat_fix_description_large']", '0 - 1', '0 - 1', '0 – 1'
+
+          # en-dash: don't substitute negative numbers
+          include_examples 'en-dash substitutions', "/resources/string[@name='field_allowed_values']", '1 -1 -2', '1 –1 –2', '1 -1 -2'
+
+          # en-dash: don't substitute checklists
+          include_examples 'en-dash substitutions', "/resources/string[@name='checklist_one']", '- 1.', '– 1.', '- 1.'
+          include_examples 'en-dash substitutions', "/resources/string[@name='checklist_two']", '- o', '– o', '- o'
         end
 
         context 'with //string-array/item tags' do
           include_examples 'ellipsis substitutions', "/resources/string-array[@name='order_list_tabs']/item[1]"
-          include_examples 'en-dash substitutions', "/resources/string-array[@name='site_settings_jetpack_allowlist_description']/item[3]"
+
+          # en-dash: substitute ranges
+          include_examples 'en-dash substitutions', "/resources/string-array[@name='settings_jetpackdescription']/item[3]", '0-1', '0-1', '0–1'
+          include_examples 'en-dash substitutions', "/resources/string-array[@name='settings_jetpackdescription_large']/item[3]", '0 - 1', '0 - 1', '0 – 1'
+
+          # en-dash: don't substitute negative numbers
+          include_examples 'en-dash substitutions', "/resources/string-array[@name='settings_number_series']/item[1]", '1 -1 -2', '1 –1 –2', '1 -1 -2'
+
+          # en-dash: don't substitute checklists
+          include_examples 'en-dash substitutions', "/resources/string-array[@name='checklist_array']/item[1]", '- 1.', '– 1.', '- 1.'
+          include_examples 'en-dash substitutions', "/resources/string-array[@name='checklist_array']/item[2]", '- o', '– o', '- o'
         end
       end
 

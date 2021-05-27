@@ -47,10 +47,27 @@
 
 
     <string name="shipping_label_payments_cant_edit_warning">Only the site owner can manage the shipping label payment methods. Please contact Store Owner %1$s (%2$s) to manage payment methods.</string>
-    <string name="threat_fix_current_not_fixable_description">Pricing ranges from $70–120/hour</string>
-    <string-array name="site_settings_jetpack_allowlist_description">
+    <string name="threat_fix_description">Pricing ranges from $70–120/hour</string>
+    <string-array name="settings_jetpackdescription">
         <item>You may mark an IP address (or series of addresses) as \"Always allowed\"</item>
         <item>preventing them from ever being blocked by Jetpack. IPv4 and IPv6 are acceptable.</item>
         <item>To specify a range, enter the low value and high value separated by a dash. Example: 12.12.12.1–12.12.12.100</item>
+    </string-array>
+    <string name="threat_fix_description_large">Pricing ranges from $70 – 120/hour</string>
+    <string-array name="settings_jetpackdescription_large">
+        <item>You may mark an IP address (or series of addresses) as \"Always allowed\"</item>
+        <item>preventing them from ever being blocked by Jetpack. IPv4 and IPv6 are acceptable.</item>
+        <item>To specify a range, enter the low value and high value separated by a dash. Example: 12.12.12.1 – 12.12.12.100</item>
+    </string-array>
+    <string name="field_allowed_values">The field can assume these values: 4 3 2 1 -1 -2</string>
+    <string-array name="settings_number_series">
+        <item>The field can assume these values: 4 3 2 1 -1 -2</item>
+        <item>Please select your choice</item>
+    </string-array>
+    <string name="checklist_one"> - 1. First point</string>
+    <string name="checklist_two"> - o Two. Second point</string>
+    <string-array name="checklist_array">
+        <item> - 1. First point</item>
+        <item> - o Two. Second point</item>
     </string-array>
 </resources>

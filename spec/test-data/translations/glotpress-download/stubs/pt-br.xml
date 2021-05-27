@@ -21,10 +21,27 @@ Language: pt_BR
 		<item>Processando...</item>
 		<item>Todos os pedidos...</item>
 	</string-array>
-	<string name="threat_fix_current_not_fixable_description">Os preços variam de $70-120/hora</string>
-    <string-array name="site_settings_jetpack_allowlist_description">
+	<string name="threat_fix_description">Os preços variam de $70-120/hora</string>
+    <string-array name="settings_jetpackdescription">
         <item>Você pode configurar um endereço IP ou diversos endereços como \"Sempre permitidos\"</item>
         <item>para evitar que sejam bloqueados pelo Jetpack. IPv4 e IPv6 são aceitos.</item>
         <item>Para especificar um intervalo, insira o menor e o maior valor separados por um traço. Exemplo: 12.12.12.0-12.12.12.100</item>
+    </string-array>
+	<string name="threat_fix_description_large">Os preços variam de $70 - 120/hora</string>
+    <string-array name="settings_jetpackdescription_large">
+        <item>Você pode configurar um endereço IP ou diversos endereços como \"Sempre permitidos\"</item>
+        <item>para evitar que sejam bloqueados pelo Jetpack. IPv4 e IPv6 são aceitos.</item>
+        <item>Para especificar um intervalo, insira o menor e o maior valor separados por um traço. Exemplo: 12.12.12.0 - 12.12.12.100</item>
+    </string-array>
+    <string name="field_allowed_values">O campo pode assumir esses valores: 4 3 2 1 -1 -2</string>
+    <string-array name="settings_number_series">
+        <item>O campo pode assumir esses valores: 4 3 2 1 -1 -2</item>
+        <item>Por favor selecione sua escolha.</item>
+    </string-array>
+    <string name="checklist_one"> - 1. Primeiro ponto</string>
+    <string name="checklist_two"> - o Dois: Segundo ponto</string>
+    <string-array name="checklist_array">
+        <item> - 1. Primeiro ponto</item>
+        <item> - o Dois: segundo ponto</item>
     </string-array>
 </resources>

@@ -30,10 +30,27 @@ Language: fr
         <item>En cours…</item>
         <item>Toutes les commandes…</item>
     </string-array>
-    <string name="threat_fix_current_not_fixable_description">Les prix vont de 70–120 $ par heure</string>
-    <string-array name="site_settings_jetpack_allowlist_description">
+    <string name="threat_fix_description">Les prix vont de 70–120 $ par heure</string>
+    <string-array name="settings_jetpackdescription">
         <item>Vous pouvez marquer une adresse IP (ou une série d’adresses IP) comme « Toujours autorisé »</item>
         <item>pour empêcher leur blocage par Jetpack. IPv4 et IPv6 sont acceptables.</item>
         <item>Pour spécifier une plage, entrez la valeur basse et la valeur haute en les séparant par un tiret. Exemple : 12.12.12.0–12.12.12.100</item>
+    </string-array>
+    <string name="threat_fix_description_large">Les prix vont de 70 – 120 $ par heure</string>
+    <string-array name="settings_jetpackdescription_large">
+        <item>Vous pouvez marquer une adresse IP (ou une série d’adresses IP) comme « Toujours autorisé »</item>
+        <item>pour empêcher leur blocage par Jetpack. IPv4 et IPv6 sont acceptables.</item>
+        <item>Pour spécifier une plage, entrez la valeur basse et la valeur haute en les séparant par un tiret. Exemple : 12.12.12.0 – 12.12.12.100</item>
+    </string-array>
+    <string name="field_allowed_values">Le champ peut prendre ces valeurs: 4 3 2 1 -1 -2</string>
+    <string-array name="settings_number_series">
+        <item>Le champ peut prendre ces valeurs: 4 3 2 1 -1 -2</item>
+        <item>Veuillez sélectionner votre choix.</item>
+    </string-array>
+    <string name="checklist_one"> - 1. Premier point</string>
+    <string name="checklist_two"> - o Deux: deuxième point</string>
+    <string-array name="checklist_array">
+        <item> - 1. Premier point</item>
+        <item> - o Deux: deuxième point</item>
     </string-array>
 </resources>
