@@ -305,11 +305,19 @@ module Fastlane
             matcher = tag.content.match(/.*(\d+\s*)-(\s*\d+).*/)
             index = 1
             while index < matcher.length do
-              puts matcher.inspect
-              puts matcher[index + 1]
-              puts matcher[index]
+              # Make sure that if there is no space before digit there isn't
+              # one on the left either -- since we don't want to consider
+              # "1 2 -3" as a range from 2 to 3
               isNegativeNumber = (matcher[index + 1][0] != ' ') && (matcher[index][matcher[index].length - 1] == ' ')
-              tag.content.gsub!("#{matcher[index]}-#{matcher[index + 1]}", "#{matcher[index]}\u2013#{matcher[index + 1]}") unless isNegativeNumber
+
+              # Do the substitution -- match the text block instead of the single dash to make sure that
+              # if there are more dashes in the tag, only the right ones get substituted.
+              puts "Original: #{tag.content} - #{isNegativeNumber}"
+              tag.content = tag.content.gsub(
+                "#{matcher[index]}-#{matcher[index + 1]}",
+                "#{matcher[index]}\u2013#{matcher[index + 1]}"
+                ) unless isNegativeNumber
+              puts "Updated: #{tag.content}"
 
               index = index + 2
             end unless matcher.nil?
