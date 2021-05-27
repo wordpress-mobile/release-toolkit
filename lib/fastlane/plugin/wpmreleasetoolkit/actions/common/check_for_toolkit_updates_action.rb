@@ -10,10 +10,12 @@ module Fastlane
         updater = Gem::CommandManager.instance[:update]
         installed_gems = updater.highest_installed_gems.select { |spec| spec == TOOLKIT_SPEC_NAME }
         local_version = Gem::Version.new(installed_gems[TOOLKIT_SPEC_NAME].version)
+        UI.message("Currently using release toolkit version #{local_version.to_s.yellow}.")
+        UI.message("Checking for updates now...")
         updates_needed = updater.which_to_update(installed_gems, [TOOLKIT_SPEC_NAME])
 
         if updates_needed.empty?
-          UI.success("The release toolkit is up-to-date (#{local_version})! ✅")
+          UI.success('Your release toolkit is up-to-date! ✅')
           return
         end
 
@@ -21,7 +23,7 @@ module Fastlane
         updates_needed = Gem::NameTuple.from_list(updates_needed)
         latest_toolkit_version = updates_needed.find { |gem_info| gem_info.name == TOOLKIT_SPEC_NAME }.version
 
-        UI.important("There is a new version #{latest_toolkit_version.to_s.yellow} of the release toolkit (you are using #{local_version.to_s.yellow}")
+        UI.message(['There is a new version '.yellow, latest_toolkit_version.to_s.red, ' of the release toolkit!'.yellow].join)
 
         return if params[:skip_update_suggestion]
         return unless UI.interactive? && UI.confirm('Do you want to update the toolkit now?')
