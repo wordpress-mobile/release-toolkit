@@ -139,30 +139,30 @@ describe Fastlane::Helper::Android::LocalizeHelper do
           include_examples 'ellipsis substitutions', "/resources/string[@name='shipping_label_payments_saving_dialog_message']"
 
           # en-dash: substitute ranges
-          include_examples 'en-dash substitutions', "/resources/string[@name='threat_fix_description']", '0-1', '0-1', '0–1'
-          include_examples 'en-dash substitutions', "/resources/string[@name='threat_fix_description_large']", '0 - 1', '0 - 1', '0 – 1'
+          include_examples 'en-dash substitutions', "/resources/string[@name='threat_fix_description']", '0-1', '0-1', "0\u20131"
+          include_examples 'en-dash substitutions', "/resources/string[@name='threat_fix_description_large']", '0 - 1', '0 - 1', "0 \u2013 1"
 
           # en-dash: don't substitute negative numbers
-          include_examples 'en-dash substitutions', "/resources/string[@name='field_allowed_values']", '1 -1 -2', '1 –1 –2', '1 -1 -2'
+          include_examples 'en-dash substitutions', "/resources/string[@name='field_allowed_values']", '1 -1 -2', "1 \u20131 \u20132", '1 -1 -2'
 
           # en-dash: don't substitute checklists
-          include_examples 'en-dash substitutions', "/resources/string[@name='checklist_one']", '- 1.', '– 1.', '- 1.'
-          include_examples 'en-dash substitutions', "/resources/string[@name='checklist_two']", '- o', '– o', '- o'
+          include_examples 'en-dash substitutions', "/resources/string[@name='checklist_one']", '- 1.', "\u2013 1.", '- 1.'
+          include_examples 'en-dash substitutions', "/resources/string[@name='checklist_two']", '- o', "\u2013 o", '- o'
         end
 
         context 'with //string-array/item tags' do
           include_examples 'ellipsis substitutions', "/resources/string-array[@name='order_list_tabs']/item[1]"
 
           # en-dash: substitute ranges
-          include_examples 'en-dash substitutions', "/resources/string-array[@name='settings_jetpackdescription']/item[3]", '0-1', '0-1', '0–1'
-          include_examples 'en-dash substitutions', "/resources/string-array[@name='settings_jetpackdescription_large']/item[3]", '0 - 1', '0 - 1', '0 – 1'
+          include_examples 'en-dash substitutions', "/resources/string-array[@name='settings_jetpackdescription']/item[3]", '0-1', '0-1', "0\u20131"
+          include_examples 'en-dash substitutions', "/resources/string-array[@name='settings_jetpackdescription_large']/item[3]", '0 - 1', '0 - 1', "0 \u2013 1"
 
           # en-dash: don't substitute negative numbers
-          include_examples 'en-dash substitutions', "/resources/string-array[@name='settings_number_series']/item[1]", '1 -1 -2', '1 –1 –2', '1 -1 -2'
+          include_examples 'en-dash substitutions', "/resources/string-array[@name='settings_number_series']/item[1]", '1 -1 -2', "1 \u20131 –2", '1 -1 -2'
 
           # en-dash: don't substitute checklists
-          include_examples 'en-dash substitutions', "/resources/string-array[@name='checklist_array']/item[1]", '- 1.', '– 1.', '- 1.'
-          include_examples 'en-dash substitutions', "/resources/string-array[@name='checklist_array']/item[2]", '- o', '– o', '- o'
+          include_examples 'en-dash substitutions', "/resources/string-array[@name='checklist_array']/item[1]", '- 1.', "\u2013 1.", '- 1.'
+          include_examples 'en-dash substitutions', "/resources/string-array[@name='checklist_array']/item[2]", '- o', "\u2013 o", '- o'
         end
       end
 
