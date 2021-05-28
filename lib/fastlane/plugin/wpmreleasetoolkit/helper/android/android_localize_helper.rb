@@ -302,25 +302,11 @@ module Fastlane
 
           # Typography en-dash
           if tag.content.include?('-')
-            matcher = tag.content.match(/.*(\d+\s*)-(\s*\d+).*/)
-            index = 1
-            while index < matcher.length do
-              # Make sure that if there is no space before digit there isn't
-              # one on the left either -- since we don't want to consider
-              # "1 2 -3" as a range from 2 to 3
-              isNegativeNumber = (matcher[index + 1][0] != ' ') && (matcher[index][matcher[index].length - 1] == ' ')
-
-              # Do the substitution -- match the text block instead of the single dash to make sure that
-              # if there are more dashes in the tag, only the right ones get substituted.
-              puts "Original: #{tag.content} - #{isNegativeNumber}"
-              tag.content = tag.content.gsub(
-                "#{matcher[index]}-#{matcher[index + 1]}",
-                "#{matcher[index]}\u2013#{matcher[index + 1]}"
-                ) unless isNegativeNumber
-              puts "Updated: #{tag.content}"
-
-              index = index + 2
-            end unless matcher.nil?
+            tag.content = tag.content.gsub(/(\d+\s*)-(\s*\d+)/) do |str|
+              match = Regexp.last_match # of type `MatchData`. match[0] == str == whole match, match[1] = 1st capture group (left part of the range), match[2] = second capture group (right part of the range)
+              isNegativeNumber = match[2][0] != ' ' && match[1][-1] == ' ' # if right part of range does not start with a space (e.g. `-3`), but left part of range does end with space, it's not a range after all but more likely a list containing negative numbers in it (e.g. `2 -3`)
+              isNegativeNumber ? str : "#{match[1]}\u2013#{match[2]}"
+            end
           end
         end
         private_class_method :apply_substitutions
