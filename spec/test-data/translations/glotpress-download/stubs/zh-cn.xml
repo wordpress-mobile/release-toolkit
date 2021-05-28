@@ -54,4 +54,5 @@ Language: zh_CN
         <item> - 1. 第一点</item>
         <item> - o 二：第二点</item>
     </string-array>
+    <string name="multi_range_statement">第一范围是2-100，第二范围是123-456</string>
 </resources>

@@ -53,4 +53,5 @@ Language: fr
         <item> - 1. Premier point</item>
         <item> - o Deux: deuxième point</item>
     </string-array>
+    <string name="multi_range_statement">La première plage est 2–100 et la seconde est 123–456.</string>
 </resources>

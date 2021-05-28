@@ -122,15 +122,28 @@ describe Fastlane::Helper::Android::LocalizeHelper do
             # This ensures that even if we modify the fixtures in the future, we will still have a case which tests this
             gp_xml = File.open(stub_file('pt-br')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
             gp_node = gp_xml.xpath(xpath).first
-            expect(gp_node.content).to include(fixture_block)
+            if fixture_block.is_a?(Array)
+              fixture_block.each do | fxt |
+                expect(gp_node.content).to include(fxt)
+              end
+            else
+              expect(gp_node.content).to include(fixture_block)
+            end
           end
 
           TEST_LOCALES_MAP.each do |h|
             it "has the text substituted in #{h[:android]}" do
               final_xml = File.open(generated_file(h[:android])) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
               final_node = final_xml.xpath(xpath).first
-              expect(final_node.content).to include(final_block)
-              expect(final_node.content).not_to include(gp_block)
+              if gp_block.is_a?(Array)
+                gp_block.each_with_index do | gp_val, index |
+                  expect(final_node.content).to include(final_block[index])
+                  expect(final_node.content).not_to include(gp_val)
+                end
+              else
+                expect(final_node.content).to include(final_block)
+                expect(final_node.content).not_to include(gp_block)
+              end
             end
           end
         end
@@ -140,6 +153,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
 
           # en-dash: substitute ranges
           include_examples 'en-dash substitutions', "/resources/string[@name='threat_fix_description']", '0-1', '0-1', "0\u20131"
+          include_examples 'en-dash substitutions', "/resources/string[@name='multi_range_statement']", %w[2-1 3-4], %w[2-1 3-4], ["2\u20131", "3\u20134"]
           include_examples 'en-dash substitutions', "/resources/string[@name='threat_fix_description_large']", '0 - 1', '0 - 1', "0 \u2013 1"
 
           # en-dash: don't substitute negative numbers

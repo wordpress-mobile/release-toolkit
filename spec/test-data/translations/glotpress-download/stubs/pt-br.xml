@@ -44,4 +44,5 @@ Language: pt_BR
         <item> - 1. Primeiro ponto</item>
         <item> - o Dois: segundo ponto</item>
     </string-array>
+    <string name="multi_range_statement">O primeiro intervalo é 2-100 e o segundo é 123-456.</string>
 </resources>

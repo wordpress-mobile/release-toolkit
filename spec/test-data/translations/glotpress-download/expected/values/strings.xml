@@ -70,4 +70,5 @@
         <item> - 1. First point</item>
         <item> - o Two. Second point</item>
     </string-array>
+    <string name="multi_range_statement">First range is 2–100 and second is 123–456.</string>
 </resources>
