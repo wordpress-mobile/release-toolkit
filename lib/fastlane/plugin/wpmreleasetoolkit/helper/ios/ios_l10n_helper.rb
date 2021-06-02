@@ -9,8 +9,7 @@ module Fastlane
         DEFAULT_BASE_LANG = 'en'
         CONFIG_FILE_NAME = 'swiftgen-stringtypes.yml'
 
-        attr_reader :install_path
-        attr_reader :version
+        attr_reader :install_path, :version
 
         # @param [String] install_path The path to install SwiftGen to. Usually something like "$PROJECT_DIR/vendor/swiftgen/#{SWIFTGEN_VERSION}".
         #        It's recommended to provide an absolute path here rather than a relative one, to ensure it's not dependant on where the action is run from.
