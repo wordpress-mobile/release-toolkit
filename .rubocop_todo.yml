@@ -263,6 +263,10 @@ Style/MethodDefParentheses:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_version_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_version_helper.rb'
 
+Style/KeywordParametersOrder:
+  Exclude:
+    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
+
 # Offense count: 1
 Style/MixinUsage:
   Exclude:

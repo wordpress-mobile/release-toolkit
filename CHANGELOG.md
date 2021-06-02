@@ -11,6 +11,7 @@ _None_
 ### New Features
 
 * New `check_for_toolkit_updates` action, to ensure you are always using the latest version of the release-toolkit plugin. [#269]
+* `android_download_translations` action now also auto-substitute hyphens for en-dash when appropriate, to avoid Android Linter violations. [#268]
 
 ### Bug Fixes
 

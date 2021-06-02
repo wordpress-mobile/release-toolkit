@@ -31,4 +31,28 @@ Language: zh_CN
 		<item>正在处理...</item>
 		<item>所有订单…</item>
 	</string-array>
+	<string name="threat_fix_description">价格从 70–120 美元/小时不等</string>
+	<string-array name="settings_jetpackdescription">
+		<item>您可以将一个或多个 IP 地址加入白名单，以避免 Jetpack 将其屏蔽</item>
+		<item>IPv4 和 IPv6 都支持。如要按范围指定地址</item>
+		<item>请输入最小值和最大值，并用破折号隔开。示例：12.12.12.0-12.12.12.100</item>
+	</string-array>
+	<string name="threat_fix_description_large">价格从 70 – 120 美元/小时不等</string>
+	<string-array name="settings_jetpackdescription_large">
+		<item>您可以将一个或多个 IP 地址加入白名单，以避免 Jetpack 将其屏蔽</item>
+		<item>IPv4 和 IPv6 都支持。如要按范围指定地址</item>
+		<item>请输入最小值和最大值，并用破折号隔开。示例：12.12.12.0 - 12.12.12.100</item>
+	</string-array>
+	<string name="field_allowed_values">该字段可以采用以下值: 4 3 2 1 -1 -2</string>
+    <string-array name="settings_number_series">
+        <item>该字段可以采用以下值: 4 3 2 1 -1 -2</item>
+        <item>请选择您的选择</item>
+    </string-array>
+    <string name="checklist_one"> - 1. 第一点</string>
+    <string name="checklist_two"> - o 二：第二点</string>
+    <string-array name="checklist_array">
+        <item> - 1. 第一点</item>
+        <item> - o 二：第二点</item>
+    </string-array>
+    <string name="multi_range_statement">第一范围是2-100，第二范围是123-456</string>
 </resources>
