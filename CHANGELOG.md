@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+* New `check_for_toolkit_updates` action, to ensure you are always using the latest version of the release-toolkit plugin. [#269]
 
 ### Bug Fixes
 
