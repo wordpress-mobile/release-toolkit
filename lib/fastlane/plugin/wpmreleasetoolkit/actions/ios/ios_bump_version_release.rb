@@ -21,12 +21,12 @@ module Fastlane
         UI.message 'Done!'
 
         UI.message 'Updating glotPressKeys...' unless params[:skip_glotpress]
-        update_glotpress_key unless params [:skip_glotpress]
-        UI.message 'Done' unless params [:skip_glotpress]
+        update_glotpress_key unless params[:skip_glotpress]
+        UI.message 'Done' unless params[:skip_glotpress]
 
         UI.message 'Updating Fastlane deliver file...' unless params[:skip_deliver]
         Fastlane::Helper::Ios::VersionHelper.update_fastlane_deliver(@new_short_version) unless params[:skip_deliver]
-        UI.message 'Done!' unless params [:skip_deliver]
+        UI.message 'Done!' unless params[:skip_deliver]
 
         UI.message 'Updating XcConfig...'
         Fastlane::Helper::Ios::VersionHelper.update_xc_configs(@new_version, @new_short_version, @new_version_internal)
