@@ -43,7 +43,7 @@ module Fastlane
 
         # Create a hash of devices, keyed by device name
         devices = config['devices']
-        devices = Hash[devices.map { |device| device['name'] }.zip(devices)]
+        devices = devices.map { |device| device['name'] }.zip(devices).to_h
 
         stylesheet_path = config['stylesheet']
 

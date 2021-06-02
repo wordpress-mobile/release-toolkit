@@ -174,7 +174,7 @@ module Fastlane
             # Run diffs
             base_file = sort_file_lines!(tmpdir, base_lang)
             langs.delete(base_lang)
-            return Hash[langs.map do |lang|
+            return langs.map do |lang|
               file = sort_file_lines!(tmpdir, lang)
               # If the lang ends up not having any translation at all (e.g. a `.lproj` without any `.strings` file in it but maybe just a storyboard or assets catalog), ignore it
               next nil if file.nil? || only_empty_lines?(file)
@@ -188,7 +188,7 @@ module Fastlane
               #       file instead, but they can still give an indication at the index in the list of keys at which this difference is located.
               diff.gsub!(/^(---|\+\+\+).*\n/, '')
               diff.empty? ? nil : [lang, diff]
-            end.compact]
+            end.compact.to_h
           end
         end
 
