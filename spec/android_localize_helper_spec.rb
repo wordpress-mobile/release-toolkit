@@ -123,7 +123,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
             gp_xml = File.open(stub_file('pt-br')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
             gp_node = gp_xml.xpath(xpath).first
             if fixture_block.is_a?(Array)
-              fixture_block.each do | fxt |
+              fixture_block.each do |fxt|
                 expect(gp_node.content).to include(fxt)
               end
             else
@@ -136,7 +136,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
               final_xml = File.open(generated_file(h[:android])) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
               final_node = final_xml.xpath(xpath).first
               if gp_block.is_a?(Array)
-                gp_block.each_with_index do | gp_val, index |
+                gp_block.each_with_index do |gp_val, index|
                   expect(final_node.content).to include(final_block[index])
                   expect(final_node.content).not_to include(gp_val)
                 end

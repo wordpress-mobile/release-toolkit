@@ -31,7 +31,6 @@ end
 
 Rake::ExtensionTask.new('drawText')
 
-
 GEM_NAME = 'fastlane-plugin-wpmreleasetoolkit'.freeze
 VERSION_FILE = File.join('lib', 'fastlane', 'plugin', 'wpmreleasetoolkit', 'version.rb')
 
@@ -103,4 +102,3 @@ def update_version_constant(version_file, new_version)
 
   sh('bundle', 'install') # To update Gemfile.lock with new wpmreleasetoolkit version
 end
-

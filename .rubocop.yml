@@ -1,6 +1,6 @@
 inherit_from: .rubocop_todo.yml
 
-require: 
+require:
 - rubocop-rspec
 
 ########## Lint / CodeStyle
@@ -46,6 +46,9 @@ Style/AsciiComments:
 
 # We are not strict to the point that we want to enforce super-short `it '…' do … end` blocks in our specs.
 RSpec/ExampleLength:
+  Enabled: false
+# Same for number of let/subject
+RSpec/MultipleMemoizedHelpers:
   Enabled: false
 
 ########## Metrics / Max Lengths Rules
