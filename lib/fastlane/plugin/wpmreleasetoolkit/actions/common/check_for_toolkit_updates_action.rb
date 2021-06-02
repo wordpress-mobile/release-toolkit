@@ -23,14 +23,36 @@ module Fastlane
         updates_needed = Gem::NameTuple.from_list(updates_needed)
         latest_version = updates_needed.find { |gem_info| gem_info.name == TOOLKIT_SPEC_NAME }.version
 
-        UI.message(['There is a new version '.yellow, latest_version.to_s.red, ' of the release toolkit!'.yellow].join)
-        non_breaking_update = Gem::Requirement.new(local_version.approximate_recommendation).satisfied_by?(latest_version)
-        UI.important('The latest version introduces breaking changes!') unless non_breaking_update
+        UI.message(['There is a newest version '.yellow, latest_version.to_s.red, ' of the release toolkit!'.yellow].join)
+        warn_on_breaking_update(local_version, latest_version)
 
         return latest_version if params[:skip_update_suggestion] || !UI.confirm('Do you want to run bundle update now?')
 
         sh('bundle', 'update', TOOLKIT_SPEC_NAME)
-        UI.abort_with_message!("#{TOOLKIT_SPEC_NAME} have been updated. Please check and commit the changes in your Gemfile.lock file, then restart your previous invocation of fastlane to use the new toolkit.")
+        UI.abort_with_message! <<~UPDATE_MESSAGE
+          #{TOOLKIT_SPEC_NAME} have been updated. Please check and commit the changes in your Gemfile.lock file,
+          then restart your previous invocation of fastlane to use the new toolkit.
+        UPDATE_MESSAGE
+      end
+
+      def self.warn_on_breaking_update(current_version, latest_version)
+        current_semver_requirement = Gem::Requirement.new(current_version.approximate_recommendation)
+        compatible_update = current_semver_requirement.satisfied_by?(latest_version)
+        return if compatible_update
+
+        new_semver_requirement = latest_version.approximate_recommendation
+        UI.important <<~BREAKING_CHANGE_MESSAGE
+          The latest version available (#{latest_version}) introduces breaking changes compared to the #{current_version} you are currently using.
+
+           - To update to #{latest_version}, first edit your \`Pluginfile\` to use '#{new_semver_requirement}', run \`bundle update\`,
+             then be sure to make all the necessary changes to your \`Fastfile\` (see the toolkit's CHANGELOG)
+             to take those breaking changes into account.
+
+           - If you are not ready to make the major version bump, you can still try to update to the latest compatible,
+             non-breaking version by running \`bundle update\` now. This will not update to the latest #{latest_version}, but
+             might still update to a newer version compatible with '#{current_semver_requirement}' if one exists; which is still valuable
+             to at least get bugfixes, until you are ready to jump to the next major version later.
+        BREAKING_CHANGE_MESSAGE
       end
 
       def self.description
