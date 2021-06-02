@@ -187,7 +187,7 @@ module Fastlane
 
           if File.directory?(abs_path)
             Dir.glob("#{abs_path}**/*").map do |sub_path|
-              sub_path.gsub(repository_path + '/', '')
+              sub_path.gsub("#{repository_path}/", '')
             end
           else
             return path

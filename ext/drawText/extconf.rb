@@ -33,4 +33,4 @@ FileUtils.cp(compiledPath, destinationPath)
 
 # Delete and overwrite the bundle file
 FileUtils.rm_rf(File.join(libDirectory, 'drawText.bundle'))
-FileUtils.touch(File.join(compilationDirectory, 'drawText.' + RbConfig::CONFIG['DLEXT']))
+FileUtils.touch(File.join(compilationDirectory, "drawText.#{RbConfig::CONFIG['DLEXT']}"))

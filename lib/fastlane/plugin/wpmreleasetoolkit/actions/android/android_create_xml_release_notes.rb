@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         require_relative '../../helper/android/android_git_helper'
 
-        release_notes_path = params[:download_path] + '/release_notes.xml'
+        release_notes_path = "#{params[:download_path]}/release_notes.xml"
         open(release_notes_path, 'w') do |f|
           params[:locales].each do |loc|
             puts "Looking for language: #{loc[1]}"

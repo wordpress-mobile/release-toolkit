@@ -44,6 +44,13 @@ Style/FrozenStringLiteralComment:
 Style/AsciiComments:
   Enabled: false
 
+# This causes issues with Pathname#.+, which is why we disable it to avoid introducing bugs because of it.
+# e.g. if `r = Pathname.new('root')` then `r + 'lib'` results in a `<Pathname:root/lib>` as expected;
+# but this rubocop rule will suggest to change this to `#{r}lib` which results in `"rootlib"` string,
+# which would be incorrect and not what we want
+Style/StringConcatenation:
+  Enabled: false
+
 # We are not strict to the point that we want to enforce super-short `it '…' do … end` blocks in our specs.
 RSpec/ExampleLength:
   Enabled: false
