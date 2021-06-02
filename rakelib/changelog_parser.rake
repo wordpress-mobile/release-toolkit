@@ -2,7 +2,7 @@
 class ChangelogParser
   PENDING_SECTION_TITLE = 'Develop'.freeze
   EMPTY_PLACEHOLDER = '_None_'.freeze
-  SUBSECTIONS_SEMVER_MAP = { 'Breaking Changes': 3, 'New Features': 2, 'Bug Fixes': 1, 'Internal Changes': 1 }
+  SUBSECTIONS_SEMVER_MAP = { 'Breaking Changes': 3, 'New Features': 2, 'Bug Fixes': 1, 'Internal Changes': 1 }.freeze
 
   def initialize(file: 'CHANGELOG.md')
     @lines = File.readlines(file)
