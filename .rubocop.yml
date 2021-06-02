@@ -51,13 +51,6 @@ Style/AsciiComments:
 Style/StringConcatenation:
   Enabled: false
 
-# We are not strict to the point that we want to enforce super-short `it '…' do … end` blocks in our specs.
-RSpec/ExampleLength:
-  Enabled: false
-# Same for number of let/subject
-RSpec/MultipleMemoizedHelpers:
-  Enabled: false
-
 ########## Metrics / Max Lengths Rules
 
 Layout/LineLength:
@@ -90,3 +83,12 @@ Metrics/CyclomaticComplexity:
 
 Metrics/PerceivedComplexity:
   Max: 20
+
+########## RSpec Rules
+
+# We are not strict to the point that we want to enforce super-short `it '…' do … end` blocks in our specs.
+RSpec/ExampleLength:
+  Enabled: false
+# Same for number of let/subject
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
