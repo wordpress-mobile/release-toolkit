@@ -39,7 +39,7 @@ class ChangelogParser
   def guessed_next_semantic_version(current:)
     comps = current.split('.')
     idx_to_bump = 3 - semver_category
-    comps[idx_to_bump] = "#{comps[idx_to_bump].to_i + 1}"
+    comps[idx_to_bump] = (comps[idx_to_bump].to_i + 1).to_s
     ((idx_to_bump + 1)...(comps.length)).each { |i| comps[i] = '0' }
     comps.join('.')
   end
