@@ -5,8 +5,8 @@ module Fastlane
         UI.message "Skip confirm: #{params[:skip_confirm]}"
         UI.message ''
 
-        require_relative '../../helper/android/android_version_helper.rb'
-        require_relative '../../helper/android/android_git_helper.rb'
+        require_relative '../../helper/android/android_version_helper'
+        require_relative '../../helper/android/android_git_helper'
 
         # Evaluate previous tag
         new_ver = params[:version_name]

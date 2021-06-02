@@ -1,5 +1,5 @@
 require 'json'
-require_relative 'file_reference.rb'
+require_relative 'file_reference'
 
 module Fastlane
   class Configuration

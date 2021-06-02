@@ -5,8 +5,8 @@ module Fastlane
         UI.message "Skip confirm: #{params[:skip_confirm]}"
         UI.message "Work on version: #{params[:base_version]}" unless params[:base_version].nil?
 
-        require_relative '../../helper/android/android_version_helper.rb'
-        require_relative '../../helper/android/android_git_helper.rb'
+        require_relative '../../helper/android/android_version_helper'
+        require_relative '../../helper/android/android_git_helper'
 
         # Checkout develop and update
         Fastlane::Helper::GitHelper.checkout_and_pull('develop')

@@ -4,8 +4,8 @@ module Fastlane
       def self.run(params)
         UI.message 'Bumping app release version...'
 
-        require_relative '../../helper/ios/ios_git_helper.rb'
-        require_relative '../../helper/ios/ios_version_helper.rb'
+        require_relative '../../helper/ios/ios_git_helper'
+        require_relative '../../helper/ios/ios_version_helper'
 
         Fastlane::Helper::GitHelper.ensure_on_branch!('release')
         create_config()

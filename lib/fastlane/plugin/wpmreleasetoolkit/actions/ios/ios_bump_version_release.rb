@@ -5,8 +5,8 @@ module Fastlane
         # fastlane will take care of reading in the parameter and fetching the environment variable:
         UI.message 'Bumping app release version...'
 
-        require_relative '../../helper/ios/ios_version_helper.rb'
-        require_relative '../../helper/ios/ios_git_helper.rb'
+        require_relative '../../helper/ios/ios_version_helper'
+        require_relative '../../helper/ios/ios_git_helper'
 
         other_action.ensure_git_branch(branch: 'develop')
 

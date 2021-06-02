@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class CircleciTriggerJobAction < Action
       def self.run(params)
-        require_relative '../../helper/ci_helper.rb'
+        require_relative '../../helper/ci_helper'
 
         UI.message "Triggering job #{params[:job_params]} on branch #{params[:branch]}"
 

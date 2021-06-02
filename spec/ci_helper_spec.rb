@@ -1,4 +1,4 @@
-require 'spec_helper.rb'
+require 'spec_helper'
 require 'webmock/rspec'
 
 shared_examples 'a CI provider' do

@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'fastlane/action'
 require 'active_support/all'
-require_relative '../../helper/promo_screenshots_helper.rb'
+require_relative '../../helper/promo_screenshots_helper'
 
 module Fastlane
   module Actions

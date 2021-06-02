@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class IosBuildPrechecksAction < Action
       def self.run(params)
-        require_relative '../../helper/ios/ios_version_helper.rb'
+        require_relative '../../helper/ios/ios_version_helper'
 
         message = ''
         message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_internal_version()} and uploading to App Center\n" if params[:internal]

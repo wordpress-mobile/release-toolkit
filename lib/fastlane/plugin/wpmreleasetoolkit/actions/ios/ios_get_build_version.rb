@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class IosGetBuildVersionAction < Action
       def self.run(params)
-        require_relative '../../helper/ios/ios_version_helper.rb'
+        require_relative '../../helper/ios/ios_version_helper'
 
         UI.user_error!('You need to set at least the PUBLIC_CONFIG_FILE env var to the path to the public xcconfig file') unless ENV['PUBLIC_CONFIG_FILE']
 

@@ -4,8 +4,8 @@ module Fastlane
       def self.run(params)
         UI.message "Skip confirm: #{params[:skip_confirm]}"
 
-        require_relative '../../helper/ios/ios_version_helper.rb'
-        require_relative '../../helper/ios/ios_git_helper.rb'
+        require_relative '../../helper/ios/ios_version_helper'
+        require_relative '../../helper/ios/ios_git_helper'
 
         UI.user_error!('This is not a release branch. Abort.') unless other_action.git_branch.start_with?('release/')
 

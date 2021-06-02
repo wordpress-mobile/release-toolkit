@@ -1,5 +1,5 @@
 require 'fastlane/action'
-require_relative '../../helper/an_metadata_update_helper.rb'
+require_relative '../../helper/an_metadata_update_helper'
 
 module Fastlane
   module Actions

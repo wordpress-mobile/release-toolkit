@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class AndroidBuildPrechecksAction < Action
       def self.run(params)
-        require_relative '../../helper/android/android_version_helper.rb'
+        require_relative '../../helper/android/android_version_helper'
 
         UI.user_error!("Can't build beta and final at the same time!") if params[:final] && params[:beta]
 

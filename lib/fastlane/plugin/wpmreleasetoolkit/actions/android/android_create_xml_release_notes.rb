@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class AndroidCreateXmlReleaseNotesAction < Action
       def self.run(params)
-        require_relative '../../helper/android/android_git_helper.rb'
+        require_relative '../../helper/android/android_git_helper'
 
         release_notes_path = params[:download_path] + '/release_notes.xml'
         open(release_notes_path, 'w') do |f|
