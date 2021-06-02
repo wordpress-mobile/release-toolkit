@@ -80,7 +80,7 @@ module Fastlane
 
         Net::HTTP.start(command_uri.host, command_uri.port, use_ssl: true) do |http|
           request = Net::HTTP::Post.new(command_uri.request_uri, headers)
-          body = { "branch": branch, "parameters": parameters }
+          body = { branch: branch, parameters: parameters }
           request.body = body.to_json
           response = http.request(request)
           return response
