@@ -22,7 +22,7 @@ module Fastlane
       File.write(path, JSON.pretty_generate(to_hash))
     end
 
-    def add_file_to_copy(source, destination, encrypt = false)
+    def add_file_to_copy(source, destination, encrypt: false)
       file = FileReference.new(file: source, destination: destination, encrypt: encrypt)
       self.files_to_copy << file
     end
