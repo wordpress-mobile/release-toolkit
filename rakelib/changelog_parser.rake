@@ -1,4 +1,3 @@
-
 class ChangelogParser
   PENDING_SECTION_TITLE = 'Develop'.freeze
   EMPTY_PLACEHOLDER = '_None_'.freeze
