@@ -5,7 +5,7 @@ module GitHelper
 
   def self.check_or_create_branch(new_version)
     release_branch = "release/#{new_version}"
-    if self.current_branch == release_branch
+    if current_branch == release_branch
       puts 'Already on release branch'
     else
       sh('git', 'checkout', '-b', release_branch)
@@ -23,6 +23,6 @@ module GitHelper
   def self.commit_files(message, files, push: true)
     Rake.sh('git', 'add', *files)
     Rake.sh('git', 'commit', '-m', message)
-    Rake.sh('git', 'push', 'origin', self.current_branch) if push
+    Rake.sh('git', 'push', 'origin', current_branch) if push
   end
 end
