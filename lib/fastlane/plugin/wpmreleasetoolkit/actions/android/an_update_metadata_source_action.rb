@@ -92,7 +92,7 @@ module Fastlane
       # Manages tags depending on the type
       def self.write_target_block(fw, line)
         if is_block_id(line)
-          key = line.split(' ')[1].tr('\"', '')
+          key = line.split[1].tr('\"', '')
           @blocks.each do |block|
             @current_block = block if block.is_handler_for(key)
           end

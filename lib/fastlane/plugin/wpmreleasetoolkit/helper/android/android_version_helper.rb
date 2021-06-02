@@ -380,7 +380,7 @@ module Fastlane
               if !found_section
                 found_section = true if line.include?(section)
               else
-                return line.split(' ')[1] if line.include?(keyword) && !line.include?("\"#{keyword}\"") && !line.include?("P#{keyword}")
+                return line.split[1] if line.include?(keyword) && !line.include?("\"#{keyword}\"") && !line.include?("P#{keyword}")
               end
             end
           end
@@ -448,13 +448,13 @@ module Fastlane
               else
                 if version_updated < 2
                   if line.include?('versionName') && !line.include?('"versionName"') && !line.include?('PversionName')
-                    version_name = line.split(' ')[1].tr('\"', '')
+                    version_name = line.split[1].tr('\"', '')
                     line.sub!(version_name, version[VERSION_NAME].to_s)
                     version_updated = version_updated + 1
                   end
 
                   if line.include? 'versionCode'
-                    version_code = line.split(' ')[1]
+                    version_code = line.split[1]
                     line.sub!(version_code, version[VERSION_CODE].to_s)
                     version_updated = version_updated + 1
                   end

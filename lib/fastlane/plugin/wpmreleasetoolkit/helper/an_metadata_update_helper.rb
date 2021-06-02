@@ -123,7 +123,7 @@ module Fastlane
       end
 
       def extract_key(line)
-        line.split(' ')[1].tr('\"', '')
+        line.split[1].tr('\"', '')
       end
 
       def is_int?(value)
