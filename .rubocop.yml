@@ -53,7 +53,7 @@ RSpec/MultipleMemoizedHelpers:
 
 ########## Metrics / Max Lengths Rules
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 300
 
 Metrics/AbcSize:
