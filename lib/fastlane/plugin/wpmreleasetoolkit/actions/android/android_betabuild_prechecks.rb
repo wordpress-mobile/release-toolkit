@@ -34,10 +34,10 @@ module Fastlane
         # Verify
         message << "Updating branch to version: #{next_beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{next_beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) "
         message << "and #{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n" unless alpha_release_version.nil?
-        if !params[:skip_confirm]
-          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
-        else
+        if params[:skip_confirm]
           UI.message(message)
+        else
+          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
         end
 
         # Check local repo status
