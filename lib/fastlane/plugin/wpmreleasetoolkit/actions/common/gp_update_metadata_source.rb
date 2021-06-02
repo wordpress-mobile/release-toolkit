@@ -23,7 +23,7 @@ module Fastlane
       # Verifies that all the source files are available
       # to this action
       def self.check_source_files(source_files)
-        source_files.values.each do |file_path|
+        source_files.each_value do |file_path|
           UI.user_error!("Couldn't find file at path '#{file_path}'") unless File.exist?(file_path)
         end
       end
