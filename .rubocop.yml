@@ -3,6 +3,10 @@ inherit_from: .rubocop_todo.yml
 require:
 - rubocop-rspec
 
+# Enable new cops when we update rubocop to a newer version
+AllCops:
+  NewCops: enable
+
 ########## Lint / CodeStyle
 
 # This gem is included as part of the `Pluginfile`, which is `required` separately,
