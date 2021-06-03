@@ -377,10 +377,10 @@ module Fastlane
           found_section = false
           File.open(file_path, 'r') do |file|
             file.each_line do |line|
-              if !found_section
-                found_section = true if line.include?(section)
+              if found_section
+                return line.split[1] if line.include?(keyword) && !line.include?("\"#{keyword}\"") && !line.include?("P#{keyword}")
               else
-                return line.split(' ')[1] if line.include?(keyword) && !line.include?("\"#{keyword}\"") && !line.include?("P#{keyword}")
+                found_section = true if line.include?(section)
               end
             end
           end
@@ -442,24 +442,24 @@ module Fastlane
           version_updated = 0
           File.open(gradle_path, 'r') do |file|
             file.each_line do |line|
-              if !found_section
-                temp_file.puts line
-                found_section = true if line.include? section
-              else
+              if found_section
                 if version_updated < 2
                   if line.include?('versionName') && !line.include?('"versionName"') && !line.include?('PversionName')
-                    version_name = line.split(' ')[1].tr('\"', '')
+                    version_name = line.split[1].tr('\"', '')
                     line.sub!(version_name, version[VERSION_NAME].to_s)
                     version_updated = version_updated + 1
                   end
 
                   if line.include? 'versionCode'
-                    version_code = line.split(' ')[1]
+                    version_code = line.split[1]
                     line.sub!(version_code, version[VERSION_CODE].to_s)
                     version_updated = version_updated + 1
                   end
                 end
                 temp_file.puts line
+              else
+                temp_file.puts line
+                found_section = true if line.include? section
               end
             end
             file.close

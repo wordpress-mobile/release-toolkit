@@ -21,7 +21,7 @@ module Fastlane
 
         UI.message("Merging in: #{strings_folder}")
 
-        tmp_main_file = main_file + '.tmp'
+        tmp_main_file = "#{main_file}.tmp"
         FileUtils.cp(main_file, tmp_main_file)
 
         join_files = Dir.glob(File.join(strings_folder, 'strings-*.xml'))

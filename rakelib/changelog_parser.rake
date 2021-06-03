@@ -1,8 +1,7 @@
-
 class ChangelogParser
   PENDING_SECTION_TITLE = 'Develop'.freeze
   EMPTY_PLACEHOLDER = '_None_'.freeze
-  SUBSECTIONS_SEMVER_MAP = { 'Breaking Changes': 3, 'New Features': 2, 'Bug Fixes': 1, 'Internal Changes': 1 }
+  SUBSECTIONS_SEMVER_MAP = { 'Breaking Changes': 3, 'New Features': 2, 'Bug Fixes': 1, 'Internal Changes': 1 }.freeze
 
   def initialize(file: 'CHANGELOG.md')
     @lines = File.readlines(file)
@@ -19,7 +18,7 @@ class ChangelogParser
     prev_subtitle = nil
     loop do
       (lines, next_level, next_subtitle) = advance_to_next_header(level: 2..3)
-      subsections.append({title: prev_subtitle, lines: lines}) unless lines.reject { |l| l.chomp.empty? || l.chomp == EMPTY_PLACEHOLDER }.empty?
+      subsections.append({ title: prev_subtitle, lines: lines }) unless lines.reject { |l| l.chomp.empty? || l.chomp == EMPTY_PLACEHOLDER }.empty?
       prev_subtitle = next_subtitle
 
       break if next_level < 3
@@ -40,8 +39,8 @@ class ChangelogParser
   def guessed_next_semantic_version(current:)
     comps = current.split('.')
     idx_to_bump = 3 - semver_category
-    comps[idx_to_bump] = "#{comps[idx_to_bump].to_i + 1}"
-    ((idx_to_bump+1)...(comps.length)).each { |i| comps[i] = '0' }
+    comps[idx_to_bump] = (comps[idx_to_bump].to_i + 1).to_s
+    ((idx_to_bump + 1)...(comps.length)).each { |i| comps[i] = '0' }
     comps.join('.')
   end
 

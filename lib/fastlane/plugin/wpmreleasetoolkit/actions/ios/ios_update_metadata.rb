@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class IosUpdateMetadataAction < Action
       def self.run(params)
-        require_relative '../../helper/ios/ios_git_helper.rb'
+        require_relative '../../helper/ios/ios_git_helper'
 
         Fastlane::Helper::Ios::GitHelper.update_metadata()
       end

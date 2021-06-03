@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         UI.message("Deleting tags for version: #{params[:version]}")
 
-        require_relative '../../helper/git_helper.rb'
+        require_relative '../../helper/git_helper'
 
         # Download all the remote tags prior to starting – that way we don't miss any on the server
         Fastlane::Helper::GitHelper.fetch_all_tags

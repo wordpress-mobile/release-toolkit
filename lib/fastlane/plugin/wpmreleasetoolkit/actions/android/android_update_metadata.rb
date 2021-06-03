@@ -6,7 +6,7 @@ module Fastlane
 
     class AndroidUpdateMetadataAction < Action
       def self.run(params)
-        require_relative '../../helper/android/android_git_helper.rb'
+        require_relative '../../helper/android/android_git_helper'
 
         Fastlane::Helper::Android::GitHelper.update_metadata(ENV['validate_translations'])
       end

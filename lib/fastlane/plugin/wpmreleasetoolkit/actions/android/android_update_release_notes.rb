@@ -4,9 +4,9 @@ module Fastlane
       def self.run(params)
         UI.message 'Updating the release notes...'
 
-        require_relative '../../helper/android/android_version_helper.rb'
-        require_relative '../../helper/release_notes_helper.rb'
-        require_relative '../../helper/git_helper.rb'
+        require_relative '../../helper/android/android_version_helper'
+        require_relative '../../helper/release_notes_helper'
+        require_relative '../../helper/git_helper'
 
         path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'RELEASE-NOTES.txt')
         next_version = Fastlane::Helper::Android::VersionHelper.calc_next_release_short_version(params[:new_version])

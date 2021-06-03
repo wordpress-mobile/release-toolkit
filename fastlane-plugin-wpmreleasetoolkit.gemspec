@@ -12,6 +12,8 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/wordpress-mobile/release-toolkit'
   spec.license       = 'MIT'
 
+  spec.required_ruby_version = '>= 2.6'
+
   spec.files         = Dir['lib/**/*'] + Dir['ext/drawText/{makefile.example,drawText/**/*,drawText Tests/**/*,drawText.xcodeproj/**/*}'] + %w[README.md LICENSE]
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
 

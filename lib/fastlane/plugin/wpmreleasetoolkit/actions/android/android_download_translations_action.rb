@@ -4,8 +4,8 @@ module Fastlane
   module Actions
     class AndroidDownloadTranslationsAction < Action
       def self.run(params)
-        require_relative '../../helper/android/android_localize_helper.rb'
-        require_relative '../../helper/git_helper.rb'
+        require_relative '../../helper/android/android_localize_helper'
+        require_relative '../../helper/git_helper'
 
         res_dir = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', params[:res_dir])
 

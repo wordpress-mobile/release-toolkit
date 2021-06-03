@@ -19,7 +19,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+* Updated our rubocop config and fixed some more new/existing violations. [#270]
 
 ## 1.0.1
 
