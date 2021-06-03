@@ -26,9 +26,15 @@ module Console
   end
 
   def self.prompt(text, default_value)
-    color_puts("#{text} [#{default_value}]?", color_code: GREEN)
+    color_puts("#{text}? [default: #{default_value}] ", color_code: GREEN)
     answer = $stdin.gets.chomp
     answer = default_value if answer.empty?
     answer
+  end
+
+  def self.confirm(text)
+    color_puts("#{text} [y/n]?", color_code: GREEN)
+    answer = $stdin.gets.chomp
+    answer.downcase == 'y'
   end
 end
