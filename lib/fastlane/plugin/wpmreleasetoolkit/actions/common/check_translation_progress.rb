@@ -18,7 +18,7 @@ module Fastlane
           skip_confirm: params[:skip_confirm]
         ) unless under_threshold_langs.length == 0
 
-        UI.message('Done')
+        UI.success('Done')
       end
 
       # Check the status of the translations and returns the list of violations
