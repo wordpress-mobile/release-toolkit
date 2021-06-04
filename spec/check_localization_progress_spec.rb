@@ -22,7 +22,7 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
         body: generate_glotpress_response_body(languages: langs)
       )
 
-    expect(FastlaneCore::UI).to receive(:'message').with('Done')
+    expect(FastlaneCore::UI).to receive(:'success').with('Done')
 
     Fastlane::Actions::CheckTranslationProgressAction.run(
       glotpress_url:'https://translate.wordpress.org/projects/apps/my-test-project/dev',
@@ -132,9 +132,9 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
       )
 
     confirm_message = <<~MSG
-    The translations for the following languages are below the 99% threshold:
-     - de is at 51%.
-    Do you want to continue?
+      The translations for the following languages are below the 99% threshold:
+       - de is at 51%.
+      Do you want to continue?
     MSG
 
     expect(FastlaneCore::UI).to receive(:'confirm').with(confirm_message.strip)
@@ -168,10 +168,10 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
       )
 
     confirm_message = <<~MSG
-    The translations for the following languages are below the 99% threshold:
-     - de is at 51%.
-     - es is at 75%.
-    Do you want to continue?
+      The translations for the following languages are below the 99% threshold:
+       - de is at 51%.
+       - es is at 75%.
+      Do you want to continue?
     MSG
 
     expect(FastlaneCore::UI).to receive(:'confirm').with(confirm_message.strip)
@@ -205,13 +205,13 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
       )
 
     confirm_message = <<~MSG
-    The translations for the following languages are below the 99% threshold:
-     - de is at 51%.
-     - es is at 75%.
+      The translations for the following languages are below the 99% threshold:
+       - de is at 51%.
+       - es is at 75%.
     MSG
 
-    expect(FastlaneCore::UI).to receive(:'important').with(confirm_message)
-    expect(FastlaneCore::UI).to receive(:'message').with('Done')
+    expect(FastlaneCore::UI).to receive(:important).with(confirm_message)
+    expect(FastlaneCore::UI).to receive(:success).with('Done')
 
     Fastlane::Actions::CheckTranslationProgressAction.run(
       glotpress_url:'https://translate.wordpress.org/projects/apps/my-test-project/dev',
@@ -240,12 +240,12 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
       )
 
     confirm_message = <<~MSG
-    The translations for the following languages are below the 99% threshold:
-     - de is at 51%.
+      The translations for the following languages are below the 99% threshold:
+       - de is at 51%.
     MSG
 
     expect(FastlaneCore::UI).to receive(:'important').with(confirm_message)
-    expect(FastlaneCore::UI).to receive(:'message').with('Done')
+    expect(FastlaneCore::UI).to receive(:'success').with('Done')
 
     Fastlane::Actions::CheckTranslationProgressAction.run(
       glotpress_url:'https://translate.wordpress.org/projects/apps/my-test-project/dev',
@@ -278,20 +278,20 @@ end
 
 def generate_glotpress_response_header()
   header = <<~HEADER
-  <!DOCTYPE html>
-  <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
-  <head>
-  <meta charset="utf-8" />
-  <!--
-  <meta property="fb:page_id" content="6427302910" />
-  -->
-  <title>Development &lt; GlotPress &mdash; WordPress.org</title>
-  <meta name="referrer" content="always">
-  <link rel='stylesheet' id='admin-bar-css'  href='https://translate.wordpress.org/wp-includes/css/admin-bar.min.css?ver=5.8-alpha-50943' media='all' />
-  <script src='https://translate.wordpress.org/wp-includes/js/hoverintent-js.min.js?ver=2.2.1' id='hoverintent-js-js'></script>
-  </head>
-  <body>
-      <tbody>
+    <!DOCTYPE html>
+    <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+    <head>
+    <meta charset="utf-8" />
+    <!--
+    <meta property="fb:page_id" content="6427302910" />
+    -->
+    <title>Development &lt; GlotPress &mdash; WordPress.org</title>
+    <meta name="referrer" content="always">
+    <link rel='stylesheet' id='admin-bar-css'  href='https://translate.wordpress.org/wp-includes/css/admin-bar.min.css?ver=5.8-alpha-50943' media='all' />
+    <script src='https://translate.wordpress.org/wp-includes/js/hoverintent-js.min.js?ver=2.2.1' id='hoverintent-js-js'></script>
+    </head>
+    <body>
+        <tbody>
   HEADER
 
   header
@@ -299,16 +299,16 @@ end
 
 def generate_glotpress_response_for_language(lang:, lang_code:, current:, fuzzy:, waiting:, untranslated:)
   lang = <<~LANG
-  <tr class="odd">
-				<td>
+    <tr class="odd">
+    		<td>
   LANG
 
 	lang << "<strong><a href=\"/projects/apps/android/dev/#{lang_code}/default/\">#{lang}</a></strong>\n"
 
   lang << <<~LANG
-      <span class="bubble morethan90">anyperc%</span>
-		</td>
-		<td class="stats percent">anyperc%</td>
+        <span class="bubble morethan90">anyperc%</span>
+    </td>
+    <td class="stats percent">anyperc%</td>
   LANG
 
   lang << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'translated', status: 'current', string_count: current)
@@ -327,9 +327,9 @@ end
 
 def generate_glotpress_response_footer()
   footer = <<~FOOTER
-    </tbody>
-  </body>
-  </html>
+      </tbody>
+    </body>
+    </html>
   FOOTER
 
   footer
