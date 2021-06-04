@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         require_relative '../../helper/glotpress_helper.rb'
 
-        UI.message('Check translations status...')
+       UI.message('Checking translations status...')
 
         under_threshold_langs = check_translations(
                                   glotpress_url: params[:glotpress_url], 
