@@ -1,14 +1,19 @@
 module GitHelper
   def self.current_branch
-    `git branch --show-current`.chomp
+    `git --no-pager branch --show-current`.chomp
   end
 
   def self.check_or_create_branch(new_version)
     release_branch = "release/#{new_version}"
+    branch_exists = !`git --no-pager branch -a --list --no-color #{release_branch}`.chomp.empty?
     if current_branch == release_branch
       puts 'Already on release branch'
-    else
-      sh('git', 'checkout', '-b', release_branch)
+    elsif branch_exists
+      Rake.sh('git', 'checkout', release_branch)
+    else # create it
+      abort('Aborted, as not run from develop nor release branch') unless current_branch == 'develop' || Console.confirm("You are not on 'develop', nor already on '#{release_branch}'. Do you really want to cut the release branch from #{current_branch}?")
+
+      Rake.sh('git', 'checkout', '-b', release_branch)
     end
   end
 
@@ -23,6 +28,6 @@ module GitHelper
   def self.commit_files(message, files, push: true)
     Rake.sh('git', 'add', *files)
     Rake.sh('git', 'commit', '-m', message)
-    Rake.sh('git', 'push', 'origin', current_branch) if push
+    Rake.sh('git', 'push', '-q', 'origin', current_branch) if push
   end
 end
