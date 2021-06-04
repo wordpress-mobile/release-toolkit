@@ -26,7 +26,7 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
 
     Fastlane::Actions::CheckTranslationProgressAction.run(
       glotpress_url:'https://translate.wordpress.org/projects/apps/my-test-project/dev',
-      language_codes: 'ar de es'.split(),
+      language_codes: %w[ar de es],
       min_acceptable_translation_percentage: 99,
       abort_on_violations: true,
       skip_confirm: false)
@@ -334,4 +334,3 @@ def generate_glotpress_response_footer()
 
   footer
 end
-
