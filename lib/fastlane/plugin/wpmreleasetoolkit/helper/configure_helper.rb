@@ -187,7 +187,7 @@ module Fastlane
 
           if File.directory?(abs_path)
             Dir.glob("#{abs_path}**/*").map do |sub_path|
-              sub_path.gsub(repository_path + '/', '')
+              sub_path.gsub("#{repository_path}/", '')
             end
           else
             return path
@@ -230,7 +230,7 @@ module Fastlane
         end
 
         new_config = self.configuration
-        new_config.add_file_to_copy(params[:source], params[:destination], params[:encrypt])
+        new_config.add_file_to_copy(params[:source], params[:destination], encrypt: params[:encrypt])
         update_configuration(new_config)
       end
 

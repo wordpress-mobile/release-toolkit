@@ -1,4 +1,4 @@
-require 'spec_helper.rb'
+require 'spec_helper'
 require 'fileutils'
 require 'tmpdir'
 require 'nokogiri'
@@ -99,30 +99,88 @@ describe Fastlane::Helper::Android::LocalizeHelper do
       end
 
       describe 'applies content substitutions' do
-        shared_examples 'substitutions' do |xpath|
-          it 'has at least one fixture with text to be substituted' do
-            # This ensures that even if we modify the fixtures in the future, we will still have a case which tests this
-            gp_xml = File.open(stub_file('pt-br')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-            gp_node = gp_xml.xpath(xpath).first
-            expect(gp_node.content).to include('...')
-          end
+        shared_examples 'ellipsis substitutions' do |xpath|
+          context 'with ellipsis character' do
+            it 'has at least one fixture with text to be substituted' do
+              # This ensures that even if we modify the fixtures in the future, we will still have a case which tests this
+              gp_xml = File.open(stub_file('pt-br')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+              gp_node = gp_xml.xpath(xpath).first
+              expect(gp_node.content).to include('...')
+            end
 
-          TEST_LOCALES_MAP.each do |h|
-            it "has the text substituted in #{h[:android]}" do
-              final_xml = File.open(generated_file(h[:android])) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-              final_node = final_xml.xpath(xpath).first
-              expect(final_node.content).to include('…')
-              expect(final_node.content).not_to include('...')
+            TEST_LOCALES_MAP.each do |h|
+              it "has the text substituted in #{h[:android]}" do
+                final_xml = File.open(generated_file(h[:android])) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+                final_node = final_xml.xpath(xpath).first
+                expect(final_node.content).to include('…')
+                expect(final_node.content).not_to include('...')
+              end
+            end
+          end
+        end
+
+        shared_examples 'en-dash substitutions' do |context_name, xpath, fixture_block, gp_block, final_block|
+          context "with #{context_name}" do
+            it 'has at least one fixture with text to be substituted' do
+              # This ensures that even if we modify the fixtures in the future, we will still have a case which tests this
+              gp_xml = File.open(stub_file('pt-br')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+              gp_node = gp_xml.xpath(xpath).first
+              if fixture_block.is_a?(Array)
+                fixture_block.each do |fxt|
+                  expect(gp_node.content).to include(fxt)
+                end
+              else
+                expect(gp_node.content).to include(fixture_block)
+              end
+            end
+
+            TEST_LOCALES_MAP.each do |h|
+              it "has the text substituted in #{h[:android]}" do
+                final_xml = File.open(generated_file(h[:android])) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+                final_node = final_xml.xpath(xpath).first
+                if gp_block.is_a?(Array)
+                  gp_block.each_with_index do |gp_val, index|
+                    expect(final_node.content).to include(final_block[index])
+                    expect(final_node.content).not_to include(gp_val)
+                  end
+                else
+                  expect(final_node.content).to include(final_block)
+                  expect(final_node.content).not_to include(gp_block)
+                end
+              end
             end
           end
         end
 
         context 'with //string tags' do
-          include_examples 'substitutions', "/resources/string[@name='shipping_label_payments_saving_dialog_message']"
+          include_examples 'ellipsis substitutions', "/resources/string[@name='shipping_label_payments_saving_dialog_message']"
+
+          # en-dash: substitute ranges
+          include_examples 'en-dash substitutions', 'simple range', "/resources/string[@name='threat_fix_description']", '0-1', '0-1', "0\u{2013}1"
+          include_examples 'en-dash substitutions', 'multiple ranges', "/resources/string[@name='multi_range_statement']", %w[2-1 3-4], %w[2-1 3-4], ["2\u{2013}1", "3\u{2013}4"]
+          include_examples 'en-dash substitutions', 'range with spaces', "/resources/string[@name='threat_fix_description_large']", '0 - 1', '0 - 1', "0 \u{2013} 1"
+
+          # en-dash: don't substitute negative numbers
+          include_examples 'en-dash substitutions', 'negative numbers', "/resources/string[@name='field_allowed_values']", '1 -1 -2', "1 \u{2013}1 \u{2013}2", '1 -1 -2'
+
+          # en-dash: don't substitute checklists
+          include_examples 'en-dash substitutions', 'ordered lists', "/resources/string[@name='checklist_one']", '- 1.', "\u{2013} 1.", '- 1.'
+          include_examples 'en-dash substitutions', 'unordered lists', "/resources/string[@name='checklist_two']", '- o', "\u{2013} o", '- o'
         end
 
         context 'with //string-array/item tags' do
-          include_examples 'substitutions', "/resources/string-array[@name='order_list_tabs']/item[1]"
+          include_examples 'ellipsis substitutions', "/resources/string-array[@name='order_list_tabs']/item[1]"
+
+          # en-dash: substitute ranges
+          include_examples 'en-dash substitutions', 'simple range', "/resources/string-array[@name='settings_jetpackdescription']/item[3]", '0-1', '0-1', "0\u{2013}1"
+          include_examples 'en-dash substitutions', 'range with spaces', "/resources/string-array[@name='settings_jetpackdescription_large']/item[3]", '0 - 1', '0 - 1', "0 \u{2013} 1"
+
+          # en-dash: don't substitute negative numbers
+          include_examples 'en-dash substitutions', 'negative numbers', "/resources/string-array[@name='settings_number_series']/item[1]", '1 -1 -2', "1 \u{2013}1 –2", '1 -1 -2'
+
+          # en-dash: don't substitute checklists
+          include_examples 'en-dash substitutions', 'ordered lists', "/resources/string-array[@name='checklist_array']/item[1]", '- 1.', "\u{2013} 1.", '- 1.'
+          include_examples 'en-dash substitutions', 'unordered lists', "/resources/string-array[@name='checklist_array']/item[2]", '- o', "\u{2013} o", '- o'
         end
       end
 

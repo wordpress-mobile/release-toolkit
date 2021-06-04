@@ -91,7 +91,7 @@ module Fastlane
 
       def is_handler_for(key)
         values = key.split('_')
-        key.start_with?(@rel_note_key) && values.length == 3 && is_int?(values[2].sub(/^[0]*/, ''))
+        key.start_with?(@rel_note_key) && values.length == 3 && is_int?(values[2].sub(/^0*/, ''))
       end
 
       def handle_line(fw, line)
@@ -123,7 +123,7 @@ module Fastlane
       end
 
       def extract_key(line)
-        line.split(' ')[1].tr('\"', '')
+        line.split[1].tr('\"', '')
       end
 
       def is_int?(value)
@@ -141,7 +141,7 @@ module Fastlane
 
       def is_handler_for(key)
         values = key.split('_')
-        key.start_with?(@rel_note_key) && values.length == 4 && is_int?(values[3].sub(/^[0]*/, ''))
+        key.start_with?(@rel_note_key) && values.length == 4 && is_int?(values[3].sub(/^0*/, ''))
       end
 
       def generate_block(fw)

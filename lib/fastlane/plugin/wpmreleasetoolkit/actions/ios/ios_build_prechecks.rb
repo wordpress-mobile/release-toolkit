@@ -2,17 +2,17 @@ module Fastlane
   module Actions
     class IosBuildPrechecksAction < Action
       def self.run(params)
-        require_relative '../../helper/ios/ios_version_helper.rb'
+        require_relative '../../helper/ios/ios_version_helper'
 
         message = ''
         message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_internal_version()} and uploading to App Center\n" if params[:internal]
         message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_build_version()} and uploading to App Center\n" if params[:internal_on_single_version]
         message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_build_version()} and uploading to TestFlight\n" if params[:external]
 
-        if !params[:skip_confirm]
-          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
-        else
+        if params[:skip_confirm]
           UI.message(message)
+        else
+          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
         end
 
         # Check local repo status

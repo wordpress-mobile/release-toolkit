@@ -5,8 +5,8 @@ module Fastlane
         UI.message "Skip confirm: #{params[:skip_confirm]}"
         UI.message ''
 
-        require_relative '../../helper/ios/ios_version_helper.rb'
-        require_relative '../../helper/ios/ios_git_helper.rb'
+        require_relative '../../helper/ios/ios_version_helper'
+        require_relative '../../helper/ios/ios_git_helper'
 
         # Evaluate previous tag
         new_ver = params[:version]
@@ -16,10 +16,10 @@ module Fastlane
         message = "Requested Hotfix version: #{new_ver}\n"
         message << "Branching from: #{prev_ver}\n"
 
-        if !params[:skip_confirm]
-          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
-        else
+        if params[:skip_confirm]
           UI.message(message)
+        else
+          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
         end
 
         # Check tags

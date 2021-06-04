@@ -4,17 +4,17 @@ module Fastlane
       def self.run(params)
         UI.message "Skip confirm: #{params[:skip_confirm]}"
 
-        require_relative '../../helper/ios/ios_version_helper.rb'
-        require_relative '../../helper/ios/ios_git_helper.rb'
+        require_relative '../../helper/ios/ios_version_helper'
+        require_relative '../../helper/ios/ios_git_helper'
 
         UI.user_error!('This is not a release branch. Abort.') unless other_action.git_branch.start_with?('release/')
 
         version = Fastlane::Helper::Ios::VersionHelper.get_public_version
         message = "Finalizing release: #{version}\n"
-        if !params[:skip_confirm]
-          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
-        else
+        if params[:skip_confirm]
           UI.message(message)
+        else
+          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
         end
 
         # Check local repo status

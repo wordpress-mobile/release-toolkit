@@ -2,8 +2,8 @@ module Fastlane
   module Actions
     class AndroidTagBuildAction < Action
       def self.run(params)
-        require_relative '../../helper/android/android_version_helper.rb'
-        require_relative '../../helper/android/android_git_helper.rb'
+        require_relative '../../helper/android/android_version_helper'
+        require_relative '../../helper/android/android_git_helper'
 
         release_ver = Fastlane::Helper::Android::VersionHelper.get_release_version()
         alpha_ver = Fastlane::Helper::Android::VersionHelper.get_alpha_version() unless ENV['HAS_ALPHA_VERSION'].nil?

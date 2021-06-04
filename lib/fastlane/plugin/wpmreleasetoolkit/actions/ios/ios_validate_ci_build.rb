@@ -2,8 +2,8 @@ module Fastlane
   module Actions
     class IosValidateCiBuildAction < Action
       def self.run(params)
-        require_relative '../../helper/ios/ios_git_helper.rb'
-        require_relative '../../helper/ios/ios_version_helper.rb'
+        require_relative '../../helper/ios/ios_git_helper'
+        require_relative '../../helper/ios/ios_version_helper'
 
         version = Fastlane::Helper::Ios::VersionHelper.get_public_version()
         head_tags = Fastlane::Helper::GitHelper.list_tags_on_current_commit()
