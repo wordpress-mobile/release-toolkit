@@ -48,7 +48,7 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
         body: generate_glotpress_response_body(languages: langs)
       )
 
-    expect(FastlaneCore::UI).to receive(:'abort_with_message!').with('Can\'t get data for language es')
+    expect(FastlaneCore::UI).to receive(:'abort_with_message!').with("Can't get data for language es")
     # Since the action doesn't actually fail during the test, fake error messages can be raised
     allow(FastlaneCore::UI).to receive(:'abort_with_message!')
 
