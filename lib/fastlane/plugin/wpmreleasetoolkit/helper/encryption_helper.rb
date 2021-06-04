@@ -9,7 +9,7 @@ module Fastlane
       end
 
       def self.cipher(op_type)
-        cipher = OpenSSL::Cipher::AES256.new :CBC
+        cipher = OpenSSL::Cipher.new('aes-256-cbc')
 
         cipher.encrypt if op_type == OperationType::ENCRYPT
         cipher.decrypt if op_type == OperationType::DECRYPT

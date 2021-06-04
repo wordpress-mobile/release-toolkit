@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class AndroidBuildPrechecksAction < Action
       def self.run(params)
-        require_relative '../../helper/android/android_version_helper.rb'
+        require_relative '../../helper/android/android_version_helper'
 
         UI.user_error!("Can't build beta and final at the same time!") if params[:final] && params[:beta]
 
@@ -18,10 +18,10 @@ module Fastlane
         message << "Building version #{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Beta Channel)\n" if params[:beta]
         message << "Building version #{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Alpha Channel)\n" if params[:alpha]
 
-        if !params[:skip_confirm]
-          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
-        else
+        if params[:skip_confirm]
           UI.message(message)
+        else
+          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
         end
 
         # Check local repo status

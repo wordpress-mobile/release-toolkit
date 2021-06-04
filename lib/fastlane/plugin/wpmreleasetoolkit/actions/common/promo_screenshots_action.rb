@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'fastlane/action'
 require 'active_support/all'
-require_relative '../../helper/promo_screenshots_helper.rb'
+require_relative '../../helper/promo_screenshots_helper'
 
 module Fastlane
   module Actions
@@ -43,7 +43,7 @@ module Fastlane
 
         # Create a hash of devices, keyed by device name
         devices = config['devices']
-        devices = Hash[devices.map { |device| device['name'] }.zip(devices)]
+        devices = devices.map { |device| device['name'] }.zip(devices).to_h
 
         stylesheet_path = config['stylesheet']
 

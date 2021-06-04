@@ -30,7 +30,7 @@ module Fastlane
             print "Fetching info for: #{v.version_string.rjust(8)} (#{v.build.version.rjust(11)}) [#{idx.to_s.rjust(3)}/#{versions.count}]\r"
             Spaceship::Tunes.client.build_details(app_id: app.id, train: v.version_string, build_number: v.build.version, platform: 'ios') rescue nil
           end.compact.reverse
-          print(' ' * 55 + "\n")
+          print("#{' ' * 55}\n")
 
           builds_details
         end
@@ -40,12 +40,12 @@ module Fastlane
         end
 
         def self.sz_mb(bytes)
-          sz(bytes).to_s.rjust(5) + ' MB'
+          "#{sz(bytes).to_s.rjust(5)} MB"
         end
 
         def self.format_csv(app_sizes, devices: nil)
           devices = DEFAULT_DEVICES if devices.nil? || devices.empty?
-          csv = "Version\t" + devices.join("\t") + "\n"
+          csv = "Version\t#{devices.join("\t")}\n"
           app_sizes.each do |details|
             build_number = details['cfBundleVersion']
             sizes = details['sizesInBytes'].select { |name, _| devices.include?(name) }

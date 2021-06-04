@@ -1,7 +1,11 @@
 inherit_from: .rubocop_todo.yml
 
-require: 
+require:
 - rubocop-rspec
+
+# Enable new cops when we update rubocop to a newer version
+AllCops:
+  NewCops: enable
 
 ########## Lint / CodeStyle
 
@@ -44,13 +48,16 @@ Style/FrozenStringLiteralComment:
 Style/AsciiComments:
   Enabled: false
 
-# We are not strict to the point that we want to enforce super-short `it '…' do … end` blocks in our specs.
-RSpec/ExampleLength:
+# This causes issues with Pathname#.+, which is why we disable it to avoid introducing bugs because of it.
+# e.g. if `r = Pathname.new('root')` then `r + 'lib'` results in a `<Pathname:root/lib>` as expected;
+# but this rubocop rule will suggest to change this to `#{r}lib` which results in `"rootlib"` string,
+# which would be incorrect and not what we want
+Style/StringConcatenation:
   Enabled: false
 
 ########## Metrics / Max Lengths Rules
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 300
 
 Metrics/AbcSize:
@@ -80,3 +87,12 @@ Metrics/CyclomaticComplexity:
 
 Metrics/PerceivedComplexity:
   Max: 20
+
+########## RSpec Rules
+
+# We are not strict to the point that we want to enforce super-short `it '…' do … end` blocks in our specs.
+RSpec/ExampleLength:
+  Enabled: false
+# Same for number of let/subject
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false

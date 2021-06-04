@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class AndroidDownloadFileByVersionAction < Action
       def self.run(params)
-        require_relative '../../helper/android/android_localize_helper.rb'
+        require_relative '../../helper/android/android_localize_helper'
         require_relative '../../helper/github_helper'
 
         version = Fastlane::Helper::Android::VersionHelper.get_library_version_from_gradle_config(import_key: params[:import_key])

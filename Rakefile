@@ -1,4 +1,5 @@
 require 'rake'
+require 'tmpdir'
 
 begin
   require 'rubocop/rake_task'
@@ -31,17 +32,13 @@ end
 
 Rake::ExtensionTask.new('drawText')
 
-
 GEM_NAME = 'fastlane-plugin-wpmreleasetoolkit'.freeze
 VERSION_FILE = File.join('lib', 'fastlane', 'plugin', 'wpmreleasetoolkit', 'version.rb')
 
 desc 'Try to build and install the gem to ensure it can be installed properly (with the native extension and all)'
 task :check_install_gem do
   require_relative(VERSION_FILE)
-  version = Fastlane::Wpmreleasetoolkit::VERSION
-  sh('gem', 'build', "#{GEM_NAME}.gemspec")
-  sh('gem', 'uninstall', GEM_NAME, '-v', version)
-  sh('gem', 'install', "#{GEM_NAME}-#{version}.gem")
+  check_install(Fastlane::Wpmreleasetoolkit::VERSION)
 end
 
 desc 'Create a new version of the release-toolkit gem'
@@ -71,9 +68,10 @@ task :new_release do
 
   ## Ensure the gem builds and is installable
   Console.header 'Testing that the gem builds and installs...'
-  Rake::Task['check_install_gem'].invoke([new_version])
+  check_install(new_version)
 
   # Commit and push
+  Console.header 'Commit and push changes...'
   GitHelper.commit_files("Bumped to version #{new_version}", [VERSION_FILE, 'Gemfile.lock', 'CHANGELOG.md'])
 
   Console.header 'Opening PR drafts in your default browser...'
@@ -101,6 +99,12 @@ def update_version_constant(version_file, new_version)
   content.gsub!(/VERSION = .*/, "VERSION = '#{new_version}'")
   File.write(version_file, content)
 
-  sh('bundle', 'install') # To update Gemfile.lock with new wpmreleasetoolkit version
+  sh('bundle', 'install', '--quiet') # To update Gemfile.lock with new wpmreleasetoolkit version
 end
 
+def check_install(version)
+  sh('gem', 'build', "#{GEM_NAME}.gemspec")
+  Dir.mktmpdir('release-toolkit-') do |tmpdir|
+    sh('gem', 'install', '--install-dir', tmpdir, '--silent', '--no-document', "#{GEM_NAME}-#{version}.gem")
+  end
+end

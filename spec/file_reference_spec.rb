@@ -1,4 +1,4 @@
-require 'spec_helper.rb'
+require 'spec_helper'
 
 RSpec.shared_examples 'shared examples' do
   describe '#destination_contents' do
