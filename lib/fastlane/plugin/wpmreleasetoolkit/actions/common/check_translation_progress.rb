@@ -44,6 +44,7 @@ module Fastlane
         UI.abort_with_message!("Can't retrieve data from #{glotpress_url}") if data.nil? || data.empty?
 
         language_codes.each do |language_code|
+          UI.message("> Getting translation status for #{language_code}")
           progress = begin
             Fastlane::Helper::GlotPressHelper.get_translation_status(
               data: data,
@@ -58,6 +59,7 @@ module Fastlane
             UI.abort_with_message!("#{language_code} is translated #{progress}% which is under the required #{threshold}%.") if progress < threshold
           end
 
+          UI.message("Language #{language_code} is #{progress}% translated.")
           under_threshold_langs.push({ lang: language_code, progress: progress }) if progress < threshold
         end
 
