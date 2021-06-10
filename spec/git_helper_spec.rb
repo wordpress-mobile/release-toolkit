@@ -6,6 +6,8 @@ describe Fastlane::Helper::GitHelper do
     @path = Dir.mktmpdir
     @tmp = Dir.pwd
     Dir.chdir(@path)
+
+    allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true)
   end
 
   after(:each) do
@@ -17,9 +19,38 @@ describe Fastlane::Helper::GitHelper do
     expect(Fastlane::Helper::GitHelper.is_git_repo?).to be false
   end
 
+  it 'can detect a missing git repository when given a path' do
+    Dir.mktmpdir do |dir|
+      expect(Fastlane::Helper::GitHelper.is_git_repo?(path: dir)).to be false
+    end
+  end
+
   it 'can detect a valid git repository' do
     `git init`
     expect(Fastlane::Helper::GitHelper.is_git_repo?).to be true
+  end
+
+  it 'can detect a valid git repository from a child folder' do
+    `git init`
+    `mkdir -p a/b`
+    Dir.chdir('./a/b')
+    expect(Fastlane::Helper::GitHelper.is_git_repo?).to be true
+  end
+
+  it 'can detect a valid git repository when given a path' do
+    Dir.mktmpdir do |dir|
+      `git -C #{dir} init`
+      expect(Fastlane::Helper::GitHelper.is_git_repo?(path: dir)).to be true
+    end
+  end
+
+  it 'can detect a valid git repository when given a child folder path' do
+    Dir.mktmpdir do |dir|
+      `git -C #{dir} init`
+      path = File.join(dir, 'a', 'b')
+      `mkdir -p #{path}`
+      expect(Fastlane::Helper::GitHelper.is_git_repo?(path: path)).to be true
+    end
   end
 
   it 'can detect a repository with Git-lfs enabled' do
@@ -90,4 +121,84 @@ describe Fastlane::Helper::GitHelper do
       Fastlane::Helper::GitHelper.commit(message: @message, push: true)
     end
   end
+
+  describe '#is_ignored?' do
+    let(:path) { 'dummy.txt' }
+
+    it 'returns false when the path is not ignored' do
+      setup_git_repo(
+        dummy_file_path: path,
+        add_file_to_gitignore: false
+      )
+      expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be false
+    end
+
+    context 'when the path is in the .gitignore' do
+      it 'returns true when the .gitignore has uncommitted changes' do
+        # For some reason, I was expecting the underlying `git check-ignore`
+        # command to fail in this case, but I'm clearly wrong.
+        #
+        # I think there's value in keeping this behavior explicity documented
+        # and verified here. – Gio
+        setup_git_repo(
+          dummy_file_path: path,
+          add_file_to_gitignore: true,
+          commit_gitignore: false
+        )
+        expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be true
+      end
+
+      it 'returns true when the .gitignore has no uncommitted changes' do
+        setup_git_repo(
+          dummy_file_path: path,
+          add_file_to_gitignore: true,
+          commit_gitignore: true
+        )
+        expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be true
+      end
+    end
+
+    # This test ensures we support the usecase of the `configure` tool, which
+    # can create new files by decrypting secrets. We need the ability to tell
+    # if a path result is ignored, regardless of whether it exists yet.
+    it 'returns false for files not yet created but part of the repository' do
+      setup_git_repo()
+      expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be false
+    end
+
+    it 'returns true when the path is outside the repository folder' do
+      # This path is in the parent directory, which is not a Git repo
+      path = File.join(@path, '..', 'dummy.txt')
+
+      setup_git_repo(dummy_file_path: path, add_file_to_gitignore: false)
+      expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be true
+    end
+
+    # This is sort of redundant given the previous example already ensures the
+    # same logic. But, we'll be using paths starting with `~` as part of our
+    # configurations, so it felt appopriate to explicitly ensure this important
+    # use case is respected.
+    it 'returns true when the path is in the home folder ' do
+      path = '~/a/path'
+      expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be true
+    end
+  end
+end
+
+def setup_git_repo(dummy_file_path: nil, add_file_to_gitignore: false, commit_gitignore: false)
+  `git init`
+  `touch .gitignore`
+  `git add .gitignore && git commit -m 'Add .gitignore'`
+
+  # If we don't have a path for the file, we don't care the values of the two
+  # flag arguments are irrelevant. We can just finish here.
+  return if dummy_file_path.nil?
+
+  `echo abc > #{dummy_file_path}`
+
+  # no point in commiting the gitignore if the file shouldn't be in it
+  return unless add_file_to_gitignore
+
+  `echo #{dummy_file_path} > .gitignore`
+  `git add .gitignore && git commit -m 'Update .gitignore'` if commit_gitignore
 end

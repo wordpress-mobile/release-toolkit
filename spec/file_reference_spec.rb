@@ -1,4 +1,4 @@
-require 'spec_helper.rb'
+require 'spec_helper'
 
 RSpec.shared_examples 'shared examples' do
   describe '#destination_contents' do
@@ -29,11 +29,26 @@ RSpec.shared_examples 'shared examples' do
   end
 
   describe '#apply' do
-    it 'copies the source to the destination' do
-      allow(FileUtils).to receive(:mkdir_p)
-      allow(subject).to receive(:source_contents).and_return('source contents')
-      expect(File).to receive(:write).with(subject.destination_file_path, 'source contents')
-      subject.apply
+    context 'when the destination is not ignored in Git' do
+      it 'raises' do
+        stub_path_as_ignored(path: subject.destination_file_path, ignored: false)
+
+        expect(FileUtils).not_to receive(:mkdir_p)
+        expect(subject).not_to receive(:source_contents)
+        expect(File).not_to receive(:write)
+        expect { subject.apply }.to raise_error(RuntimeError)
+      end
+    end
+
+    context 'when the destination is ignored in Git' do
+      it 'copies the source to the destination' do
+        stub_path_as_ignored(path: subject.destination_file_path, ignored: true)
+
+        allow(FileUtils).to receive(:mkdir_p)
+        allow(subject).to receive(:source_contents).and_return('source contents')
+        expect(File).to receive(:write).with(subject.destination_file_path, 'source contents')
+        subject.apply
+      end
     end
   end
 end
@@ -111,4 +126,10 @@ describe Fastlane::Configuration::FileReference do
       end
     end
   end
+end
+
+def stub_path_as_ignored(path:, ignored:)
+  allow(Fastlane::Helper::GitHelper).to receive(:is_ignored?)
+    .with(path: path)
+    .and_return(ignored)
 end

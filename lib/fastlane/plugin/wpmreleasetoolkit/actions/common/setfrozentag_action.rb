@@ -21,7 +21,7 @@ module Fastlane
             return # Already frozen: nothing to do
           end
 
-          mile_title = mile_title + ' ❄️'
+          mile_title = "#{mile_title} ❄️"
         else
           mile_title = milestone_title
         end

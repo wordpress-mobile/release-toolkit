@@ -88,6 +88,8 @@ module Fastlane
         else
           UI.message "Skipping #{file_reference.destination}"
         end
+      rescue StandardError => e
+        UI.user_error!(e)
       end
 
       def self.repository_path

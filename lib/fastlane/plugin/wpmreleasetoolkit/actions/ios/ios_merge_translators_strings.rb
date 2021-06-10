@@ -27,8 +27,8 @@ module Fastlane
         join_files.each do |join_strings|
           my_strings = File.read(join_strings).split("\n")
           my_strings.each do |string|
-            if string[/^\"(.*)\" = \"(.*)\";$/]
-              /^\"(?<string_key>.*)\" = \"/i =~ string
+            if string[/^"(.*)" = "(.*)";$/]
+              /^"(?<string_key>.*)" = "/i =~ string
               unless extra_keys.include?(string_key)
                 extra_strings << string
                 extra_keys << string_key
@@ -50,9 +50,9 @@ module Fastlane
       end
 
       def self.check_line(line, extra_keys)
-        return line unless line[/^\"(.*)\" = \"(.*)\";$/]
+        return line unless line[/^"(.*)" = "(.*)";$/]
 
-        /^\"(?<line_key>.*)\" = \"/i =~ line
+        /^"(?<line_key>.*)" = "/i =~ line
         return '' if extra_keys.include?(line_key)
 
         return line

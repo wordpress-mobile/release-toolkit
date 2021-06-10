@@ -5,8 +5,8 @@ module Fastlane
         # fastlane will take care of reading in the parameter and fetching the environment variable:
         UI.message "Skip confirm on code freeze: #{params[:skip_confirm]}"
 
-        require_relative '../../helper/ios/ios_version_helper.rb'
-        require_relative '../../helper/ios/ios_git_helper.rb'
+        require_relative '../../helper/ios/ios_version_helper'
+        require_relative '../../helper/ios/ios_git_helper'
 
         # Checkout develop and update
         Fastlane::Helper::GitHelper.checkout_and_pull('develop')
@@ -17,8 +17,8 @@ module Fastlane
         next_version = Fastlane::Helper::Ios::VersionHelper.calc_next_release_version(current_version)
 
         # Ask user confirmation
-        unless params[:skip_confirm]
-          UI.user_error!('Aborted by user request') unless UI.confirm("Building a new release branch starting from develop.\nCurrent version is #{current_version} (#{current_build_version}).\nAfter codefreeze the new version will be: #{next_version}.\nDo you want to continue?")
+        unless params[:skip_confirm] || UI.confirm("Building a new release branch starting from develop.\nCurrent version is #{current_version} (#{current_build_version}).\nAfter codefreeze the new version will be: #{next_version}.\nDo you want to continue?")
+          UI.user_error!('Aborted by user request')
         end
 
         # Check local repo status

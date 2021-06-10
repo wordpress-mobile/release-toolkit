@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         UI.message 'Bumping app release version for hotfix...'
 
-        require_relative '../../helper/android/android_git_helper.rb'
+        require_relative '../../helper/android/android_git_helper'
         Fastlane::Helper::GitHelper.create_branch("release/#{params[:version_name]}", from: params[:previous_version_name])
 
         app = ENV['PROJECT_NAME'].nil? ? params[:app] : ENV['PROJECT_NAME']

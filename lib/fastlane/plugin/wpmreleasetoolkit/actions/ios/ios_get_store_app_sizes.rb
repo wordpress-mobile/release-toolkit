@@ -1,4 +1,4 @@
-require_relative '../../helper/ios/ios_adc_app_sizes_helper.rb'
+require_relative '../../helper/ios/ios_adc_app_sizes_helper'
 
 module Fastlane
   module Actions

@@ -187,7 +187,7 @@ module Fastlane
 
           if File.directory?(abs_path)
             Dir.glob("#{abs_path}**/*").map do |sub_path|
-              sub_path.gsub(repository_path + '/', '')
+              sub_path.gsub("#{repository_path}/", '')
             end
           else
             return path
@@ -225,8 +225,12 @@ module Fastlane
 
         UI.user_error!('You must pass a `destination` to `add_file`') unless params[:destination]
 
+        unless Fastlane::Helper::GitHelper.is_ignored?(path: params[:destination])
+          UI.user_error! "Attempted to add a file to a location which is not ignored under Git (#{params[:destination]}). Please either edit your `.configure` file to use an already-ignored destination, or add that destination to the `.gitignore` manually to fix this."
+        end
+
         new_config = self.configuration
-        new_config.add_file_to_copy(params[:source], params[:destination], params[:encrypt])
+        new_config.add_file_to_copy(params[:source], params[:destination], encrypt: params[:encrypt])
         update_configuration(new_config)
       end
 

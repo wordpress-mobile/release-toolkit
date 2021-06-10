@@ -2,8 +2,8 @@ module Fastlane
   module Actions
     class AndroidTagBuildAction < Action
       def self.run(params)
-        require_relative '../../helper/android/android_version_helper.rb'
-        require_relative '../../helper/android/android_git_helper.rb'
+        require_relative '../../helper/android/android_version_helper'
+        require_relative '../../helper/android/android_git_helper'
 
         app = ENV['PROJECT_NAME'].nil? ? params[:app] : ENV['PROJECT_NAME']
 

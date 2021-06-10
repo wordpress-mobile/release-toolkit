@@ -2,8 +2,8 @@ module Fastlane
   module Actions
     class IosCheckBetaDepsAction < Action
       def self.run(params)
-        require_relative '../../helper/ios/ios_version_helper.rb'
-        require_relative '../../helper/ios/ios_git_helper.rb'
+        require_relative '../../helper/ios/ios_version_helper'
+        require_relative '../../helper/ios/ios_git_helper'
 
         beta_pods = []
         File.open(params[:podfile]).each do |li|

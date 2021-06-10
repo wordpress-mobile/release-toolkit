@@ -3,6 +3,35 @@ version: 2.1
 orbs:
   ios: wordpress-mobile/ios@1.0
 
+# Common steps reused on various jobs
+commands:
+  setup_tools:
+    description: "Install Homebrew and Ruby dependencies"
+    parameters:
+      skip_brew_install:
+        type: boolean
+        default: false
+    steps:
+      - restore_cache:
+          name: Restore Homebrew + Ruby Dependencies
+          keys:
+            - &cache_key brew-dependencies-{{ checksum ".circleci/cache-version" }}-{{ checksum ".circleci/.brewfile" }}-{{ checksum "Gemfile.lock" }}
+      - unless:
+          condition: <<parameters.skip_brew_install>>
+          steps:
+            - run:
+                name: Install Homebrew dependencies, if neeeded
+                command: brew update && xargs brew install --verbose < .circleci/.brewfile
+      - run:
+          name: Install Ruby dependencies, if neeeded
+          command: bundle check --path vendor/bundle || bundle install --with screenshots
+      - save_cache:
+          name: Cache Homebrew + Ruby Dependencies
+          key: *cache_key
+          paths:
+            - vendor/
+            - /usr/local/Cellar
+
 jobs:
   test:
     executor:
@@ -13,31 +42,10 @@ jobs:
       PKG_CONFIG_PATH: "/usr/local/opt/imagemagick@6/lib/pkgconfig"
     steps:
       - checkout
-
-      - restore_cache:
-          name: Restore Homebrew + Ruby Dependencies
-          keys:
-            - &cache_key brew-dependencies-{{ checksum ".circleci/.brewfile" }}-{{ checksum "Gemfile.lock" }}
-
-      - run:
-          name: Install Homebrew dependencies, if neeeded
-          command: xargs brew install --verbose < .circleci/.brewfile
-
-      - run:
-          name: Install Ruby dependencies, if neeeded
-          command: bundle check --path vendor/bundle || bundle install --with screenshots
-
-      - save_cache:
-          name: Cache Homebrew + Ruby Dependencies
-          key: *cache_key
-          paths:
-            - vendor/
-            - /usr/local/Cellar
-            
+      - setup_tools
       - run: # Compile drawText
           name: Compile drawText
           command: bundle exec rake compile
-
       - run:
           name: Run rspec and upload coverage report
           command: |
@@ -46,7 +54,6 @@ jobs:
                               --out test_results/rspec.xml \
                               --format progress \
                               $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
-
       # Save test results for timing analysis
       - store_test_results:
           path: test_results
@@ -54,7 +61,37 @@ jobs:
       # Coverage reports are sent to Codecov as part of running `rspec`, not as a CircleCI step.
       # We may wish to change this for consistency.
 
+  gem-push:
+    executor:
+      name: ios/default
+      xcode-version: "11.2.1" # We need an Xcode-enabled CI image to build drawText during gem build
+    steps:
+      - checkout
+      - setup_tools:
+          skip_brew_install: true
+      - run:
+          name: Build gem
+          command: gem build fastlane-plugin-wpmreleasetoolkit.gemspec
+      - run:
+          name: Check the gem is installable
+          command: gem install --user-install fastlane-plugin-wpmreleasetoolkit-*.gem
+      - run:
+          name: Push to RubyGems
+          command: |
+            echo ":rubygems_api_key: ${GEM_HOST_API_KEY}" >>"$HOME/.gem/credentials"
+            chmod 600 "$HOME/.gem/credentials"
+            gem push fastlane-plugin-wpmreleasetoolkit-*.gem
+
 workflows:
   test:
     jobs:
       - test
+  release:
+    jobs:
+      - gem-push:
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
+

@@ -12,7 +12,9 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/wordpress-mobile/release-toolkit'
   spec.license       = 'MIT'
 
-  spec.files         = Dir['lib/**/*'] + %w[README.md LICENSE]
+  spec.required_ruby_version = '>= 2.6'
+
+  spec.files         = Dir['lib/**/*'] + Dir['ext/drawText/{makefile.example,drawText/**/*,drawText Tests/**/*,drawText.xcodeproj/**/*}'] + %w[README.md LICENSE]
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
 
   spec.files << 'ext/drawText/extconf.rb'
@@ -50,11 +52,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'bigdecimal', '~> 1.4'
 
   spec.add_development_dependency 'pry', '~> 0.12.2'
-  spec.add_development_dependency 'bundler', '>= 1.17'
+  spec.add_development_dependency 'bundler', '~> 2.0'
   spec.add_development_dependency 'rspec', '~> 3.8'
   spec.add_development_dependency 'rspec_junit_formatter', '~> 0.4.1'
-  spec.add_development_dependency 'rubocop', '0.75'
-  spec.add_development_dependency 'rubocop-rspec'
+  spec.add_development_dependency 'rubocop', '~> 1.0'
+  spec.add_development_dependency 'rubocop-rspec', '2.3.0'
   spec.add_development_dependency 'rubocop-require_tools', '~> 0.1.2'
   spec.add_development_dependency 'simplecov', '~> 0.16.1'
   spec.add_development_dependency 'fastlane', '~> 2'

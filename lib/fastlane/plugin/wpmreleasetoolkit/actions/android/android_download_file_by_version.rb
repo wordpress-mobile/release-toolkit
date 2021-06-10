@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class AndroidDownloadFileByVersionAction < Action
       def self.run(params)
-        require_relative '../../helper/android/android_localize_helper.rb'
+        require_relative '../../helper/android/android_localize_helper'
         require_relative '../../helper/github_helper'
 
         version = Fastlane::Helper::Android::VersionHelper.get_library_version_from_gradle_config(import_key: params[:import_key])
@@ -33,30 +33,30 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :library_name,
-                        description: "The display name of the library",
-                        type: String,
-                        optional: false),
+                                       description: 'The display name of the library',
+                                       type: String,
+                                       optional: false),
           FastlaneCore::ConfigItem.new(key: :import_key,
-                        description: "The key which is used in build.gradle to reference the version of the library to import",
-                        type: String,
-                        optional: false),
+                                       description: 'The key which is used in build.gradle to reference the version of the library to import',
+                                       type: String,
+                                       optional: false),
           FastlaneCore::ConfigItem.new(key: :repository,
-                        description: "The GitHub repository slug ('<orgname>/<reponame>') which hosts the library project",
-                        type: String,
-                        optional: false),
+                                       description: "The GitHub repository slug ('<orgname>/<reponame>') which hosts the library project",
+                                       type: String,
+                                       optional: false),
           FastlaneCore::ConfigItem.new(key: :file_path,
-                        description: "The path of the file to download",
-                        type: String,
-                        optional: false),
+                                       description: 'The path of the file to download',
+                                       type: String,
+                                       optional: false),
           FastlaneCore::ConfigItem.new(key: :download_folder,
-                        description: "The download folder",
-                        type: String,
-                        optional: true,
-                        default_value: Dir.tmpdir()),
+                                       description: 'The download folder',
+                                       type: String,
+                                       optional: true,
+                                       default_value: Dir.tmpdir()),
           FastlaneCore::ConfigItem.new(key: :github_release_prefix,
-                        description: "The prefix which is used in the GitHub release title",
-                        type: String,
-                        optional: true),
+                                       description: 'The prefix which is used in the GitHub release title',
+                                       type: String,
+                                       optional: true),
         ]
       end
 

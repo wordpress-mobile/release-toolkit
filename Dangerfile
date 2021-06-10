@@ -22,3 +22,19 @@ Please run `bundle install` to make sure they match.
 }
   fail(message)
 end
+
+# Check that the PR contains changes to the CHANGELOG.md file.
+#  - If it's a feature PR, CHANGELOG should have a new entry describing the changes
+#  - If it's a release PR, we expect the CHANGELOG to have been updated during `rake new_release` with updated section title + new placeholder section
+unless git.modified_files.include?('CHANGELOG.md')
+  warn 'Please add an entry in the CHANGELOG.md file to describe the changes made by this PR'
+end
+
+# Lint with Rubocop and report violations inline in GitHub
+github.dismiss_out_of_range_messages # This way, fixed violations should go
+renaming_map = (git.renamed_files || []).map { |e| [e[:before], e[:after]] }.to_h # when files are renamed, git.modified_files contains old name, not new one, so we need to do the convertion
+rubocop.lint(
+  files: git.added_files + (git.modified_files.map { |f| renaming_map[f] || f }) - git.deleted_files,
+  inline_comment: true,
+  fail_on_inline_comment: true # Make the inline comments failures
+)

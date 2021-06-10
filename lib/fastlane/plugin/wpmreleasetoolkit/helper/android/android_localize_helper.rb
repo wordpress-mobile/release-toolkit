@@ -154,7 +154,7 @@ module Fastlane
         def self.verify_local_diff(main, library, main_strings, lib_strings)
           `git diff #{main}`.each_line do |line|
             if line.start_with?('+ ') || line.start_with?('- ')
-              diffs = line.gsub(/\s+/m, ' ').strip.split(' ')
+              diffs = line.gsub(/\s+/m, ' ').strip.split
               diffs.each do |diff|
                 verify_diff(diff, main_strings, lib_strings, library)
               end
@@ -165,7 +165,7 @@ module Fastlane
         def self.verify_pr_diff(main, library, main_strings, lib_strings, source_diff)
           source_diff.each_line do |line|
             if line.start_with?('+ ') || line.start_with?('- ')
-              diffs = line.gsub(/\s+/m, ' ').strip.split(' ')
+              diffs = line.gsub(/\s+/m, ' ').strip.split
               diffs.each do |diff|
                 verify_diff(diff, main_strings, lib_strings, library)
               end
@@ -299,6 +299,15 @@ module Fastlane
         #
         def self.apply_substitutions(tag)
           tag.content = tag.content.gsub('...', '…')
+
+          # Typography en-dash
+          if tag.content.include?('-')
+            tag.content = tag.content.gsub(/(\d+\s*)-(\s*\d+)/) do |str|
+              match = Regexp.last_match # of type `MatchData`. match[0] == str == whole match, match[1] = 1st capture group (left part of the range), match[2] = second capture group (right part of the range)
+              is_negative_number = match[2][0] != ' ' && match[1][-1] == ' ' # if right part of range does not start with a space (e.g. `-3`), but left part of range does end with space, it's not a range after all but more likely a list containing negative numbers in it (e.g. `2 -3`)
+              is_negative_number ? str : "#{match[1]}\u{2013}#{match[2]}"
+            end
+          end
         end
         private_class_method :apply_substitutions
 

@@ -4,8 +4,8 @@ module Fastlane
   module Actions
     class AndroidDownloadTranslationsAction < Action
       def self.run(params)
-        require_relative '../../helper/android/android_localize_helper.rb'
-        require_relative '../../helper/git_helper.rb'
+        require_relative '../../helper/android/android_localize_helper'
+        require_relative '../../helper/git_helper'
 
         res_dir = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', params[:res_dir])
 
@@ -75,7 +75,7 @@ module Fastlane
             description: 'An array of hashes – each with the :glotpress and :android keys – listing the locale codes to download and update',
             type: Array,
             verify_block: proc do |value|
-              unless value.is_a?(Array) && value.all? { |e| e.is_a?(Hash) && e.has_key?(:glotpress) && e.has_key?(:android) }
+              unless value.is_a?(Array) && value.all? { |e| e.is_a?(Hash) && e.key?(:glotpress) && e.key?(:android) }
                 UI.user_error!('The value for the `locales` parameter must be an Array of Hashes, and each Hash must have at least `:glotpress` and `:android` keys.')
               end
             end

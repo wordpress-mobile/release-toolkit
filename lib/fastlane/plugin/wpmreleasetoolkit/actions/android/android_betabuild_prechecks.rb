@@ -5,8 +5,8 @@ module Fastlane
         UI.message "Skip confirm: #{params[:skip_confirm]}"
         UI.message "Work on version: #{params[:base_version]}" unless params[:base_version].nil?
 
-        require_relative '../../helper/android/android_version_helper.rb'
-        require_relative '../../helper/android/android_git_helper.rb'
+        require_relative '../../helper/android/android_version_helper'
+        require_relative '../../helper/android/android_git_helper'
 
         # Checkout develop and update
         Fastlane::Helper::GitHelper.checkout_and_pull('develop')
@@ -36,10 +36,10 @@ module Fastlane
         # Verify
         message << "Updating branch to version: #{next_beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{next_beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) "
         message << "and #{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n" unless alpha_release_version.nil?
-        if !params[:skip_confirm]
-          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
-        else
+        if params[:skip_confirm]
           UI.message(message)
+        else
+          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
         end
 
         # Check local repo status

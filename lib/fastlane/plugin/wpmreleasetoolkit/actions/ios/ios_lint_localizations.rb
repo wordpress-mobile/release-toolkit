@@ -17,7 +17,7 @@ module Fastlane
       def self.run_linter(params)
         UI.message 'Linting localizations for parameter placeholders consistency...'
 
-        require_relative '../../helper/ios/ios_l10n_helper.rb'
+        require_relative '../../helper/ios/ios_l10n_helper'
         helper = Fastlane::Helper::Ios::L10nHelper.new(
           install_path: resolve_path(params[:install_path]),
           version: params[:version]

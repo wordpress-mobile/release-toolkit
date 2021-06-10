@@ -1,4 +1,4 @@
-require 'spec_helper.rb'
+require 'spec_helper'
 require 'fileutils'
 require 'tmpdir'
 require 'yaml'
@@ -37,7 +37,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
             fi
           SCRIPT
           FileUtils.mkdir_p File.join(install_dir, 'bin')
-          # note: `0o` is octal notation, used to specify chmod-like flags
+          # NOTE: `0o` is octal notation, used to specify chmod-like flags
           File.write(File.join(install_dir, 'bin/swiftgen'), script, perm: 0o766)
 
           # Second run: ensure we only run SwiftGen directly, without a call to curl nor unzip beforehand
@@ -56,7 +56,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
   context 'Linter' do
     before(:each) do
       @test_data_dir = Dir.mktmpdir('a8c-lint-l10n-tests-data-')
-      allow(FastlaneCore::UI).to receive(:'abort_with_message!')
+      allow(FastlaneCore::UI).to receive(:abort_with_message!)
     end
 
     it 'succeeds when there are no violations' do
