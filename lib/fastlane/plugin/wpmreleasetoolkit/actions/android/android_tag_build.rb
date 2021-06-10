@@ -34,7 +34,7 @@ module Fastlane
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :app,
                                        env_name: 'PROJECT_NAME',
-                                       description: 'The app to get the release version for',
+                                       description: 'The name of the app to get the release version for',
                                        is_string: true), # true: verifies the input is a string, false: every kind of value
         ]
       end
