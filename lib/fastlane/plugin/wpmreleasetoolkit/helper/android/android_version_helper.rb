@@ -50,7 +50,7 @@ module Fastlane
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
-        def self.get_version_from_properties(product_name, is_alpha)
+        def self.get_version_from_properties(product_name:, is_alpha: false)
           version_name_key = "#{product_name}.#{is_alpha ? 'alpha.' : ''}versionName"
           version_code_key = "#{product_name}.#{is_alpha ? 'alpha.' : ''}versionCode"
 
