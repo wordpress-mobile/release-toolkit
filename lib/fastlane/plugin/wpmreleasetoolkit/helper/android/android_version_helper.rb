@@ -43,7 +43,7 @@ module Fastlane
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_release_version(app)
-          if ENV['HAS_VERSION_PROPERTIES'].nil?
+          if properties_file_exists
             section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
             gradle_path = self.gradle_path
             name = get_version_name_from_gradle_file(gradle_path, section)
@@ -52,6 +52,12 @@ module Fastlane
           end
 
           return get_version_from_properties(product_name: app)
+        end
+
+        def self.properties_file_exists
+          properties_file_path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'version.properties')
+
+          return File.exist?(properties_file_path)
         end
 
         # Extract the version name and code from the `version.properties` file in the project root
@@ -85,7 +91,7 @@ module Fastlane
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
         def self.get_alpha_version(app)
-          if ENV['HAS_VERSION_PROPERTIES'].nil?
+          if properties_file_exists
             return nil if ENV['HAS_ALPHA_VERSION'].nil?
 
             section = 'defaultConfig'
@@ -303,7 +309,7 @@ module Fastlane
         #
         def self.update_versions(app, new_version_beta, new_version_alpha)
 
-          if ENV['HAS_VERSION_PROPERTIES'].nil?
+          if properties_file_exists
             self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
             self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
             return
