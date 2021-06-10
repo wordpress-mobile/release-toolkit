@@ -3,7 +3,7 @@ module Fastlane
     class AndroidGetAlphaVersionAction < Action
       def self.run(params)
         require_relative '../../helper/android/android_version_helper.rb'
-        app = ENV['APP'].nil? ? params[:app] : ENV['APP']
+        app = ENV['PROJECT_NAME'].nil? ? params[:app] : ENV['PROJECT_NAME']
         Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
       end
 
@@ -23,10 +23,9 @@ module Fastlane
         # Define all options your action supports.
         [
           FastlaneCore::ConfigItem.new(key: :app,
-                                       env_name: 'APP',
+                                       env_name: 'PROJECT_NAME',
                                        description: 'The app to get the release version for',
-                                       is_string: true, # true: verifies the input is a string, false: every kind of value
-                                       default_value: 'wordpress'), # the default value if the user didn't provide one
+                                       is_string: true), # true: verifies the input is a string, false: every kind of value
         ]
       end
 

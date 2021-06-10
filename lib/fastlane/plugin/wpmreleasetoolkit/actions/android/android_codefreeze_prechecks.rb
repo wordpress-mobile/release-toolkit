@@ -14,7 +14,7 @@ module Fastlane
         # Checkout develop and update
         Fastlane::Helper::GitHelper.checkout_and_pull('develop')
 
-        app = ENV['APP'].nil? ? params[:app] : ENV['APP']
+        app = ENV['PROJECT_NAME'].nil? ? params[:app] : ENV['PROJECT_NAME']
 
         # Create versions
         current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(app)
@@ -61,10 +61,9 @@ module Fastlane
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
                                        default_value: false), # the default value if the user didn't provide one
           FastlaneCore::ConfigItem.new(key: :app,
-                                       env_name: 'APP',
+                                       env_name: 'PROJECT_NAME',
                                        description: 'The app to get the release version for',
-                                       is_string: true, # true: verifies the input is a string, false: every kind of value
-                                       default_value: 'wordpress'), # the default value if the user didn't provide one
+                                       is_string: true), # true: verifies the input is a string, false: every kind of value
         ]
       end
 

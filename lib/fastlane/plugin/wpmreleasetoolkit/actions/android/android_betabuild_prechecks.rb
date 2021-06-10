@@ -11,13 +11,13 @@ module Fastlane
         # Checkout develop and update
         Fastlane::Helper::GitHelper.checkout_and_pull('develop')
 
-        @app = ENV['APP'].nil? ? params[:app] : ENV['APP']
+        app = ENV['PROJECT_NAME'].nil? ? params[:app] : ENV['PROJECT_NAME']
 
         # Check versions
-        release_version = Fastlane::Helper::Android::VersionHelper.get_release_version(@app)
-        message = "[#{@app}] The following current version has been detected: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n"
-        alpha_release_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(@app)
-        message << "[#{@app}] The following Alpha version has been detected: #{alpha_release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
+        release_version = Fastlane::Helper::Android::VersionHelper.get_release_version(app)
+        message = "[#{app}] The following current version has been detected: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n"
+        alpha_release_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
+        message << "[#{app}] The following Alpha version has been detected: #{alpha_release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
 
         # Check branch
         app_version = Fastlane::Helper::Android::VersionHelper.get_public_version
@@ -50,9 +50,9 @@ module Fastlane
       end
 
       def self.get_user_build_version(version, message)
-        UI.user_error!("[#{@app}] Release branch for version #{version} doesn't exist. Abort.") unless Fastlane::Helper::GitHelper.checkout_and_pull(release: version)
+        UI.user_error!("[#{app}] Release branch for version #{version} doesn't exist. Abort.") unless Fastlane::Helper::GitHelper.checkout_and_pull(release: version)
         release_version = Fastlane::Helper::Android::VersionHelper.get_release_version
-        message << "#{@app}] Looking at branch release/#{version} as requested by user. Detected version: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}.\n"
+        message << "#{app}] Looking at branch release/#{version} as requested by user. Detected version: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}.\n"
         alpha_release_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version
         message << "and Alpha Version: #{alpha_release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
         [release_version, alpha_release_version]
@@ -83,10 +83,9 @@ module Fastlane
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
                                        default_value: false), # the default value if the user didn't provide one
           FastlaneCore::ConfigItem.new(key: :app,
-                                       env_name: 'APP',
+                                       env_name: 'PROJECT_NAME',
                                        description: 'The app to get the release version for',
-                                       is_string: true, # true: verifies the input is a string, false: every kind of value
-                                       default_value: 'wordpress'), # the default value if the user didn't provide one
+                                       is_string: true), # true: verifies the input is a string, false: every kind of value
         ]
       end
 

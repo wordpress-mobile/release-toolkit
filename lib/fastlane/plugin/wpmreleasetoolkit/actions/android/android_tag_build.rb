@@ -5,7 +5,7 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper.rb'
         require_relative '../../helper/android/android_git_helper.rb'
 
-        app = ENV['APP'].nil? ? params[:app] : ENV['APP']
+        app = ENV['PROJECT_NAME'].nil? ? params[:app] : ENV['PROJECT_NAME']
 
         release_ver = Fastlane::Helper::Android::VersionHelper.get_release_version(app)
         alpha_ver = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
@@ -33,10 +33,9 @@ module Fastlane
                                        is_string: false,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :app,
-                                       env_name: 'APP',
+                                       env_name: 'PROJECT_NAME',
                                        description: 'The app to get the release version for',
-                                       is_string: true, # true: verifies the input is a string, false: every kind of value
-                                       default_value: 'wordpress'), # the default value if the user didn't provide one
+                                       is_string: true), # true: verifies the input is a string, false: every kind of value
         ]
       end
 

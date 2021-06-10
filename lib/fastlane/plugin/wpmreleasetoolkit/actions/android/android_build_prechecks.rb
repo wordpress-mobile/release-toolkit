@@ -9,7 +9,7 @@ module Fastlane
 
         Fastlane::Helper::GitHelper.ensure_on_branch!('release') unless other_action.is_ci()
 
-        app = ENV['APP'].nil? ? params[:app] : ENV['APP']
+        app = ENV['PROJECT_NAME'].nil? ? params[:app] : ENV['PROJECT_NAME']
         message = ''
         beta_version = Fastlane::Helper::Android::VersionHelper.get_release_version(app) unless !params[:beta] && !params[:final]
         alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app) if params[:alpha]
@@ -65,10 +65,9 @@ module Fastlane
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :app,
-                                       env_name: 'APP',
+                                       env_name: 'PROJECT_NAME',
                                        description: 'The app to get the release version for',
-                                       is_string: true, # true: verifies the input is a string, false: every kind of value
-                                       default_value: 'wordpress'), # the default value if the user didn't provide one
+                                       is_string: true), # true: verifies the input is a string, false: every kind of value
         ]
       end
 
