@@ -463,6 +463,7 @@ module Fastlane
           end
           return nil
         end
+        
         # The path to the build.gradle file for the project.
         #
         # @env PROJECT_ROOT_FOLDER The path to the root of the project (the folder containing the `.git` directory).
