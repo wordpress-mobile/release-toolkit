@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-* Added a `check_translation_progress` action which checks the status of the translations on GlotPress. [#263]
+_None_
 
 ### Bug Fixes
 
@@ -19,6 +19,12 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 1.2.0
+
+### New Features
+
+* Added a `check_translation_progress` action which checks the status of the translations on GlotPress. [#263]
 
 ## 1.1.0
 
