@@ -36,7 +36,7 @@ describe Fastlane::Helper::Android::VersionHelper do
 
       allow(File).to receive(:exist?).and_return(true)
       allow(File).to receive(:open).with('./version.properties', 'r').and_yield(StringIO.new(test_file_content))
-      expect(subject.get_version_from_properties(product_name: 'jetpack', is_alpha_version: true)).to be_nil
+      expect(subject.get_version_from_properties(product_name: 'jetpack', is_alpha: true)).to be_nil
     end
   end
 
