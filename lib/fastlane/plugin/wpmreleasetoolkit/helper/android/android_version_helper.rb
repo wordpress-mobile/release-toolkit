@@ -31,7 +31,7 @@ module Fastlane
         #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
         #
         def self.get_public_version(app)
-          version = get_version_from_properties(product_name: app)
+          version = get_release_version(product_name: app)
           vp = get_version_parts(version[VERSION_NAME])
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
 
@@ -43,6 +43,14 @@ module Fastlane
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_release_version(app)
+          if ENV['HAS_VERSION_PROPERTIES'].nil?
+            section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
+            gradle_path = self.gradle_path
+            name = get_version_name_from_gradle_file(gradle_path, section)
+            code = get_version_build_from_gradle_file(gradle_path, section)
+            return { VERSION_NAME => name, VERSION_CODE => code }
+          end
+
           return get_version_from_properties(product_name: app)
         end
 
@@ -77,6 +85,15 @@ module Fastlane
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
         def self.get_alpha_version(app)
+          if ENV['HAS_VERSION_PROPERTIES'].nil?
+            return nil if ENV['HAS_ALPHA_VERSION'].nil?
+
+            section = 'defaultConfig'
+            gradle_path = self.gradle_path
+            name = get_version_name_from_gradle_file(gradle_path, section)
+            code = get_version_build_from_gradle_file(gradle_path, section)
+            return { VERSION_NAME => name, VERSION_CODE => code }
+          end
           return get_version_from_properties(product_name: app, is_alpha: true)
         end
 
@@ -270,16 +287,7 @@ module Fastlane
         #
         def self.bump_version_release(app)
           # Bump release
-          return bump_version_for_app(app, false)
-        end
-
-        # Prints the current and next version names for a given section to stdout, then returns the next version
-        #
-        # @return [String] The next version name to use after bumping the currently used version.
-        #
-        def self.bump_version_for_app(app, is_alpha)
-          # Bump release
-          current_version = get_version_from_properties(product_name: app, is_alpha: is_alpha)
+          current_version = get_release_version(app)
           UI.message("Current version: #{current_version[VERSION_NAME]}")
           new_version = calc_next_release_base_version(current_version)
           UI.message("New version: #{new_version[VERSION_NAME]}")
@@ -294,6 +302,13 @@ module Fastlane
         # @param [Hash] new_version_alpha The version hash for the alpha , containing values for keys "name" and "code"
         #
         def self.update_versions(app, new_version_beta, new_version_alpha)
+
+          if ENV['HAS_VERSION_PROPERTIES'].nil?
+            self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
+            self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
+            return
+          end
+
           new_version_name_beta_key = "#{app}.versionName"
           new_version_code_beta_key = "#{app}.versionCode"
           new_version_name_alpha_key = "#{app}.alpha.versionName"
