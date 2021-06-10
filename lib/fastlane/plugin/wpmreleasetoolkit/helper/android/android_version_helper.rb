@@ -31,7 +31,7 @@ module Fastlane
         #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
         #
         def self.get_public_version(app)
-          version = get_version_from_properties(app, false)
+          version = get_version_from_properties(product_name: app)
           vp = get_version_parts(version[VERSION_NAME])
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
 
@@ -43,7 +43,7 @@ module Fastlane
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_release_version(app)
-          return get_version_from_properties(app, false)
+          return get_version_from_properties(product_name: app)
         end
 
         # Extract the version name and code from the `version.properties` file in the project root
@@ -77,7 +77,7 @@ module Fastlane
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
         def self.get_alpha_version(app)
-          return get_version_from_properties(app, true)
+          return get_version_from_properties(product_name: app, is_alpha: true)
         end
 
         # Determines if a version name corresponds to an alpha version (starts with `"alpha-"`` prefix)
@@ -279,7 +279,7 @@ module Fastlane
         #
         def self.bump_version_for_app(app, is_alpha)
           # Bump release
-          current_version = get_version_from_properties(app, is_alpha)
+          current_version = get_version_from_properties(product_name: app, is_alpha: is_alpha)
           UI.message("Current version: #{current_version[VERSION_NAME]}")
           new_version = calc_next_release_base_version(current_version)
           UI.message("New version: #{new_version[VERSION_NAME]}")
