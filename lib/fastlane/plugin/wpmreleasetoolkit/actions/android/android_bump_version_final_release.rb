@@ -14,7 +14,6 @@ module Fastlane
         current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
         final_version = Fastlane::Helper::Android::VersionHelper.calc_final_release_version(current_version, current_version_alpha)
 
-
         vname = Fastlane::Helper::Android::VersionHelper::VERSION_NAME
         vcode = Fastlane::Helper::Android::VersionHelper::VERSION_CODE
         UI.message("Current version[#{app}]: #{current_version[vname]}(#{current_version[vcode]})")

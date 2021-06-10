@@ -6,7 +6,7 @@ module Fastlane
 
     class AndroidCurrentBranchIsHotfixAction < Action
       def self.run(params)
-        require_relative '../../helper/android/android_version_helper.rb'
+        require_relative '../../helper/android/android_version_helper'
         app = ENV['PROJECT_NAME'].nil? ? params[:app] : ENV['PROJECT_NAME']
         Fastlane::Helper::Android::VersionHelper.is_hotfix?(Fastlane::Helper::Android::VersionHelper.get_release_version(app))
       end

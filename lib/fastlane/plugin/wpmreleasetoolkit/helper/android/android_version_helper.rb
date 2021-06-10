@@ -308,7 +308,6 @@ module Fastlane
         # @param [Hash] new_version_alpha The version hash for the alpha , containing values for keys "name" and "code"
         #
         def self.update_versions(app, new_version_beta, new_version_alpha)
-
           if properties_file_exists
             self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
             self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
@@ -410,7 +409,6 @@ module Fastlane
         def self.is_int? string
           true if Integer(string) rescue false
         end
-
 
         #########
         # Functions to support versioning through build.gradle - can be removed once all projects adopt version.properties
