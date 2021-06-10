@@ -404,6 +404,116 @@ module Fastlane
         def self.is_int? string
           true if Integer(string) rescue false
         end
+
+
+        #########
+        # Functions to support versioning through build.gradle - can be removed once all projects adopt version.properties
+        ########
+
+        # Extract the versionName from a build.gradle file
+        #
+        # @param [String] file_path The path to the `.gradle` file
+        # @param [String] section The name of the section we expect the keyword to be in, e.g. "defaultConfig" or "vanilla"
+        #
+        # @return [String] The value of the versionName attribute as found in the build.gradle file and for this section.
+        #
+        def self.get_version_name_from_gradle_file(file_path, section)
+          res = get_keyword_from_gradle_file(file_path, section, 'versionName')
+          res = res.tr('\"', '') unless res.nil?
+          return res
+        end
+
+        # Extract the versionCode rom a build.gradle file
+        #
+        # @param [String] file_path The path to the `.gradle` file
+        # @param [String] section The name of the section we expect the keyword to be in, e.g. "defaultConfig" or "vanilla"
+        #
+        # @return [String] The value of the versionCode attribute as found in the build.gradle file and for this section.
+        #
+        def self.get_version_build_from_gradle_file(file_path, section)
+          res = get_keyword_from_gradle_file(file_path, section, 'versionCode')
+          return res.to_i
+        end
+
+        # Extract the value for a specific keyword in a specific section of a `.gradle` file
+        #
+        # @todo: This implementation is very fragile. This should be done parsing the file in a proper way.
+        #        Leveraging gradle itself is probably the easiest way.
+        #
+        # @param [String] file_path The path of the `.gradle` file to extract the value from
+        # @param [String] section The name of the section from which we want to extract this keyword from. For example `defaultConfig` or `myFlavor`
+        # @param [String] keyword The keyword (key name) we want the value for
+        #
+        # @return [String] Returns the value for that keyword in the section of the `.gradle` file, or nil if not found.
+        #
+        def self.get_keyword_from_gradle_file(file_path, section, keyword)
+          found_section = false
+          File.open(file_path, 'r') do |file|
+            file.each_line do |line|
+              if !found_section
+                found_section = true if line.include?(section)
+              else
+                return line.split(' ')[1] if line.include?(keyword) && !line.include?("\"#{keyword}\"") && !line.include?("P#{keyword}")
+              end
+            end
+          end
+          return nil
+        end
+        # The path to the build.gradle file for the project.
+        #
+        # @env PROJECT_ROOT_FOLDER The path to the root of the project (the folder containing the `.git` directory).
+        # @env PROJECT_NAME The name of the project, i.e. the name of the subdirectory containing the project's `build.gradle` file.
+        #
+        # @return [String] The path of the `build.gradle` file inside the project subfolder in the project's repo
+        #
+        def self.gradle_path
+          UI.user_error!("You need to set the \`PROJECT_ROOT_FOLDER\` environment variable to the path to the project's root") if ENV['PROJECT_ROOT_FOLDER'].nil?
+          UI.user_error!("You need to set the \`PROJECT_NAME\` environment variable to the relative path to the project subfolder name") if ENV['PROJECT_NAME'].nil?
+          File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'build.gradle')
+        end
+
+        # Update both the versionName and versionCode of the build.gradle file to the specified version.
+        #
+        # @param [Hash] version The version hash, containing values for keys "name" and "code"
+        # @param [String] section The name of the section to update in the build.gradle file, e.g. "defaultConfig" or "vanilla"
+        #
+        # @todo This implementation is very fragile. This should be done parsing the file in a proper way.
+        #       Leveraging gradle itself is probably the easiest way.
+        #
+        def self.update_version(version, section)
+          gradle_path = self.gradle_path
+          temp_file = Tempfile.new('fastlaneIncrementVersion')
+          found_section = false
+          version_updated = 0
+          File.open(gradle_path, 'r') do |file|
+            file.each_line do |line|
+              if !found_section
+                temp_file.puts line
+                found_section = true if line.include? section
+              else
+                if version_updated < 2
+                  if line.include?('versionName') && !line.include?('"versionName"') && !line.include?('PversionName')
+                    version_name = line.split(' ')[1].tr('\"', '')
+                    line.sub!(version_name, version[VERSION_NAME].to_s)
+                    version_updated = version_updated + 1
+                  end
+
+                  if line.include? 'versionCode'
+                    version_code = line.split(' ')[1]
+                    line.sub!(version_code, version[VERSION_CODE].to_s)
+                    version_updated = version_updated + 1
+                  end
+                end
+                temp_file.puts line
+              end
+            end
+            file.close
+          end
+          temp_file.rewind
+          temp_file.close
+          FileUtils.mv(temp_file.path, gradle_path)
+          temp_file.unlink
+        end
       end
     end
   end
