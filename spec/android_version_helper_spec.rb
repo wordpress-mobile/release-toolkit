@@ -28,7 +28,7 @@ describe Fastlane::Helper::Android::VersionHelper do
       expect(subject.get_version_from_properties(product_name: 'wordpress', is_alpha: true)).to eq('name' => 'alpha-222', 'code' => 1234)
     end
 
-    it 'returns nil when alpha version name and code when not present' do
+    it 'returns nil when alpha version name and code not present' do
       test_file_content = <<~CONTENT
         jetpack.versionName=17.0
         jetpack.versionCode=123
