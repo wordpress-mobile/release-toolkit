@@ -56,7 +56,6 @@ module Fastlane
           name = get_version_name_from_gradle_file(gradle_path, section)
           code = get_version_build_from_gradle_file(gradle_path, section)
           return { VERSION_NAME => name, VERSION_CODE => code }
-
         end
 
         def self.properties_file_exists
