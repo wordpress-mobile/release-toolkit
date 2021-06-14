@@ -92,15 +92,16 @@ module Fastlane
         #
         def self.get_alpha_version(app)
           if properties_file_exists
-            return nil if ENV['HAS_ALPHA_VERSION'].nil?
-
-            section = 'defaultConfig'
-            gradle_path = self.gradle_path
-            name = get_version_name_from_gradle_file(gradle_path, section)
-            code = get_version_build_from_gradle_file(gradle_path, section)
-            return { VERSION_NAME => name, VERSION_CODE => code }
+            return get_version_from_properties(product_name: app, is_alpha: true)
           end
-          return get_version_from_properties(product_name: app, is_alpha: true)
+
+          return nil if ENV['HAS_ALPHA_VERSION'].nil?
+
+          section = 'defaultConfig'
+          gradle_path = self.gradle_path
+          name = get_version_name_from_gradle_file(gradle_path, section)
+          code = get_version_build_from_gradle_file(gradle_path, section)
+          return { VERSION_NAME => name, VERSION_CODE => code }
         end
 
         # Determines if a version name corresponds to an alpha version (starts with `"alpha-"`` prefix)
@@ -309,19 +310,19 @@ module Fastlane
         #
         def self.update_versions(app, new_version_beta, new_version_alpha)
           if properties_file_exists
-            self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
-            self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
+            new_version_name_beta_key = "#{app}.versionName"
+            new_version_code_beta_key = "#{app}.versionCode"
+            new_version_name_alpha_key = "#{app}.alpha.versionName"
+            new_version_code_alpha_key = "#{app}.alpha.versionCode"
+            Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_name_beta_key}", "-Pvalue=#{new_version_beta[VERSION_NAME]}")
+            Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_code_beta_key}", "-Pvalue=#{new_version_beta[VERSION_CODE]}")
+            Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_name_alpha_key}", "-Pvalue=#{new_version_alpha[VERSION_NAME]}") unless new_version_alpha.nil?
+            Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_code_alpha_key}", "-Pvalue=#{new_version_alpha[VERSION_CODE]}") unless new_version_alpha.nil?
             return
           end
 
-          new_version_name_beta_key = "#{app}.versionName"
-          new_version_code_beta_key = "#{app}.versionCode"
-          new_version_name_alpha_key = "#{app}.alpha.versionName"
-          new_version_code_alpha_key = "#{app}.alpha.versionCode"
-          Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_name_beta_key}", "-Pvalue=#{new_version_beta[VERSION_NAME]}")
-          Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_code_beta_key}", "-Pvalue=#{new_version_beta[VERSION_CODE]}")
-          Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_name_alpha_key}", "-Pvalue=#{new_version_alpha[VERSION_NAME]}") unless new_version_alpha.nil?
-          Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_code_alpha_key}", "-Pvalue=#{new_version_alpha[VERSION_CODE]}") unless new_version_alpha.nil?
+          self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
+          self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
         end
 
         # Compute the name of the previous hotfix version.
