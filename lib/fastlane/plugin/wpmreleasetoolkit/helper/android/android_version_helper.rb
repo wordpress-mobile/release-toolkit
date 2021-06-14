@@ -48,14 +48,15 @@ module Fastlane
         #
         def self.get_release_version(app)
           if properties_file_exists
-            section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
-            gradle_path = self.gradle_path
-            name = get_version_name_from_gradle_file(gradle_path, section)
-            code = get_version_build_from_gradle_file(gradle_path, section)
-            return { VERSION_NAME => name, VERSION_CODE => code }
+            return get_version_from_properties(product_name: app)
           end
 
-          return get_version_from_properties(product_name: app)
+          section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
+          gradle_path = self.gradle_path
+          name = get_version_name_from_gradle_file(gradle_path, section)
+          code = get_version_build_from_gradle_file(gradle_path, section)
+          return { VERSION_NAME => name, VERSION_CODE => code }
+
         end
 
         def self.properties_file_exists
