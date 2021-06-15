@@ -6,13 +6,12 @@
 
 ### Breaking Changes
 
-* Clients adopting the new version.properties will need to implement a gradle task to update the version.properties file named `updateVersionProperties`
-
 ### New Features
 
 * Support for a version.properties to manage app versioning - all existing paths remain intact and new paths are only used when a version.properties file is present
 * Add support for providing an `app:` parameter to most versioning-related actions to allow support for multiple apps hosted in a monorepo
-* Supporting the new version.properties file also allows for the HAS_ALPHA_VERSION variable to be removed as the alpha reference in the properties file will be used going forward. 
+* Supporting the new version.properties file also allows for the HAS_ALPHA_VERSION variable to be removed as the alpha reference in the properties file will be used going forward.
+* Clients adopting the new version.properties will need to implement a gradle task to update the version.properties file named `updateVersionProperties`
 
 ### Bug Fixes
 
