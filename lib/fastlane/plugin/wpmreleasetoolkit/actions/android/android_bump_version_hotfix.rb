@@ -33,11 +33,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Bumps the version of the app and creates the new release branch'
+        'Bumps the version of the app and creates the new release branch. Depends on a gradle task to update the keys in a version.properties file.'
       end
 
       def self.details
-        'Bumps the version of the app and creates the new release branch'
+        'Bumps the version of the app and creates the new release branch. Depends on a gradle task to update the keys in a version.properties file.'
       end
 
       def self.available_options
