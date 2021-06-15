@@ -22,7 +22,7 @@ module Fastlane
         UI.message("New beta version[#{app}]: #{new_version_beta[vname]}(#{new_version_beta[vcode]})")
         UI.message("New alpha version[#{app}]: #{new_version_alpha[vname]}(#{new_version_alpha[vcode]})") unless current_version_alpha.nil?
 
-        UI.message 'Updating build.gradle...'
+        UI.message 'Updating app version...'
         Fastlane::Helper::Android::VersionHelper.update_versions(app, new_version_beta, new_version_alpha)
         UI.message 'Done!'
 

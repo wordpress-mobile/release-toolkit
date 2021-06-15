@@ -34,7 +34,7 @@ module Fastlane
         Fastlane::Helper::GitHelper.create_branch(new_release_branch, from: 'develop')
         UI.message 'Done!'
 
-        UI.message 'Updating versions...'
+        UI.message 'Updating app version...'
         Fastlane::Helper::Android::VersionHelper.update_versions(app, new_version_beta, new_version_alpha)
         Fastlane::Helper::Android::GitHelper.commit_version_bump()
         UI.message 'Done.'

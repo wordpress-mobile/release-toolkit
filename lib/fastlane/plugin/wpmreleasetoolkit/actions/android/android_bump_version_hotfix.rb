@@ -19,7 +19,7 @@ module Fastlane
         UI.message("New hotfix version[#{app}]: #{new_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{new_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]})")
         UI.message("Release branch: #{new_release_branch}")
 
-        UI.message 'Updating version.properties...'
+        UI.message 'Updating app version...'
         Fastlane::Helper::Android::VersionHelper.update_versions(app, new_version, current_version_alpha)
         UI.message 'Done!'
 
