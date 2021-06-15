@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-_None_
+* Clients adopting the new version.properties will need to implement a gradle task to update the version.properties file named `updateVersionProperties`
 
 ### New Features
 
