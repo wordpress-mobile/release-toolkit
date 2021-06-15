@@ -8,7 +8,7 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper'
 
         Fastlane::Helper::GitHelper.ensure_on_branch!('release')
-        app = ENV['PROJECT_NAME'].nil? ? params[:app] : ENV['PROJECT_NAME']
+        app = params[:app]
 
         current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(app)
         current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
