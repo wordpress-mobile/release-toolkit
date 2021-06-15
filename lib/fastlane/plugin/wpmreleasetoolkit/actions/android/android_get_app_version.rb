@@ -3,8 +3,7 @@ module Fastlane
     class AndroidGetAppVersionAction < Action
       def self.run(params)
         require_relative '../../helper/android/android_version_helper'
-        app = ENV['PROJECT_NAME'].nil? ? params[:app] : ENV['PROJECT_NAME']
-        Fastlane::Helper::Android::VersionHelper.get_public_version(app)
+        Fastlane::Helper::Android::VersionHelper.get_public_version(params[:app])
       end
 
       #####################################################

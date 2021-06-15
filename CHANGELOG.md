@@ -12,6 +12,7 @@ _None_
 
 * Support for a version.properties to manage app versioning - all existing paths remain intact and new paths are only used when a version.properties file is present
 * Add support for providing an `app:` parameter to most versioning-related actions to allow support for multiple apps hosted in a monorepo
+
 ### Bug Fixes
 
 * Some cleanup to how we scope variables in some of our actions

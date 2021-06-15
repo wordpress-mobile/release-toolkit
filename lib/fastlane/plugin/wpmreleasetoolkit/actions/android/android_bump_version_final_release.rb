@@ -20,7 +20,7 @@ module Fastlane
         UI.message("Current alpha version[#{app}]: #{current_version_alpha[vname]}(#{current_version_alpha[vcode]})") unless current_version_alpha.nil?
         UI.message("New release version[#{app}]: #{final_version[vname]}(#{final_version[vcode]})")
 
-        UI.message 'Updating version.properties...'
+        UI.message 'Updating app version...'
         Fastlane::Helper::Android::VersionHelper.update_versions(app, final_version, current_version_alpha)
         UI.message 'Done!'
 

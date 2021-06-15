@@ -11,7 +11,7 @@ module Fastlane
         other_action.ensure_git_branch(branch: 'develop')
 
         # Create new configuration
-        app = ENV['PROJECT_NAME'].nil? ? params[:app] : ENV['PROJECT_NAME']
+        app = params[:app]
         new_short_version = Fastlane::Helper::Android::VersionHelper.bump_version_release(app)
 
         current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(app)
