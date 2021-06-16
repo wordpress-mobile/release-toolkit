@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+Fixes a bug that was breaking the `promo_screenshots` helper [#276]
 
 ### Internal Changes
 

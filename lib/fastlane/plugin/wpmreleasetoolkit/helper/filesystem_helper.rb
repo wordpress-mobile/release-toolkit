@@ -36,7 +36,8 @@ module Fastlane
         while continue
           child_filenames = dir.children.map! { |x| File.basename(x) }
 
-          if child_filenames.include? 'fastlane-plugin-wpmreleasetoolkit.gemspec'
+          # The first option is for development (where the .gemspec is present in the project root), the second is for production (where it is not)
+          if child_filenames.include?('fastlane-plugin-wpmreleasetoolkit.gemspec') || File.basename(dir).include?('fastlane-plugin-wpmreleasetoolkit')
             continue = false
           else
             dir = dir.parent
