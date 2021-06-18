@@ -46,8 +46,8 @@ module Fastlane
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
-        def self.get_release_version(app)
-          return get_version_from_properties(product_name: app) if properties_file_exists
+        def self.get_release_version(product_name:)
+          return get_version_from_properties(product_name: product_name) if properties_file_exists
 
           section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
           gradle_path = self.gradle_path
@@ -300,7 +300,7 @@ module Fastlane
         #
         def self.bump_version_release(app)
           # Bump release
-          current_version = get_release_version(app)
+          current_version = get_release_version(product_name: app)
           UI.message("Current version: #{current_version[VERSION_NAME]}")
           new_version = calc_next_release_base_version(current_version)
           UI.message("New version: #{new_version[VERSION_NAME]}")

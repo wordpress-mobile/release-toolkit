@@ -17,7 +17,7 @@ module Fastlane
         app = params[:app]
 
         # Create versions
-        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(app)
+        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(product_name: app)
         current_alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
         next_version = Fastlane::Helper::Android::VersionHelper.calc_next_release_version(current_version, current_alpha_version)
         next_alpha_version = current_alpha_version.nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(next_version, current_alpha_version)

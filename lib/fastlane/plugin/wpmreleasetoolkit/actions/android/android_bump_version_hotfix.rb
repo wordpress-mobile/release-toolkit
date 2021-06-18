@@ -9,7 +9,7 @@ module Fastlane
 
         app = params[:app]
 
-        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(app)
+        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(product_name: app)
         current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
         new_version = Fastlane::Helper::Android::VersionHelper.calc_next_hotfix_version(params[:version_name], params[:version_code])
         new_short_version = new_version_name
