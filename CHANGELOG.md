@@ -29,7 +29,7 @@ _None_
 * Supporting the new `version.properties` file also allows for the `HAS_ALPHA_VERSION` variable to be removed as the alpha reference in the properties file will be used going forward.
 * Clients adopting the new `version.properties` will need to implement a gradle task named `updateVersionProperties` to update the `version.properties` file.
 
-### Bug Fixes
+### Internal Changes
 
 * Some cleanup to how we scope variables in some of our actions
 
