@@ -6,6 +6,22 @@
 
 ### Breaking Changes
 
+_None_
+
+### New Features
+
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 1.3.0
+
 ### New Features
 
 * Support for a `version.properties` to manage app versioning - all existing paths remain intact and new paths are only used when a `version.properties` file is present.
@@ -16,10 +32,6 @@
 ### Bug Fixes
 
 * Some cleanup to how we scope variables in some of our actions
-
-### Internal Changes
-
-_None_
 
 ## 1.2.0
 
