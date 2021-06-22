@@ -3,7 +3,7 @@ module Fastlane
     class AndroidGetReleaseVersionAction < Action
       def self.run(params)
         require_relative '../../helper/android/android_version_helper'
-        Fastlane::Helper::Android::VersionHelper.get_release_version()
+        Fastlane::Helper::Android::VersionHelper.get_release_version(product_name: params[:app])
       end
 
       #####################################################
@@ -20,6 +20,12 @@ module Fastlane
 
       def self.available_options
         # Define all options your action supports.
+        [
+          FastlaneCore::ConfigItem.new(key: :app,
+                                       env_name: 'PROJECT_NAME',
+                                       description: 'The name of the app to get the release version for',
+                                       is_string: true), # true: verifies the input is a string, false: every kind of value
+        ]
       end
 
       def self.output

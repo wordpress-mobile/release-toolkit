@@ -1,6 +1,45 @@
 require 'spec_helper'
 
 describe Fastlane::Helper::Android::VersionHelper do
+  describe 'get_version_from_properties' do
+    it 'returns version name and code when present' do
+      test_file_content = <<~CONTENT
+        wordpress.versionName=17.0
+        wordpress.versionCode=123
+        wordpress.alpha.versionName=alpha-222
+        wordpress.alpha.versionCode=1234
+      CONTENT
+
+      allow(File).to receive(:exist?).and_return(true)
+      allow(File).to receive(:open).with('./version.properties', 'r').and_yield(StringIO.new(test_file_content))
+      expect(subject.get_version_from_properties(product_name: 'wordpress')).to eq('name' => '17.0', 'code' => 123)
+    end
+
+    it 'returns alpha version name and code when present' do
+      test_file_content = <<~CONTENT
+        wordpress.versionName=17.0
+        wordpress.versionCode=123
+        wordpress.alpha.versionName=alpha-222
+        wordpress.alpha.versionCode=1234
+      CONTENT
+
+      allow(File).to receive(:exist?).and_return(true)
+      allow(File).to receive(:open).with('./version.properties', 'r').and_yield(StringIO.new(test_file_content))
+      expect(subject.get_version_from_properties(product_name: 'wordpress', is_alpha: true)).to eq('name' => 'alpha-222', 'code' => 1234)
+    end
+
+    it 'returns nil when alpha version name and code not present' do
+      test_file_content = <<~CONTENT
+        jetpack.versionName=17.0
+        jetpack.versionCode=123
+      CONTENT
+
+      allow(File).to receive(:exist?).and_return(true)
+      allow(File).to receive(:open).with('./version.properties', 'r').and_yield(StringIO.new(test_file_content))
+      expect(subject.get_version_from_properties(product_name: 'jetpack', is_alpha: true)).to be_nil
+    end
+  end
+
   describe 'get_library_version_from_gradle_config' do
     it 'returns nil when gradle file is not present' do
       allow(File).to receive(:exist?).and_return(false)

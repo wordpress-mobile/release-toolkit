@@ -26,26 +26,29 @@ module Fastlane
         #    "1.2" # Assuming build.gradle contains versionName "1.2.0"
         #    "1.2.3" # Assuming build.gradle contains versionName "1.2.3"
         #
+        # @param [String] app The name of the app to be used for beta and alpha version update
+        #
         # @return [String] The public-facing version number, extracted from the `versionName` of the `build.gradle` file.
         #         - If this version is a hotfix (more than 2 parts and 3rd part is non-zero), returns the "X.Y.Z" formatted string
         #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
         #
-        def self.get_public_version
-          version = get_release_version
+        def self.get_public_version(app)
+          version = get_release_version(product_name: app)
           vp = get_version_parts(version[VERSION_NAME])
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
 
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}"
         end
 
-        # Extract the version name and code from the `vanilla` flavor of the `$PROJECT_NAME/build.gradle file`
-        #   or for the defaultConfig if `HAS_ALPHA_VERSION` is not defined.
+        # Extract the version name and code from the release version of the app from `version.properties file`
         #
-        # @env HAS_ALPHA_VERSION If set (with any value), indicates that the project uses `vanilla` flavor.
+        # @param [String] app The name of the app to be used for beta and alpha version update
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
-        def self.get_release_version
+        def self.get_release_version(product_name:)
+          return get_version_from_properties(product_name: product_name) if properties_file_exists
+
           section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
           gradle_path = self.gradle_path
           name = get_version_name_from_gradle_file(gradle_path, section)
@@ -53,12 +56,50 @@ module Fastlane
           return { VERSION_NAME => name, VERSION_CODE => code }
         end
 
-        # Extract the version name and code from the `defaultConfig` of the `$PROJECT_NAME/build.gradle` file
+        def self.properties_file_exists
+          properties_file_path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'version.properties')
+
+          return File.exist?(properties_file_path)
+        end
+
+        # Extract the version name and code from the `version.properties` file in the project root
+        #
+        # @param [String] product_name The name of the app to extract the version from e.g. wordpress, simplenote
+        # @param [Boolean] is_alpha true if the alpha version should be returned, false otherwise
+        #
+        # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
+        #
+        def self.get_version_from_properties(product_name:, is_alpha: false)
+          version_name_key = "#{product_name}.#{is_alpha ? 'alpha.' : ''}versionName"
+          version_code_key = "#{product_name}.#{is_alpha ? 'alpha.' : ''}versionCode"
+
+          properties_file_path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'version.properties')
+
+          return nil unless File.exist?(properties_file_path)
+
+          File.open(properties_file_path, 'r') do |f|
+            text = f.read
+            name = text.match(/#{version_name_key}=(\S*)/m)&.captures&.first
+            code = text.match(/#{version_code_key}=(\S*)/m)&.captures&.first
+
+            f.close
+
+            return nil if name.nil? || code.nil?
+
+            return { VERSION_NAME => name, VERSION_CODE => code.to_i }
+          end
+        end
+
+        # Extract the version name and code from the `version.properties` file in the project root
+        #
+        # @param [String] app The name of the app to be used for beta and alpha version update
         #
         # @return [Hash] A hash with 2 keys `"name"` and `"code"` containing the extracted version name and code, respectively,
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
-        def self.get_alpha_version
+        def self.get_alpha_version(app)
+          return get_version_from_properties(product_name: app, is_alpha: true) if properties_file_exists
+
           return nil if ENV['HAS_ALPHA_VERSION'].nil?
 
           section = 'defaultConfig'
@@ -95,8 +136,8 @@ module Fastlane
         # - The final version name corresponds to the beta's versionName, without the `-rc` suffix
         # - The final version code corresponds to the versionCode for the alpha (or for the beta if alpha_version is nil) incremented by one.
         #
-        # @param [Hash] beta_version The version hash for the beta (vanilla flavor), containing values for keys "name" and "code"
-        # @param [Hash] alpha_version The version hash for the alpha (defaultConfig), containing values for keys "name" and "code",
+        # @param [Hash] beta_version The version hash for the beta, containing values for keys "name" and "code"
+        # @param [Hash] alpha_version The version hash for the alpha, containing values for keys "name" and "code",
         #                             or `nil` if no alpha version to consider.
         #
         # @return [Hash] A version hash with keys "name" and "code", containing the version name and code to use for final release.
@@ -254,11 +295,12 @@ module Fastlane
 
         # Prints the current and next release version names to stdout, then returns the next release version
         #
+        # @param [String] app The name of the app to be used for beta and alpha version update
         # @return [String] The next release version name to use after bumping the currently used release version.
         #
-        def self.bump_version_release
+        def self.bump_version_release(app)
           # Bump release
-          current_version = get_release_version()
+          current_version = get_release_version(product_name: app)
           UI.message("Current version: #{current_version[VERSION_NAME]}")
           new_version = calc_next_release_base_version(current_version)
           UI.message("New version: #{new_version[VERSION_NAME]}")
@@ -267,13 +309,25 @@ module Fastlane
           return verified_version
         end
 
-        # Update the `build.gradle` file with new `versionName` and `versionCode` values, both or the `defaultConfig` and `vanilla` flavors
+        # Update the `version.properties` file with new `versionName` and `versionCode` values
         #
-        # @param [Hash] new_version_beta The version hash for the beta (vanilla flavor), containing values for keys "name" and "code"
-        # @param [Hash] new_version_alpha The version hash for the alpha (defaultConfig), containing values for keys "name" and "code"
-        # @env HAS_ALPHA_VERSION If set (with any value), indicates that the project uses `vanilla` flavor.
+        # @param [String] app The name of the app to be used for beta and alpha version update
+        # @param [Hash] new_version_beta The version hash for the beta, containing values for keys "name" and "code"
+        # @param [Hash] new_version_alpha The version hash for the alpha , containing values for keys "name" and "code"
         #
-        def self.update_versions(new_version_beta, new_version_alpha)
+        def self.update_versions(app, new_version_beta, new_version_alpha)
+          if properties_file_exists
+            new_version_name_beta_key = "#{app}.versionName"
+            new_version_code_beta_key = "#{app}.versionCode"
+            new_version_name_alpha_key = "#{app}.alpha.versionName"
+            new_version_code_alpha_key = "#{app}.alpha.versionCode"
+            Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_name_beta_key}", "-Pvalue=#{new_version_beta[VERSION_NAME]}")
+            Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_code_beta_key}", "-Pvalue=#{new_version_beta[VERSION_CODE]}")
+            Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_name_alpha_key}", "-Pvalue=#{new_version_alpha[VERSION_NAME]}") unless new_version_alpha.nil?
+            Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_code_alpha_key}", "-Pvalue=#{new_version_alpha[VERSION_CODE]}") unless new_version_alpha.nil?
+            return
+          end
+
           self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
           self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
         end
@@ -337,6 +391,37 @@ module Fastlane
           return parts
         end
 
+        # Ensure that a version string is correctly formatted (that is, each of its parts is a number) and returns the 2-parts version number
+        #
+        # @param [String] version The version string to verify
+        #
+        # @return [String] The "major.minor" version string, only with the first 2 components
+        # @raise [UserError] If any of the parts of the version string is not a number
+        #
+        def self.verify_version(version)
+          v_parts = get_version_parts(version)
+
+          v_parts.each do |part|
+            UI.user_error!('Version value can only contains numbers.') unless is_int?(part)
+          end
+
+          "#{v_parts[MAJOR_NUMBER]}.#{v_parts[MINOR_NUMBER]}"
+        end
+
+        # Check if a string is an integer.
+        #
+        # @param [String] string The string to test
+        #
+        # @return [Bool] true if the string is representing an integer value, false if not
+        #
+        def self.is_int? string
+          true if Integer(string) rescue false
+        end
+
+        #########
+        # Functions to support versioning through build.gradle - can be removed once all projects adopt version.properties
+        ########
+
         # Extract the versionName from a build.gradle file
         #
         # @param [String] file_path The path to the `.gradle` file
@@ -385,33 +470,6 @@ module Fastlane
             end
           end
           return nil
-        end
-
-        # Ensure that a version string is correctly formatted (that is, each of its parts is a number) and returns the 2-parts version number
-        #
-        # @param [String] version The version string to verify
-        #
-        # @return [String] The "major.minor" version string, only with the first 2 components
-        # @raise [UserError] If any of the parts of the version string is not a number
-        #
-        def self.verify_version(version)
-          v_parts = get_version_parts(version)
-
-          v_parts.each do |part|
-            UI.user_error!('Version value can only contains numbers.') unless is_int?(part)
-          end
-
-          "#{v_parts[MAJOR_NUMBER]}.#{v_parts[MINOR_NUMBER]}"
-        end
-
-        # Check if a string is an integer.
-        #
-        # @param [String] string The string to test
-        #
-        # @return [Bool] true if the string is representing an integer value, false if not
-        #
-        def self.is_int? string
-          true if Integer(string) rescue false
         end
 
         # The path to the build.gradle file for the project.
