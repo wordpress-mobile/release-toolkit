@@ -42,7 +42,7 @@ module Fastlane
 
         # Extract the version name and code from the release version of the app from `version.properties file`
         #
-        # @param [String] app The name of the app to be used for beta and alpha version update
+        # @param [String] product_name The name of the app to be used for beta and alpha version update
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
