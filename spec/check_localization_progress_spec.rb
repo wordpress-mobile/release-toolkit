@@ -96,7 +96,6 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
   it 'fails when one the language is below the set threshold' do
     langs = [
       { lang_name: 'arabic', lang_code: 'ar', current: '2,087', fuzzy: '0', waiting: '0', untranslated: '0', progress: '100' },
-      # Mock de to be translated at 51%
       { lang_name: 'german', lang_code: 'de', current: '1,078', fuzzy: '2', waiting: '1003', untranslated: '4', progress: '51' },
       { lang_name: 'spanish', lang_code: 'es', current: '2,085', fuzzy: '0', waiting: '0', untranslated: '2', progress: '99' },
     ]
@@ -111,6 +110,35 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
            )
 
     expect(FastlaneCore::UI).to receive(:abort_with_message!).with('de is translated 51% which is under the required 99%.')
+
+    described_class.run(
+      glotpress_url: 'https://translate.wordpress.org/projects/apps/my-test-project/dev',
+      language_codes: 'ar de es'.split(),
+      min_acceptable_translation_percentage: 99,
+      abort_on_violations: true,
+      skip_confirm: true
+    )
+
+    expect(stub).to have_been_made.once
+  end
+
+  it 'does not fail when one the language is above the set threshold, but there are updates waiting for review' do
+    langs = [
+      { lang_name: 'arabic', lang_code: 'ar', current: '2,087', fuzzy: '0', waiting: '0', untranslated: '0', progress: '100' },
+      { lang_name: 'german', lang_code: 'de', current: '2,087', fuzzy: '0', waiting: '103', untranslated: '0', progress: '99' },
+      { lang_name: 'spanish', lang_code: 'es', current: '2,085', fuzzy: '0', waiting: '0', untranslated: '2', progress: '99' },
+    ]
+
+    stub = stub_request(
+      :get,
+      'https://translate.wordpress.org/projects/apps/my-test-project/dev'
+    )
+           .to_return(
+             status: 200,
+             body: generate_glotpress_response_body(languages: langs)
+           )
+
+    expect(FastlaneCore::UI).to receive(:success).with('Done')
 
     described_class.run(
       glotpress_url: 'https://translate.wordpress.org/projects/apps/my-test-project/dev',
@@ -330,7 +358,7 @@ end
 
 def generate_glotpress_response_header_for_language(lang:, lang_code:, progress:)
   lang = "<strong><a href=\"/projects/apps/whatever/dev/#{lang_code}/default/\">#{lang}</a></strong>\n"
-  lang << "<span #{ progress.to_i > 90 ? 'class="bubble morethan90"' : '' }>#{progress}%</span>\n"
+  lang << "<span#{ progress.to_i > 90 ? 'class=" bubble morethan90"' : '' }>#{progress}%</span>\n"
 end
 
 def generate_glotpress_response_for_language_status(lang_code:, status_main:, status:, string_count:)
