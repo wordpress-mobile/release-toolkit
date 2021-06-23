@@ -9,9 +9,9 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
 
   it 'does not fail when all the languages are above the set threshold' do
     langs = [
-      { lang_name: 'arabic', lang_code: 'ar', current: '2,087', fuzzy: '0', waiting: '0', untranslated: '0' },
-      { lang_name: 'german', lang_code: 'de', current: '2,078', fuzzy: '2', waiting: '3', untranslated: '4' },
-      { lang_name: 'spanish', lang_code: 'es', current: '2,085', fuzzy: '0', waiting: '0', untranslated: '2' },
+      { lang_name: 'arabic', lang_code: 'ar', current: '2,087', fuzzy: '0', waiting: '0', untranslated: '0', progress: '100' },
+      { lang_name: 'german', lang_code: 'de', current: '2,078', fuzzy: '2', waiting: '3', untranslated: '4', progress: '99' },
+      { lang_name: 'spanish', lang_code: 'es', current: '2,085', fuzzy: '0', waiting: '0', untranslated: '2', progress: '99' },
     ]
 
     stub = stub_request(
@@ -38,8 +38,8 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
 
   it 'fails on missing data for a language' do
     langs = [
-      { lang_name: 'arabic', lang_code: 'ar', current: '2,087', fuzzy: '0', waiting: '0', untranslated: '0' },
-      { lang_name: 'german', lang_code: 'de', current: '2,078', fuzzy: '2', waiting: '3', untranslated: '4' },
+      { lang_name: 'arabic', lang_code: 'ar', current: '2,087', fuzzy: '0', waiting: '0', untranslated: '0', progress: '100' },
+      { lang_name: 'german', lang_code: 'de', current: '2,078', fuzzy: '2', waiting: '3', untranslated: '4', progress: '99' },
     ]
 
     stub = stub_request(
@@ -95,10 +95,10 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
 
   it 'fails when one the language is below the set threshold' do
     langs = [
-      { lang_name: 'arabic', lang_code: 'ar', current: '2,087', fuzzy: '0', waiting: '0', untranslated: '0' },
+      { lang_name: 'arabic', lang_code: 'ar', current: '2,087', fuzzy: '0', waiting: '0', untranslated: '0', progress: '100' },
       # Mock de to be translated at 51%
-      { lang_name: 'german', lang_code: 'de', current: '1,078', fuzzy: '2', waiting: '1003', untranslated: '4' },
-      { lang_name: 'spanish', lang_code: 'es', current: '2,085', fuzzy: '0', waiting: '0', untranslated: '2' },
+      { lang_name: 'german', lang_code: 'de', current: '1,078', fuzzy: '2', waiting: '1003', untranslated: '4', progress: '51' },
+      { lang_name: 'spanish', lang_code: 'es', current: '2,085', fuzzy: '0', waiting: '0', untranslated: '2', progress: '99' },
     ]
 
     stub = stub_request(
@@ -125,10 +125,9 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
 
   it 'prints the report and asks user confirmation when one the language is below the threshold and aborting is disabled' do
     langs = [
-      { lang_name: 'arabic', lang_code: 'ar', current: '2,087', fuzzy: '0', waiting: '0', untranslated: '0' },
-      # Mock de to be translated at 51%
-      { lang_name: 'german', lang_code: 'de', current: '1,078', fuzzy: '2', waiting: '1003', untranslated: '4' },
-      { lang_name: 'spanish', lang_code: 'es', current: '2,085', fuzzy: '0', waiting: '0', untranslated: '2' },
+      { lang_name: 'arabic', lang_code: 'ar', current: '2,087', fuzzy: '0', waiting: '0', untranslated: '0', progress: '100' },
+      { lang_name: 'german', lang_code: 'de', current: '1,078', fuzzy: '2', waiting: '1003', untranslated: '4', progress: '51' },
+      { lang_name: 'spanish', lang_code: 'es', current: '2,085', fuzzy: '0', waiting: '0', untranslated: '2', progress: '99' },
     ]
 
     stub = stub_request(
@@ -162,11 +161,9 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
 
   it 'prints the report and asks user confirmation when multiples languages are below the threshold and aborting is disabled' do
     langs = [
-      { lang_name: 'arabic', lang_code: 'ar', current: '2,087', fuzzy: '0', waiting: '0', untranslated: '0' },
-      # Mock de to be translated at 51%
-      { lang_name: 'german', lang_code: 'de', current: '1,078', fuzzy: '2', waiting: '1003', untranslated: '4' },
-      # Mock de to be translated at 75%
-      { lang_name: 'spanish', lang_code: 'es', current: '1,585', fuzzy: '0', waiting: '0', untranslated: '502' },
+      { lang_name: 'arabic', lang_code: 'ar', current: '2,087', fuzzy: '0', waiting: '0', untranslated: '0', progress: '100' },
+      { lang_name: 'german', lang_code: 'de', current: '1,078', fuzzy: '2', waiting: '1003', untranslated: '4', progress: '51' },
+      { lang_name: 'spanish', lang_code: 'es', current: '1,585', fuzzy: '0', waiting: '0', untranslated: '502', progress: '75' },
     ]
 
     stub = stub_request(
@@ -201,11 +198,9 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
 
   it 'prints the report and continues when one the language is below the threshold, aborting is disabled and confirmation is skipped' do
     langs = [
-      { lang_name: 'arabic', lang_code: 'ar', current: '2,087', fuzzy: '0', waiting: '0', untranslated: '0' },
-      # Mock de to be translated at 51%
-      { lang_name: 'german', lang_code: 'de', current: '1,078', fuzzy: '2', waiting: '1003', untranslated: '4' },
-      # Mock de to be translated at 75%
-      { lang_name: 'spanish', lang_code: 'es', current: '1,585', fuzzy: '0', waiting: '0', untranslated: '502' },
+      { lang_name: 'arabic', lang_code: 'ar', current: '2,087', fuzzy: '0', waiting: '0', untranslated: '0', progress: '100' },
+      { lang_name: 'german', lang_code: 'de', current: '1,078', fuzzy: '2', waiting: '1003', untranslated: '4', progress: '51' },
+      { lang_name: 'spanish', lang_code: 'es', current: '1,585', fuzzy: '0', waiting: '0', untranslated: '502', progress: '75' },
     ]
 
     stub = stub_request(
@@ -239,10 +234,9 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
 
   it 'prints the report and continues when multiple languages are below the threshold, aborting is disabled and confirmation is skipped' do
     langs = [
-      { lang_name: 'arabic', lang_code: 'ar', current: '2,087', fuzzy: '0', waiting: '0', untranslated: '0' },
-      # Mock de to be translated at 51%
-      { lang_name: 'german', lang_code: 'de', current: '1,078', fuzzy: '2', waiting: '1003', untranslated: '4' },
-      { lang_name: 'spanish', lang_code: 'es', current: '2,085', fuzzy: '0', waiting: '0', untranslated: '2' },
+      { lang_name: 'arabic', lang_code: 'ar', current: '2,087', fuzzy: '0', waiting: '0', untranslated: '0', progress: '100' },
+      { lang_name: 'german', lang_code: 'de', current: '1,078', fuzzy: '2', waiting: '1003', untranslated: '4', progress: '51' },
+      { lang_name: 'spanish', lang_code: 'es', current: '2,085', fuzzy: '0', waiting: '0', untranslated: '2', progress: '100' },
     ]
 
     stub = stub_request(
@@ -284,7 +278,8 @@ def generate_glotpress_response_body(languages:)
       current: language[:current],
       fuzzy: language[:fuzzy],
       waiting: language[:waiting],
-      untranslated: language[:untranslated]
+      untranslated: language[:untranslated],
+      progress: language[:progress]
     )
   end
 
@@ -311,7 +306,7 @@ def generate_glotpress_response_header
   HEADER
 end
 
-def generate_glotpress_response_for_language(lang:, lang_code:, current:, fuzzy:, waiting:, untranslated:)
+def generate_glotpress_response_for_language(lang:, lang_code:, current:, fuzzy:, waiting:, untranslated:, progress:)
   lang << <<~LANG
     <tr class="odd">
     		<td>
@@ -325,11 +320,17 @@ def generate_glotpress_response_for_language(lang:, lang_code:, current:, fuzzy:
     <td class="stats percent">anyperc%</td>
   LANG
 
+  lang << generate_glotpress_response_header_for_language(lang: lang, lang_code: lang_code, progress: progress)
   lang << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'translated', status: 'current', string_count: current)
   lang << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'fuzzy', status: 'fuzzy', string_count: fuzzy)
   lang << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'untranslated', status: 'untranslated', string_count: waiting)
   lang << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'waiting', status: 'waiting', string_count: untranslated)
   lang <<	'</tr>'
+end
+
+def generate_glotpress_response_header_for_language(lang:, lang_code:, progress:)
+  lang = "<strong><a href=\"/projects/apps/whatever/dev/#{lang_code}/default/\">#{lang}</a></strong>\n"
+  lang << "<span #{ progress.to_i > 90 ? 'class="bubble morethan90"' : '' }>#{progress}%</span>\n"
 end
 
 def generate_glotpress_response_for_language_status(lang_code:, status_main:, status:, string_count:)
