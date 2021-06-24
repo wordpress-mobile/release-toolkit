@@ -70,8 +70,9 @@ module Fastlane
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_version_from_properties(product_name:, is_alpha: false)
-          version_name_key = "#{product_name}.#{is_alpha ? 'alpha.' : ''}versionName"
-          version_code_key = "#{product_name}.#{is_alpha ? 'alpha.' : ''}versionCode"
+          alpha_variant = is_alpha ? alpha_flavor_name : nil
+          version_name_key = [product_name, alpha_variant, 'versionName'].compact.join('.')
+          version_code_key = [product_name, alpha_variant, 'versionCode'].compact.join('.')
 
           properties_file_path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'version.properties')
 
@@ -88,6 +89,22 @@ module Fastlane
 
             return { VERSION_NAME => name, VERSION_CODE => code.to_i }
           end
+        end
+
+        # Returns the name of the flavor used for alpha builds
+        #
+        # @env HAS_ALPHA_VERSION Should contain the name of the flavor used for alpha
+        #
+        # @return [String] The flavor name as provided by the env var, defaulting to `zalpha` if the env var
+        #                  is not set or is set to '1' ('boolean' value used in legacy call sites)
+        def self.alpha_flavor_name
+          # TODO: Have each fastlane action which depends on this take the alpha flavor name as ConfigItem/parameter
+          #   explicitly instead (and get rid of the HAS_ALPHA_VERSION global / env var after that)
+
+          # For now we pass the alpha flavor name by reusing the HAS_ALPHA_VERSION env var.
+          return ENV['HAS_ALPHA_VERSION'] if ENV['HAS_ALPHA_VERSION'] && ENV['HAS_ALPHA_VERSION'] != '1'
+
+          'zalpha' # Default value if HAS_ALPHA_VERSION is not set or hasn't been updated at call site to the flavor name instead of '1'
         end
 
         # Extract the version name and code from the `version.properties` file in the project root
@@ -319,17 +336,20 @@ module Fastlane
           if properties_file_exists
             new_version_name_beta_key = "#{app}.versionName"
             new_version_code_beta_key = "#{app}.versionCode"
-            new_version_name_alpha_key = "#{app}.alpha.versionName"
-            new_version_code_alpha_key = "#{app}.alpha.versionCode"
             Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_name_beta_key}", "-Pvalue=#{new_version_beta[VERSION_NAME]}")
             Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_code_beta_key}", "-Pvalue=#{new_version_beta[VERSION_CODE]}")
-            Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_name_alpha_key}", "-Pvalue=#{new_version_alpha[VERSION_NAME]}") unless new_version_alpha.nil?
-            Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_code_alpha_key}", "-Pvalue=#{new_version_alpha[VERSION_CODE]}") unless new_version_alpha.nil?
-            return
-          end
 
-          self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
-          self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
+            unless new_version_alpha.nil?
+              new_version_name_alpha_key = "#{app}.#{alpha_flavor_name}.versionName"
+              new_version_code_alpha_key = "#{app}.#{alpha_flavor_name}.versionCode"
+
+              Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_name_alpha_key}", "-Pvalue=#{new_version_alpha[VERSION_NAME]}") unless new_version_alpha.nil?
+              Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_code_alpha_key}", "-Pvalue=#{new_version_alpha[VERSION_CODE]}") unless new_version_alpha.nil?
+            end
+          else
+            self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
+            self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
+          end
         end
 
         # Compute the name of the previous hotfix version.
