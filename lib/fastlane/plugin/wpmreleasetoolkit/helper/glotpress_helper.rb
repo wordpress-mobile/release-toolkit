@@ -49,7 +49,7 @@ module Fastlane
         # ([0-9]+)    : progress is the first group
         # %<\/td>     : tag closure
         regex = "^\\s*<strong><a href=\".*\\/#{language_code}\\/default\\/\">.*<\\/strong>\\n"
-        regex += "(?:\\s*<span class=\"bubble morethan90\">\\d\\d\\d?%<\\/span>\\n)?\\s*<\\/td>\\n\\s*<td class=\"stats percent\">([0-9]+)%<\\/td>$"
+        regex += '(?:\s*<span class="bubble morethan90">\d\d\d?%<\/span>\n)?\s*<\/td>\n\s*<td class="stats percent">([0-9]+)%<\/td>$'
 
         # 1. Merge the array into a single string.
         # 2. Match the info and extract the value in group 1.
