@@ -26,12 +26,13 @@ module Fastlane
       # @return [Integer] The percentage of the translated strings.
       #
       def self.get_translation_status(data:, language_code:)
-        current = extract_value_from_translation_info_data(data: data, language_code: language_code, status: 'current')
-        fuzzy = extract_value_from_translation_info_data(data: data, language_code: language_code, status: 'fuzzy')
-        untranslated = extract_value_from_translation_info_data(data: data, language_code: language_code, status: 'untranslated')
-        waiting = extract_value_from_translation_info_data(data: data, language_code: language_code, status: 'waiting')
+        regex = "<strong><a href=\".*\/#{language_code}\/default\/\">.*<\/strong>\n<span.*>([0-9]+)%<\/span>"
 
-        (current * 100 / (current + fuzzy + untranslated + waiting)).round
+        # 1. Grep the line with contains the required info.
+        # 2. Match the info and extract the value in group 1.
+        # 3. Convert to integer.
+        puts data
+        data.grep(/#{regex}/)[0].match(/#{regex}/)[1].to_i
       end
 
       # Extract the number of strings which are in the given status.
