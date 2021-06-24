@@ -14,7 +14,8 @@ _None_
 
 ### Bug Fixes
 
-_None_
+* Fix crashes introduced in `1.3.0` – incorrect parameters in calls to `get_release_version`. [#283]
+* Fix the way versioning is handled for alphas – i.e. `version.properties` is indexed by flavor name, defaulting to `zalpha` for alphas. [#283]
 
 ### Internal Changes
 
@@ -25,7 +26,7 @@ _None_
 ### New Features
 
 * Support for a `version.properties` to manage app versioning - all existing paths remain intact and new paths are only used when a `version.properties` file is present.
-* Add support for providing an `app:` parameter to most versioning-related actions to allow support for multiple apps hosted in a monorepo
+* Add support for providing an `app:` parameter to most versioning-related actions to allow support for multiple apps hosted in a monorepo.
 * Supporting the new `version.properties` file also allows for the `HAS_ALPHA_VERSION` variable to be removed as the alpha reference in the properties file will be used going forward.
 * Clients adopting the new `version.properties` will need to implement a gradle task named `updateVersionProperties` to update the `version.properties` file.
 
