@@ -26,7 +26,7 @@ module Fastlane
       # @return [Integer] The percentage of the translated strings.
       #
       def self.get_translation_status(data:, language_code:)
-        regex = "<strong><a href=\".*\\/#{language_code}\\/default\\/\">.*<\\/strong>\\n.*<span.*>([0-9]+)%<\\/span>"
+        regex = "$\\s*<strong><a href=\".*\\/#{language_code}\\/default\\/\">.*<\\/strong>\\n.*\\n*.*\\n*.*<td class=\"stats percent\">([0-9]+)%<\/td>$"
 
         # 1. Grep the line with contains the required info.
         # 2. Match the info and extract the value in group 1.
