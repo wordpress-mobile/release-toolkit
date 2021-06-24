@@ -335,37 +335,29 @@ def generate_glotpress_response_header
 end
 
 def generate_glotpress_response_for_language(lang:, lang_code:, current:, fuzzy:, waiting:, untranslated:, progress:)
-  lang << <<~LANG
+  res = <<~LANG
     <tr class="odd">
     		<td>
   LANG
 
-  lang << "<strong><a href=\"/projects/apps/android/dev/#{lang_code}/default/\">#{lang}</a></strong>\n"
-
-  lang << <<~LANG
-        <span class="bubble morethan90">anyperc%</span>
-    </td>
-    <td class="stats percent">anyperc%</td>
-  LANG
-
-  lang << generate_glotpress_response_header_for_language(lang: lang, lang_code: lang_code, progress: progress)
-  lang << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'translated', status: 'current', string_count: current)
-  lang << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'fuzzy', status: 'fuzzy', string_count: fuzzy)
-  lang << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'untranslated', status: 'untranslated', string_count: waiting)
-  lang << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'waiting', status: 'waiting', string_count: untranslated)
-  lang <<	'</tr>'
+  res << generate_glotpress_response_header_for_language(lang: lang, lang_code: lang_code, progress: progress)
+  res << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'translated', status: 'current', string_count: current)
+  res << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'fuzzy', status: 'fuzzy', string_count: fuzzy)
+  res << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'untranslated', status: 'untranslated', string_count: waiting)
+  res << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'waiting', status: 'waiting', string_count: untranslated)
+  res <<	'</tr>'
 end
 
 def generate_glotpress_response_header_for_language(lang:, lang_code:, progress:)
-  lang = "<strong><a href=\"/projects/apps/whatever/dev/#{lang_code}/default/\">#{lang}</a></strong>\n"
-  lang << "<span#{ progress.to_i > 90 ? 'class=" bubble morethan90"' : '' }>#{progress}%</span>\n"
+  res = "<strong><a href=\"/projects/apps/whatever/dev/#{lang_code}/default/\">#{lang}</a></strong>\n"
+  res << "<span#{ progress.to_i > 90 ? ' class="bubble morethan90"' : '' }>#{progress}%</span>\n"
 end
 
 def generate_glotpress_response_for_language_status(lang_code:, status_main:, status:, string_count:)
-  lang = "<td class=\"stats #{status_main}\" title=\"#{status_main}\">\n"
-  lang << "<a href=\"/projects/apps/whatever/dev/#{lang_code}/default/?filters%5Btranslated%5D=yes&#038;filters%5Bstatus%5D=#{status}\">#{string_count}</a></td>"
+  res = "<td class=\"stats #{status_main}\" title=\"#{status_main}\">\n"
+  res << "<a href=\"/projects/apps/whatever/dev/#{lang_code}/default/?filters%5Btranslated%5D=yes&#038;filters%5Bstatus%5D=#{status}\">#{string_count}</a></td>"
 
-  lang
+  res
 end
 
 def generate_glotpress_response_footer
