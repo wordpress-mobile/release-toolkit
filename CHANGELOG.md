@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+* Fixed an issue in `check_translation_progress` where a wrong evaluation of the progress is possible when there are Waiting string in Glotpress.
 
 ### Internal Changes
 
