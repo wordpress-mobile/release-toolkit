@@ -347,7 +347,7 @@ end
 def generate_glotpress_response_header_for_language(lang:, lang_code:, progress:)
   res = "<td>\n"
   res << "<strong><a href=\"/projects/apps/whatever/dev/#{lang_code}/default/\">#{lang}</a></strong>\n"
-  res << "<span class=\"bubble morethan90\"}>#{progress}%</span>\n" if progress.to_i > 90
+  res << "<span class=\"bubble morethan90\">#{progress}%</span>\n" if progress.to_i > 90
   res << "</td>\n"
   res << "<td class=\"stats percent\">#{progress}%</td>\n"
 end
