@@ -26,7 +26,7 @@ module Fastlane
       # @return [Integer] The percentage of the translated strings.
       #
       def self.get_translation_status(data:, language_code:)
-        # The status is parsed from Glotpress project page.
+        # The status is parsed from the GlotPress project page.
         # The row can be identified by the language code and the progress is in the column identified by the class "stats percent".
         # When the progress is above 90%, a special badge is added.
         # Because of the way the HTML is organized, this regex matches content spawned on three or four lines
