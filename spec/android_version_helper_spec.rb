@@ -6,8 +6,8 @@ describe Fastlane::Helper::Android::VersionHelper do
       test_file_content = <<~CONTENT
         wordpress.versionName=17.0
         wordpress.versionCode=123
-        wordpress.alpha.versionName=alpha-222
-        wordpress.alpha.versionCode=1234
+        wordpress.zalpha.versionName=alpha-222
+        wordpress.zalpha.versionCode=1234
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
@@ -19,8 +19,8 @@ describe Fastlane::Helper::Android::VersionHelper do
       test_file_content = <<~CONTENT
         wordpress.versionName=17.0
         wordpress.versionCode=123
-        wordpress.alpha.versionName=alpha-222
-        wordpress.alpha.versionCode=1234
+        wordpress.zalpha.versionName=alpha-222
+        wordpress.zalpha.versionCode=1234
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)

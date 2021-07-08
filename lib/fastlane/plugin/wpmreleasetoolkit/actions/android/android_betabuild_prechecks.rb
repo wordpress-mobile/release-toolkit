@@ -14,18 +14,18 @@ module Fastlane
         app = params[:app]
 
         # Check versions
-        release_version = Fastlane::Helper::Android::VersionHelper.get_release_version(app)
+        release_version = Fastlane::Helper::Android::VersionHelper.get_release_version(product_name: app)
         message = "[#{app}] The following current version has been detected: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n"
         alpha_release_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
         message << "[#{app}] The following Alpha version has been detected: #{alpha_release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
 
         # Check branch
-        app_version = Fastlane::Helper::Android::VersionHelper.get_public_version
+        app_version = Fastlane::Helper::Android::VersionHelper.get_public_version(app)
         UI.user_error!("#{message}Release branch for version #{app_version} doesn't exist. Abort.") unless !params[:base_version].nil? || Fastlane::Helper::GitHelper.checkout_and_pull(release: app_version)
 
         # Check user overwrite
         unless params[:base_version].nil?
-          overwrite_version = get_user_build_version(params[:base_version], message)
+          overwrite_version = get_user_build_version(product_name: app, version: params[:base_version], message: message)
           release_version = overwrite_version[0]
           alpha_release_version = overwrite_version[1]
         end
@@ -49,11 +49,11 @@ module Fastlane
         [next_beta_version, next_alpha_version]
       end
 
-      def self.get_user_build_version(version, message)
+      def self.get_user_build_version(product_name:, version:, message:)
         UI.user_error!("[#{app}] Release branch for version #{version} doesn't exist. Abort.") unless Fastlane::Helper::GitHelper.checkout_and_pull(release: version)
-        release_version = Fastlane::Helper::Android::VersionHelper.get_release_version
+        release_version = Fastlane::Helper::Android::VersionHelper.get_release_version(product_name: product_name)
         message << "#{app}] Looking at branch release/#{version} as requested by user. Detected version: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}.\n"
-        alpha_release_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version
+        alpha_release_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(product_name)
         message << "and Alpha Version: #{alpha_release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
         [release_version, alpha_release_version]
       end

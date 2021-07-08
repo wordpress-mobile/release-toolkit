@@ -7,7 +7,7 @@ module Fastlane
 
         app = ENV['PROJECT_NAME'].nil? ? params[:app] : ENV['PROJECT_NAME']
 
-        release_ver = Fastlane::Helper::Android::VersionHelper.get_release_version(app)
+        release_ver = Fastlane::Helper::Android::VersionHelper.get_release_version(product_name: app)
         alpha_ver = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
         Fastlane::Helper::GitHelper.create_tag(release_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME])
         Fastlane::Helper::GitHelper.create_tag(alpha_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]) unless alpha_ver.nil? || (params[:tag_alpha] == false)
