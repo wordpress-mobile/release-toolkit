@@ -25,7 +25,6 @@ commands:
                   # Because the CircleCI image uses shallow clones, we need to unshallow them first. See https://bit.ly/3vx6EAL
                   git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core fetch --unshallow
                   git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask fetch --unshallow
-
                   brew update && xargs brew install --verbose < .circleci/.brewfile
       - run:
           name: Install Ruby dependencies, if neeeded
@@ -62,7 +61,7 @@ jobs:
       # Save test results for timing analysis
       - store_test_results:
           path: test_results
-      
+
       # Coverage reports are sent to Codecov as part of running `rspec`, not as a CircleCI step.
       # We may wish to change this for consistency.
 
@@ -99,4 +98,3 @@ workflows:
               only: /.*/
             branches:
               ignore: /.*/
-

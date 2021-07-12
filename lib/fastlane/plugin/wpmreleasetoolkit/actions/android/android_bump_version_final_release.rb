@@ -8,11 +8,20 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper'
 
         Fastlane::Helper::GitHelper.ensure_on_branch!('release')
-        create_config()
-        show_config()
+        app = params[:app]
 
-        UI.message 'Updating gradle.properties...'
-        Fastlane::Helper::Android::VersionHelper.update_versions(@final_version, @current_version_alpha)
+        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(product_name: app)
+        current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
+        final_version = Fastlane::Helper::Android::VersionHelper.calc_final_release_version(current_version, current_version_alpha)
+
+        vname = Fastlane::Helper::Android::VersionHelper::VERSION_NAME
+        vcode = Fastlane::Helper::Android::VersionHelper::VERSION_CODE
+        UI.message("Current version[#{app}]: #{current_version[vname]}(#{current_version[vcode]})")
+        UI.message("Current alpha version[#{app}]: #{current_version_alpha[vname]}(#{current_version_alpha[vcode]})") unless current_version_alpha.nil?
+        UI.message("New release version[#{app}]: #{final_version[vname]}(#{final_version[vcode]})")
+
+        UI.message 'Updating app version...'
+        Fastlane::Helper::Android::VersionHelper.update_versions(app, final_version, current_version_alpha)
         UI.message 'Done!'
 
         Fastlane::Helper::Android::GitHelper.commit_version_bump()
@@ -23,11 +32,21 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Bumps the version of the app for a new beta'
+        'Bumps the version of the app for a new beta. Requires the `updateVersionProperties` gradle task to update the keys if you are using a `version.properties` file.'
       end
 
       def self.details
-        'Bumps the version of the app for a new beta'
+        'Bumps the version of the app for a new beta. Requires the `updateVersionProperties` gradle task to update the keys if you are using a `version.properties` file.'
+      end
+
+      def self.available_options
+        # Define all options your action supports.
+        [
+          FastlaneCore::ConfigItem.new(key: :app,
+                                       env_name: 'PROJECT_NAME',
+                                       description: 'The name of the app to get the release version for',
+                                       is_string: true), # true: verifies the input is a string, false: every kind of value
+        ]
       end
 
       def self.authors
@@ -36,22 +55,6 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :android
-      end
-
-      private
-
-      def self.create_config
-        @current_version = Fastlane::Helper::Android::VersionHelper.get_release_version()
-        @current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version()
-        @final_version = Fastlane::Helper::Android::VersionHelper.calc_final_release_version(@current_version, @current_version_alpha)
-      end
-
-      def self.show_config
-        vname = Fastlane::Helper::Android::VersionHelper::VERSION_NAME
-        vcode = Fastlane::Helper::Android::VersionHelper::VERSION_CODE
-        UI.message("Current version: #{@current_version[vname]}(#{@current_version[vcode]})")
-        UI.message("Current alpha version: #{@current_version_alpha[vname]}(#{@current_version_alpha[vcode]})") unless ENV['HAS_ALPHA_VERSION'].nil?
-        UI.message("New release version: #{@final_version[vname]}(#{@final_version[vcode]})")
       end
     end
   end

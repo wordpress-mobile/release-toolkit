@@ -12,11 +12,20 @@ module Fastlane
         # @env PROJECT_NAME The name of the directory containing the project code (especially containing the `build.gradle` file)
         #
         def self.commit_version_bump
-          Fastlane::Helper::GitHelper.commit(
-            message: 'Bump version number',
-            files: File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'build.gradle'),
-            push: true
-          )
+          require_relative './android_version_helper'
+          if Fastlane::Helper::Android::VersionHelper.properties_file_exists
+            Fastlane::Helper::GitHelper.commit(
+              message: 'Bump version number',
+              files: File.join(ENV['PROJECT_ROOT_FOLDER'], 'version.properties'),
+              push: true
+            )
+          else
+            Fastlane::Helper::GitHelper.commit(
+              message: 'Bump version number',
+              files: File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'build.gradle'),
+              push: true
+            )
+          end
         end
 
         # Calls the `tools/update-translations.sh` script from the project repo, then lint them using the provided gradle task
