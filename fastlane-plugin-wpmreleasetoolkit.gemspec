@@ -43,13 +43,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'progress_bar', '~> 1.3'
   spec.add_dependency 'parallel', '~> 1.14'
   spec.add_dependency 'chroma', '0.2.0'
-  spec.add_dependency 'activesupport', '~> 5'
-  # Some of the upstream code uses `BigDecimal.new` which version 2.0 of the
-  # `bigdecimal` gem removed. Until we'll find the time to identify the
-  # dependencies and see if we can move them to something compatible with
-  # modern `bigdecimal`, let's constrain the gem to a version still supporting
-  # `.new` but which warns about it deprecation.
-  spec.add_dependency 'bigdecimal', '~> 1.4'
+  spec.add_dependency 'activesupport', '~> 6.0'
+  spec.add_dependency 'bigdecimal', '~> 2.0'
 
   spec.add_development_dependency 'pry', '~> 0.12.2'
   spec.add_development_dependency 'bundler', '~> 2.0'

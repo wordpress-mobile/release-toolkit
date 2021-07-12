@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+Update the `BigDecimal` and `ActiveSupport` gems to clean up our `Gemfile` and improve future compatibility.
 
 ## 1.3.1
 
