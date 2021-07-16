@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+* Fix crashes in actions dealing with hotfixes. [#288]
 
 ### Internal Changes
 
