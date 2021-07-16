@@ -9,14 +9,18 @@ module Fastlane
         create_config(params[:previous_version], params[:version])
         show_config()
 
-        UI.message 'Updating Fastlane deliver file...'
-        Fastlane::Helper::Ios::VersionHelper.update_fastlane_deliver(@new_short_version)
-        UI.message 'Done!'
+        update_deliverfile = params[:skip_deliver] == false
+        if update_deliverfile
+          UI.message 'Updating Fastlane deliver file...'
+          Fastlane::Helper::Ios::VersionHelper.update_fastlane_deliver(@new_short_version)
+          UI.message 'Done!'
+        end
+
         UI.message 'Updating XcConfig...'
         Fastlane::Helper::Ios::VersionHelper.update_xc_configs(@new_version, @new_short_version, @new_version_internal)
         UI.message 'Done!'
 
-        Fastlane::Helper::Ios::GitHelper.commit_version_bump(include_deliverfile: true, include_metadata: false)
+        Fastlane::Helper::Ios::GitHelper.commit_version_bump(include_deliverfile: update_deliverfile, include_metadata: false)
 
         UI.message 'Done.'
       end
