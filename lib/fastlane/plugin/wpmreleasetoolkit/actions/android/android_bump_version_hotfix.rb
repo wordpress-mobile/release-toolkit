@@ -10,7 +10,6 @@ module Fastlane
         app = params[:app]
 
         current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(product_name: app)
-        current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
         new_version = Fastlane::Helper::Android::VersionHelper.calc_next_hotfix_version(params[:version_name], params[:version_code]) # Note: this just puts the name/code values in a tuple, unchanged (no actual calc/bumping)
         new_release_branch = "release/#{params[:version_name]}"
 
@@ -20,7 +19,7 @@ module Fastlane
         UI.message("Release branch: #{new_release_branch}")
 
         UI.message 'Updating app version...'
-        Fastlane::Helper::Android::VersionHelper.update_versions(app, new_version, current_version_alpha)
+        Fastlane::Helper::Android::VersionHelper.update_versions(app, new_version, nil)
         UI.message 'Done!'
 
         Fastlane::Helper::Android::GitHelper.commit_version_bump()
