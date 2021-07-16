@@ -9,14 +9,18 @@ module Fastlane
         create_config(params[:previous_version], params[:version])
         show_config()
 
-        UI.message 'Updating Fastlane deliver file...'
-        Fastlane::Helper::Ios::VersionHelper.update_fastlane_deliver(@new_short_version)
-        UI.message 'Done!'
+        update_deliverfile = params[:skip_deliver] == false
+        if update_deliverfile
+          UI.message 'Updating Fastlane deliver file...'
+          Fastlane::Helper::Ios::VersionHelper.update_fastlane_deliver(@new_short_version)
+          UI.message 'Done!'
+        end
+
         UI.message 'Updating XcConfig...'
         Fastlane::Helper::Ios::VersionHelper.update_xc_configs(@new_version, @new_short_version, @new_version_internal)
         UI.message 'Done!'
 
-        Fastlane::Helper::Ios::GitHelper.commit_version_bump(include_deliverfile: true, include_metadata: false)
+        Fastlane::Helper::Ios::GitHelper.commit_version_bump(include_deliverfile: update_deliverfile, include_metadata: false)
 
         UI.message 'Done.'
       end
@@ -34,18 +38,29 @@ module Fastlane
       end
 
       def self.available_options
-        # Define all options your action supports.
-
-        # Below a few examples
         [
-          FastlaneCore::ConfigItem.new(key: :version,
-                                       env_name: 'FL_IOS_BUMP_VERSION_HOTFIX_VERSION',
-                                       description: 'The version of the hotfix',
-                                       is_string: true),
-          FastlaneCore::ConfigItem.new(key: :previous_version,
-                                       env_name: 'FL_IOS_BUMP_VERSION_HOTFIX_PREVIOUS_VERSION',
-                                       description: 'The version to branch from',
-                                       is_string: true), # the default value if the user didn't provide one
+          FastlaneCore::ConfigItem.new(
+            key: :version,
+            env_name: 'FL_IOS_BUMP_VERSION_HOTFIX_VERSION',
+            description: 'The version of the hotfix',
+            is_string: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :previous_version,
+            env_name: 'FL_IOS_BUMP_VERSION_HOTFIX_PREVIOUS_VERSION',
+            description: 'The version to branch from',
+            is_string: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :skip_deliver,
+            env_name: 'FL_IOS_BUMP_VERSION_HOTFIX_SKIP_DELIVER',
+            description: 'Skips Deliverfile key update',
+            is_string: false, # Boolean parameter
+            optional: true,
+            # Don't skip the Deliverfile by default. At the time of writing, 2 out of 3 consumers
+            # still have a Deliverfile.
+            default_value: false
+          ),
         ]
       end
 
