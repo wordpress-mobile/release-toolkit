@@ -14,11 +14,12 @@ _None_
 
 ### Bug Fixes
 
+* Fixes a bug that was breaking the `promo_screenshots` helper [#276]
 * Fix crashes in actions dealing with hotfixes. [#288]
 
 ### Internal Changes
 
-_None_
+* Update the `BigDecimal` and `ActiveSupport` gems to clean up our `Gemfile` and improve future compatibility.
 
 ## 1.3.1
 
