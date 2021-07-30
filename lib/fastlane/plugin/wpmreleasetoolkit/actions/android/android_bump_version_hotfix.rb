@@ -10,17 +10,17 @@ module Fastlane
         app = params[:app]
 
         current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(product_name: app)
-        current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
-        new_version = Fastlane::Helper::Android::VersionHelper.calc_next_hotfix_version(params[:version_name], params[:version_code])
-        new_short_version = new_version_name
-        new_release_branch = "release/#{new_short_version}"
+        new_version = Fastlane::Helper::Android::VersionHelper.calc_next_hotfix_version(params[:version_name], params[:version_code]) # NOTE: this just puts the name/code values in a tuple, unchanged (no actual calc/bumping)
+        new_release_branch = "release/#{params[:version_name]}"
 
-        UI.message("Current version[#{app}]: #{current_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{current_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]})")
-        UI.message("New hotfix version[#{app}]: #{new_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{new_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]})")
+        name_key = Fastlane::Helper::Android::VersionHelper::VERSION_NAME
+        code_key = Fastlane::Helper::Android::VersionHelper::VERSION_CODE
+        UI.message("Current version [#{app}]: #{current_version[name_key]} (#{current_version[code_key]})")
+        UI.message("New hotfix version[#{app}]: #{new_version[name_key]} (#{new_version[code_key]})")
         UI.message("Release branch: #{new_release_branch}")
 
         UI.message 'Updating app version...'
-        Fastlane::Helper::Android::VersionHelper.update_versions(app, new_version, current_version_alpha)
+        Fastlane::Helper::Android::VersionHelper.update_versions(app, new_version, nil)
         UI.message 'Done!'
 
         Fastlane::Helper::Android::GitHelper.commit_version_bump()
@@ -41,25 +41,22 @@ module Fastlane
       end
 
       def self.available_options
-        # Define all options your action supports.
-
-        # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :version_name,
                                        env_name: 'FL_ANDROID_BUMP_VERSION_HOTFIX_VERSION',
-                                       description: 'The version of the hotfix',
+                                       description: 'The version name for the hotfix',
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :version_code,
                                        env_name: 'FL_ANDROID_BUMP_VERSION_HOTFIX_CODE',
-                                       description: 'The version of the hotfix'),
+                                       description: 'The version code for the hotfix'),
           FastlaneCore::ConfigItem.new(key: :previous_version_name,
                                        env_name: 'FL_ANDROID_BUMP_VERSION_HOTFIX_PREVIOUS_VERSION',
                                        description: 'The version to branch from',
-                                       is_string: true), # the default value if the user didn't provide one
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :app,
                                        env_name: 'PROJECT_NAME',
                                        description: 'The name of the app to get the release version for',
-                                       is_string: true), # true: verifies the input is a string, false: every kind of value
+                                       is_string: true),
         ]
       end
 
