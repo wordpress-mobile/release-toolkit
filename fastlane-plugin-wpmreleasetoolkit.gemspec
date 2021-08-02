@@ -61,4 +61,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'simplecov', '~> 0.16.1'
   spec.add_development_dependency 'fastlane', '~> 2'
   spec.add_development_dependency 'rmagick', '~> 4.1'
+  spec.add_development_dependency 'cocoapods', '~> 1.10'
 end
