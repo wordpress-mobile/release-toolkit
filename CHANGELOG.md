@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+* Add option to skip updating `Deliverfile` when creating a new hotfix version (`ios_bump_version_hotfix`) [#287]
 
 ### Bug Fixes
 
