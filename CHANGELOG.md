@@ -10,16 +10,26 @@ _None_
 
 ### New Features
 
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 1.4.0
+
+### New Features
+
 * Add option to skip updating `Deliverfile` when creating a new hotfix version (`ios_bump_version_hotfix`) [#287]
 
 ### Bug Fixes
 
 * Fixes a bug that was breaking the `promo_screenshots` helper [#276]
 * Fix crashes in actions dealing with hotfixes. [#288]
-
-### Internal Changes
-
-_None_
 
 ## 1.3.1
 
