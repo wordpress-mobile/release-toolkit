@@ -34,6 +34,7 @@ _None_
 ### Internal Changes
 
 * Opt-out from installing platform-specific gems with Bundler [#293]
+* Update gems in the repository to fix `addressable` security vulnerability [#294]
 
 ## 1.3.1
 
