@@ -20,6 +20,22 @@ _None_
 
 _None_
 
+## 1.4.0
+
+### New Features
+
+* Add option to skip updating `Deliverfile` when creating a new hotfix version (`ios_bump_version_hotfix`) [#287]
+
+### Bug Fixes
+
+* Fixes a bug that was breaking the `promo_screenshots` helper [#276]
+* Fix crashes in actions dealing with hotfixes. [#288]
+
+### Internal Changes
+
+* Opt-out from installing platform-specific gems with Bundler [#293]
+* Update gems in the repository to fix `addressable` security vulnerability [#294]
+
 ## 1.3.1
 
 ### Bug Fixes
@@ -27,7 +43,6 @@ _None_
 * Fix crashes introduced in `1.3.0` – incorrect parameters in calls to `get_release_version`. [#283]
 * Fix the way versioning is handled for alphas – i.e. `version.properties` is indexed by flavor name, defaulting to `zalpha` for alphas. [#283]
 * Fixed an issue in `check_translation_progress` where a wrong evaluation of the progress is possible when there are Waiting string in GlotPress.
-
 
 ## 1.3.0
 

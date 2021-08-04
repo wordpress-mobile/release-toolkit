@@ -14,7 +14,7 @@ module Fastlane
 
         # Confirm
         message = "Requested Hotfix version: #{new_ver}\n"
-        message << "Branching from: #{prev_ver}\n"
+        message << "Branching from tag: #{prev_ver}\n"
 
         if params[:skip_confirm]
           UI.message(message)
@@ -50,13 +50,13 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :version_name,
                                        env_name: 'FL_ANDROID_HOTFIX_PRECHECKS_VERSION',
-                                       description: 'The version to work on', # a short description of this parameter
+                                       description: 'The hotfix version number to create',
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
                                        env_name: 'FL_ANDROID_HOTFIX_PRECHECKS_SKIPCONFIRM',
                                        description: 'Skips confirmation',
-                                       is_string: false, # true: verifies the input is a string, false: every kind of value
-                                       default_value: false), # the default value if the user didn't provide one
+                                       is_string: false, # Boolean
+                                       default_value: false),
         ]
       end
 
