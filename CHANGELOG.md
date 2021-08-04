@@ -39,6 +39,9 @@ _None_
 * Fix the way versioning is handled for alphas – i.e. `version.properties` is indexed by flavor name, defaulting to `zalpha` for alphas. [#283]
 * Fixed an issue in `check_translation_progress` where a wrong evaluation of the progress is possible when there are Waiting string in GlotPress.
 
+### Internal Changes
+
+* Opt-out from installing platform-specific gems with Bundler [#293]
 
 ## 1.3.0
 
