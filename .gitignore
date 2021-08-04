@@ -5,7 +5,6 @@
 .idea
 
 # Ruby / Bundler
-.bundle/
 vendor/bundle
 
 # Fastlane
