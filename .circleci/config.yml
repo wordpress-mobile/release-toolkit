@@ -28,7 +28,7 @@ commands:
                   brew update && xargs brew install --verbose < .circleci/.brewfile
       - run:
           name: Install Ruby dependencies, if neeeded
-          command: bundle check --path vendor/bundle || bundle install --with screenshots
+          command: bundle check --path vendor/bundle || bundle install
       - save_cache:
           name: Cache Homebrew + Ruby Dependencies
           key: *cache_key
