@@ -80,6 +80,16 @@ describe Fastlane::Locales do
     end
   end
 
+  it 'has only valid codes for known locales' do
+    described_class.all.each do |locale|
+      expect(locale.glotpress || 'xx').to match(/^[a-z]{2,3}(-[a-z]{2})?$/)
+      expect(locale.android || 'xx-rYY').to match(/^[a-z]{2,3}(-r[A-Z]{2})?$/)
+      expect(locale.google_play || 'xx-YY').to match(/^[a-z]{2,3}(-[A-Z]{2})?$/)
+      expect(locale.app_store || 'xx-Yy').to match(/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/)
+      expect(locale.ios || 'xx-Yy').to match(/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/)
+    end
+  end
+
   it 'returns exactly 16 Mag16 locales' do
     expect(described_class.mag16.count).to eq(16)
   end
