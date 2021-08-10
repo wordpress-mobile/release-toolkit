@@ -38,7 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'octokit', '~> 4.18'
   spec.add_dependency 'git', '~> 1.3'
   spec.add_dependency 'jsonlint', '~> 0.3'
-  spec.add_dependency 'rake', '~> 12.3'
+  spec.add_dependency 'rake', '~> 13.0'
   spec.add_dependency 'rake-compiler', '~> 1.0'
   spec.add_dependency 'progress_bar', '~> 1.3'
   spec.add_dependency 'parallel', '~> 1.14'
