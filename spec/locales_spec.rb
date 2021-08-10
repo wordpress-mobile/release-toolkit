@@ -8,9 +8,9 @@ describe Fastlane::Locale do
   end
 
   it 'raises if no locale was found for a given code' do
-    expect {
+    expect do
       Fastlane::Locale['invalidcode']
-    }.to raise_error(RuntimeError, "Unknown locale for glotpress code 'invalidcode'")
+    end.to raise_error(RuntimeError, "Unknown locale for glotpress code 'invalidcode'")
   end
 end
 
@@ -37,9 +37,9 @@ describe Fastlane::Locales do
     end
 
     it 'raises if one of the locale codes passed was not found' do
-      expect {
+      expect do
         Fastlane::Locales.send(method_sym, [fr_code, 'invalidcode', 'pt-br'])
-      }.to raise_error(RuntimeError, "Unknown locale for #{key} code 'invalidcode'")
+      end.to raise_error(RuntimeError, "Unknown locale for #{key} code 'invalidcode'")
     end
   end
 
@@ -95,7 +95,7 @@ describe Fastlane::Locales do
     mag16_except_pt = Fastlane::Locales.mag16 - Fastlane::Locales['pt-br']
     expect(mag16_except_pt.count).to equal(15)
     expect(mag16_except_pt.find { |l| l.glotpress == 'pt-br' }).to be_nil
-    expect(mag16_except_pt.find { |l| l.glotpress == 'fr' }).to_not be_nil
+    expect(mag16_except_pt.find { |l| l.glotpress == 'fr' }).not_to be_nil
   end
 
   it 'can convert a Locale to a hash' do
