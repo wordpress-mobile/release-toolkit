@@ -15,6 +15,6 @@ describe Fastlane::Locale do
 
   it 'can convert a Locale to a hash' do
     h = described_class['fr'].to_h
-    expect(h).to eq({ glotpress: 'fr', android: 'fr', google_play: 'fr-FR', ios: nil, app_store: nil })
+    expect(h).to eq({ glotpress: 'fr', android: 'fr', google_play: 'fr-FR', ios: 'fr-FR', app_store: 'fr-FR' })
   end
 end

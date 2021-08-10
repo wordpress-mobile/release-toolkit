@@ -3,6 +3,7 @@ require 'spec_helper'
 describe Fastlane::Locales do
   shared_examples 'from_xxx' do |key, fr_code, pt_code|
     let(:method_sym) { "from_#{key}".to_sym }
+
     it 'can find a locale from a single code' do
       fr_locale = described_class.send(method_sym, fr_code)
       expect(fr_locale).to be_instance_of(Fastlane::Locale)
@@ -41,7 +42,13 @@ describe Fastlane::Locales do
     include_examples 'from_xxx', :google_play, 'fr-FR', 'pt-BR'
   end
 
-  # @TODO: from_ios, from_app_store
+  describe 'from_ios' do
+    include_examples 'from_xxx', :ios, 'fr-FR', 'pt-BR'
+  end
+
+  describe 'from_app_store' do
+    include_examples 'from_xxx', :app_store, 'fr-FR', 'pt-BR'
+  end
 
   describe 'subscript [] operator' do
     it 'returns an Array<Locale> even if a single one was passed' do
