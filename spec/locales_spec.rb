@@ -25,7 +25,7 @@ describe Fastlane::Locales do
 
     it 'raises if one of the locale codes passed was not found' do
       expect do
-        described_class.send(method_sym, [fr_code, 'invalidcode', 'pt-br'])
+        described_class.send(method_sym, [fr_code, 'invalidcode', pt_code])
       end.to raise_error(RuntimeError, "Unknown locale for #{key} code 'invalidcode'")
     end
   end

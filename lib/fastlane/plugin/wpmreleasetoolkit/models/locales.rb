@@ -90,7 +90,7 @@ module Fastlane
       #
       # Those can be used in the rare cases where you need to find locales via codes other than the glotpress ones,
       # like searching by android locale code(s) or google_play locale code(s).
-      # In most cases, prefer using the `Locales[…]` method instead ()with glotpress locale codes).
+      # In most cases, prefer using the `Locales[…]` method instead (with glotpress locale codes).
       #
       # @param [Array<String>, String] list of locale codes to search for, or single value for single result
       # @return [Array<Locale>, Locale] list of found locales, or single locale if a single value was passed
