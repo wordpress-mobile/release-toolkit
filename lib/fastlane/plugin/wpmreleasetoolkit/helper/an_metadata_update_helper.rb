@@ -50,7 +50,7 @@ module Fastlane
 
         if line_count <= 1
           # Single line output
-          fw.puts("msgid \"#{File.open(@content_file_path, 'r').read}\"")
+          fw.puts("msgid \"#{File.open(@content_file_path, 'r').read.strip}\"")
         else
           # Multiple line output
           fw.puts('msgid ""')
