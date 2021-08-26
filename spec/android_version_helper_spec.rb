@@ -45,6 +45,60 @@ describe Fastlane::Helper::Android::VersionHelper do
     end
   end
 
+  describe 'update_versions' do
+    context 'with a version.properties file' do
+      let(:original_content) do
+        <<~CONTENT
+          # Some header
+
+          versionName=12.3
+          versionCode=1234
+
+          alpha.versionName=alpha-456
+          alpha.versionCode=4567
+        CONTENT
+      end
+      let(:new_beta_version) do
+        { 'name' => '12.4-rc-1', 'code' => '1240' }
+      end
+      let(:new_alpha_version) do
+        { 'name' => 'alpha-457', 'code' => '4570' }
+      end
+
+      it 'updates only the main version if no alpha provided' do
+        expected_content = <<~CONTENT
+          # Some header
+
+          versionName=12.4-rc-1
+          versionCode=1240
+
+          alpha.versionName=alpha-456
+          alpha.versionCode=4567
+        CONTENT
+        allow(File).to receive(:exist?).with('./version.properties').and_return(true)
+        allow(File).to receive(:read).with('./version.properties').and_return(original_content)
+        expect(File).to receive(:write).with('./version.properties', expected_content)
+        subject.update_versions('wordpress', new_beta_version, nil)
+      end
+
+      it 'updates both the main and alpha versions if alpha provided' do
+        expected_content = <<~CONTENT
+          # Some header
+
+          versionName=12.4-rc-1
+          versionCode=1240
+
+          alpha.versionName=alpha-457
+          alpha.versionCode=4570
+        CONTENT
+        allow(File).to receive(:exist?).with('./version.properties').and_return(true)
+        allow(File).to receive(:read).with('./version.properties').and_return(original_content)
+        expect(File).to receive(:write).with('./version.properties', expected_content)
+        subject.update_versions('wordpress', new_beta_version, new_alpha_version)
+      end
+    end
+  end
+
   describe 'get_library_version_from_gradle_config' do
     it 'returns nil when gradle file is not present' do
       allow(File).to receive(:exist?).and_return(false)
