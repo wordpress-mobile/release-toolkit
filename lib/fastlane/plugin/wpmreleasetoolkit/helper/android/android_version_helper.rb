@@ -47,7 +47,7 @@ module Fastlane
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_release_version(product_name:)
-          return get_version_from_properties(product_name: product_name) if File.exist?(version_properties_file)
+          return get_version_from_properties() if File.exist?(version_properties_file)
 
           section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
           gradle_path = self.gradle_path
@@ -62,12 +62,11 @@ module Fastlane
 
         # Extract the version name and code from the `version.properties` file in the project root
         #
-        # @param [String] product_name The name of the app to extract the version from e.g. wordpress, simplenote
         # @param [Boolean] is_alpha true if the alpha version should be returned, false otherwise
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
-        def self.get_version_from_properties(product_name:, is_alpha: false)
+        def self.get_version_from_properties(is_alpha: false)
           return nil unless File.exist?(version_properties_file)
 
           version_name_key = is_alpha ? 'alpha.versionName' : 'versionName'
@@ -88,7 +87,7 @@ module Fastlane
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
         def self.get_alpha_version(app)
-          return get_version_from_properties(product_name: app, is_alpha: true) if File.exist?(version_properties_file)
+          return get_version_from_properties(is_alpha: true) if File.exist?(version_properties_file)
 
           return nil if ENV['HAS_ALPHA_VERSION'].nil?
 

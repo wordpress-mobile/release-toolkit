@@ -4,39 +4,44 @@ describe Fastlane::Helper::Android::VersionHelper do
   describe 'get_version_from_properties' do
     it 'returns version name and code when present' do
       test_file_content = <<~CONTENT
-        wordpress.versionName=17.0
-        wordpress.versionCode=123
-        wordpress.zalpha.versionName=alpha-222
-        wordpress.zalpha.versionCode=1234
+        # Some header
+
+        versionName=17.0
+        versionCode=123
+
+        alpha.versionName=alpha-222
+        alpha.versionCode=1234
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
       allow(File).to receive(:read).with('./version.properties').and_return(test_file_content)
-      expect(subject.get_version_from_properties(product_name: 'wordpress')).to eq('name' => '17.0', 'code' => 123)
+      expect(subject.get_version_from_properties()).to eq('name' => '17.0', 'code' => 123)
     end
 
     it 'returns alpha version name and code when present' do
       test_file_content = <<~CONTENT
-        wordpress.versionName=17.0
-        wordpress.versionCode=123
-        wordpress.zalpha.versionName=alpha-222
-        wordpress.zalpha.versionCode=1234
+        # Some header
+
+        versionName=17.0
+        versionCode=123
+        alpha.versionName=alpha-222
+        alpha.versionCode=1234
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
       allow(File).to receive(:read).with('./version.properties').and_return(test_file_content)
-      expect(subject.get_version_from_properties(product_name: 'wordpress', is_alpha: true)).to eq('name' => 'alpha-222', 'code' => 1234)
+      expect(subject.get_version_from_properties(is_alpha: true)).to eq('name' => 'alpha-222', 'code' => 1234)
     end
 
     it 'returns nil when alpha version name and code not present' do
       test_file_content = <<~CONTENT
-        jetpack.versionName=17.0
-        jetpack.versionCode=123
+        versionName=17.0
+        versionCode=123
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
       allow(File).to receive(:read).with('./version.properties').and_return(test_file_content)
-      expect(subject.get_version_from_properties(product_name: 'jetpack', is_alpha: true)).to be_nil
+      expect(subject.get_version_from_properties(is_alpha: true)).to be_nil
     end
   end
 
