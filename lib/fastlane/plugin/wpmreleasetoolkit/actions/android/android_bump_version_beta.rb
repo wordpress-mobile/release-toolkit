@@ -34,11 +34,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Bumps the version of the app for a new beta. Requires the `updateVersionProperties` gradle task to update the keys if you are using a `version.properties` file.'
+        'Bumps the version of the app for a new beta.'
       end
 
       def self.details
-        'Bumps the version of the app for a new beta. Requires the `updateVersionProperties` gradle task to update the keys if you are using a `version.properties` file.'
+        'Bumps the version of the app for a new beta.'
       end
 
       def self.available_options
