@@ -11,7 +11,7 @@ describe Fastlane::Helper::Android::VersionHelper do
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:open).with('./version.properties', 'r').and_yield(StringIO.new(test_file_content))
+      allow(File).to receive(:read).with('./version.properties').and_return(test_file_content)
       expect(subject.get_version_from_properties(product_name: 'wordpress')).to eq('name' => '17.0', 'code' => 123)
     end
 
@@ -24,7 +24,7 @@ describe Fastlane::Helper::Android::VersionHelper do
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:open).with('./version.properties', 'r').and_yield(StringIO.new(test_file_content))
+      allow(File).to receive(:read).with('./version.properties').and_return(test_file_content)
       expect(subject.get_version_from_properties(product_name: 'wordpress', is_alpha: true)).to eq('name' => 'alpha-222', 'code' => 1234)
     end
 
@@ -35,7 +35,7 @@ describe Fastlane::Helper::Android::VersionHelper do
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:open).with('./version.properties', 'r').and_yield(StringIO.new(test_file_content))
+      allow(File).to receive(:read).with('./version.properties').and_return(test_file_content)
       expect(subject.get_version_from_properties(product_name: 'jetpack', is_alpha: true)).to be_nil
     end
   end

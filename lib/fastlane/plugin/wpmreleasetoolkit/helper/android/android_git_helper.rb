@@ -13,7 +13,7 @@ module Fastlane
         #
         def self.commit_version_bump
           require_relative './android_version_helper'
-          if Fastlane::Helper::Android::VersionHelper.properties_file_exists
+          if File.exist?(Fastlane::Helper::Android::VersionHelper.version_properties_file)
             Fastlane::Helper::GitHelper.commit(
               message: 'Bump version number',
               files: File.join(ENV['PROJECT_ROOT_FOLDER'], 'version.properties'),

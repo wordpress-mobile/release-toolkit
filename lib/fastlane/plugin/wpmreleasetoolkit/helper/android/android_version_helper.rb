@@ -47,7 +47,7 @@ module Fastlane
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_release_version(product_name:)
-          return get_version_from_properties(product_name: product_name) if properties_file_exists
+          return get_version_from_properties(product_name: product_name) if File.exist?(version_properties_file)
 
           section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
           gradle_path = self.gradle_path
@@ -56,10 +56,8 @@ module Fastlane
           return { VERSION_NAME => name, VERSION_CODE => code }
         end
 
-        def self.properties_file_exists
-          properties_file_path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'version.properties')
-
-          return File.exist?(properties_file_path)
+        def self.version_properties_file
+          File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'version.properties')
         end
 
         # Extract the version name and code from the `version.properties` file in the project root
@@ -70,41 +68,16 @@ module Fastlane
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_version_from_properties(product_name:, is_alpha: false)
-          alpha_variant = is_alpha ? alpha_flavor_name : nil
-          version_name_key = [product_name, alpha_variant, 'versionName'].compact.join('.')
-          version_code_key = [product_name, alpha_variant, 'versionCode'].compact.join('.')
+          return nil unless File.exist?(version_properties_file)
 
-          properties_file_path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'version.properties')
+          version_name_key = is_alpha ? 'alpha.versionName' : 'versionName'
+          version_code_key = is_alpha ? 'alpha.versionCode' : 'versionCode'
 
-          return nil unless File.exist?(properties_file_path)
+          text = File.read(version_properties_file)
+          name = text.match(/#{version_name_key}=(\S*)/m)&.captures&.first
+          code = text.match(/#{version_code_key}=(\S*)/m)&.captures&.first
 
-          File.open(properties_file_path, 'r') do |f|
-            text = f.read
-            name = text.match(/#{version_name_key}=(\S*)/m)&.captures&.first
-            code = text.match(/#{version_code_key}=(\S*)/m)&.captures&.first
-
-            f.close
-
-            return nil if name.nil? || code.nil?
-
-            return { VERSION_NAME => name, VERSION_CODE => code.to_i }
-          end
-        end
-
-        # Returns the name of the flavor used for alpha builds
-        #
-        # @env HAS_ALPHA_VERSION Should contain the name of the flavor used for alpha
-        #
-        # @return [String] The flavor name as provided by the env var, defaulting to `zalpha` if the env var
-        #                  is not set or is set to '1' ('boolean' value used in legacy call sites)
-        def self.alpha_flavor_name
-          # TODO: Have each fastlane action which depends on this take the alpha flavor name as ConfigItem/parameter
-          #   explicitly instead (and get rid of the HAS_ALPHA_VERSION global / env var after that)
-
-          # For now we pass the alpha flavor name by reusing the HAS_ALPHA_VERSION env var.
-          return ENV['HAS_ALPHA_VERSION'] if ENV['HAS_ALPHA_VERSION'] && ENV['HAS_ALPHA_VERSION'] != '1'
-
-          'zalpha' # Default value if HAS_ALPHA_VERSION is not set or hasn't been updated at call site to the flavor name instead of '1'
+          return (name.nil? || code.nil?) ? nil : { VERSION_NAME => name, VERSION_CODE => code.to_i }
         end
 
         # Extract the version name and code from the `version.properties` file in the project root
@@ -115,7 +88,7 @@ module Fastlane
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
         def self.get_alpha_version(app)
-          return get_version_from_properties(product_name: app, is_alpha: true) if properties_file_exists
+          return get_version_from_properties(product_name: app, is_alpha: true) if File.exist?(version_properties_file)
 
           return nil if ENV['HAS_ALPHA_VERSION'].nil?
 
@@ -333,19 +306,20 @@ module Fastlane
         # @param [Hash] new_version_alpha The version hash for the alpha , containing values for keys "name" and "code"
         #
         def self.update_versions(app, new_version_beta, new_version_alpha)
-          if properties_file_exists
-            new_version_name_beta_key = "#{app}.versionName"
-            new_version_code_beta_key = "#{app}.versionCode"
-            Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_name_beta_key}", "-Pvalue=#{new_version_beta[VERSION_NAME]}")
-            Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_code_beta_key}", "-Pvalue=#{new_version_beta[VERSION_CODE]}")
-
-            unless new_version_alpha.nil?
-              new_version_name_alpha_key = "#{app}.#{alpha_flavor_name}.versionName"
-              new_version_code_alpha_key = "#{app}.#{alpha_flavor_name}.versionCode"
-
-              Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_name_alpha_key}", "-Pvalue=#{new_version_alpha[VERSION_NAME]}") unless new_version_alpha.nil?
-              Action.sh('./gradlew', 'updateVersionProperties', "-Pkey=#{new_version_code_alpha_key}", "-Pvalue=#{new_version_alpha[VERSION_CODE]}") unless new_version_alpha.nil?
+          if File.exist?(version_properties_file)
+            replacements = {
+              'versionName': (new_version_beta || {})[VERSION_NAME],
+              'versionCode': (new_version_beta || {})[VERSION_CODE],
+              'alpha.versionName': (new_version_alpha || {})[VERSION_NAME],
+              'alpha.versionCode': (new_version_alpha || {})[VERSION_CODE]
+            }
+            content = File.read(version_properties_file)
+            content.gsub!(/^(.*) ?=.*$/) do |line|
+              key = $1.to_sym
+              value = replacements[key]
+              value.nil? ? line : "#{key}=#{value}"
             end
+            File.write(version_properties_file, content)
           else
             self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
             self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
