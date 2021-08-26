@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-_None_
+* Updates the keys used for version reads and bumps when using a `version.properties` file in Android. [#298]
 
 ### New Features
 
