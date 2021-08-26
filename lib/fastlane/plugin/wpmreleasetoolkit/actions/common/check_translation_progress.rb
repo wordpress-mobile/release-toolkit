@@ -98,7 +98,7 @@ module Fastlane
 
       def self.details
         'This actions checks the current status of the translations on GlotPress ' \
-        'and raises an error if it\'s below the provided threshold'
+          'and raises an error if it\'s below the provided threshold'
       end
 
       def self.available_options

@@ -78,7 +78,7 @@ module Fastlane
           name = text.match(/#{version_name_key}=(\S*)/m)&.captures&.first
           code = text.match(/#{version_code_key}=(\S*)/m)&.captures&.first
 
-          return (name.nil? || code.nil?) ? nil : { VERSION_NAME => name, VERSION_CODE => code.to_i }
+          return name.nil? || code.nil? ? nil : { VERSION_NAME => name, VERSION_CODE => code.to_i }
         end
 
         # Extract the version name and code from the `version.properties` file in the project root
@@ -312,14 +312,14 @@ module Fastlane
         def self.update_versions(app, new_version_beta, new_version_alpha)
           if File.exist?(version_properties_file)
             replacements = {
-              'versionName': (new_version_beta || {})[VERSION_NAME],
-              'versionCode': (new_version_beta || {})[VERSION_CODE],
+              versionName: (new_version_beta || {})[VERSION_NAME],
+              versionCode: (new_version_beta || {})[VERSION_CODE],
               'alpha.versionName': (new_version_alpha || {})[VERSION_NAME],
               'alpha.versionCode': (new_version_alpha || {})[VERSION_CODE]
             }
             content = File.read(version_properties_file)
             content.gsub!(/^(.*) ?=.*$/) do |line|
-              key = $1.to_sym
+              key = Regexp.last_match(1).to_sym
               value = replacements[key]
               value.nil? ? line : "#{key}=#{value}"
             end
