@@ -4,39 +4,98 @@ describe Fastlane::Helper::Android::VersionHelper do
   describe 'get_version_from_properties' do
     it 'returns version name and code when present' do
       test_file_content = <<~CONTENT
-        wordpress.versionName=17.0
-        wordpress.versionCode=123
-        wordpress.zalpha.versionName=alpha-222
-        wordpress.zalpha.versionCode=1234
+        # Some header
+
+        versionName=17.0
+        versionCode=123
+
+        alpha.versionName=alpha-222
+        alpha.versionCode=1234
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:open).with('./version.properties', 'r').and_yield(StringIO.new(test_file_content))
-      expect(subject.get_version_from_properties(product_name: 'wordpress')).to eq('name' => '17.0', 'code' => 123)
+      allow(File).to receive(:read).with('./version.properties').and_return(test_file_content)
+      expect(subject.get_version_from_properties()).to eq('name' => '17.0', 'code' => 123)
     end
 
     it 'returns alpha version name and code when present' do
       test_file_content = <<~CONTENT
-        wordpress.versionName=17.0
-        wordpress.versionCode=123
-        wordpress.zalpha.versionName=alpha-222
-        wordpress.zalpha.versionCode=1234
+        # Some header
+
+        versionName=17.0
+        versionCode=123
+        alpha.versionName=alpha-222
+        alpha.versionCode=1234
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:open).with('./version.properties', 'r').and_yield(StringIO.new(test_file_content))
-      expect(subject.get_version_from_properties(product_name: 'wordpress', is_alpha: true)).to eq('name' => 'alpha-222', 'code' => 1234)
+      allow(File).to receive(:read).with('./version.properties').and_return(test_file_content)
+      expect(subject.get_version_from_properties(is_alpha: true)).to eq('name' => 'alpha-222', 'code' => 1234)
     end
 
     it 'returns nil when alpha version name and code not present' do
       test_file_content = <<~CONTENT
-        jetpack.versionName=17.0
-        jetpack.versionCode=123
+        versionName=17.0
+        versionCode=123
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:open).with('./version.properties', 'r').and_yield(StringIO.new(test_file_content))
-      expect(subject.get_version_from_properties(product_name: 'jetpack', is_alpha: true)).to be_nil
+      allow(File).to receive(:read).with('./version.properties').and_return(test_file_content)
+      expect(subject.get_version_from_properties(is_alpha: true)).to be_nil
+    end
+  end
+
+  describe 'update_versions' do
+    context 'with a version.properties file' do
+      let(:original_content) do
+        <<~CONTENT
+          # Some header
+
+          versionName=12.3
+          versionCode=1234
+
+          alpha.versionName=alpha-456
+          alpha.versionCode=4567
+        CONTENT
+      end
+      let(:new_beta_version) do
+        { 'name' => '12.4-rc-1', 'code' => '1240' }
+      end
+      let(:new_alpha_version) do
+        { 'name' => 'alpha-457', 'code' => '4570' }
+      end
+
+      it 'updates only the main version if no alpha provided' do
+        expected_content = <<~CONTENT
+          # Some header
+
+          versionName=12.4-rc-1
+          versionCode=1240
+
+          alpha.versionName=alpha-456
+          alpha.versionCode=4567
+        CONTENT
+        allow(File).to receive(:exist?).with('./version.properties').and_return(true)
+        allow(File).to receive(:read).with('./version.properties').and_return(original_content)
+        expect(File).to receive(:write).with('./version.properties', expected_content)
+        subject.update_versions('wordpress', new_beta_version, nil)
+      end
+
+      it 'updates both the main and alpha versions if alpha provided' do
+        expected_content = <<~CONTENT
+          # Some header
+
+          versionName=12.4-rc-1
+          versionCode=1240
+
+          alpha.versionName=alpha-457
+          alpha.versionCode=4570
+        CONTENT
+        allow(File).to receive(:exist?).with('./version.properties').and_return(true)
+        allow(File).to receive(:read).with('./version.properties').and_return(original_content)
+        expect(File).to receive(:write).with('./version.properties', expected_content)
+        subject.update_versions('wordpress', new_beta_version, new_alpha_version)
+      end
     end
   end
 
