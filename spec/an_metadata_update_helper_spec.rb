@@ -30,4 +30,31 @@ describe Fastlane::Helper::StandardMetadataBlock do
       EXP
     end
   end
+
+  it 'does not strip a trailing new line when generating the block for a multi-line input' do
+    Dir.mktmpdir do |dir|
+      input = "Multi-line\nmessage\nwith\ntrailing new line\n"
+
+      # Generate the input file to convert to .pot block
+      input_path = File.join(dir, 'input')
+      File.write(input_path, input)
+
+      # Write the .pot block in a StringIO to bypass the filesystem and have
+      # faster tests
+      output_io = StringIO.new
+      described_class.new('any-key', input_path).generate_block(output_io)
+
+      # Note that the new line after `msgstr` is intentional. It's part of the
+      # formatting at the time of writing.
+      expect(output_io.string).to eq %q(msgctxt "any-key"
+msgid ""
+"Multi-line\n"
+"message\n"
+"with\n"
+"trailing new line\n"
+msgstr ""
+
+)
+    end
+  end
 end
