@@ -12,18 +12,17 @@ describe Fastlane::Helper::StandardMetadataBlock do
       # Ensure the input has only one line
       expect(File.read(input_path).lines.count).to eq 1
 
-      # Write the .pot block in an output file
-      output_path = File.join(dir, 'output')
-      File.open(output_path, 'w') do |file|
-        described_class.new('any-key', input_path).generate_block(file)
-      end
+      # Write the .pot block in a StringIO to bypass the filesystem and have
+      # faster tests
+      output_io = StringIO.new
+      described_class.new('any-key', input_path).generate_block(output_io)
 
       # Ensure the output matches the expectation: the trailing new line has
       # been stripped.
       #
       # Note that the final new line is intentional. It's part of the
       # formatting at the time of writing.
-      expect(File.read(output_path)).to eq <<~EXP
+      expect(output_io.string).to eq <<~EXP
         msgctxt "any-key"
         msgid "Single line message with new line"
         msgstr ""
