@@ -46,15 +46,16 @@ describe Fastlane::Helper::StandardMetadataBlock do
 
       # Note that the new line after `msgstr` is intentional. It's part of the
       # formatting at the time of writing.
-      expect(output_io.string).to eq %q(msgctxt "any-key"
-msgid ""
-"Multi-line\n"
-"message\n"
-"with\n"
-"trailing new line\n"
-msgstr ""
+      expect(output_io.string).to eq <<~'EXP'
+        msgctxt "any-key"
+        msgid ""
+        "Multi-line\n"
+        "message\n"
+        "with\n"
+        "trailing new line\n"
+        msgstr ""
 
-)
+      EXP
     end
   end
 end
