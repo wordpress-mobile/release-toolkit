@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-Adopts Buildkite
+- Adopt Buildkite
 
 ## 1.4.0
 
