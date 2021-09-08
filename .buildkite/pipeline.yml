@@ -55,3 +55,7 @@ steps:
 
       echo "--- :rubocop: Run Danger"
       bundle exec danger
+    env: *common_env
+    plugins: *common_plugins
+    agents:
+      queue: "mac"
