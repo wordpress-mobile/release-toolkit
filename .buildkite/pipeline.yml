@@ -14,16 +14,19 @@ steps:
     key: "test"
     command: |
       echo "--- :beer: Installing Dependencies"
-      brew bundle --file .buildkite/.brewfile
+      brew bundle --file .buildkite/brewfile
 
       echo "--- :rubygems: Setting up Gems"
       install_gems
 
+      echo "--- :hammer: Build DrawText"
+      bundle exec rake compile
+
+      echo "--- :git: Setting up git-lfs"
+      git-lfs install
+
       echo "--- :rspec: Run Rspec"
-      bundle exec rspec --profile 10 \
-        --format RspecJunitFormatter \
-        --out test_results/rspec.xml \
-        --format progress
+      bundle exec rspec --profile 10 --format progress
     env: *common_env
     plugins: *common_plugins
     agents:
