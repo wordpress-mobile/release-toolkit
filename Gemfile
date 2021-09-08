@@ -6,7 +6,7 @@ gem 'danger', '~> 8.0'
 gem 'danger-rubocop', '~> 0.6'
 
 gem 'codecov', require: false
-gem 'webmock', require: false, group: :test
+gem 'webmock', require: false
 gem 'yard'
 
 plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')
