@@ -27,7 +27,7 @@ module Fastlane
 
       def self.details
         'This action extracts the version of the library which is imported by the client app' \
-        'and downloads the request file from the relevant GitHub release'
+          'and downloads the request file from the relevant GitHub release'
       end
 
       def self.available_options
