@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Fastlane::Locales do
   shared_examples 'from_xxx' do |key, fr_code, pt_code|
-    let(:method_sym) { "from_#{key}".to_sym }
+    let(:method_sym) { "from_#{key}!".to_sym }
 
     it 'can find a locale from a single code' do
       fr_locale = described_class.send(method_sym, fr_code)
@@ -30,23 +30,23 @@ describe Fastlane::Locales do
     end
   end
 
-  describe 'from_glotpress' do
+  describe 'from_glotpress!' do
     include_examples 'from_xxx', :glotpress, 'fr', 'pt-br'
   end
 
-  describe 'from_android' do
+  describe 'from_android!' do
     include_examples 'from_xxx', :android, 'fr', 'pt-rBR'
   end
 
-  describe 'from_google_play' do
+  describe 'from_google_play!' do
     include_examples 'from_xxx', :google_play, 'fr-FR', 'pt-BR'
   end
 
-  describe 'from_ios' do
+  describe 'from_ios!' do
     include_examples 'from_xxx', :ios, 'fr-FR', 'pt-BR'
   end
 
-  describe 'from_app_store' do
+  describe 'from_app_store!' do
     include_examples 'from_xxx', :app_store, 'fr-FR', 'pt-BR'
   end
 

@@ -89,7 +89,7 @@ module Fastlane
       # @raise [RuntimeException] if at least one of the locale codes was unknown
       #
       %i[glotpress android google_play ios app_store].each do |key|
-        define_method("from_#{key}") { |args| search!(key, args) }
+        define_method("from_#{key}!") { |args| search!(key, args) }
       end
 
       # Return an Array<Locale> based on glotpress locale codes
@@ -104,14 +104,14 @@ module Fastlane
         # If we passed a variadic list of Strings, `*list` will make it a single `Array<String>` and we were already good to go.
         # But if we passed an Array, `*list` will make it an Array<Array<String>> of one item; taking `list.first` will go back to Array<String>.
         list = list.first if list.count == 1 && list.first.is_a?(Array)
-        from_glotpress(list)
+        from_glotpress!(list)
       end
 
       # Return the subset of the 16 locales most of our apps are localized 100% (the ones we call the "Magnificent 16")
       #
       # @return [Array<Locale>] List of the Mag16 locales
       def mag16
-        from_glotpress(MAG16_GP_CODES)
+        from_glotpress!(MAG16_GP_CODES)
       end
 
       ###################
