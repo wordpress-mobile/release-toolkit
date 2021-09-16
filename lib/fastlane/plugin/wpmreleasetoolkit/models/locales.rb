@@ -1,19 +1,11 @@
-module Fastlane
-  # Define a single Locale with the various locale codes depending on the representation needed
-  Locale = Struct.new(:glotpress, :android, :google_play, :ios, :app_store, keyword_init: true) do
-    # Returns the Locale with the given glotpress locale code from the list of all known locales (`Locales.all`)
-    #
-    # @param [String] The glotpress locale code for the locale to fetch
-    # @return [Locale] The locale found
-    # @raise [RuntimeException] if the locale with given glotpress code is unknown
-    def self.[](code)
-      Locales[code].first
-    end
-  end
+require_relative 'locale'
 
+module Fastlane
   # A class with static methods to manipulate lists of locales.
+  #
   # Exposes various `Array<Locale>` lists like all known locales, the Mag16,
   # and convenience methods to turn list of Strings into list of Locales.
+  #
   class Locales
     ###################
     ## Constants
