@@ -5,10 +5,8 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper'
         require_relative '../../helper/android/android_git_helper'
 
-        app = ENV['PROJECT_NAME'].nil? ? params[:app] : ENV['PROJECT_NAME']
-
-        release_ver = Fastlane::Helper::Android::VersionHelper.get_release_version(product_name: app)
-        alpha_ver = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
+        release_ver = Fastlane::Helper::Android::VersionHelper.get_release_version()
+        alpha_ver = Fastlane::Helper::Android::VersionHelper.get_alpha_version()
         Fastlane::Helper::GitHelper.create_tag(release_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME])
         Fastlane::Helper::GitHelper.create_tag(alpha_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]) unless alpha_ver.nil? || (params[:tag_alpha] == false)
       end
@@ -32,10 +30,6 @@ module Fastlane
                                        description: 'True to skip tagging the alpha version',
                                        is_string: false,
                                        default_value: true),
-          FastlaneCore::ConfigItem.new(key: :app,
-                                       env_name: 'PROJECT_NAME',
-                                       description: 'The name of the app to get the release version for',
-                                       is_string: true), # true: verifies the input is a string, false: every kind of value
         ]
       end
 

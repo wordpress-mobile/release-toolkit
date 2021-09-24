@@ -9,16 +9,15 @@ module Fastlane
 
         Fastlane::Helper::GitHelper.ensure_on_branch!('release') unless other_action.is_ci()
 
-        app = params[:app]
         message = ''
-        beta_version = Fastlane::Helper::Android::VersionHelper.get_release_version(product_name: app) unless !params[:beta] && !params[:final]
-        alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app) if params[:alpha]
+        beta_version = Fastlane::Helper::Android::VersionHelper.get_release_version() unless !params[:beta] && !params[:final]
+        alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version() if params[:alpha]
 
         UI.user_error!("Can't build a final release out of this branch because it's configured as a beta release!") if params[:final] && Fastlane::Helper::Android::VersionHelper.is_beta_version?(beta_version)
 
-        message << "[#{app}] Building version #{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Release Channel)\n" if params[:final]
-        message << "[#{app}] Building version #{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Beta Channel)\n" if params[:beta]
-        message << "[#{app}] Building version #{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Alpha Channel)\n" if params[:alpha]
+        message << "Building version #{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Release Channel)\n" if params[:final]
+        message << "Building version #{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Beta Channel)\n" if params[:beta]
+        message << "Building version #{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Alpha Channel)\n" if params[:alpha]
 
         if params[:skip_confirm]
           UI.message(message)
@@ -64,10 +63,6 @@ module Fastlane
                                        description: 'True if this is for a final build',
                                        is_string: false,
                                        default_value: false),
-          FastlaneCore::ConfigItem.new(key: :app,
-                                       env_name: 'PROJECT_NAME',
-                                       description: 'The name of the app to get the release version for',
-                                       is_string: true), # true: verifies the input is a string, false: every kind of value
         ]
       end
 

@@ -13,8 +13,8 @@ module Fastlane
 
         UI.user_error!('This is not a release branch. Abort.') unless other_action.git_branch.start_with?('release/')
 
-        version = Fastlane::Helper::Android::VersionHelper.get_public_version(params[:app])
-        message = "Finalizing #{params[:app]} release: #{version}\n"
+        version = Fastlane::Helper::Android::VersionHelper.get_public_version()
+        message = "Finalizing release: #{version}\n"
         if params[:skip_confirm]
           UI.message(message)
         else
@@ -49,10 +49,6 @@ module Fastlane
                                        description: 'Skips confirmation',
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
                                        default_value: false), # the default value if the user didn't provide one
-          FastlaneCore::ConfigItem.new(key: :app,
-                                       env_name: 'PROJECT_NAME',
-                                       description: 'The name of the app to get the release version for',
-                                       is_string: true), # true: verifies the input is a string, false: every kind of value
         ]
       end
 

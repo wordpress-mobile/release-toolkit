@@ -78,7 +78,7 @@ describe Fastlane::Helper::Android::VersionHelper do
         allow(File).to receive(:exist?).with('./version.properties').and_return(true)
         allow(File).to receive(:read).with('./version.properties').and_return(original_content)
         expect(File).to receive(:write).with('./version.properties', expected_content)
-        subject.update_versions('wordpress', new_beta_version, nil)
+        subject.update_versions(new_beta_version, nil)
       end
 
       it 'updates both the main and alpha versions if alpha provided' do
@@ -94,7 +94,7 @@ describe Fastlane::Helper::Android::VersionHelper do
         allow(File).to receive(:exist?).with('./version.properties').and_return(true)
         allow(File).to receive(:read).with('./version.properties').and_return(original_content)
         expect(File).to receive(:write).with('./version.properties', expected_content)
-        subject.update_versions('wordpress', new_beta_version, new_alpha_version)
+        subject.update_versions(new_beta_version, new_alpha_version)
       end
     end
   end
