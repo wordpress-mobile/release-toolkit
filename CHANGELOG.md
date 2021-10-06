@@ -14,6 +14,8 @@ _None_
 
 ### Bug Fixes
 
+* Strip trailing new lines in single line msgid when generating .po[t] file
+
 _None_
 
 ### Internal Changes
