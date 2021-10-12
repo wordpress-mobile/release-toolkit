@@ -7,6 +7,7 @@
 ### Breaking Changes
 
 * Updates the keys used for version reads and bumps when using a `version.properties` file in Android. [#298]
+* Removed the `app:` parameter (aka `ConfigItem`) from all the Android version-related actions, now that versions are unified for all apps. [#300]
 
 ### New Features
 
