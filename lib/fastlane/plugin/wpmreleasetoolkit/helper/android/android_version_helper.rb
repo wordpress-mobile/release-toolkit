@@ -31,7 +31,7 @@ module Fastlane
         #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
         #
         def self.get_public_version
-          version = self.get_release_version
+          version = get_release_version
           vp = get_version_parts(version[VERSION_NAME])
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
 
