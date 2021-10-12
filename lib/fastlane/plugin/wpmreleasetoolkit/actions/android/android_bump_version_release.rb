@@ -11,10 +11,10 @@ module Fastlane
         other_action.ensure_git_branch(branch: 'develop')
 
         # Create new configuration
-        new_short_version = Fastlane::Helper::Android::VersionHelper.bump_version_release()
+        new_short_version = Fastlane::Helper::Android::VersionHelper.bump_version_release
 
-        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version()
-        current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version()
+        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version
+        current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version
         new_version_beta = Fastlane::Helper::Android::VersionHelper.calc_next_release_version(current_version, current_version_alpha)
         new_version_alpha = current_version_alpha.nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(new_version_beta, current_version_alpha)
         new_release_branch = "release/#{new_short_version}"

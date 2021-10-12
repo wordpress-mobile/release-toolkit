@@ -15,8 +15,8 @@ module Fastlane
         Fastlane::Helper::GitHelper.checkout_and_pull('develop')
 
         # Create versions
-        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version()
-        current_alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version()
+        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version
+        current_alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version
         next_version = Fastlane::Helper::Android::VersionHelper.calc_next_release_version(current_version, current_alpha_version)
         next_alpha_version = current_alpha_version.nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(next_version, current_alpha_version)
 
@@ -35,7 +35,7 @@ module Fastlane
         other_action.ensure_git_status_clean()
 
         # Return the current version
-        Fastlane::Helper::Android::VersionHelper.get_public_version()
+        Fastlane::Helper::Android::VersionHelper.get_public_version
       end
 
       #####################################################

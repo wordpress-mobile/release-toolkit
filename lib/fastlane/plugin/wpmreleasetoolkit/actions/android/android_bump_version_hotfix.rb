@@ -7,7 +7,7 @@ module Fastlane
         require_relative '../../helper/android/android_git_helper'
         Fastlane::Helper::GitHelper.create_branch("release/#{params[:version_name]}", from: params[:previous_version_name])
 
-        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version()
+        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version
         new_version = Fastlane::Helper::Android::VersionHelper.calc_next_hotfix_version(params[:version_name], params[:version_code]) # NOTE: this just puts the name/code values in a tuple, unchanged (no actual calc/bumping)
         new_release_branch = "release/#{params[:version_name]}"
 

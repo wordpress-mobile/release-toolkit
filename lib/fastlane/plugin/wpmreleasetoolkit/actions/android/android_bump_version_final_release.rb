@@ -9,8 +9,8 @@ module Fastlane
 
         Fastlane::Helper::GitHelper.ensure_on_branch!('release')
 
-        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version()
-        current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version()
+        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version
+        current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version
         final_version = Fastlane::Helper::Android::VersionHelper.calc_final_release_version(current_version, current_version_alpha)
 
         vname = Fastlane::Helper::Android::VersionHelper::VERSION_NAME
