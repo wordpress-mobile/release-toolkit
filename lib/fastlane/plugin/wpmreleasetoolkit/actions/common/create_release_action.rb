@@ -10,7 +10,7 @@ module Fastlane
         repository = params[:repository]
         version = params[:version]
         assets = params[:release_assets]
-        release_notes = params[:release_notes_file_path].nil? ? '' : IO.read(params[:release_notes_file_path])
+        release_notes = params[:release_notes_file_path].nil? ? '' : File.read(params[:release_notes_file_path])
         prerelease = params[:prerelease]
 
         UI.message("Creating draft release #{version} in #{repository}.")
