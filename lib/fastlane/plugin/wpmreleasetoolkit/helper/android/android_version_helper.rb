@@ -26,15 +26,12 @@ module Fastlane
         #    "1.2" # Assuming build.gradle contains versionName "1.2.0"
         #    "1.2.3" # Assuming build.gradle contains versionName "1.2.3"
         #
-        # @param [String] app (UNUSED/DEPRECATED) The name of the app to be used for beta and alpha version.
-        #                     No longer used, will be removed in future breaking update
-        #
         # @return [String] The public-facing version number, extracted from the `versionName` of the `build.gradle` file.
         #         - If this version is a hotfix (more than 2 parts and 3rd part is non-zero), returns the "X.Y.Z" formatted string
         #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
         #
-        def self.get_public_version(app)
-          version = get_release_version(product_name: app)
+        def self.get_public_version
+          version = get_release_version
           vp = get_version_parts(version[VERSION_NAME])
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
 
@@ -43,12 +40,9 @@ module Fastlane
 
         # Extract the version name and code from the release version of the app from `version.properties file`
         #
-        # @param [String] product_name (UNUSED/DEPRECATED) The name of the app to be used for beta and alpha version.
-        #                              No longer used, will be removed in future breaking update
-        #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
-        def self.get_release_version(product_name:)
+        def self.get_release_version
           return get_version_from_properties() if File.exist?(version_properties_file)
 
           section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
@@ -83,13 +77,10 @@ module Fastlane
 
         # Extract the version name and code from the `version.properties` file in the project root
         #
-        # @param [String] app (UNUSED/DEPRECATED) The name of the app to be used for beta and alpha version.
-        #                     No longer used, will be removed in future breaking update
-        #
         # @return [Hash] A hash with 2 keys `"name"` and `"code"` containing the extracted version name and code, respectively,
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
-        def self.get_alpha_version(app)
+        def self.get_alpha_version
           return get_version_from_properties(is_alpha: true) if File.exist?(version_properties_file)
 
           return nil if ENV['HAS_ALPHA_VERSION'].nil?
@@ -287,13 +278,11 @@ module Fastlane
 
         # Prints the current and next release version names to stdout, then returns the next release version
         #
-        # @param [String] app (UNUSED/DEPRECATED) The name of the app to be used for beta and alpha version update
-        #                     No longer used, will be removed in future breaking update
         # @return [String] The next release version name to use after bumping the currently used release version.
         #
-        def self.bump_version_release(app)
+        def self.bump_version_release
           # Bump release
-          current_version = get_release_version(product_name: app)
+          current_version = self.get_release_version
           UI.message("Current version: #{current_version[VERSION_NAME]}")
           new_version = calc_next_release_base_version(current_version)
           UI.message("New version: #{new_version[VERSION_NAME]}")
@@ -304,12 +293,10 @@ module Fastlane
 
         # Update the `version.properties` file with new `versionName` and `versionCode` values
         #
-        # @param [String] app (UNUSED/DEPRECATED) The name of the app to be used for beta and alpha version update
-        #                     No longer used, will be removed in future breaking update
         # @param [Hash] new_version_beta The version hash for the beta, containing values for keys "name" and "code"
         # @param [Hash] new_version_alpha The version hash for the alpha , containing values for keys "name" and "code"
         #
-        def self.update_versions(app, new_version_beta, new_version_alpha)
+        def self.update_versions(new_version_beta, new_version_alpha)
           if File.exist?(version_properties_file)
             replacements = {
               versionName: (new_version_beta || {})[VERSION_NAME],

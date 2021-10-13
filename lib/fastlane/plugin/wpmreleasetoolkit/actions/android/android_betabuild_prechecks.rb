@@ -11,21 +11,19 @@ module Fastlane
         # Checkout develop and update
         Fastlane::Helper::GitHelper.checkout_and_pull('develop')
 
-        app = params[:app]
-
         # Check versions
-        release_version = Fastlane::Helper::Android::VersionHelper.get_release_version(product_name: app)
-        message = "[#{app}] The following current version has been detected: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n"
-        alpha_release_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
-        message << "[#{app}] The following Alpha version has been detected: #{alpha_release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
+        release_version = Fastlane::Helper::Android::VersionHelper.get_release_version
+        message = "The following current version has been detected: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n"
+        alpha_release_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version
+        message << "The following Alpha version has been detected: #{alpha_release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
 
         # Check branch
-        app_version = Fastlane::Helper::Android::VersionHelper.get_public_version(app)
+        app_version = Fastlane::Helper::Android::VersionHelper.get_public_version
         UI.user_error!("#{message}Release branch for version #{app_version} doesn't exist. Abort.") unless !params[:base_version].nil? || Fastlane::Helper::GitHelper.checkout_and_pull(release: app_version)
 
         # Check user overwrite
         unless params[:base_version].nil?
-          overwrite_version = get_user_build_version(product_name: app, version: params[:base_version], message: message)
+          overwrite_version = get_user_build_version(version: params[:base_version], message: message)
           release_version = overwrite_version[0]
           alpha_release_version = overwrite_version[1]
         end
@@ -49,11 +47,11 @@ module Fastlane
         [next_beta_version, next_alpha_version]
       end
 
-      def self.get_user_build_version(product_name:, version:, message:)
-        UI.user_error!("[#{app}] Release branch for version #{version} doesn't exist. Abort.") unless Fastlane::Helper::GitHelper.checkout_and_pull(release: version)
-        release_version = Fastlane::Helper::Android::VersionHelper.get_release_version(product_name: product_name)
-        message << "#{app}] Looking at branch release/#{version} as requested by user. Detected version: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}.\n"
-        alpha_release_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(product_name)
+      def self.get_user_build_version(version:, message:)
+        UI.user_error!("Release branch for version #{version} doesn't exist. Abort.") unless Fastlane::Helper::GitHelper.checkout_and_pull(release: version)
+        release_version = Fastlane::Helper::Android::VersionHelper.get_release_version
+        message << "Looking at branch release/#{version} as requested by user. Detected version: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}.\n"
+        alpha_release_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version
         message << "and Alpha Version: #{alpha_release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
         [release_version, alpha_release_version]
       end
@@ -82,10 +80,6 @@ module Fastlane
                                        description: 'Skips confirmation',
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
                                        default_value: false), # the default value if the user didn't provide one
-          FastlaneCore::ConfigItem.new(key: :app,
-                                       env_name: 'PROJECT_NAME',
-                                       description: 'The name of the app to get the release version for',
-                                       is_string: true), # true: verifies the input is a string, false: every kind of value
         ]
       end
 
