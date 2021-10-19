@@ -31,8 +31,6 @@ _None_
 
 * Strip trailing new lines in single line msgid when generating .po[t] file. [#297]
 
-_None_
-
 ## 1.4.0
 
 ### New Features
