@@ -16,7 +16,7 @@ describe Fastlane::Helper::ConfigureHelper do
         # reasonable enough assumption to make for the real world usage of this
         # tool. Still, it would be nice to have proper handling of that
         # scenario at some point.
-        `git init`
+        `git init --initial-branch main || git init`
 
         expect(Fastlane::UI).to receive(:user_error!)
 

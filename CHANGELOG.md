@@ -20,6 +20,17 @@ _None_
 
 _None_
 
+## 2.0.0
+
+### Breaking Changes
+
+* Updates the keys used for version reads and bumps when using a `version.properties` file in Android. [#298]
+* Removed the `app:` parameter (aka `ConfigItem`) from all the Android version-related actions, now that versions are unified for all apps. [#300]
+
+### Bug Fixes
+
+* Strip trailing new lines in single line msgid when generating .po[t] file. [#297]
+
 ## 1.4.0
 
 ### New Features

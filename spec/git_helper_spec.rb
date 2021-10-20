@@ -26,12 +26,12 @@ describe Fastlane::Helper::GitHelper do
   end
 
   it 'can detect a valid git repository' do
-    `git init`
+    `git init --initial-branch main || git init`
     expect(Fastlane::Helper::GitHelper.is_git_repo?).to be true
   end
 
   it 'can detect a valid git repository from a child folder' do
-    `git init`
+    `git init --initial-branch main || git init`
     `mkdir -p a/b`
     Dir.chdir('./a/b')
     expect(Fastlane::Helper::GitHelper.is_git_repo?).to be true
@@ -39,14 +39,14 @@ describe Fastlane::Helper::GitHelper do
 
   it 'can detect a valid git repository when given a path' do
     Dir.mktmpdir do |dir|
-      `git -C #{dir} init`
+      `git -C #{dir} init --initial-branch main || git -C #{dir} init`
       expect(Fastlane::Helper::GitHelper.is_git_repo?(path: dir)).to be true
     end
   end
 
   it 'can detect a valid git repository when given a child folder path' do
     Dir.mktmpdir do |dir|
-      `git -C #{dir} init`
+      `git -C #{dir} init --initial-branch main || git -C #{dir} init`
       path = File.join(dir, 'a', 'b')
       `mkdir -p #{path}`
       expect(Fastlane::Helper::GitHelper.is_git_repo?(path: path)).to be true
@@ -54,13 +54,13 @@ describe Fastlane::Helper::GitHelper do
   end
 
   it 'can detect a repository with Git-lfs enabled' do
-    `git init`
+    `git init --initial-branch main || git init`
     `git lfs install`
     expect(Fastlane::Helper::GitHelper.has_git_lfs?).to be true
   end
 
   it 'can detect a repository without Git-lfs enabled' do
-    `git init`
+    `git init --initial-branch main || git init`
     `git lfs uninstall &>/dev/null`
     expect(Fastlane::Helper::GitHelper.is_git_repo?).to be true
     expect(Fastlane::Helper::GitHelper.has_git_lfs?).to be false
@@ -186,7 +186,7 @@ describe Fastlane::Helper::GitHelper do
 end
 
 def setup_git_repo(dummy_file_path: nil, add_file_to_gitignore: false, commit_gitignore: false)
-  `git init`
+  `git init --initial-branch main || git init`
   `touch .gitignore`
   `git add .gitignore && git commit -m 'Add .gitignore'`
 

@@ -11,22 +11,21 @@ module Fastlane
         other_action.ensure_git_branch(branch: 'develop')
 
         # Create new configuration
-        app = params[:app]
-        new_short_version = Fastlane::Helper::Android::VersionHelper.bump_version_release(app)
+        new_short_version = Fastlane::Helper::Android::VersionHelper.bump_version_release
 
-        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(product_name: app)
-        current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version(app)
+        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version
+        current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version
         new_version_beta = Fastlane::Helper::Android::VersionHelper.calc_next_release_version(current_version, current_version_alpha)
         new_version_alpha = current_version_alpha.nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(new_version_beta, current_version_alpha)
         new_release_branch = "release/#{new_short_version}"
 
         vname = Fastlane::Helper::Android::VersionHelper::VERSION_NAME
         vcode = Fastlane::Helper::Android::VersionHelper::VERSION_CODE
-        UI.message("Current version[#{app}]: #{current_version[vname]}(#{current_version[vcode]})")
-        UI.message("Current alpha version[#{app}]: #{current_version_alpha[vname]}(#{current_version_alpha[vcode]})") unless current_version_alpha.nil?
-        UI.message("New beta version[#{app}]: #{new_version_beta[vname]}(#{new_version_beta[vcode]})")
-        UI.message("New alpha version[#{app}]: #{new_version_alpha[vname]}(#{new_version_alpha[vcode]})") unless current_version_alpha.nil?
-        UI.message("New version[#{app}]: #{new_short_version}")
+        UI.message("Current version: #{current_version[vname]}(#{current_version[vcode]})")
+        UI.message("Current alpha version: #{current_version_alpha[vname]}(#{current_version_alpha[vcode]})") unless current_version_alpha.nil?
+        UI.message("New beta version: #{new_version_beta[vname]}(#{new_version_beta[vcode]})")
+        UI.message("New alpha version: #{new_version_alpha[vname]}(#{new_version_alpha[vcode]})") unless current_version_alpha.nil?
+        UI.message("New version: #{new_short_version}")
         UI.message("Release branch: #{new_release_branch}")
 
         # Update local develop and branch
@@ -35,7 +34,7 @@ module Fastlane
         UI.message 'Done!'
 
         UI.message 'Updating app version...'
-        Fastlane::Helper::Android::VersionHelper.update_versions(app, new_version_beta, new_version_alpha)
+        Fastlane::Helper::Android::VersionHelper.update_versions(new_version_beta, new_version_alpha)
         Fastlane::Helper::Android::GitHelper.commit_version_bump()
         UI.message 'Done.'
       end
@@ -45,21 +44,15 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Bumps the version of the app for a new beta. Requires the `updateVersionProperties` gradle task to update the keys if you are using a `version.properties` file.'
+        'Bumps the version of the app for a new beta.'
       end
 
       def self.details
-        'Bumps the version of the app for a new beta. Requires the `updateVersionProperties` gradle task to update the keys if you are using a `version.properties` file.'
+        'Bumps the version of the app for a new beta.'
       end
 
       def self.available_options
         # Define all options your action supports.
-        [
-          FastlaneCore::ConfigItem.new(key: :app,
-                                       env_name: 'PROJECT_NAME',
-                                       description: 'The name of the app to get the release version for',
-                                       is_string: true), # true: verifies the input is a string, false: every kind of value
-        ]
       end
 
       def self.output
