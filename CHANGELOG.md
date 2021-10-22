@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-- Adopt Buildkite
+- Replace CircleCI and GitHub Actions with Buildkite
 
 ## 1.4.0
 
