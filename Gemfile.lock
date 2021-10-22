@@ -417,8 +417,6 @@ DEPENDENCIES
   pry (~> 0.12.2)
   rmagick (~> 4.1)
   rspec (~> 3.8)
-  rspec-expectations (~> 3.8)
-  rspec-mocks (~> 3.8)
   rspec_junit_formatter (~> 0.4.1)
   rubocop (~> 1.0)
   rubocop-require_tools (~> 0.1.2)
