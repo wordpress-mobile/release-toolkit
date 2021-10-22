@@ -67,6 +67,9 @@ steps:
   - label: ":rubygems: Publish to RubyGems"
     key: "gem-push"
     if: build.tag != null
+    # Note: We intentionally call a separate `.sh` script here (as opposed to having all the 
+    # commands written inline) to avoid leaking a key used in the process in clear in the
+    # BUILDKITE_COMMAND environment variable.
     command: .buildkite/gem-push.sh
     env: *common_env
     plugins: *common_plugins
