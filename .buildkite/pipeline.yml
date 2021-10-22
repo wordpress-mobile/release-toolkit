@@ -12,11 +12,7 @@ steps:
   - label: "🧪 Build and Test"
     key: "test"
     command: |
-      echo "--- :beer: Installing Dependencies"
-      brew bundle --file .buildkite/brewfile
-
-      echo "--- :rubygems: Setting up Gems"
-      install_gems
+      .buildkite/install-dependencies.sh
 
       echo "--- :hammer: Build DrawText"
       bundle exec rake compile
@@ -36,8 +32,7 @@ steps:
   #################
   - label: "🧹 Lint"
     command: |
-      echo "--- :rubygems: Setting up Gems"
-      install_gems
+      .buildkite/install-dependencies.sh
 
       echo "--- :rubocop: Run Rubocop"
       bundle exec rubocop
@@ -51,8 +46,7 @@ steps:
   #################
   - label: "⛔️ Danger"
     command: |
-      echo "--- :rubygems: Setting up Gems"
-      install_gems
+      .buildkite/install-dependencies.sh
 
       echo "--- :rubocop: Run Danger"
       bundle exec danger

@@ -1,10 +1,6 @@
 #!/bin/bash -eu
 
-echo "--- :beer: Installing Dependencies"
-brew bundle --file .buildkite/brewfile
-
-echo "--- :rubygems: Setting up Gems"
-install_gems
+./install-dependencies.sh
 
 echo "--- :hammer: Build Gemspec"
 gem build fastlane-plugin-wpmreleasetoolkit.gemspec
