@@ -1,6 +1,6 @@
 require 'fastlane_core'
 
-# The feature in this file are controlled by the following ENV vars:
+# The features in this file are controlled by the following ENV vars:
 #
 # @env `FASTLANE_PROMPT_REMINDER_DISABLE_AUTO_PATCH`
 #     If this variable is set, it will disable the auto-application of the monkey patch. In such case,
