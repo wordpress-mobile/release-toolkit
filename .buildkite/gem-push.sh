@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash -eu
 
 echo "--- :beer: Installing Dependencies"
 brew bundle --file .buildkite/brewfile
