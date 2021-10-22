@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Replace CircleCI and GitHub Actions with Buildkite
 
 ## 2.0.0
 
