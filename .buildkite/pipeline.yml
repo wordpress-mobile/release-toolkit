@@ -1,0 +1,71 @@
+# Nodes with values to reuse in the pipeline.
+common_params:
+  plugins: &common_plugins
+  - &bash_cache automattic/bash-cache#v1.3.2: ~
+  env: &common_env
+    IMAGE_ID: xcode-12.5.1
+
+steps:
+  #################
+  # Build and Test
+  #################
+  - label: "🧪 Build and Test"
+    key: "test"
+    command: |
+      .buildkite/install-dependencies.sh
+
+      echo "--- :hammer: Build DrawText"
+      bundle exec rake compile
+
+      echo "--- :git: Setting up git-lfs"
+      git-lfs install
+
+      echo "--- :rspec: Run Rspec"
+      bundle exec rspec --profile 10 --format progress
+    env: *common_env
+    plugins: *common_plugins
+    agents:
+      queue: "mac"
+
+  #################
+  # Lint
+  #################
+  - label: "🧹 Lint"
+    command: |
+      .buildkite/install-dependencies.sh
+
+      echo "--- :rubocop: Run Rubocop"
+      bundle exec rubocop
+    env: *common_env
+    plugins: *common_plugins
+    agents:
+      queue: "mac"
+
+  #################
+  # Danger
+  #################
+  - label: "⛔️ Danger"
+    command: |
+      .buildkite/install-dependencies.sh
+
+      echo "--- :rubocop: Run Danger"
+      bundle exec danger
+    env: *common_env
+    plugins: *common_plugins
+    agents:
+      queue: "mac"
+
+  #################
+  # Push to RubyGems
+  #################
+  - label: ":rubygems: Publish to RubyGems"
+    key: "gem-push"
+    if: build.tag != null
+    # Note: We intentionally call a separate `.sh` script here (as opposed to having all the 
+    # commands written inline) to avoid leaking a key used in the process in clear in the
+    # BUILDKITE_COMMAND environment variable.
+    command: .buildkite/gem-push.sh
+    env: *common_env
+    plugins: *common_plugins
+    agents:
+      queue: "mac"

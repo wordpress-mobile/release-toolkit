@@ -1,0 +1,4 @@
+brew "pkg-config"
+brew "libxml2"
+brew "imagemagick@6"
+brew "git-lfs"
