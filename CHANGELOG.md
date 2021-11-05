@@ -10,11 +10,21 @@ _None_
 
 ### New Features
 
-* Added a reminder mechanism for when you forgot a prompt was waiting for you in the Terminal. This reminder is [configurable via environment variables](https://github.com/wordpress-mobile/release-toolkit/blob/5c9b79db4bfcb298376fe3e81bc53881795922a5/lib/fastlane/plugin/wpmreleasetoolkit/helper/interactive_prompt_reminder.rb#L3-L22) to change the default delays and optionally opt-in for speaking a voice message in addition to the default beep + dock icon badge. [#302]
+_None_
 
 ### Bug Fixes
 
 _None_
+
+### Internal Changes
+
+_None_
+
+## 2.1.0
+
+### New Features
+
+* Added a reminder mechanism for when you forgot a prompt was waiting for you in the Terminal. This reminder is [configurable via environment variables](https://github.com/wordpress-mobile/release-toolkit/blob/5c9b79db4bfcb298376fe3e81bc53881795922a5/lib/fastlane/plugin/wpmreleasetoolkit/helper/interactive_prompt_reminder.rb#L3-L22) to change the default delays and optionally opt-in for speaking a voice message in addition to the default beep + dock icon badge. [#302]
 
 ### Internal Changes
 
