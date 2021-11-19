@@ -1,5 +1,3 @@
-require 'open3'
-
 module Fastlane
   module Actions
     class IosGenerateStringsFileFromCode < Action
@@ -9,10 +7,7 @@ module Fastlane
 
         flags = [('-q' if params[:quiet]), ('-SwiftUI' if params[:swiftui])].compact
 
-        out, status = Open3.capture2e('genstrings', '-o', params[:output_dir], *flags, *files)
-
-        UI.error("genstrings failed with exit code #{status.exitstatus}") unless status.success?
-        UI.command_output(out) unless params[:quiet]
+        out = sh('genstrings', '-o', params[:output_dir], *flags, *files)
 
         # Return the warnings as an Array
         out.split("\n")
