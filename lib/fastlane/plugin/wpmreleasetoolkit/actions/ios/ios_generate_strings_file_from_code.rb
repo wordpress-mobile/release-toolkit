@@ -34,7 +34,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :paths,
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_PATHS',
-                                       description: 'Array of directory paths to scan for `.m` and `.swift` files. The entries can contain glob patterns too.',
+                                       description: 'Array of directory paths to scan for `.m` and `.swift` files. The entries can contain glob patterns too',
                                        type: Array,
                                        default_value: ['.']),
           FastlaneCore::ConfigItem.new(key: :quiet,
@@ -44,7 +44,7 @@ module Fastlane
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :swiftui,
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_SWIFTUI',
-                                       description: 'Should we include SwiftUI\'s `Text()` when parsing code with `genstrings`?',
+                                       description: "Should we include SwiftUI's `Text()` when parsing code with `genstrings`",
                                        is_string: false, # Boolean
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :output_dir,
