@@ -55,7 +55,7 @@ module Fastlane
                                        default_value: []),
           FastlaneCore::ConfigItem.new(key: :quiet,
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_QUIET',
-                                       description: 'In quiet mode, genstrings will log warnings about duplicate values, but not about duplicate comments',
+                                       description: 'In quiet mode, `genstrings` will log warnings about duplicate values, but not about duplicate comments',
                                        is_string: false, # Boolean
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :swiftui,
@@ -65,7 +65,7 @@ module Fastlane
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :output_dir,
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_OUTPUT_DIR',
-                                       description: 'The path to the directory where the generated .strings files should be created',
+                                       description: 'The path to the directory where the generated `.strings` files should be created',
                                        type: String),
         ]
       end
