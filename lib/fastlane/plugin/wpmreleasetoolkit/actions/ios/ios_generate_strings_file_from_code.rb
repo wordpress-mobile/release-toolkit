@@ -4,8 +4,9 @@ module Fastlane
       def self.run(params)
         files = files_matching(paths: params[:paths], exclude: params[:exclude])
         flags = [('-q' if params[:quiet]), ('-SwiftUI' if params[:swiftui])].compact
-        out = Actions.sh('genstrings', '-o', params[:output_dir], *flags, *files, log: false).strip.split("\n")
-        out.each { |line| UI.command_output(line.strip) }
+        verbose = FastlaneCore::Globals.verbose?
+        out = Actions.sh('genstrings', '-o', params[:output_dir], *flags, *files, log: verbose).strip.split("\n")
+        out.each { |line| UI.command_output(line.strip) } unless verbose
         out
       end
 
