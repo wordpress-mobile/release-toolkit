@@ -2,15 +2,24 @@ module Fastlane
   module Actions
     class IosGenerateStringsFileFromCode < Action
       def self.run(params)
-        globbed_paths = params[:paths].map { |p| File.file?(p) ? p : "#{p}/**/*.{m,swift}" }
+        globbed_paths = params[:paths].map { |p| glob_pattern(p) }
         files = Dir.glob(globbed_paths)
 
         flags = [('-q' if params[:quiet]), ('-SwiftUI' if params[:swiftui])].compact
 
         out = sh('genstrings', '-o', params[:output_dir], *flags, *files)
-
-        # Return the warnings as an Array
         out.split("\n")
+      end
+
+      # Adds the proper `**/*.{m,swift}` to the list of paths
+      def self.glob_pattern(path)
+        if path.end_with?('**') || path.end_with?('**/')
+          File.join(path, '*.{m,swift}')
+        elsif File.directory?(path) || path.end_with?('/')
+          File.join(path, '**', '*.{m,swift}')
+        else
+          path
+        end
       end
 
       #####################################################

@@ -36,6 +36,28 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCode do
     end
   end
 
+  context 'when building path glob patterns' do
+    it 'handle paths pointing to (existing) directories' do
+      Dir.mktmpdir('a8c-wpmrt-ios_generate_strings_file_from_code-') do |tmp_dir|
+        expect(described_class.glob_pattern(tmp_dir)).to eq("#{tmp_dir}/**/*.{m,swift}")
+        expect(described_class.glob_pattern("#{tmp_dir}/")).to eq("#{tmp_dir}/**/*.{m,swift}")
+        expect(described_class.glob_pattern("#{tmp_dir}/**")).to eq("#{tmp_dir}/**/*.{m,swift}")
+      end
+    end
+
+    it 'handle strings and globs to directories-like paths' do
+      expect(described_class.glob_pattern('foo/')).to eq('foo/**/*.{m,swift}')
+      expect(described_class.glob_pattern('foo/')).to eq('foo/**/*.{m,swift}')
+      expect(described_class.glob_pattern('foo/**')).to eq('foo/**/*.{m,swift}')
+    end
+
+    it 'does not impact the provided path if already pointing to file-like path' do
+      expect(described_class.glob_pattern('foo/bar.m')).to eq('foo/bar.m')
+      expect(described_class.glob_pattern('foo/bar.swift')).to eq('foo/bar.swift')
+      expect(described_class.glob_pattern('foo/*.{swift,m,mm}')).to eq('foo/*.{swift,m,mm}')
+    end
+  end
+
   context 'when including pods' do
     it 'Generates the expected .strings files with SwiftUI support' do
       test_genstrings(paths_to_scan: [app_src_dir, pods_src_dir], quiet: true, swiftui: true, expected_dir_name: 'expected-pods-swiftui')
