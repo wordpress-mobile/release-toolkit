@@ -4,10 +4,9 @@ module Fastlane
       def self.run(params)
         files = files_matching(paths: params[:paths], exclude: params[:exclude])
         flags = [('-q' if params[:quiet]), ('-SwiftUI' if params[:swiftui])].compact
-        verbose = FastlaneCore::Globals.verbose?
-        out = Actions.sh('genstrings', '-o', params[:output_dir], *flags, *files, log: verbose).strip.split("\n")
-        out.each { |line| UI.command_output(line.strip) } unless verbose
-        out
+        cmd = ['genstrings', '-o', params[:output_dir], *flags, *files]
+        out = Actions.sh_control_output(*cmd, print_command: FastlaneCore::Globals.verbose?, print_command_output: true)
+        out.strip.split("\n")
       end
 
       # Adds the proper `**/*.{m,swift}` to the list of paths
