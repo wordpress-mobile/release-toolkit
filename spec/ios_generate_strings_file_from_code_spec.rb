@@ -14,8 +14,9 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCode do
       output_files = Dir[File.join(tmp_dir, '*.strings')]
       expected_files = Dir[File.join(test_data_dir, expected_dir_name, '*.strings')]
 
-      # Assert: same list of generated files
+      # Assert: stdout/stderr warning messages from genstrings
       expect(genstrings_logs).to eq(expected_logs) unless expected_logs.nil?
+      # Assert: same list of generated files
       expect(output_files.map { |f| File.basename(f) }.sort).to eq(expected_files.map { |f| File.basename(f) }.sort)
 
       # Assert: each generated file has expected content
