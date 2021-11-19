@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'tmpdir'
 
-describe Fastlane::Actions::IosGenerateStringsFileFromCode do
+describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
   let(:test_data_dir) { File.join(File.dirname(__FILE__), 'test-data', 'translations', 'ios_generate_strings_file_from_code') }
   let(:app_src_dir) { File.join(test_data_dir, 'sample-project', 'Sources') }
   let(:pods_src_dir) { File.join(test_data_dir, 'sample-project', 'Pods') }

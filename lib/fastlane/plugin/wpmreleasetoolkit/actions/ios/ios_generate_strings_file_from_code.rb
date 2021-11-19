@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    class IosGenerateStringsFileFromCode < Action
+    class IosGenerateStringsFileFromCodeAction < Action
       def self.run(params)
         files = files_matching(paths: params[:paths], exclude: params[:exclude])
         flags = [('-q' if params[:quiet]), ('-SwiftUI' if params[:swiftui])].compact
