@@ -63,7 +63,7 @@ module Fastlane
       end
 
       def self.authors
-        ['AliSoftware']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)
