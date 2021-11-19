@@ -36,7 +36,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCode do
     end
   end
 
-  context 'when building glob patterns from paths' do
+  context 'when building the list of paths' do
     it 'handle paths pointing to (existing) directories' do
       Dir.mktmpdir('a8c-wpmrt-ios_generate_strings_file_from_code-') do |tmp_dir|
         expect(described_class.glob_pattern(tmp_dir)).to eq("#{tmp_dir}/**/*.{m,swift}")
@@ -55,6 +55,28 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCode do
       expect(described_class.glob_pattern('foo/bar.m')).to eq('foo/bar.m')
       expect(described_class.glob_pattern('./*/foo/bar.swift')).to eq('./*/foo/bar.swift')
       expect(described_class.glob_pattern('foo/*.{swift,m,mm}')).to eq('foo/*.{swift,m,mm}')
+    end
+
+    context 'when excluding files by pattern' do
+      def test_exclude_patterns(filter:, expected:)
+        list = described_class.files_matching(paths: [app_src_dir, pods_src_dir], exclude: filter)
+        expected_fullpaths = expected.map { |f| File.join(test_data_dir, 'sample-project', f) }
+        expect(list).to eq(expected_fullpaths), "expected: #{expected.inspect}\n     got: #{list.map { |f| f.gsub(%r{^.*/sample-project/}, '') }.inspect}"
+      end
+
+      it 'excludes files matching filters starting with *' do
+        test_exclude_patterns(
+          filter:['*.m', '*View.swift'],
+          expected: %w[Sources/AppClass1.swift Pods/SomePod/Sources/PodClass1.swift]
+        )
+      end
+
+      it 'excludes files matching filters containing * mid-pattern' do
+        test_exclude_patterns(
+          filter: ['*.m', 'App*View.swift'],
+          expected: %w[Sources/AppClass1.swift Pods/SomePod/Sources/PodClass1.swift Pods/SomePod/Sources/PodSampleView.swift]
+        )
+      end
     end
   end
 

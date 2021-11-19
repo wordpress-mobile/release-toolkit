@@ -2,11 +2,8 @@ module Fastlane
   module Actions
     class IosGenerateStringsFileFromCode < Action
       def self.run(params)
-        globbed_paths = params[:paths].map { |p| glob_pattern(p) }
-        files = Dir.glob(globbed_paths)
-
+        files = files_matching(paths: params[:paths], exclude: params[:exclude])
         flags = [('-q' if params[:quiet]), ('-SwiftUI' if params[:swiftui])].compact
-
         out = sh('genstrings', '-o', params[:output_dir], *flags, *files)
         out.split("\n")
       end
@@ -19,6 +16,13 @@ module Fastlane
           File.join(path, '**', '*.{m,swift}')
         else
           path
+        end
+      end
+
+      def self.files_matching(paths:, exclude:)
+        globbed_paths = paths.map { |p| glob_pattern(p) }
+        Dir.glob(globbed_paths).reject do |file|
+          exclude&.any? { |ex| File.fnmatch?("*/#{ex}", file) }
         end
       end
 
@@ -41,9 +45,14 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :paths,
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_PATHS',
-                                       description: 'Array of directory paths to scan for `.m` and `.swift` files. The entries can contain glob patterns too',
+                                       description: 'Array of paths to scan for `.m` and `.swift` files. The entries can also contain glob patterns',
                                        type: Array,
                                        default_value: ['.']),
+          FastlaneCore::ConfigItem.new(key: :exclude,
+                                       env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_EXCLUDE',
+                                       description: 'Array of paths or glob patterns to exclude from scanning',
+                                       type: Array,
+                                       default_value: []),
           FastlaneCore::ConfigItem.new(key: :quiet,
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_QUIET',
                                        description: 'In quiet mode, genstrings will log warnings about duplicate values, but not about duplicate comments',
