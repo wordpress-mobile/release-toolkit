@@ -63,7 +63,7 @@ module Fastlane
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_SWIFTUI',
                                        description: "Should we include SwiftUI's `Text()` when parsing code with `genstrings`",
                                        is_string: false, # Boolean
-                                       default_value: true),
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :output_dir,
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_OUTPUT_DIR',
                                        description: 'The path to the directory where the generated `.strings` files should be created',

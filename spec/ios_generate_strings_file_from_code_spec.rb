@@ -109,8 +109,8 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
         test_genstrings(
           paths_to_scan: [app_src_dir, pods_src_dir],
           quiet: true,
-          swiftui: true,
-          expected_dir_name: 'expected-pods-swiftui',
+          swiftui: false,
+          expected_dir_name: 'expected-pods-noswiftui',
           expected_logs: expected_logs
         )
       end
@@ -124,8 +124,8 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
         test_genstrings(
           paths_to_scan: [app_src_dir, pods_src_dir],
           quiet: false,
-          swiftui: true,
-          expected_dir_name: 'expected-pods-swiftui',
+          swiftui: false,
+          expected_dir_name: 'expected-pods-noswiftui',
           expected_logs: expected_logs
         )
       end
