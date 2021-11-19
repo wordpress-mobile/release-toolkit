@@ -6,36 +6,6 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCode do
   let(:app_src_dir) { File.join(test_data_dir, 'sample-project', 'Sources') }
   let(:pods_src_dir) { File.join(test_data_dir, 'sample-project', 'Pods') }
 
-  def test_genstrings(paths_to_scan:, quiet:, swiftui:, expected_dir_name:, expected_logs: nil)
-    # Arrange
-    allow_fastlane_action_sh # see spec_helper
-    cmd_output = []
-    allow(FastlaneCore::UI).to receive(:command_output) { |line| cmd_output << line }
-
-    Dir.mktmpdir('a8c-wpmrt-ios_generate_strings_file_from_code-') do |tmp_dir|
-      # Act
-      return_value = described_class.run(paths: paths_to_scan, quiet: quiet, swiftui: swiftui, output_dir: tmp_dir)
-
-      output_files = Dir[File.join(tmp_dir, '*.strings')]
-      expected_files = Dir[File.join(test_data_dir, expected_dir_name, '*.strings')]
-
-      # Assert: UI.messages and return value from the action
-      unless expected_logs.nil?
-        expect(cmd_output).to eq(expected_logs)
-        expect(return_value).to eq(expected_logs)
-      end
-      # Assert: same list of generated files
-      expect(output_files.map { |f| File.basename(f) }.sort).to eq(expected_files.map { |f| File.basename(f) }.sort)
-
-      # Assert: each generated file has expected content
-      output_files.each do |generated_file|
-        file_basename = File.basename(generated_file)
-        expected_file = expected_files.find { |f| File.basename(f) == file_basename }
-        expect(File.read(generated_file)).to eq(File.read(expected_file)), "Content of '#{file_basename}' and '#{expected_file}' do not match."
-      end
-    end
-  end
-
   context 'when building the list of paths' do
     it 'handle paths pointing to (existing) directories' do
       Dir.mktmpdir('a8c-wpmrt-ios_generate_strings_file_from_code-') do |tmp_dir|
@@ -66,7 +36,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCode do
 
       it 'excludes files matching filters starting with *' do
         test_exclude_patterns(
-          filter:['*.m', '*View.swift'],
+          filter: ['*.m', '*View.swift'],
           expected: %w[Sources/AppClass1.swift Pods/SomePod/Sources/PodClass1.swift]
         )
       end
@@ -81,6 +51,36 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCode do
   end
 
   context 'when generating .strings files from code' do
+    def test_genstrings(paths_to_scan:, quiet:, swiftui:, expected_dir_name:, expected_logs: nil)
+      # Arrange
+      allow_fastlane_action_sh # see spec_helper
+      cmd_output = []
+      allow(FastlaneCore::UI).to receive(:command_output) { |line| cmd_output << line }
+
+      Dir.mktmpdir('a8c-wpmrt-ios_generate_strings_file_from_code-') do |tmp_dir|
+        # Act
+        return_value = described_class.run(paths: paths_to_scan, quiet: quiet, swiftui: swiftui, output_dir: tmp_dir)
+
+        output_files = Dir[File.join(tmp_dir, '*.strings')]
+        expected_files = Dir[File.join(test_data_dir, expected_dir_name, '*.strings')]
+
+        # Assert: UI.messages and return value from the action
+        unless expected_logs.nil?
+          expect(cmd_output).to eq(expected_logs)
+          expect(return_value).to eq(expected_logs)
+        end
+        # Assert: same list of generated files
+        expect(output_files.map { |f| File.basename(f) }.sort).to eq(expected_files.map { |f| File.basename(f) }.sort)
+
+        # Assert: each generated file has expected content
+        output_files.each do |generated_file|
+          file_basename = File.basename(generated_file)
+          expected_file = expected_files.find { |f| File.basename(f) == file_basename }
+          expect(File.read(generated_file)).to eq(File.read(expected_file)), "Content of '#{file_basename}' and '#{expected_file}' do not match."
+        end
+      end
+    end
+
     context 'with swiftui support disabled' do
       it 'scans all the paths provided (e.g. Pods)' do
         test_genstrings(paths_to_scan: [app_src_dir, pods_src_dir], quiet: true, swiftui: false, expected_dir_name: 'expected-pods-noswiftui')
@@ -101,7 +101,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCode do
       end
     end
 
-    context 'when it finds warnings' do
+    context 'when `genstrings` finds warnings' do
       it 'only logs warnings about multiple values in quiet mode' do
         expected_logs = [
           %(Key "app.key5" used with multiple values. Value "app value 5\\nwith multiple lines." kept. Value "app value 5\\nwith multiple lines, and different value than in Swift" ignored.),
