@@ -1,7 +1,5 @@
 #import <Foundation/Foundation.h>
-
-@interface PodClass2: NSObject
-@end
+#import "PodClass2.h"
 
 @implementation PodClass2
 

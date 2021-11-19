@@ -1,7 +1,5 @@
 #import <Foundation/Foundation.h>
-
-@interface AppClass2: NSObject
-@end
+#import "AppClass2.h"
 
 @implementation AppClass2
 
