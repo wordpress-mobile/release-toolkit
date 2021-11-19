@@ -4,7 +4,7 @@ require 'tmpdir'
 describe Fastlane::Actions::IosGenerateStringsFileFromCode do
   let(:test_data_dir) { File.join(File.dirname(__FILE__), 'test-data', 'translations', 'ios_generate_strings_file_from_code') }
   let(:app_src_dir) { File.join(test_data_dir, 'sample-project', 'Sources') }
-  let(:pod_src_dir) { File.join(test_data_dir, 'sample-project', 'Pods') }
+  let(:pods_src_dir) { File.join(test_data_dir, 'sample-project', 'Pods') }
 
   def test_genstrings(paths_to_scan:, quiet:, swiftui:, expected_dir_name:, expected_logs: nil)
     Dir.mktmpdir('a8c-wpmrt-ios_generate_strings_file_from_code-') do |tmp_dir|
@@ -29,11 +29,11 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCode do
 
   context 'when including pods' do
     it 'Generates the expected .strings files with SwiftUI support' do
-      test_genstrings(paths_to_scan: [app_src_dir, pod_src_dir], quiet: true, swiftui: true, expected_dir_name: 'expected-pods-swiftui')
+      test_genstrings(paths_to_scan: [app_src_dir, pods_src_dir], quiet: true, swiftui: true, expected_dir_name: 'expected-pods-swiftui')
     end
 
     it 'Generates the expected .strings files without SwiftUI support' do
-      test_genstrings(paths_to_scan: [app_src_dir, pod_src_dir], quiet: true, swiftui: false, expected_dir_name: 'expected-pods-noswiftui')
+      test_genstrings(paths_to_scan: [app_src_dir, pods_src_dir], quiet: true, swiftui: false, expected_dir_name: 'expected-pods-noswiftui')
     end
   end
 
@@ -52,7 +52,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCode do
       expected_logs = [
         %(Key "app.key5" used with multiple values. Value "app value 5\\nwith multiple lines." kept. Value "app value 5\\nwith multiple lines, and different value than in Swift" ignored.),
       ]
-      test_genstrings(paths_to_scan: [app_src_dir, pod_src_dir], quiet: true, swiftui: true, expected_dir_name: 'expected-pods-swiftui', expected_logs: expected_logs)
+      test_genstrings(paths_to_scan: [app_src_dir, pods_src_dir], quiet: true, swiftui: true, expected_dir_name: 'expected-pods-swiftui', expected_logs: expected_logs)
     end
 
     it 'logs warnings about both multiple values and multiple comments if not in quiet mode' do
@@ -61,7 +61,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCode do
         %(genstrings: warning: Key "app.key5" used with multiple comments "App key 5, with value, custom table and placeholder." & "Duplicate declaration of App key 5 between ObjC and Swift,and with a comment even spanning multiple lines!"),
         %(genstrings: warning: Key "pod.key5" used with multiple comments "Duplicate declaration of Pod key 5 between ObjC and Swift,and with a comment even spanning multiple lines!" & "Pod key 5, with value, custom table and placeholder."),
       ]
-      test_genstrings(paths_to_scan: [app_src_dir, pod_src_dir], quiet: false, swiftui: true, expected_dir_name: 'expected-pods-swiftui', expected_logs: expected_logs)
+      test_genstrings(paths_to_scan: [app_src_dir, pods_src_dir], quiet: false, swiftui: true, expected_dir_name: 'expected-pods-swiftui', expected_logs: expected_logs)
     end
   end
 end
