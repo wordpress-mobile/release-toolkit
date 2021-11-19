@@ -6,7 +6,7 @@ module Fastlane
         flags = [('-q' if params[:quiet]), ('-SwiftUI' if params[:swiftui])].compact
         cmd = ['genstrings', '-o', params[:output_dir], *flags, *files]
         out = Actions.sh_control_output(*cmd, print_command: FastlaneCore::Globals.verbose?, print_command_output: true)
-        out.strip.split("\n")
+        out.scrub.strip.split("\n")
       end
 
       # Adds the proper `**/*.{m,swift}` to the list of paths
