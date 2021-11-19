@@ -55,7 +55,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCode do
       test_genstrings(paths_to_scan: [app_src_dir, pod_src_dir], quiet: true, swiftui: true, expected_dir_name: 'expected-pods-swiftui', expected_logs: expected_logs)
     end
 
-    it 'logs warnings about both duplicate values and duplicate comments if not in quiet mode' do
+    it 'logs warnings about both multiple values and multiple comments if not in quiet mode' do
       expected_logs = [
         %(Key "app.key5" used with multiple values. Value "app value 5\\nwith multiple lines." kept. Value "app value 5\\nwith multiple lines, and different value than in Swift" ignored.),
         %(genstrings: warning: Key "app.key5" used with multiple comments "App key 5, with value, custom table and placeholder." & "Duplicate declaration of App key 5 between ObjC and Swift,and with a comment even spanning multiple lines!"),

@@ -23,11 +23,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Generate the .strings files from your ObjC and Swift code'
+        'Generate the .strings files from your Objective-C and Swift code'
       end
 
       def self.details
-        'Use genstrings to generate the .strings files from your ObjC and Swift code.'
+        'Use genstrings to generate the .strings files from your Objective-C and Swift code.'
       end
 
       def self.available_options
@@ -49,13 +49,13 @@ module Fastlane
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :output_dir,
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_OUTPUT_DIR',
-                                       description: 'The path to the directory where the generated .strings files should be created.',
+                                       description: 'The path to the directory where the generated .strings files should be created',
                                        type: String),
         ]
       end
 
       def self.output
-        'Generates .strings files (especially Localizable.strings but could generate more if the code uses custom tables)'
+        ['Generates .strings files (especially Localizable.strings but could generate more if the code uses custom tables)']
       end
 
       def self.return_value
