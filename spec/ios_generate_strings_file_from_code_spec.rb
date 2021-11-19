@@ -43,7 +43,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
 
       it 'excludes files matching filters containing * mid-pattern' do
         test_exclude_patterns(
-          filter: ['*.m', 'App*View.swift'],
+          filter: ['*.m', '*/App*View.swift'],
           expected: %w[Sources/AppClass1.swift Pods/SomePod/Sources/PodClass1.swift Pods/SomePod/Sources/PodSampleView.swift]
         )
       end

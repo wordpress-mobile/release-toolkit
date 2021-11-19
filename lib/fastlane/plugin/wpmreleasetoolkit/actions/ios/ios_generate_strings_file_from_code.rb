@@ -22,7 +22,7 @@ module Fastlane
       def self.files_matching(paths:, exclude:)
         globbed_paths = paths.map { |p| glob_pattern(p) }
         Dir.glob(globbed_paths).reject do |file|
-          exclude&.any? { |ex| File.fnmatch?("*/#{ex}", file) }
+          exclude&.any? { |ex| File.fnmatch?(ex, file) }
         end
       end
 
