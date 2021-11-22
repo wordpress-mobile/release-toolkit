@@ -51,7 +51,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
   end
 
   context 'when generating .strings files from code' do
-    def test_genstrings(paths_to_scan:, quiet:, swiftui:, routines: [], expected_dir_name:, expected_logs: nil)
+    def test_genstrings(paths_to_scan:, quiet:, swiftui:, routines: [], expected_dir_name:, expected_logs: nil) # rubocop:disable Style/KeywordParametersOrder
       # Arrange
       allow_fastlane_action_sh # see spec_helper
       cmd_output = []
