@@ -6,8 +6,8 @@ enum AppClass1 {
                                               value: "appvalue2, %1$@.",
                                               comment: "App key 2, with value containing placeholder.")
     static let appString3 = NSLocalizedString("app.key3.%1@d",
-                                              comment: "App key 3, no value, with key containing placeholder,"
-                                                + "and with multi-line comment")
+                                              comment: "App key 3, no value, with key containing placeholder, "
+                                                + "and with comment literal spanning multiple lines in code.")
     static let appString4 = NSLocalizedString("app.key4",
                                               bundle: Bundle(for: BundleToken.self),
                                               value: "appvalue4, %1$@.",
