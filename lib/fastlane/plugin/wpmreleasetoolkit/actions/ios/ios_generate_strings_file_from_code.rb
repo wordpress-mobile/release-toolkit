@@ -4,6 +4,7 @@ module Fastlane
       def self.run(params)
         files = files_matching(paths: params[:paths], exclude: params[:exclude])
         flags = [('-q' if params[:quiet]), ('-SwiftUI' if params[:swiftui])].compact
+        flags += Array(params[:routines]).flat_map { |s| ['-s', s] }
         cmd = ['genstrings', '-o', params[:output_dir], *flags, *files]
         out = Actions.sh_control_output(*cmd, print_command: FastlaneCore::Globals.verbose?, print_command_output: true)
         out.scrub.strip.split("\n")
@@ -52,6 +53,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :exclude,
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_EXCLUDE',
                                        description: 'Array of paths or glob patterns to exclude from scanning',
+                                       type: Array,
+                                       default_value: []),
+          FastlaneCore::ConfigItem.new(key: :routines,
+                                       env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_ROUTINES',
+                                       description: 'Base name of the alternate methods to be parsed in addition to the standard NSLocalizedString() one',
                                        type: Array,
                                        default_value: []),
           FastlaneCore::ConfigItem.new(key: :quiet,

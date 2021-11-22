@@ -51,7 +51,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
   end
 
   context 'when generating .strings files from code' do
-    def test_genstrings(paths_to_scan:, quiet:, swiftui:, expected_dir_name:, expected_logs: nil)
+    def test_genstrings(paths_to_scan:, quiet:, swiftui:, routines: [], expected_dir_name:, expected_logs: nil)
       # Arrange
       allow_fastlane_action_sh # see spec_helper
       cmd_output = []
@@ -59,7 +59,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
 
       Dir.mktmpdir('a8c-wpmrt-ios_generate_strings_file_from_code-') do |tmp_dir|
         # Act
-        return_value = described_class.run(paths: paths_to_scan, quiet: quiet, swiftui: swiftui, output_dir: tmp_dir)
+        return_value = described_class.run(paths: paths_to_scan, routines: routines, quiet: quiet, swiftui: swiftui, output_dir: tmp_dir)
 
         output_files = Dir[File.join(tmp_dir, '*.strings')]
         expected_files = Dir[File.join(test_data_dir, expected_dir_name, '*.strings')]
@@ -98,6 +98,12 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
 
       it 'only scans the provided paths (e.g. if limiting to app folder)' do
         test_genstrings(paths_to_scan: [app_src_dir], quiet: true, swiftui: true, expected_dir_name: 'expected-nopods-swiftui')
+      end
+    end
+
+    context 'when allowing custom routines' do
+      it 'can parse strings from custom routines' do
+        test_genstrings(paths_to_scan: [pods_src_dir], quiet: true, swiftui: false, routines: 'PodLocalizedString', expected_dir_name: 'expected-custom-routine')
       end
     end
 
