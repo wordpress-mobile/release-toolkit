@@ -20,16 +20,15 @@ module Fastlane
       end
 
       def self.details
-        'Gathers the string to localise'
+        'Gathers the string to localise. Deprecated in favor of the new `ios_generate_strings_file_from_code`'
       end
 
-      def self.available_options
+      def self.category
+        :deprecated
       end
 
-      def self.output
-      end
-
-      def self.return_value
+      def self.deprecated_notes
+        'This action is deprecated in favor of `ios_generate_strings_file_from_code`'
       end
 
       def self.authors

@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+* Added a new `ios_generate_strings_file_from_code` action to replace the soon-to-be-obsoleted `ios_localize_project` action (and `Scripts/localize.py` script in app repos). [#309]
 
 ### Bug Fixes
 
