@@ -42,7 +42,15 @@ module Fastlane
       def self.details
         <<~DETAILS
           Uses `genstrings` to generate the `.strings` files from your Objective-C and Swift code.
-          (especially `Localizable.strings` but could generate more if the code uses custom tables)
+          (especially `Localizable.strings` but it could generate more if the code uses custom tables).
+
+          You can provide a list of paths to scan but also paths to exclude. Both supports glob patterns.
+          You can also optionally provide a list of custom "routines" (aka macros or functions) that
+          `genstrings` should parse in addition to the usual `NSLocalizedString`. (see `-s` option of `genstrings`).
+
+          Tip: support for custom routines is useful if some of your targets define a helper function e.g.
+          `PodLocalizedString` to wrap calls to `Bundle.localizedString(forKey: key, value: value, table: nil)`,
+          just like the build-in `NSLocalizedString` does, but providing a custom bundle to look up the strings from.
         DETAILS
       end
 
@@ -60,7 +68,7 @@ module Fastlane
                                        default_value: []),
           FastlaneCore::ConfigItem.new(key: :routines,
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_ROUTINES',
-                                       description: 'Base name of the alternate methods to be parsed in addition to the standard `NSLocalizedString()` one',
+                                       description: 'Base name of the alternate methods to be parsed in addition to the standard `NSLocalizedString()` one. See the `-s` option in `man genstrings`',
                                        type: Array,
                                        default_value: []),
           FastlaneCore::ConfigItem.new(key: :quiet,
