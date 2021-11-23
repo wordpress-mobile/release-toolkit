@@ -3,8 +3,9 @@ require 'tmpdir'
 
 describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
   let(:test_data_dir) { File.join(File.dirname(__FILE__), 'test-data', 'translations', 'ios_generate_strings_file_from_code') }
-  let(:app_src_dir) { File.join(test_data_dir, 'sample-project', 'Sources') }
-  let(:pods_src_dir) { File.join(test_data_dir, 'sample-project', 'Pods') }
+  let(:sample_project_dir) { File.join(test_data_dir, 'sample-project') }
+  let(:app_src_dir) { File.join(sample_project_dir, 'Sources') }
+  let(:pods_src_dir) { File.join(sample_project_dir, 'Pods') }
 
   context 'when building the list of paths' do
     it 'handle paths pointing to (existing) directories' do
@@ -30,8 +31,8 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
     context 'when excluding files by pattern' do
       def test_exclude_patterns(filter:, expected:)
         list = described_class.files_matching(paths: [app_src_dir, pods_src_dir], exclude: filter)
-        expected_fullpaths = expected.map { |f| File.join(test_data_dir, 'sample-project', f) }
-        expect(list).to eq(expected_fullpaths), "expected: #{expected.inspect}\n     got: #{list.map { |f| f.gsub(%r{^.*/sample-project/}, '') }.inspect}"
+        expected_fullpaths = expected.map { |f| File.join(sample_project_dir, f) }
+        expect(list).to eq(expected_fullpaths), "expected: #{expected.inspect}\n     got: #{list.map { |f| f.sub(sample_project_dir, '') }.inspect}"
       end
 
       it 'excludes files matching filters starting with *' do
