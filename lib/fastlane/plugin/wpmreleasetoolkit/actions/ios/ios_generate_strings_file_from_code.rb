@@ -7,7 +7,10 @@ module Fastlane
         flags += Array(params[:routines]).flat_map { |routine| ['-s', routine] }
         cmd = ['genstrings', '-o', params[:output_dir], *flags, *files]
         out = Actions.sh_control_output(*cmd, print_command: FastlaneCore::Globals.verbose?, print_command_output: true)
-        out.scrub.strip.split("\n")
+        out = out.scrub.strip.split("\n")
+        errors = out.select { |line| line.include?('genstrings: error: ') }
+        UI.user_error!(errors.join("\n")) unless !params[:fail_on_error] || errors.empty?
+        out
       end
 
       # Adds the proper `**/*.{m,swift}` to the list of paths
