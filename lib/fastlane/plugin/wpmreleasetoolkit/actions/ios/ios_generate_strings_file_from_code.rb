@@ -4,9 +4,13 @@ module Fastlane
       def self.run(params)
         files = files_matching(paths: params[:paths], exclude: params[:exclude])
         flags = [('-q' if params[:quiet]), ('-SwiftUI' if params[:swiftui])].compact
+        flags += Array(params[:routines]).flat_map { |routine| ['-s', routine] }
         cmd = ['genstrings', '-o', params[:output_dir], *flags, *files]
         out = Actions.sh_control_output(*cmd, print_command: FastlaneCore::Globals.verbose?, print_command_output: true)
-        out.scrub.strip.split("\n")
+        out = out.scrub.strip.split("\n")
+        errors = out.select { |line| line.include?('genstrings: error: ') }
+        UI.user_error!(errors.join("\n")) unless !params[:fail_on_error] || errors.empty?
+        out
       end
 
       # Adds the proper `**/*.{m,swift}` to the list of paths
@@ -38,7 +42,15 @@ module Fastlane
       def self.details
         <<~DETAILS
           Uses `genstrings` to generate the `.strings` files from your Objective-C and Swift code.
-          (especially `Localizable.strings` but could generate more if the code uses custom tables)
+          (especially `Localizable.strings` but it could generate more if the code uses custom tables).
+
+          You can provide a list of paths to scan but also paths to exclude. Both supports glob patterns.
+          You can also optionally provide a list of custom "routines" (aka macros or functions) that
+          `genstrings` should parse in addition to the usual `NSLocalizedString`. (see `-s` option of `genstrings`).
+
+          Tip: support for custom routines is useful if some of your targets define a helper function e.g.
+          `PodLocalizedString` to wrap calls to `Bundle.localizedString(forKey: key, value: value, table: nil)`,
+          just like the build-in `NSLocalizedString` does, but providing a custom bundle to look up the strings from.
         DETAILS
       end
 
@@ -52,6 +64,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :exclude,
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_EXCLUDE',
                                        description: 'Array of paths or glob patterns to exclude from scanning',
+                                       type: Array,
+                                       default_value: []),
+          FastlaneCore::ConfigItem.new(key: :routines,
+                                       env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_ROUTINES',
+                                       description: 'Base name of the alternate methods to be parsed in addition to the standard `NSLocalizedString()` one. See the `-s` option in `man genstrings`',
                                        type: Array,
                                        default_value: []),
           FastlaneCore::ConfigItem.new(key: :quiet,
@@ -68,6 +85,11 @@ module Fastlane
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_OUTPUT_DIR',
                                        description: 'The path to the directory where the generated `.strings` files should be created',
                                        type: String),
+          FastlaneCore::ConfigItem.new(key: :fail_on_error,
+                                       env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_FAIL_ON_ERROR',
+                                       description: 'If true, will fail with user_error! if `genstrings` printed any error while parsing',
+                                       is_string: false, # Boolean
+                                       default_value: true),
         ]
       end
 
