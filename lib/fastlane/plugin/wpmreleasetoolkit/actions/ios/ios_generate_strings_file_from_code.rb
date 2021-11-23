@@ -57,7 +57,7 @@ module Fastlane
                                        default_value: []),
           FastlaneCore::ConfigItem.new(key: :routines,
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_ROUTINES',
-                                       description: 'Base name of the alternate methods to be parsed in addition to the standard NSLocalizedString() one',
+                                       description: 'Base name of the alternate methods to be parsed in addition to the standard `NSLocalizedString()` one',
                                        type: Array,
                                        default_value: []),
           FastlaneCore::ConfigItem.new(key: :quiet,
