@@ -74,6 +74,11 @@ module Fastlane
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_OUTPUT_DIR',
                                        description: 'The path to the directory where the generated `.strings` files should be created',
                                        type: String),
+          FastlaneCore::ConfigItem.new(key: :fail_on_error,
+                                       env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_FAIL_ON_ERROR',
+                                       description: 'If true, will fail with user_error! if `genstrings` printed any error while parsing',
+                                       is_string: false, # Boolean
+                                       default_value: true),
         ]
       end
 

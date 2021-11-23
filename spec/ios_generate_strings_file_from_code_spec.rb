@@ -53,13 +53,17 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
 
   context 'when generating .strings files from code' do
     # Helper method for all the test examples in this context group
-    def test_genstrings(params:, expected_dir_name:, expected_logs: nil)
+    def test_genstrings(params:, expected_dir_name:, expected_logs: nil, expected_failures: nil)
       # Arrange
       allow_fastlane_action_sh # see spec_helper
       cmd_output = []
       allow(FastlaneCore::UI).to receive(:command_output) { |line| cmd_output << line }
+      user_errors = []
+      allow(FastlaneCore::UI).to receive(:user_error!) { |line| user_errors << line }
 
       Dir.mktmpdir('a8c-wpmrt-ios_generate_strings_file_from_code-') do |tmp_dir|
+        clean_abs_dirs = ->(lines) { lines.map { |l| l.sub(tmp_dir, '<tmpdir>').sub(sample_project_dir, '<testdir>') } }
+
         # Act
         params[:output_dir] = tmp_dir
         config_items = Fastlane::ConfigurationHelper.parse(described_class, params) # Handles ConfigItem' default values
@@ -68,11 +72,14 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
         output_files = Dir[File.join(tmp_dir, '*.strings')]
         expected_files = Dir[File.join(test_data_dir, expected_dir_name, '*.strings')]
 
-        # Assert: UI.messages and return value from the action
+        # Assert: UI.messages, UI.user_error! and return value from the action
         unless expected_logs.nil?
-          clean_abs_dirs = ->(lines) { lines.map { |l| l.sub(tmp_dir, '<tmpdir>').sub(sample_project_dir, '<testdir>') } }
           expect(clean_abs_dirs[cmd_output]).to eq(expected_logs)
           expect(clean_abs_dirs[return_value]).to eq(expected_logs)
+        end
+
+        unless expected_failures.nil?
+          expect(clean_abs_dirs[user_errors]).to eq(expected_failures)
         end
 
         # Assert: same list of generated files
@@ -122,7 +129,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
     context 'when allowing custom routines' do
       it 'can parse strings from custom routines' do
         test_genstrings(
-          params: { paths: [pods_src_dir], quiet: true, swiftui: false, routines: 'PodLocalizedString' },
+          params: { paths: [app_src_dir, pods_src_dir], quiet: true, swiftui: false, routines: 'PodLocalizedString' },
           expected_dir_name: 'expected-custom-routine'
         )
       end
@@ -150,6 +157,46 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
           params: { paths: [app_src_dir, pods_src_dir], quiet: false, swiftui: false },
           expected_dir_name: 'expected-pods-noswiftui',
           expected_logs: expected_logs
+        )
+      end
+
+      it 'does not fail if any error is in the output when `fail_on_error` is off' do
+        expected_logs = [
+          %(Key "app.key5" used with multiple values. Value "app value 5\\nwith multiple lines." kept. Value "app value 5\\nwith multiple lines, and different value than in Swift" ignored.),
+          %(genstrings: error: bad entry in file <testdir>/Pods/SomePod/Sources/PodClass1.swift (line = 3): Argument is not a literal string.),
+        ]
+        test_genstrings(
+          params: { paths: [app_src_dir, pods_src_dir], quiet: true, swiftui: false, routines: 'PodLocalizedString', fail_on_error: false },
+          expected_dir_name: 'expected-custom-routine',
+          expected_logs: expected_logs,
+          expected_failures: []
+        )
+      end
+
+      it 'fails if there is any error in the output in `fail_on_error` mode, even in quiet mode' do
+        expected_logs = [
+          %(Key "app.key5" used with multiple values. Value "app value 5\\nwith multiple lines." kept. Value "app value 5\\nwith multiple lines, and different value than in Swift" ignored.),
+          %(genstrings: error: bad entry in file <testdir>/Pods/SomePod/Sources/PodClass1.swift (line = 3): Argument is not a literal string.),
+        ]
+        test_genstrings(
+          params: { paths: [app_src_dir, pods_src_dir], quiet: true, swiftui: false, routines: 'PodLocalizedString', fail_on_error: true },
+          expected_dir_name: 'expected-custom-routine',
+          expected_logs: expected_logs,
+          expected_failures: [expected_logs.last]
+        )
+      end
+
+      it 'does not fail if there are warnings but no error in the output, even in `fail_on_error` mode' do
+        expected_logs = [
+          %(Key "app.key5" used with multiple values. Value "app value 5\\nwith multiple lines." kept. Value "app value 5\\nwith multiple lines, and different value than in Swift" ignored.),
+          %(genstrings: warning: Key "app.key5" used with multiple comments "App key 5, with value, custom table and placeholder." & "Duplicate declaration of App key 5 between ObjC and Swift,and with a comment even spanning multiple lines!"),
+          %(genstrings: warning: Key "pod.key5" used with multiple comments "Duplicate declaration of Pod key 5 between ObjC and Swift,and with a comment even spanning multiple lines!" & "Pod key 5, with value, custom table and placeholder."),
+        ]
+        test_genstrings(
+          params: { paths: [app_src_dir, pods_src_dir], quiet: false, swiftui: false, fail_on_error: true },
+          expected_dir_name: 'expected-pods-noswiftui',
+          expected_logs: expected_logs,
+          expected_failures: []
         )
       end
     end
