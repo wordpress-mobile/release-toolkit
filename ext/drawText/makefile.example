@@ -1,8 +1,0 @@
-build:
-	true
-
-clean:
-	true
-
-install:
-	true

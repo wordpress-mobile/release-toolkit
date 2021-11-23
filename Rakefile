@@ -30,8 +30,6 @@ task :docstats, [:path] do |_, args|
   sh('yard', 'stats', '--list-undoc', path)
 end
 
-Rake::ExtensionTask.new('drawText')
-
 GEM_NAME = 'fastlane-plugin-wpmreleasetoolkit'.freeze
 VERSION_FILE = File.join('lib', 'fastlane', 'plugin', 'wpmreleasetoolkit', 'version.rb')
 
