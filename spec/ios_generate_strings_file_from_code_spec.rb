@@ -70,8 +70,9 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
 
         # Assert: UI.messages and return value from the action
         unless expected_logs.nil?
-          expect(cmd_output).to eq(expected_logs)
-          expect(return_value).to eq(expected_logs)
+          clean_abs_dirs = ->(lines) { lines.map { |l| l.sub(tmp_dir, '<tmpdir>').sub(sample_project_dir, '<testdir>') } }
+          expect(clean_abs_dirs[cmd_output]).to eq(expected_logs)
+          expect(clean_abs_dirs[return_value]).to eq(expected_logs)
         end
 
         # Assert: same list of generated files
