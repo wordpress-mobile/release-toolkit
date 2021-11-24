@@ -29,8 +29,7 @@ module Fastlane
           UI.user_error!(message)
         end
 
-
-        UI.user_error!("`drawText` not found – install it using `brew install automattic/build-tools/drawText`.") unless system('which drawText')
+        UI.user_error!('`drawText` not found – install it using `brew install automattic/build-tools/drawText`.') unless system('which drawText')
       end
 
       def read_json(configFilePath)
