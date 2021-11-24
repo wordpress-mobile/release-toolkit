@@ -29,14 +29,15 @@ steps:
   #################
   - label: "🧹 Lint"
     command: |
-      .buildkite/install-dependencies.sh
-
+      bundle install
       echo "--- :rubocop: Run Rubocop"
       bundle exec rubocop
     env: *common_env
-    plugins: *common_plugins
+    plugins:
+      - docker#v3.8.0:
+          image: "ruby:2.7.4"
     agents:
-      queue: "mac"
+      queue: "default"
 
   #################
   # Danger
