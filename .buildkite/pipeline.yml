@@ -14,9 +14,6 @@ steps:
     command: |
       .buildkite/install-dependencies.sh
 
-      echo "--- :hammer: Build DrawText"
-      bundle exec rake compile
-
       echo "--- :git: Setting up git-lfs"
       git-lfs install
 
