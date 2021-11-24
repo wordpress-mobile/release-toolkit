@@ -44,14 +44,18 @@ steps:
   #################
   - label: "⛔️ Danger"
     command: |
-      .buildkite/install-dependencies.sh
-
+      bundle install
       echo "--- :rubocop: Run Danger"
       bundle exec danger
     env: *common_env
-    plugins: *common_plugins
+    plugins:
+      - docker#v3.8.0:
+          image: "ruby:2.7.4"
+          propagate-environment: true
+          environment:
+            - "DANGER_GITHUB_API_TOKEN"
     agents:
-      queue: "mac"
+      queue: "default"
 
   #################
   # Push to RubyGems
