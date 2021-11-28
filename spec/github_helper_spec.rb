@@ -19,4 +19,27 @@ describe Fastlane::Helper::GithubHelper do
       end
     end
   end
+
+  describe 'github_token' do
+    after do
+      ENV['GHHELPER_ACCESS'] = nil
+      ENV['GITHUB_TOKEN'] = nil
+    end
+
+    it 'can use `GHHELPER_ACCESS`' do
+      ENV['GHHELPER_ACCESS'] = 'GHHELPER_ACCESS'
+      expect(described_class.github_token).to eq('GHHELPER_ACCESS')
+    end
+
+    it 'can use `GITHUB_TOKEN`' do
+      ENV['GITHUB_TOKEN'] = 'GITHUB_TOKEN'
+      expect(described_class.github_token).to eq('GITHUB_TOKEN')
+    end
+
+    it 'prioritizes GHHELPER_ACCESS` over `GITHUB_TOKEN` if both are present' do
+      ENV['GITHUB_TOKEN'] = 'GITHUB_TOKEN'
+      ENV['GHHELPER_ACCESS'] = 'GHHELPER_ACCESS'
+      expect(described_class.github_token).to eq('GHHELPER_ACCESS')
+    end
+  end
 end

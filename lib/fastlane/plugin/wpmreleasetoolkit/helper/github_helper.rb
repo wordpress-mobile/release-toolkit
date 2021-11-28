@@ -7,8 +7,16 @@ module Fastlane
 
   module Helper
     class GithubHelper
+      def self.github_token
+        [
+          'GHHELPER_ACCESS', # For historical reasons / backward compatibility
+          'GITHUB_TOKEN',    # Used by the `gh` CLI tool
+        ].map { |key| ENV[key] }
+          .detect { |value| !value.nil? }
+      end
+
       def self.github_client
-        client = Octokit::Client.new(access_token: ENV['GHHELPER_ACCESS'])
+        client = Octokit::Client.new(access_token: github_token)
 
         # Fetch the current user
         user = client.user
@@ -127,6 +135,27 @@ module Fastlane
         end
 
         download_path
+      end
+
+      # Creates (or updates an existing) GitHub PR Comment
+      def self.comment_on_pr(project_slug:, pr_number:, body:, reuse_identifier:)
+        comments = github_client.issue_comments(project_slug, pr_number)
+
+        existing_comment = comments.detect do |comment|
+          comment.body.include?(reuse_identifier)
+        end
+
+        comment_body = prepare_comment_body(body, reuse_identifier)
+
+        if existing_comment.nil?
+          github_client.add_comment(project_slug, pr_number, comment_body)
+        else
+          github_client.update_comment(project_slug, existing_comment.id, comment_body)
+        end
+      end
+
+      def self.prepare_comment_body(body, reuse_identifier)
+        "<!-- REUSE_ID: #{reuse_identifier} -->" + body
       end
     end
   end
