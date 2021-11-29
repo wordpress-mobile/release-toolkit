@@ -12,7 +12,7 @@ module Fastlane
           'GHHELPER_ACCESS', # For historical reasons / backward compatibility
           'GITHUB_TOKEN',    # Used by the `gh` CLI tool
         ].map { |key| ENV[key] }
-          .detect { |value| !value.nil? }
+          .compact.first
       end
 
       def self.github_client

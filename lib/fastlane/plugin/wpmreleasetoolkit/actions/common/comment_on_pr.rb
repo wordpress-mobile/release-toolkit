@@ -26,11 +26,10 @@ module Fastlane
 
       def self.details
         <<~DETAILS
-          If used just once, this method makes it nice and easy to post a quick comment to a GitHub
-          PR. Subsequent runs will allow you to update an existing comment as many times as you need
-          to (for instance, across multiple CI runs).
+          If used just once, this method makes it nice and easy to post a quick comment to a GitHub PR.
 
-          The `:reuse_identifier` config item enables this.
+          Subsequent runs will allow you to update an existing comment as many times as you need to
+          (e.g. across multiple CI runs), by using a `:reuse_identifier` to identify the comment to update.
         DETAILS
       end
 
@@ -40,13 +39,13 @@ module Fastlane
             key: :access_token,
             env_name: 'GITHUB_TOKEN',
             description: 'The GitHub token to use for posting the comment',
-            is_string: true
+            type: String
           ),
           FastlaneCore::ConfigItem.new(
             key: :reuse_identifier,
             description: 'If provided, the reuse identifier can identify an existing comment to overwrite',
             is_string: true,
-            default_value: SecureRandom.uuid
+            default_value: nil
           ),
           FastlaneCore::ConfigItem.new(
             key: :project,
@@ -56,7 +55,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :pr_number,
             description: 'The PR number',
-            is_string: false # integer
+            type: Integer
           ),
           FastlaneCore::ConfigItem.new(
             key: :body,
