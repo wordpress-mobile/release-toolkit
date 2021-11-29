@@ -52,13 +52,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :reuse_identifier,
             description: 'If provided, the reuse identifier can identify an existing comment to overwrite',
-            is_string: true,
+            type: String,
             default_value: nil
           ),
           FastlaneCore::ConfigItem.new(
             key: :project,
             description: 'The project slug (ex: `rails/rails`)',
-            is_string: true
+            type: String
           ),
           FastlaneCore::ConfigItem.new(
             key: :pr_number,
@@ -68,7 +68,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :body,
             description: 'The content of the comment',
-            is_string: true
+            type: String
           ),
         ]
       end
