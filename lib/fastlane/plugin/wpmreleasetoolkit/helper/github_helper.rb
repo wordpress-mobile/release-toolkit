@@ -142,23 +142,24 @@ module Fastlane
 
       # Creates (or updates an existing) GitHub PR Comment
       def self.comment_on_pr(project_slug:, pr_number:, body:, reuse_identifier: SecureRandom.uuid)
-        comments = github_client.issue_comments(project_slug, pr_number)
+        client = github_client
+        comments = client.issue_comments(project_slug, pr_number)
 
-        existing_comment = comments.find do |comment|
-          comment.body.include?(reuse_identifier)
-        end
+        complete_reuse_identifier = "<!-- REUSE_ID: #{reuse_identifier} -->"
 
-        comment_body = prepare_comment_body(body, reuse_identifier)
+        existing_comment = comments
+                           .select { |comment| comment.user.id == client.user.id } # Only match comments posted by the owner of the GitHub Token
+                           .find { |comment| comment.body.include?(complete_reuse_identifier) }
+
+        comment_body = complete_reuse_identifier + body
 
         if existing_comment.nil?
-          github_client.add_comment(project_slug, pr_number, comment_body)
+          client.add_comment(project_slug, pr_number, comment_body)
         else
-          github_client.update_comment(project_slug, existing_comment.id, comment_body)
+          client.update_comment(project_slug, existing_comment.id, comment_body)
         end
-      end
 
-      def self.prepare_comment_body(body, reuse_identifier)
-        "<!-- REUSE_ID: #{reuse_identifier} -->\n" + body
+        reuse_identifier
       end
     end
   end
