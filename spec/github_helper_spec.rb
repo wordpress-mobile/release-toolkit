@@ -41,5 +41,9 @@ describe Fastlane::Helper::GithubHelper do
       ENV['GHHELPER_ACCESS'] = 'GHHELPER_ACCESS'
       expect(described_class.github_token).to eq('GHHELPER_ACCESS')
     end
+
+    it 'prints an error if no environment variable is present' do
+      expect{ described_class.github_token }.to raise_error(FastlaneCore::Interface::FastlaneError)
+    end
   end
 end

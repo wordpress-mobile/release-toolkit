@@ -8,11 +8,14 @@ module Fastlane
   module Helper
     class GithubHelper
       def self.github_token
-        [
+        token = [
           'GHHELPER_ACCESS', # For historical reasons / backward compatibility
           'GITHUB_TOKEN',    # Used by the `gh` CLI tool
         ].map { |key| ENV[key] }
-          .compact.first
+        .compact
+        .first
+
+        token || UI.user_error!('Please provide a GitHub authentication token via the `GITHUB_TOKEN` environment variable')
       end
 
       def self.github_client
