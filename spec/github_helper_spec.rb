@@ -46,4 +46,54 @@ describe Fastlane::Helper::GithubHelper do
       expect { described_class.github_token }.to raise_error(FastlaneCore::Interface::FastlaneError)
     end
   end
+
+  describe 'comment_on_pr' do
+    let(:client) { double(Octokit::Client, :issue_comments => [], :add_comment => nil, :update_comment => nil, :user => double('User', :id => 1234)) }
+
+    before do
+      allow(described_class).to receive(:github_client).and_return(client)
+    end
+
+    it 'will create a new comment if an existing one is not found' do
+      expect(client).to receive(:add_comment)
+      comment_on_pr
+    end
+
+    it 'will update an existing comment if one is found' do
+      allow(client).to receive(:issue_comments).and_return([mockComment])
+      expect(client).to receive(:update_comment)
+      comment_on_pr
+    end
+
+    it 'will not match text outside the reuseID tag' do
+      allow(client).to receive(:issue_comments).and_return([mockComment(body: 'test-id')])
+      expect(client).to receive(:add_comment)
+      comment_on_pr
+    end
+
+    it 'will not match comments belonging to other users' do
+      allow(client).to receive(:issue_comments).and_return([mockComment(user_id: 0)])
+      expect(client).to receive(:add_comment)
+      comment_on_pr
+    end
+
+    it 'will return the reuse identifier' do
+        expect(comment_on_pr).to eq 'test-id'
+    end
+
+    @private
+
+    def comment_on_pr
+      described_class.comment_on_pr(
+          project_slug:'test/test',
+          pr_number: 1234,
+          body: 'Test',
+          reuse_identifier: 'test-id'
+        )
+    end
+
+    def mockComment(body: '<!-- REUSE_ID: test-id --> Test', user_id: 1234)
+      double('Comment', :id => 1234, :body => body, :user => double('User', :id => user_id))
+    end
+  end
 end
