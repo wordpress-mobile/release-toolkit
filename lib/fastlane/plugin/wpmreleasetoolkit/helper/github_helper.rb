@@ -141,10 +141,10 @@ module Fastlane
       end
 
       # Creates (or updates an existing) GitHub PR Comment
-      def self.comment_on_pr(project_slug:, pr_number:, body:, reuse_identifier:)
+      def self.comment_on_pr(project_slug:, pr_number:, body:, reuse_identifier: SecureRandom.uuid)
         comments = github_client.issue_comments(project_slug, pr_number)
 
-        existing_comment = comments.detect do |comment|
+        existing_comment = comments.find do |comment|
           comment.body.include?(reuse_identifier)
         end
 
@@ -158,7 +158,7 @@ module Fastlane
       end
 
       def self.prepare_comment_body(body, reuse_identifier)
-        "<!-- REUSE_ID: #{reuse_identifier} -->" + body
+        "<!-- REUSE_ID: #{reuse_identifier} -->\n" + body
       end
     end
   end
