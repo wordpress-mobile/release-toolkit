@@ -4,16 +4,24 @@ require 'securerandom'
 
 module Fastlane
   module Actions
+    module SharedValues
+      PR_COMMENT_REUSE_IDENTIFIER = :PR_COMMENT_REUSE_IDENTIFIER
+    end
+
     class CommentOnPrAction < Action
       def self.run(params)
         require_relative '../../helper/github_helper'
 
-        Fastlane::Helper::GithubHelper.comment_on_pr(
+        reuse_identifier = Fastlane::Helper::GithubHelper.comment_on_pr(
           project_slug: params[:project],
           pr_number: params[:pr_number],
           body: params[:body],
           reuse_identifier: params[:reuse_identifier]
         )
+
+        Actions.lane_context[SharedValues::PR_COMMENT_REUSE_IDENTIFIER] = reuse_identifier
+
+        reuse_identifier
       end
 
       def self.description
@@ -63,6 +71,16 @@ module Fastlane
             is_string: true
           ),
         ]
+      end
+
+      def self.output
+        [
+          ['PR_COMMENT_REUSE_IDENTIFIER', 'The `reuse_identifier` for the most recently posted comment'],
+        ]
+      end
+
+      def self.return_value
+        'The `reuse_identifier` for the posted comment (useful for updating it later, if needed)'
       end
 
       def self.is_supported?(platform)
