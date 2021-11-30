@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+* Fixed the rendering of PR links in the body of GitHub Releases created via the `create_release` action. [#316]
 
 ### Internal Changes
 
