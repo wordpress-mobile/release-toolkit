@@ -33,7 +33,7 @@ end
 GEM_NAME = 'fastlane-plugin-wpmreleasetoolkit'.freeze
 VERSION_FILE = File.join('lib', 'fastlane', 'plugin', 'wpmreleasetoolkit', 'version.rb')
 
-desc 'Try to build and install the gem to ensure it can be installed properly (with the native extension and all)'
+desc 'Try to build and install the gem to ensure it can be installed properly'
 task :check_install_gem do
   require_relative(VERSION_FILE)
   check_install(Fastlane::Wpmreleasetoolkit::VERSION)
