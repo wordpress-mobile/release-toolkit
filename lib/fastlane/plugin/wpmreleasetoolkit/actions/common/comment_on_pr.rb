@@ -1,6 +1,4 @@
 require 'fastlane/action'
-require 'rubygems/command_manager'
-require 'securerandom'
 
 module Fastlane
   module Actions
