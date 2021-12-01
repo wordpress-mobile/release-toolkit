@@ -8,7 +8,7 @@ module Fastlane
 
   module Helper
     class GithubHelper
-      def self.github_token
+      def self.github_token!
         token = [
           'GHHELPER_ACCESS', # For historical reasons / backward compatibility
           'GITHUB_TOKEN',    # Used by the `gh` CLI tool
@@ -20,7 +20,7 @@ module Fastlane
       end
 
       def self.github_client
-        client = Octokit::Client.new(access_token: github_token)
+        client = Octokit::Client.new(access_token: github_token!)
 
         # Fetch the current user
         user = client.user
