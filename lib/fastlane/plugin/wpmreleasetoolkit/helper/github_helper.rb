@@ -1,6 +1,7 @@
 require 'fastlane_core/ui/ui'
 require 'octokit'
 require 'open-uri'
+require 'securerandom'
 
 module Fastlane
   UI = FastlaneCore::UI unless Fastlane.const_defined?('UI')
