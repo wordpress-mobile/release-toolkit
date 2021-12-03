@@ -28,22 +28,22 @@ describe Fastlane::Helper::GithubHelper do
 
     it 'can use `GHHELPER_ACCESS`' do
       ENV['GHHELPER_ACCESS'] = 'GHHELPER_ACCESS'
-      expect(described_class.github_token).to eq('GHHELPER_ACCESS')
+      expect(described_class.github_token!).to eq('GHHELPER_ACCESS')
     end
 
     it 'can use `GITHUB_TOKEN`' do
       ENV['GITHUB_TOKEN'] = 'GITHUB_TOKEN'
-      expect(described_class.github_token).to eq('GITHUB_TOKEN')
+      expect(described_class.github_token!).to eq('GITHUB_TOKEN')
     end
 
     it 'prioritizes GHHELPER_ACCESS` over `GITHUB_TOKEN` if both are present' do
       ENV['GITHUB_TOKEN'] = 'GITHUB_TOKEN'
       ENV['GHHELPER_ACCESS'] = 'GHHELPER_ACCESS'
-      expect(described_class.github_token).to eq('GHHELPER_ACCESS')
+      expect(described_class.github_token!).to eq('GHHELPER_ACCESS')
     end
 
     it 'prints an error if no environment variable is present' do
-      expect { described_class.github_token }.to raise_error(FastlaneCore::Interface::FastlaneError)
+      expect { described_class.github_token! }.to raise_error(FastlaneCore::Interface::FastlaneError)
     end
   end
 
