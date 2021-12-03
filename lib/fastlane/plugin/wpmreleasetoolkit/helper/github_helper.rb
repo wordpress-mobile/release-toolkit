@@ -150,9 +150,10 @@ module Fastlane
 
         reuse_marker = "<!-- REUSE_ID: #{reuse_identifier} -->"
 
-        existing_comment = comments
-                           .select { |comment| comment.user.id == client.user.id } # Only match comments posted by the owner of the GitHub Token
-                           .find { |comment| comment.body.include?(reuse_marker) }
+        existing_comment = comments.find do |comment|
+          # Only match comments posted by the owner of the GitHub Token, and with the given reuse ID
+          comment.user.id == client.user.id and comment.body.include?(reuse_marker)
+        end
 
         comment_body = reuse_marker + body
 
