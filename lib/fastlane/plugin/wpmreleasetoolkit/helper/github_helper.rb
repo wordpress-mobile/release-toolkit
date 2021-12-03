@@ -30,8 +30,6 @@ module Fastlane
           # Auto-paginate to ensure we're not missing data
           client.auto_paginate = true
         end
-
-        @@client
       end
 
       def self.get_milestone(repository, release)
