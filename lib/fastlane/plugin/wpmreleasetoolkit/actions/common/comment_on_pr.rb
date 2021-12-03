@@ -55,7 +55,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :project,
-            description: 'The project slug (ex: `rails/rails`)',
+            description: 'The project slug (ex: `wordpress-mobile/wordpress-ios`)',
             type: String
           ),
           FastlaneCore::ConfigItem.new(
