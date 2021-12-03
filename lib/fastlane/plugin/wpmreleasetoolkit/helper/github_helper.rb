@@ -148,13 +148,13 @@ module Fastlane
         client = github_client
         comments = client.issue_comments(project_slug, pr_number)
 
-        complete_reuse_identifier = "<!-- REUSE_ID: #{reuse_identifier} -->"
+        reuse_marker = "<!-- REUSE_ID: #{reuse_identifier} -->"
 
         existing_comment = comments
                            .select { |comment| comment.user.id == client.user.id } # Only match comments posted by the owner of the GitHub Token
-                           .find { |comment| comment.body.include?(complete_reuse_identifier) }
+                           .find { |comment| comment.body.include?(reuse_marker) }
 
-        comment_body = complete_reuse_identifier + body
+        comment_body = reuse_marker + body
 
         if existing_comment.nil?
           client.add_comment(project_slug, pr_number, comment_body)
