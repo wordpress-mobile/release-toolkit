@@ -21,7 +21,7 @@ module Fastlane
 
       def self.github_client
         @@client ||= begin
-          Octokit::Client.new(access_token: github_token!)
+          client = Octokit::Client.new(access_token: github_token!)
 
           # Fetch the current user
           user = client.user
@@ -29,6 +29,8 @@ module Fastlane
 
           # Auto-paginate to ensure we're not missing data
           client.auto_paginate = true
+
+          client
         end
       end
 
