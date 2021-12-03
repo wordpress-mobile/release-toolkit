@@ -49,10 +49,10 @@ describe Fastlane::Helper::GithubHelper do
 
   describe 'github_client' do
     let(:client) do
-      double(
+      instance_double(
         Octokit::Client,
         user: instance_double('User', name: 'test'),
-        'auto_paginate=': nil,
+        'auto_paginate=': nil
       )
     end
 
