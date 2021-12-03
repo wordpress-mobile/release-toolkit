@@ -484,3 +484,7 @@ Style/ZeroLengthPredicate:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_devices_to_provisioning_profiles.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/git_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_download_helper.rb'
+
+Style/ClassVars:
+  Exclude:
+    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/github_helper.rb'
