@@ -20,16 +20,18 @@ module Fastlane
       end
 
       def self.github_client
-        client = Octokit::Client.new(access_token: github_token!)
+        @@client ||= begin
+          Octokit::Client.new(access_token: github_token!)
 
-        # Fetch the current user
-        user = client.user
-        UI.message("Logged in as: #{user.name}")
+          # Fetch the current user
+          user = client.user
+          UI.message("Logged in as: #{user.name}")
 
-        # Auto-paginate to ensure we're not missing data
-        client.auto_paginate = true
+          # Auto-paginate to ensure we're not missing data
+          client.auto_paginate = true
+        end
 
-        client
+        @@client
       end
 
       def self.get_milestone(repository, release)
