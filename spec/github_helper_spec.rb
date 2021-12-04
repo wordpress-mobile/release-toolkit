@@ -47,6 +47,25 @@ describe Fastlane::Helper::GithubHelper do
     end
   end
 
+  describe 'github_client' do
+    let(:client) do
+      instance_double(
+        Octokit::Client,
+        user: instance_double('User', name: 'test'),
+        'auto_paginate=': nil
+      )
+    end
+
+    before do
+      allow(described_class).to receive(:github_token!).and_return('')
+      allow(Octokit::Client).to receive(:new).and_return(client)
+    end
+
+    it 'is not nil' do
+      expect(described_class.github_client).not_to be_nil
+    end
+  end
+
   describe 'comment_on_pr' do
     let(:client) do
       instance_double(
