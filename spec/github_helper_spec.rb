@@ -61,8 +61,19 @@ describe Fastlane::Helper::GithubHelper do
       allow(Octokit::Client).to receive(:new).and_return(client)
     end
 
+    after do
+      # Clean up the client memoization between runs to ensure it's re-initialized in each test
+      described_class.remove_class_variable(:@@client) if described_class.class_variable_defined?(:@@client)
+    end
+
     it 'is not nil' do
       expect(described_class.github_client).not_to be_nil
+    end
+
+    it 'memoizes the client' do
+      expect(Octokit::Client).to receive(:new).once
+      described_class.github_client
+      described_class.github_client
     end
   end
 
