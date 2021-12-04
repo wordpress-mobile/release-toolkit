@@ -8,7 +8,7 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper'
         require_relative '../../helper/android/android_git_helper'
 
-        other_action.ensure_git_branch(branch: 'develop')
+        other_action.ensure_git_branch(branch: 'trunk')
 
         # Create new configuration
         new_short_version = Fastlane::Helper::Android::VersionHelper.bump_version_release
@@ -28,9 +28,9 @@ module Fastlane
         UI.message("New version: #{new_short_version}")
         UI.message("Release branch: #{new_release_branch}")
 
-        # Update local develop and branch
+        # Update local trunk and branch
         UI.message 'Creating new branch...'
-        Fastlane::Helper::GitHelper.create_branch(new_release_branch, from: 'develop')
+        Fastlane::Helper::GitHelper.create_branch(new_release_branch, from: 'trunk')
         UI.message 'Done!'
 
         UI.message 'Updating app version...'

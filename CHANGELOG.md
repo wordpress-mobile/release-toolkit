@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-_None_
+* Updated default branch for clients to `trunk`
 
 ### New Features
 

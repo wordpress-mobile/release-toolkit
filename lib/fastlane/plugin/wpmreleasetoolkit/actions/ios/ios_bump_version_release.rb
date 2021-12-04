@@ -8,16 +8,16 @@ module Fastlane
         require_relative '../../helper/ios/ios_version_helper'
         require_relative '../../helper/ios/ios_git_helper'
 
-        other_action.ensure_git_branch(branch: 'develop')
+        other_action.ensure_git_branch(branch: 'trunk')
 
         # Create new configuration
         @new_version = Fastlane::Helper::Ios::VersionHelper.bump_version_release()
         create_config()
         show_config()
 
-        # Update local develop and branch
-        Fastlane::Helper::GitHelper.checkout_and_pull('develop')
-        Fastlane::Helper::GitHelper.create_branch(@new_release_branch, from: 'develop')
+        # Update local trunk and branch
+        Fastlane::Helper::GitHelper.checkout_and_pull('trunk')
+        Fastlane::Helper::GitHelper.create_branch(@new_release_branch, from: 'trunk')
         UI.message 'Done!'
 
         UI.message 'Updating glotPressKeys...' unless params[:skip_glotpress]

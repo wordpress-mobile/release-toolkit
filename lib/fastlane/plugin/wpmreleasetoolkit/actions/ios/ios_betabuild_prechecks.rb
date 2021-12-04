@@ -8,8 +8,8 @@ module Fastlane
         require_relative '../../helper/ios/ios_version_helper'
         require_relative '../../helper/ios/ios_git_helper'
 
-        # Checkout develop and update
-        Fastlane::Helper::GitHelper.checkout_and_pull('develop')
+        # Checkout trunk and update
+        Fastlane::Helper::GitHelper.checkout_and_pull('trunk')
 
         # Check versions
         build_version = Fastlane::Helper::Ios::VersionHelper.get_build_version
