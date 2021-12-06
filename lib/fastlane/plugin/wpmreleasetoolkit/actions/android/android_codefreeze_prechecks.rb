@@ -11,8 +11,9 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper'
         require_relative '../../helper/android/android_git_helper'
 
-        # Checkout trunk and update
-        Fastlane::Helper::GitHelper.checkout_and_pull('trunk')
+        # Checkout default branch and update
+        default_branch = params[:default_branch] || 'develop'
+        Fastlane::Helper::GitHelper.checkout_and_pull(default_branch)
 
         # Create versions
         current_version = Fastlane::Helper::Android::VersionHelper.get_release_version
@@ -23,7 +24,7 @@ module Fastlane
         no_alpha_version_message = "No alpha version configured. If you wish to configure an alpha version please update version.properties to include an alpha key for this app\n"
         # Ask user confirmation
         unless params[:skip_confirm]
-          confirm_message = "Building a new release branch starting from trunk.\nCurrent version is #{current_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{current_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
+          confirm_message = "Building a new release branch starting from #{default_branch}.\nCurrent version is #{current_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{current_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
           confirm_message += current_alpha_version.nil? ? no_alpha_version_message : "Current Alpha version is #{current_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{current_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
           confirm_message += "After codefreeze the new version will be: #{next_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{next_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
           confirm_message += current_alpha_version.nil? ? '' : "After codefreeze the new Alpha will be: #{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
@@ -47,7 +48,7 @@ module Fastlane
       end
 
       def self.details
-        'Updates the trunk branch, checks the app version and ensure the branch is clean'
+        'Updates the default branch, checks the app version and ensure the branch is clean'
       end
 
       def self.available_options

@@ -8,8 +8,9 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper'
         require_relative '../../helper/android/android_git_helper'
 
-        # Checkout trunk and update
-        Fastlane::Helper::GitHelper.checkout_and_pull('trunk')
+        # Checkout default branch and update
+        default_branch = params[:default_branch] || 'develop'
+        Fastlane::Helper::GitHelper.checkout_and_pull(default_branch)
 
         # Check versions
         release_version = Fastlane::Helper::Android::VersionHelper.get_release_version
