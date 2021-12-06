@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-* Updated default branch for clients to `trunk`
+_None_
 
 ### New Features
 
@@ -15,6 +15,7 @@
 * Added a `comment_on_pr` action to allow commenting on (and updating comments on) PRs. [#313]
 
 * Added the ability to use the `GITHUB_TOKEN` environment variable for GitHub operations. `GHHELPER_ACCESS` will be deprecated in a future version. [#313]
+* Added parameter for default/base branch across several actions [#319]
 
 ### Bug Fixes
 
