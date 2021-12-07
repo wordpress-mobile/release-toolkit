@@ -8,7 +8,7 @@ module Fastlane
         require_relative '../../helper/ios/ios_version_helper'
         require_relative '../../helper/ios/ios_git_helper'
 
-        default_branch = params[:default_branch] || 'develop'
+        default_branch = params[:default_branch]
         other_action.ensure_git_branch(branch: default_branch)
 
         # Create new configuration
@@ -65,7 +65,11 @@ module Fastlane
                                        description: 'Skips Deliver key update',
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
                                        default_value: false), # the default value if the user didn't provide one
-
+          FastlaneCore::ConfigItem.new(key: :default_branch,
+                                       env_name: 'FL_RELEASE_TOOLKIT_DEFAULT_BRANCH',
+                                       description: 'Default branch of the repository',
+                                       is_string: false, # true: verifies the input is a string, false: every kind of value
+                                       default_value: Fastlane::Helper::GitHelper::DEFAULT_GIT_BRANCH),
         ]
       end
 

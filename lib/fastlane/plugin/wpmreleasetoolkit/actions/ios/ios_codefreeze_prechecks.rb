@@ -9,7 +9,7 @@ module Fastlane
         require_relative '../../helper/ios/ios_git_helper'
 
         # Checkout default branch and update
-        default_branch = params[:default_branch] || 'develop'
+        default_branch = params[:default_branch]
         Fastlane::Helper::GitHelper.checkout_and_pull(default_branch)
 
         # Create versions
@@ -49,6 +49,11 @@ module Fastlane
                                        description: 'Skips confirmation before codefreeze',
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
                                        default_value: false), # the default value if the user didn't provide one
+          FastlaneCore::ConfigItem.new(key: :default_branch,
+                                       env_name: 'FL_RELEASE_TOOLKIT_DEFAULT_BRANCH',
+                                       description: 'Default branch of the repository',
+                                       is_string: false, # true: verifies the input is a string, false: every kind of value
+                                       default_value: Fastlane::Helper::GitHelper::DEFAULT_GIT_BRANCH),
         ]
       end
 
