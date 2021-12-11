@@ -16,6 +16,8 @@ _None_
 
 * Added the ability to use the `GITHUB_TOKEN` environment variable for GitHub operations. `GHHELPER_ACCESS` will be deprecated in a future version. [#313]
 
+* Added support for downloading GitHub content for private repositories
+
 ### Bug Fixes
 
 * Fixed the rendering of PR links in the body of GitHub Releases created via the `create_release` action. [#316]
