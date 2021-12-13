@@ -10,21 +10,30 @@ _None_
 
 ### New Features
 
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 2.2.0
+
+### New Features
+
 * Added a new `ios_generate_strings_file_from_code` action to replace the now-deprecated `ios_localize_project` action (and `Scripts/localize.py` script in app repos). [#309, #311]
-
 * Added a `comment_on_pr` action to allow commenting on (and updating comments on) PRs. [#313]
-
 * Added the ability to use the `GITHUB_TOKEN` environment variable for GitHub operations. `GHHELPER_ACCESS` will be deprecated in a future version. [#313]
+* Added support for downloading GitHub content for private repositories [#321]
 * Added parameter for default/base branch across several actions [#319]
 
 ### Bug Fixes
 
 * Fixed the rendering of PR links in the body of GitHub Releases created via the `create_release` action. [#316]
 * Fixed a bug introduced in [#313] that caused the GitHub helper not to work [#318]
-
-### Internal Changes
-
-_None_
 
 ## 2.1.0
 

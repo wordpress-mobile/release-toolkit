@@ -3,17 +3,32 @@ require 'webmock/rspec'
 
 describe Fastlane::Helper::GithubHelper do
   describe 'download_file_from_tag' do
+    let(:test_repo) { 'repo-test/project-test' }
+    let(:test_tag) { '1.0' }
+    let(:test_file) { 'test-folder/test-file.xml' }
+    let(:content_url) { "https://api.github.com/repos/#{test_repo}/contents/#{test_file}?ref=#{test_tag}" }
+    let(:client) do
+      instance_double(
+        Octokit::Client,
+        contents: double(download_url: content_url) # rubocop:disable RSpec/VerifiedDoubles
+      )
+    end
+
+    before do
+      allow(described_class).to receive(:github_client).and_return(client)
+    end
+
     it 'fails if it does not find the right release on GitHub' do
-      stub = stub_request(:get, 'https://raw.githubusercontent.com/repo-test/project-test/1.0/test-file.xml').to_return(status: [404, 'Not Found'])
-      expect(described_class.download_file_from_tag(repository: 'repo-test/project-test', tag: '1.0', file_path: 'test-file.xml', download_folder: './')).to be_nil
+      stub = stub_request(:get, content_url).to_return(status: [404, 'Not Found'])
+      expect(described_class.download_file_from_tag(repository: test_repo, tag: test_tag, file_path: test_file, download_folder: './')).to be_nil
       expect(stub).to have_been_made.once
     end
 
     it 'writes the raw content to a file' do
-      stub = stub_request(:get, 'https://raw.githubusercontent.com/repo-test/project-test/1.0/test-file.xml').to_return(status: 200, body: 'my-test-content')
+      stub = stub_request(:get, content_url).to_return(status: 200, body: 'my-test-content')
       Dir.mktmpdir('a8c-download-repo-file-') do |tmpdir|
         dst_file = File.join(tmpdir, 'test-file.xml')
-        expect(described_class.download_file_from_tag(repository: 'repo-test/project-test', tag: '1.0', file_path: 'test-file.xml', download_folder: tmpdir)).to eq(dst_file)
+        expect(described_class.download_file_from_tag(repository: test_repo, tag: test_tag, file_path: test_file, download_folder: tmpdir)).to eq(dst_file)
         expect(stub).to have_been_made.once
         expect(File.read(dst_file)).to eq('my-test-content')
       end
@@ -61,8 +76,19 @@ describe Fastlane::Helper::GithubHelper do
       allow(Octokit::Client).to receive(:new).and_return(client)
     end
 
+    after do
+      # Clean up the client memoization between runs to ensure it's re-initialized in each test
+      described_class.remove_class_variable(:@@client) if described_class.class_variable_defined?(:@@client)
+    end
+
     it 'is not nil' do
       expect(described_class.github_client).not_to be_nil
+    end
+
+    it 'memoizes the client' do
+      expect(Octokit::Client).to receive(:new).once
+      described_class.github_client
+      described_class.github_client
     end
   end
 
