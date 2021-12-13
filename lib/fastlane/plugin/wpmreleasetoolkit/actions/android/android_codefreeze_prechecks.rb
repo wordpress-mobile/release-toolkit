@@ -62,7 +62,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :default_branch,
                                        env_name: 'FL_RELEASE_TOOLKIT_DEFAULT_BRANCH',
                                        description: 'Default branch of the repository',
-                                       is_string: false, # true: verifies the input is a string, false: every kind of value
+                                       type: String,
                                        default_value: Fastlane::Helper::GitHelper::DEFAULT_GIT_BRANCH),
         ]
       end
