@@ -131,8 +131,11 @@ module Fastlane
         file_name = File.basename(file_path)
         download_path = File.join(download_folder, file_name)
 
+        download_url = github_client.contents(repository,
+                                              path: file_path,
+                                              ref: tag).download_url
         begin
-          uri = URI.parse("https://raw.githubusercontent.com/#{repository}/#{tag}/#{file_path}")
+          uri = URI.parse(download_url)
           uri.open do |remote_file|
             File.write(download_path, remote_file.read)
           end
