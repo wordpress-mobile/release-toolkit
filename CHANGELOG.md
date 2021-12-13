@@ -25,11 +25,8 @@ _None_
 ### New Features
 
 * Added a new `ios_generate_strings_file_from_code` action to replace the now-deprecated `ios_localize_project` action (and `Scripts/localize.py` script in app repos). [#309, #311]
-
 * Added a `comment_on_pr` action to allow commenting on (and updating comments on) PRs. [#313]
-
 * Added the ability to use the `GITHUB_TOKEN` environment variable for GitHub operations. `GHHELPER_ACCESS` will be deprecated in a future version. [#313]
-
 * Added support for downloading GitHub content for private repositories
 
 ### Bug Fixes
