@@ -11,6 +11,8 @@ module Fastlane
         version = params[:version]
         assets = params[:release_assets]
         release_notes = params[:release_notes_file_path].nil? ? '' : File.read(params[:release_notes_file_path])
+        # Replace full URLS to PRs/Issues with shorthand, because GitHub does not render them properly otherwise.
+        release_notes.gsub!(%r{https://github.com/([^/]*/[^/]*)/(pulls?|issues?)/([0-9]*)}, '\1#\3')
         prerelease = params[:prerelease]
 
         UI.message("Creating draft release #{version} in #{repository}.")

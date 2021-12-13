@@ -1,23 +1,37 @@
 require 'fastlane_core/ui/ui'
 require 'octokit'
 require 'open-uri'
+require 'securerandom'
 
 module Fastlane
   UI = FastlaneCore::UI unless Fastlane.const_defined?('UI')
 
   module Helper
     class GithubHelper
+      def self.github_token!
+        token = [
+          'GHHELPER_ACCESS', # For historical reasons / backward compatibility
+          'GITHUB_TOKEN',    # Used by the `gh` CLI tool
+        ].map { |key| ENV[key] }
+                .compact
+                .first
+
+        token || UI.user_error!('Please provide a GitHub authentication token via the `GITHUB_TOKEN` environment variable')
+      end
+
       def self.github_client
-        client = Octokit::Client.new(access_token: ENV['GHHELPER_ACCESS'])
+        @@client ||= begin
+          client = Octokit::Client.new(access_token: github_token!)
 
-        # Fetch the current user
-        user = client.user
-        UI.message("Logged in as: #{user.name}")
+          # Fetch the current user
+          user = client.user
+          UI.message("Logged in as: #{user.name}")
 
-        # Auto-paginate to ensure we're not missing data
-        client.auto_paginate = true
+          # Auto-paginate to ensure we're not missing data
+          client.auto_paginate = true
 
-        client
+          client
+        end
       end
 
       def self.get_milestone(repository, release)
@@ -117,8 +131,11 @@ module Fastlane
         file_name = File.basename(file_path)
         download_path = File.join(download_folder, file_name)
 
+        download_url = github_client.contents(repository,
+                                              path: file_path,
+                                              ref: tag).download_url
         begin
-          uri = URI.parse("https://raw.githubusercontent.com/#{repository}/#{tag}/#{file_path}")
+          uri = URI.parse(download_url)
           uri.open do |remote_file|
             File.write(download_path, remote_file.read)
           end
@@ -127,6 +144,29 @@ module Fastlane
         end
 
         download_path
+      end
+
+      # Creates (or updates an existing) GitHub PR Comment
+      def self.comment_on_pr(project_slug:, pr_number:, body:, reuse_identifier: SecureRandom.uuid)
+        client = github_client
+        comments = client.issue_comments(project_slug, pr_number)
+
+        reuse_marker = "<!-- REUSE_ID: #{reuse_identifier} -->"
+
+        existing_comment = comments.find do |comment|
+          # Only match comments posted by the owner of the GitHub Token, and with the given reuse ID
+          comment.user.id == client.user.id and comment.body.include?(reuse_marker)
+        end
+
+        comment_body = reuse_marker + body
+
+        if existing_comment.nil?
+          client.add_comment(project_slug, pr_number, comment_body)
+        else
+          client.update_comment(project_slug, existing_comment.id, comment_body)
+        end
+
+        reuse_identifier
       end
     end
   end
