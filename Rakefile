@@ -74,7 +74,7 @@ task :new_release do
   Console.header 'Commit and push changes...'
   GitHelper.commit_files("Bumped to version #{new_version}", [VERSION_FILE, 'Gemfile.lock', 'CHANGELOG.md'])
 
-  Console.header 'Opening PR drafts in your default browser...'
+  Console.header 'Opening PR draft in your default browser...'
   GitHelper.prepare_github_pr("release/#{new_version}", 'trunk', "Release #{new_version} into trunk", "New version #{new_version}. Be sure to create a GitHub Release and tag once this PR gets merged.")
 
   Console.info <<~INSTRUCTIONS
