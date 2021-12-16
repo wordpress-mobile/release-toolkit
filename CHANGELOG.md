@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+* Ensure that the `gem push` step only runs on CI if lint, test and danger steps passed before it. [#325]
 
 ## 2.3.0
 
