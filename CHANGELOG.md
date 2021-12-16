@@ -20,6 +20,12 @@ _None_
 
 _None_
 
+## 2.3.0
+
+### New Features
+
+* Added parameter for default/base branch across several actions [#319]
+
 ## 2.2.0
 
 ### New Features
@@ -28,7 +34,6 @@ _None_
 * Added a `comment_on_pr` action to allow commenting on (and updating comments on) PRs. [#313]
 * Added the ability to use the `GITHUB_TOKEN` environment variable for GitHub operations. `GHHELPER_ACCESS` will be deprecated in a future version. [#313]
 * Added support for downloading GitHub content for private repositories [#321]
-* Added parameter for default/base branch across several actions [#319]
 
 ### Bug Fixes
 
