@@ -20,6 +20,8 @@ _None_
 
 _None_
 
+## 2.3.0
+
 ## 2.2.0
 
 ### New Features
