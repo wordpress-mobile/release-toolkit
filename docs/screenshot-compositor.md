@@ -23,7 +23,7 @@ This argument is a path to the directory containing the screenshots, typically g
 
 **`metadata_folder`**
 
-This argument is a path to the directory containing any metadata, such as localized strings for use on the final screenshots. This directory should contain subdirectories named after locales. 
+This argument is a path to the directory containing any metadata, such as localized strings for use on the final screenshots. This directory should contain subdirectories named after locales.
 
 > Note: The tool will automatically check these directories, and will be default use any locales found in both directories.
 
@@ -43,7 +43,7 @@ The tool uses a `.json` file for configuration. By default, the tool will attemp
 
 The following sample implementations provide a good example of how to create a configuration file:
 
-- [WordPress Android](https://github.com/wordpress-mobile/WordPress-Android/blob/develop/fastlane/screenshots.json)
+- [WordPress Android](https://github.com/wordpress-mobile/WordPress-Android/blob/trunk/fastlane/screenshots.json)
 
 ## Creating a configuration file
 
@@ -160,7 +160,7 @@ Entries specify the set of output screenshots. This takes the form of an array o
 
 > Note: There is a 1:1 relationship between entries and the final screenshots. Note that it is not necessary to create a set of entries for each locale – this is automatically handled for you.
 
-Each entry looks something like this: 
+Each entry looks something like this:
 
 ```json
 {
@@ -251,19 +251,19 @@ Specifies a list of attachments, which can be images or text. They are composite
 ```
 Text attachments use the following keys:
 
-**`text`** 
+**`text`**
 
 Specifies the path to the text file for this attachment. The path should be specified relative to the configuration file, and can contain the `{locale}` placeholder to allow for localization.
 
-**`size`** 
+**`size`**
 
-Sets the dimensions of the text bounding box within the final image. This must be provided as an array with two values corresponding to the width and height, respectively. If the size is too small, the compositor will crash saying it was unable to draw the text in an area this small. The text will be horizontally and vertically centered within the bounding box. 
+Sets the dimensions of the text bounding box within the final image. This must be provided as an array with two values corresponding to the width and height, respectively. If the size is too small, the compositor will crash saying it was unable to draw the text in an area this small. The text will be horizontally and vertically centered within the bounding box.
 
-**`position`** 
+**`position`**
 
 Sets the origin of the text bounding box within the final image. This must be provided as an array with two values corresponding to the x and y coordinates, respectively.
 
-**`font-size`** 
+**`font-size`**
 
 Specifies the font size for the text of this attachment. If this number is too large, such that it doesn't fit into the bounding box described by the `size` key, the compositor will exit with an error message.
 
@@ -282,19 +282,19 @@ Specifies a stylesheet used for this attachment. It should contain a path to the
 
 Image attachments use the following keys:
 
-**`file`** 
+**`file`**
 
 Specifies the path to the attachment image. The path should be specified relative to the configuration file, and can contain the `{locale}` placeholder to allow for localization.
 
-**`size`** 
+**`size`**
 
 Sets the dimensions of the attachment within the final image. This must be provided as an array with two values corresponding to the width and height, respectively.
 
-**`position`** 
+**`position`**
 
 Sets the origin of the attachment within the final image. This must be provided as an array with two values corresponding to the x and y coordinates, respectively.
 
-**`operations`** 
+**`operations`**
 
 Specifies a set of operations to perform on the attachment prior to drawing it to the canvas. Operations run in the order they're specified within the configuration file. Operations are defined as an array of hashes. For example:
 
@@ -308,7 +308,7 @@ Specifies a set of operations to perform on the attachment prior to drawing it t
 
 They use the following keys:
 
-**`type`** 
+**`type`**
 
 Describes the type of operation. Currently `crop` is the only operation that can be specified.
 
@@ -316,10 +316,10 @@ Describes the type of operation. Currently `crop` is the only operation that can
 
 *Crop* allows you to crop the image using two keys:
 
-**`at`** 
+**`at`**
 
 Specifies the origin point crop bounding box. This must be provided as an array with two values corresponding to the x and y coordinates, respectively.
 
-**`to`** 
+**`to`**
 
 Specifies the dimensions of the crop bounding box. This must be provided as an array with two values corresponding to the width and height, respectively.

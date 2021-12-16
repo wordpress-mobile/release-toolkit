@@ -11,7 +11,7 @@ module GitHelper
     elsif branch_exists
       Rake.sh('git', 'checkout', release_branch)
     else # create it
-      abort('Aborted, as not run from develop nor release branch') unless current_branch == 'develop' || Console.confirm("You are not on 'develop', nor already on '#{release_branch}'. Do you really want to cut the release branch from #{current_branch}?")
+      abort('Aborted, as not run from trunk nor release branch') unless current_branch == 'trunk' || Console.confirm("You are not on 'trunk', nor already on '#{release_branch}'. Do you really want to cut the release branch from #{current_branch}?")
 
       Rake.sh('git', 'checkout', '-b', release_branch)
     end

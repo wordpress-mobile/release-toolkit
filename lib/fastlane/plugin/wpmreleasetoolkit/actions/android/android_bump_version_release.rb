@@ -8,7 +8,8 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper'
         require_relative '../../helper/android/android_git_helper'
 
-        other_action.ensure_git_branch(branch: 'develop')
+        default_branch = params[:default_branch]
+        other_action.ensure_git_branch(branch: default_branch)
 
         # Create new configuration
         new_short_version = Fastlane::Helper::Android::VersionHelper.bump_version_release
@@ -28,9 +29,9 @@ module Fastlane
         UI.message("New version: #{new_short_version}")
         UI.message("Release branch: #{new_release_branch}")
 
-        # Update local develop and branch
+        # Update local default branch and create branch from it
         UI.message 'Creating new branch...'
-        Fastlane::Helper::GitHelper.create_branch(new_release_branch, from: 'develop')
+        Fastlane::Helper::GitHelper.create_branch(new_release_branch, from: default_branch)
         UI.message 'Done!'
 
         UI.message 'Updating app version...'
@@ -52,7 +53,13 @@ module Fastlane
       end
 
       def self.available_options
-        # Define all options your action supports.
+        [
+          FastlaneCore::ConfigItem.new(key: :default_branch,
+                                       env_name: 'FL_RELEASE_TOOLKIT_DEFAULT_BRANCH',
+                                       description: 'Default branch of the repository',
+                                       type: String,
+                                       default_value: Fastlane::Helper::GitHelper::DEFAULT_GIT_BRANCH),
+        ]
       end
 
       def self.output

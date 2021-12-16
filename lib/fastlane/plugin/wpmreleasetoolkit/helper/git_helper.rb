@@ -5,6 +5,11 @@ module Fastlane
     # Helper methods to execute git-related operations
     #
     module GitHelper
+      # Fallback default branch of the client repository. It's currently set to 'develop' for
+      # backwards compatibility.
+      # TODO: Set to 'trunk' for the next major release.
+      DEFAULT_GIT_BRANCH = 'develop'.freeze
+
       # Checks if the given path, or current directory if no path is given, is
       # inside a Git repository
       #
