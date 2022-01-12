@@ -18,6 +18,9 @@ steps:
       echo "--- :git: Setting up git-lfs"
       git-lfs install
 
+      echo "--- :rubygems: Setting up Gems"
+      install_gems
+
       echo "--- :rspec: Run Rspec"
       bundle exec rspec --profile 10 --format progress
     env: *common_env
