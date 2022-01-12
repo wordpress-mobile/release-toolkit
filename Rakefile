@@ -62,8 +62,7 @@ task :new_release do
   Console.header 'Commit and push changes...'
   GitHelper.commit_files("Bumped to version #{new_version}", [VERSION_FILE, 'Gemfile.lock', 'CHANGELOG.md'])
 
-  Console.header 'Opening PR drafts in your default browser...'
-  GitHelper.prepare_github_pr("release/#{new_version}", 'develop', "Release #{new_version} into develop", "New version #{new_version}")
+  Console.header 'Opening PR draft in your default browser...'
   GitHelper.prepare_github_pr("release/#{new_version}", 'trunk', "Release #{new_version} into trunk", "New version #{new_version}. Be sure to create a GitHub Release and tag once this PR gets merged.")
 
   Console.info <<~INSTRUCTIONS
@@ -72,8 +71,8 @@ task :new_release do
 
     >>> WHAT'S NEXT
 
-    1. Create PRs to `develop` and `trunk`.
-    2. Once the PRs are merged, publish a GitHub release for \`#{new_version}\`, targeting \`trunk\`,
+    1. Create a PR against `trunk`.
+    2. Once the PR is merged, publish a GitHub release for \`#{new_version}\`, targeting \`trunk\`,
        creating a new \`#{new_version} tag in the process.
 
     The creation of the new tag will trigger a CI workflow that will take care of doing the

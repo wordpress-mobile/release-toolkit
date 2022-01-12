@@ -19,7 +19,7 @@ steps:
   # Build and Test
   #################
   - label: "🧪 Build and Test"
-    key: "test"
+    key: test
     command: |
       # We only need this for tasks running on a Mac
       brew install pkg-config git-lfs libxml2 imagemagick@6
@@ -35,14 +35,15 @@ steps:
     env: 
       IMAGE_ID: xcode-12.5.1
     plugins:
-      automattic/bash-cache#v1.3.2: ~
+      automattic/bash-cache#2.0.0: ~
     agents:
       queue: "mac"
 
   #################
   # Lint
   #################
-  - label: "🧹 Lint"
+  - label: "🧹 Lint (Rubocop)"
+    key: rubocop
     command: |
       bundle install
       echo "--- :rubocop: Run Rubocop"
@@ -55,6 +56,7 @@ steps:
   # Danger
   #################
   - label: "⛔️ Danger"
+    key: danger
     command: |
       bundle install
       echo "--- :rubocop: Run Danger"
@@ -69,6 +71,10 @@ steps:
   - label: ":rubygems: Publish to RubyGems"
     key: "gem-push"
     if: build.tag != null
+    depends_on:
+     - test
+     - rubocop
+     - danger
     # Note: We intentionally call a separate `.sh` script here (as opposed to having all the 
     # commands written inline) to avoid leaking a key used in the process in clear in the
     # BUILDKITE_COMMAND environment variable.

@@ -8,8 +8,9 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper'
         require_relative '../../helper/android/android_git_helper'
 
-        # Checkout develop and update
-        Fastlane::Helper::GitHelper.checkout_and_pull('develop')
+        # Checkout default branch and update
+        default_branch = params[:default_branch]
+        Fastlane::Helper::GitHelper.checkout_and_pull(default_branch)
 
         # Check versions
         release_version = Fastlane::Helper::Android::VersionHelper.get_release_version
@@ -80,6 +81,11 @@ module Fastlane
                                        description: 'Skips confirmation',
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
                                        default_value: false), # the default value if the user didn't provide one
+          FastlaneCore::ConfigItem.new(key: :default_branch,
+                                       env_name: 'FL_RELEASE_TOOLKIT_DEFAULT_BRANCH',
+                                       description: 'Default branch of the repository',
+                                       type: String,
+                                       default_value: Fastlane::Helper::GitHelper::DEFAULT_GIT_BRANCH),
         ]
       end
 

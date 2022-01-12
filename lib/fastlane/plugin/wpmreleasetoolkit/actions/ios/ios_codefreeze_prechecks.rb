@@ -8,8 +8,9 @@ module Fastlane
         require_relative '../../helper/ios/ios_version_helper'
         require_relative '../../helper/ios/ios_git_helper'
 
-        # Checkout develop and update
-        Fastlane::Helper::GitHelper.checkout_and_pull('develop')
+        # Checkout default branch and update
+        default_branch = params[:default_branch]
+        Fastlane::Helper::GitHelper.checkout_and_pull(default_branch)
 
         # Create versions
         current_version = Fastlane::Helper::Ios::VersionHelper.get_public_version
@@ -17,7 +18,7 @@ module Fastlane
         next_version = Fastlane::Helper::Ios::VersionHelper.calc_next_release_version(current_version)
 
         # Ask user confirmation
-        unless params[:skip_confirm] || UI.confirm("Building a new release branch starting from develop.\nCurrent version is #{current_version} (#{current_build_version}).\nAfter codefreeze the new version will be: #{next_version}.\nDo you want to continue?")
+        unless params[:skip_confirm] || UI.confirm("Building a new release branch starting from #{default_branch}.\nCurrent version is #{current_version} (#{current_build_version}).\nAfter codefreeze the new version will be: #{next_version}.\nDo you want to continue?")
           UI.user_error!('Aborted by user request')
         end
 
@@ -37,7 +38,7 @@ module Fastlane
       end
 
       def self.details
-        'Updates the develop branch, checks the app version and ensure the branch is clean'
+        'Updates the default branch, checks the app version and ensure the branch is clean'
       end
 
       def self.available_options
@@ -48,6 +49,11 @@ module Fastlane
                                        description: 'Skips confirmation before codefreeze',
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
                                        default_value: false), # the default value if the user didn't provide one
+          FastlaneCore::ConfigItem.new(key: :default_branch,
+                                       env_name: 'FL_RELEASE_TOOLKIT_DEFAULT_BRANCH',
+                                       description: 'Default branch of the repository',
+                                       type: String,
+                                       default_value: Fastlane::Helper::GitHelper::DEFAULT_GIT_BRANCH),
         ]
       end
 
