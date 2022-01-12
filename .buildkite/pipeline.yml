@@ -4,6 +4,9 @@ common_params:
   - &docker_plugin
     docker#v3.8.0:
       image: &ruby_version "ruby:2.7.4"
+      propagate-environment: true
+      environment:
+        - "RUBYGEMS_API_KEY"
   - &docker_plugin_with_danger_token
     docker#v3.8.0:
       image: *ruby_version
