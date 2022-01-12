@@ -9,4 +9,4 @@ gem install --user-install fastlane-plugin-wpmreleasetoolkit-*.gem
 echo "--- :rubygems: Gem Push"
 echo ":rubygems_api_key: ${RUBYGEMS_API_KEY}" >>".gem-credentials"
 chmod 600 ".gem-credentials"
-gem push --config-file ".gem-credentials" fastlane-plugin-wpmreleasetoolkit-*.gem
+#gem push --config-file ".gem-credentials" fastlane-plugin-wpmreleasetoolkit-*.gem
