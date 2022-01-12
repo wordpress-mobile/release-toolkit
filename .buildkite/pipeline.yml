@@ -12,7 +12,8 @@ steps:
   - label: "🧪 Build and Test"
     key: "test"
     command: |
-      .buildkite/install-dependencies.sh
+      # We only need this for tasks running on a Mac
+      brew install pkg-config git-lfs libxml2 imagemagick@6
 
       echo "--- :git: Setting up git-lfs"
       git-lfs install
