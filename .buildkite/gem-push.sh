@@ -1,7 +1,5 @@
 #!/bin/bash -eu
 
-.buildkite/install-dependencies.sh
-
 echo "--- :hammer: Build Gemspec"
 gem build fastlane-plugin-wpmreleasetoolkit.gemspec
 

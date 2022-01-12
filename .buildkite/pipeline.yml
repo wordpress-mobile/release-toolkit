@@ -1,9 +1,15 @@
 # Nodes with values to reuse in the pipeline.
 common_params:
-  plugins: &common_plugins
-  - &bash_cache automattic/bash-cache#v1.3.2: ~
-  env: &common_env
-    IMAGE_ID: xcode-12.5.1
+  plugins:
+  - &docker_plugin
+    docker#v3.8.0:
+      image: &ruby_version "ruby:2.7.4"
+  - &docker_plugin_with_danger_token
+    docker#v3.8.0:
+      image: *ruby_version
+      propagate-environment: true
+      environment:
+        - "DANGER_GITHUB_API_TOKEN"
 
 steps:
   #################
@@ -23,8 +29,10 @@ steps:
 
       echo "--- :rspec: Run Rspec"
       bundle exec rspec --profile 10 --format progress
-    env: *common_env
-    plugins: *common_plugins
+    env: 
+      IMAGE_ID: xcode-12.5.1
+    plugins:
+      automattic/bash-cache#v1.3.2: ~
     agents:
       queue: "mac"
 
@@ -36,10 +44,7 @@ steps:
       bundle install
       echo "--- :rubocop: Run Rubocop"
       bundle exec rubocop
-    env: *common_env
-    plugins:
-      - docker#v3.8.0:
-          image: "ruby:2.7.4"
+    plugins: [*docker_plugin]
     agents:
       queue: "default"
 
@@ -51,13 +56,7 @@ steps:
       bundle install
       echo "--- :rubocop: Run Danger"
       bundle exec danger
-    env: *common_env
-    plugins:
-      - docker#v3.8.0:
-          image: "ruby:2.7.4"
-          propagate-environment: true
-          environment:
-            - "DANGER_GITHUB_API_TOKEN"
+    plugins: [*docker_plugin_with_danger_token]
     agents:
       queue: "default"
 
@@ -71,7 +70,6 @@ steps:
     # commands written inline) to avoid leaking a key used in the process in clear in the
     # BUILDKITE_COMMAND environment variable.
     command: .buildkite/gem-push.sh
-    env: *common_env
-    plugins: *common_plugins
+    plugins: [*docker_plugin]
     agents:
-      queue: "mac"
+      queue: "default"
