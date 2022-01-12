@@ -58,10 +58,6 @@ task :new_release do
   Console.header 'Updating CHANGELOG...'
   parser.update_for_new_release(new_version: new_version)
 
-  ## Ensure the gem builds and is installable
-  Console.header 'Testing that the gem builds and installs...'
-  check_install(new_version)
-
   # Commit and push
   Console.header 'Commit and push changes...'
   GitHelper.commit_files("Bumped to version #{new_version}", [VERSION_FILE, 'Gemfile.lock', 'CHANGELOG.md'])
