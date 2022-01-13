@@ -145,6 +145,7 @@ RSpec/FilePath:
     - 'spec/ios_generate_strings_file_from_code_spec.rb'
     - 'spec/ios_l10n_helper_spec.rb'
     - 'spec/ios_merge_strings_files_spec.rb'
+    - 'spec/gp_update_metadata_source_spec.rb'
 
 # Offense count: 8
 # Cop supports --auto-correct.
