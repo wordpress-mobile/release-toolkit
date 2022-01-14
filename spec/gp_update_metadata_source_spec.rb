@@ -1,19 +1,17 @@
 require 'spec_helper'
 
 describe Fastlane::Actions::GpUpdateMetadataSourceAction do
-  it 'works' do
+  it 'updates any block in a given .po file with the values from the given sources' do
     Dir.mktmpdir do |dir|
-      # Reminder: you can stub Fastlane stuff with calls like
-      # expect(FastlaneCore::UI).to receive(:success).with('Done')
-
-      # 1: Create tmp location for the po file
-      #
-      # Note, can't use StringIO.new because of implementation details:
-      #
-      # Failure/Error: "#{File.dirname(orig_file_path)}/#{File.basename(orig_file_path, '.*')}.tmp"
+      # 1: Create a dummy .po file to use as input.
       output_path = File.join(dir, 'output.po')
-      # Also note: The file must exist already
       dummy_text = <<~PO
+        msgctxt "v1.0-whats-new"
+        msgid "this value should change"
+        msgstr ""
+        msgctxt "release_note_0122"
+        msgid "previous version notes required to have current one added"
+        msgstr ""
         msgctxt "key1"
         msgid "this value should change"
         msgstr ""
@@ -23,24 +21,56 @@ describe Fastlane::Actions::GpUpdateMetadataSourceAction do
       PO
       File.write(output_path, dummy_text)
 
-      # 2: read a few sources
+      # 2: Create source files with value to insert in the .po
+      release_notes_path = File.join(dir, 'release_notes.txt')
+      File.write(release_notes_path, "- release notes\n- more release notes")
+      whats_new_path = File.join(dir, 'whats_new.txt')
+      File.write(whats_new_path, "- something new\n- something else new")
       file_1_path = File.join(dir, '1.txt')
       File.write(file_1_path, 'value 1')
       file_2_path = File.join(dir, '2.txt')
       File.write(file_2_path, 'value 2')
+      file_3_path = File.join(dir, '3.txt')
+      File.write(file_3_path, 'value 3')
 
       described_class.run(
         po_file_path: output_path,
         release_version: '1.23',
         source_files: {
+          release_note: release_notes_path,
+          whats_new: whats_new_path,
           key1: file_1_path,
-          key2: file_2_path
+          key2: file_2_path,
+          key3: file_3_path # This is not in the input .po and won't be added
         }
       )
 
-      # 3: compare
-      # notice that the new line after each block is added by the conversion
+      # 3: Assert given .po has been updated as expected
+      #
+      # Notice:
+      #
+      # - The new line after each block is added by the conversion
+      # - That there's no new line between release_note_0122 and key1, because
+      #   the notes are copied as they are with no extra manipulation
+      # - The key3 source is not part of the output because was not in the
+      #   original .po input
       expected = <<~PO
+        msgctxt "v1.23-whats-new"
+        msgid ""
+        "- something new\\n"
+        "- something else new\\n"
+        msgstr ""
+
+        msgctxt "release_note_0123"
+        msgid ""
+        "1.23:\\n"
+        "- release notes\\n"
+        "- more release notes\\n"
+        msgstr ""
+
+        msgctxt "release_note_0122"
+        msgid "previous version notes required to have current one added"
+        msgstr ""
         msgctxt "key1"
         msgid "value 1"
         msgstr ""
