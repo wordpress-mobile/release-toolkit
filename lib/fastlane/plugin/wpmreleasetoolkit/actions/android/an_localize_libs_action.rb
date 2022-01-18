@@ -36,12 +36,14 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :app_strings_path,
                                        description: 'The path of the main strings file',
                                        optional: false,
-                                       is_string: true),
+                                       type: String),
+          # The name of this parameter is a bit misleading due to legacy. In practice it's expected to be an Array of Hashes, each describing a library to merge.
+          # See `Fastlane::Helper::Android::LocalizeHelper.merge_lib`'s YARD doc for more details on the keys expected for each Hash.
           FastlaneCore::ConfigItem.new(key: :libs_strings_path,
                                        env_name: 'LOCALIZE_LIBS_STRINGS_PATH',
-                                       description: 'The list of libs to merge',
+                                       description: 'The list of libs to merge. Each item in the provided array must be a Hash with the keys `:library` (The library display name), `:strings_path` (The path to the `strings.xml` file of the library) and `:exclusions` (Array of string keys to exclude from merging)',
                                        optional: false,
-                                       is_string: false),
+                                       type: Array),
         ]
       end
 
