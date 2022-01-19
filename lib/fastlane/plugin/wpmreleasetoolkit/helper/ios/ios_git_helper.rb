@@ -35,8 +35,9 @@ module Fastlane
         # @env PROJECT_ROOT_FOLDER The path to the git root of the project
         # @env PROJECT_NAME The name of the directory containing the project code (especially containing the `build.gradle` file)
         #
-        # @todo Migrate the scripts, currently in each host repo and called by this method, to be helpers and actions
-        #       in the release-toolkit instead, and move this code away from `ios_git_helper`.
+        # @deprecated This method is only used by the `ios_localize_project` action, which is itself deprecated
+        #             in favor of the new `ios_generate_strings_file_from_code` action
+        # @todo [Next Major] Remove this method once we fully remove `ios_localize_project`
         #
         def self.localize_project
           Action.sh("cd #{get_from_env!(key: 'PROJECT_ROOT_FOLDER')} && ./Scripts/localize.py")
