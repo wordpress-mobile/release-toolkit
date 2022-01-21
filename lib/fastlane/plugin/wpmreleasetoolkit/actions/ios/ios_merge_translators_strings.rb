@@ -85,8 +85,16 @@ module Fastlane
         ]
       end
 
+      def self.category
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        'This action is deprecated. For a similar feature, you might want to check `ios_merge_strings_file` instead'
+      end
+
       def self.is_supported?(platform)
-        true
+        :ios
       end
     end
   end

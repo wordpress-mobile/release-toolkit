@@ -1,0 +1,22 @@
+/* Generated File. Do not edit. */
+
+// MARK: - Localizable-utf16.strings
+
+/* Some file header comment here */
+
+/* comment on key 1 */
+"key1" = "string 1";
+
+/* comment on key 2 */
+"key2" = "string 2️⃣";
+
+/* multiline comment
+   on key 3 */
+"key3" = "string 3";
+
+// MARK: - InfoPlist-utf8.strings
+
+"InfoKey1" = "Info String 1";
+"InfoKey2" = "Info String 2️⃣";
+"InfoKey3" = "Info String 3";
+
