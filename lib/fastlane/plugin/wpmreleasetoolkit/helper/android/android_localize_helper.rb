@@ -92,6 +92,14 @@ module Fastlane
           UI.user_error!("String #{string_name} [#{string_content}] was found in library #{library[:library]} but not in the main file.")
         end
 
+        # Merge strings from a library into the strings.xml of the main app
+        #
+        # @param [String] main Path to the main strings.xml file (something like `…/res/values/strings.xml`)
+        # @param [Hash] library Hash describing the library to merge. The Hash should contain the following keys:
+        #                       - `:library`: The human readable name of the library, used to display in console messages
+        #                       - `:strings_path`: The path to the strings.xml file of the library to merge into the main one
+        #                       - `:exclusions`: An array of strings keys to exclude during merge. Any of those keys from the library's `strings.xml` will be skipped and won't be merged into the main one.
+        # @return [Boolean] True if at least one string from the library has been added to (or has updated) the main strings file.
         def self.merge_lib(main, library)
           UI.message("Merging #{library[:library]} strings into #{main}")
           main_strings = File.open(main) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
