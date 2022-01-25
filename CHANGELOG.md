@@ -19,6 +19,7 @@ _None_
 ### Internal Changes
 
 * Ensure that the `gem push` step only runs on CI if lint, test and danger steps passed before it. [#325]
+* Rename internal `Ios::L10nHelper` to `Ios::L10nLinterHelper`. [#328]
 
 ## 2.3.0
 

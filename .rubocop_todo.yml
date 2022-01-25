@@ -306,7 +306,7 @@ Style/MutableConstant:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_lint_localizations.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_version_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_adc_app_sizes_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_l10n_helper.rb'
+    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_l10n_linter_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/version.rb'
     - 'spec/release_notes_helper_spec.rb'
 
@@ -403,7 +403,7 @@ Style/RescueStandardError:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/gp_update_metadata_source.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_build_preflight.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/git_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_l10n_helper.rb'
+    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_l10n_linter_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
 
 # Offense count: 2

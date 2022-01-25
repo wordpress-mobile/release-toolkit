@@ -4,7 +4,7 @@ require 'tmpdir'
 module Fastlane
   module Helper
     module Ios
-      class L10nHelper
+      class L10nLinterHelper
         SWIFTGEN_VERSION = '6.4.0'
         DEFAULT_BASE_LANG = 'en'
         CONFIG_FILE_NAME = 'swiftgen-stringtypes.yml'
