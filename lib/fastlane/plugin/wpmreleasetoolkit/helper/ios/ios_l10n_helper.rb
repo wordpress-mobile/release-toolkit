@@ -43,13 +43,14 @@ module Fastlane
         # @raise [RuntimeError] If one of the paths provided is not in text format (but XML or binary instead), or if any of the files are missing.
         #
         def self.merge_strings(paths:, output_path: nil)
+          duplicates = []
           Tempfile.create('wpmrt-l10n-merge-', encoding: 'utf-8') do |tmp_file|
             all_keys_found = []
-            duplicates = []
 
             tmp_file.write("/* Generated File. Do not edit. */\n\n")
             paths.each do |input_file|
               fmt = strings_file_type(path: input_file)
+              raise "The file `#{input_file}` does not exist or is of unknown format." if fmt.nil?
               raise "The file `#{input_file}` is in #{fmt} format but we currently only support merging `.strings` files in text format." unless fmt == :text
 
               string_keys = read_strings_file_as_hash(path: input_file).keys
@@ -64,6 +65,7 @@ module Fastlane
             tmp_file.close # ensure we flush the content to disk
             FileUtils.cp(tmp_file.path, output_path)
           end
+          duplicates
         end
 
         # Return the list of translations in a `.strings` file.

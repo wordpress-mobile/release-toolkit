@@ -66,6 +66,15 @@ describe Fastlane::Helper::Ios::L10nHelper do
       end
     end
 
+    it 'returns duplicate keys found' do
+      paths = [fixture('Localizable-utf16.strings'), fixture('non-latin-utf16.strings')]
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        output_file = File.join(tmp_dir, 'output.strings')
+        duplicates = described_class.merge_strings(paths: paths, output_path: output_file)
+        expect(duplicates).to eq(%w[key1 key2])
+      end
+    end
+
     it 'raises if one of the strings file is not in textual format' do
       paths = [fixture('Localizable-utf16.strings'), fixture('xml-format.strings')]
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
@@ -73,6 +82,16 @@ describe Fastlane::Helper::Ios::L10nHelper do
         expect do
           described_class.merge_strings(paths: paths, output_path: output_file)
         end.to raise_exception(RuntimeError, "The file `#{paths[1]}` is in xml format but we currently only support merging `.strings` files in text format.")
+      end
+    end
+
+    it 'raises if one of the strings file does not exist' do
+      paths = [fixture('Localizable-utf16.strings'), '/these/are/not/the/droids/you/are/looking/for']
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        output_file = File.join(tmp_dir, 'output.strings')
+        expect do
+          described_class.merge_strings(paths: paths, output_path: output_file)
+        end.to raise_exception(RuntimeError, "The file `#{paths[1]}` does not exist or is of unknown format.")
       end
     end
   end
@@ -130,8 +149,8 @@ describe Fastlane::Helper::Ios::L10nHelper do
 
       # 1. Read a textual strings file written in UTF-16 and containing non-latin chars
       translations = described_class.read_strings_file_as_hash(path: non_latin_fixture)
-      # 2. Filter the keys of the hash (to simulate an extraction of the InfoPlist.strings key from GlotPress download)
-      translations.delete('to-exclude')
+      # 2. Only keep specific keys from the hash (to simulate an extraction of the InfoPlist.strings key from GlotPress download)
+      translations.slice!(*%w[diacritics emojis japanese])
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         output_file = File.join(tmp_dir, 'output.strings')
         # 3. Generate XML strings file from the filtered hash
