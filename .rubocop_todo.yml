@@ -132,6 +132,7 @@ RSpec/FilePath:
     - 'spec/android_merge_translators_strings_spec.rb'
     - 'spec/android_version_helper_spec.rb'
     - 'spec/an_metadata_update_helper_spec.rb'
+    - 'spec/an_update_metadata_source_spec.rb'
     - 'spec/configuration_spec.rb'
     - 'spec/configure_helper_spec.rb'
     - 'spec/encryption_helper_spec.rb'
