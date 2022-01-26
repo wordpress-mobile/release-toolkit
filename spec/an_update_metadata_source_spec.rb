@@ -1,9 +1,13 @@
 require 'spec_helper'
 
+# See also `gp_update_metadata_source_spec.rb` for the iOS counterpart and an
+# annotated spec.
+#
+# The fact that we have an Android and iOS differentiation is not ideal and
+# something we hope to address in an upcoming refactor/rewrite.
 describe Fastlane::Actions::AnUpdateMetadataSourceAction do
   it 'updates any block in a given .po file with the values from the given sources' do
     Dir.mktmpdir do |dir|
-      # 1: Create a dummy .po file to use as input.
       output_path = File.join(dir, 'output.po')
       dummy_text = <<~PO
         msgctxt "release_note_0122"
@@ -21,15 +25,12 @@ describe Fastlane::Actions::AnUpdateMetadataSourceAction do
       PO
       File.write(output_path, dummy_text)
 
-      # 2: Create source files with value to insert in the .po
       release_notes_path = File.join(dir, 'release_notes.txt')
       File.write(release_notes_path, "- release notes\n- more release notes")
       file_1_path = File.join(dir, '1.txt')
       File.write(file_1_path, 'value 1')
       file_2_path = File.join(dir, '2.txt')
       File.write(file_2_path, 'value 2')
-      file_3_path = File.join(dir, '3.txt')
-      File.write(file_3_path, 'value 3')
 
       described_class.run(
         po_file_path: output_path,
@@ -37,20 +38,10 @@ describe Fastlane::Actions::AnUpdateMetadataSourceAction do
         source_files: {
           release_note: release_notes_path,
           key1: file_1_path,
-          key2: file_2_path,
-          key3: file_3_path # This is not in the input .po and won't be added
+          key2: file_2_path
         }
       )
 
-      # 3: Assert given .po has been updated as expected
-      #
-      # Notice:
-      #
-      # - The new line after each block is added by the conversion
-      # - That there's no new line between release_note_0122 and key1, because
-      #   the notes are copied as they are with no extra manipulation
-      # - The key3 source is not part of the output because was not in the
-      #   original .po input
       expected = <<~PO
         msgctxt "release_note_0123"
         msgid ""
@@ -103,6 +94,45 @@ describe Fastlane::Actions::AnUpdateMetadataSourceAction do
         msgid ""
         "- something new\\n"
         "- something else new\\n"
+        msgstr ""
+
+      PO
+      expect(File.read(output_path)).to eq(expected)
+    end
+  end
+
+  it 'adds entries passed as input even if not part of the original `.po` file' do
+    pending 'this currently fails and will be addressed as part of the upcoming refactor/rewrite of the functionality'
+    Dir.mktmpdir do |dir|
+      output_path = File.join(dir, 'output.po')
+      dummy_text = <<~PO
+        msgctxt "key1"
+        msgid "this value should change"
+        msgstr ""
+      PO
+      File.write(output_path, dummy_text)
+
+      # 2: Create source files with value to insert in the .po
+      file_1_path = File.join(dir, '1.txt')
+      File.write(file_1_path, 'value 1')
+      file_2_path = File.join(dir, '2.txt')
+      File.write(file_2_path, 'value 2')
+
+      described_class.run(
+        po_file_path: output_path,
+        source_files: {
+          key1: file_1_path,
+          key2: file_2_path
+        }
+      )
+
+      expected = <<~PO
+        msgctxt "key1"
+        msgid "value 1"
+        msgstr ""
+
+        msgctxt "key2"
+        msgid "value 2"
         msgstr ""
 
       PO
