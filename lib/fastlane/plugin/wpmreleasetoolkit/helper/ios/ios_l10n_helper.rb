@@ -57,7 +57,7 @@ module Fastlane
               duplicates += (string_keys & all_keys_found) # Find duplicates using Array intersection, and add those to duplicates list
               all_keys_found += string_keys
 
-              tmp_file.write("// MARK: - #{File.basename(input_file)}\n\n")
+              tmp_file.write("/* MARK: - #{File.basename(input_file)} */\n\n")
               # Read line-by-line to reduce memory footprint during content copy; Be sure to guess file encoding using the Byte-Order-Mark.
               File.readlines(input_file, mode: 'rb:BOM|UTF-8').each { |line| tmp_file.write(line) }
               tmp_file.write("\n")
