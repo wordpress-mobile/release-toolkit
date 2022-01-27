@@ -52,6 +52,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
         output_file = File.join(tmp_dir, 'output.strings')
         described_class.merge_strings(paths: paths, output_path: output_file)
         expect(File.read(output_file)).to eq(File.read(fixture('expected-merged.strings')))
+        expect(file_encoding(output_file)).to eq(Encoding::UTF_8)
       end
     end
 
@@ -85,7 +86,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
       end
     end
 
-    it 'raises if one of the strings file does not exist' do
+    it 'raises if any of the strings file does not exist' do
       paths = [fixture('Localizable-utf16.strings'), '/these/are/not/the/droids/you/are/looking/for']
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         output_file = File.join(tmp_dir, 'output.strings')
@@ -138,8 +139,8 @@ describe Fastlane::Helper::Ios::L10nHelper do
       end
     end
 
-    # Reads non-latin content from UTF-16BE file and generating output file as UTF8
-    it 'handles non-latin, Unicode content properly' do
+    # Reads non-latin content from UTF-16BE file and generates output file as UTF8
+    it 'handles non-Latin, Unicode content properly' do
       non_latin_fixture = fixture('non-latin-utf16.strings')
       expected_file = fixture('expected-generated-non-latin.strings')
 
