@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+* Introduce new `ios_merge_strings_files` action. [#329]
 
 ### Bug Fixes
 
