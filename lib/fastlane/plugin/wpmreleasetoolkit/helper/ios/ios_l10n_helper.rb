@@ -18,7 +18,12 @@ module Fastlane
         #         - `nil` if the file does not exist or is neither of those format (e.g. not a `.strings` file at all)
         #
         def self.strings_file_type(path:)
-          format_desc, status = Open3.capture2('file', path)
+          # Start by checking it seems like a valid property-list file (and not e.g. an image or plain text file)
+          _, status = Open3.capture2('/usr/bin/plutil', '-lint', path)
+          return nil unless status.success?
+
+          # If it is a valid property-list file, determine the actual format used
+          format_desc, status = Open3.capture2('/usr/bin/file', path)
           return nil unless status.success?
 
           case format_desc

@@ -33,9 +33,9 @@ describe Fastlane::Helper::Ios::L10nHelper do
     end
 
     it 'returns nil on file that is not a strings file at all' do
-      png_fixture = fixture('not-a-strings-file.png')
-      expect(File).to exist(png_fixture)
-      expect(described_class.strings_file_type(path: '/invalid-path')).to be_nil
+      invalid_fixture = fixture('invalid-file.strings')
+      expect(File).to exist(invalid_fixture)
+      expect(described_class.strings_file_type(path: invalid_fixture)).to be_nil
     end
   end
 
@@ -117,7 +117,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
     end
 
     it 'raises if trying to parse an invalid strings file' do
-      file = fixture('not-a-strings-file.png')
+      file = fixture('invalid-file.strings')
       expect do
         described_class.read_strings_file_as_hash(path: file)
       end.to raise_exception(RuntimeError)
