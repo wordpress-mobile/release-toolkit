@@ -16,11 +16,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Gathers the string to localise'
+        'Gathers the strings to localise. Deprecated'
       end
 
       def self.details
-        'Gathers the string to localise. Deprecated in favor of the new `ios_generate_strings_file_from_code`'
+        'Gathers the strings to localise. Deprecated in favor of the new `ios_generate_strings_file_from_code`'
       end
 
       def self.category
