@@ -67,6 +67,20 @@ def expect_shell_command(*command, exitstatus: 0, output: '')
   expect(Open3).to receive(:popen2e).with(*command).and_yield(mock_input, mock_output, mock_thread)
 end
 
+# If the `described_class` of a spec is a `Fastlane::Action` subclass, it runs
+# it with the given parameters.
+#
+def run_described_action(parameters, lane_name = 'test')
+  lane = <<~LANE
+    lane :#{lane_name} do
+      #{described_class.action_name}(
+        #{stringify_for_fastlane(parameters)}
+      )
+    end
+  LANE
+  Fastlane::FastFile.new.parse(lane).runner.execute(lane_name.to_sym)
+end
+
 # Executes the given block within an ad hoc temporary directory.
 def in_tmp_dir
   Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmpdir|
@@ -74,4 +88,20 @@ def in_tmp_dir
       yield tmpdir
     end
   end
+end
+
+private
+
+def stringify_for_fastlane(hash)
+  hash.map do |key, value|
+    # rubocop:disable Style/CaseLikeIf
+    if value.is_a?(Hash)
+      "#{key}: {\n#{stringify_for_fastlane(value)}\n}"
+    elsif value.is_a?(String)
+      "#{key}: \"#{value}\""
+    else
+      "#{key}: #{value}"
+    end
+    # rubocop:enable Style/CaseLikeIf
+  end.join(",\n")
 end
