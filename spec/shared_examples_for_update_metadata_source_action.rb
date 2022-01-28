@@ -19,8 +19,9 @@ RSpec.shared_examples 'update_metadata_source_action' do |options|
       file_2_path = File.join(dir, '2.txt')
       File.write(file_2_path, 'value 2')
 
-      described_class.run(
+      run_described_action(
         po_file_path: output_path,
+        release_version: '1.0',
         source_files: {
           key1: file_1_path,
           key2: file_2_path
@@ -56,7 +57,7 @@ RSpec.shared_examples 'update_metadata_source_action' do |options|
       whats_new_path = File.join(dir, 'whats_new.txt')
       File.write(whats_new_path, "- something new\n- something else new")
 
-      described_class.run(
+      run_described_action(
         po_file_path: output_path,
         release_version: '1.23',
         source_files: {
@@ -94,7 +95,7 @@ RSpec.shared_examples 'update_metadata_source_action' do |options|
       file_2_path = File.join(dir, '2.txt')
       File.write(file_2_path, 'value 2')
 
-      described_class.run(
+      run_described_action(
         po_file_path: output_path,
         source_files: {
           key1: file_1_path,
@@ -135,7 +136,7 @@ RSpec.shared_examples 'update_metadata_source_action' do |options|
       release_notes_path = File.join(dir, 'release_notes.txt')
       File.write(release_notes_path, "- release notes\n- more release notes")
 
-      described_class.run(
+      run_described_action(
         po_file_path: output_path,
         release_version: '1.23',
         source_files: {
@@ -158,4 +159,30 @@ RSpec.shared_examples 'update_metadata_source_action' do |options|
       expect(File.read(output_path).inspect).to eq(expected.inspect)
     end
   end
+end
+
+def run_described_action(parameters)
+  lane_name = 'test'
+  lane = <<~LANE
+    lane :#{lane_name} do
+      #{described_class.action_name}(
+        #{stringify_for_fastlane(parameters)}
+      )
+    end
+  LANE
+  Fastlane::FastFile.new.parse(lane).runner.execute(lane_name.to_sym)
+end
+
+def stringify_for_fastlane(hash)
+  hash.map do |key, value|
+    # rubocop:disable Style/CaseLikeIf
+    if value.is_a?(Hash)
+      "#{key}: {\n#{stringify_for_fastlane(value)}\n}"
+    elsif value.is_a?(String)
+      "#{key}: \"#{value}\""
+    else
+      "#{key}: #{value}"
+    end
+    # rubocop:enable Style/CaseLikeIf
+  end.join(",\n")
 end
