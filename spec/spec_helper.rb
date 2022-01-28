@@ -71,6 +71,8 @@ end
 # it with the given parameters.
 #
 def run_described_action(parameters, lane_name = 'test')
+  expect(described_class).to be < Fastlane::Action, "Only call `#{__callee__}` from a spec describing a `Fastlane::Action` subclass."
+
   lane = <<~LANE
     lane :#{lane_name} do
       #{described_class.action_name}(
