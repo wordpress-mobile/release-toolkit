@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    class IosDownloadStringsFilesFromGlotPressAction < Action
+    class IosDownloadStringsFilesFromGlotpressAction < Action
       def self.run(params)
         # TODO: Once we introduce the `Locale` POD via #296, check if the param is an array of locales and if so convert it to Hash{glotpress=>lproj}
         locales = params[:locales]

@@ -3,7 +3,7 @@ require 'tmpdir'
 
 Locale = Struct.new(:name)
 
-describe Fastlane::Actions::IosDownloadStringsFilesFromGlotPressAction do
+describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
   let(:test_data_dir) { File.join(File.dirname(__FILE__), 'test-data', 'translations', 'ios_generate_strings_file_from_code') }
 
   describe 'downloading export files from GlotPress' do
