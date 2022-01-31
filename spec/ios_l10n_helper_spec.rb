@@ -164,7 +164,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
   describe '#download_glotpress_export_file' do
     let(:gp_fake_url) { 'https://stub.glotpress.com/rspec-fake-project' }
 
-    describe 'the request query parameters' do
+    describe 'request query parameters' do
       it 'passes the expected params when no filters are provided' do
         # Arrange
         stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations?format=strings").to_return(body: 'content')
@@ -186,23 +186,12 @@ describe Fastlane::Helper::Ios::L10nHelper do
         expect(stub).to have_been_made.once
         expect(dest.string).to eq('content')
       end
+    end
 
-      it 'prints UI.error if passed a non-existing locale (or any other 404)' do
-        # Arrange
-        stub = stub_request(:get, "#{gp_fake_url}/invalid/default/export-translations?format=strings").to_return(status: [404, 'Not Found'])
-        error_messages = []
-        allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
-        dest = StringIO.new
-        # Act
-        described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'invalid', filters: nil, destination: dest)
-        # Assert
-        expect(stub).to have_been_made.once
-        expect(error_messages).to eq(['Error downloading locale `invalid` — 404 Not Found'])
-      end
+    describe 'destination parameter' do
+      # it 'accepts an IO (File)' # Not really needed, as all previous tests already cover this by using a `StringIO`
 
-      # it 'accepts an IO (File) as destination' # Not really needed, as all previous tests already cover this by using a `StringIO`
-
-      it 'accepts a String (path) as destination' do
+      it 'accepts a String (path)' do
         Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
           # Arrange
           # Note: in practice it seems that GlotPress's `.strings` exports are using UTF8 (but served as `application/octet-stream`)
@@ -217,6 +206,35 @@ describe Fastlane::Helper::Ios::L10nHelper do
           expect(File).to exist(dest)
           expect(File.read(dest)).to eq(body)
         end
+      end
+    end
+
+    describe 'invalid parameters' do
+      it 'prints an `UI.error` if passed a non-existing locale (or any other 404)' do
+        # Arrange
+        stub = stub_request(:get, "#{gp_fake_url}/invalid/default/export-translations?format=strings").to_return(status: [404, 'Not Found'])
+        error_messages = []
+        allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+        dest = StringIO.new
+        # Act
+        described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'invalid', filters: nil, destination: dest)
+        # Assert
+        expect(stub).to have_been_made.once
+        expect(error_messages).to eq(['Error downloading locale `invalid` — 404 Not Found'])
+      end
+
+      it 'prints an `UI.error` if the destination cannot be written to' do
+        # Arrange
+        stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations?format=strings").to_return(body: 'content')
+        error_messages = []
+        allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+        dest = '/these/are/not/the/droids/you/are/looking/for.strings'
+        # Act
+        described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: nil, destination: dest)
+        # Assert
+        expect(stub).to have_been_made.once
+        expect(File).not_to exist(dest)
+        expect(error_messages).to eq(["Error downloading locale `fr` — No such file or directory @ rb_sysopen - #{dest}"])
       end
     end
   end
