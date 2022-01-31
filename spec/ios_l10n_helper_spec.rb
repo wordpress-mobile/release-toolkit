@@ -165,12 +165,12 @@ describe Fastlane::Helper::Ios::L10nHelper do
     let(:gp_fake_url) { 'https://stub.glotpress.com/rspec-fake-project' }
 
     describe 'the request query parameters' do
-      it 'passes the expected params when filters are forced to nil' do
+      it 'passes the expected params when no filters are provided' do
         # Arrange
         stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations?format=strings").to_return(body: 'content')
         dest = StringIO.new
         # Act
-        described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', destination: dest, filters: nil)
+        described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: nil, destination: dest)
         # Assert
         expect(stub).to have_been_made.once
         expect(dest.string).to eq('content')
@@ -181,7 +181,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
         stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations?format=strings&filters%5Bstatus%5D=current&filters%5Bterm%5D=foobar").to_return(body: 'content')
         dest = StringIO.new
         # Act
-        described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', destination: dest, filters: { status: 'current', term: 'foobar' })
+        described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: { status: 'current', term: 'foobar' }, destination: dest)
         # Assert
         expect(stub).to have_been_made.once
         expect(dest.string).to eq('content')
@@ -189,12 +189,12 @@ describe Fastlane::Helper::Ios::L10nHelper do
 
       it 'prints UI.error if passed a non-existing locale (or any other 404)' do
         # Arrange
-        stub = stub_request(:get, "#{gp_fake_url}/invalid/default/export-translations?format=strings&filters%5Bstatus%5D=current").to_return(status: [404, 'Not Found'])
+        stub = stub_request(:get, "#{gp_fake_url}/invalid/default/export-translations?format=strings").to_return(status: [404, 'Not Found'])
         error_messages = []
         allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
         dest = StringIO.new
         # Act
-        described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'invalid', destination: dest)
+        described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'invalid', filters: nil, destination: dest)
         # Assert
         expect(stub).to have_been_made.once
         expect(error_messages).to eq(['Error downloading locale `invalid` — 404 Not Found'])
@@ -211,7 +211,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
           stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations?format=strings").to_return(body: body)
           dest = File.join(tmp_dir, 'export.strings')
           # Act
-          described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', destination: dest, filters: nil)
+          described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: nil, destination: dest)
           # Assert
           expect(stub).to have_been_made.once
           expect(File).to exist(dest)

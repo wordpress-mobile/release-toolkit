@@ -131,7 +131,7 @@ module Fastlane
         #                               Typical examples include `{ status: 'current' }` (the default) or `{ status: 'review' }`.
         # @param [String, IO] destination The path or `IO`-like instance, where to write the downloaded file on disk.
         #
-        def self.download_glotpress_export_file(project_url:, locale:, destination:, filters: { status: 'current' })
+        def self.download_glotpress_export_file(project_url:, locale:, filters:, destination:)
           query_params = (filters || {}).transform_keys { |k| "filters[#{k}]" }.merge(format: 'strings')
           uri = URI.parse("#{project_url.chomp('/')}/#{locale}/default/export-translations?#{URI.encode_www_form(query_params)}")
           begin
