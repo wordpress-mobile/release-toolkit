@@ -1,5 +1,7 @@
 # Nodes with values to reuse in the pipeline.
 common_params:
+  env: &xcode_image
+    IMAGE_ID: xcode-12.5.1
   plugins:
   - &docker_plugin
     docker#v3.8.0:
@@ -13,6 +15,7 @@ common_params:
       propagate-environment: true
       environment:
         - "DANGER_GITHUB_API_TOKEN"
+
 
 steps:
   #################
@@ -32,8 +35,7 @@ steps:
 
       echo "--- :rspec: Run Rspec"
       bundle exec rspec --profile 10 --format progress
-    env: 
-      IMAGE_ID: xcode-12.5.1
+    env: *xcode_image
     plugins:
       automattic/bash-cache#2.0.0: ~
     agents:
