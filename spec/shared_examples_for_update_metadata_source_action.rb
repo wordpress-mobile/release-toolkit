@@ -19,8 +19,9 @@ RSpec.shared_examples 'update_metadata_source_action' do |options|
       file_2_path = File.join(dir, '2.txt')
       File.write(file_2_path, 'value 2')
 
-      described_class.run(
+      run_described_fastlane_action(
         po_file_path: output_path,
+        release_version: '1.0',
         source_files: {
           key1: file_1_path,
           key2: file_2_path
@@ -56,7 +57,7 @@ RSpec.shared_examples 'update_metadata_source_action' do |options|
       whats_new_path = File.join(dir, 'whats_new.txt')
       File.write(whats_new_path, "- something new\n- something else new")
 
-      described_class.run(
+      run_described_fastlane_action(
         po_file_path: output_path,
         release_version: '1.23',
         source_files: {
@@ -94,8 +95,9 @@ RSpec.shared_examples 'update_metadata_source_action' do |options|
       file_2_path = File.join(dir, '2.txt')
       File.write(file_2_path, 'value 2')
 
-      described_class.run(
+      run_described_fastlane_action(
         po_file_path: output_path,
+        release_version: '1.0',
         source_files: {
           key1: file_1_path,
           key2: file_2_path
@@ -135,7 +137,7 @@ RSpec.shared_examples 'update_metadata_source_action' do |options|
       release_notes_path = File.join(dir, 'release_notes.txt')
       File.write(release_notes_path, "- release notes\n- more release notes")
 
-      described_class.run(
+      run_described_fastlane_action(
         po_file_path: output_path,
         release_version: '1.23',
         source_files: {

@@ -67,6 +67,24 @@ def expect_shell_command(*command, exitstatus: 0, output: '')
   expect(Open3).to receive(:popen2e).with(*command).and_yield(mock_input, mock_output, mock_thread)
 end
 
+# If the `described_class` of a spec is a `Fastlane::Action` subclass, it runs
+# it with the given parameters.
+#
+def run_described_fastlane_action(parameters)
+  raise "Only call `#{__callee__}` from a spec describing a `Fastlane::Action` subclass." unless Fastlane::Actions.is_class_action?(described_class)
+
+  # Avoid logging messages about deprecated actions while running tests on them
+  allow(Fastlane::Actions).to receive(:is_deprecated?).and_return(false)
+  lane = <<~LANE
+    lane :test do
+      #{described_class.action_name}(
+        #{parameters.inspect}
+      )
+    end
+  LANE
+  Fastlane::FastFile.new.parse(lane).runner.execute(:test)
+end
+
 # Executes the given block within an ad hoc temporary directory.
 def in_tmp_dir
   Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmpdir|
