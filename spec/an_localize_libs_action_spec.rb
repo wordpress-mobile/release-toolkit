@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Fastlane::Actions::AnLocalizeLibsAction do
-  # This test is more of a way of ensuring `run_described_action` handles array
+  # This test is more of a way of ensuring `run_described_fastlane_action` handles array
   # of hashes properly than a comprehensive test for the
   # `an_localize_libs_action` action.
   #
@@ -18,7 +18,7 @@ describe Fastlane::Actions::AnLocalizeLibsAction do
       lib2_strings_path = File.join(tmp_dir, 'lib2.xml')
       File.write(lib2_strings_path, android_xml_with_content('<string name="a_lib2_string">test from lib 2</string>'))
 
-      run_described_action(
+      run_described_fastlane_action(
         app_strings_path: app_strings_path,
         libs_strings_path: [
           { library: 'lib_1', strings_path: lib1_strings_path, exclusions: [] },

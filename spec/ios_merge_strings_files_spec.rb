@@ -19,7 +19,7 @@ describe Fastlane::Actions::IosMergeStringsFilesAction do
 
         # Act
         result = Dir.chdir(tmpdir) do
-          run_described_action(
+          run_described_fastlane_action(
             paths: [inputs[0], inputs[1]],
             destination: 'output.strings'
           )

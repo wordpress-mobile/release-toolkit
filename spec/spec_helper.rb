@@ -70,7 +70,7 @@ end
 # If the `described_class` of a spec is a `Fastlane::Action` subclass, it runs
 # it with the given parameters.
 #
-def run_described_action(parameters, lane_name = 'test')
+def run_described_fastlane_action(parameters, lane_name = 'test')
   expect(described_class).to be < Fastlane::Action, "Only call `#{__callee__}` from a spec describing a `Fastlane::Action` subclass."
 
   lane = <<~LANE
