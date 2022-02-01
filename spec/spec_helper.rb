@@ -70,17 +70,19 @@ end
 # If the `described_class` of a spec is a `Fastlane::Action` subclass, it runs
 # it with the given parameters.
 #
-def run_described_fastlane_action(parameters, lane_name = 'test')
-  expect(described_class).to be < Fastlane::Action, "Only call `#{__callee__}` from a spec describing a `Fastlane::Action` subclass."
+def run_described_fastlane_action(parameters)
+  raise "Only call `#{__callee__}` from a spec describing a `Fastlane::Action` subclass." unless Fastlane::Actions.is_class_action?(described_class)
 
+  # Avoid logging messages about deprecated actions while running tests on them
+  allow(Fastlane::Actions).to receive(:is_deprecated?).and_return(false)
   lane = <<~LANE
-    lane :#{lane_name} do
+    lane :test do
       #{described_class.action_name}(
         #{parameters.inspect}
       )
     end
   LANE
-  Fastlane::FastFile.new.parse(lane).runner.execute(lane_name.to_sym)
+  Fastlane::FastFile.new.parse(lane).runner.execute(:test)
 end
 
 # Executes the given block within an ad hoc temporary directory.
