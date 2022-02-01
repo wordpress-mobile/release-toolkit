@@ -20,6 +20,7 @@ _None_
 
 * Ensure that the `gem push` step only runs on CI if lint, test and danger steps passed before it. [#325]
 * Rename internal `Ios::L10nHelper` to `Ios::L10nLinterHelper`. [#328]
+* Provide new `run_described_fastlane_action` to run Fastlane actions more thoroughly in unit tests [#330]
 
 ## 2.3.0
 
