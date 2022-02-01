@@ -27,7 +27,7 @@ module Fastlane
           UI.error(
             "Found empty translations in `#{destination}` for the following keys: #{empty_keys}.\n" \
               + "This is likely a GlotPress bug, and will lead to copies replaced by empty text in the UI.\n" \
-              + 'Please report this to the GlotPress team, and fix the file locally this continuing.'
+              + 'Please report this to the GlotPress team, and fix the file locally before continuing.'
           )
         end
       rescue StandardError => e

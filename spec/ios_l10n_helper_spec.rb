@@ -194,8 +194,8 @@ describe Fastlane::Helper::Ios::L10nHelper do
       it 'accepts a String (path)' do
         Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
           # Arrange
-          # Note: in practice it seems that GlotPress's `.strings` exports are using UTF8 (but served as `application/octet-stream`)
-          #       but it does not hurt to ensure the download to a file can work with UTF16 ()and copy the binary stream verbatim)
+          # Note: in practice it seems that GlotPress's `.strings` exports are using UTF-8 (but served as `application/octet-stream`)
+          #       but it does not hurt to ensure the download to a file can work with UTF-16 ()and copy the binary stream verbatim)
           body = File.read(fixture('Localizable-utf16.strings'))
           stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations?format=strings").to_return(body: body)
           dest = File.join(tmp_dir, 'export.strings')
