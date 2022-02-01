@@ -76,7 +76,7 @@ def run_described_action(parameters, lane_name = 'test')
   lane = <<~LANE
     lane :#{lane_name} do
       #{described_class.action_name}(
-        #{stringify_for_fastlane(parameters)}
+        #{parameters.inspect}
       )
     end
   LANE
@@ -90,20 +90,4 @@ def in_tmp_dir
       yield tmpdir
     end
   end
-end
-
-private
-
-def stringify_for_fastlane(hash)
-  hash.map do |key, value|
-    # rubocop:disable Style/CaseLikeIf
-    if value.is_a?(Hash)
-      "#{key}: {\n#{stringify_for_fastlane(value)}\n}"
-    elsif value.is_a?(String)
-      "#{key}: \"#{value}\""
-    else
-      "#{key}: #{value}"
-    end
-    # rubocop:enable Style/CaseLikeIf
-  end.join(",\n")
 end
