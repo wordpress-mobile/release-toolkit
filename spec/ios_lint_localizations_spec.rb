@@ -23,7 +23,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
           expect(FileUtils).to receive(:cp_r)
           expect_shell_command("#{install_dir}/bin/swiftgen", 'config', 'run', '--config', anything)
 
-          Fastlane::Actions::IosLintLocalizationsAction.run(
+          run_described_fastlane_action(
             install_path: install_dir,
             input_dir: empty_dataset,
             base_lang: 'en'
@@ -43,7 +43,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
           # Second run: ensure we only run SwiftGen directly, without a call to curl nor unzip beforehand
           expect_shell_command("#{install_dir}/bin/swiftgen", 'config', 'run', '--config', anything)
 
-          Fastlane::Actions::IosLintLocalizationsAction.run(
+          run_described_fastlane_action(
             install_path: install_dir,
             input_dir: empty_dataset,
             base_lang: 'en'
@@ -103,7 +103,7 @@ def run_l10n_linter_test(data_file)
   #       remove this after the test ends, so that further executions of the test run faster.
   #       Only the first execution of the tests might take longer if it needs to install SwiftGen first to be able to run the tests.
   install_dir = "vendor/swiftgen/#{Fastlane::Helper::Ios::L10nLinterHelper::SWIFTGEN_VERSION}"
-  result = Fastlane::Actions::IosLintLocalizationsAction.run(
+  result = run_described_fastlane_action(
     install_path: install_dir,
     input_dir: @test_data_dir,
     base_lang: 'en'

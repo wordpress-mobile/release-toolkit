@@ -35,7 +35,7 @@ end
 def amts_run_test(script)
   test_script = @amtsTestUtils.get_test_from_file(script)
   @amtsTestUtils.create_test_data(test_script)
-  Fastlane::Actions::AndroidMergeTranslatorsStringsAction.run(strings_folder: @amtsTestUtils.test_folder_path)
+  run_described_fastlane_action(strings_folder: @amtsTestUtils.test_folder_path)
   expect(@amtsTestUtils.read_result_data(test_script)).to eq(test_script['result']['content'])
 end
 

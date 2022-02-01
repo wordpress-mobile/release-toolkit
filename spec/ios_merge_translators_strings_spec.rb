@@ -35,7 +35,7 @@ end
 def imts_run_test(script)
   test_script = @imtsTestUtils.get_test_from_file(script)
   @imtsTestUtils.create_test_data(test_script)
-  Fastlane::Actions::IosMergeTranslatorsStringsAction.run(strings_folder: @imtsTestUtils.test_folder_path)
+  run_described_fastlane_action(strings_folder: @imtsTestUtils.test_folder_path)
   expect(@imtsTestUtils.read_result_data(test_script)).to eq(test_script['result']['content'])
 end
 
