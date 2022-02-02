@@ -30,16 +30,16 @@ module Fastlane
         return unless File.exist?(destination) # If the file failed to download, don't try to validate an non-existing file. We'd already have a separate error for the download failure anyway.
 
         translations = Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: destination)
-        empty_keys = translations.select { |_, value| value.nil? || value.empty? }.keys
+        empty_keys = translations.select { |_, value| value.nil? || value.empty? }.keys.sort
         unless empty_keys.empty?
           UI.error(
-            "Found empty translations in `#{destination}` for the following keys: #{empty_keys}.\n" \
+            "Found empty translations in `#{destination}` for the following keys: #{empty_keys.inspect}.\n" \
               + "This is likely a GlotPress bug, and will lead to copies replaced by empty text in the UI.\n" \
               + 'Please report this to the GlotPress team, and fix the file locally before continuing.'
           )
         end
       rescue StandardError => e
-        UI.error("Error while validating the file exported from GlotPress (`#{destination}`) - #{e.message}")
+        UI.error("Error while validating the file exported from GlotPress (`#{destination}`) - #{e.message.chomp}")
       end
 
       #####################################################
