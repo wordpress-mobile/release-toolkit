@@ -65,7 +65,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :download_dir,
                                        env_name: 'FL_IOS_DOWNLOAD_STRINGS_FILES_FROM_GLOTPRESS_DOWNLOAD_DIR',
                                        description: 'The parent directory containing all the `*.lproj` subdirectories in which the downloaded files will be saved',
-                                       type: Hash),
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :table_basename,
                                        env_name: 'FL_IOS_DOWNLOAD_STRINGS_FILES_FROM_GLOTPRESS_TABLE_BASENAME',
                                        description: 'The basename to save the `.strings` files under',
