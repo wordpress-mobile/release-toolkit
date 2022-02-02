@@ -4,7 +4,7 @@ PATH
     fastlane-plugin-wpmreleasetoolkit (2.3.0)
       activesupport (~> 5)
       bigdecimal (~> 1.4)
-      buildkit (~> 1.4.5)
+      buildkit (~> 1.4)
       chroma (= 0.2.0)
       diffy (~> 3.3)
       git (~> 1.3)
