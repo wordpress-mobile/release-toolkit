@@ -1,9 +1,21 @@
 # Nodes with values to reuse in the pipeline.
 common_params:
-  plugins: &common_plugins
-  - &bash_cache automattic/bash-cache#2.0.0: ~
-  env: &common_env
+  env: &xcode_image
     IMAGE_ID: xcode-12.5.1
+  plugins:
+  - &docker_plugin
+    docker#v3.8.0:
+      image: &ruby_version "ruby:2.7.4"
+      propagate-environment: true
+      environment:
+        - "RUBYGEMS_API_KEY"
+  - &docker_plugin_with_danger_token
+    docker#v3.8.0:
+      image: *ruby_version
+      propagate-environment: true
+      environment:
+        - "DANGER_GITHUB_API_TOKEN"
+
 
 steps:
   #################
@@ -12,18 +24,20 @@ steps:
   - label: "🧪 Build and Test"
     key: test
     command: |
-      .buildkite/install-dependencies.sh
-
-      echo "--- :hammer: Build DrawText"
-      bundle exec rake compile
+      # We only need this for tasks running on a Mac
+      brew install pkg-config git-lfs libxml2 imagemagick@6
 
       echo "--- :git: Setting up git-lfs"
       git-lfs install
 
+      echo "--- :rubygems: Setting up Gems"
+      install_gems
+
       echo "--- :rspec: Run Rspec"
       bundle exec rspec --profile 10 --format progress
-    env: *common_env
-    plugins: *common_plugins
+    env: *xcode_image
+    plugins:
+      automattic/bash-cache#2.0.0: ~
     agents:
       queue: "mac"
 
@@ -33,14 +47,12 @@ steps:
   - label: "🧹 Lint (Rubocop)"
     key: rubocop
     command: |
-      .buildkite/install-dependencies.sh
-
+      bundle install
       echo "--- :rubocop: Run Rubocop"
       bundle exec rubocop
-    env: *common_env
-    plugins: *common_plugins
+    plugins: [*docker_plugin]
     agents:
-      queue: "mac"
+      queue: "default"
 
   #################
   # Danger
@@ -48,14 +60,12 @@ steps:
   - label: "⛔️ Danger"
     key: danger
     command: |
-      .buildkite/install-dependencies.sh
-
+      bundle install
       echo "--- :rubocop: Run Danger"
       bundle exec danger
-    env: *common_env
-    plugins: *common_plugins
+    plugins: [*docker_plugin_with_danger_token]
     agents:
-      queue: "mac"
+      queue: "default"
 
   #################
   # Push to RubyGems
@@ -71,7 +81,6 @@ steps:
     # commands written inline) to avoid leaking a key used in the process in clear in the
     # BUILDKITE_COMMAND environment variable.
     command: .buildkite/gem-push.sh
-    env: *common_env
-    plugins: *common_plugins
+    plugins: [*docker_plugin]
     agents:
-      queue: "mac"
+      queue: "default"

@@ -30,16 +30,8 @@ task :docstats, [:path] do |_, args|
   sh('yard', 'stats', '--list-undoc', path)
 end
 
-Rake::ExtensionTask.new('drawText')
-
 GEM_NAME = 'fastlane-plugin-wpmreleasetoolkit'.freeze
 VERSION_FILE = File.join('lib', 'fastlane', 'plugin', 'wpmreleasetoolkit', 'version.rb')
-
-desc 'Try to build and install the gem to ensure it can be installed properly (with the native extension and all)'
-task :check_install_gem do
-  require_relative(VERSION_FILE)
-  check_install(Fastlane::Wpmreleasetoolkit::VERSION)
-end
 
 desc 'Create a new version of the release-toolkit gem'
 task :new_release do
@@ -65,10 +57,6 @@ task :new_release do
   update_version_constant(VERSION_FILE, new_version)
   Console.header 'Updating CHANGELOG...'
   parser.update_for_new_release(new_version: new_version)
-
-  ## Ensure the gem builds and is installable
-  Console.header 'Testing that the gem builds and installs...'
-  check_install(new_version)
 
   # Commit and push
   Console.header 'Commit and push changes...'
@@ -99,11 +87,4 @@ def update_version_constant(version_file, new_version)
   File.write(version_file, content)
 
   sh('bundle', 'install', '--quiet') # To update Gemfile.lock with new wpmreleasetoolkit version
-end
-
-def check_install(version)
-  sh('gem', 'build', "#{GEM_NAME}.gemspec")
-  Dir.mktmpdir('release-toolkit-') do |tmpdir|
-    sh('gem', 'install', '--install-dir', tmpdir, '--silent', '--no-document', "#{GEM_NAME}-#{version}.gem")
-  end
 end

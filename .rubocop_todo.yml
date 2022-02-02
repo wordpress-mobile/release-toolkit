@@ -83,8 +83,6 @@ Naming/PredicateName:
 # SupportedStyles: snake_case, camelCase
 Naming/VariableName:
   Exclude:
-    - 'bin/drawText'
-    - 'ext/drawText/extconf.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/common/promo_screenshots_action.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_add_files_to_copy_action.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/configure/configure_validate_action.rb'

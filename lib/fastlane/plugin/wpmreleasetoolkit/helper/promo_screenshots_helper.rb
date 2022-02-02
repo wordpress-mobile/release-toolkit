@@ -28,6 +28,8 @@ module Fastlane
           message << 'Aborting.'
           UI.user_error!(message)
         end
+
+        UI.user_error!('`drawText` not found – install it using `brew install automattic/build-tools/drawText`.') unless system('command -v drawText')
       end
 
       def read_json(configFilePath)
@@ -233,9 +235,7 @@ module Fastlane
         begin
           tempTextFile = Tempfile.new()
 
-          command = "bundle exec drawText html=\"#{text}\" maxWidth=#{width} maxHeight=#{height} output=#{tempTextFile.path} fontSize=#{font_size} stylesheet=\"#{stylesheet_path}\" alignment=\"#{position}\""
-
-          UI.crash!('Unable to draw text') unless system(command)
+          sh('drawText', "html=\"#{text}\"", "maxWidth=#{width}", "maxHeight=#{height}", "output=\"#{tempTextFile.path}\"", "fontSize=#{font_size}", "stylesheet=\"#{stylesheet_path}\"", "alignment=\"#{position}\"")
 
           text_content = open_image(tempTextFile.path).trim
           text_frame = create_image(width, height)

@@ -14,20 +14,12 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.6'
 
-  spec.files         = Dir['lib/**/*'] + Dir['ext/drawText/{makefile.example,drawText/**/*,drawText Tests/**/*,drawText.xcodeproj/**/*}'] + %w[README.md LICENSE]
+  spec.files         = Dir['lib/**/*'] + %w[README.md LICENSE]
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
-
-  spec.files << 'ext/drawText/extconf.rb'
-  spec.files << Dir['bin/*']
-  spec.files << Dir['ext/*']
 
   # Bring in any generated executables
   spec.bindir = 'bin'
   spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-
-  # These files are used to generate Makefile files which in turn are used
-  # to build and install the C extension.
-  spec.extensions = ['ext/drawText/extconf.rb']
 
   # Don't add a dependency to fastlane or fastlane_re
   # since this would cause a circular dependency

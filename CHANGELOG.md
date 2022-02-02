@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-_None_
+* Removes the `drawText` binary from the gem (instead depending on it being installed via `brew`). Because this update can not be safely applied with no side effects, it's considered a breaking change.
 
 ### New Features
 
