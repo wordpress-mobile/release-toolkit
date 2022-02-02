@@ -167,7 +167,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
     describe 'request query parameters' do
       it 'passes the expected params when no filters are provided' do
         # Arrange
-        stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations?format=strings").to_return(body: 'content')
+        stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations").with(query: { format: 'strings' }).to_return(body: 'content')
         dest = StringIO.new
         # Act
         described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: nil, destination: dest)
@@ -178,7 +178,8 @@ describe Fastlane::Helper::Ios::L10nHelper do
 
       it 'passes the expected params when a list of filters is provided' do
         # Arrange
-        stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations?format=strings&filters%5Bstatus%5D=current&filters%5Bterm%5D=foobar").to_return(body: 'content')
+        stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations")
+               .with(query: { format: 'strings', 'filters[status]': 'current', 'filters[term]': 'foobar' }).to_return(body: 'content')
         dest = StringIO.new
         # Act
         described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: { status: 'current', term: 'foobar' }, destination: dest)
@@ -197,7 +198,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
           # Note: in practice it seems that GlotPress's `.strings` exports are using UTF-8 (but served as `application/octet-stream`)
           #       but it does not hurt to ensure the download to a file can work with UTF-16 (and copy the binary stream verbatim)
           body = File.read(fixture('Localizable-utf16.strings'))
-          stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations?format=strings").to_return(body: body)
+          stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations").with(query: { format: 'strings' }).to_return(body: body)
           dest = File.join(tmp_dir, 'export.strings')
           # Act
           described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: nil, destination: dest)
@@ -212,7 +213,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
     describe 'invalid parameters' do
       it 'prints an `UI.error` if passed a non-existing locale (or any other 404)' do
         # Arrange
-        stub = stub_request(:get, "#{gp_fake_url}/invalid/default/export-translations?format=strings").to_return(status: [404, 'Not Found'])
+        stub = stub_request(:get, "#{gp_fake_url}/invalid/default/export-translations").with(query: { format: 'strings' }).to_return(status: [404, 'Not Found'])
         error_messages = []
         allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
         dest = StringIO.new
@@ -225,7 +226,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
 
       it 'prints an `UI.error` if the destination cannot be written to' do
         # Arrange
-        stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations?format=strings").to_return(body: 'content')
+        stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations").with(query: { format: 'strings' }).to_return(body: 'content')
         error_messages = []
         allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
         dest = '/these/are/not/the/droids/you/are/looking/for.strings'
