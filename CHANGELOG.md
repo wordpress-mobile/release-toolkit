@@ -11,6 +11,7 @@
 ### New Features
 
 * Introduce new `ios_merge_strings_files` action. [#329]
+* Introduce new `buildkite_trigger_build` action. [#333]
 
 ### Bug Fixes
 
