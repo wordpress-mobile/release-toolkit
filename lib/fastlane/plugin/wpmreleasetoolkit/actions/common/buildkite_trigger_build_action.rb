@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         require 'buildkit'
 
-        UI.message "Triggering build on branch #{params[:branch]} at #{params[:commit]}"
+        UI.message "Triggering build on branch #{params[:branch]}, commit #{params[:commit]}, using pipeline from #{params[:pipeline_file]}"
 
         pipeline_name = {
           PIPELINE: params[:pipeline_file]
