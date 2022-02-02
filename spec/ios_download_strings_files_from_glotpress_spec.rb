@@ -3,15 +3,14 @@ require 'tmpdir'
 
 describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
   let(:test_data_dir) { File.join(File.dirname(__FILE__), 'test-data', 'translations', 'ios_generate_strings_file_from_code') }
+  let(:gp_fake_url) { 'https://stub.glotpress.com/rspec-fake-project' }
+  let(:locales_subset) { { 'fr-FR': 'fr', 'zh-cn': 'zh-Hans' } }
+
+  def gp_stub(locale:, query:)
+    stub_request(:get, "#{gp_fake_url}/#{locale}/default/export-translations").with(query: query)
+  end
 
   describe 'downloading export files from GlotPress' do
-    let(:gp_fake_url) { 'https://stub.glotpress.com/rspec-fake-project' }
-    let(:locales_subset) { {'fr-FR': 'fr', 'zh-cn': 'zh-Hans' } }
-
-    def gp_stub(locale:, query:)
-      stub_request(:get, "#{gp_fake_url}/#{locale}/default/export-translations").with(query: query)
-    end
-
     def test_gp_download(filters:, tablename:, expected_gp_params:)
       Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
         # Arrange
@@ -55,16 +54,127 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
     it 'uses a custom table name for the `.strings` files if provided' do
       test_gp_download(
         filters: nil,
-        tablename: "MyApp",
+        tablename: 'MyApp',
         expected_gp_params: { 'filters[status]': 'current', format: 'strings' }
       )
     end
   end
 
   describe 'error handling' do
-    it 'shows an error if an invalid locale is provided (404)'
-    it 'shows an error if the file cannot be written in the destination'
-    it 'reports if a downloaded file is invalid by default'
-    it 'does not report invalid downloaded files if skip_file_validation:true'
+    it 'shows an error if an invalid locale is provided (404)' do
+      Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
+        # Arrange
+        stub = gp_stub(locale: 'unknown-locale', query: { 'filters[status]': 'current', format: 'strings' }).to_return(status: [404, 'Not Found'])
+        error_messages = []
+        allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+
+        # Act
+        run_described_fastlane_action(
+          project_url: gp_fake_url,
+          locales: { 'unknown-locale': 'Base' },
+          download_dir: tmp_dir
+        )
+
+        # Assert
+        expect(stub).to have_been_made.once
+        file = File.join(tmp_dir, 'Base.lproj', 'Localizable.strings')
+        expect(File).not_to exist(file)
+        expect(error_messages).to eq(['Error downloading locale `unknown-locale` — 404 Not Found'])
+      end
+    end
+
+    it 'shows an error if the file cannot be written in the destination' do
+      # Arrange
+      download_dir = '/these/are/not/the/dirs/you/are/looking/for/'
+
+      # Act
+      act = lambda do
+        run_described_fastlane_action(
+          project_url: gp_fake_url,
+          locales: { 'fr-FR': 'fr' },
+          download_dir: download_dir
+        )
+      end
+
+      # Assert
+      expect { act.call }.to raise_error(FastlaneCore::Interface::FastlaneError, "The parent directory `#{download_dir}` (which contains all the `*.lproj` subdirectories) must already exist")
+    end
+
+    it 'reports if a downloaded file is not a valid `.strings` file' do
+      Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
+        # Arrange
+        stub = gp_stub(locale: 'fr-FR', query: { 'filters[status]': 'current', format: 'strings' }).to_return(body: 'some invalid strings file content')
+        error_messages = []
+        allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+
+        # Act
+        run_described_fastlane_action(
+          project_url: gp_fake_url,
+          locales: { 'fr-FR': 'fr' },
+          download_dir: tmp_dir
+        )
+
+        # Assert
+        expect(stub).to have_been_made.once
+        file = File.join(tmp_dir, 'fr.lproj', 'Localizable.strings')
+        expect(File).to exist(file)
+        expected_error = 'Property List error: Unexpected character s at line 1 / JSON error: JSON text did not start with array or object and option to allow fragments not set. around line 1, column 0.'
+        expect(error_messages).to eq(["Error while validating the file exported from GlotPress (`#{file}`) - #{file}: #{expected_error}"])
+      end
+    end
+
+    it 'reports if a downloaded file has empty translations' do
+      Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
+        # Arrange
+        stub = gp_stub(locale: 'fr-FR', query: { 'filters[status]': 'current', format: 'strings' })
+               .to_return(body: ['"key1" = "value1";', '"key2" = "";', '"key3" = "";', '/* translators: use "" quotes please */', '"key4" = "value4";'].join("\n"))
+        error_messages = []
+        allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+
+        # Act
+        run_described_fastlane_action(
+          project_url: gp_fake_url,
+          locales: { 'fr-FR': 'fr' },
+          download_dir: tmp_dir
+        )
+
+        # Assert
+        expect(stub).to have_been_made.once
+        file = File.join(tmp_dir, 'fr.lproj', 'Localizable.strings')
+        expect(File).to exist(file)
+        expected_error = <<~MSG.chomp
+          Found empty translations in `#{file}` for the following keys: ["key2", "key3"].
+          This is likely a GlotPress bug, and will lead to copies replaced by empty text in the UI.
+          Please report this to the GlotPress team, and fix the file locally before continuing.
+        MSG
+        expect(error_messages).to eq([expected_error])
+      end
+    end
+
+    it 'does not report invalid downloaded files if `skip_file_validation:true`' do
+      Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
+        # Arrange
+        stub = gp_stub(locale: 'fr-FR', query: { 'filters[status]': 'current', format: 'strings' }).to_return(body: 'some invalid strings file content')
+        error_messages = []
+        allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+
+        # Act
+        act = lambda do
+          run_described_fastlane_action(
+            project_url: gp_fake_url,
+            locales: { 'fr-FR': 'fr' },
+            download_dir: tmp_dir,
+            skip_file_validation: true
+          )
+        end
+
+        # Assert
+        expect { act.call }.not_to raise_error
+        expect(stub).to have_been_made.once
+        file = File.join(tmp_dir, 'fr.lproj', 'Localizable.strings')
+        expect(File).to exist(file)
+        expect(error_messages).to eq([])
+      end
+    end
   end
 end
