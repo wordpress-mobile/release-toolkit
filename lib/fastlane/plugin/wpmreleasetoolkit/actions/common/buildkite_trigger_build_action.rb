@@ -21,7 +21,7 @@ module Fastlane
           }
         )
 
-        response.state == 'scheduled' ? UI.message('Done!') : UI.user_error!("Failed to start job\nError: [#{response}]")
+        response.state == 'scheduled' ? UI.message('Done!') : UI.crash!("Failed to start job\nError: [#{response}]")
       end
 
       #####################################################
