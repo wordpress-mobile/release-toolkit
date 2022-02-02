@@ -7,7 +7,10 @@ module Fastlane
 
         locales.each do |glotpress_locale, lproj_name|
           # Download the export in the proper `.lproj` directory
-          destination = File.join(params[:download_dir], "#{lproj_name}.lproj", "#{params[:table_basename]}.strings")
+          lproj_dir = File.join(params[:download_dir], "#{lproj_name}.lproj")
+          destination = File.join(lproj_dir, "#{params[:table_basename]}.strings")
+          FileUtils.mkdir(lproj_dir) unless Dir.exist?(lproj_dir)
+
           Fastlane::Helper::Ios::L10nHelper.download_glotpress_export_file(
             project_url: params[:project_url],
             locale: glotpress_locale,
