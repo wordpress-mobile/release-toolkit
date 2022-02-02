@@ -36,21 +36,21 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(
             key: :buildkite_token,
-            env_name: 'BUILDKITE_ACCESS_TOKEN',
+            env_name: 'BUILDKITE_TOKEN',
             description: 'Buildkite Personal Access Token',
-            type: String
+            type: String,
+            sensitive: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :buildkite_organization,
             env_name: 'BUILDKITE_ORGANIZTION',
             description: 'The Buildkite organization that contains your pipeline',
-            type: String,
-            default_value: 'wordpress-mobile'
+            type: String
           ),
           FastlaneCore::ConfigItem.new(
             key: :buildkite_pipeline,
             env_name: 'BUILDKITE_PIPELINE',
-            description: 'The Buildkite pipeline you\'d like to build',
+            description: %(The Buildkite pipeline you'd like to build),
             type: String
           ),
           FastlaneCore::ConfigItem.new(
@@ -79,7 +79,7 @@ module Fastlane
       end
 
       def self.authors
-        ['jkmassel']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)
