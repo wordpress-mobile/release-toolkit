@@ -4,10 +4,13 @@ module Fastlane
       def self.run(params)
         # TODO: Once we introduce the `Locale` POD via #296, check if the param is an array of locales and if so convert it to Hash{glotpress=>lproj}
         locales = params[:locales]
+        download_dir = params[:download_dir]
+
+        UI.user_error!("The parent directory `#{download_dir}` (which contains all the `*.lproj` subdirectories) must already exist") unless Dir.exist?(download_dir)
 
         locales.each do |glotpress_locale, lproj_name|
           # Download the export in the proper `.lproj` directory
-          lproj_dir = File.join(params[:download_dir], "#{lproj_name}.lproj")
+          lproj_dir = File.join(download_dir, "#{lproj_name}.lproj")
           destination = File.join(lproj_dir, "#{params[:table_basename]}.strings")
           FileUtils.mkdir(lproj_dir) unless Dir.exist?(lproj_dir)
 
