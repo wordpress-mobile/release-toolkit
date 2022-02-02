@@ -24,7 +24,9 @@ module Fastlane
 
       # Validate that a `.strings` file downloaded from GlotPress seems valid and does not contain empty translations
       def self.validate_strings_file(destination)
-        translations = Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(destination)
+        return unless File.exist?(destination) # If the file failed to download, don't try to validate an non-existing file. We'd already have a separate error for the download failure anyway.
+
+        translations = Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: destination)
         empty_keys = translations.select { |_, value| value.nil? || value.empty? }.keys
         unless empty_keys.empty?
           UI.error(
