@@ -118,8 +118,9 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
         expect(stub).to have_been_made.once
         file = File.join(tmp_dir, 'fr.lproj', 'Localizable.strings')
         expect(File).to exist(file)
-        expected_error = 'Property List error: Unexpected character s at line 1 / JSON error: JSON text did not start with array or object and option to allow fragments not set. around line 1, column 0.'
-        expect(error_messages).to eq(["Error while validating the file exported from GlotPress (`#{file}`) - #{file}: #{expected_error}"])
+        expected_error = 'Property List error: Unexpected character s at line 1 / JSON error: JSON text did not start with array or object and option to allow fragments not set.'
+        expect(error_messages.count).to eq(1)
+        expect(error_messages.first).to start_with("Error while validating the file exported from GlotPress (`#{file}`) - #{file}: #{expected_error}") # Different versions of `plutil` might append the line/column as well, but not all.
       end
     end
 
