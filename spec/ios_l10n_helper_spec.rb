@@ -160,4 +160,83 @@ describe Fastlane::Helper::Ios::L10nHelper do
       end
     end
   end
+
+  describe '#download_glotpress_export_file' do
+    let(:gp_fake_url) { 'https://stub.glotpress.com/rspec-fake-project' }
+
+    describe 'request query parameters' do
+      it 'passes the expected params when no filters are provided' do
+        # Arrange
+        stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations").with(query: { format: 'strings' }).to_return(body: 'content')
+        dest = StringIO.new
+        # Act
+        described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: nil, destination: dest)
+        # Assert
+        expect(stub).to have_been_made.once
+        expect(dest.string).to eq('content')
+      end
+
+      it 'passes the expected params when a list of filters is provided' do
+        # Arrange
+        stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations")
+               .with(query: { format: 'strings', 'filters[status]': 'current', 'filters[term]': 'foobar' }).to_return(body: 'content')
+        dest = StringIO.new
+        # Act
+        described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: { status: 'current', term: 'foobar' }, destination: dest)
+        # Assert
+        expect(stub).to have_been_made.once
+        expect(dest.string).to eq('content')
+      end
+    end
+
+    describe 'destination parameter' do
+      # it 'accepts an IO (File)' # Not really needed, as all previous tests already cover this by using a `StringIO`
+
+      it 'accepts a String (path)' do
+        Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
+          # Arrange
+          # Note: in practice it seems that GlotPress's `.strings` exports are using UTF-8 (but served as `application/octet-stream`)
+          #       but it does not hurt to ensure the download to a file can work with UTF-16 (and copy the binary stream verbatim)
+          body = File.read(fixture('Localizable-utf16.strings'))
+          stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations").with(query: { format: 'strings' }).to_return(body: body)
+          dest = File.join(tmp_dir, 'export.strings')
+          # Act
+          described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: nil, destination: dest)
+          # Assert
+          expect(stub).to have_been_made.once
+          expect(File).to exist(dest)
+          expect(File.read(dest)).to eq(body)
+        end
+      end
+    end
+
+    describe 'invalid parameters' do
+      it 'prints an `UI.error` if passed a non-existing locale (or any other 404)' do
+        # Arrange
+        stub = stub_request(:get, "#{gp_fake_url}/invalid/default/export-translations").with(query: { format: 'strings' }).to_return(status: [404, 'Not Found'])
+        error_messages = []
+        allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+        dest = StringIO.new
+        # Act
+        described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'invalid', filters: nil, destination: dest)
+        # Assert
+        expect(stub).to have_been_made.once
+        expect(error_messages).to eq(['Error downloading locale `invalid` — 404 Not Found'])
+      end
+
+      it 'prints an `UI.error` if the destination cannot be written to' do
+        # Arrange
+        stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations").with(query: { format: 'strings' }).to_return(body: 'content')
+        error_messages = []
+        allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+        dest = '/these/are/not/the/droids/you/are/looking/for.strings'
+        # Act
+        described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: nil, destination: dest)
+        # Assert
+        expect(stub).to have_been_made.once
+        expect(File).not_to exist(dest)
+        expect(error_messages).to eq(["Error downloading locale `fr` — No such file or directory @ rb_sysopen - #{dest}"])
+      end
+    end
+  end
 end

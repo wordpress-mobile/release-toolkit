@@ -11,6 +11,7 @@
 ### New Features
 
 * Introduce new `ios_merge_strings_files` action. [#329]
+* Introduce new `ios_download_strings_files_from_glotpress` action. [#331]
 
 ### Bug Fixes
 
