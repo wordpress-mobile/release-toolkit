@@ -43,7 +43,7 @@ def android_xml_with_content(content)
   #
   # The desired indentation is 4 spaces to stay aligned with the production
   # code applies when merging the XMLs.
-  indented_content = content.chomp.lines.map { |l| "    #{default_indentation}#{l}" }.join
+  indented_content = content.chomp.lines.map { |l| "    #{l}" }.join
 
   return <<~XML
     <?xml version="1.0" encoding="UTF-8"?>
