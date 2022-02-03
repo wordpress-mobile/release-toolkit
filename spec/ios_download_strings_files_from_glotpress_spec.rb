@@ -18,6 +18,9 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
         stub_zh = gp_stub(locale: 'zh-cn', query: expected_gp_params).to_return(body: '"key" = "zh-copy";')
 
         # Act
+        # Note: The use of `.compact` here allows us to remove the keys (like `table_basename` and `filters`) from the `Hash` whose values are `nil`,
+        # so that we don't include those parameters at all in the action's call site -- making them use the default value from their respective
+        # `ConfigItem` (as opposed to passing a value of `nil` explicitly and overwrite the default value, which is not what we want to test).
         run_described_fastlane_action({
           project_url: gp_fake_url,
           locales: locales_subset,
@@ -96,6 +99,7 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
       end
 
       # Assert
+      # Note: FastlaneError is the exception raised by UI.user_error!
       expect { act.call }.to raise_error(FastlaneCore::Interface::FastlaneError, "The parent directory `#{download_dir}` (which contains all the `*.lproj` subdirectories) must already exist")
     end
 
