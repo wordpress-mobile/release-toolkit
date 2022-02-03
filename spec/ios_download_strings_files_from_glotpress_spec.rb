@@ -77,8 +77,7 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
 
         # Assert
         expect(stub).to have_been_made.once
-        file = File.join(tmp_dir, 'Base.lproj', 'Localizable.strings')
-        expect(File).not_to exist(file)
+        expect(File).not_to exist(File.join(tmp_dir, 'Base.lproj', 'Localizable.strings'))
         expect(error_messages).to eq(['Error downloading locale `unknown-locale` — 404 Not Found'])
       end
     end
