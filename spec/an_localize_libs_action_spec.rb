@@ -37,17 +37,13 @@ describe Fastlane::Actions::AnLocalizeLibsAction do
 end
 
 def android_xml_with_content(content)
-  # Under the hood, the code hardcodes the generated XML indentation as 4
-  # spaces. Let's "force" it to be the same in here for consistency.
-  #
-  # See
-  # https://github.com/wordpress-mobile/release-toolkit/blob/da405f2c5ca90d696857ba2ad01da2753daa60dc/lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb#L67
-  default_indentation = ' ' * 4
-
   # I couldn't find a way to interpolate a multiline string preserving its
   # indentation in the heredoc below, so I hacked the following transformation
   # of the input that adds the desired indentation to all lines.
-  indented_content = content.chomp.lines.map { |l| "#{default_indentation}#{l}" }.join
+  #
+  # The desired indentation is 4 spaces to stay aligned with the production
+  # code applies when merging the XMLs.
+  indented_content = content.chomp.lines.map { |l| "    #{default_indentation}#{l}" }.join
 
   return <<~XML
     <?xml version="1.0" encoding="UTF-8"?>
