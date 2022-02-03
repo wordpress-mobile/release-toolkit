@@ -120,15 +120,10 @@ module Fastlane
 
         # Downloads the export from GlotPress for a given locale and given filters.
         #
-        # Also post-process the downloaded content to comment out any potential line with an empty (`""`) translation,
-        # to ensure those would fall back to the English/Base locale at runtime instead. These case should theoretically
-        # never happen as GlotPress should not include empty translations in its exports, but we've seen issues in the
-        # past, so better safe than sorry.
-        #
         # @param [String] project_url The URL to the GlotPress project to export from, e.g. `"https://translate.wordpress.org/projects/apps/ios/dev"`
         # @param [String] locale The GlotPress locale code to download strings for.
         # @param [Hash{Symbol=>String}] filters The hash of filters to apply when exporting from GlotPress.
-        #                               Typical examples include `{ status: 'current' }` (the default) or `{ status: 'review' }`.
+        #                               Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
         # @param [String, IO] destination The path or `IO`-like instance, where to write the downloaded file on disk.
         #
         def self.download_glotpress_export_file(project_url:, locale:, filters:, destination:)
