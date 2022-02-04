@@ -26,13 +26,10 @@ describe Fastlane::Actions::AnLocalizeLibsAction do
         ]
       )
 
-      # Notice the extra indentation in the library strings. The action doesn't
-      # modify the app's strings content indentation, but it applies its own
-      # standard to the values read from the given library strings
       expected = <<~XML
         <string name="a_string">test from app</string>
-          <string name="a_lib1_string">test from lib 1</string>
-          <string name="a_lib2_string">test from lib 2</string>
+        <string name="a_lib1_string">test from lib 1</string>
+        <string name="a_lib2_string">test from lib 2</string>
       XML
       expect(File.read(app_strings_path)).to eq(android_xml_with_content(expected))
     end
@@ -43,7 +40,10 @@ def android_xml_with_content(content)
   # I couldn't find a way to interpolate a multiline string preserving its
   # indentation in the heredoc below, so I hacked the following transformation
   # of the input that adds the desired indentation to all lines.
-  indented_content = content.chomp.lines.map { |l| "  #{l}" }.join
+  #
+  # The desired indentation is 4 spaces to stay aligned with the production
+  # code applies when merging the XMLs.
+  indented_content = content.chomp.lines.map { |l| "    #{l}" }.join
 
   return <<~XML
     <?xml version="1.0" encoding="UTF-8"?>

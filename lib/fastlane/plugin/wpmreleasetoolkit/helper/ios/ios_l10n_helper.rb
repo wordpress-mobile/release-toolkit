@@ -1,8 +1,9 @@
-require 'open3'
-require 'tempfile'
 require 'fileutils'
-require 'nokogiri'
 require 'json'
+require 'nokogiri'
+require 'open3'
+require 'open-uri'
+require 'tempfile'
 
 module Fastlane
   module Helper
@@ -115,6 +116,25 @@ module Fastlane
             end
           end
           File.write(output_path, builder.to_xml)
+        end
+
+        # Downloads the export from GlotPress for a given locale and given filters.
+        #
+        # @param [String] project_url The URL to the GlotPress project to export from, e.g. `"https://translate.wordpress.org/projects/apps/ios/dev"`
+        # @param [String] locale The GlotPress locale code to download strings for.
+        # @param [Hash{Symbol=>String}] filters The hash of filters to apply when exporting from GlotPress.
+        #                               Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
+        # @param [String, IO] destination The path or `IO`-like instance, where to write the downloaded file on disk.
+        #
+        def self.download_glotpress_export_file(project_url:, locale:, filters:, destination:)
+          query_params = (filters || {}).transform_keys { |k| "filters[#{k}]" }.merge(format: 'strings')
+          uri = URI.parse("#{project_url.chomp('/')}/#{locale}/default/export-translations?#{URI.encode_www_form(query_params)}")
+          begin
+            IO.copy_stream(uri.open, destination)
+          rescue StandardError => e
+            UI.error "Error downloading locale `#{locale}` — #{e.message}"
+            return nil
+          end
         end
       end
     end
