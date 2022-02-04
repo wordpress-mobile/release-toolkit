@@ -6,6 +6,24 @@
 
 ### Breaking Changes
 
+_None_
+
+### New Features
+
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 3.0.0
+
+### Breaking Changes
+
 * Removes the `drawText` binary from the gem (instead depending on it being installed via `brew`). Because this update can not be safely applied with no side effects, it's considered a breaking change.
 
 ### New Features
@@ -13,10 +31,6 @@
 * Introduce new `ios_merge_strings_files` action. [#329]
 * Introduce new `buildkite_trigger_build` action. [#333]
 * Introduce new `ios_download_strings_files_from_glotpress` action. [#331]
-
-### Bug Fixes
-
-_None_
 
 ### Internal Changes
 
