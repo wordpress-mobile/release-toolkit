@@ -1,0 +1,90 @@
+module Fastlane
+  module Actions
+    class BuildkiteTriggerBuildAction < Action
+      def self.run(params)
+        require 'buildkit'
+
+        UI.message "Triggering build on branch #{params[:branch]}, commit #{params[:commit]}, using pipeline from #{params[:pipeline_file]}"
+
+        pipeline_name = {
+          PIPELINE: params[:pipeline_file]
+        }
+
+        client = Buildkit.new(token: params[:buildkite_token])
+        response = client.create_build(
+          params[:buildkite_organization],
+          params[:buildkite_pipeline],
+          {
+            branch: params[:branch],
+            commit: params[:commit],
+            env: params[:environment].merge(pipeline_name)
+          }
+        )
+
+        response.state == 'scheduled' ? UI.message('Done!') : UI.crash!("Failed to start job\nError: [#{response}]")
+      end
+
+      #####################################################
+      # @!group Documentation
+      #####################################################
+
+      def self.description
+        'Triggers a job on Buildkite'
+      end
+
+      def self.available_options
+        [
+          FastlaneCore::ConfigItem.new(
+            key: :buildkite_token,
+            env_name: 'BUILDKITE_TOKEN',
+            description: 'Buildkite Personal Access Token',
+            type: String,
+            sensitive: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :buildkite_organization,
+            env_name: 'BUILDKITE_ORGANIZTION',
+            description: 'The Buildkite organization that contains your pipeline',
+            type: String
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :buildkite_pipeline,
+            env_name: 'BUILDKITE_PIPELINE',
+            description: %(The Buildkite pipeline you'd like to build),
+            type: String
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :branch,
+            description: 'The branch you want to build',
+            type: String
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :commit,
+            description: 'The commit hash you want to build',
+            type: String,
+            default_value: 'HEAD'
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :pipeline_file,
+            description: 'The name of the pipeline file in the project',
+            type: String
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :environment,
+            description: 'Any additional environment variables to provide to the job',
+            type: Hash,
+            default_value: {}
+          ),
+        ]
+      end
+
+      def self.authors
+        ['Automattic']
+      end
+
+      def self.is_supported?(platform)
+        true
+      end
+    end
+  end
+end
