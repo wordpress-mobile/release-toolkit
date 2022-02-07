@@ -25,6 +25,7 @@ _None_
 ### Breaking Changes
 
 * Removes the `drawText` binary from the gem (instead depending on it being installed via `brew`). Because this update can not be safely applied with no side effects, it's considered a breaking change. [#312]
+* When doing Git operations, if no branch is provided, we'll use `trunk` as a default instead of `develop` [#335]
 
 ### New Features
 
