@@ -69,19 +69,17 @@ describe Fastlane::Configuration::FileReference do
 
     describe '#source_contents' do
       it 'gets the contents from the secrets repo' do
-        set_circle_env(false) do
-          allow(File).to receive(:read).with(subject.secrets_repository_file_path).and_return('source contents')
-          expect(subject.source_contents).to eq('source contents')
-        end
+        allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(false)
+        allow(File).to receive(:read).with(subject.secrets_repository_file_path).and_return('source contents')
+        expect(subject.source_contents).to eq('source contents')
       end
     end
 
     describe '#source_contents on ci' do
       it 'gets the contents from the secrets repo' do
-        set_circle_env(true) do
-          allow(File).to receive(:read).with(subject.secrets_repository_file_path).and_return('source contents')
-          expect(subject.source_contents).to eq(nil)
-        end
+        allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(true)
+        allow(File).to receive(:read).with(subject.secrets_repository_file_path).and_return('source contents')
+        expect(subject.source_contents).to eq(nil)
       end
     end
 
