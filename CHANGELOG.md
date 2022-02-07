@@ -26,6 +26,7 @@ _None_
 
 * Removes the `drawText` binary from the gem (instead depending on it being installed via `brew`). Because this update can not be safely applied with no side effects, it's considered a breaking change. [#312]
 * When doing Git operations, if no branch is provided, we'll use `trunk` as a default instead of `develop` [#335]
+* Remove deprecated `android_merge_translators_strings`, `android_update_metadata`, and `ios_merge_translators_strings` actions [#337]
 
 ### New Features
 
