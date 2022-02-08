@@ -28,23 +28,6 @@ module Fastlane
           Fastlane::Helper::GitHelper.commit(message: 'Bump version number', files: files_list, push: true)
         end
 
-        # Calls the `Scripts/localize.py` script in the project root folder and push the `*.strings` files
-        #
-        # That script updates the `.strings` files with translations from GlotPress.
-        #
-        # @env PROJECT_ROOT_FOLDER The path to the git root of the project
-        # @env PROJECT_NAME The name of the directory containing the project code (especially containing the `build.gradle` file)
-        #
-        # @deprecated This method is only used by the `ios_localize_project` action, which is itself deprecated
-        #             in favor of the new `ios_generate_strings_file_from_code` action
-        # @todo [Next Major] Remove this method once we fully remove `ios_localize_project`
-        #
-        def self.localize_project
-          Action.sh("cd #{get_from_env!(key: 'PROJECT_ROOT_FOLDER')} && ./Scripts/localize.py")
-
-          Fastlane::Helper::GitHelper.commit(message: 'Update strings for localization', files: strings_files, push: true) || UI.message('No new strings, skipping commit')
-        end
-
         # Call the `Scripts/update-translations.rb` then the `fastlane/download_metadata` Scripts from the host project folder
         #
         # @env PROJECT_ROOT_FOLDER The path to the git root of the project
