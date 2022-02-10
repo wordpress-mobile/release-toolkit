@@ -36,7 +36,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Generate the .strings files from your Objective-C and Swift code'
+        'Generate the `.strings` files from your Objective-C and Swift code'
       end
 
       def self.details
