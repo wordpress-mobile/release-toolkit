@@ -20,9 +20,11 @@ module Fastlane
             extracted_translations = translations.slice(*keys_to_extract)
             FileUtils.mkdir_p(File.dirname(target_strings_file)) # Ensure path up to parent dir exists, create it if not.
             Fastlane::Helper::Ios::L10nHelper.generate_strings_file_from_hash(translations: extracted_translations, output_path: target_strings_file)
+          rescue StandardError => e
+            UI.error("Error while writing extracted translations to `#{target_strings_file}`: #{e.message}")
           end
         rescue StandardError => e
-          UI.error("Error while extracting keys from #{source_strings_file}: #{e.message}")
+          UI.error("Error while extracting translations from source file `#{source_strings_file}`: #{e.message}")
         end
       end
 
