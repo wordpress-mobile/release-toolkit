@@ -1,0 +1,17 @@
+"key1" = "value1";
+"key2" = "value2";
+"key3" = "value3";
+
+/* MARK: - InfoPlist.strings */
+
+"NSLocationUsageDescription" = "WordPress would like to add your location to posts on sites where you have enabled geotagging.";
+"NSCameraUsageDescription" = "To take photos or videos to use in your posts.";
+
+/* MARK: - Sites.strings */
+
+"BOl9KQ" = "There are ${count} options matching ‘${site}’.";
+"ILcGmf" = "Site";
+"cyajMn" = "Site";
+"gpCwrM" = "Select Site";
+"s4dJhx" = "Just to confirm, you wanted ‘${site}’?";
+

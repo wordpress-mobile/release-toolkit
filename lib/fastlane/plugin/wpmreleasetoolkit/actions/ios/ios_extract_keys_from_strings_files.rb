@@ -2,35 +2,62 @@ module Fastlane
   module Actions
     class IosExtractKeysFromStringsFilesAction < Action
       def self.run(params)
-        lprojs_parent_dir = params[:lprojs_parent_dir]
+        source_parent_dir = params[:source_parent_dir]
         source_strings_filename = "#{params[:source_tablename]}.strings"
-        target_strings_filename = "#{params[:target_tablename]}.strings"
-        base_lproj_dir = "#{params[:base_locale]}.lproj"
+        target_original_files = params[:target_original_files]
 
-        # The file containing the originals (e.g. English copy) of the keys we want to extract -- e.g. `en-US.lproj/InfoPlist.strings`
-        target_table_originals = File.join(lprojs_parent_dir, base_lproj_dir, target_strings_filename)
-        begin
-          keys_to_extract = Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: target_table_originals).keys
-        rescue StandardError => e
-          UI.user_error!("Failed to read the keys to extract from originals file `#{target_table_originals}`: #{e.message}")
-        end
+        keys_to_extract_per_target_file = keys_list_per_target_file(target_original_files)
 
-        # For each locale, extract the `keys_to_extract` translations from `source_strings_filename` into `target_strings_filename`
-        Dir.chdir(lprojs_parent_dir) do
-          Dir.glob('*.lproj').each do |lproj_dir|
-            next if lproj_dir == base_lproj_dir
-
-            source_strings_file = File.join(lproj_dir, source_strings_filename)
-            target_strings_file = File.join(lproj_dir, target_strings_filename)
-            UI.message("Extracting #{keys_to_extract.count} keys into #{target_strings_file}...")
-
+        # For each locale, extract the right translations from `source_strings_filename` into each target `.strings` file
+        Dir.chdir(source_parent_dir) do
+          Dir.glob('*.lproj').each do |lproj_dir_name|
+            source_strings_file = File.join(lproj_dir_name, source_strings_filename)
             translations = Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: source_strings_file)
-            translations.slice!(*keys_to_extract) # only keep the keys/translations we want to extract
-            Fastlane::Helper::Ios::L10nHelper.generate_strings_file_from_hash(translations: translations, output_path: target_strings_file)
+
+            target_original_files.each do |target_original_file|
+              keys_to_extract = keys_to_extract_per_target_file[target_original_file]
+              target_strings_file = change_lproj_dir(target_original_file, to: lproj_dir_name)
+
+              UI.message("Extracting #{keys_to_extract.count} keys into #{target_strings_file}...")
+
+              extracted_translations = translations.slice(*keys_to_extract)
+              FileUtils.mkdir_p(File.dirname(target_strings_file)) # Ensure path up to parent dir exists, create it if not.
+              Fastlane::Helper::Ios::L10nHelper.generate_strings_file_from_hash(translations: extracted_translations, output_path: target_strings_file)
+            end
           rescue StandardError => e
-            UI.error("Error while extracting keys from #{source_strings_file} into #{target_strings_file}: #{e.message}")
+            UI.error("Error while extracting keys from #{source_strings_file}: #{e.message}")
           end
         end
+      end
+
+      # Return the same path but to a different `*.lproj`.
+      #
+      # @param [String] path The input path to operate on. Expected to be ending in `[…]/*.lproj/*.strings`
+      # @param [String] to the name of the new `*.lproj` folder to point to
+      # @return [String] The same path as `path` but with the `/*.lproj/` part changed to the new lproj/locale
+      #
+      def self.change_lproj_dir(path, to:)
+        original_lproj = File.dirname(path)
+        UI.user_error! "Expected #{path} to end in a `*.lproj/*`." unless File.extname(original_lproj) == '.lproj'
+
+        new_lproj_name = File.extname(to).empty? ? "#{to}.lproj" : to
+        UI.user_error! "Expected #{to} to have an `.lproj` extension, but found #{File.extname(to)} instead." unless File.extname(new_lproj_name) == '.lproj'
+
+        File.join(File.dirname(original_lproj), new_lproj_name, File.basename(path))
+      end
+
+      # Pre-load the list of keys to extract for each target file.
+      #
+      # @param [Array<String>] original_files array of paths to the originals of target files
+      # @return [Hash<String, Array<String>>] The hash listing the keys to extract for each target file
+      #
+      def self.keys_list_per_target_file(original_files)
+        original_files.map do |original_file|
+          keys = Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: original_file).keys
+          [original_file, keys]
+        end.to_h
+      rescue StandardError => e
+        UI.user_error!("Failed to read the keys to extract from originals file: #{e.message}")
       end
 
       #####################################################
@@ -57,30 +84,36 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :lprojs_parent_dir,
-                                       env_name: 'FL_IOS_EXTRACT_KEYS_FROM_STRINGS_FILES_LPROJS_PARENT_DIR',
+          FastlaneCore::ConfigItem.new(key: :source_parent_dir,
+                                       env_name: 'FL_IOS_EXTRACT_KEYS_FROM_STRINGS_FILES_SOURCE_PARENT_DIR',
                                        description: 'The parent directory containing all the `*.lproj` subdirectories in which the `.strings` files reside',
-                                       type: String),
+                                       type: String,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("`source_parent_dir` should be a path to an existing directory, but found #{value}.") unless File.directory?(value)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :source_tablename,
                                        env_name: 'FL_IOS_EXTRACT_KEYS_FROM_STRINGS_FILES_SOURCE_TABLENAME',
                                        description: 'The basename of the `.strings` file (without the extension) to extract the keys and translations from',
                                        type: String,
                                        default_value: 'Localizable'),
-          FastlaneCore::ConfigItem.new(key: :target_tablename,
-                                       env_name: 'FL_IOS_EXTRACT_KEYS_FROM_STRINGS_FILES_TARGET_TABLENAME',
-                                       description: 'The basename of the `.strings` file (without the extension) to extract the translations subset to',
-                                       type: String),
-          FastlaneCore::ConfigItem.new(key: :base_locale,
-                                       env_name: 'FL_IOS_EXTRACT_KEYS_FROM_STRINGS_FILES_BASE_LOCALE',
-                                       description: 'The basename of the `.lproj` directory which acts as reference/originals (e.g. `en-US` or `Base`). Used to determine which entries to extract, by looking at the keys present in `<base_locale>.lproj/<<target_tablename>.strings`',
-                                       type: String),
+          FastlaneCore::ConfigItem.new(key: :target_original_files,
+                                       env_name: 'FL_IOS_EXTRACT_KEYS_FROM_STRINGS_FILES_TARGET_ORIGINAL_FILES',
+                                       description: 'The path to the `<base-locale>.lproj/<target-tablename>.strings` file(s) for which we want to extract the keys to. ' \
+                                        + 'Those files containing the originals (typical `en` or `Base` locale) will be used to determine which keys to extract from the `source_tablename`, ' \
+                                        + 'and into each target file in each of the other `*.lproj` sibling folders',
+                                       type: Array,
+                                       verify_block: proc do |values|
+                                         values.each do |v|
+                                           UI.user_error!("Path `#{v}` (found in `target_original_files`) must point to an existing `.strings` file") unless File.exist?(v) && File.extname(v) == '.strings'
+                                         end
+                                       end),
         ]
       end
 
       def self.return_type
         # Describes what type of data is expected to be returned
         # see RETURN_TYPES in https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/action.rb
-        :array_of_strings
+        nil
       end
 
       def self.return_value
