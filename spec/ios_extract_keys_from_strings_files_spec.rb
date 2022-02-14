@@ -21,7 +21,6 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         # Act
         run_described_fastlane_action(
           source_parent_dir: lproj_source_dir,
-          source_tablename: 'Localizable',
           target_original_files: File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
         )
 
@@ -44,7 +43,6 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         # Act
         run_described_fastlane_action(
           source_parent_dir: resources_dir,
-          source_tablename: 'Localizable',
           target_original_files: [
             File.join(resources_dir, 'en.lproj', 'InfoPlist.strings'),
             File.join(siri_intent_dir, 'en.lproj', 'Sites.strings'),
@@ -57,6 +55,31 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
           File.join(siri_intent_dir, 'fr.lproj', 'Sites.strings') => 'Sites-expected-fr.strings',
           File.join(resources_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-zh-Hans.strings',
           File.join(siri_intent_dir, 'zh-Hans.lproj', 'Sites.strings') => 'Sites-expected-zh-Hans.strings'
+        )
+      end
+    end
+
+    it 'supports using an input file other than `Localizable.strings`' do
+      in_tmp_dir do |tmp_dir|
+        # Arrange
+        lproj_source_dir = File.join(tmp_dir, 'NonStandardFiles')
+        FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), lproj_source_dir)
+        Dir.glob('**/Localizable.strings', base: lproj_source_dir).each do |file|
+          src_file = File.join(lproj_source_dir, file)
+          FileUtils.mv(src_file, File.join(File.dirname(src_file), 'GlotPressTranslations.strings'))
+        end
+
+        # Act
+        run_described_fastlane_action(
+          source_parent_dir: lproj_source_dir,
+          source_tablename: 'GlotPressTranslations',
+          target_original_files: File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
+        )
+
+        # Assert
+        assert_output_files_match(
+          File.join(lproj_source_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-fr.strings',
+          File.join(lproj_source_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-zh-Hans.strings'
         )
       end
     end
