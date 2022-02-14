@@ -12,9 +12,10 @@ module Fastlane
           translations = Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: source_strings_file)
 
           target_original_files.each do |target_original_file|
-            keys_to_extract = keys_to_extract_per_target_file[target_original_file]
             target_strings_file = change_lproj_dir(target_original_file, to: lproj_dir_name)
+            next if target_strings_file == target_original_file # do not generate/overwrite the original locale itself
 
+            keys_to_extract = keys_to_extract_per_target_file[target_original_file]
             UI.message("Extracting #{keys_to_extract.count} keys into #{target_strings_file}...")
 
             extracted_translations = translations.slice(*keys_to_extract)

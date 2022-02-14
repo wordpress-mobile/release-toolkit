@@ -84,7 +84,24 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
       end
     end
 
-    it 'does not overwrite the original files'
+    it 'does not overwrite the original files' do
+      in_tmp_dir do |tmp_dir|
+        # Arrange
+        lproj_source_dir = File.join(tmp_dir, 'Resources')
+        FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), lproj_source_dir)
+
+        # Act
+        run_described_fastlane_action(
+          source_parent_dir: lproj_source_dir,
+          target_original_files: File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
+        )
+
+        # Assert
+        assert_output_files_match(
+          File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings') => File.join('Resources', 'en.lproj', 'InfoPlist.strings')
+        )
+      end
+    end
   end
 
   describe 'input parameters validation' do
