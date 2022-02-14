@@ -13,9 +13,9 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
     end
 
     it 'can extract keys to a single `InfoPlist.strings` target table' do
-      Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
+      in_tmp_dir do |tmp_dir|
         # Arrange
-        lproj_source_dir = File.join(tmp_dir, 'Localization')
+        lproj_source_dir = File.join(tmp_dir, 'LocalizationFiles')
         FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), lproj_source_dir)
 
         # Act
@@ -34,7 +34,7 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
     end
 
     it 'can extract keys to multiple `.strings` files' do
-      Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
+      in_tmp_dir do |tmp_dir|
         # Arrange
         resources_dir = File.join(tmp_dir, 'Resources')
         siri_intent_dir = File.join(tmp_dir, 'SiriIntentTarget')
