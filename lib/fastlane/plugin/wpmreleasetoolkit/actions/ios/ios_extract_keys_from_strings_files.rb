@@ -3,30 +3,26 @@ module Fastlane
     class IosExtractKeysFromStringsFilesAction < Action
       def self.run(params)
         source_parent_dir = params[:source_parent_dir]
-        source_strings_filename = "#{params[:source_tablename]}.strings"
         target_original_files = params[:target_original_files]
-
         keys_to_extract_per_target_file = keys_list_per_target_file(target_original_files)
 
-        # For each locale, extract the right translations from `source_strings_filename` into each target `.strings` file
-        Dir.chdir(source_parent_dir) do
-          Dir.glob('*.lproj').each do |lproj_dir_name|
-            source_strings_file = File.join(lproj_dir_name, source_strings_filename)
-            translations = Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: source_strings_file)
+        # For each locale, extract the right translations from `<source_tablename>.strings` into each target `.strings` file
+        Dir.glob('*.lproj', base: source_parent_dir).each do |lproj_dir_name|
+          source_strings_file = File.join(source_parent_dir, lproj_dir_name, "#{params[:source_tablename]}.strings")
+          translations = Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: source_strings_file)
 
-            target_original_files.each do |target_original_file|
-              keys_to_extract = keys_to_extract_per_target_file[target_original_file]
-              target_strings_file = change_lproj_dir(target_original_file, to: lproj_dir_name)
+          target_original_files.each do |target_original_file|
+            keys_to_extract = keys_to_extract_per_target_file[target_original_file]
+            target_strings_file = change_lproj_dir(target_original_file, to: lproj_dir_name)
 
-              UI.message("Extracting #{keys_to_extract.count} keys into #{target_strings_file}...")
+            UI.message("Extracting #{keys_to_extract.count} keys into #{target_strings_file}...")
 
-              extracted_translations = translations.slice(*keys_to_extract)
-              FileUtils.mkdir_p(File.dirname(target_strings_file)) # Ensure path up to parent dir exists, create it if not.
-              Fastlane::Helper::Ios::L10nHelper.generate_strings_file_from_hash(translations: extracted_translations, output_path: target_strings_file)
-            end
-          rescue StandardError => e
-            UI.error("Error while extracting keys from #{source_strings_file}: #{e.message}")
+            extracted_translations = translations.slice(*keys_to_extract)
+            FileUtils.mkdir_p(File.dirname(target_strings_file)) # Ensure path up to parent dir exists, create it if not.
+            Fastlane::Helper::Ios::L10nHelper.generate_strings_file_from_hash(translations: extracted_translations, output_path: target_strings_file)
           end
+        rescue StandardError => e
+          UI.error("Error while extracting keys from #{source_strings_file}: #{e.message}")
         end
       end
 
