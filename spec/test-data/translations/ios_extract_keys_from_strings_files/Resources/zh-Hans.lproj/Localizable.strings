@@ -1,3 +1,5 @@
+/* This file is typically downloaded from GlotPress by exporting the `fr-FR` translations */
+
 "key1" = "value1-Hans";
 "key2" = "value2-Hans";
 "key3" = "value3-Hans";

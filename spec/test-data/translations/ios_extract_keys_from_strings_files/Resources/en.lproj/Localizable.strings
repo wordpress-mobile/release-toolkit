@@ -1,3 +1,8 @@
+/* This file is supposed to be the file we send to GlotPress, typically after:
+    - generating the initial keys using `ios_generate_strings_file_from_code`
+    - merging the keys from other manually-maintained `.strings` files (`InfoPlist.strings` and `Sites.strings`) using `iso_merge_strings_files`
+*/
+
 "key1" = "value1";
 "key2" = "value2";
 "key3" = "value3";
