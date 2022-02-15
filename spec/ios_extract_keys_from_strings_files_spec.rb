@@ -105,8 +105,77 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
   end
 
   describe 'input parameters validation' do
-    it 'errors if the source dir does not exist'
-    it 'errors if one of the target original files does not exist'
+    it 'errors if the source dir does not exist' do
+      in_tmp_dir do |tmp_dir|
+        FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), tmp_dir)
+
+        expect {
+          run_described_fastlane_action(
+            source_parent_dir: '/this/is/not/the/dir/you/are/looking/for/',
+            target_original_files: File.join(tmp_dir, 'en.lproj', 'InfoPlist.strings')
+          )
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, '`source_parent_dir` should be a path to an existing directory, but found `/this/is/not/the/dir/you/are/looking/for/`.')
+      end
+    end
+
+    it 'errors if the source dir does not contain any `.lproj` subfolder' do
+      in_tmp_dir do |tmp_dir|
+        FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), tmp_dir)
+        src_dir = File.join(tmp_dir, 'EmptyDir')
+        FileUtils.mkdir_p(src_dir)
+
+        expect {
+          run_described_fastlane_action(
+            source_parent_dir: src_dir,
+            target_original_files: File.join(tmp_dir, 'en.lproj', 'InfoPlist.strings')
+          )
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, "`source_parent_dir` should contain at least one `.lproj` subdirectory, but `#{src_dir}` does not contain any.")
+      end
+    end
+
+    it 'errors if no target original files provided' do
+      in_tmp_dir do |tmp_dir|
+        FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), tmp_dir)
+
+        expect {
+          run_described_fastlane_action(
+            source_parent_dir: tmp_dir,
+            target_original_files: []
+          )
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, '`target_original_files` must contain at least one path to an original `.strings` file.')
+      end
+    end
+
+    it 'errors if one of the target original files does not exist' do
+      in_tmp_dir do |tmp_dir|
+        FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), tmp_dir)
+        non_existing_target_file = File.join(tmp_dir, 'does', 'not', 'exist')
+        expect {
+          run_described_fastlane_action(
+            source_parent_dir: tmp_dir,
+            target_original_files: [
+              File.join(tmp_dir, 'en.lproj', 'InfoPlist.strings'),
+              non_existing_target_file
+            ]
+          )
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, "Path `#{non_existing_target_file}` (found in `target_original_files`) does not exist.")
+      end
+    end
+
+    it 'errors if one of the target original files does not point to a path like `**/*.lproj/*.strings`' do
+      in_tmp_dir do |tmp_dir|
+        FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), tmp_dir)
+        misleading_target_file = File.join(tmp_dir, 'en.lproj', 'Info.plist')
+        FileUtils.cp(File.join(tmp_dir, 'en.lproj', 'InfoPlist.strings'), misleading_target_file)
+
+        expect {
+          run_described_fastlane_action(
+            source_parent_dir: tmp_dir,
+            target_original_files: misleading_target_file
+          )
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, "Expected `#{misleading_target_file}` (found in `target_original_files`) to be a path ending in a `*.lproj/*.strings`.")
+      end
+    end
   end
 
   describe 'error handling during processing' do
