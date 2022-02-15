@@ -36,13 +36,7 @@ module Fastlane
       # @return [String] The same path as `path` but with the `/*.lproj/` part changed to the new lproj/locale
       #
       def self.change_lproj_dir(path, to:)
-        original_lproj = File.dirname(path)
-        UI.user_error! "Expected #{path} to end in a `*.lproj/*`." unless File.extname(original_lproj) == '.lproj'
-
-        new_lproj_name = File.extname(to).empty? ? "#{to}.lproj" : to
-        UI.user_error! "Expected #{to} to have an `.lproj` extension, but found #{File.extname(to)} instead." unless File.extname(new_lproj_name) == '.lproj'
-
-        File.join(File.dirname(original_lproj), new_lproj_name, File.basename(path))
+        File.join(File.dirname(File.dirname(path)), to, File.basename(path))
       end
 
       # Pre-load the list of keys to extract for each target file.
@@ -88,7 +82,8 @@ module Fastlane
                                        description: 'The parent directory containing all the `*.lproj` subdirectories in which the `.strings` files reside',
                                        type: String,
                                        verify_block: proc do |value|
-                                         UI.user_error!("`source_parent_dir` should be a path to an existing directory, but found #{value}.") unless File.directory?(value)
+                                         UI.user_error!("`source_parent_dir` should be a path to an existing directory, but found `#{value}`.") unless File.directory?(value)
+                                         UI.user_error!("`source_parent_dir` should contain at least one `.lproj` subdirectory, but `#{value}` does not contain any.") if Dir.glob('*.lproj', base: value).empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :source_tablename,
                                        env_name: 'FL_IOS_EXTRACT_KEYS_FROM_STRINGS_FILES_SOURCE_TABLENAME',
@@ -102,8 +97,10 @@ module Fastlane
                                         + 'and into each target file in each of the other `*.lproj` sibling folders',
                                        type: Array,
                                        verify_block: proc do |values|
+                                         UI.user_error!('`target_original_files` must contain at least one path to an original `.strings` file.') if values.empty?
                                          values.each do |v|
-                                           UI.user_error!("Path `#{v}` (found in `target_original_files`) must point to an existing `.strings` file") unless File.exist?(v) && File.extname(v) == '.strings'
+                                           UI.user_error!("Path `#{v}` (found in `target_original_files`) does not exist.") unless File.exist?(v)
+                                           UI.user_error! "Expected `#{v}` (found in `target_original_files`) to be a path ending in a `*.lproj/*.strings`." unless File.extname(v) == '.strings' && File.extname(File.dirname(v)) == '.lproj'
                                          end
                                        end),
         ]
