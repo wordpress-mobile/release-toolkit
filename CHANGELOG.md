@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+* Introduce new `ios_extract_keys_from_strings_files` action. [#338]
 
 ### Bug Fixes
 
