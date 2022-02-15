@@ -179,7 +179,51 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
   end
 
   describe 'error handling during processing' do
-    it 'errors it if fails to read the keys to extract'
-    it 'errors it if fails to write one of the target files'
+    it 'errors if fails to read a source file' do
+      in_tmp_dir do |tmp_dir|
+        lproj_source_dir = File.join(tmp_dir, 'Resources')
+        FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), lproj_source_dir)
+        broken_file_path = File.join(lproj_source_dir, 'fr.lproj', 'Localizable.strings')
+        File.write(broken_file_path, 'Invalid strings file content')
+
+        expect {
+          run_described_fastlane_action(
+            source_parent_dir: lproj_source_dir,
+            target_original_files: File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
+          )
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, /^Error while reading the translations from source file `#{broken_file_path}`: #{broken_file_path}: Property List error/)
+      end
+    end
+
+    it 'errors if fails to read the keys to extract from a target originals file' do
+      in_tmp_dir do |tmp_dir|
+        lproj_source_dir = File.join(tmp_dir, 'Resources')
+        FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), lproj_source_dir)
+        broken_file_path = File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
+        File.write(broken_file_path, 'Invalid strings file content')
+
+        expect {
+          run_described_fastlane_action(
+            source_parent_dir: lproj_source_dir,
+            target_original_files: File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
+          )
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, /^Failed to read the keys to extract from originals file: #{broken_file_path}: Property List error/)
+      end
+    end
+
+    it 'errors it if fails to write one of the target files' do
+      in_tmp_dir do |tmp_dir|
+        lproj_source_dir = File.join(tmp_dir, 'Resources')
+        FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), lproj_source_dir)
+        allow(File).to receive(:write) { raise 'Stubbed IO error' }
+
+        expect {
+          run_described_fastlane_action(
+            source_parent_dir: lproj_source_dir,
+            target_original_files: File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
+          )
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, /Error while writing extracted translations to `#{File.join(lproj_source_dir, '.*\.lproj', 'InfoPlist\.strings')}`: Stubbed IO error/)
+      end
+    end
   end
 end
