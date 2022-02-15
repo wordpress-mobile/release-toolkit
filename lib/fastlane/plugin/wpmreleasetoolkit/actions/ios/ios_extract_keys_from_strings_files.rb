@@ -12,7 +12,7 @@ module Fastlane
           translations = Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: source_strings_file)
 
           target_original_files.each do |target_original_file|
-            target_strings_file = change_lproj_dir(target_original_file, to: lproj_dir_name)
+            target_strings_file = File.join(File.dirname(File.dirname(target_original_file)), lproj_dir_name, File.basename(target_original_file))
             next if target_strings_file == target_original_file # do not generate/overwrite the original locale itself
 
             keys_to_extract = keys_to_extract_per_target_file[target_original_file]
@@ -27,16 +27,6 @@ module Fastlane
         rescue StandardError => e
           UI.user_error!("Error while reading the translations from source file `#{source_strings_file}`: #{e.message}")
         end
-      end
-
-      # Return the same path but to a different `*.lproj`.
-      #
-      # @param [String] path The input path to operate on. Expected to be ending in `[…]/*.lproj/*.strings`
-      # @param [String] to the name of the new `*.lproj` folder to point to
-      # @return [String] The same path as `path` but with the `/*.lproj/` part changed to the new lproj/locale
-      #
-      def self.change_lproj_dir(path, to:)
-        File.join(File.dirname(File.dirname(path)), to, File.basename(path))
       end
 
       # Pre-load the list of keys to extract for each target file.
