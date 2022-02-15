@@ -109,12 +109,12 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
       in_tmp_dir do |tmp_dir|
         FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), tmp_dir)
 
-        expect {
+        expect do
           run_described_fastlane_action(
             source_parent_dir: '/this/is/not/the/dir/you/are/looking/for/',
             target_original_files: File.join(tmp_dir, 'en.lproj', 'InfoPlist.strings')
           )
-        }.to raise_error(FastlaneCore::Interface::FastlaneError, '`source_parent_dir` should be a path to an existing directory, but found `/this/is/not/the/dir/you/are/looking/for/`.')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, '`source_parent_dir` should be a path to an existing directory, but found `/this/is/not/the/dir/you/are/looking/for/`.')
       end
     end
 
@@ -124,12 +124,12 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         src_dir = File.join(tmp_dir, 'EmptyDir')
         FileUtils.mkdir_p(src_dir)
 
-        expect {
+        expect do
           run_described_fastlane_action(
             source_parent_dir: src_dir,
             target_original_files: File.join(tmp_dir, 'en.lproj', 'InfoPlist.strings')
           )
-        }.to raise_error(FastlaneCore::Interface::FastlaneError, "`source_parent_dir` should contain at least one `.lproj` subdirectory, but `#{src_dir}` does not contain any.")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "`source_parent_dir` should contain at least one `.lproj` subdirectory, but `#{src_dir}` does not contain any.")
       end
     end
 
@@ -137,12 +137,12 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
       in_tmp_dir do |tmp_dir|
         FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), tmp_dir)
 
-        expect {
+        expect do
           run_described_fastlane_action(
             source_parent_dir: tmp_dir,
             target_original_files: []
           )
-        }.to raise_error(FastlaneCore::Interface::FastlaneError, '`target_original_files` must contain at least one path to an original `.strings` file.')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, '`target_original_files` must contain at least one path to an original `.strings` file.')
       end
     end
 
@@ -150,15 +150,15 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
       in_tmp_dir do |tmp_dir|
         FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), tmp_dir)
         non_existing_target_file = File.join(tmp_dir, 'does', 'not', 'exist')
-        expect {
+        expect do
           run_described_fastlane_action(
             source_parent_dir: tmp_dir,
             target_original_files: [
               File.join(tmp_dir, 'en.lproj', 'InfoPlist.strings'),
-              non_existing_target_file
+              non_existing_target_file,
             ]
           )
-        }.to raise_error(FastlaneCore::Interface::FastlaneError, "Path `#{non_existing_target_file}` (found in `target_original_files`) does not exist.")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Path `#{non_existing_target_file}` (found in `target_original_files`) does not exist.")
       end
     end
 
@@ -168,12 +168,12 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         misleading_target_file = File.join(tmp_dir, 'en.lproj', 'Info.plist')
         FileUtils.cp(File.join(tmp_dir, 'en.lproj', 'InfoPlist.strings'), misleading_target_file)
 
-        expect {
+        expect do
           run_described_fastlane_action(
             source_parent_dir: tmp_dir,
             target_original_files: misleading_target_file
           )
-        }.to raise_error(FastlaneCore::Interface::FastlaneError, "Expected `#{misleading_target_file}` (found in `target_original_files`) to be a path ending in a `*.lproj/*.strings`.")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Expected `#{misleading_target_file}` (found in `target_original_files`) to be a path ending in a `*.lproj/*.strings`.")
       end
     end
   end
@@ -186,12 +186,12 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         broken_file_path = File.join(lproj_source_dir, 'fr.lproj', 'Localizable.strings')
         File.write(broken_file_path, 'Invalid strings file content')
 
-        expect {
+        expect do
           run_described_fastlane_action(
             source_parent_dir: lproj_source_dir,
             target_original_files: File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
           )
-        }.to raise_error(FastlaneCore::Interface::FastlaneError, /^Error while reading the translations from source file `#{broken_file_path}`: #{broken_file_path}: Property List error/)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /^Error while reading the translations from source file `#{broken_file_path}`: #{broken_file_path}: Property List error/)
       end
     end
 
@@ -202,12 +202,12 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         broken_file_path = File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
         File.write(broken_file_path, 'Invalid strings file content')
 
-        expect {
+        expect do
           run_described_fastlane_action(
             source_parent_dir: lproj_source_dir,
             target_original_files: File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
           )
-        }.to raise_error(FastlaneCore::Interface::FastlaneError, /^Failed to read the keys to extract from originals file: #{broken_file_path}: Property List error/)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /^Failed to read the keys to extract from originals file: #{broken_file_path}: Property List error/)
       end
     end
 
@@ -217,12 +217,12 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), lproj_source_dir)
         allow(File).to receive(:write) { raise 'Stubbed IO error' }
 
-        expect {
+        expect do
           run_described_fastlane_action(
             source_parent_dir: lproj_source_dir,
             target_original_files: File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
           )
-        }.to raise_error(FastlaneCore::Interface::FastlaneError, /Error while writing extracted translations to `#{File.join(lproj_source_dir, '.*\.lproj', 'InfoPlist\.strings')}`: Stubbed IO error/)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /Error while writing extracted translations to `#{File.join(lproj_source_dir, '.*\.lproj', 'InfoPlist\.strings')}`: Stubbed IO error/)
       end
     end
   end
