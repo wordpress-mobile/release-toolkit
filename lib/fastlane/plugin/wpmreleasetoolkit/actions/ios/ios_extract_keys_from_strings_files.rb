@@ -48,20 +48,20 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Extracts a subset of keys from a `.strings` file into a separate `.strings` file'
+        'Extracts a subset of keys from a `.strings` file into separate `.strings` file(s)'
       end
 
       def self.details
         <<~DETAILS
-          Extracts a subset of keys from a `.strings` file into a separate `.strings` file, for each `*.lproj` subdirectory.
+          Extracts a subset of keys from a `.strings` file into separate `.strings` file(s), for each `*.lproj` subdirectory.
 
-          This is especially useful to extract keys for `InfoPlist.strings` or `<SomeIntentDefinitionFile>.strings`
-          from the `Localizable.strings` file, for each locale.
+          This is especially useful to extract, for each locale, the translations for files like `InfoPlist.strings` or
+          `<SomeIntentDefinitionFile>.strings` from the `Localizable.strings` file that we exported/downloaded back from GlotPress.
 
-          Since we typically merge all `*.strings` original files (e.g. `en.lproj/Localizable.strings` + `en.lproj/InfoPlist.strings`)
-          via `ios_merge_strings_file` before sending the originals to translations, this is why we then need to extract
-          the relevant keys and translations back into `InfoPlist.strings` after we pull those translations back from GlotPress
-          (`ios_download_strings_files_from_glotpress`) using this `ios_extract_keys_from_strings_files` action.
+          Since we typically merge all `*.strings` original files (e.g. `en.lproj/Localizable.strings` + `en.lproj/InfoPlist.strings` + …)
+          via `ios_merge_strings_file` before sending the originals to translations, we then need to extract the relevant keys and
+          translations back into the `*.lproj/InfoPlist.strings` after we pull those translations back from GlotPress
+          (`ios_download_strings_files_from_glotpress`). This is what this `ios_extract_keys_from_strings_files` action is for.
         DETAILS
       end
 
@@ -69,7 +69,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :source_parent_dir,
                                        env_name: 'FL_IOS_EXTRACT_KEYS_FROM_STRINGS_FILES_SOURCE_PARENT_DIR',
-                                       description: 'The parent directory containing all the `*.lproj` subdirectories in which the `.strings` files reside',
+                                       description: 'The parent directory containing all the `*.lproj` subdirectories in which the source `.strings` files reside',
                                        type: String,
                                        verify_block: proc do |value|
                                          UI.user_error!("`source_parent_dir` should be a path to an existing directory, but found `#{value}`.") unless File.directory?(value)
@@ -77,14 +77,15 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :source_tablename,
                                        env_name: 'FL_IOS_EXTRACT_KEYS_FROM_STRINGS_FILES_SOURCE_TABLENAME',
-                                       description: 'The basename of the `.strings` file (without the extension) to extract the keys and translations from',
+                                       description: 'The basename of the `.strings` file (without the extension) to extract the keys and translations from for each locale',
                                        type: String,
                                        default_value: 'Localizable'),
           FastlaneCore::ConfigItem.new(key: :target_original_files,
                                        env_name: 'FL_IOS_EXTRACT_KEYS_FROM_STRINGS_FILES_TARGET_ORIGINAL_FILES',
                                        description: 'The path to the `<base-locale>.lproj/<target-tablename>.strings` file(s) for which we want to extract the keys to. ' \
-                                        + 'Those files containing the originals (typical `en` or `Base` locale) will be used to determine which keys to extract from the `source_tablename`, ' \
-                                        + 'and into each target file in each of the other `*.lproj` sibling folders',
+                                        + 'Those files, containing the originals (typical `en` or `Base` locale), will be used to determine which keys to extract from the `source_tablename`, ' \
+                                        + 'and the target file path(s) in which to extract the translations will be determined from those path, writing them in the file with the same basename ' \
+                                        +' in each of the other `*.lproj` sibling folders of those target paths',
                                        type: Array,
                                        verify_block: proc do |values|
                                          UI.user_error!('`target_original_files` must contain at least one path to an original `.strings` file.') if values.empty?
