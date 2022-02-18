@@ -7,8 +7,8 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
   describe 'extract the right keys from `Localizable.strings` to all locales' do
     def assert_output_files_match(expectations_map)
       expectations_map.each do |output_file, expected_file|
-        expect(File).to exist(output_file), "expect `#{output_file}` to exist"
-        expect(File.read(output_file)).to eq(File.read(File.join(test_data_dir, expected_file))), "expect content of `#{output_file}` to match `#{expected_file}`"
+        expect(File).to exist(output_file), "expected `#{output_file}` to exist"
+        expect(File.read(output_file)).to eq(File.read(File.join(test_data_dir, expected_file))), "expected content of `#{output_file}` to match `#{expected_file}`"
       end
     end
 
@@ -179,7 +179,7 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
   end
 
   describe 'error handling during processing' do
-    it 'errors if fails to read a source file' do
+    it 'errors when failing to read a source file' do
       in_tmp_dir do |tmp_dir|
         lproj_source_dir = File.join(tmp_dir, 'Resources')
         FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), lproj_source_dir)
