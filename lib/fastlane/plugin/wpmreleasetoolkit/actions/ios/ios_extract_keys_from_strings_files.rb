@@ -82,10 +82,9 @@ module Fastlane
                                        default_value: 'Localizable'),
           FastlaneCore::ConfigItem.new(key: :target_original_files,
                                        env_name: 'FL_IOS_EXTRACT_KEYS_FROM_STRINGS_FILES_TARGET_ORIGINAL_FILES',
-                                       description: 'The path to the `<base-locale>.lproj/<target-tablename>.strings` file(s) for which we want to extract the keys to. ' \
-                                        + 'Those files, containing the originals (typical `en` or `Base` locale), will be used to determine which keys to extract from the `source_tablename`, ' \
-                                        + 'and the target file path(s) in which to extract the translations will be determined from those path, writing them in the file with the same basename ' \
-                                        +' in each of the other `*.lproj` sibling folders of those target paths',
+                                       description: 'The path(s) to the `<base-locale>.lproj/<target-tablename>.strings` file(s) for which we want to extract the keys to. ' \
+                                        + 'Each of those files should containing the original strings (typically `en` or `Base` locale) and will be used to determine which keys to extract from the `source_tablename`. ' \
+                                        + 'For each of those, the path(s) in which the translations will be extracted will be the files with the same basename in each of the other `*.lproj` sibling folders',
                                        type: Array,
                                        verify_block: proc do |values|
                                          UI.user_error!('`target_original_files` must contain at least one path to an original `.strings` file.') if values.empty?
