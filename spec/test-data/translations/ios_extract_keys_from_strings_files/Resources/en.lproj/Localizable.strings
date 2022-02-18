@@ -1,0 +1,22 @@
+/* This file is supposed to be the file we send to GlotPress, typically after:
+    - generating the initial keys using `ios_generate_strings_file_from_code`
+    - merging the keys from other manually-maintained `.strings` files (`InfoPlist.strings` and `Sites.strings`) using `iso_merge_strings_files`
+*/
+
+"key1" = "value1";
+"key2" = "value2";
+"key3" = "value3";
+
+/* MARK: - InfoPlist.strings */
+
+"NSLocationUsageDescription" = "WordPress would like to add your location to posts on sites where you have enabled geotagging.";
+"NSCameraUsageDescription" = "To take photos or videos to use in your posts.";
+
+/* MARK: - Sites.strings */
+
+"BOl9KQ" = "There are ${count} options matching ‘${site}’.";
+"ILcGmf" = "Site";
+"cyajMn" = "Site";
+"gpCwrM" = "Select Site";
+"s4dJhx" = "Just to confirm, you wanted ‘${site}’?";
+

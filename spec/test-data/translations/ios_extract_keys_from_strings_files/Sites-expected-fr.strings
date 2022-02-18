@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--Warning: Auto-generated file, do not edit.-->
+<plist version="1.0">
+  <dict>
+    <key>BOl9KQ</key>
+    <string>Il y a ${count} options correspondant à ‘${site}’.</string>
+    <key>ILcGmf</key>
+    <string>Site</string>
+    <key>cyajMn</key>
+    <string>Site</string>
+    <key>gpCwrM</key>
+    <string>Sélectionner un Site</string>
+    <key>s4dJhx</key>
+    <string>Juste pour confirmer, vous souhaitez ‘${site}’ ?</string>
+  </dict>
+</plist>

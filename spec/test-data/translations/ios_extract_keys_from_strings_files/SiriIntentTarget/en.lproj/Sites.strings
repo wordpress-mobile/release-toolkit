@@ -1,0 +1,14 @@
+/*
+   This file (`en.lproj/Sites.strings`) contains the *originals* for the `Sites.intentdefinition`, and is supposed to
+   be manually-maintained by the developers when they need a new key translated for that `Sites.intentdefinition` file.
+ */
+
+"BOl9KQ" = "There are ${count} options matching ‘${site}’.";
+
+"ILcGmf" = "Site";
+
+"cyajMn" = "Site";
+
+"gpCwrM" = "Select Site";
+
+"s4dJhx" = "Just to confirm, you wanted ‘${site}’?";

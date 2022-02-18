@@ -1,0 +1,12 @@
+/* This file is typically downloaded from GlotPress by exporting the `fr-FR` translations */
+
+"key1" = "value1-Hans";
+"key2" = "value2-Hans";
+"key3" = "value3-Hans";
+"NSLocationUsageDescription" = "对于已启用地理标记的站点，WordPress 会向其中的文章内添加您的位置。";
+"NSCameraUsageDescription" = "拍摄要在文章内使用的照片或视频。";
+"BOl9KQ" =  "有 ${count} 个选项匹配“${site}”。";
+"ILcGmf" =  "网站";
+// "cyajMn" =  ""; // Imagine this one is missing its translation in GlotPress
+"gpCwrM" =  "选择一个网站";
+"s4dJhx" =  "只是为了确认一下，你想要'${site}'？";

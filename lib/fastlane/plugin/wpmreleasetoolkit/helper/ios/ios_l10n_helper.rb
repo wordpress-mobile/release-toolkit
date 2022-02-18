@@ -108,7 +108,7 @@ module Fastlane
             xml.comment('Warning: Auto-generated file, do not edit.')
             xml.plist(version: '1.0') do
               xml.dict do
-                translations.each do |k, v|
+                translations.sort.each do |k, v| # NOTE: use `sort` just in order to be deterministic over various runs
                   xml.key(k.to_s)
                   xml.string(v.to_s)
                 end
