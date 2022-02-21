@@ -4,7 +4,7 @@ require 'digest/sha1'
 module Fastlane
   module Actions
     module SharedValues
-      UPLOADED_FILE_PATH = :UPLOADED_FILE_PATH
+      S3_UPLOADED_FILE_PATH = :S3_UPLOADED_FILE_PATH
     end
 
     class UploadToS3Action < Action
@@ -37,7 +37,7 @@ module Fastlane
 
         UI.success('Upload Complete')
 
-        Actions.lane_context[SharedValues::UPLOADED_FILE_PATH] = key
+        Actions.lane_context[SharedValues::S3_UPLOADED_FILE_PATH] = key
 
         return key
       end
