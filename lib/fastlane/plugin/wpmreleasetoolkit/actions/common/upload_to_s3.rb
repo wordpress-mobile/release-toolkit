@@ -52,7 +52,7 @@ module Fastlane
           bucket: bucket,
           key: key
         )
-        return (response[:content_length]).positive?
+        return response[:content_length].positive?
       rescue Aws::S3::Errors::NotFound
         return false
       end
