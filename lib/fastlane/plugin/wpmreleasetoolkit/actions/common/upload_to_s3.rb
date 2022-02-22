@@ -70,7 +70,6 @@ module Fastlane
       end
 
       def self.details
-        # Optional:
         'Uploads a file to S3, and makes a pre-signed URL available in the lane context'
       end
 
@@ -93,10 +92,11 @@ module Fastlane
             description: 'The path to the local file on disk',
             optional: false,
             type: String
+            verify_block: proc { |f| UI.user_error!("Path `#{f}` does not exist.") unless File.file?(f) }
           ),
           FastlaneCore::ConfigItem.new(
             key: :auto_prefix,
-            description: 'Generate a derived prefix based on the filename that makes it harder to guess the URL to the uploaded object',
+            description: 'Generate a derived prefix based on the filename that makes it harder to guess the URL of the uploaded object',
             optional: true,
             default_value: true,
             type: Boolean
