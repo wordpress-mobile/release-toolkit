@@ -15,9 +15,6 @@ module Fastlane
         bucket = params[:bucket]
         key = params[:key]
 
-        UI.user_error!('You must provide a valid bucket name') if bucket.empty?
-        UI.user_error!('You must provide a valid key') if key.is_a?(String) && key.empty?
-
         key = file_name if key.nil?
 
         if params[:auto_prefix] == true
@@ -78,13 +75,15 @@ module Fastlane
             key: :bucket,
             description: 'The bucket that will store the file',
             optional: false,
-            type: String
+            type: String,
+            verify_block: proc { |bucket| UI.user_error!('You must provide a valid bucket name') if bucket.empty? }
           ),
           FastlaneCore::ConfigItem.new(
             key: :key,
             description: 'The path to the file within the bucket',
             optional: true,
-            type: String
+            type: String,
+            verify_block: proc { |key| UI.user_error!('You must provide a valid key') if key.is_a?(String) && key.empty? }
           ),
           FastlaneCore::ConfigItem.new(
             key: :file,
