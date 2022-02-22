@@ -23,7 +23,7 @@ describe Fastlane::Actions::UploadToS3Action do
   end
 
   describe 'happy path' do
-    it 'generates a prefix for the key when using auto_prefix:true' do
+    it 'generates a prefix for the key by default' do
       in_tmp_dir do |tmp_dir|
         file_path = File.join(tmp_dir, 'input_file_1')
         File.write(file_path, 'Dummy content')
@@ -43,7 +43,47 @@ describe Fastlane::Actions::UploadToS3Action do
       end
     end
 
-    it 'uses the provided key verbatim when using auto_prefix:false'
+    it 'generates a prefix for the key when using auto_prefix:true' do
+      in_tmp_dir do |tmp_dir|
+        file_path = File.join(tmp_dir, 'input_file_1')
+        File.write(file_path, 'Dummy content')
+        expected_key = 'k5w5OY2yQF55HiBXeP9w+F3/Yg4=/subdir/a8c-key1'
+
+        stub_s3_head_request(expected_key, 0) # File does not exist in S3
+        expect(client).to receive(:put_object).with(body: file_instance_of(file_path), bucket: test_bucket, key: expected_key)
+
+        return_value = run_described_fastlane_action(
+          bucket: test_bucket,
+          key: 'subdir/a8c-key1',
+          file: file_path,
+          auto_prefix: true
+        )
+
+        expect(return_value).to eq(expected_key)
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::S3_UPLOADED_FILE_PATH]).to eq(expected_key)
+      end
+    end
+
+    it 'uses the provided key verbatim when using auto_prefix:false' do
+      in_tmp_dir do |tmp_dir|
+        file_path = File.join(tmp_dir, 'input_file_1')
+        File.write(file_path, 'Dummy content')
+        expected_key = 'subdir/a8c-key1'
+
+        stub_s3_head_request(expected_key, 0) # File does not exist in S3
+        expect(client).to receive(:put_object).with(body: file_instance_of(file_path), bucket: test_bucket, key: expected_key)
+
+        return_value = run_described_fastlane_action(
+          bucket: test_bucket,
+          key: 'subdir/a8c-key1',
+          file: file_path,
+          auto_prefix: false
+        )
+
+        expect(return_value).to eq(expected_key)
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::S3_UPLOADED_FILE_PATH]).to eq(expected_key)
+      end
+    end
   end
 
   describe 'error reporting' do
