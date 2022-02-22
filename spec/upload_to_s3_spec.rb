@@ -147,7 +147,7 @@ describe Fastlane::Actions::UploadToS3Action do
           key: 'key',
           file: 'this-file-does-not-exist.txt'
         )
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Unable to read file at this-file-does-not-exist.txt')
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Path `this-file-does-not-exist.txt` does not exist.')
     end
 
     it 'fails if the file already exists on S3' do

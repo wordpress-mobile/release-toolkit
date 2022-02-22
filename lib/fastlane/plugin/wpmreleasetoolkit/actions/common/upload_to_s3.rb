@@ -11,7 +11,6 @@ module Fastlane
       def self.run(params)
         file_path = params[:file]
         file_name = File.basename(file_path)
-        UI.user_error!("Unable to read file at #{file_path}") unless File.file?(file_path)
 
         bucket = params[:bucket]
         key = params[:key]
@@ -91,7 +90,7 @@ module Fastlane
             key: :file,
             description: 'The path to the local file on disk',
             optional: false,
-            type: String
+            type: String,
             verify_block: proc { |f| UI.user_error!("Path `#{f}` does not exist.") unless File.file?(f) }
           ),
           FastlaneCore::ConfigItem.new(
