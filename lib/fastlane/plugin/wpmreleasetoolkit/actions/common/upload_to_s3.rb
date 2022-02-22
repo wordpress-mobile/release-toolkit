@@ -16,8 +16,8 @@ module Fastlane
         bucket = params[:bucket]
         key = params[:key]
 
-        UI.user_error!("You must provide a valid bucket name") if bucket.empty?
-        UI.user_error!("You must provide a valid key") if key.is_a?(String) && key.empty?
+        UI.user_error!('You must provide a valid bucket name') if bucket.empty?
+        UI.user_error!('You must provide a valid key') if key.is_a?(String) && key.empty?
 
         key = file_name if key.nil?
 
@@ -35,7 +35,7 @@ module Fastlane
             body: file,
             bucket: bucket,
             key: key
-        )
+          )
         rescue Aws::S3::Errors::ServiceError => e
           UI.crash!("Unable to upload file to S3: #{e.message}")
         end

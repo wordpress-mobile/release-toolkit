@@ -96,7 +96,7 @@ end
 # Executes the given block with a temporary file
 def with_tmp_file_path
   in_tmp_dir do |tmp_dir|
-    file_name = ('a'..'z').to_a.shuffle[0,8].join #8-character random file name
+    file_name = ('a'..'z').to_a.sample(8).join # 8-character random file name
     file_path = File.join(tmp_dir, file_name)
 
     File.write(file_path, '')
