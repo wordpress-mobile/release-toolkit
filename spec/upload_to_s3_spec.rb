@@ -16,12 +16,6 @@ describe Fastlane::Actions::UploadToS3Action do
       .and_return(Aws::S3::Types::HeadObjectOutput.new(content_length: content_length))
   end
 
-  # Allow us to do `.with` matching against a `File` instance to a particular path in RSpec expectations
-  # Because `File.open(path)` returns a different instance of `File` for the same path on each call)
-  RSpec::Matchers.define :file_instance_of do |path|
-    match { |actual| actual.is_a?(File) && actual.path == path }
-  end
-
   describe 'uploading a file' do
     it 'generates a prefix for the key by default' do
       in_tmp_dir do |tmp_dir|

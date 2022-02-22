@@ -32,6 +32,12 @@ def allow_fastlane_action_sh
   allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true)
 end
 
+# Allow us to do `.with` matching against a `File` instance to a particular path in RSpec expectations
+# Because `File.open(path)` returns a different instance of `File` for the same path on each call)
+RSpec::Matchers.define :file_instance_of do |path|
+  match { |actual| actual.is_a?(File) && actual.path == path }
+end
+
 # Allows to assert if an `Action.sh` command has been triggered by the action under test.
 # Requires `allow_fastlane_action_sh` to have been called so that `Action.sh` actually calls `Open3.popen2e`
 #
