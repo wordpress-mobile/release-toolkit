@@ -16,14 +16,20 @@ describe Fastlane::Actions::UploadToS3Action do
       .and_return(Aws::S3::Types::HeadObjectOutput.new(content_length: content_length))
   end
 
+  def stub_s3_file_exists(key)
+    stub_s3_head_request(key, 1)
+  end
+
+  def stub_s3_file_does_not_exist(key)
+    stub_s3_head_request(key, 0)
+  end
+
   describe 'uploading a file' do
     it 'generates a prefix for the key by default' do
-      in_tmp_dir do |tmp_dir|
-        file_path = File.join(tmp_dir, 'input_file_1')
-        File.write(file_path, '')
-        expected_key = '939c39398db2405e791e205778ff70f85dff620e/a8c-key1'
+      expected_key = '939c39398db2405e791e205778ff70f85dff620e/a8c-key1'
+      stub_s3_file_does_not_exist(expected_key)
 
-        stub_s3_head_request(expected_key, 0) # File does not exist in S3
+      with_tmp_file_path_for_file_named('input_file_1') do |file_path|
         expect(client).to receive(:put_object).with(body: file_instance_of(file_path), bucket: test_bucket, key: expected_key)
 
         return_value = run_described_fastlane_action(
@@ -38,12 +44,10 @@ describe Fastlane::Actions::UploadToS3Action do
     end
 
     it 'generates a prefix for the key when using auto_prefix:true' do
-      in_tmp_dir do |tmp_dir|
-        file_path = File.join(tmp_dir, 'input_file_2')
-        File.write(file_path, '')
-        expected_key = '8bde1a7a04300df27b52f4383dc997e5fbbff180/a8c-key2'
+      expected_key = '8bde1a7a04300df27b52f4383dc997e5fbbff180/a8c-key2'
+      stub_s3_file_does_not_exist(expected_key)
 
-        stub_s3_head_request(expected_key, 0) # File does not exist in S3
+      with_tmp_file_path_for_file_named('input_file_2') do |file_path|
         expect(client).to receive(:put_object).with(body: file_instance_of(file_path), bucket: test_bucket, key: expected_key)
 
         return_value = run_described_fastlane_action(
@@ -59,12 +63,10 @@ describe Fastlane::Actions::UploadToS3Action do
     end
 
     it 'uses the provided key verbatim when using auto_prefix:false' do
-      in_tmp_dir do |tmp_dir|
-        file_path = File.join(tmp_dir, 'input_file_1')
-        File.write(file_path, '')
-        expected_key = 'a8c-key1'
+      expected_key = 'a8c-key1'
+      stub_s3_file_does_not_exist(expected_key)
 
-        stub_s3_head_request(expected_key, 0) # File does not exist in S3
+      with_tmp_file_path do |file_path|
         expect(client).to receive(:put_object).with(body: file_instance_of(file_path), bucket: test_bucket, key: expected_key)
 
         return_value = run_described_fastlane_action(
@@ -80,12 +82,10 @@ describe Fastlane::Actions::UploadToS3Action do
     end
 
     it 'correctly appends the key if it contains subdirectories' do
-      in_tmp_dir do |tmp_dir|
-        file_path = File.join(tmp_dir, 'input_file_1')
-        File.write(file_path, '')
-        expected_key = '939c39398db2405e791e205778ff70f85dff620e/subdir/a8c-key1'
+      expected_key = '939c39398db2405e791e205778ff70f85dff620e/subdir/a8c-key1'
+      stub_s3_file_does_not_exist(expected_key)
 
-        stub_s3_head_request(expected_key, 0) # File does not exist in S3
+      with_tmp_file_path_for_file_named('input_file_1') do |file_path|
         expect(client).to receive(:put_object).with(body: file_instance_of(file_path), bucket: test_bucket, key: expected_key)
 
         return_value = run_described_fastlane_action(
@@ -101,9 +101,9 @@ describe Fastlane::Actions::UploadToS3Action do
 
     it 'uses the filename as the key if one is not provided' do
       expected_key = 'c125bd799c6aad31092b02e440a8fae25b45a2ad/test_file_1'
+      stub_s3_file_does_not_exist(expected_key)
 
       with_tmp_file_path_for_file_named('test_file_1') do |file_path|
-        stub_s3_head_request(expected_key, 0) # File does not exist in S3
         expect(client).to receive(:put_object).with(body: file_instance_of(file_path), bucket: test_bucket, key: expected_key)
 
         return_value = run_described_fastlane_action(
@@ -152,7 +152,7 @@ describe Fastlane::Actions::UploadToS3Action do
 
     it 'fails if the file already exists on S3' do
       expected_key = 'a62f2225bf70bfaccbc7f1ef2a397836717377de/key'
-      stub_s3_head_request(expected_key, 1) # File already exists on S3
+      stub_s3_file_exists(expected_key)
 
       with_tmp_file_path_for_file_named('key') do |file_path|
         expect do
