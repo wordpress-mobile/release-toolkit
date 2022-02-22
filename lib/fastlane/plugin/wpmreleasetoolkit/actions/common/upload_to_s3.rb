@@ -16,8 +16,13 @@ module Fastlane
         bucket = params[:bucket]
         key = params[:key]
 
+        UI.user_error!('You must provide a valid bucket name') if bucket.empty?
+        UI.user_error!('You must provide a valid key') if key.is_a?(String) && key.empty?
+
+        key = file_name if key.nil?
+
         if params[:auto_prefix] == true
-          file_name_hash = Digest::SHA1.base64digest(file_name)
+          file_name_hash = Digest::SHA1.hexdigest(file_name)
           key = [file_name_hash, key].join('/')
         end
 
@@ -26,11 +31,11 @@ module Fastlane
         UI.message("Uploading #{file_path} to: #{key}")
 
         File.open(file_path, 'rb') do |file|
-          Aws::S3::Client.new().put_object({
-                                             body: file,
-                                             bucket: bucket,
-                                             key: key
-                                           })
+          Aws::S3::Client.new().put_object(
+            body: file,
+            bucket: bucket,
+            key: key
+          )
         rescue Aws::S3::Errors::ServiceError => e
           UI.crash!("Unable to upload file to S3: #{e.message}")
         end
