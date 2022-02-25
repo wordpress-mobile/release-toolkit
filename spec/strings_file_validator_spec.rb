@@ -3,7 +3,7 @@ require 'spec_helper'
 module StringsFileValidator
 end
 
-def extract_key(line)
+def extract_key(line:)
   # The `gsub(\\./, '..')` call replaces any backslash-escape (\n, \r, \\, \",
   # …) with 2 different characters that won't mess up our RegEx instead
   key_range =
@@ -22,7 +22,7 @@ def find_duplicated_keys(file:)
   found_keys = {}
   duplicated_keys = []
   file.lines.each_with_index do |line, index|
-    key = extract_key(line)
+    key = extract_key(line: line)
 
     next if key.nil?
 
