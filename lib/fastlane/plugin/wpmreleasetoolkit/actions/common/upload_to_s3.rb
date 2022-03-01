@@ -83,6 +83,7 @@ module Fastlane
             type: String,
             verify_block: proc { |key|
               next if key.is_a?(String) && !key.empty?
+
               UI.user_error!('The provided key must not be empty. Use nil instead if you want to default to the file basename')
             }
           ),

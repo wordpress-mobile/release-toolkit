@@ -9,11 +9,11 @@ describe Fastlane::Actions::UploadToS3Action do
   end
 
   # Stub head_object to return a specific content_length
-  def stub_s3_response_for_file(key, exists = true)
+  def stub_s3_response_for_file(key, exists: true)
     content_length = exists == true ? 1 : 0
     allow(client).to(receive(:head_object))
-      .with(bucket: test_bucket, key: key)
-      .and_return(Aws::S3::Types::HeadObjectOutput.new(content_length: content_length))
+                 .with(bucket: test_bucket, key: key)
+                 .and_return(Aws::S3::Types::HeadObjectOutput.new(content_length: content_length))
   end
 
   describe 'uploading a file with valid parameters' do
