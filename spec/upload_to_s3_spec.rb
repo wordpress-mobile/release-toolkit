@@ -16,7 +16,7 @@ describe Fastlane::Actions::UploadToS3Action do
       .and_return(Aws::S3::Types::HeadObjectOutput.new(content_length: content_length))
   end
 
-  describe 'uploading a file' do
+  describe 'uploading a file with valid parameters' do
     it 'generates a prefix for the key by default' do
       expected_key = '939c39398db2405e791e205778ff70f85dff620e/a8c-key1'
       stub_s3_response_for_file(expected_key, exists: false)
@@ -107,7 +107,9 @@ describe Fastlane::Actions::UploadToS3Action do
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::S3_UPLOADED_FILE_PATH]).to eq(expected_key)
       end
     end
+  end
 
+  describe 'uploading a file with invalid parameters' do
     it 'fails if bucket is empty or nil' do
       expect do
         with_tmp_file_path do |file_path|
