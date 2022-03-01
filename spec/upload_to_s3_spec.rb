@@ -9,9 +9,9 @@ describe Fastlane::Actions::UploadToS3Action do
   end
 
   # Stub head_object to return a specific content_length
-  def stub_s3_file_exists(key, exists)
-    content_length = exists ? 1 : 0
-    allow(client).to receive(:head_object)
+  def stub_s3_response_for_file(key, exists = true)
+    content_length = exists == true ? 1 : 0
+    allow(client).to(receive(:head_object))
       .with(bucket: test_bucket, key: key)
       .and_return(Aws::S3::Types::HeadObjectOutput.new(content_length: content_length))
   end
@@ -19,7 +19,7 @@ describe Fastlane::Actions::UploadToS3Action do
   describe 'uploading a file' do
     it 'generates a prefix for the key by default' do
       expected_key = '939c39398db2405e791e205778ff70f85dff620e/a8c-key1'
-      stub_s3_file_does_not_exist(expected_key)
+      stub_s3_response_for_file(expected_key, exists: false)
 
       with_tmp_file_path_for_file_named('input_file_1') do |file_path|
         expect(client).to receive(:put_object).with(body: file_instance_of(file_path), bucket: test_bucket, key: expected_key)
@@ -37,7 +37,7 @@ describe Fastlane::Actions::UploadToS3Action do
 
     it 'generates a prefix for the key when using auto_prefix:true' do
       expected_key = '8bde1a7a04300df27b52f4383dc997e5fbbff180/a8c-key2'
-      stub_s3_file_does_not_exist(expected_key)
+      stub_s3_response_for_file(expected_key, exists: false)
 
       with_tmp_file_path_for_file_named('input_file_2') do |file_path|
         expect(client).to receive(:put_object).with(body: file_instance_of(file_path), bucket: test_bucket, key: expected_key)
@@ -56,7 +56,7 @@ describe Fastlane::Actions::UploadToS3Action do
 
     it 'uses the provided key verbatim when using auto_prefix:false' do
       expected_key = 'a8c-key1'
-      stub_s3_file_does_not_exist(expected_key)
+      stub_s3_response_for_file(expected_key, exists: false)
 
       with_tmp_file_path do |file_path|
         expect(client).to receive(:put_object).with(body: file_instance_of(file_path), bucket: test_bucket, key: expected_key)
@@ -75,7 +75,7 @@ describe Fastlane::Actions::UploadToS3Action do
 
     it 'correctly appends the key if it contains subdirectories' do
       expected_key = '939c39398db2405e791e205778ff70f85dff620e/subdir/a8c-key1'
-      stub_s3_file_does_not_exist(expected_key)
+      stub_s3_response_for_file(expected_key, exists: false)
 
       with_tmp_file_path_for_file_named('input_file_1') do |file_path|
         expect(client).to receive(:put_object).with(body: file_instance_of(file_path), bucket: test_bucket, key: expected_key)
@@ -93,7 +93,7 @@ describe Fastlane::Actions::UploadToS3Action do
 
     it 'uses the filename as the key if one is not provided' do
       expected_key = 'c125bd799c6aad31092b02e440a8fae25b45a2ad/test_file_1'
-      stub_s3_file_does_not_exist(expected_key)
+      stub_s3_response_for_file(expected_key, exists: false)
 
       with_tmp_file_path_for_file_named('test_file_1') do |file_path|
         expect(client).to receive(:put_object).with(body: file_instance_of(file_path), bucket: test_bucket, key: expected_key)
@@ -129,7 +129,7 @@ describe Fastlane::Actions::UploadToS3Action do
             file: file_path
           )
         end
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'You must provide a valid key')
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'The provided key must not be empty. Use nil instead if you want to default to the file basename')
     end
 
     it 'fails if local file does not exist' do
@@ -144,7 +144,7 @@ describe Fastlane::Actions::UploadToS3Action do
 
     it 'fails if the file already exists on S3' do
       expected_key = 'a62f2225bf70bfaccbc7f1ef2a397836717377de/key'
-      stub_s3_file_exists(expected_key)
+      stub_s3_response_for_file(expected_key)
 
       with_tmp_file_path_for_file_named('key') do |file_path|
         expect do
@@ -153,7 +153,7 @@ describe Fastlane::Actions::UploadToS3Action do
             key: 'key',
             file: file_path
           )
-        end.to raise_error(FastlaneCore::Interface::FastlaneError, "File already exists at #{expected_key}")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "File already exists in S3 bucket #{test_bucket} at #{expected_key}")
       end
     end
   end

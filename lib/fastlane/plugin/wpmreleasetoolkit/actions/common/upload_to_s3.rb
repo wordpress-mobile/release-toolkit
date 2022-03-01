@@ -78,10 +78,13 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :key,
-            description: 'The path to the file within the bucket. If `nil`, will default to the `file`'s basename',
+            description: 'The path to the file within the bucket. If `nil`, will default to the `file\'s basename',
             optional: true,
             type: String,
-            verify_block: proc { |key| UI.user_error!('The provided key must not be empty. Use nil instead if you want to default to the file basename') if key.is_a?(String) && key.empty? }
+            verify_block: proc { |key|
+              next if key.is_a?(String) && !key.empty?
+              UI.user_error!('The provided key must not be empty. Use nil instead if you want to default to the file basename')
+            }
           ),
           FastlaneCore::ConfigItem.new(
             key: :file,
