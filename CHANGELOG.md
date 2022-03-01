@@ -10,8 +10,7 @@ _None_
 
 ### New Features
 
-* Introduce new `ios_extract_keys_from_strings_files` action. [#338]
-* Add Upload to S3 Action. [#339]
+_None_
 
 ### Bug Fixes
 
@@ -20,6 +19,13 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 3.1.0
+
+### New Features
+
+* Introduce new `ios_extract_keys_from_strings_files` action. [#338]
+* Add Upload to S3 Action. [#339]
 
 ## 3.0.0
 
