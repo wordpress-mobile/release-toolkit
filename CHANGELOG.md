@@ -11,6 +11,7 @@ _None_
 ### New Features
 
 * Introduce new `ios_extract_keys_from_strings_files` action. [#338]
+* Add Upload to S3 Action. [#339]
 
 ### Bug Fixes
 

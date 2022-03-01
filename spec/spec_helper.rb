@@ -32,6 +32,12 @@ def allow_fastlane_action_sh
   allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true)
 end
 
+# Allow us to do `.with` matching against a `File` instance to a particular path in RSpec expectations
+# (Because `File.open(path)` returns a different instance of `File` for the same path on each call)
+RSpec::Matchers.define :file_instance_of do |path|
+  match { |actual| actual.is_a?(File) && actual.path == path }
+end
+
 # Allows to assert if an `Action.sh` command has been triggered by the action under test.
 # Requires `allow_fastlane_action_sh` to have been called so that `Action.sh` actually calls `Open3.popen2e`
 #
@@ -73,5 +79,18 @@ def in_tmp_dir
     Dir.chdir(tmpdir) do
       yield tmpdir
     end
+  end
+end
+
+# Executes the given block with a temporary file with the given `file_name`
+def with_tmp_file(named: nil, content: '')
+  in_tmp_dir do |tmp_dir|
+    file_name = named || ('a'..'z').to_a.sample(8).join # 8-character random file name if nil
+    file_path = File.join(tmp_dir, file_name)
+
+    File.write(file_path, content)
+    yield file_path
+  ensure
+    File.delete(file_path)
   end
 end

@@ -126,28 +126,7 @@ RSpec/DescribedClass:
 # Include: **/*_spec*rb*, **/spec/**/*
 RSpec/FilePath:
   Exclude:
-    - 'spec/android_localize_helper_spec.rb'
-    - 'spec/android_merge_translators_strings_spec.rb'
-    - 'spec/android_version_helper_spec.rb'
-    - 'spec/an_localize_libs_action_spec.rb'
-    - 'spec/an_metadata_update_helper_spec.rb'
-    - 'spec/an_update_metadata_source_spec.rb'
-    - 'spec/configuration_spec.rb'
-    - 'spec/configure_helper_spec.rb'
-    - 'spec/encryption_helper_spec.rb'
-    - 'spec/git_helper_spec.rb'
-    - 'spec/github_helper_spec.rb'
-    - 'spec/ios_git_helper_spec.rb'
-    - 'spec/ios_lint_localizations_spec.rb'
-    - 'spec/ios_merge_translators_strings_spec.rb'
-    - 'spec/release_notes_helper_spec.rb'
-    - 'spec/check_localization_progress_spec.rb'
-    - 'spec/ios_generate_strings_file_from_code_spec.rb'
-    - 'spec/ios_l10n_helper_spec.rb'
-    - 'spec/ios_merge_strings_files_spec.rb'
-    - 'spec/gp_update_metadata_source_spec.rb'
-    - 'spec/ios_download_strings_files_from_glotpress_spec.rb'
-    - 'spec/ios_extract_keys_from_strings_files_spec.rb'
+    - 'spec/*_spec.rb'
 
 # Offense count: 8
 # Cop supports --auto-correct.
