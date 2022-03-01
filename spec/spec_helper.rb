@@ -33,7 +33,7 @@ def allow_fastlane_action_sh
 end
 
 # Allow us to do `.with` matching against a `File` instance to a particular path in RSpec expectations
-# Because `File.open(path)` returns a different instance of `File` for the same path on each call)
+# (Because `File.open(path)` returns a different instance of `File` for the same path on each call)
 RSpec::Matchers.define :file_instance_of do |path|
   match { |actual| actual.is_a?(File) && actual.path == path }
 end
@@ -89,6 +89,7 @@ def with_tmp_file_path_for_file_named(file_name)
 
     File.write(file_path, '')
     yield file_path
+  ensure
     File.delete(file_path)
   end
 end

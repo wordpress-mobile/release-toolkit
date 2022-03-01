@@ -1,4 +1,3 @@
-require 'tempfile'
 require_relative './spec_helper'
 
 describe Fastlane::Actions::UploadToS3Action do
@@ -10,18 +9,11 @@ describe Fastlane::Actions::UploadToS3Action do
   end
 
   # Stub head_object to return a specific content_length
-  def stub_s3_head_request(key, content_length)
+  def stub_s3_file_exists(key, exists)
+    content_length = exists ? 1 : 0
     allow(client).to receive(:head_object)
       .with(bucket: test_bucket, key: key)
       .and_return(Aws::S3::Types::HeadObjectOutput.new(content_length: content_length))
-  end
-
-  def stub_s3_file_exists(key)
-    stub_s3_head_request(key, 1)
-  end
-
-  def stub_s3_file_does_not_exist(key)
-    stub_s3_head_request(key, 0)
   end
 
   describe 'uploading a file' do

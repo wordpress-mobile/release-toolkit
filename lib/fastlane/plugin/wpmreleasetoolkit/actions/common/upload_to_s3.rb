@@ -13,16 +13,14 @@ module Fastlane
         file_name = File.basename(file_path)
 
         bucket = params[:bucket]
-        key = params[:key]
-
-        key = file_name if key.nil?
+        key = params[:key] || file_name
 
         if params[:auto_prefix] == true
           file_name_hash = Digest::SHA1.hexdigest(file_name)
           key = [file_name_hash, key].join('/')
         end
 
-        UI.user_error!("File already exists at #{key}") if file_is_already_uploaded?(bucket, key)
+        UI.user_error!("File already exists in S3 bucket #{bucket} at #{key}") if file_is_already_uploaded?(bucket, key)
 
         UI.message("Uploading #{file_path} to: #{key}")
 
@@ -80,10 +78,10 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :key,
-            description: 'The path to the file within the bucket',
+            description: 'The path to the file within the bucket. If `nil`, will default to the `file`'s basename',
             optional: true,
             type: String,
-            verify_block: proc { |key| UI.user_error!('You must provide a valid key') if key.is_a?(String) && key.empty? }
+            verify_block: proc { |key| UI.user_error!('The provided key must not be empty. Use nil instead if you want to default to the file basename') if key.is_a?(String) && key.empty? }
           ),
           FastlaneCore::ConfigItem.new(
             key: :file,
