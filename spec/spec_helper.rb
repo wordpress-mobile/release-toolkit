@@ -83,25 +83,14 @@ def in_tmp_dir
 end
 
 # Executes the given block with a temporary file with the given `file_name`
-def with_tmp_file_path_for_file_named(file_name)
+def with_tmp_file(named: nil, content: '')
   in_tmp_dir do |tmp_dir|
+    file_name = named || ('a'..'z').to_a.sample(8).join # 8-character random file name if nil
     file_path = File.join(tmp_dir, file_name)
 
-    File.write(file_path, '')
+    File.write(file_path, content)
     yield file_path
   ensure
-    File.delete(file_path)
-  end
-end
-
-# Executes the given block with a temporary file
-def with_tmp_file_path
-  in_tmp_dir do |tmp_dir|
-    file_name = ('a'..'z').to_a.sample(8).join # 8-character random file name
-    file_path = File.join(tmp_dir, file_name)
-
-    File.write(file_path, '')
-    yield file_path
     File.delete(file_path)
   end
 end
