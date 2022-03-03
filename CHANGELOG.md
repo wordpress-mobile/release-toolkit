@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+* Improved logs and console output, to avoid `ios_download_strings_files_from_glotpress` to look like it's deadlocked while it takes some time to download all the exports of all the locales, and to avoid the log messages from `ios_extract_keys_from_strings_files` to be misleading. [#344]
 
 ### Internal Changes
 
