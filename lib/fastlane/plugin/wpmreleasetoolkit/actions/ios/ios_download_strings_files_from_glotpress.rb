@@ -10,6 +10,7 @@ module Fastlane
 
         locales.each do |glotpress_locale, lproj_name|
           # Download the export in the proper `.lproj` directory
+          UI.message "Downloading translations for '#{lproj_name}' from GlotPress (#{glotpress_locale}) [#{params[:filters]}]..."
           lproj_dir = File.join(download_dir, "#{lproj_name}.lproj")
           destination = File.join(lproj_dir, "#{params[:table_basename]}.strings")
           FileUtils.mkdir(lproj_dir) unless Dir.exist?(lproj_dir)
