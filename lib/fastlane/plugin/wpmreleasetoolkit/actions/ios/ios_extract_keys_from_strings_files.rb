@@ -16,9 +16,9 @@ module Fastlane
             next if target_strings_file == target_original_file # do not generate/overwrite the original locale itself
 
             keys_to_extract = keys_to_extract_per_target_file[target_original_file]
-            UI.message("Extracting #{keys_to_extract.count} keys into #{target_strings_file}...")
-
             extracted_translations = translations.slice(*keys_to_extract)
+            UI.message("Extracting #{extracted_translations.count} keys (out of #{keys_to_extract.count} expected) into #{target_strings_file}...")
+
             FileUtils.mkdir_p(File.dirname(target_strings_file)) # Ensure path up to parent dir exists, create it if not.
             Fastlane::Helper::Ios::L10nHelper.generate_strings_file_from_hash(translations: extracted_translations, output_path: target_strings_file)
           rescue StandardError => e
