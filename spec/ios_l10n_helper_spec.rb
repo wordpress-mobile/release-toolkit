@@ -67,6 +67,19 @@ describe Fastlane::Helper::Ios::L10nHelper do
       end
     end
 
+    it 'adds prefixes to string keys when merging files' do
+      paths = {
+        fixture('Localizable-utf16.strings') => 'main.',
+        fixture('InfoPlist-utf8.strings') => 'infoplist.', # Useful case because it typically does not have quotes around keys
+        fixture('non-latin-utf16.strings') => 'other.' # While this one does have quotes around its keys
+      }
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        output_file = File.join(tmp_dir, 'output.strings')
+        described_class.merge_strings(paths: paths, output_path: output_file)
+        expect(File.read(output_file)).to eq(File.read(fixture('expected-merged-prefixed.strings')))
+      end
+    end
+
     it 'returns duplicate keys found' do
       paths = { fixture('Localizable-utf16.strings') => nil, fixture('non-latin-utf16.strings') => nil }
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
