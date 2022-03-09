@@ -4,7 +4,8 @@ module Fastlane
       def self.run(params)
         UI.message "Merging strings files: #{params[:paths].inspect}"
 
-        duplicates = Fastlane::Helper::Ios::L10nHelper.merge_strings(paths: params[:paths], output_path: params[:destination])
+        destination = params[:destination] || params[:paths].keys.first # Use first path if destination not provided, to do an in-place merge.
+        duplicates = Fastlane::Helper::Ios::L10nHelper.merge_strings(paths: params[:paths], output_path: destination)
         duplicates.each do |dup_key|
           UI.important "Duplicate key found while merging the `.strings` files: `#{dup_key}`"
         end
@@ -40,8 +41,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :paths,
             env_name: 'FL_IOS_MERGE_STRINGS_FILES_PATHS',
-            description: 'The paths of all the `.strings` files to merge together',
-            type: Array,
+            description: 'A hash of the paths of all the `.strings` files to merge together, with the prefix to be used for their keys as associated value',
+            type: Hash,
             optional: false
           ),
           FastlaneCore::ConfigItem.new(
@@ -60,7 +61,7 @@ module Fastlane
       end
 
       def self.return_value
-        'The list of duplicate keys found while merging the various `.strings` files'
+        'The list of duplicate keys (after prefix has been added to each) found while merging the various `.strings` files'
       end
 
       def self.authors

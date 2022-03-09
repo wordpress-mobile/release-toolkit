@@ -36,8 +36,8 @@ module Fastlane
 
         # Merge the content of multiple `.strings` files into a new `.strings` text file.
         #
-        # @param [Array<String>] paths The paths of the `.strings` files to merge together
-        # @param [String] into The path to the merged `.strings` file to generate as a result.
+        # @param [Hash<String, String>] paths The paths of the `.strings` files to merge together, associated with the prefix to prepend to each of their respective keys
+        # @param [String] output_path The path to the merged `.strings` file to generate as a result.
         # @return [Array<String>] List of duplicate keys found while validating the merge.
         #
         # @note For now, this method only supports merging `.strings` file in `:text` format
@@ -48,24 +48,33 @@ module Fastlane
         #
         # @raise [RuntimeError] If one of the paths provided is not in text format (but XML or binary instead), or if any of the files are missing.
         #
-        def self.merge_strings(paths:, output_path: nil)
+        def self.merge_strings(paths:, output_path:)
           duplicates = []
           Tempfile.create('wpmrt-l10n-merge-', encoding: 'utf-8') do |tmp_file|
             all_keys_found = []
 
             tmp_file.write("/* Generated File. Do not edit. */\n\n")
-            paths.each do |input_file|
+            paths.each do |input_file, prefix|
               fmt = strings_file_type(path: input_file)
               raise "The file `#{input_file}` does not exist or is of unknown format." if fmt.nil?
               raise "The file `#{input_file}` is in #{fmt} format but we currently only support merging `.strings` files in text format." unless fmt == :text
 
-              string_keys = read_strings_file_as_hash(path: input_file).keys
+              string_keys = read_strings_file_as_hash(path: input_file).keys.map { |k| "#{prefix}#{k}" }
               duplicates += (string_keys & all_keys_found) # Find duplicates using Array intersection, and add those to duplicates list
               all_keys_found += string_keys
 
               tmp_file.write("/* MARK: - #{File.basename(input_file)} */\n\n")
               # Read line-by-line to reduce memory footprint during content copy; Be sure to guess file encoding using the Byte-Order-Mark.
-              File.readlines(input_file, mode: 'rb:BOM|UTF-8').each { |line| tmp_file.write(line) }
+              File.readlines(input_file, mode: 'rb:BOM|UTF-8').each do |line|
+                if prefix
+                  # We need to ensure the line and RegExp are using the same encoding, so we transcode everything to UTF-8.
+                  line.encode!(Encoding::UTF8)
+                  # The `/u` modifier on the RegExps is to make them UTF-8
+                  line.gsub!(/(^\s*")/u, "\\\1#{prefix}") # Lines starting with a quote are considered to be start of a key; add prefix right after the quote
+                  line.gsub!(/(^\s*)([A-Z_]+\s*=)/ui, "\\\1#{prefix}\\\2") # Lines starting with an identifier followed by a '=' are considered to be an unquoted key (typical in InfoPlist.strings files for example)
+                end
+                tmp_file.write(line)
+              end
               tmp_file.write("\n")
             end
             tmp_file.close # ensure we flush the content to disk
