@@ -75,8 +75,11 @@ describe Fastlane::Helper::Ios::L10nHelper do
       }
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         output_file = File.join(tmp_dir, 'output.strings')
-        described_class.merge_strings(paths: paths, output_path: output_file)
+        duplicates = described_class.merge_strings(paths: paths, output_path: output_file)
         expect(File.read(output_file)).to eq(File.read(fixture('expected-merged-prefixed.strings')))
+        # We should also not find duplicates anymore, given that `key1` and `key2` (duplicates from `Localizable-utf16.strings`
+        # and `non-latin-utf16.strings` files) will now be prefixed differently, and thus made different during merge
+        expect(duplicates).to be_empty
       end
     end
 
