@@ -36,5 +36,28 @@ describe Fastlane::Actions::IosMergeStringsFilesAction do
         )
       end
     end
+
+    it 'merges in-place if no destination is provided' do
+      # Arrange
+      allow(FastlaneCore::UI).to receive(:important)
+      inputs = ['Localizable-utf16.strings', 'non-latin-utf16.strings']
+
+      in_tmp_dir do |tmpdir|
+        inputs.each { |f| FileUtils.cp(fixture(f), tmpdir) }
+
+        # Act
+        result = Dir.chdir(tmpdir) do
+          run_described_fastlane_action(
+            paths: { inputs[0] => nil, inputs[1] => nil }
+          )
+        end
+
+        # Assert
+        derived_output_file = File.join(tmpdir, inputs[0])
+        expect(File).to exist(derived_output_file)
+        expect(File.read(derived_output_file)).to eq(File.read(fixture('expected-merged-nonlatin.strings')))
+        expect(result).to eq(%w[key1 key2])
+      end
+    end
   end
 end
