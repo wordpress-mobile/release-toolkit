@@ -70,8 +70,8 @@ module Fastlane
                   # We need to ensure the line and RegExp are using the same encoding, so we transcode everything to UTF-8.
                   line.encode!(Encoding::UTF_8)
                   # The `/u` modifier on the RegExps is to make them UTF-8
-                  line.gsub!(/(^\s*")/u, "\\1#{prefix}") # Lines starting with a quote are considered to be start of a key; add prefix right after the quote
-                  line.gsub!(/(^\s*)([A-Z_]+\s*=\s*")/ui, "\\1#{prefix}\\2") # Lines starting with an identifier followed by a '=' are considered to be an unquoted key (typical in InfoPlist.strings files for example)
+                  line.gsub!(/^(\s*")/u, "\\1#{prefix}") # Lines starting with a quote are considered to be start of a key; add prefix right after the quote
+                  line.gsub!(/^(\s*)([A-Z0-9_]+)(\s*=\s*")/ui, "\\1\"#{prefix}\\2\"\\3") # Lines starting with an identifier followed by a '=' are considered to be an unquoted key (typical in InfoPlist.strings files for example)
                 end
                 tmp_file.write(line)
               end
