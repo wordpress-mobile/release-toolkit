@@ -3,7 +3,7 @@ module Fastlane
     class IosExtractKeysFromStringsFilesAction < Action
       def self.run(params)
         source_parent_dir = params[:source_parent_dir]
-        target_original_files = params[:target_original_files]
+        target_original_files = params[:target_original_files].keys # TODO: Use the prefixes associated with each file
         keys_to_extract_per_target_file = keys_list_per_target_file(target_original_files)
 
         # For each locale, extract the right translations from `<source_tablename>.strings` into each target `.strings` file
@@ -82,15 +82,16 @@ module Fastlane
                                        default_value: 'Localizable'),
           FastlaneCore::ConfigItem.new(key: :target_original_files,
                                        env_name: 'FL_IOS_EXTRACT_KEYS_FROM_STRINGS_FILES_TARGET_ORIGINAL_FILES',
-                                       description: 'The path(s) to the `<base-locale>.lproj/<target-tablename>.strings` file(s) for which we want to extract the keys to. ' \
-                                        + 'Each of those files should containing the original strings (typically `en` or `Base` locale) and will be used to determine which keys to extract from the `source_tablename`. ' \
-                                        + 'For each of those, the path(s) in which the translations will be extracted will be the files with the same basename in each of the other `*.lproj` sibling folders',
-                                       type: Array,
+                                       description: 'The path(s) to the `<base-locale>.lproj/<target-tablename>.strings` file(s) for which we want to extract the keys to, and the prefix to remove from their keys. ' \
+                                        + 'Each key in the Hash should point to a file containing the original strings (typically `en` or `Base` locale), and will be used to determine which keys to extract from the `source_tablename`. ' \
+                                        + 'For each key, the associated value is an optional prefix to remove from the keys (which can be useful if you used a prefix during `ios_merge_strings_files` to avoid duplicates). Can be nil or empty if no prefix was used during merge for that file.' \
+                                        + 'Note: For each entry, the path(s) in which the translations will be extracted to will be the files with the same basename as the key in each of the other `*.lproj` sibling folders. ',
+                                       type: Hash,
                                        verify_block: proc do |values|
                                          UI.user_error!('`target_original_files` must contain at least one path to an original `.strings` file.') if values.empty?
-                                         values.each do |v|
-                                           UI.user_error!("Path `#{v}` (found in `target_original_files`) does not exist.") unless File.exist?(v)
-                                           UI.user_error! "Expected `#{v}` (found in `target_original_files`) to be a path ending in a `*.lproj/*.strings`." unless File.extname(v) == '.strings' && File.extname(File.dirname(v)) == '.lproj'
+                                         values.each do |path, _|
+                                           UI.user_error!("Path `#{path}` (found in `target_original_files`) does not exist.") unless File.exist?(path)
+                                           UI.user_error! "Expected `#{path}` (found in `target_original_files`) to be a path ending in a `*.lproj/*.strings`." unless File.extname(path) == '.strings' && File.extname(File.dirname(path)) == '.lproj'
                                          end
                                        end),
         ]
