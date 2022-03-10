@@ -3,8 +3,9 @@ module Fastlane
     class IosExtractKeysFromStringsFilesAction < Action
       def self.run(params)
         source_parent_dir = params[:source_parent_dir]
-        target_original_files = params[:target_original_files].keys # TODO: Use the prefixes associated with each file
-        keys_to_extract_per_target_file = keys_list_per_target_file(target_original_files)
+        target_original_files = params[:target_original_files].keys # Array [original-file-paths]
+        keys_to_extract_per_target_file = keys_list_per_target_file(target_original_files) # Hash { original-file-path => [keys] }
+        prefix_to_remove_per_target_file = params[:target_original_files] # Hash { original-file-path => prefix }
 
         # For each locale, extract the right translations from `<source_tablename>.strings` into each target `.strings` file
         Dir.glob('*.lproj', base: source_parent_dir).each do |lproj_dir_name|
@@ -15,8 +16,9 @@ module Fastlane
             target_strings_file = File.join(File.dirname(File.dirname(target_original_file)), lproj_dir_name, File.basename(target_original_file))
             next if target_strings_file == target_original_file # do not generate/overwrite the original locale itself
 
-            keys_to_extract = keys_to_extract_per_target_file[target_original_file]
-            extracted_translations = translations.slice(*keys_to_extract)
+            keys_prefix = prefix_to_remove_per_target_file[target_original_file] || ''
+            keys_to_extract = keys_to_extract_per_target_file[target_original_file].map { |k| "#{keys_prefix}#{k}" }
+            extracted_translations = translations.slice(*keys_to_extract).transform_keys { |k| k.delete_prefix(keys_prefix) }
             UI.message("Extracting #{extracted_translations.count} keys (out of #{keys_to_extract.count} expected) into #{target_strings_file}...")
 
             FileUtils.mkdir_p(File.dirname(target_strings_file)) # Ensure path up to parent dir exists, create it if not.
