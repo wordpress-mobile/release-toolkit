@@ -71,8 +71,8 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         run_described_fastlane_action(
           source_parent_dir: wp_resources_dir, # The `*.lproj/Localizable.strings` files we want to extract the keys from are in `WordPress-Resources` parent dir
           target_original_files: {
-            File.join(wp_resources_dir, 'en.lproj', 'InfoPlist.strings') => 'wordpress.',
-            File.join(jp_resources_dir, 'en.lproj', 'InfoPlist.strings') => 'jetpack.'
+            File.join(wp_resources_dir, 'en.lproj', 'InfoPlist.strings') => 'wordpress.infoplist.',
+            File.join(jp_resources_dir, 'en.lproj', 'InfoPlist.strings') => 'jetpack.infoplist.'
           }
         )
 

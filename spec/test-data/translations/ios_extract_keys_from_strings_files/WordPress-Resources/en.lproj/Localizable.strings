@@ -9,13 +9,13 @@
 
 /* MARK: - InfoPlist.strings */
 
-"wordpress.NSLocationUsageDescription" = "WordPress would like to add your location to posts on sites where you have enabled geotagging.";
-"wordpress.NSCameraUsageDescription" = "To take photos or videos to use in your posts.";
+"wordpress.infoplist.NSLocationUsageDescription" = "WordPress would like to add your location to posts on sites where you have enabled geotagging.";
+"wordpress.infoplist.NSCameraUsageDescription" = "To take photos or videos to use in your posts.";
 
 /* MARK: - InfoPlist.strings */
 
-"jetpack.NSLocationUsageDescription" = "Jetpack would like to add your location to posts on sites where you have enabled geotagging.";
-"jetpack.NSCameraUsageDescription" = "To take photos or videos to use in your posts.";
+"jetpack.infoplist.NSLocationUsageDescription" = "Jetpack would like to add your location to posts on sites where you have enabled geotagging.";
+"jetpack.infoplist.NSCameraUsageDescription" = "To take photos or videos to use in your posts.";
 
 /* MARK: - Sites.strings */
 

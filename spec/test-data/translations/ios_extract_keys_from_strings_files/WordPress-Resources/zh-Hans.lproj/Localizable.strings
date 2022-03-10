@@ -3,10 +3,10 @@
 "key1" = "value1-Hans";
 "key2" = "value2-Hans";
 "key3" = "value3-Hans";
-"wordpress.NSLocationUsageDescription" = "对于已启用地理标记的站点，WordPress 会向其中的文章内添加您的位置。";
-"wordpress.NSCameraUsageDescription" = "拍摄要在文章内使用的照片或视频。";
-"jetpack.NSLocationUsageDescription" = "对于已启用地理标记的站点，Jetpack 会向其中的文章内添加您的位置。";
-"jetpack.NSCameraUsageDescription" = "拍摄要在文章内使用的照片或视频。";
+"wordpress.infoplist.NSLocationUsageDescription" = "对于已启用地理标记的站点，WordPress 会向其中的文章内添加您的位置。";
+"wordpress.infoplist.NSCameraUsageDescription" = "拍摄要在文章内使用的照片或视频。";
+"jetpack.infoplist.NSLocationUsageDescription" = "对于已启用地理标记的站点，Jetpack 会向其中的文章内添加您的位置。";
+"jetpack.infoplist.NSCameraUsageDescription" = "拍摄要在文章内使用的照片或视频。";
 "BOl9KQ" =  "有 ${count} 个选项匹配“${site}”。";
 "ILcGmf" =  "网站";
 // "cyajMn" =  ""; // Imagine this one is missing its translation in GlotPress

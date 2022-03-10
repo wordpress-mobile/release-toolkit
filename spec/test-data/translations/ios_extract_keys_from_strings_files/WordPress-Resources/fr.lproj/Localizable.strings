@@ -3,10 +3,10 @@
 "key1" = "value1-FR";
 "key2" = "value2-FR";
 "key3" = "value3";
-"wordpress.NSLocationUsageDescription" = "WordPress voudrait ajouter votre position aux articles des sites pour lesquels vous avez activé la géolocalisation.";
-"wordpress.NSCameraUsageDescription" = "Pour prendre des photos ou réaliser des vidéos à utiliser dans vos articles.";
-"jetpack.NSLocationUsageDescription" = "Jetpack voudrait ajouter votre position aux articles des sites pour lesquels vous avez activé la géolocalisation.";
-"jetpack.NSCameraUsageDescription" = "Pour prendre des photos ou réaliser des vidéos à utiliser dans vos articles.";
+"wordpress.infoplist.NSLocationUsageDescription" = "WordPress voudrait ajouter votre position aux articles des sites pour lesquels vous avez activé la géolocalisation.";
+"wordpress.infoplist.NSCameraUsageDescription" = "Pour prendre des photos ou réaliser des vidéos à utiliser dans vos articles.";
+"jetpack.infoplist.NSLocationUsageDescription" = "Jetpack voudrait ajouter votre position aux articles des sites pour lesquels vous avez activé la géolocalisation.";
+"jetpack.infoplist.NSCameraUsageDescription" = "Pour prendre des photos ou réaliser des vidéos à utiliser dans vos articles.";
 "BOl9KQ" = "Il y a ${count} options correspondant à ‘${site}’.";
 "ILcGmf" = "Site";
 "cyajMn" = "Site";
