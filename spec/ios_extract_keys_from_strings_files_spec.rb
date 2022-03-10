@@ -59,6 +59,35 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
       end
     end
 
+    it 'can extract keys with prefixes to multiple `.strings` files, and strip the prefixes' do
+      in_tmp_dir do |tmp_dir|
+        # Arrange
+        wp_resources_dir = File.join(tmp_dir, 'WordPress-Resources')
+        jp_resources_dir = File.join(tmp_dir, 'Jetpack-Resources')
+        FileUtils.cp_r(File.join(test_data_dir, 'WordPress-Resources', '.'), wp_resources_dir)
+        FileUtils.cp_r(File.join(test_data_dir, 'Jetpack-Resources', '.'), jp_resources_dir)
+
+        # Act
+        run_described_fastlane_action(
+          source_parent_dir: wp_resources_dir, # The `*.lproj/Localizable.strings` files we want to extract the keys from are in `WordPress-Resources` parent dir
+          target_original_files: {
+            File.join(wp_resources_dir, 'en.lproj', 'InfoPlist.strings') => 'wordpress.',
+            File.join(jp_resources_dir, 'en.lproj', 'InfoPlist.strings') => 'jetpack.'
+          }
+        )
+
+        # Assert
+        assert_output_files_match(
+          # extracted files for WordPress target
+          File.join(wp_resources_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-fr.strings',
+          File.join(wp_resources_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-zh-Hans.strings',
+          # extracted files for Jetpack target
+          File.join(jp_resources_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-jp-fr.strings',
+          File.join(jp_resources_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-jp-zh-Hans.strings'
+        )
+      end
+    end
+
     it 'supports using an input file other than `Localizable.strings`' do
       in_tmp_dir do |tmp_dir|
         # Arrange
