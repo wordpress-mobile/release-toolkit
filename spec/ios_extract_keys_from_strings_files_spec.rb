@@ -26,8 +26,8 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
 
         # Assert
         assert_output_files_match(
-          File.join(lproj_source_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-fr.strings',
-          File.join(lproj_source_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-zh-Hans.strings'
+          File.join(lproj_source_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-fr.strings',
+          File.join(lproj_source_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-zh-Hans.strings'
         )
       end
     end
@@ -51,9 +51,9 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
 
         # Assert
         assert_output_files_match(
-          File.join(resources_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-fr.strings',
+          File.join(resources_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-fr.strings',
           File.join(siri_intent_dir, 'fr.lproj', 'Sites.strings') => 'Sites-expected-fr.strings',
-          File.join(resources_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-zh-Hans.strings',
+          File.join(resources_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-zh-Hans.strings',
           File.join(siri_intent_dir, 'zh-Hans.lproj', 'Sites.strings') => 'Sites-expected-zh-Hans.strings'
         )
       end
@@ -78,8 +78,8 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
 
         # Assert
         assert_output_files_match(
-          File.join(lproj_source_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-fr.strings',
-          File.join(lproj_source_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-zh-Hans.strings'
+          File.join(lproj_source_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-fr.strings',
+          File.join(lproj_source_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-zh-Hans.strings'
         )
       end
     end
