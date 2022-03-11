@@ -32,6 +32,7 @@ describe Fastlane::Actions::IosMergeStringsFilesAction do
           [
             'Duplicate key found while merging the `.strings` files: `key1`',
             'Duplicate key found while merging the `.strings` files: `key2`',
+            'Tip: To avoid those key conflicts, you might want to consider providing different prefixes in the `Hash` you used for the `paths:` parameter.',
           ]
         )
       end

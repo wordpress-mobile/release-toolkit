@@ -9,6 +9,7 @@ module Fastlane
         duplicates.each do |dup_key|
           UI.important "Duplicate key found while merging the `.strings` files: `#{dup_key}`"
         end
+        UI.important 'Tip: To avoid those key conflicts, you might want to consider providing different prefixes in the `Hash` you used for the `paths:` parameter.' unless duplicates.empty?
         duplicates
       end
 
