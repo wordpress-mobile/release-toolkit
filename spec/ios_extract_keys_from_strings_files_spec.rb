@@ -64,15 +64,18 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         # Arrange
         wp_resources_dir = File.join(tmp_dir, 'WordPress-Resources')
         jp_resources_dir = File.join(tmp_dir, 'Jetpack-Resources')
+        siri_intent_dir = File.join(tmp_dir, 'SiriIntentTarget')
         FileUtils.cp_r(File.join(test_data_dir, 'WordPress-Resources', '.'), wp_resources_dir)
         FileUtils.cp_r(File.join(test_data_dir, 'Jetpack-Resources', '.'), jp_resources_dir)
+        FileUtils.cp_r(File.join(test_data_dir, 'SiriIntentTarget', '.'), siri_intent_dir)
 
         # Act
         run_described_fastlane_action(
           source_parent_dir: wp_resources_dir, # The `*.lproj/Localizable.strings` files we want to extract the keys from are in `WordPress-Resources` parent dir
           target_original_files: {
             File.join(wp_resources_dir, 'en.lproj', 'InfoPlist.strings') => 'wordpress.infoplist.',
-            File.join(jp_resources_dir, 'en.lproj', 'InfoPlist.strings') => 'jetpack.infoplist.'
+            File.join(jp_resources_dir, 'en.lproj', 'InfoPlist.strings') => 'jetpack.infoplist.',
+            File.join(siri_intent_dir, 'en.lproj', 'Sites.strings') => 'ios-widget.'
           }
         )
 
@@ -83,7 +86,10 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
           File.join(wp_resources_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-zh-Hans.strings',
           # extracted files for Jetpack target
           File.join(jp_resources_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-jp-fr.strings',
-          File.join(jp_resources_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-jp-zh-Hans.strings'
+          File.join(jp_resources_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-jp-zh-Hans.strings',
+          # extracted files for IntentDefinition target
+          File.join(siri_intent_dir, 'fr.lproj', 'Sites.strings') => 'Sites-expected-fr.strings',
+          File.join(siri_intent_dir, 'zh-Hans.lproj', 'Sites.strings') => 'Sites-expected-zh-Hans.strings'
         )
       end
     end

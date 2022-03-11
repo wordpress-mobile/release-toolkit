@@ -20,9 +20,9 @@
 
 /* MARK: - Sites.strings */
 
-"BOl9KQ" = "There are ${count} options matching ‘${site}’.";
-"ILcGmf" = "Site";
-"cyajMn" = "Site";
-"gpCwrM" = "Select Site";
-"s4dJhx" = "Just to confirm, you wanted ‘${site}’?";
+"ios-widget.BOl9KQ" = "There are ${count} options matching ‘${site}’.";
+"ios-widget.ILcGmf" = "Site";
+"ios-widget.cyajMn" = "Site";
+"ios-widget.gpCwrM" = "Select Site";
+"ios-widget.s4dJhx" = "Just to confirm, you wanted ‘${site}’?";
 

@@ -7,8 +7,8 @@
 "wordpress.infoplist.NSCameraUsageDescription" = "Pour prendre des photos ou réaliser des vidéos à utiliser dans vos articles.";
 "jetpack.infoplist.NSLocationUsageDescription" = "Jetpack voudrait ajouter votre position aux articles des sites pour lesquels vous avez activé la géolocalisation.";
 "jetpack.infoplist.NSCameraUsageDescription" = "Pour prendre des photos ou réaliser des vidéos à utiliser dans vos articles.";
-"BOl9KQ" = "Il y a ${count} options correspondant à ‘${site}’.";
-"ILcGmf" = "Site";
-"cyajMn" = "Site";
-"gpCwrM" = "Sélectionner un Site";
-"s4dJhx" = "Juste pour confirmer, vous souhaitez ‘${site}’ ?";
+"ios-widget.BOl9KQ" = "Il y a ${count} options correspondant à ‘${site}’.";
+"ios-widget.ILcGmf" = "Site";
+"ios-widget.cyajMn" = "Site";
+"ios-widget.gpCwrM" = "Sélectionner un Site";
+"ios-widget.s4dJhx" = "Juste pour confirmer, vous souhaitez ‘${site}’ ?";
