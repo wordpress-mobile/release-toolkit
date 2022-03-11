@@ -42,7 +42,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
   describe '#merge_strings' do
     # Ensuring we test this against input files which are using different encodings (UTF-16BE & UTF-8) is an important case to cover
     it 'properly merges 2 textual strings files with different encodings into a new one' do
-      paths = { fixture('Localizable-utf16.strings') => nil, fixture('InfoPlist-utf8.strings') => nil }
+      paths = { fixture('Localizable-utf16.strings') => nil, fixture('InfoPlist-utf8.strings') => '' }
 
       # Just making sure we don't accidentally change the encoding of the fixture files in the future
       expect(file_encoding(paths.keys[0])).to eq(Encoding::UTF_16BE)

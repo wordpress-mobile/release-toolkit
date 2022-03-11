@@ -66,7 +66,7 @@ module Fastlane
               tmp_file.write("/* MARK: - #{File.basename(input_file)} */\n\n")
               # Read line-by-line to reduce memory footprint during content copy; Be sure to guess file encoding using the Byte-Order-Mark.
               File.readlines(input_file, mode: 'rb:BOM|UTF-8').each do |line|
-                if prefix
+                unless prefix.nil? || prefix.empty?
                   # We need to ensure the line and RegExp are using the same encoding, so we transcode everything to UTF-8.
                   line.encode!(Encoding::UTF_8)
                   # The `/u` modifier on the RegExps is to make them UTF-8
