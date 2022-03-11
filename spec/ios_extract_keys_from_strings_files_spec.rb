@@ -36,25 +36,25 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
       in_tmp_dir do |tmp_dir|
         # Arrange
         resources_dir = File.join(tmp_dir, 'Resources')
-        siri_intent_dir = File.join(tmp_dir, 'SiriIntentTarget')
+        intentsdef_dir = File.join(tmp_dir, 'IntentsDefinitionTarget')
         FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), resources_dir)
-        FileUtils.cp_r(File.join(test_data_dir, 'SiriIntentTarget', '.'), siri_intent_dir)
+        FileUtils.cp_r(File.join(test_data_dir, 'IntentsDefinitionTarget', '.'), intentsdef_dir)
 
         # Act
         run_described_fastlane_action(
           source_parent_dir: resources_dir,
           target_original_files: {
             File.join(resources_dir, 'en.lproj', 'InfoPlist.strings') => nil,
-            File.join(siri_intent_dir, 'en.lproj', 'Sites.strings') => nil
+            File.join(intentsdef_dir, 'en.lproj', 'Sites.strings') => nil
           }
         )
 
         # Assert
         assert_output_files_match(
           File.join(resources_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-fr.strings',
-          File.join(siri_intent_dir, 'fr.lproj', 'Sites.strings') => 'Sites-expected-fr.strings',
+          File.join(intentsdef_dir, 'fr.lproj', 'Sites.strings') => 'Sites-expected-fr.strings',
           File.join(resources_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-zh-Hans.strings',
-          File.join(siri_intent_dir, 'zh-Hans.lproj', 'Sites.strings') => 'Sites-expected-zh-Hans.strings'
+          File.join(intentsdef_dir, 'zh-Hans.lproj', 'Sites.strings') => 'Sites-expected-zh-Hans.strings'
         )
       end
     end
@@ -64,10 +64,10 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         # Arrange
         wp_resources_dir = File.join(tmp_dir, 'WordPress-Resources')
         jp_resources_dir = File.join(tmp_dir, 'Jetpack-Resources')
-        siri_intent_dir = File.join(tmp_dir, 'SiriIntentTarget')
+        intentsdef_dir = File.join(tmp_dir, 'IntentsDefinitionTarget')
         FileUtils.cp_r(File.join(test_data_dir, 'WordPress-Resources', '.'), wp_resources_dir)
         FileUtils.cp_r(File.join(test_data_dir, 'Jetpack-Resources', '.'), jp_resources_dir)
-        FileUtils.cp_r(File.join(test_data_dir, 'SiriIntentTarget', '.'), siri_intent_dir)
+        FileUtils.cp_r(File.join(test_data_dir, 'IntentsDefinitionTarget', '.'), intentsdef_dir)
 
         # Act
         run_described_fastlane_action(
@@ -75,7 +75,7 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
           target_original_files: {
             File.join(wp_resources_dir, 'en.lproj', 'InfoPlist.strings') => 'wordpress.infoplist.',
             File.join(jp_resources_dir, 'en.lproj', 'InfoPlist.strings') => 'jetpack.infoplist.',
-            File.join(siri_intent_dir, 'en.lproj', 'Sites.strings') => 'ios-widget.'
+            File.join(intentsdef_dir, 'en.lproj', 'Sites.strings') => 'ios-widget.'
           }
         )
 
@@ -88,8 +88,8 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
           File.join(jp_resources_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-jp-fr.strings',
           File.join(jp_resources_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-jp-zh-Hans.strings',
           # extracted files for IntentDefinition target
-          File.join(siri_intent_dir, 'fr.lproj', 'Sites.strings') => 'Sites-expected-fr.strings',
-          File.join(siri_intent_dir, 'zh-Hans.lproj', 'Sites.strings') => 'Sites-expected-zh-Hans.strings'
+          File.join(intentsdef_dir, 'fr.lproj', 'Sites.strings') => 'Sites-expected-fr.strings',
+          File.join(intentsdef_dir, 'zh-Hans.lproj', 'Sites.strings') => 'Sites-expected-zh-Hans.strings'
         )
       end
     end
