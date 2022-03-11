@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe Fastlane::Actions::IosMergeStringsFilesAction do
   let(:test_data_dir) { File.join(File.dirname(__FILE__), 'test-data', 'translations', 'ios_l10n_helper') }
 
