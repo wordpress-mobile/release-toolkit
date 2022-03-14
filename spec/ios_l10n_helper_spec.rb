@@ -69,6 +69,13 @@ describe Fastlane::Helper::Ios::L10nHelper do
 
     it 'adds prefixes to string keys when merging files' do
       paths = {
+        # NOTE: In real-world applications we typically won't use a prefix for the main `Localizable.strings` file which contains most of the strings,
+        # but instead only use a prefix on **secondary** files, with low number of strings — because we want to avoid polluting most of the strings in
+        # GlotPress with a prefix if they don't need one, and also want to reduce the number of applications of the RexExp adding the prefixes to a minimum.
+        #
+        # But for the sake of this Unit Test, since the goal of this test is to validate the prefix insertion on as many test cases as possible,
+        # using a prefix on all the files — including the main one — allows us to widen the coverage of the test. This is not supposed to reflect
+        # how this action is going to be used in real-world projects (where the main strings file would typically not use a prefix in most scenarios).
         fixture('Localizable-utf16.strings') => 'main.',
         fixture('InfoPlist-utf8.strings') => 'infoplist.', # Useful case because it typically does not have quotes around keys
         fixture('non-latin-utf16.strings') => 'other.' # While this one does have quotes around its keys
