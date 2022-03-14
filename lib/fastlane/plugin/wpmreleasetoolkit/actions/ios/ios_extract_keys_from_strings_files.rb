@@ -7,19 +7,22 @@ module Fastlane
         keys_to_extract_per_target_file = keys_list_per_target_file(target_original_files) # Hash { original-file-path => [keys] }
         prefix_to_remove_per_target_file = params[:target_original_files] # Hash { original-file-path => prefix }
 
+        UI.message("Extracting keys from `#{source_parent_dir}/*.lproj/#{params[:source_tablename]}.strings` into:")
+        target_original_files.each { |f| UI.message(' - ' + replace_lproj_in_path(f, with_lproj: '*.lproj')) }
+
         # For each locale, extract the right translations from `<source_tablename>.strings` into each target `.strings` file
         Dir.glob('*.lproj', base: source_parent_dir).each do |lproj_dir_name|
           source_strings_file = File.join(source_parent_dir, lproj_dir_name, "#{params[:source_tablename]}.strings")
           translations = Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: source_strings_file)
 
           target_original_files.each do |target_original_file|
-            target_strings_file = File.join(File.dirname(File.dirname(target_original_file)), lproj_dir_name, File.basename(target_original_file))
+            target_strings_file = replace_lproj_in_path(target_original_file, with_lproj: lproj_dir_name)
             next if target_strings_file == target_original_file # do not generate/overwrite the original locale itself
 
             keys_prefix = prefix_to_remove_per_target_file[target_original_file] || ''
             keys_to_extract = keys_to_extract_per_target_file[target_original_file].map { |k| "#{keys_prefix}#{k}" }
             extracted_translations = translations.slice(*keys_to_extract).transform_keys { |k| k.delete_prefix(keys_prefix) }
-            UI.message("Extracting #{extracted_translations.count} keys (out of #{keys_to_extract.count} expected) into #{target_strings_file}...")
+            UI.verbose("Extracting #{extracted_translations.count} keys (out of #{keys_to_extract.count} expected) into #{target_strings_file}...")
 
             FileUtils.mkdir_p(File.dirname(target_strings_file)) # Ensure path up to parent dir exists, create it if not.
             Fastlane::Helper::Ios::L10nHelper.generate_strings_file_from_hash(translations: extracted_translations, output_path: target_strings_file)
@@ -43,6 +46,15 @@ module Fastlane
         end.to_h
       rescue StandardError => e
         UI.user_error!("Failed to read the keys to extract from originals file: #{e.message}")
+      end
+
+      # Replaces the `*.lproj` component of the path to a `.strings` file with a different `.lproj` folder
+      #
+      # @param [String] path The path the the `.strings` file, assumed to be in a `.lproj` parent folder
+      # @param [String] with_lproj The new name of the `.lproj` parent folder to point to
+      #
+      def self.replace_lproj_in_path(path, with_lproj:)
+        File.join(File.dirname(File.dirname(path)), with_lproj, File.basename(path))
       end
 
       #####################################################
