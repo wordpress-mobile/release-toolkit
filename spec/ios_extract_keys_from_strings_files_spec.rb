@@ -41,7 +41,7 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         FileUtils.cp_r(File.join(test_data_dir, 'IntentsDefinitionTarget', '.'), intentsdef_dir)
 
         # Act
-        run_described_fastlane_action(
+        result = run_described_fastlane_action(
           source_parent_dir: resources_dir,
           target_original_files: {
             File.join(resources_dir, 'en.lproj', 'InfoPlist.strings') => nil,
@@ -50,12 +50,14 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         )
 
         # Assert
-        assert_output_files_match(
+        expected_files_map = {
           File.join(resources_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-fr.strings',
           File.join(intentsdef_dir, 'fr.lproj', 'Sites.strings') => 'Sites-expected-fr.strings',
           File.join(resources_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-zh-Hans.strings',
           File.join(intentsdef_dir, 'zh-Hans.lproj', 'Sites.strings') => 'Sites-expected-zh-Hans.strings'
-        )
+        }
+        assert_output_files_match(expected_files_map)
+        expect(result.sort).to eq(expected_files_map.keys.sort)
       end
     end
 

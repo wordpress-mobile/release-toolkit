@@ -10,6 +10,8 @@ module Fastlane
         UI.message("Extracting keys from `#{source_parent_dir}/*.lproj/#{params[:source_tablename]}.strings` into:")
         target_original_files.each { |f| UI.message(' - ' + replace_lproj_in_path(f, with_lproj: '*.lproj')) }
 
+        updated_files_list = []
+
         # For each locale, extract the right translations from `<source_tablename>.strings` into each target `.strings` file
         Dir.glob('*.lproj', base: source_parent_dir).each do |lproj_dir_name|
           source_strings_file = File.join(source_parent_dir, lproj_dir_name, "#{params[:source_tablename]}.strings")
@@ -26,12 +28,15 @@ module Fastlane
 
             FileUtils.mkdir_p(File.dirname(target_strings_file)) # Ensure path up to parent dir exists, create it if not.
             Fastlane::Helper::Ios::L10nHelper.generate_strings_file_from_hash(translations: extracted_translations, output_path: target_strings_file)
+            updated_files_list.append(target_strings_file)
           rescue StandardError => e
             UI.user_error!("Error while writing extracted translations to `#{target_strings_file}`: #{e.message}")
           end
         rescue StandardError => e
           UI.user_error!("Error while reading the translations from source file `#{source_strings_file}`: #{e.message}")
         end
+
+        updated_files_list
       end
 
       # Pre-load the list of keys to extract for each target file.
@@ -112,13 +117,11 @@ module Fastlane
       end
 
       def self.return_type
-        # Describes what type of data is expected to be returned
-        # see RETURN_TYPES in https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/action.rb
-        nil
+        :array_of_strings
       end
 
       def self.return_value
-        # Freeform textual description of the return value
+        'The list of files which have been generated and written to disk by the action'
       end
 
       def self.authors
