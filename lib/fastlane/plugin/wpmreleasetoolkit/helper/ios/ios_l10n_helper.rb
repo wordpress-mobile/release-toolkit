@@ -19,7 +19,7 @@ module Fastlane
         #         - `nil` if the file does not exist or is neither of those format (e.g. not a `.strings` file at all)
         #
         def self.strings_file_type(path:)
-          return :text if File.size(path).zero? # If completely empty file, consider it as a valid .strings files in textual format
+          return :text if File.exist?(path) && File.size(path).zero? # If completely empty file, consider it as a valid `.strings` files in textual format
 
           # Start by checking it seems like a valid property-list file (and not e.g. an image or plain text file)
           _, status = Open3.capture2('/usr/bin/plutil', '-lint', path)
@@ -57,7 +57,7 @@ module Fastlane
 
             tmp_file.write("/* Generated File. Do not edit. */\n\n")
             paths.each do |input_file, prefix|
-              next if File.size(input_file).zero? # Accept but skip totally-empty files
+              next if File.exist?(input_file) && File.size(input_file).zero? # Accept but skip existing-but-totally-empty files (to avoid adding useless `MARK:` comment for them)
 
               fmt = strings_file_type(path: input_file)
               raise "The file `#{input_file}` does not exist or is of unknown format." if fmt.nil?
@@ -94,7 +94,7 @@ module Fastlane
         # @raise [RuntimeError] If the file is not a valid strings file or there was an error in parsing its content.
         #
         def self.read_strings_file_as_hash(path:)
-          return {} if File.size(path).zero? # Return empty hash if completely empty file
+          return {} if File.exist?(path) && File.size(path).zero? # Return empty hash if completely empty file
 
           output, status = Open3.capture2e('/usr/bin/plutil', '-convert', 'json', '-o', '-', path)
           raise output unless status.success?
