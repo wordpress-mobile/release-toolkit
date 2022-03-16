@@ -6,7 +6,8 @@
 
 ### Breaking Changes
 
-_None_
+* Update the API of `ios_merge_strings_files` and `ios_extract_keys_from_strings_files` to support using prefixes for string keys when merging/splitting the files.
+  The actions now expect a `Hash` (instead of an `Array`) for the list of files to provide an associated prefix (or `nil` or `''` when none) for each file to merge/split. [#345]
 
 ### New Features
 

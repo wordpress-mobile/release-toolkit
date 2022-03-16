@@ -42,11 +42,11 @@ describe Fastlane::Helper::Ios::L10nHelper do
   describe '#merge_strings' do
     # Ensuring we test this against input files which are using different encodings (UTF-16BE & UTF-8) is an important case to cover
     it 'properly merges 2 textual strings files with different encodings into a new one' do
-      paths = [fixture('Localizable-utf16.strings'), fixture('InfoPlist-utf8.strings')]
+      paths = { fixture('Localizable-utf16.strings') => nil, fixture('InfoPlist-utf8.strings') => '' }
 
       # Just making sure we don't accidentally change the encoding of the fixture files in the future
-      expect(file_encoding(paths[0])).to eq(Encoding::UTF_16BE)
-      expect(file_encoding(paths[1])).to eq(Encoding::UTF_8)
+      expect(file_encoding(paths.keys[0])).to eq(Encoding::UTF_16BE)
+      expect(file_encoding(paths.keys[1])).to eq(Encoding::UTF_8)
 
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         output_file = File.join(tmp_dir, 'output.strings')
@@ -61,14 +61,37 @@ describe Fastlane::Helper::Ios::L10nHelper do
       paths = [fixture('Localizable-utf16.strings'), fixture('InfoPlist-utf8.strings')]
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         paths.each { |f| FileUtils.cp(f, tmp_dir) }
-        paths.map! { |f| File.join(tmp_dir, File.basename(f)) }
-        described_class.merge_strings(paths: paths, output_path: paths.first)
-        expect(File.read(paths.first)).to eq(File.read(fixture('expected-merged.strings')))
+        paths = paths.map { |f| [File.join(tmp_dir, File.basename(f)), nil] }.to_h
+        described_class.merge_strings(paths: paths, output_path: paths.keys.first)
+        expect(File.read(paths.keys.first)).to eq(File.read(fixture('expected-merged.strings')))
+      end
+    end
+
+    it 'adds prefixes to string keys when merging files' do
+      paths = {
+        # NOTE: In real-world applications we typically won't use a prefix for the main `Localizable.strings` file which contains most of the strings,
+        # but instead only use a prefix on **secondary** files, with low number of strings — because we want to avoid polluting most of the strings in
+        # GlotPress with a prefix if they don't need one, and also want to reduce the number of applications of the RexExp adding the prefixes to a minimum.
+        #
+        # But for the sake of this Unit Test, since the goal of this test is to validate the prefix insertion on as many test cases as possible,
+        # using a prefix on all the files — including the main one — allows us to widen the coverage of the test. This is not supposed to reflect
+        # how this action is going to be used in real-world projects (where the main strings file would typically not use a prefix in most scenarios).
+        fixture('Localizable-utf16.strings') => 'main.',
+        fixture('InfoPlist-utf8.strings') => 'infoplist.', # Useful case because it typically does not have quotes around keys
+        fixture('non-latin-utf16.strings') => 'other.' # While this one does have quotes around its keys
+      }
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        output_file = File.join(tmp_dir, 'output.strings')
+        duplicates = described_class.merge_strings(paths: paths, output_path: output_file)
+        expect(File.read(output_file)).to eq(File.read(fixture('expected-merged-prefixed.strings')))
+        # We should also not find duplicates anymore, given that `key1` and `key2` (duplicates from `Localizable-utf16.strings`
+        # and `non-latin-utf16.strings` files) will now be prefixed differently, and thus made different during merge
+        expect(duplicates).to be_empty
       end
     end
 
     it 'returns duplicate keys found' do
-      paths = [fixture('Localizable-utf16.strings'), fixture('non-latin-utf16.strings')]
+      paths = { fixture('Localizable-utf16.strings') => nil, fixture('non-latin-utf16.strings') => nil }
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         output_file = File.join(tmp_dir, 'output.strings')
         duplicates = described_class.merge_strings(paths: paths, output_path: output_file)
@@ -77,22 +100,22 @@ describe Fastlane::Helper::Ios::L10nHelper do
     end
 
     it 'raises if one of the strings file is not in textual format' do
-      paths = [fixture('Localizable-utf16.strings'), fixture('xml-format.strings')]
+      paths = { fixture('Localizable-utf16.strings') => nil, fixture('xml-format.strings') => nil }
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         output_file = File.join(tmp_dir, 'output.strings')
         expect do
           described_class.merge_strings(paths: paths, output_path: output_file)
-        end.to raise_exception(RuntimeError, "The file `#{paths[1]}` is in xml format but we currently only support merging `.strings` files in text format.")
+        end.to raise_exception(RuntimeError, "The file `#{paths.keys[1]}` is in xml format but we currently only support merging `.strings` files in text format.")
       end
     end
 
     it 'raises if any of the strings file does not exist' do
-      paths = [fixture('Localizable-utf16.strings'), '/these/are/not/the/droids/you/are/looking/for']
+      paths = { fixture('Localizable-utf16.strings') => nil, '/these/are/not/the/droids/you/are/looking/for' => nil }
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         output_file = File.join(tmp_dir, 'output.strings')
         expect do
           described_class.merge_strings(paths: paths, output_path: output_file)
-        end.to raise_exception(RuntimeError, "The file `#{paths[1]}` does not exist or is of unknown format.")
+        end.to raise_exception(RuntimeError, "The file `#{paths.keys[1]}` does not exist or is of unknown format.")
       end
     end
   end
@@ -100,7 +123,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
   describe '#read_strings_file_as_hash' do
     it 'can read the content of a textual strings file' do
       file = fixture('Localizable-utf16.strings')
-      expected_hash = { 'key1' => 'string 1', 'key2' => 'string 2️⃣', 'key3' => 'string 3' }
+      expected_hash = { 'key1' => 'string 1', 'key2' => 'string 2️⃣', 'key3' => "string 3\non %d lines" }
       expect(described_class.read_strings_file_as_hash(path: file)).to eq(expected_hash)
     end
 

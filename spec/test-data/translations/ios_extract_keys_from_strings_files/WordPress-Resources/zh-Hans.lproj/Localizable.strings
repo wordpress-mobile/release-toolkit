@@ -1,0 +1,14 @@
+/* This file is typically downloaded from GlotPress by exporting the `fr-FR` translations */
+
+"key1" = "value1-Hans";
+"key2" = "value2-Hans";
+"key3" = "value3-Hans";
+"wordpress.infoplist.NSLocationUsageDescription" = "对于已启用地理标记的站点，WordPress 会向其中的文章内添加您的位置。";
+"wordpress.infoplist.NSCameraUsageDescription" = "拍摄要在文章内使用的照片或视频。";
+"jetpack.infoplist.NSLocationUsageDescription" = "对于已启用地理标记的站点，Jetpack 会向其中的文章内添加您的位置。";
+"jetpack.infoplist.NSCameraUsageDescription" = "拍摄要在文章内使用的照片或视频。";
+"ios-widget.BOl9KQ" =  "有 ${count} 个选项匹配“${site}”。";
+"ios-widget.ILcGmf" =  "网站";
+// "ios-widget.cyajMn" =  ""; // Imagine this one is missing its translation in GlotPress
+"ios-widget.gpCwrM" =  "选择一个网站";
+"ios-widget.s4dJhx" =  "只是为了确认一下，你想要'${site}'？";
