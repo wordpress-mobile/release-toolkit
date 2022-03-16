@@ -14,21 +14,18 @@ describe Fastlane::Actions::IosMergeStringsFilesAction do
       allow(FastlaneCore::UI).to receive(:important) do |message|
         messages.append(message)
       end
-      inputs = ['Localizable-utf16.strings', 'non-latin-utf16.strings']
 
-      Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmpdir|
-        inputs.each { |f| FileUtils.cp(fixture(f), tmpdir) }
+      in_tmp_dir do |tmpdir|
+        FileUtils.cp(fixture('Localizable-utf16.strings'), tmpdir)
 
         # Act
-        result = Dir.chdir(tmpdir) do
-          run_described_fastlane_action(
-            paths: { inputs[0] => nil, inputs[1] => nil },
-            destination: 'output.strings'
-          )
-        end
+        result = run_described_fastlane_action(
+          paths_to_merge: { fixture('non-latin-utf16.strings') => nil },
+          destination: 'Localizable-utf16.strings'
+        )
 
         # Assert
-        expect(File).to exist(File.join(tmpdir, 'output.strings'))
+        expect(File.read('Localizable-utf16.strings')).to eq(File.read(fixture('expected-merged-nonlatin.strings')))
         expect(result).to eq(%w[key1 key2])
         expect(messages).to eq(
           [
@@ -40,25 +37,23 @@ describe Fastlane::Actions::IosMergeStringsFilesAction do
       end
     end
 
-    it 'merges in-place if no destination is provided' do
+    it 'can create the destination file if it did not exist yet' do
       # Arrange
       allow(FastlaneCore::UI).to receive(:important)
-      inputs = ['Localizable-utf16.strings', 'non-latin-utf16.strings']
+      dest_file = 'output.strings'
 
       in_tmp_dir do |tmpdir|
-        inputs.each { |f| FileUtils.cp(fixture(f), tmpdir) }
-
         # Act
         result = Dir.chdir(tmpdir) do
           run_described_fastlane_action(
-            paths: { inputs[0] => nil, inputs[1] => nil }
+            paths_to_merge: { fixture('Localizable-utf16.strings') => nil, fixture('non-latin-utf16.strings') => nil },
+            destination: dest_file
           )
         end
 
         # Assert
-        derived_output_file = File.join(tmpdir, inputs[0])
-        expect(File).to exist(derived_output_file)
-        expect(File.read(derived_output_file)).to eq(File.read(fixture('expected-merged-nonlatin.strings')))
+        expect(File).to exist(dest_file)
+        expect(File.read(dest_file)).to eq(File.read(fixture('expected-merged-nonlatin.strings')))
         expect(result).to eq(%w[key1 key2])
       end
     end
