@@ -16,8 +16,6 @@ common_params:
       environment:
         - "DANGER_GITHUB_API_TOKEN"
 
-agents:
-  queue: "default"
 
 steps:
   #################
@@ -38,6 +36,8 @@ steps:
     env: *xcode_image
     plugins:
       automattic/bash-cache#2.0.0: ~
+    agents:
+      queue: "mac"
 
   #################
   # Lint
@@ -49,6 +49,8 @@ steps:
       echo "--- :rubocop: Run Rubocop"
       bundle exec rubocop
     plugins: [*docker_plugin]
+    agents:
+      queue: "default"
 
   #################
   # Danger
@@ -60,6 +62,8 @@ steps:
       echo "--- :rubocop: Run Danger"
       bundle exec danger
     plugins: [*docker_plugin_with_danger_token]
+    agents:
+      queue: "default"
 
   #################
   # Push to RubyGems
@@ -76,3 +80,5 @@ steps:
     # BUILDKITE_COMMAND environment variable.
     command: .buildkite/gem-push.sh
     plugins: [*docker_plugin]
+    agents:
+      queue: "default"
