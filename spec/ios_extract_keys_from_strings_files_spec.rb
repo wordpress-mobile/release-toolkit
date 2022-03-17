@@ -21,13 +21,13 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         # Act
         run_described_fastlane_action(
           source_parent_dir: lproj_source_dir,
-          target_original_files: File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
+          target_original_files: { File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings') => nil }
         )
 
         # Assert
         assert_output_files_match(
-          File.join(lproj_source_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-fr.strings',
-          File.join(lproj_source_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-zh-Hans.strings'
+          File.join(lproj_source_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-fr.strings',
+          File.join(lproj_source_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-zh-Hans.strings'
         )
       end
     end
@@ -36,25 +36,62 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
       in_tmp_dir do |tmp_dir|
         # Arrange
         resources_dir = File.join(tmp_dir, 'Resources')
-        siri_intent_dir = File.join(tmp_dir, 'SiriIntentTarget')
+        intentsdef_dir = File.join(tmp_dir, 'IntentsDefinitionTarget')
         FileUtils.cp_r(File.join(test_data_dir, 'Resources', '.'), resources_dir)
-        FileUtils.cp_r(File.join(test_data_dir, 'SiriIntentTarget', '.'), siri_intent_dir)
+        FileUtils.cp_r(File.join(test_data_dir, 'IntentsDefinitionTarget', '.'), intentsdef_dir)
+
+        # Act
+        result = run_described_fastlane_action(
+          source_parent_dir: resources_dir,
+          target_original_files: {
+            File.join(resources_dir, 'en.lproj', 'InfoPlist.strings') => nil,
+            File.join(intentsdef_dir, 'en.lproj', 'Sites.strings') => nil
+          }
+        )
+
+        # Assert
+        expected_files_map = {
+          File.join(resources_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-fr.strings',
+          File.join(intentsdef_dir, 'fr.lproj', 'Sites.strings') => 'Sites-expected-fr.strings',
+          File.join(resources_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-zh-Hans.strings',
+          File.join(intentsdef_dir, 'zh-Hans.lproj', 'Sites.strings') => 'Sites-expected-zh-Hans.strings'
+        }
+        assert_output_files_match(expected_files_map)
+        expect(result.sort).to eq(expected_files_map.keys.sort)
+      end
+    end
+
+    it 'can extract keys with prefixes to multiple `.strings` files, and strip the prefixes' do
+      in_tmp_dir do |tmp_dir|
+        # Arrange
+        wp_resources_dir = File.join(tmp_dir, 'WordPress-Resources')
+        jp_resources_dir = File.join(tmp_dir, 'Jetpack-Resources')
+        intentsdef_dir = File.join(tmp_dir, 'IntentsDefinitionTarget')
+        FileUtils.cp_r(File.join(test_data_dir, 'WordPress-Resources', '.'), wp_resources_dir)
+        FileUtils.cp_r(File.join(test_data_dir, 'Jetpack-Resources', '.'), jp_resources_dir)
+        FileUtils.cp_r(File.join(test_data_dir, 'IntentsDefinitionTarget', '.'), intentsdef_dir)
 
         # Act
         run_described_fastlane_action(
-          source_parent_dir: resources_dir,
-          target_original_files: [
-            File.join(resources_dir, 'en.lproj', 'InfoPlist.strings'),
-            File.join(siri_intent_dir, 'en.lproj', 'Sites.strings'),
-          ]
+          source_parent_dir: wp_resources_dir, # The `*.lproj/Localizable.strings` files we want to extract the keys from are in `WordPress-Resources` parent dir
+          target_original_files: {
+            File.join(wp_resources_dir, 'en.lproj', 'InfoPlist.strings') => 'wordpress.infoplist.',
+            File.join(jp_resources_dir, 'en.lproj', 'InfoPlist.strings') => 'jetpack.infoplist.',
+            File.join(intentsdef_dir, 'en.lproj', 'Sites.strings') => 'ios-widget.'
+          }
         )
 
         # Assert
         assert_output_files_match(
-          File.join(resources_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-fr.strings',
-          File.join(siri_intent_dir, 'fr.lproj', 'Sites.strings') => 'Sites-expected-fr.strings',
-          File.join(resources_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-zh-Hans.strings',
-          File.join(siri_intent_dir, 'zh-Hans.lproj', 'Sites.strings') => 'Sites-expected-zh-Hans.strings'
+          # extracted files for WordPress target
+          File.join(wp_resources_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-fr.strings',
+          File.join(wp_resources_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-zh-Hans.strings',
+          # extracted files for Jetpack target
+          File.join(jp_resources_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-jp-fr.strings',
+          File.join(jp_resources_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-jp-zh-Hans.strings',
+          # extracted files for IntentDefinition target
+          File.join(intentsdef_dir, 'fr.lproj', 'Sites.strings') => 'Sites-expected-fr.strings',
+          File.join(intentsdef_dir, 'zh-Hans.lproj', 'Sites.strings') => 'Sites-expected-zh-Hans.strings'
         )
       end
     end
@@ -73,13 +110,13 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         run_described_fastlane_action(
           source_parent_dir: lproj_source_dir,
           source_tablename: 'GlotPressTranslations',
-          target_original_files: File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
+          target_original_files: { File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings') => nil }
         )
 
         # Assert
         assert_output_files_match(
-          File.join(lproj_source_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-fr.strings',
-          File.join(lproj_source_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-zh-Hans.strings'
+          File.join(lproj_source_dir, 'fr.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-fr.strings',
+          File.join(lproj_source_dir, 'zh-Hans.lproj', 'InfoPlist.strings') => 'InfoPlist-expected-wp-zh-Hans.strings'
         )
       end
     end
@@ -93,7 +130,7 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         # Act
         run_described_fastlane_action(
           source_parent_dir: lproj_source_dir,
-          target_original_files: File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
+          target_original_files: { File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings') => nil }
         )
 
         # Assert
@@ -112,7 +149,7 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         expect do
           run_described_fastlane_action(
             source_parent_dir: '/this/is/not/the/dir/you/are/looking/for/',
-            target_original_files: File.join(tmp_dir, 'en.lproj', 'InfoPlist.strings')
+            target_original_files: { File.join(tmp_dir, 'en.lproj', 'InfoPlist.strings') => nil }
           )
         end.to raise_error(FastlaneCore::Interface::FastlaneError, '`source_parent_dir` should be a path to an existing directory, but found `/this/is/not/the/dir/you/are/looking/for/`.')
       end
@@ -127,7 +164,7 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         expect do
           run_described_fastlane_action(
             source_parent_dir: src_dir,
-            target_original_files: File.join(tmp_dir, 'en.lproj', 'InfoPlist.strings')
+            target_original_files: { File.join(tmp_dir, 'en.lproj', 'InfoPlist.strings') => nil }
           )
         end.to raise_error(FastlaneCore::Interface::FastlaneError, "`source_parent_dir` should contain at least one `.lproj` subdirectory, but `#{src_dir}` does not contain any.")
       end
@@ -140,7 +177,7 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         expect do
           run_described_fastlane_action(
             source_parent_dir: tmp_dir,
-            target_original_files: []
+            target_original_files: {}
           )
         end.to raise_error(FastlaneCore::Interface::FastlaneError, '`target_original_files` must contain at least one path to an original `.strings` file.')
       end
@@ -153,10 +190,10 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         expect do
           run_described_fastlane_action(
             source_parent_dir: tmp_dir,
-            target_original_files: [
-              File.join(tmp_dir, 'en.lproj', 'InfoPlist.strings'),
-              non_existing_target_file,
-            ]
+            target_original_files: {
+              File.join(tmp_dir, 'en.lproj', 'InfoPlist.strings') => nil,
+              non_existing_target_file => nil
+            }
           )
         end.to raise_error(FastlaneCore::Interface::FastlaneError, "Path `#{non_existing_target_file}` (found in `target_original_files`) does not exist.")
       end
@@ -171,7 +208,7 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         expect do
           run_described_fastlane_action(
             source_parent_dir: tmp_dir,
-            target_original_files: misleading_target_file
+            target_original_files: { misleading_target_file => nil }
           )
         end.to raise_error(FastlaneCore::Interface::FastlaneError, "Expected `#{misleading_target_file}` (found in `target_original_files`) to be a path ending in a `*.lproj/*.strings`.")
       end
@@ -189,7 +226,7 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         expect do
           run_described_fastlane_action(
             source_parent_dir: lproj_source_dir,
-            target_original_files: File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
+            target_original_files: { File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings') => nil }
           )
         end.to raise_error(FastlaneCore::Interface::FastlaneError, /^Error while reading the translations from source file `#{broken_file_path}`: #{broken_file_path}: Property List error/)
       end
@@ -205,7 +242,7 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         expect do
           run_described_fastlane_action(
             source_parent_dir: lproj_source_dir,
-            target_original_files: File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
+            target_original_files: { File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings') => nil }
           )
         end.to raise_error(FastlaneCore::Interface::FastlaneError, /^Failed to read the keys to extract from originals file: #{broken_file_path}: Property List error/)
       end
@@ -220,7 +257,7 @@ describe Fastlane::Actions::IosExtractKeysFromStringsFilesAction do
         expect do
           run_described_fastlane_action(
             source_parent_dir: lproj_source_dir,
-            target_original_files: File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings')
+            target_original_files: { File.join(lproj_source_dir, 'en.lproj', 'InfoPlist.strings') => nil }
           )
         end.to raise_error(FastlaneCore::Interface::FastlaneError, /Error while writing extracted translations to `#{File.join(lproj_source_dir, '.*\.lproj', 'InfoPlist\.strings')}`: Stubbed IO error/)
       end

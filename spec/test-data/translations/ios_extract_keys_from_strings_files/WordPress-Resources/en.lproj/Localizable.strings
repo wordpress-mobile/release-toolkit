@@ -1,0 +1,28 @@
+/* This file is supposed to be the file we send to GlotPress, typically after:
+    - generating the initial keys using `ios_generate_strings_file_from_code`
+    - merging the keys from other manually-maintained `.strings` files (e.g. `InfoPlist.strings` files from both WordPress + Jetpack)
+      using `ios_merge_strings_files` — using `wordpress.infoplist.` and `jetpack.infoplist.` key prefixes during the merge in this example.
+*/
+
+"key1" = "value1";
+"key2" = "value2";
+"key3" = "value3";
+
+/* MARK: - InfoPlist.strings */
+
+"wordpress.infoplist.NSLocationUsageDescription" = "WordPress would like to add your location to posts on sites where you have enabled geotagging.";
+"wordpress.infoplist.NSCameraUsageDescription" = "To take photos or videos to use in your posts.";
+
+/* MARK: - InfoPlist.strings */
+
+"jetpack.infoplist.NSLocationUsageDescription" = "Jetpack would like to add your location to posts on sites where you have enabled geotagging.";
+"jetpack.infoplist.NSCameraUsageDescription" = "To take photos or videos to use in your posts.";
+
+/* MARK: - Sites.strings */
+
+"ios-widget.BOl9KQ" = "There are ${count} options matching ‘${site}’.";
+"ios-widget.ILcGmf" = "Site";
+"ios-widget.cyajMn" = "Site";
+"ios-widget.gpCwrM" = "Select Site";
+"ios-widget.s4dJhx" = "Just to confirm, you wanted ‘${site}’?";
+

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane-plugin-wpmreleasetoolkit (3.1.0)
+    fastlane-plugin-wpmreleasetoolkit (4.0.0)
       activesupport (~> 5)
       bigdecimal (~> 1.4)
       buildkit (~> 1.5)

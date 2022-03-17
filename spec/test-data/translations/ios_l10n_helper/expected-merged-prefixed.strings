@@ -1,0 +1,34 @@
+/* Generated File. Do not edit. */
+
+/* MARK: - Localizable-utf16.strings */
+
+/* Some file header comment here */
+
+/* comment on key 1 */
+"main.key1" = "string 1";
+
+/* comment on key 2 */
+"main.key2" = "string 2️⃣";
+
+/* multiline comment on key 3.
+   %d = number of lines
+   and = a red herring for when merge_strings tries to add prefixes to lines it identifies as pairs using unquoted keys */
+"main.key3" = "string 3
+on %d lines";
+
+/* MARK: - InfoPlist-utf8.strings */
+
+"infoplist.InfoKey1" = "Info String 1";
+"infoplist.InfoKey2" = "Info String 2️⃣.
+Please accept.";
+"infoplist.InfoKey3" = "Info String 3";
+
+/* MARK: - non-latin-utf16.strings */
+
+"other.diacritics" = "Ça c'est un bon café! ☕️";
+"other.emojis" = "😎🥳👨‍👩‍👧‍👦🍊";
+"other.to-exclude" = "❌🙅🏽";
+"other.key2" = "another dup";
+"other.japanese" = "お体を大切に。";
+"other.key1" = "duplicate";
+

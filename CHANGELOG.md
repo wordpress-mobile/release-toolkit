@@ -25,6 +25,18 @@ _None_
 	* rake-compiler (1.1.1) -> (1.1.9)
 * Updated the following public dependency: [#341]
 	* buildkit (1.4.5) -> (1.5.0)
+* Speed up our CI by removing now-useless installation of ImageMagick on CI to run the "Build and Test" step. [#348]
+
+## 4.0.0
+
+### Breaking Changes
+
+* Update the API of `ios_merge_strings_files` and `ios_extract_keys_from_strings_files` to support using prefixes for string keys when merging/splitting the files.
+  The actions now expect a `Hash` (instead of an `Array`) for the list of files to provide an associated prefix (or `nil` or `''` when none) for each file to merge/split. [#345]
+
+### Bug Fixes
+
+* Improved logs and console output, to avoid `ios_download_strings_files_from_glotpress` to look like it's deadlocked while it takes some time to download all the exports of all the locales, and to avoid the log messages from `ios_extract_keys_from_strings_files` to be misleading. [#344]
 
 ## 3.1.0
 

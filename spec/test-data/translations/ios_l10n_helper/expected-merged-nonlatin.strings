@@ -16,10 +16,12 @@
 "key3" = "string 3
 on %d lines";
 
-/* MARK: - InfoPlist-utf8.strings */
+/* MARK: - non-latin-utf16.strings */
 
-InfoKey1 = "Info String 1";
-InfoKey2 = "Info String 2️⃣.
-Please accept.";
-InfoKey3 = "Info String 3";
+"diacritics" = "Ça c'est un bon café! ☕️";
+"emojis" = "😎🥳👨‍👩‍👧‍👦🍊";
+"to-exclude" = "❌🙅🏽";
+"key2" = "another dup";
+"japanese" = "お体を大切に。";
+"key1" = "duplicate";
 
