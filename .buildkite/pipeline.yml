@@ -16,6 +16,8 @@ common_params:
       environment:
         - "DANGER_GITHUB_API_TOKEN"
 
+agents:
+  queue: "default"
 
 steps:
   #################
@@ -24,10 +26,8 @@ steps:
   - label: "🧪 Build and Test"
     key: test
     command: |
-      # We only need this for tasks running on a Mac
-      brew install pkg-config git-lfs libxml2 imagemagick@6
-
       echo "--- :git: Setting up git-lfs"
+      brew install git-lfs
       git-lfs install
 
       echo "--- :rubygems: Setting up Gems"
@@ -38,8 +38,6 @@ steps:
     env: *xcode_image
     plugins:
       automattic/bash-cache#2.0.0: ~
-    agents:
-      queue: "mac"
 
   #################
   # Lint
@@ -51,8 +49,6 @@ steps:
       echo "--- :rubocop: Run Rubocop"
       bundle exec rubocop
     plugins: [*docker_plugin]
-    agents:
-      queue: "default"
 
   #################
   # Danger
@@ -64,8 +60,6 @@ steps:
       echo "--- :rubocop: Run Danger"
       bundle exec danger
     plugins: [*docker_plugin_with_danger_token]
-    agents:
-      queue: "default"
 
   #################
   # Push to RubyGems
@@ -82,5 +76,3 @@ steps:
     # BUILDKITE_COMMAND environment variable.
     command: .buildkite/gem-push.sh
     plugins: [*docker_plugin]
-    agents:
-      queue: "default"
