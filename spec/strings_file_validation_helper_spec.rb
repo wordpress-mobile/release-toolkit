@@ -53,11 +53,12 @@ describe Fastlane::Helper::StringsFileValidationHelper do
       input = File.join(test_data_dir, 'file-with-duplicated-keys.strings')
 
       # TODO: This should become a hash with key and an array of the line
-      # numbers where they occurr.
+      # numbers where they occur.
       expect(described_class.find_duplicated_keys(file: input)).to match_array [
         'dup1', 'dup2', 'dup3', 'dup4',
         '\U0025 key', '\U0026 key',
         'key with \"%@\" character',
+        'key with \"%@\" but diff translations',
         'key with multiple \"%@\" escapes \":)\" in it',
         'key with trailing spaces ',
         'key with \"%@\" and = character',

@@ -59,6 +59,9 @@ Another line.";
 /* Duplicated keys that include escaped quotes */
 "key with \"%@\" character" = "localized translation here";
 "key with \"%@\" character" = "localized translation here";
+/* Red herring: duplicated keys which include quotes and equal sign in their translations, making the RegExp mismatch all the preceding portion as being all part of the key */
+"key with \"%@\" but diff translations" = "localized translation 1 for \"%@\" = 1";
+"key with \"%@\" but diff translations" = "localized translation 2 for \"%@\" = 2";
 /* Duplicated keys that include escaped quotes, interleaved */
 "key with multiple \"%@\" escapes \":)\" in it" = "localized translation here";
 "Login to a \"%@\" account" = "Login to a \"%@\" account"; // Here %@ = the service name, like Google
