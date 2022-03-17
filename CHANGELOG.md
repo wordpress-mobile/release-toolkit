@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+* Speed up our CI by removing now-useless installation of ImageMagick on CI to run the "Build and Test" step. [#348]
 
 ## 4.0.0
 
