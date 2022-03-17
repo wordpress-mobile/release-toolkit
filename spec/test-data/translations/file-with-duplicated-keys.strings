@@ -11,7 +11,7 @@ Another line.";
 /* A multi-line
  comment
 */
-"comment" = "comment"
+"comment" = "comment";
 /* Below are two keys with leading spaces to test against malformatted files */
  "space" = "localized translation here";
   "more.space" = "localized translation here";
