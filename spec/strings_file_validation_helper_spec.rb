@@ -60,6 +60,9 @@ describe Fastlane::Helper::StringsFileValidationHelper do
         'key with \"%@\" character',
         'key with multiple \"%@\" escapes \":)\" in it',
         'key with trailing spaces ',
+        'key with \"%@\" and = character',
+        'key with \"%@\" character and equal in translation',
+        'Login to a \"%@\" account',
       ]
     end
   end

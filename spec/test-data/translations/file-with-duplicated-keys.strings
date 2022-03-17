@@ -59,8 +59,16 @@ Another line.";
 /* Duplicated keys that include escaped quotes */
 "key with \"%@\" character" = "localized translation here";
 "key with \"%@\" character" = "localized translation here";
+/* Duplicated keys that include escaped quotes, interleaved */
 "key with multiple \"%@\" escapes \":)\" in it" = "localized translation here";
+"Login to a \"%@\" account" = "Login to a \"%@\" account"; // Here %@ = the service name, like Google
 "key with multiple \"%@\" escapes \":)\" in it" = "localized translation here";
+"Login to a \"%@\" account" = "Login to a \"%@\" account"; // Here %@ = the service name, like Google
+/* Duplicated keys with escaped quotes and equals */
+"key with \"%@\" and = character" = "localized translation here";
+"key with \"%@\" and = character" = "localized translation here";
+"key with \"%@\" character and equal in translation" = "localized = translation here";
+"key with \"%@\" character and equal in translation" = "localized = translation here";
 /* Duplicated keys with trailing spaces */
 "key with trailing spaces " = "localized translation here";
 "key with trailing spaces " = "localized translation here";
