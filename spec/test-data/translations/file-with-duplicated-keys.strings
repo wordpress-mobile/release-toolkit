@@ -56,11 +56,11 @@ Another line.";
 "The Google account \"%@\" doesn't match any account on WordPress.com" = "localized translation here";
 /* A red herring that might be seen as duplicate to the previous one if our RegExp does not correctly account for escaped quotes */
 "The Google account \"%@\" is invalid" = "localized translation here";
-/* Duplicated \"%@\" */
+/* Duplicated keys that include escaped quotes */
 "key with \"%@\" character" = "localized translation here";
 "key with \"%@\" character" = "localized translation here";
 "key with multiple \"%@\" escapes \":)\" in it" = "localized translation here";
 "key with multiple \"%@\" escapes \":)\" in it" = "localized translation here";
-/* This is just a check for Gio's implementation. We might want to remove it? */
+/* Duplicated keys with trailing spaces */
 "key with trailing spaces " = "localized translation here";
 "key with trailing spaces " = "localized translation here";
