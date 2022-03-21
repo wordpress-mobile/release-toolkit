@@ -24,7 +24,6 @@ _None_
 	* rake-compiler (1.1.1) -> (1.1.9)
 * Updated the following public dependency: [#341]
 	* buildkit (1.4.5) -> (1.5.0)
-* Speed up our CI by removing now-useless installation of ImageMagick on CI to run the "Build and Test" step. [#348]
 
 ## 4.0.0
 

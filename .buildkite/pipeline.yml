@@ -24,8 +24,10 @@ steps:
   - label: "🧪 Build and Test"
     key: test
     command: |
+      # We only need this for tasks running on a Mac
+      brew install pkg-config git-lfs libxml2 imagemagick@6
+
       echo "--- :git: Setting up git-lfs"
-      brew install git-lfs
       git-lfs install
 
       echo "--- :rubygems: Setting up Gems"
