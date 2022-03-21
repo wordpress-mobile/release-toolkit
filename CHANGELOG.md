@@ -18,7 +18,12 @@ _None_
 
 ### Internal Changes
 
-_None_
+* Updated the following internal dependencies: [#341]
+	* nokogiri (1.12.5) -> (1.13.3)
+	* oj (3.13.9) -> (3.13.11)
+	* rake-compiler (1.1.1) -> (1.1.9)
+* Updated the following public dependency: [#341]
+	* buildkit (1.4.5) -> (1.5.0)
 
 ## 4.0.0
 
