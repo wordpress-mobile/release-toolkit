@@ -147,4 +147,6 @@ describe Fastlane::Helper::GithubHelper do
       instance_double('Comment', id: 1234, body: body, user: instance_double('User', id: user_id))
     end
   end
+
+  describe ''
 end

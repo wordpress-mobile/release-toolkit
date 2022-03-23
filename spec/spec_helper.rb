@@ -94,3 +94,12 @@ def with_tmp_file(named: nil, content: '')
     File.delete(file_path)
   end
 end
+
+def version(major:, minor:, patch: 0, rc_number: nil)
+  Fastlane::Helper::Version.new(
+    major: major,
+    minor: minor,
+    patch: patch,
+    rc_number: rc_number
+  )
+end

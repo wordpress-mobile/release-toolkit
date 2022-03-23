@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+* Adds automatic version number calculation. [#350]
 
 ### Bug Fixes
 
