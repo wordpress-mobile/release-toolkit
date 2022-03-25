@@ -45,19 +45,53 @@ describe Fastlane::Helper::Version do
       expect(Fastlane::Helper::VersionHelpers.combine_components_and_rc_segments(%w[1 2], %w[3 4])).to eq %w[1 2 3 4]
       expect(Fastlane::Helper::VersionHelpers.combine_components_and_rc_segments(%w[1 2 3], %w[4])).to eq %w[1 2 3 4]
     end
+
+    it 'raises for invalid component and rc segment combinations' do
+      expect { Fastlane::Helper::VersionHelpers.combine_components_and_rc_segments(%w[1 2 3], %w[1 32]) }.to raise_error 'Invalid components: ["1", "2", "3"] or rc_segments: ["1", "32"]'
+    end
   end
 
   describe 'compare' do
     it 'correctly recognizes that different versions are equal' do
       expect(version(major: 1, minor: 2, patch: 3, rc_number: 4)).to eq version(major: 1, minor: 2, patch: 3, rc_number: 4)
+      expect(version(major: 1, minor: 2, patch: 3, rc_number: 4)).to be version(major: 1, minor: 2, patch: 3, rc_number: 4)
+    end
+
+    it 'correctly recognizes that one version is an RC of another version' do
+      expect(version(major: 1, minor: 2, rc_number: 1).is_rc_of(version(major: 1, minor: 2))).to be true
+      expect(version(major: 1, minor: 2).is_rc_of(version(major: 1, minor: 2, rc_number: 1))).to be false
+      expect(version(major: 1, minor: 2).is_rc_of(version(major: 1, minor: 2))).to be false
     end
 
     it 'correctly recognizes that two different versions are the same except for their RC' do
       expect(version(major: 1, minor: 2, rc_number: 1).is_different_rc_of(version(major: 1, minor: 2, rc_number: 2))).to be true
+      expect(version(major: 1, minor: 2).is_different_rc_of(version(major: 1, minor: 2, rc_number: 3))).to be false
+      expect(version(major: 1, minor: 2, rc_number: 1).is_different_rc_of(version(major: 1, minor: 2))).to be false
     end
 
     it 'correctly recognizes that two different versions are the same except for their PATCH segment' do
       expect(version(major: 1, minor: 2).is_different_patch_of(version(major: 1, minor: 2, patch: 1))).to be true
+    end
+
+    it 'correctly sorts production versions' do
+      expect(version(major: 1, minor: 2)).to be < version(major: 1, minor: 3)
+      expect(version(major: 1, minor: 2)).to be < version(major: 1, minor: 2, patch: 1)
+      expect(version(major: 1, minor: 2, patch: 1)).to be < version(major: 1, minor: 2, patch: 2)
+    end
+
+    it 'correctly sorts pre-release versions' do
+      expect(version(major: 1, minor: 2, rc_number: 1)).to be < version(major: 1, minor: 2, rc_number: 2)
+      expect(version(major: 1, minor: 2, rc_number: 1)).to be == version(major: 1, minor: 2, rc_number: 1)
+    end
+
+    it 'correctly sorts pre-release versions against release versions' do
+      expect(version(major: 1, minor: 1)).to be < version(major: 1, minor: 2, rc_number: 1)
+    end
+
+    it 'correctly identifies release versions as newer than RC versions' do
+      # Test these both ways to validate the custom sorting logic
+      expect(version(major: 1, minor: 2, rc_number: 1)).to be < version(major: 1, minor: 2)
+      expect(version(major: 1, minor: 2)).to be > version(major: 1, minor: 2, rc_number: 1)
     end
   end
 
@@ -117,6 +151,14 @@ describe Fastlane::Helper::Version do
       expect(described_class.create('alpha-123456')).to be_nil
       expect(described_class.create('1.2.3.4.5')).to be_nil
     end
+
+    it 'raises for invalid version codes if requested' do
+      expect { described_class.create!('1.2.3.4.5') }.to raise_error 'Invalid Version: 1.2.3.4.5'
+    end
+
+    it 'does not raise for valid version codes' do
+      expect(described_class.create!('1.2.3.4')).to eq version(major: 1, minor: 2, patch: 3, rc_number: 4)
+    end
   end
 
   describe 'properties' do
@@ -145,6 +187,13 @@ describe Fastlane::Helper::Version do
       expect(described_class.new(major: 1, minor: 2, patch: 3).android_version_code).to eq '11020300'
       expect(described_class.new(major: 1, minor: 2, patch: 3, rc_number: 4).android_version_code).to eq '11020304'
       expect(described_class.new(major: 1, minor: 2, patch: 0, rc_number: 4).android_version_code).to eq '11020004'
+    end
+
+    it 'prints the Android version code correctly if a prefix is provided' do
+      expect(described_class.new(major: 1, minor: 2).android_version_code(prefix: 2)).to eq '21020000'
+      expect(described_class.new(major: 1, minor: 2, patch: 3).android_version_code(prefix: 2)).to eq '21020300'
+      expect(described_class.new(major: 1, minor: 2, patch: 3, rc_number: 4).android_version_code(prefix: 2)).to eq '21020304'
+      expect(described_class.new(major: 1, minor: 2, patch: 0, rc_number: 4).android_version_code(prefix: 2)).to eq '21020004'
     end
 
     it 'prints the iOS version code correctly' do

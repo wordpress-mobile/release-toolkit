@@ -28,6 +28,13 @@ describe Fastlane::Helper::VersionHelper do
       expect(manager.newest_rc_for_version(version(major: 1, minor: 1), repository: 'test', github_client: client)).to eq version(major: 1, minor: 1, rc_number: 4)
     end
 
+    it 'ignores release version codes' do
+      allow(client).to receive(:tags).and_return([{ name: '10.0' }, { name: '1.1.rc4' }])
+      manager = described_class.new(git: repo)
+
+      expect(manager.newest_rc_for_version(version(major: 1, minor: 1), repository: 'test', github_client: client)).to eq version(major: 1, minor: 1, rc_number: 4)
+    end
+
     it 'returns nil if version not found' do
       allow(client).to receive(:tags).and_return([{ name: '1.1.rc4' }, { name: '1.1.rc3' }])
       manager = described_class.new(git: repo)
@@ -43,7 +50,6 @@ describe Fastlane::Helper::VersionHelper do
   end
 
   describe 'version calculation' do
-
     before do
       allow(ENV).to receive(:[]).with('BUILDKITE_PULL_REQUEST').and_return('1234')
       allow(ENV).to receive(:[]).with('CIRCLE_PR_NUMBER').and_return('1234')

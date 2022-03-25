@@ -13,6 +13,8 @@ module Fastlane
         pr_number ||= current_pr_number
         commit ||= current_commit
 
+        UI.user_error!('Unable to find a PR in the environment – falling back to a branch-based version name. To run this in a development environment, try: `export LOCAL_PR_NUMBER=1234`') if pr_number.nil?
+
         "pr-#{pr_number}-#{commit[:sha][0, 7]}"
       end
 
@@ -53,8 +55,7 @@ module Fastlane
 
         tags.map { |t| Version.create(t[:name]) }
             .compact
-            .filter { |v| v.is_different_rc_of(version) }
-            .filter(&:prerelease?)
+            .filter { |v| v.is_rc_of(version) }
             .sort
             .reverse
             .first

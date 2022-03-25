@@ -93,7 +93,7 @@ module Fastlane
       # Returns a formatted string suitable for use as an Android Version Code
       def android_version_code(prefix: 1)
         [
-          '1',
+          prefix,
           @major,
           format('%02d', @minor),
           format('%02d', @patch),
@@ -111,6 +111,13 @@ module Fastlane
       # This method has no version number padding, so its likely to have collisions
       def raw_version_code
         [@major, @minor, @patch, @rc || 0].join.to_i
+      end
+
+      # Returns a string suitable for comparing two version objects without the `rc` component.
+      #
+      # This method has no version number padding, so its likely to have collisions
+      def release_version_code
+        [@major, @minor, @patch].join.to_i
       end
 
       # Is this version number a patch version?
@@ -174,6 +181,16 @@ module Fastlane
       # Is this version the same as another version, just with different RC codes?
       def is_different_rc_of(other)
         return false unless other.is_a?(Version)
+        return false if @rc.nil?
+        return false if other.rc.nil?
+
+        return other.major == @major && other.minor == @minor && other.patch == @patch
+      end
+
+      # Is this version a release candidate for the given version?
+      def is_rc_of(other)
+        return false unless other.is_a?(Version)
+        return false if @rc.nil?
 
         return other.major == @major && other.minor == @minor && other.patch == @patch
       end
@@ -191,12 +208,23 @@ module Fastlane
         raw_version_code == other.raw_version_code
       end
 
+      # Treat `Version` comparisons like they're primitives instead of objects
       def equal?(other)
         self == other
       end
 
       def <=>(other)
-        raw_version_code <=> other.raw_version_code
+        # If neither version is prerelease, things are simple
+        return raw_version_code <=> other.raw_version_code if !prerelease? && !other.prerelease?
+
+        # If these are the same version, but different RCs, the comparison is also pretty simple
+        return raw_version_code <=> other.raw_version_code if is_different_rc_of(other)
+
+        # If the major/minor versions don't line up, just use those to compare – the RC is irrelevant
+        return release_version_code <=> other.release_version_code if @major != other.major || @minor != other.minor
+
+        return -1 if prerelease?
+        return 1 if other.prerelease?
       end
     end
 
