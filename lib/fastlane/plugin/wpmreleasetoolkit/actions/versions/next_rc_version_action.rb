@@ -9,13 +9,10 @@ module Fastlane
         client = Octokit::Client.new(access_token: params[:access_token])
         client.auto_paginate = true
 
-        helper = Fastlane::Helper::VersionHelper.new(
-          github_client: client,
-          git: Git.open(Dir.pwd)
-        )
+        helper = Fastlane::Helper::VersionHelper.new(git: Git.open(params[:project_root]))
 
         version = Fastlane::Helper::Version.create(params[:version])
-        next_version = helper.next_rc_for_version(version, repository: params[:project])
+        next_version = helper.next_rc_for_version(version, repository: params[:project], github_client: client)
 
         UI.message "Next RC Version is #{next_version.rc}"
 
