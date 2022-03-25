@@ -34,6 +34,12 @@ describe Fastlane::Helper::VersionHelper do
 
       expect(manager.newest_rc_for_version(version(major: 1, minor: 2), repository: 'test')).to be_nil
     end
+
+    it 'raises if GitHub response is invalid' do
+      allow(client).to receive(:tags).and_return('foo')
+      manager = described_class.new(github_client: client, git: repo)
+      expect{ manager.newest_rc_for_version(version(major: 1, minor: 2), repository: 'test') }.to raise_error('Unable to connect to GitHub. Please try again later.')
+    end
   end
 
   describe 'version calculation' do

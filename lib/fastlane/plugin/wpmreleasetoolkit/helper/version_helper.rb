@@ -46,9 +46,13 @@ module Fastlane
 
       # Find the newest rc of a specific version in a given GitHub repository.
       def newest_rc_for_version(version, repository:)
-        @github_client
-          .tags(repository)
-          .map { |t| Version.create(t[:name]) }
+        tags = @github_client.tags(repository)
+
+        # GitHub Enterprise can return raw HTML if the connection isn't
+        #working, so we need to validate that this is what we expect it is
+        UI.crash! 'Unable to connect to GitHub. Please try again later.' if !tags.is_a? Array
+
+        tags.map { |t| Version.create(t[:name]) }
           .compact
           .filter { |v| v.is_different_rc_of(version) }
           .filter(&:prerelease?)
