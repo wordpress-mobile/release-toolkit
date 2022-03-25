@@ -91,6 +91,7 @@ module Fastlane
         %w[
           BUILDKITE_PULL_REQUEST
           CIRCLE_PR_NUMBER
+          LOCAL_PR_NUMBER
         ].map { |k| ENV[k] }
           .compact
           .first

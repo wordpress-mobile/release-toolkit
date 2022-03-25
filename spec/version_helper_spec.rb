@@ -53,6 +53,7 @@ describe Fastlane::Helper::VersionHelper do
     before do
       allow(ENV).to receive(:[]).with('BUILDKITE_PULL_REQUEST').and_return('1234')
       allow(ENV).to receive(:[]).with('CIRCLE_PR_NUMBER').and_return('1234')
+      allow(ENV).to receive(:[]).with('LOCAL_PR_NUMBER').and_return('1234') # This is just here to allow local integration testing in a project
     end
 
     it 'provides the correct `next_rc_number` for the first RC ever' do
