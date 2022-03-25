@@ -73,7 +73,7 @@ module Fastlane
         File.readlines(file).each_with_index do |line, line_no|
           line.chars.each_with_index do |c, col_no|
             # Handle escaped characters at a global level
-            if (!state.in_escaped_ctx && c == '\\') || state.in_escaped_ctx
+            if state.in_escaped_ctx || c == '\\'
               state.buffer.write(c) if state.context == :in_quoted_key
               state.in_escaped_ctx = !state.in_escaped_ctx
               next
