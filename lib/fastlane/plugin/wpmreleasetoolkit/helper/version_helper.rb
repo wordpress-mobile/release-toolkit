@@ -15,7 +15,7 @@ module Fastlane
 
         UI.user_error!('Unable to find a PR in the environment – falling back to a branch-based version name. To run this in a development environment, try: `export LOCAL_PR_NUMBER=1234`') if pr_number.nil?
 
-        "pr-#{pr_number}-#{commit[:sha][0, 7]}"
+        "pr-#{pr_number}-#{commit.sha[0, 7]}"
       end
 
       # Generate a prototype build number based on the most recent commit.
@@ -24,7 +24,7 @@ module Fastlane
       # on a different commit.
       def prototype_build_number(commit: nil)
         commit ||= current_commit
-        commit[:date].to_i
+        commit.date.to_i
       end
 
       # Generate an alpha build name based on the current branch and commit.
@@ -35,7 +35,7 @@ module Fastlane
         branch ||= current_branch
         commit ||= current_commit
 
-        "#{branch}-#{commit[:sha][0, 7]}"
+        "#{branch}-#{commit.sha[0, 7]}"
       end
 
       # Generate an alpha number.

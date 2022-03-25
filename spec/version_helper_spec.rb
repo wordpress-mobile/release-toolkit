@@ -82,24 +82,24 @@ describe Fastlane::Helper::VersionHelper do
 
     it 'provides the correct `prototype_build_name` for a given branch and commit' do
       manager = described_class.new(git: repo)
-      expect(manager.prototype_build_name(pr_number: 1234, commit: { sha: 'abcdef123456' })).to eq 'pr-1234-abcdef1'
+      expect(manager.prototype_build_name(pr_number: 1234, commit: mock_commit)).to eq 'pr-1234-abcdef1'
     end
 
     it 'provides the correct `prototype_build_name` for an autodetected PR and commit' do
-      allow(repo).to receive(:log).and_return([{ sha: 'abcdef123456' }])
+      allow(repo).to receive(:log).and_return([mock_commit])
       manager = described_class.new(git: repo)
       expect(manager.prototype_build_name).to eq 'pr-1234-abcdef1'
     end
 
     it 'provides the correct `prototype_build_number` for a given commit' do
-      allow(repo).to receive(:log).and_return([{ date: now }])
+      allow(repo).to receive(:log).and_return([mock_commit])
       manager = described_class.new(git: repo)
       expect(manager.prototype_build_number).to eq now.to_i
     end
 
     it 'provides the correct `alpha_build_name` for a given branch and commit' do
       allow(repo).to receive(:current_branch).and_return('foo')
-      allow(repo).to receive(:log).and_return([{ sha: 'abcdef123456' }])
+      allow(repo).to receive(:log).and_return([mock_commit])
       manager = described_class.new(git: repo)
       expect(manager.alpha_build_name).to eq 'foo-abcdef1'
     end
