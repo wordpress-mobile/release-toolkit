@@ -29,6 +29,7 @@ describe Fastlane::Helper::StringsFileValidationHelper do
         { key: 'key with trailing spaces ', lines: [76, 77] },
         { key: 'key with \"%@\" and = character', lines: [71, 72] },
         { key: 'key with \"%@\" character and equal in translation', lines: [73, 74] },
+        { key: 'key repeated more than twice', lines: [79, 80, 81] },
       ]
     end
   end

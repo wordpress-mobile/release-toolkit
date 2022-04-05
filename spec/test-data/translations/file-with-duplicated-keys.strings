@@ -75,3 +75,7 @@ Another line.";
 /* Duplicated keys with trailing spaces */
 "key with trailing spaces " = "localized translation here";
 "key with trailing spaces " = "localized translation here";
+/* What happens if a key is repeated more than twice? */
+"key repeated more than twice" = "a translation";
+"key repeated more than twice" = "a translation";
+"key repeated more than twice" = "a translation";

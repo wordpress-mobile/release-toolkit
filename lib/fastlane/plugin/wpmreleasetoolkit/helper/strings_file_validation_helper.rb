@@ -66,7 +66,6 @@ module Fastlane
       # @param [String] file The path to the file to inspect.
       def self.find_duplicated_keys(file:)
         all_keys = {}
-        dup_keys = []
 
         state = State.new(context: :root, buffer: StringIO.new, in_escaped_ctx: false, found_key: nil)
 
@@ -97,15 +96,11 @@ module Fastlane
             # a new key, process it
             key = state.found_key.dup
             state.found_key = nil
-            if all_keys.key?(key)
-              # FIXME: Handle case of key repeated more that twice
-              dup_keys.append({ key: key, lines: [all_keys[key], line_no + 1] })
-            else
-              all_keys[key] = line_no + 1
-            end
+
+            all_keys[key] = all_keys[key].nil? ? [line_no + 1] : all_keys[key].push(line_no + 1)
           end
         end
-        dup_keys
+        all_keys.select { |_, lines| lines.length > 1 }.map { |key, lines| { key: key, lines: lines } }
       end
     end
   end
