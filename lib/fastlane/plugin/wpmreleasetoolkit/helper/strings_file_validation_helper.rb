@@ -59,14 +59,14 @@ module Fastlane
         }
       }.freeze
 
-      # Extracts all the keys and the lines at which they occurr from the given
-      # `.strings` file
+      # Returns all the keys in the given `.strings` file, and the line(s) at
+      # which they are defined.
       #
       # @param [String] file The path to the file to inspect.
       # @return [<Hash>] A `Hash` with keys the key values read from the
       #         `.strings` file. The value of each entry is an array with the
       #         line numbers where the key occurs.
-      def self.extract_key_lines_from_strings(file:)
+      def self.get_keys_from_strings(file:)
         keys_with_lines = {}
 
         state = State.new(context: :root, buffer: StringIO.new, in_escaped_ctx: false, found_key: nil)
@@ -106,14 +106,15 @@ module Fastlane
         keys_with_lines
       end
 
-      # Inspects the given `.strings` file for duplicated keys.
+      # Inspects the given `.strings` file for duplicated keys, returning them
+      # if any.
       #
       # @param [String] file The path to the file to inspect.
       # @return [Array<Hash>] Array of all the duplicated keys. Each entry is a
       #         a `Hash` with keys: `key` for the key value and `lines` with an
       #         array of line numbers at which the key occurs.
       def self.find_duplicated_keys(file:)
-        extract_key_lines_from_strings(file: file).reduce([]) do |accumulator, (key, lines)|
+        get_keys_from_strings(file: file).reduce([]) do |accumulator, (key, lines)|
           if lines.length >= 2
             # Duplicate key, keep
             accumulator.append({ key: key, lines: lines })
