@@ -72,8 +72,14 @@ module Fastlane
 
         File.readlines(file).each_with_index do |line, line_no|
           line.chars.each_with_index do |c, col_no|
-            # Handle escaped characters at a global level
+            # Handle escaped characters at a global level. This is more
+            # straightforward than having a `TRANSITIONS` table that account
+            # for it.
             if state.in_escaped_ctx || c == '\\'
+              # Just because we check for escaped characters at the global
+              # level, it doesn't mean we allow them in every context.
+              raise "Found escaped character outside of allowed contexts (current context: #{state.context})" unless [:in_quoted_key, :in_quoted_value, :in_block_comment].include?(state.context)
+
               state.buffer.write(c) if state.context == :in_quoted_key
               state.in_escaped_ctx = !state.in_escaped_ctx
               next

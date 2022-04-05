@@ -1,0 +1,6 @@
+/* This file has characters root context (not in a comment, or key, or value), which is not a valid `.strings` syntax */
+"key" = "value";
+"other key" = "other value";
+\\
+/* The parsing shouldn't reach this, line. It should tell us the escape up there is not valid. */
+"final key" = "final value";
