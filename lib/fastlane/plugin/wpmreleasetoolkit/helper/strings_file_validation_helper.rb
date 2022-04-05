@@ -64,6 +64,9 @@ module Fastlane
       # Inspects the given `.strings` file for duplicated keys.
       #
       # @param [String] file The path to the file to inspect.
+      # @return [Array<Hash>] Array of all the duplicated keys. Each entry is a
+      #         a `Hash` with keys: `key` for the key value and `lines` with an
+      #         array of line numbers at which the key occurs.
       def self.find_duplicated_keys(file:)
         keys_with_lines = {}
 
