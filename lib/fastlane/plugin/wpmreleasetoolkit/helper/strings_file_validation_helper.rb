@@ -3,26 +3,6 @@ module Fastlane
 
   module Helper
     class StringsFileValidationHelper
-      # Inspects the given `.strings` file for duplicated keys.
-      #
-      # @param [String] file The path to the file to inspect.
-      # @return [Array<Hash>] Array of all the duplicated keys. Each entry is a
-      #         a `Hash` with keys: `key` for the key value and `lines` with an
-      #         array of line numbers at which the key occurs.
-      def self.find_duplicated_keys(file:)
-        extract_key_lines_from_strings(file: file).reduce([]) do |accumulator, (key, lines)|
-          if lines.length >= 2
-            # Duplicate key, keep
-            accumulator.append({ key: key, lines: lines })
-          else
-            # Valid key, discard
-            accumulator
-          end
-        end
-      end
-
-      private
-
       # context can be one of:
       #   :root, :maybe_comment_start, :in_line_comment, :in_block_comment,
       #   :maybe_block_comment_end, :in_quoted_key,
@@ -81,7 +61,6 @@ module Fastlane
         }
       }.freeze
 
-
       # Extracts all the keys and the lines at which they occurr from the given
       # `.strings` file
       #
@@ -102,7 +81,7 @@ module Fastlane
             if state.in_escaped_ctx || c == '\\'
               # Just because we check for escaped characters at the global
               # level, it doesn't mean we allow them in every context.
-              raise "Found escaped character outside of allowed contexts (current context: #{state.context})" unless [:in_quoted_key, :in_quoted_value, :in_block_comment].include?(state.context)
+              raise "Found escaped character outside of allowed contexts (current context: #{state.context})" unless %i[in_quoted_key in_quoted_value in_block_comment].include?(state.context)
 
               state.buffer.write(c) if state.context == :in_quoted_key
               state.in_escaped_ctx = !state.in_escaped_ctx
@@ -127,6 +106,24 @@ module Fastlane
         end
 
         keys_with_lines
+      end
+
+      # Inspects the given `.strings` file for duplicated keys.
+      #
+      # @param [String] file The path to the file to inspect.
+      # @return [Array<Hash>] Array of all the duplicated keys. Each entry is a
+      #         a `Hash` with keys: `key` for the key value and `lines` with an
+      #         array of line numbers at which the key occurs.
+      def self.find_duplicated_keys(file:)
+        extract_key_lines_from_strings(file: file).reduce([]) do |accumulator, (key, lines)|
+          if lines.length >= 2
+            # Duplicate key, keep
+            accumulator.append({ key: key, lines: lines })
+          else
+            # Valid key, discard
+            accumulator
+          end
+        end
       end
     end
   end
