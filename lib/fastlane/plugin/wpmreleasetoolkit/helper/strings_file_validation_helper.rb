@@ -1,6 +1,4 @@
 module Fastlane
-  UI = FastlaneCore::UI unless Fastlane.const_defined?('UI')
-
   module Helper
     class StringsFileValidationHelper
       # context can be one of:
