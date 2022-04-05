@@ -3,6 +3,26 @@ module Fastlane
 
   module Helper
     class StringsFileValidationHelper
+      # Inspects the given `.strings` file for duplicated keys.
+      #
+      # @param [String] file The path to the file to inspect.
+      # @return [Array<Hash>] Array of all the duplicated keys. Each entry is a
+      #         a `Hash` with keys: `key` for the key value and `lines` with an
+      #         array of line numbers at which the key occurs.
+      def self.find_duplicated_keys(file:)
+        extract_key_lines_from_strings(file: file).reduce([]) do |accumulator, (key, lines)|
+          if lines.length >= 2
+            # Duplicate key, keep
+            accumulator.append({ key: key, lines: lines })
+          else
+            # Valid key, discard
+            accumulator
+          end
+        end
+      end
+
+      private
+
       # context can be one of:
       #   :root, :maybe_comment_start, :in_line_comment, :in_block_comment,
       #   :maybe_block_comment_end, :in_quoted_key,
@@ -61,13 +81,15 @@ module Fastlane
         }
       }.freeze
 
-      # Inspects the given `.strings` file for duplicated keys.
+
+      # Extracts all the keys and the lines at which they occurr from the given
+      # `.strings` file
       #
       # @param [String] file The path to the file to inspect.
-      # @return [Array<Hash>] Array of all the duplicated keys. Each entry is a
-      #         a `Hash` with keys: `key` for the key value and `lines` with an
-      #         array of line numbers at which the key occurs.
-      def self.find_duplicated_keys(file:)
+      # @return [<Hash>] A `Hash` with keys the key values read from the
+      #         `.strings` file. The value of each entry is an array with the
+      #         line numbers where the key occurs.
+      def self.extract_key_lines_from_strings(file:)
         keys_with_lines = {}
 
         state = State.new(context: :root, buffer: StringIO.new, in_escaped_ctx: false, found_key: nil)
@@ -104,10 +126,7 @@ module Fastlane
           end
         end
 
-        # Return an array of keys that appear more than once
-        keys_with_lines.reduce([]) do |accumulator, (key, lines)|
-          lines.length >= 2 ? accumulator.append({ key: key, lines: lines }) : accumulator
-        end
+        keys_with_lines
       end
     end
   end
