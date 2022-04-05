@@ -98,8 +98,8 @@ module Fastlane
             key = state.found_key.dup
             state.found_key = nil
             if all_keys.key?(key)
-              puts "warning: key `#{key}` on line #{line_no + 1} is a duplicate of a similar key found on line #{all_keys[key]}" # UI.warning
-              dup_keys.append(key)
+              # FIXME: Handle case of key repeated more that twice
+              dup_keys.append({ key: key, lines: [all_keys[key], line_no + 1] })
             else
               all_keys[key] = line_no + 1
             end

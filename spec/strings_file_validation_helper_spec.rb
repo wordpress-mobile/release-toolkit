@@ -12,21 +12,23 @@ describe Fastlane::Helper::StringsFileValidationHelper do
   end
 
   context 'when there are duplicated keys' do
-    it 'returns them' do
+    it 'returns them in an array' do
       input = File.join(test_data_dir, 'file-with-duplicated-keys.strings')
 
-      # TODO: This should become a hash with key and an array of the line
-      # numbers where they occur.
       expect(described_class.find_duplicated_keys(file: input)).to match_array [
-        'dup1', 'dup2', 'dup3', 'dup4',
-        '\U0025 key', '\U0026 key',
-        'key with \"%@\" character',
-        'key with \"%@\" but diff translations',
-        'key with multiple \"%@\" escapes \":)\" in it',
-        'key with trailing spaces ',
-        'key with \"%@\" and = character',
-        'key with \"%@\" character and equal in translation',
-        'Login to a \"%@\" account',
+        { key: 'dup1', lines: [30, 31] },
+        { key: 'dup2', lines: [33, 35] },
+        { key: 'dup3', lines: [36, 39] },
+        { key: 'dup4', lines: [41, 42] },
+        { key: '\U0025 key', lines: [49, 50] },
+        { key: '\U0026 key', lines: [52, 54] },
+        { key: 'key with \"%@\" character', lines: [60, 61] },
+        { key: 'key with \"%@\" but diff translations', lines: [63, 64] },
+        { key: 'key with multiple \"%@\" escapes \":)\" in it', lines: [66, 68] },
+        { key: 'Login to a \"%@\" account', lines: [67, 69] },
+        { key: 'key with trailing spaces ', lines: [76, 77] },
+        { key: 'key with \"%@\" and = character', lines: [71, 72] },
+        { key: 'key with \"%@\" character and equal in translation', lines: [73, 74] },
       ]
     end
   end
