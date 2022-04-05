@@ -33,4 +33,21 @@ describe Fastlane::Helper::StringsFileValidationHelper do
       ]
     end
   end
+
+  context 'when there are no duplicated keys' do
+    it 'returns an empty array' do
+      # Piggy back on some of the `.strings` from other tests to ensure this
+      # behaves correctly
+      expect(
+        described_class.find_duplicated_keys(
+          file: File.join(test_data_dir, 'ios_l10n_helper', 'expected-merged.strings')
+        )
+      ).to be_empty
+      expect(
+        described_class.find_duplicated_keys(
+          file: File.join(test_data_dir, 'ios_extract_keys_from_strings_files', 'Resources', 'en.lproj', 'Localizable.strings')
+        )
+      ).to be_empty
+    end
+  end
 end
