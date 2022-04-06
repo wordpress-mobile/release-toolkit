@@ -37,6 +37,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'parallel', '~> 1.14'
   spec.add_dependency 'chroma', '0.2.0'
   spec.add_dependency 'activesupport', '~> 5'
+
+  # `google-cloud-storage` is required by fastlane, but we pin it in case it's not in the future
+  spec.add_dependency 'google-cloud-storage', '~> 1'
+
   # Some of the upstream code uses `BigDecimal.new` which version 2.0 of the
   # `bigdecimal` gem removed. Until we'll find the time to identify the
   # dependencies and see if we can move them to something compatible with

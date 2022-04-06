@@ -1,25 +1,26 @@
 require 'spec_helper'
 
-def create_model(model: 'Nexus5', version: 2, locale: 'en', orientation: 'portrait')
-  Fastlane::Helper::Android::FirebaseHelper::FirebaseDevice.new(
-    model: model,
-    version: version,
-    locale: locale,
-    orientation: orientation
-  )
-end
+LOCALE_SAMPLE_DATA_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-locale-list.json')
+MODEL_SAMPLE_DATA_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-model-list.json')
+VERSION_SAMPLE_DATA_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-version-list.json')
 
-describe Fastlane::Helper::Android::FirebaseHelper::FirebaseDevice do
-  before do
-    allow(described_class).to receive(:valid_model_names).and_return(['Nexus5'])
-    allow(described_class).to receive(:valid_version_numbers).and_return([1, 2, 3])
-    allow(described_class).to receive(:valid_locales).and_return(['en'])
+describe Fastlane::FirebaseDevice do
+  before do |test|
+    next if test.metadata[:calls_data_providers]
+
+    allow(described_class).to receive(:locale_data).and_return(File.read(LOCALE_SAMPLE_DATA_PATH))
+    allow(described_class).to receive(:model_data).and_return(File.read(MODEL_SAMPLE_DATA_PATH))
+    allow(described_class).to receive(:version_data).and_return(File.read(VERSION_SAMPLE_DATA_PATH))
+  end
+
+  def create_model(model: 'Nexus5', version: 27, locale: 'en', orientation: 'portrait')
+    described_class.new(model: model, version: version, locale: locale, orientation: orientation)
   end
 
   describe 'initialization' do
     it 'assigns ivars correctly' do
       expect(create_model(model: 'Nexus5').model).to eq 'Nexus5'
-      expect(create_model(version: 3).version).to eq 3
+      expect(create_model(version: 27).version).to eq 27
       expect(create_model(locale: 'en').locale).to eq 'en'
       expect(create_model(orientation: 'portrait').orientation).to eq 'portrait'
     end
@@ -37,9 +38,60 @@ describe Fastlane::Helper::Android::FirebaseHelper::FirebaseDevice do
     end
   end
 
-  describe 'to_s' do
-    it 'contains the specified elements' do
-      expect(create_model.to_s).to eq 'model=Nexus5,version=2,locale=en,orientation=portrait'
+  describe '#to_s' do
+    subject { create_model.to_s }
+
+    it { is_expected.to eq 'model=Nexus5,version=27,locale=en,orientation=portrait' }
+  end
+
+  describe '.valid_model_names' do
+    subject { described_class.valid_model_names }
+
+    it { is_expected.to be_an_instance_of(Array) }
+    it { is_expected.to all(be_a(String)) }
+  end
+
+  describe '.valid_locales' do
+    subject { described_class.valid_locales }
+
+    it { is_expected.to be_an_instance_of(Array) }
+    it { is_expected.to all(be_a(String)) }
+  end
+
+  describe '.valid_version_numbers' do
+    subject { described_class.valid_version_numbers }
+
+    it { is_expected.to be_an_instance_of(Array) }
+    it { is_expected.to all(be_a(Integer)) }
+  end
+
+  describe '.valid_orientations' do
+    subject { described_class.valid_orientations }
+
+    it { is_expected.to be_an_instance_of(Array) }
+    it { is_expected.to all(be_a(String)) }
+    it { is_expected.to include 'portrait' }
+    it { is_expected.to include 'landscape' }
+  end
+
+  describe '.locale_data' do
+    it 'runs the right command', :calls_data_providers do
+      expect(Fastlane::Actions).to receive('sh').with('gcloud firebase test android locales list --format="json"', log: false)
+      described_class.locale_data
+    end
+  end
+
+  describe '.model_data' do
+    it 'runs the right command', :calls_data_providers do
+      expect(Fastlane::Actions).to receive('sh').with('gcloud firebase test android models list --format="json"', log: false)
+      described_class.model_data
+    end
+  end
+
+  describe '.version_data' do
+    it 'runs the right command', :calls_data_providers do
+      expect(Fastlane::Actions).to receive('sh').with('gcloud firebase test android versions list --format="json"', log: false)
+      described_class.version_data
     end
   end
 end

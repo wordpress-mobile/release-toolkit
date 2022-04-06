@@ -1,21 +1,53 @@
+require 'securerandom'
+
 module Fastlane
   module Actions
     require_relative '../../helper/android/android_firebase_helper'
 
+    module SharedValues
+      FIREBASE_PROJECT_ID = :FIREBASE_PROJECT_ID
+      FIREBASE_CREDENTIALS = :FIREBASE_CREDENTIALS
+      FIREBASE_TEST_RESULT = :FIREBASE_TEST_ACTION_RESULT
+      FIREBASE_TEST_LOG_FILE_PATH = :FIREBASE_TEST_LOG_FILE_PATH
+      FIREBASE_TEST_RESULTS_FILE_PATH = :FIREBASE_TEST_LOG_FILE_PATH
+    end
+
     class AndroidFirebaseTestAction < Action
       def self.run(params)
+        # Preflight – ensure the system is set up correctly
+        Fastlane::Helper::Android::FirebaseHelper.verify_has_gcloud_binary
+
+        # Log in to Firebase (and validate credentials)
         Fastlane::Helper::Android::FirebaseHelper.setup(key_file: params[:key_file])
 
-        device = Fastlane::Helper::Android::FirebaseHelper::FirebaseDevice.new(
+        # Set up the log file and output directory
+        Fastlane::Actions.lane_context[:FIREBASE_TEST_RESULTS_FILE_PATH] = params[:results_output_dir]
+        Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE_PATH] = File.join(params[:results_output_dir], 'output.log')
+
+        device = Fastlane::FirebaseDevice.new(
           model: params[:model],
           version: params[:version],
           locale: params[:locale],
           orientation: params[:orientation]
         )
 
-        Fastlane::Helper::Android::FirebaseHelper.run_tests(
-          device: device
+        result = Fastlane::Helper::Android::FirebaseHelper.run_tests(
+          apk_path: params[:apk_path],
+          test_apk_path: params[:test_apk_path],
+          device: device,
+          type: params[:type]
         )
+
+        # Download all of the outputs from the job to the local machine
+        Fastlane::Helper::Android::FirebaseHelper.download_raw_results
+
+        if result == true
+          UI.success 'Firebase Tests Complete'
+          return
+        end
+
+        more_details_url = Fastlane::Helper::Android::FirebaseHelper.more_details_url
+        FastlaneCore::UI.test_failure! "Firebase Tests failed – more information can be found at #{more_details_url}"
       end
 
       #####################################################
@@ -31,6 +63,8 @@ module Fastlane
       end
 
       def self.available_options
+        run_uuid = SecureRandom.uuid
+
         [
           FastlaneCore::ConfigItem.new(
             key: :project_id,
@@ -50,11 +84,31 @@ module Fastlane
             end
           ),
           FastlaneCore::ConfigItem.new(
+            key: :apk_path,
+            description: 'The application APK',
+            type: String,
+            verify_block: proc do |value|
+              next if File.file? value
+
+              UI.user_error!("Invalid application APK: #{value}")
+            end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :test_apk_path,
+            description: 'The test APK',
+            type: String,
+            verify_block: proc do |value|
+              next if File.file? value
+
+              UI.user_error!("Invalid test APK: #{value}")
+            end
+          ),
+          FastlaneCore::ConfigItem.new(
             key: :model,
             description: 'The device model to run',
             type: String,
             verify_block: proc do |value|
-              model_names = Fastlane::Helper::Android::FirebaseHelper::FirebaseDevice.valid_model_names
+              model_names = Fastlane::FirebaseDevice.valid_model_names
               next if model_names.include? value
 
               UI.user_error!("Invalid Model Name: #{value}. Valid Model Names: #{model_names}")
@@ -65,7 +119,7 @@ module Fastlane
             description: 'The device version to run',
             type: Integer,
             verify_block: proc do |value|
-              version_numbers = Fastlane::Helper::Android::FirebaseHelper::FirebaseDevice.valid_version_numbers
+              version_numbers = Fastlane::FirebaseDevice.valid_version_numbers
               next if version_numbers.include? value
 
               UI.user_error!("Invalid Version Number: #{value}. Valid Verison Numbers: #{version_numbers}")
@@ -77,7 +131,7 @@ module Fastlane
             type: String,
             default_value: 'en',
             verify_block: proc do |value|
-              locale_codes = Fastlane::Helper::Android::FirebaseHelper::FirebaseDevice.valid_locales
+              locale_codes = Fastlane::FirebaseDevice.valid_locales
               next if locale_codes.include? value
 
               UI.user_error!("Invalid Locale: #{value}. Valid Locales: #{locale_codes}")
@@ -89,11 +143,35 @@ module Fastlane
             type: String,
             default_value: 'portrait',
             verify_block: proc do |value|
-              orientations = Fastlane::Helper::Android::FirebaseHelper::FirebaseDevice.valid_orientations
+              orientations = Fastlane::FirebaseDevice.valid_orientations
               next if orientations.include? value
 
               UI.user_error!("Invalid Orientation: #{value}. Valid Orientations: #{orientations}")
             end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :type,
+            description: 'Which type of test are we running?',
+            type: String,
+            default_value: 'instrumentation',
+            verify_block: proc do |value|
+              types = Fastlane::Helper::Android::FirebaseHelper.valid_test_types
+              next if types.include? value
+
+              UI.user_error!("Invalid Test Type: #{value}. Valid Types: #{types}")
+            end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :test_run_id,
+            description: 'A unique ID used to identify this test run',
+            type: String,
+            default_value: run_uuid
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :results_output_dir,
+            description: 'Where should we store the results of this test run?',
+            type: String,
+            default_value: File.join(Dir.tmpdir(), run_uuid)
           ),
         ]
       end

@@ -1,72 +1,68 @@
 require 'json'
+require 'uri'
 
 module Fastlane
   module Helper
     module Android
       module FirebaseHelper
-        class FirebaseDevice
-          attr_reader :model, :version, :locale, :orientation
-
-          def initialize(model:, version:, orientation:, locale: 'en')
-            raise 'Invalid Model' unless FirebaseDevice.valid_model_names.include? model
-            raise 'Invalid Version' unless FirebaseDevice.valid_version_numbers.include? version
-            raise 'Invalid Locale' unless FirebaseDevice.valid_locales.include? locale
-            raise 'Invalid Orientation' unless FirebaseDevice.valid_orientations.include? orientation
-
-            @model = model
-            @version = version
-            @locale = locale
-            @orientation = orientation
-          end
-
-          def to_s
-            "model=#{@model},version=#{@version},locale=#{@locale},orientation=#{@orientation}"
-          end
-
-          def self.valid_model_names
-            JSON.parse(model_data).map { |device| device['codename'] }
-          end
-
-          def self.valid_version_numbers
-            JSON.parse(version_data).map { |version| version['apiLevel'].to_i }
-          end
-
-          def self.valid_locales
-            JSON.parse(locale_data).map { |locale| locale['id'] }
-          end
-
-          def self.valid_orientations
-            %w[portrait landscape]
-          end
-
-          def self.model_data
-            `gcloud firebase test android models list --format="json"`
-          end
-
-          def self.version_data
-            `gcloud firebase test android versions list --format="json"`
-          end
-
-          def self.locale_data
-            `gcloud firebase test android locales list --format="json"`
-          end
-        end
-
         def self.run_tests(apk_path:, test_apk_path:, device:, type: 'instrumentation')
           raise "Unable to find apk: #{apk_path}" unless File.file? apk_path
           raise "Unable to find apk: #{test_apk_path}" unless File.file? test_apk_path
-          raise "Invalid Type: #{type}" unless %w[instrumentation robo].include? type
+          raise "Invalid Type: #{type}" unless valid_test_types.include? type
 
-          Action.sh(
+          command = [
             'gcloud', 'firebase', 'test', 'android', 'run',
-            '--type', type,
-            '--app', apk_path,
-            '--test', test_apk_path,
-            '--device', device.to_s
+            '--type', Shellwords.escape(type),
+            '--app', Shellwords.escape(apk_path),
+            '--test', Shellwords.escape(test_apk_path),
+            '--device', Shellwords.escape(device.to_s),
+            '--verbosity', 'info',
+          ].join(' ')
+
+          log_file = Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE_PATH]
+          UI.message "Streaming log output to #{log_file}"
+          Action.sh("#{command} 2>&1 | tee #{log_file}")
+
+          # Exit `true` if we can't find `Failed` in the log output
+          File.readlines(log_file).all? { |line| !line.include? 'Failed' }
+        end
+
+        def self.download_raw_results
+          paths = raw_results_paths
+          return if paths.nil?
+
+          destination = Fastlane::Actions.lane_context[:FIREBASE_TEST_RESULTS_FILE_PATH]
+
+          FileUtils.mkdir_p(destination)
+
+          require 'google/cloud/storage'
+          storage = Google::Cloud::Storage.new(
+            project_id: Fastlane::Actions.lane_context[:FIREBASE_PROJECT_ID],
+            credentials: Fastlane::Actions.lane_context[:FIREBASE_CREDENTIALS]
           )
+
+          # Set up the download
+          bucket = storage.bucket(paths[:bucket])
+          files_to_download = bucket.files(prefix: paths[:prefix])
+
+          UI.header "Downloading Results Files to #{destination}" # a big box
+
+          # Download the files
+          files_to_download.each { |file| download_file(file: file, destination: destination) }
+        end
+
+        def self.download_file(file:, destination:)
+          destination = File.join(destination, file.name)
+          FileUtils.mkdir_p(File.dirname(destination))
+
+          # Print our progress
+          UI.message(file.name)
+
+          file.download(destination)
         end
 
         def self.project=(project_id)
+          Fastlane::Actions.lane_context[:FIREBASE_PROJECT_ID] = project_id
           Action.sh('gcloud', 'config', 'set', 'project', project_id)
         end
 
@@ -77,10 +73,53 @@ module Fastlane
             'gcloud', 'auth', 'activate-service-account',
             '--key-file', key_file
           )
+
+          # Assuming the action above was successful, we can store this for future use
+          Fastlane::Actions.lane_context[:FIREBASE_CREDENTIALS] = key_file
         end
 
-        def self.has_gcloud_binary
-          UI.user_error!("The `gcloud` binary isn't available on this machine. Unable to continue.") unless system('command -v gcloud > /dev/null')
+        # Get the "More details are available..." URL from the log
+        def self.more_details_url
+          log_file = Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE_PATH]
+          return nil unless File.file? log_file
+
+          File.readlines(log_file)
+              .map { |line| URI.extract(line) }
+              .flatten
+              .compact
+              .filter { |string| string.include? 'matrices' }
+              .first
+        end
+
+        # Get the Google Cloud Storage Bucket URL to the raw results from the log
+        def self.raw_results_paths
+          log_file = Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE_PATH]
+          return nil unless File.file? log_file
+
+          uri = File.readlines(log_file)
+                    .map { |line| URI.extract(line) }
+                    .flatten
+                    .compact
+                    .map { |string| URI(string) }
+                    .filter { |u| u.scheme == 'gs' }
+                    .first
+
+          return nil if uri.nil?
+
+          return {
+            bucket: uri.host,
+            prefix: uri.path.delete_prefix('/').chomp('/')
+          }
+        end
+
+        def self.verify_has_gcloud_binary
+          Action.sh('command -v gcloud > /dev/null')
+        rescue StandardError
+          UI.user_error!("The `gcloud` binary isn't available on this machine. Unable to continue.")
+        end
+
+        def self.valid_test_types
+          %w[instrumentation robo]
         end
       end
     end
