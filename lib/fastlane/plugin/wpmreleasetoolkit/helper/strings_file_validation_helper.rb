@@ -67,7 +67,7 @@ module Fastlane
       #         `.strings` file. The value of each entry is an array with the
       #         line numbers where the key occurs.
       def self.get_keys_from_strings(file:)
-        keys_with_lines = {}
+        keys_with_lines = Hash.new([])
 
         state = State.new(context: :root, buffer: StringIO.new, in_escaped_ctx: false, found_key: nil)
 
@@ -99,7 +99,7 @@ module Fastlane
             key = state.found_key.dup
             state.found_key = nil
 
-            keys_with_lines[key] = keys_with_lines[key].nil? ? [line_no + 1] : keys_with_lines[key].push(line_no + 1)
+            keys_with_lines[key] += [line_no + 1]
           end
         end
 
