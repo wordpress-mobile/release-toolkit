@@ -9,6 +9,8 @@ module Fastlane
   module Helper
     module Android
       module LocalizeHelper
+        LIB_SOURCE_XML_ATTR = 'a8c-src-lib'.freeze
+
         # Checks if string_line has the content_override flag set
         def self.skip_string_by_tag(string_line)
           skip = string_line.attr('content_override') == 'true' unless string_line.attr('content_override').nil?
@@ -35,6 +37,7 @@ module Fastlane
         def self.merge_string(main_strings, library, string_line)
           string_name = string_line.attr('name')
           string_content = string_line.content
+          lib_src_id = library[:source_id]
 
           # Skip strings in the exclusions list
           return :skipped if skip_string_by_exclusion_list(library, string_name)
@@ -58,12 +61,14 @@ module Fastlane
               else
                 # It has the tools:ignore flag, so update the content without touching the other attributes
                 this_string.content = string_content
+                this_string[LIB_SOURCE_XML_ATTR] = lib_src_id unless lib_src_id.nil?
                 return result
               end
             end
           end
 
           # String not found, or removed because needing update and not in the exclusion list: add to the main file
+          string_line[LIB_SOURCE_XML_ATTR] = lib_src_id unless lib_src_id.nil?
           main_strings.xpath('//string').last().add_next_sibling("\n#{' ' * 4}#{string_line.to_xml().strip}")
           return result
         end
