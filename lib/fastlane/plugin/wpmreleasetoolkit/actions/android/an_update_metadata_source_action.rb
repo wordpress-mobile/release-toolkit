@@ -4,111 +4,20 @@ require_relative '../../helper/an_metadata_update_helper'
 module Fastlane
   module Actions
     class AnUpdateMetadataSourceAction < Action
+      def self.category
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        'This action is deprecated. Use `gp_update_metadata_source` instead.'
+      end
+
       def self.run(params)
-        # fastlane will take care of reading in the parameter and fetching the environment variable:
-        UI.message "Parameter .po file path: #{params[:po_file_path]}"
-        UI.message "Release version: #{params[:release_version]}"
-
-        # Init
-        create_block_parsers(params[:release_version], params[:source_files])
-
-        # Do
-        check_source_files(params[:source_files])
-        temp_po_name = create_temp_po(params)
-        swap_po(params[:po_file_path], temp_po_name)
-
-        UI.message "File #{params[:po_file_path]} updated!"
-      end
-
-      # Verifies that all the source files are available
-      # to this action
-      def self.check_source_files(source_files)
-        source_files.each_value do |file_path|
-          UI.user_error!("Couldn't find file at path '#{file_path}'") unless File.exist?(file_path)
-        end
-      end
-
-      # Creates a temp po file merging
-      # new data for known tags
-      # and the data already in the original
-      # .po fo the others.
-      def self.create_temp_po(params)
-        orig = params[:po_file_path]
-        target = self.create_target_file_path(orig)
-
-        # Clear if older exists
-        File.delete(target) if File.exist? target
-
-        # Create the new one
-        begin
-          File.open(target, 'a') do |fw|
-            File.open(orig, 'r').each do |fr|
-              write_target_block(fw, fr)
-            end
-          end
-        rescue
-          File.delete(target) if File.exist? target
-          raise
-        end
-
-        target
-      end
-
-      # Deletes the old po and moves the temp one
-      # to the final location
-      def self.swap_po(orig_file_path, temp_file_path)
-        File.delete(orig_file_path) if File.exist? orig_file_path
-        File.rename(temp_file_path, orig_file_path)
-      end
-
-      # Generates the temp file path
-      def self.create_target_file_path(orig_file_path)
-        "#{File.dirname(orig_file_path)}/#{File.basename(orig_file_path, '.*')}.tmp"
-      end
-
-      # Creates the block instances
-      def self.create_block_parsers(release_version, block_files)
-        @blocks = []
-
-        # Inits default handler
-        @blocks.push Fastlane::Helper::UnknownMetadataBlock.new
-
-        # Init special handlers
-        block_files.each do |key, file_path|
-          case key
-          when :release_note
-            @blocks.push Fastlane::Helper::ReleaseNoteMetadataBlock.new(key, file_path, release_version)
-          when :release_note_short
-            @blocks.push Fastlane::Helper::ReleaseNoteShortMetadataBlock.new(key, file_path, release_version)
-          else
-            @blocks.push Fastlane::Helper::StandardMetadataBlock.new(key, file_path)
-          end
-        end
-
-        # Sets the default
-        @current_block = @blocks[0]
-      end
-
-      # Manages tags depending on the type
-      def self.write_target_block(fw, line)
-        if is_block_id(line)
-          key = line.split[1].tr('\"', '')
-          @blocks.each do |block|
-            @current_block = block if block.is_handler_for(key)
-          end
-        end
-
-        @current_block = @blocks.first if is_comment(line)
-
-        @current_block.handle_line(fw, line)
-      end
-
-      def self.is_block_id(line)
-        line.start_with?('msgctxt')
-      end
-
-      def self.is_comment(line)
-        line.start_with?('#')
+        other_action.gp_update_metadata_source(
+          po_file_path: params[:po_file_path],
+          source_files: params[:source_files],
+          release_version: params[:release_version]
+        )
       end
 
       #####################################################

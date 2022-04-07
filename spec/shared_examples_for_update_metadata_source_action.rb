@@ -43,8 +43,6 @@ RSpec.shared_examples 'update_metadata_source_action' do |options|
   end
 
   it 'combines the given `release_version` and `whats_new` parameter into a new block' do
-    pending 'this currently fails; in the long run, we might consolidate `whats_new` with `release_notes`' if options[:whats_new_fails]
-
     Dir.mktmpdir do |dir|
       output_path = File.join(dir, 'output.po')
       dummy_text = <<~PO
