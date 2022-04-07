@@ -78,6 +78,8 @@ module Fastlane
           case key
           when :release_note
             @blocks.push Fastlane::Helper::ReleaseNoteMetadataBlock.new(key, file_path, release_version)
+          when :release_note_short
+            @blocks.push Fastlane::Helper::ReleaseNoteShortMetadataBlock.new(key, file_path, release_version)
           when :whats_new
             @blocks.push Fastlane::Helper::WhatsNewMetadataBlock.new(key, file_path, release_version)
           else
