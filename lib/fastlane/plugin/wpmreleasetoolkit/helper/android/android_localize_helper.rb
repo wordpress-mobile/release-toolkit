@@ -15,7 +15,7 @@ module Fastlane
         def self.skip_string_by_tag(string_line)
           skip = string_line.attr('content_override') == 'true' unless string_line.attr('content_override').nil?
           if skip
-            puts " - Skipping #{string_line.attr('name')} string"
+            UI.message " - Skipping #{string_line.attr('name')} string"
             return true
           end
 
@@ -28,7 +28,7 @@ module Fastlane
 
           skip = library[:exclusions].include?(string_name)
           if skip
-            puts " - Skipping #{string_name} string"
+            UI.message " - Skipping #{string_name} string"
             return true
           end
         end
@@ -118,12 +118,12 @@ module Fastlane
             res = merge_string(main_strings, library, string_line)
             case res
             when :updated
-              puts "#{string_line.attr('name')} updated."
+              UI.verbose "#{string_line.attr('name')} updated."
               updated_count = updated_count + 1
             when :found
               untouched_count = untouched_count + 1
             when :added
-              puts "#{string_line.attr('name')} added."
+              UI.verbose "#{string_line.attr('name')} added."
               added_count = added_count + 1
             when :skipped
               skipped_count = skipped_count + 1
