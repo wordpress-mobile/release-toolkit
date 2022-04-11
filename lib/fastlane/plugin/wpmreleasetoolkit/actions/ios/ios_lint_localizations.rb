@@ -28,8 +28,8 @@ module Fastlane
           only_langs: params[:only_langs]
         )
 
-        violations.each do |lang, diff|
-          UI.error "Inconsistencies found between '#{params[:base_lang]}' and '#{lang}':\n\n#{diff}\n"
+        violations.each do |lang, violations|
+          UI.error "Inconsistencies found between '#{params[:base_lang]}' and '#{lang}':\n\n#{violations.join("\n")}\n"
         end
 
         violations

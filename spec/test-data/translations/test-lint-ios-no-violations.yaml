@@ -5,6 +5,7 @@ test_data:
     "string_int_pos" = "String %1$@ and Int %2$d";
     "string_int_pos_inv" = "Int %2$d before String %1$@";
     "many_placeholders_mix_pos" = "String %2$@, Float %4$f, Int %1$d, Long %5$li, Precise %3$.3lf";
+    "extra_string_not_translated" = "This string might not have a translation yet in %1$d of our locales.";
     "repeated_placeholder" = "String %1$@, yes, I repeat, that's %1$@ indeed, told you %2$d times.";
   fr: |
     "string_no_pos" = "String %@ here.";
