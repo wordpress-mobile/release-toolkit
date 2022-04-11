@@ -10,7 +10,9 @@ _None_
 
 ### New Features
 
-_None_
+* Add the option for `an_localize_libs` to provide a `source_id` for each library being merged.  
+  If provided, that identifier will be added as an `a8c-src-lib` XML attribute to the `<string>` nodes being updated with strings from said library.
+  This can be useful to help identify where each string come from in the resulting, merged `strings.xml`. [#351]
 
 ### Bug Fixes
 

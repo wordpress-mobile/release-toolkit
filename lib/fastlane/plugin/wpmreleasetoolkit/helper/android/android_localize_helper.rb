@@ -9,11 +9,13 @@ module Fastlane
   module Helper
     module Android
       module LocalizeHelper
+        LIB_SOURCE_XML_ATTR = 'a8c-src-lib'.freeze
+
         # Checks if string_line has the content_override flag set
         def self.skip_string_by_tag(string_line)
           skip = string_line.attr('content_override') == 'true' unless string_line.attr('content_override').nil?
           if skip
-            puts " - Skipping #{string_line.attr('name')} string"
+            UI.message " - Skipping #{string_line.attr('name')} string"
             return true
           end
 
@@ -22,11 +24,11 @@ module Fastlane
 
         # Checks if string_name is in the excluesion list
         def self.skip_string_by_exclusion_list(library, string_name)
-          return false unless library.key?(:exclusions)
+          return false if library[:exclusions].nil?
 
           skip = library[:exclusions].include?(string_name)
           if skip
-            puts " - Skipping #{string_name} string"
+            UI.message " - Skipping #{string_name} string"
             return true
           end
         end
@@ -35,6 +37,7 @@ module Fastlane
         def self.merge_string(main_strings, library, string_line)
           string_name = string_line.attr('name')
           string_content = string_line.content
+          lib_src_id = library[:source_id]
 
           # Skip strings in the exclusions list
           return :skipped if skip_string_by_exclusion_list(library, string_name)
@@ -58,12 +61,14 @@ module Fastlane
               else
                 # It has the tools:ignore flag, so update the content without touching the other attributes
                 this_string.content = string_content
+                this_string[LIB_SOURCE_XML_ATTR] = lib_src_id unless lib_src_id.nil?
                 return result
               end
             end
           end
 
           # String not found, or removed because needing update and not in the exclusion list: add to the main file
+          string_line[LIB_SOURCE_XML_ATTR] = lib_src_id unless lib_src_id.nil?
           main_strings.xpath('//string').last().add_next_sibling("\n#{' ' * 4}#{string_line.to_xml().strip}")
           return result
         end
@@ -113,12 +118,12 @@ module Fastlane
             res = merge_string(main_strings, library, string_line)
             case res
             when :updated
-              puts "#{string_line.attr('name')} updated."
+              UI.verbose "#{string_line.attr('name')} updated."
               updated_count = updated_count + 1
             when :found
               untouched_count = untouched_count + 1
             when :added
-              puts "#{string_line.attr('name')} added."
+              UI.verbose "#{string_line.attr('name')} added."
               added_count = added_count + 1
             when :skipped
               skipped_count = skipped_count + 1
