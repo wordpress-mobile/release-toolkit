@@ -79,7 +79,8 @@ module Fastlane
             if state.in_escaped_ctx || c == '\\'
               # Just because we check for escaped characters at the global
               # level, it doesn't mean we allow them in every context.
-              raise "Found escaped character outside of allowed contexts on line #{line_no + 1} (current context: #{state.context})" unless %i[in_quoted_key in_quoted_value in_block_comment].include?(state.context)
+              allowed_contexts_for_escaped_characters = %i[in_quoted_key in_quoted_value in_block_comment in_line_comment]
+              raise "Found escaped character outside of allowed contexts on line #{line_no + 1} (current context: #{state.context})" unless allowed_contexts_for_escaped_characters.include?(state.context)
 
               state.buffer.write(c) if state.context == :in_quoted_key
               state.in_escaped_ctx = !state.in_escaped_ctx
