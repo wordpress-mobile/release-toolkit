@@ -22,17 +22,17 @@ module Fastlane
           install_path: resolve_path(params[:install_path]),
           version: params[:version]
         )
-        violations = helper.run(
+        all_violations = helper.run(
           input_dir: resolve_path(params[:input_dir]),
           base_lang: params[:base_lang],
           only_langs: params[:only_langs]
         )
 
-        violations.each do |lang, violations|
-          UI.error "Inconsistencies found between '#{params[:base_lang]}' and '#{lang}':\n\n#{violations.join("\n")}\n"
+        all_violations.each do |lang, lang_violations|
+          UI.error "Inconsistencies found between '#{params[:base_lang]}' and '#{lang}':\n\n#{lang_violations.join("\n")}\n"
         end
 
-        violations
+        all_violations
       end
 
       RETRY_MESSAGE = <<~MSG
@@ -148,15 +148,15 @@ module Fastlane
       end
 
       def self.return_type
-        :hash_of_strings
+        :hash
       end
 
       def self.return_value
-        'A hash, keyed by language code, whose values are the diff found for said language'
+        'A hash, keyed by language code, whose values are arrays of violations found for that language'
       end
 
       def self.authors
-        ['AliSoftware']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)
