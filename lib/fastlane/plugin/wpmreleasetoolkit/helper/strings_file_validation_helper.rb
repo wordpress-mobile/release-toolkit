@@ -114,15 +114,7 @@ module Fastlane
       #         a `Hash` with keys: `key` for the key value and `lines` with an
       #         array of line numbers at which the key occurs.
       def self.find_duplicated_keys(file:)
-        get_keys_from_strings(file: file).reduce([]) do |accumulator, (key, lines)|
-          if lines.length >= 2
-            # Duplicate key, keep
-            accumulator.append({ key: key, lines: lines })
-          else
-            # Valid key, discard
-            accumulator
-          end
-        end
+        get_keys_from_strings(file: file).keep_if { |_, lines| lines.count > 1 }
       end
     end
   end
