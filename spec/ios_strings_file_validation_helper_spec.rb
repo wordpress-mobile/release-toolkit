@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Fastlane::Helper::StringsFileValidationHelper do
+describe Fastlane::Helper::Ios::StringsFileValidationHelper do
   let(:test_data_dir) { File.join(File.dirname(__FILE__), 'test-data', 'translations') }
 
   context 'when there is an escape character in the root context' do
