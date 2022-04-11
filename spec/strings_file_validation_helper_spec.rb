@@ -7,7 +7,7 @@ describe Fastlane::Helper::StringsFileValidationHelper do
     it 'raises' do
       input = File.join(test_data_dir, 'strings-with-escape-character-in-root-context.strings')
       expect { described_class.find_duplicated_keys(file: input) }
-        .to raise_error(RuntimeError, 'Found escaped character outside of allowed contexts on line 4 (current context: root)')
+        .to raise_error(RuntimeError, 'Found escaped character outside of allowed contexts on line 8 (current context: root)')
     end
   end
 
