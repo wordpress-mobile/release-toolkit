@@ -54,6 +54,34 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
   end
 
   context 'Linter' do
+    def run_l10n_linter_test(data_file)
+      # Arrange: Prepare test files
+      test_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', "test-lint-ios-#{data_file}.yaml")
+      yml = YAML.load_file(test_file)
+
+      files = yml['test_data']
+      FileUtils.mkdir_p(@test_data_dir)
+      files.each do |lang, content|
+        lproj = File.join(@test_data_dir, "#{lang}.lproj")
+        FileUtils.mkdir_p(lproj)
+        File.write(File.join(lproj, 'Localizable.strings'), content) unless content.nil?
+      end
+
+      # Act
+      # Note: We will install SwiftGen in vendor/swiftgen if it's not already installed yet, and intentionally won't
+      #       remove this after the test ends, so that further executions of the test run faster.
+      #       Only the first execution of the tests might take longer if it needs to install SwiftGen first to be able to run the tests.
+      install_dir = "vendor/swiftgen/#{Fastlane::Helper::Ios::L10nLinterHelper::SWIFTGEN_VERSION}"
+      result = run_described_fastlane_action(
+        install_path: install_dir,
+        input_dir: @test_data_dir,
+        base_lang: 'en'
+      )
+
+      # Assert
+      expect(result).to eq(yml['result'])
+    end
+
     before(:each) do
       @test_data_dir = Dir.mktmpdir('a8c-lint-l10n-tests-data-')
       allow(FastlaneCore::UI).to receive(:abort_with_message!)
@@ -83,32 +111,4 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       FileUtils.remove_entry @test_data_dir
     end
   end
-end
-
-def run_l10n_linter_test(data_file)
-  # Arrange: Prepare test files
-  test_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', "test-lint-ios-#{data_file}.yaml")
-  yml = YAML.load_file(test_file)
-
-  files = yml['test_data']
-  FileUtils.mkdir_p(@test_data_dir)
-  files.each do |lang, content|
-    lproj = File.join(@test_data_dir, "#{lang}.lproj")
-    FileUtils.mkdir_p(lproj)
-    File.write(File.join(lproj, 'Localizable.strings'), content) unless content.nil?
-  end
-
-  # Act
-  # Note: We will install SwiftGen in vendor/swiftgen if it's not already installed yet, and intentionally won't
-  #       remove this after the test ends, so that further executions of the test run faster.
-  #       Only the first execution of the tests might take longer if it needs to install SwiftGen first to be able to run the tests.
-  install_dir = "vendor/swiftgen/#{Fastlane::Helper::Ios::L10nLinterHelper::SWIFTGEN_VERSION}"
-  result = run_described_fastlane_action(
-    install_path: install_dir,
-    input_dir: @test_data_dir,
-    base_lang: 'en'
-  )
-
-  # Assert
-  expect(result).to eq(yml['result'])
 end

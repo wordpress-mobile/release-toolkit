@@ -21,19 +21,10 @@ test_data:
     "many_placeholders_mix_pos" = "String %2$@, Float %4$f, Int %1$d, Long %5$li, Precise %3$.3lf";
     "repeated_placeholder" = "String %1$d, yes, I repeat, that's %1$d indeed, I said %d.";
 
-result: 
-  fr: |
-    @@ -3 +3 @@
-    -"many_placeholders_mix_pos" => [Int,String,Float,Int]
-    +"many_placeholders_mix_pos" => [String,Float,Int,Int]
-    @@ -5 +5 @@
-    -"string_int_pos" => [String,Int]
-    +"string_int_pos" => [Int,String]
-    @@ -7 +7 @@
-    -"string_no_pos" => [String]
-    +"string_no_pos" => [Int]
-
-  it: |
-    @@ -4 +4 @@
-    -"repeated_placeholder" => [String]
-    +"repeated_placeholder" => [Int]
+result:
+  fr:
+    - "`many_placeholders_mix_pos` expected placeholders for [Int,String,Float,Int] but found [String,Float,Int,Int] instead."
+    - "`string_int_pos` expected placeholders for [String,Int] but found [Int,String] instead."
+    - "`string_no_pos` expected placeholders for [String] but found [Int] instead."
+  it:
+    - "`repeated_placeholder` expected placeholders for [String] but found [Int] instead."

@@ -12,6 +12,7 @@ test_data:
     "string_int_pos" = "String %1$@ and Int %2$d";
     "string_int_pos_inv" = "Int %2$d before String %1$@";
     "many_placeholders_mix_pos" = "String %2$@, Float %4$f, Int %1$d, Long %5$li, Precise %3$.3lf";
+    "unexpected_key_not_present_in_base" = "This key should not exist in the translation given it does not exist in English";
     "repeated_placeholder" = "String %1$@, yes, that's it indeed, %@.";
   it: |
     "string_no_pos" = "String %@ here.";
@@ -21,12 +22,9 @@ test_data:
     "many_placeholders_mix_pos" = "String %2$@, Float %4$f, Int %1$d, Long %5$li, Precise %3$.3lf";
     "repeated_placeholder" = "String %1$@, yes, and not %2%@, I repeat, that's not %2$@.";
 
-result: 
-  fr: |
-    @@ -7 +7 @@
-    -"string_no_pos" => [String]
-    +"string_no_pos" => [String,String]
-  it: |
-    @@ -4 +4 @@
-    -"repeated_placeholder" => [String]
-    +"repeated_placeholder" => [String,String]
+result:
+  fr:
+    - "`string_no_pos` expected placeholders for [String] but found [String,String] instead."
+    - "`unexpected_key_not_present_in_base` was unexpected, as it is not present in the base locale."
+  it:
+    - "`repeated_placeholder` expected placeholders for [String] but found [String,String] instead."

@@ -16,7 +16,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+* Fix `ios_lint_localizations` action so that it no longer mistakely reports missing keys not yet translated in the other locales' `.strings` as violations. [#353]
 
 ### Internal Changes
 

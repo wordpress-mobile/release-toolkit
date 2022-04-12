@@ -23,17 +23,9 @@ test_data:
     "repeated_placeholder" = "السلسلة   %1$@ ، نعم ، أكرر ، هذه   %1$@ بالفعل ، وليست   %2$d."; // OK
 
 result:
-  fr: |
-    @@ -3 +3 @@
-    -"many_placeholders_mix_pos" => [Int,String,Float,Float,Int]
-    +"many_placeholders_mix_pos" => [String,Float,Float,Int]
-    @@ -5 +5 @@
-    -"string_int_pos" => [String,Int]
-    +"string_int_pos" => [Int]
-    @@ -7 +7 @@
-    -"string_no_pos" => [String]
-    +"string_no_pos" => []
-  ar: |
-    @@ -8 +8 @@
-    -"string_pos" => [String]
-    +"string_pos" => []
+  fr:
+    - "`many_placeholders_mix_pos` expected placeholders for [Int,String,Float,Float,Int] but found [String,Float,Float,Int] instead."
+    - "`string_int_pos` expected placeholders for [String,Int] but found [Int] instead."
+    - "`string_no_pos` expected placeholders for [String] but found [] instead."
+  ar:
+    - "`string_pos` expected placeholders for [String] but found [] instead."
