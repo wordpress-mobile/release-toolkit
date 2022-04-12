@@ -6,5 +6,5 @@
 "yet another key" = "yet another value"; // Escapes should be allowed in inline comments, too \\
 
 \\
-/* The parsing shouldn't reach this, line. It should tell us the escape up there is not valid. */
+/* The parsing shouldn't reach this line. It should tell us the escape up there is not valid. */
 "final key" = "final value";
