@@ -33,11 +33,12 @@ module Fastlane
 
       def self.available_options
         libs_hash_description = <<~KEYS
-          - `:library`: The library display name
-          - `:strings_path`: The path to the `strings.xml` file of the library
-          - `:exclusions`: An optional `Array` of string keys to exclude from merging
+          - `:library`: The library display name.
+          - `:strings_path`: The path to the `strings.xml` file of the library.
+          - `:exclusions`: An optional `Array` of string keys to exclude from merging.
           - `:source_id`: An optional `String` which will be added as the `a8c-src-lib` XML attribute
             to strings coming from this library, to help identify their source in the merged file.
+          - `:add_ignore_attr`: If set to true, will add `tools:ignore="UnusedResources"` to merged strings.
         KEYS
         [
           FastlaneCore::ConfigItem.new(key: :app_strings_path,
