@@ -60,14 +60,13 @@ module Fastlane
           }
         }.freeze
 
-        # Returns all the keys in the given `.strings` file, and the line(s) at
-        # which they are defined.
+        # Inspects the given `.strings` file for duplicated keys, returning them
+        # if any.
         #
         # @param [String] file The path to the file to inspect.
-        # @return [<Hash>] A `Hash` with keys the key values read from the
-        #         `.strings` file. The value of each entry is an array with the
-        #         line numbers where the key occurs.
-        def self.get_keys_from_strings(file:)
+        # @return [Hash<String, Array<Int>] Hash with the dublipcated keys.
+        #         Each element has the duplicated key (from the `.strings`) as key and an array of line numbers where the key occurs as value.
+        def self.find_duplicated_keys(file:)
           keys_with_lines = Hash.new([])
 
           state = State.new(context: :root, buffer: StringIO.new, in_escaped_ctx: false, found_key: nil)
@@ -105,18 +104,7 @@ module Fastlane
             end
           end
 
-          keys_with_lines
-        end
-
-        # Inspects the given `.strings` file for duplicated keys, returning them
-        # if any.
-        #
-        # @param [String] file The path to the file to inspect.
-        # @return [Array<Hash>] Array of all the duplicated keys. Each entry is a
-        #         a `Hash` with keys: `key` for the key value and `lines` with an
-        #         array of line numbers at which the key occurs.
-        def self.find_duplicated_keys(file:)
-          get_keys_from_strings(file: file).keep_if { |_, lines| lines.count > 1 }
+          keys_with_lines.keep_if { |_, lines| lines.count > 1 }
         end
       end
     end
