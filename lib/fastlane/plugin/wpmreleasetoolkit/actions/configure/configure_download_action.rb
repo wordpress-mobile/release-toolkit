@@ -17,8 +17,7 @@ module Fastlane
       end
 
       # Ensure the git repository at `~/.mobile-secrets` is up to date.
-      # If the secrets repo is in a detached HEAD state, skip the pull,
-      # since it will fail.
+      # If the secrets repo is in a detached HEAD state, skip the pull, since it will fail.
       def self.update_repository
         secrets_repo_branch = Fastlane::Helper::ConfigureHelper.repo_branch_name
 
