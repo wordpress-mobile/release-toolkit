@@ -40,11 +40,9 @@ module Fastlane
       end
 
       # "Applies" the instruction described in the instance to the file system.
-      # That is, copies the content of the source `file` to the `destination`
-      # path.
+      # That is, copies the content of the source `file` to the `destination` path.
       #
-      # @raise [StandardError] For security reasons, it will raise if
-      # `destination` is not ignored under Git.
+      # @raise [StandardError] For security reasons, it will raise if `destination` is not ignored under Git.
       def apply
         # Only decrypt the file if the destination is ignored in Git
         unless Fastlane::Helper::GitHelper.is_ignored?(path: destination_file_path)
