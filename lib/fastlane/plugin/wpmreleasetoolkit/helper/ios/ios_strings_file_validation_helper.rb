@@ -60,8 +60,7 @@ module Fastlane
           }
         }.freeze
 
-        # Inspects the given `.strings` file for duplicated keys, returning them
-        # if any.
+        # Inspects the given `.strings` file for duplicated keys, returning them if any.
         #
         # @param [String] file The path to the file to inspect.
         # @return [Hash<String, Array<Int>] Hash with the dublipcated keys.
@@ -73,12 +72,10 @@ module Fastlane
 
           File.readlines(file).each_with_index do |line, line_no|
             line.chars.each_with_index do |c, col_no|
-              # Handle escaped characters at a global level. This is more
-              # straightforward than having a `TRANSITIONS` table that account
-              # for it.
+              # Handle escaped characters at a global level.
+              # This is more straightforward than having a `TRANSITIONS` table that account for it.
               if state.in_escaped_ctx || c == '\\'
-                # Just because we check for escaped characters at the global
-                # level, it doesn't mean we allow them in every context.
+                # Just because we check for escaped characters at the global level, it doesn't mean we allow them in every context.
                 allowed_contexts_for_escaped_characters = %i[in_quoted_key in_quoted_value in_block_comment in_line_comment]
                 raise "Found escaped character outside of allowed contexts on line #{line_no + 1} (current context: #{state.context})" unless allowed_contexts_for_escaped_characters.include?(state.context)
 
@@ -87,16 +84,14 @@ module Fastlane
                 next
               end
 
-              # Look at the transitions table for the current context, and find
-              # the first transition matching the current character
+              # Look at the transitions table for the current context, and find the first transition matching the current character
               (_, next_context) = TRANSITIONS[state.context].find { |regex, _| c.match?(regex) } || [nil, nil]
               raise "Invalid character `#{c}` found on line #{line_no + 1}, col #{col_no + 1}" if next_context.nil?
 
               state.context = next_context.is_a?(Proc) ? next_context.call(state, c) : next_context
               next unless state.found_key
 
-              # If we just exited the :in_quoted_key context and thus have found
-              # a new key, process it
+              # If we just exited the :in_quoted_key context and thus have found a new key, process it
               key = state.found_key.dup
               state.found_key = nil
 
