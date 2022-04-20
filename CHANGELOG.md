@@ -18,6 +18,7 @@ _None_
 ### Bug Fixes
 
 * Fix `ios_lint_localizations` action so that it no longer mistakely reports missing keys not yet translated in the other locales' `.strings` as violations. [#353]
+* Fix `an_localize_libs` so that it does not move XML nodes around when merging lib strings (and replace them in-place instead). [#358]
 
 ### Internal Changes
 
