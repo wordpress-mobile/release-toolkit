@@ -62,17 +62,16 @@ module Fastlane
               return :found if lib_string_node =~ main_string_node
 
               # The string needs an update
-              result = :updated
               if main_string_node.attr('tools:ignore').nil?
-                # It can be updated, so remove the current one and move ahead
-                main_string_node.remove
-                break
+                # No `tools:ignore` attribute; completely replace existing main string node with lib's one
+                add_xml_attributes!(lib_string_node, library)
+                main_string_node.replace lib_string_node
               else
-                # It has the tools:ignore flag, so update the content without touching the other attributes
-                main_string_node.content = string_content
+                # Has the `tools:ignore` flag; update the content without touching the other existing attributes
                 add_xml_attributes!(main_string_node, library)
-                return result
+                main_string_node.content = string_content
               end
+              return :updated
             end
           end
 
