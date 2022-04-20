@@ -33,11 +33,20 @@ module Fastlane
           end
         end
 
+        # Adds the appropriate XML attributes to an XML `<string>` node according to library configuration
+        def self.add_xml_attributes!(string_node, library)
+          if library[:add_ignore_attr] == true
+            existing_ignores = (string_node['tools:ignore'] || '').split(',')
+            existing_ignores.append('UnusedResources') unless existing_ignores.include?('UnusedResources')
+            string_node['tools:ignore'] = existing_ignores.join(',')
+          end
+          string_node[LIB_SOURCE_XML_ATTR] = library[:source_id] unless library[:source_id].nil?
+        end
+
         # Merge string_line into main_string
         def self.merge_string(main_strings, library, string_line)
           string_name = string_line.attr('name')
           string_content = string_line.content
-          lib_src_id = library[:source_id]
 
           # Skip strings in the exclusions list
           return :skipped if skip_string_by_exclusion_list(library, string_name)
@@ -61,14 +70,14 @@ module Fastlane
               else
                 # It has the tools:ignore flag, so update the content without touching the other attributes
                 this_string.content = string_content
-                this_string[LIB_SOURCE_XML_ATTR] = lib_src_id unless lib_src_id.nil?
+                add_xml_attributes!(this_string, library)
                 return result
               end
             end
           end
 
           # String not found, or removed because needing update and not in the exclusion list: add to the main file
-          string_line[LIB_SOURCE_XML_ATTR] = lib_src_id unless lib_src_id.nil?
+          add_xml_attributes!(string_line, library)
           main_strings.xpath('//string').last().add_next_sibling("\n#{' ' * 4}#{string_line.to_xml().strip}")
           return result
         end
@@ -103,8 +112,14 @@ module Fastlane
         # @param [Hash] library Hash describing the library to merge. The Hash should contain the following keys:
         #                       - `:library`: The human readable name of the library, used to display in console messages
         #                       - `:strings_path`: The path to the strings.xml file of the library to merge into the main one
-        #                       - `:exclusions`: An array of strings keys to exclude during merge. Any of those keys from the library's `strings.xml` will be skipped and won't be merged into the main one.
+        #                       - `:exclusions`: An array of strings keys to exclude during merge. Any of those keys from the
+        #                         library's `strings.xml` will be skipped and won't be merged into the main one.
+        #                       - `:source_id`: An optional `String` which will be added as the `a8c-src-lib` XML attribute
+        #                         to strings coming from this library, to help identify their source in the merged file.
+        #                       - `:add_ignore_attr`: If set to `true`, will add `tools:ignore="UnusedResources"` to merged strings.
+        #
         # @return [Boolean] True if at least one string from the library has been added to (or has updated) the main strings file.
+        #
         def self.merge_lib(main, library)
           UI.message("Merging #{library[:library]} strings into #{main}")
           main_strings = File.open(main) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
