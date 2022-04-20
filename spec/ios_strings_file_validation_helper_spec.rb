@@ -42,7 +42,7 @@ describe Fastlane::Helper::Ios::StringsFileValidationHelper do
       # behaves correctly
       expect(
         described_class.find_duplicated_keys(
-          file: File.join(test_data_dir, 'ios_l10n_helper', 'expected-merged.strings')
+          file: File.join(test_data_dir, 'ios_l10n_helper', 'expected-merged-prefixed.strings')
         )
       ).to be_empty
       expect(
@@ -50,6 +50,17 @@ describe Fastlane::Helper::Ios::StringsFileValidationHelper do
           file: File.join(test_data_dir, 'ios_extract_keys_from_strings_files', 'Resources', 'en.lproj', 'Localizable.strings')
         )
       ).to be_empty
+    end
+  end
+
+  context 'when there are unquoted keys' do
+    it 'returns an error' do
+      # Unquoted strings are currently not supported by our validation helper in its current state, despite being a valid syntax, because we considered
+      # that it was not worth adding complexity to our state machine logic for this use case — we expect all the `.strings` files we plan to validate will
+      # come from GlotPress exports, and will thus always have their keys quoted.
+      # If support for unquoted strings is added to our validation helper in the future, feel free to update this test example accordingly.
+      expect { described_class.find_duplicated_keys(file: File.join(test_data_dir, 'ios_l10n_helper', 'expected-merged.strings')) }
+        .to raise_error(RuntimeError, 'Invalid character `I` found on line 21, col 1')
     end
   end
 end
