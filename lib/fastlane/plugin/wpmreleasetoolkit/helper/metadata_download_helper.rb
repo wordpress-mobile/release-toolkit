@@ -12,8 +12,7 @@ module Fastlane
         @alternates = {}
       end
 
-      # Downloads data from GlotPress,
-      # in JSON format
+      # Downloads data from GlotPress, in JSON format
       def download(target_locale, glotpress_url, is_source)
         uri = URI(glotpress_url)
         response = Net::HTTP.get_response(uri)
@@ -80,8 +79,7 @@ module Fastlane
         end
       end
 
-      # Writes the downloaded content
-      # to the target file
+      # Writes the downloaded content to the target file
       def save_metadata(locale, file_name, content)
         file_path = get_target_file_path(locale, file_name)
 

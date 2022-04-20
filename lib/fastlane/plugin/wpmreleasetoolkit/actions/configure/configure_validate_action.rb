@@ -15,8 +15,8 @@ module Fastlane
         # otherwise, the error messaging isn't as helpful.
         validate_that_secrets_repo_is_clean
 
-        # Update the repository to get the latest version of the configuration secrets – that's
-        # how we'll know if we're behind in subsequent validations
+        # Update the repository to get the latest version of the configuration secrets
+        # – that's how we'll know if we're behind in subsequent validations
         ConfigureDownloadAction.run
 
         validate_that_branches_match

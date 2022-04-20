@@ -8,14 +8,11 @@ module Fastlane
       # Fallback default branch of the client repository.
       DEFAULT_GIT_BRANCH = 'trunk'.freeze
 
-      # Checks if the given path, or current directory if no path is given, is
-      # inside a Git repository
+      # Checks if the given path, or current directory if no path is given, is inside a Git repository
       #
-      # @param [String] path An optional path where to check if a Git repo
-      #        exists.
+      # @param [String] path An optional path where to check if a Git repo exists.
       #
-      # @return [Bool] True if the current directory is the root of a git repo
-      #         (i.e. a local working copy) or a subdirectory of one.
+      # @return [Bool] True if the current directory is the root of a git repo (i.e. a local working copy) or a subdirectory of one.
       #
       def self.is_git_repo?(path: Dir.pwd)
         # If the path doesn't exist, find its first ancestor.
@@ -23,23 +20,19 @@ module Fastlane
         # Get the path's directory, so we can look in it for the Git folder
         dir = path.directory? ? path : path.dirname
 
-        # Recursively look for the Git folder until it's found or we read the
-        # the file system root
+        # Recursively look for the Git folder until it's found or we read the the file system root
         dir = dir.parent until Dir.entries(dir).include?('.git') || dir.root?
 
-        # If we reached the root, we haven't found a repo. (Technically, there
-        # could be a repo in the root of the system, but that's a usecase that
-        # we don't need to support at this time)
+        # If we reached the root, we haven't found a repo.
+        # (Technically, there could be a repo in the root of the system, but that's a usecase that we don't need to support at this time)
         return dir.root? == false
       end
 
-      # Travels back the hierarchy of the given path until it finds an existing
-      # ancestor, or it reaches the root of the file system.
+      # Travels back the hierarchy of the given path until it finds an existing ancestor, or it reaches the root of the file system.
       #
       # @param [String] path The path to inspect
       #
-      # @return [Pathname] The first existing ancestor, or `path` itself if it
-      #         exists
+      # @return [Pathname] The first existing ancestor, or `path` itself if it exists
       #
       def self.first_existing_ancestor_of(path:)
         p = Pathname(path).expand_path
@@ -106,7 +99,7 @@ module Fastlane
       #
       # @param [String] message The commit message to use
       # @param [String|Array<String>] files A file or array of files to git-add before creating the commit.
-      #        use `nil` or `[]` if you already added the files in a separate step and don't wan't this method to add any new file before commit.
+      #        Use `nil` or `[]` if you already added the files in a separate step and don't wan't this method to add any new file before commit.
       #        Also accepts the special symbol `:all` to add all the files (`git commit -a -m …`).
       # @param [Bool] push If true, will `git push` to `origin` after the commit has been created. Defaults to `false`.
       #
@@ -209,8 +202,7 @@ module Fastlane
         UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)
       end
 
-      # Checks whether a given path is ignored by Git, relying on Git's
-      # `check-ignore` under the hood.
+      # Checks whether a given path is ignored by Git, relying on Git's `check-ignore` under the hood.
       #
       # @param [String] path The path to check against `.gitignore`
       #

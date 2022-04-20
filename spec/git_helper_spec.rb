@@ -135,11 +135,10 @@ describe Fastlane::Helper::GitHelper do
 
     context 'when the path is in the .gitignore' do
       it 'returns true when the .gitignore has uncommitted changes' do
-        # For some reason, I was expecting the underlying `git check-ignore`
-        # command to fail in this case, but I'm clearly wrong.
+        # For some reason, I was expecting the underlying `git check-ignore` command to fail in this case, but I'm clearly wrong.
         #
-        # I think there's value in keeping this behavior explicity documented
-        # and verified here. – Gio
+        # I think there's value in keeping this behavior explicity documented and verified here.
+        # – Gio
         setup_git_repo(
           dummy_file_path: path,
           add_file_to_gitignore: true,
@@ -158,9 +157,8 @@ describe Fastlane::Helper::GitHelper do
       end
     end
 
-    # This test ensures we support the usecase of the `configure` tool, which
-    # can create new files by decrypting secrets. We need the ability to tell
-    # if a path result is ignored, regardless of whether it exists yet.
+    # This test ensures we support the usecase of the `configure` tool, which can create new files by decrypting secrets.
+    # We need the ability to tell if a path result is ignored, regardless of whether it exists yet.
     it 'returns false for files not yet created but part of the repository' do
       setup_git_repo()
       expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be false
@@ -174,10 +172,8 @@ describe Fastlane::Helper::GitHelper do
       expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be true
     end
 
-    # This is sort of redundant given the previous example already ensures the
-    # same logic. But, we'll be using paths starting with `~` as part of our
-    # configurations, so it felt appopriate to explicitly ensure this important
-    # use case is respected.
+    # This is sort of redundant given the previous example already ensures the same logic.
+    # But, we'll be using paths starting with `~` as part of our configurations, so it felt appopriate to explicitly ensure this important use case is respected.
     it 'returns true when the path is in the home folder ' do
       path = '~/a/path'
       expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be true
@@ -190,8 +186,8 @@ def setup_git_repo(dummy_file_path: nil, add_file_to_gitignore: false, commit_gi
   `touch .gitignore`
   `git add .gitignore && git commit -m 'Add .gitignore'`
 
-  # If we don't have a path for the file, we don't care the values of the two
-  # flag arguments are irrelevant. We can just finish here.
+  # If we don't have a path for the file, we don't care the values of the two flag arguments are irrelevant.
+  # We can just finish here.
   return if dummy_file_path.nil?
 
   `echo abc > #{dummy_file_path}`

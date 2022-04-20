@@ -1,12 +1,9 @@
 require 'spec_helper'
 
 describe Fastlane::Actions::AnLocalizeLibsAction do
-  # This test is more of a way of ensuring `run_described_fastlane_action` handles array
-  # of hashes properly than a comprehensive test for the
-  # `an_localize_libs_action` action.
+  # This test is more of a way of ensuring `run_described_fastlane_action` handles array of hashes properly than a comprehensive test for the `an_localize_libs_action` action.
   #
-  # Please consider expanding this test if you'll find yourself working on its
-  # action.
+  # Please consider expanding this test if you'll find yourself working on its action.
   it 'merges the strings from the given array into the given main strings file' do
     in_tmp_dir do |tmp_dir|
       app_strings_path = File.join(tmp_dir, 'app.xml')
@@ -37,12 +34,9 @@ describe Fastlane::Actions::AnLocalizeLibsAction do
 end
 
 def android_xml_with_content(content)
-  # I couldn't find a way to interpolate a multiline string preserving its
-  # indentation in the heredoc below, so I hacked the following transformation
-  # of the input that adds the desired indentation to all lines.
+  # I couldn't find a way to interpolate a multiline string preserving its indentation in the heredoc below, so I hacked the following transformation of the input that adds the desired indentation to all lines.
   #
-  # The desired indentation is 4 spaces to stay aligned with the production
-  # code applies when merging the XMLs.
+  # The desired indentation is 4 spaces to stay aligned with the production code applies when merging the XMLs.
   indented_content = content.chomp.lines.map { |l| "    #{l}" }.join
 
   return <<~XML

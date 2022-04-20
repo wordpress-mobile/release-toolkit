@@ -10,12 +10,9 @@ describe Fastlane::Helper::ConfigureHelper do
           .with(path: destination)
           .and_return(false)
 
-        # Currently, we need a Git repository to exists in the hierarchy
-        # containing the call site otherwise the tests will end up stuck in
-        # some kind of loop (which I haven't fully inspected). That's a
-        # reasonable enough assumption to make for the real world usage of this
-        # tool. Still, it would be nice to have proper handling of that
-        # scenario at some point.
+        # Currently, we need a Git repository to exists in the hierarchy containing the call site otherwise the tests will end up stuck in some kind of loop (which I haven't fully inspected).
+        # That's a reasonable enough assumption to make for the real world usage of this tool.
+        # Still, it would be nice to have proper handling of that scenario at some point.
         `git init --initial-branch main || git init`
 
         expect(Fastlane::UI).to receive(:user_error!)

@@ -55,8 +55,7 @@ def expect_shell_command(*command, exitstatus: 0, output: '')
   expect(Open3).to receive(:popen2e).with(*command).and_yield(mock_input, mock_output, mock_thread)
 end
 
-# If the `described_class` of a spec is a `Fastlane::Action` subclass, it runs
-# it with the given parameters.
+# If the `described_class` of a spec is a `Fastlane::Action` subclass, it runs it with the given parameters.
 #
 def run_described_fastlane_action(parameters)
   raise "Only call `#{__callee__}` from a spec describing a `Fastlane::Action` subclass." unless Fastlane::Actions.is_class_action?(described_class)

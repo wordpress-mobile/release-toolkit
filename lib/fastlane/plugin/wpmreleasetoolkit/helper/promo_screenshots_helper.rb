@@ -117,8 +117,7 @@ module Fastlane
       end
 
       def draw_screenshot_to_canvas(entry, canvas, device)
-        # Don't require a screenshot to be present – we can just skip
-        # this function if one doesn't exist.
+        # Don't require a screenshot to be present – we can just skip this function if one doesn't exist.
         return canvas if entry['screenshot'].nil?
 
         device_mask = device['screenshot_mask']
