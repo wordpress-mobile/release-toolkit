@@ -11,7 +11,7 @@ module Fastlane
       module LocalizeHelper
         LIB_SOURCE_XML_ATTR = 'a8c-src-lib'.freeze
 
-        # Checks if `string_node` has the content_override flag set
+        # Checks if `string_node` has the `content_override` flag set
         def self.skip_string_by_tag?(string_node)
           skip = string_node.attr('content_override') == 'true' unless string_node.attr('content_override').nil?
           if skip
