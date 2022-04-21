@@ -75,7 +75,6 @@ describe Fastlane::Actions::AnLocalizeLibsAction do
 
         expected = [
           '<string name="override-true" content_override="true">from app override-true</string>',
-          '', '', # FIXME: Current implementation adds empty lines; we should get rid of those at some point
           '<string name="override-false">from lib override-false</string>',
           '<string name="override-missing">from lib override-missing</string>',
         ]
@@ -118,11 +117,9 @@ describe Fastlane::Actions::AnLocalizeLibsAction do
 
         expected = [
           '<string name="override-true" content_override="true">from app override-true</string>',
-          '', # FIXME: Current implementation adds empty lines; we should get rid of those at some point
-          '<string name="lib1-key" a8c-src-lib="lib1-id">Key only present in lib1</string>',
           '<string name="override-missing" a8c-src-lib="lib2-id">from lib2 override-missing</string>',
+          '<string name="lib1-key" a8c-src-lib="lib1-id">Key only present in lib1</string>',
           '<string name="lib2-key" a8c-src-lib="lib2-id">Key only present in lib2</string>',
-          '', # FIXME: Current implementation adds empty lines; we should get rid of those at some point
         ]
         expect(File.read(app_strings_path)).to eq(android_xml_with_lines(expected))
       end
@@ -212,9 +209,8 @@ describe Fastlane::Actions::AnLocalizeLibsAction do
 
         expected = [
           '<string name="override-true" content_override="true">from app override-true</string>',
-          '', # FIXME: Current implementation adds empty lines; we should get rid of those at some point
-          '<string name="override-missing">from app override-missing</string>',
           '<string name="override-false">from lib override-false</string>',
+          '<string name="override-missing">from app override-missing</string>',
         ]
         expect(File.read(app_strings_path)).to eq(android_xml_with_lines(expected))
       end

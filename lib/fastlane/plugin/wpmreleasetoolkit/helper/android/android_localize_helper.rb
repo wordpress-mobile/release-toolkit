@@ -11,19 +11,19 @@ module Fastlane
       module LocalizeHelper
         LIB_SOURCE_XML_ATTR = 'a8c-src-lib'.freeze
 
-        # Checks if string_line has the content_override flag set
-        def self.skip_string_by_tag(string_line)
-          skip = string_line.attr('content_override') == 'true' unless string_line.attr('content_override').nil?
+        # Checks if `string_node` has the content_override flag set
+        def self.skip_string_by_tag?(string_node)
+          skip = string_node.attr('content_override') == 'true' unless string_node.attr('content_override').nil?
           if skip
-            UI.message " - Skipping #{string_line.attr('name')} string"
+            UI.message " - Skipping #{string_node.attr('name')} string"
             return true
           end
 
           return false
         end
 
-        # Checks if string_name is in the excluesion list
-        def self.skip_string_by_exclusion_list(library, string_name)
+        # Checks if `string_name` is in the exclusion list
+        def self.skip_string_by_exclusion_list?(library, string_name)
           return false if library[:exclusions].nil?
 
           skip = library[:exclusions].include?(string_name)
@@ -43,66 +43,65 @@ module Fastlane
           string_node[LIB_SOURCE_XML_ATTR] = library[:source_id] unless library[:source_id].nil?
         end
 
-        # Merge string_line into main_string
-        def self.merge_string(main_strings, library, string_line)
-          string_name = string_line.attr('name')
-          string_content = string_line.content
+        # Merge a single `lib_string_node` XML node into the `main_strings_xml``
+        def self.merge_string_node(main_strings_xml, library, lib_string_node)
+          string_name = lib_string_node.attr('name')
+          string_content = lib_string_node.content
 
           # Skip strings in the exclusions list
-          return :skipped if skip_string_by_exclusion_list(library, string_name)
+          return :skipped if skip_string_by_exclusion_list?(library, string_name)
 
           # Search for the string in the main file
           result = :added
-          main_strings.xpath('//string').each do |this_string|
-            if this_string.attr('name') == string_name
+          main_strings_xml.xpath('//string').each do |main_string_node|
+            if main_string_node.attr('name') == string_name
               # Skip if the string has the content_override tag
-              return :skipped if skip_string_by_tag(this_string)
+              return :skipped if skip_string_by_tag?(main_string_node)
 
               # If nodes are equivalent, skip
-              return :found if string_line =~ this_string
+              return :found if lib_string_node =~ main_string_node
 
               # The string needs an update
-              result = :updated
-              if this_string.attr('tools:ignore').nil?
-                # It can be updated, so remove the current one and move ahead
-                this_string.remove
-                break
+              if main_string_node.attr('tools:ignore').nil?
+                # No `tools:ignore` attribute; completely replace existing main string node with lib's one
+                add_xml_attributes!(lib_string_node, library)
+                main_string_node.replace lib_string_node
               else
-                # It has the tools:ignore flag, so update the content without touching the other attributes
-                this_string.content = string_content
-                add_xml_attributes!(this_string, library)
-                return result
+                # Has the `tools:ignore` flag; update the content without touching the other existing attributes
+                add_xml_attributes!(main_string_node, library)
+                main_string_node.content = string_content
               end
+              return :updated
             end
           end
 
           # String not found, or removed because needing update and not in the exclusion list: add to the main file
-          add_xml_attributes!(string_line, library)
-          main_strings.xpath('//string').last().add_next_sibling("\n#{' ' * 4}#{string_line.to_xml().strip}")
+          add_xml_attributes!(lib_string_node, library)
+          main_strings_xml.xpath('//string').last().add_next_sibling("\n#{' ' * 4}#{lib_string_node.to_xml().strip}")
           return result
         end
 
-        # Verify a string
-        def self.verify_string(main_strings, library, string_line)
-          string_name = string_line.attr('name')
-          string_content = string_line.content
+        # Verify a string node from a library has properly been merged into the main one
+        def self.verify_string(main_strings_xml, library, lib_string_node)
+          string_name = lib_string_node.attr('name')
+          string_content = lib_string_node.content
 
           # Skip strings in the exclusions list
-          return if skip_string_by_exclusion_list(library, string_name)
+          return if skip_string_by_exclusion_list?(library, string_name)
 
           # Search for the string in the main file
-          main_strings.xpath('//string').each do |this_string|
-            if this_string.attr('name') == string_name
+          main_strings_xml.xpath('//string').each do |main_string_node|
+            if main_string_node.attr('name') == string_name
               # Skip if the string has the content_override tag
-              return if skip_string_by_tag(this_string)
+              return if skip_string_by_tag?(main_string_node)
 
-              # Update if needed
-              UI.user_error!("String #{string_name} [#{string_content}] has been updated in the main file but not in the library #{library[:library]}.") if this_string.content != string_content
+              # Check if up-to-date
+              UI.user_error!("String #{string_name} [#{string_content}] has been updated in the main file but not in the library #{library[:library]}.") if main_string_node.content != string_content
               return
             end
           end
 
-          # String not found and not in the exclusion list:
+          # String not found and not in the exclusion list
           UI.user_error!("String #{string_name} [#{string_content}] was found in library #{library[:library]} but not in the main file.")
         end
 
@@ -122,23 +121,23 @@ module Fastlane
         #
         def self.merge_lib(main, library)
           UI.message("Merging #{library[:library]} strings into #{main}")
-          main_strings = File.open(main) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-          lib_strings = File.open(library[:strings_path]) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+          main_strings_xml = File.open(main) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+          lib_strings_xml = File.open(library[:strings_path]) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
 
           updated_count = 0
           untouched_count = 0
           added_count = 0
           skipped_count = 0
-          lib_strings.xpath('//string').each do |string_line|
-            res = merge_string(main_strings, library, string_line)
+          lib_strings_xml.xpath('//string').each do |string_node|
+            res = merge_string_node(main_strings_xml, library, string_node)
             case res
             when :updated
-              UI.verbose "#{string_line.attr('name')} updated."
+              UI.verbose "#{string_node.attr('name')} updated."
               updated_count = updated_count + 1
             when :found
               untouched_count = untouched_count + 1
             when :added
-              UI.verbose "#{string_line.attr('name')} added."
+              UI.verbose "#{string_node.attr('name')} added."
               added_count = added_count + 1
             when :skipped
               skipped_count = skipped_count + 1
@@ -148,7 +147,7 @@ module Fastlane
           end
 
           File.open(main, 'w:UTF-8') do |f|
-            f.write(main_strings.to_xml(indent: 4))
+            f.write(main_strings_xml.to_xml(indent: 4))
           end
 
           UI.message("Done (#{added_count} added, #{updated_count} updated, #{untouched_count} untouched, #{skipped_count} skipped).")
@@ -164,8 +163,8 @@ module Fastlane
 
             diff_string = diff_string.slice(0..(end_index - 1))
 
-            lib_strings.xpath('//string').each do |string_line|
-              res = verify_string(main_strings, library, string_line) if string_line.attr('name') == diff_string
+            lib_strings.xpath('//string').each do |string_node|
+              res = verify_string(main_strings, library, string_node) if string_node.attr('name') == diff_string
             end
           end
         end
