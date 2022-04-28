@@ -54,6 +54,10 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
   end
 
   context 'Linter' do
+    # Helper function that DRYs the code running each test.
+    #
+    # @param [String] data_file The name, without extension or "test-lint-ios-" prefix, of the YML file containing the test input and expected output.
+    #
     def run_l10n_linter_test(data_file:)
       # Arrange: Prepare test files
       test_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', "test-lint-ios-#{data_file}.yaml")
