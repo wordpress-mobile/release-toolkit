@@ -54,7 +54,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
   end
 
   context 'Linter' do
-    def run_l10n_linter_test(data_file)
+    def run_l10n_linter_test(data_file:)
       # Arrange: Prepare test files
       test_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', "test-lint-ios-#{data_file}.yaml")
       yml = YAML.load_file(test_file)
@@ -88,23 +88,23 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     end
 
     it 'succeeds when there are no violations' do
-      run_l10n_linter_test('no-violations')
+      run_l10n_linter_test(data_file: 'no-violations')
     end
 
     it 'detects inconsistent placeholder count' do
-      run_l10n_linter_test('wrong-placeholder-count')
+      run_l10n_linter_test(data_file: 'wrong-placeholder-count')
     end
 
     it 'detects inconsistent placeholder types' do
-      run_l10n_linter_test('wrong-placeholder-types')
+      run_l10n_linter_test(data_file: 'wrong-placeholder-types')
     end
 
     it 'properly handles misleading characters and placeholders in RTL languages' do
-      run_l10n_linter_test('tricky-chars')
+      run_l10n_linter_test(data_file: 'tricky-chars')
     end
 
     it 'does not fail if a locale does not have any Localizable.strings' do
-      run_l10n_linter_test('no-strings')
+      run_l10n_linter_test(data_file: 'no-strings')
     end
 
     after(:each) do
