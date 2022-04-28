@@ -2,10 +2,12 @@ module Fastlane
   module Actions
     class IosLintLocalizationsAction < Action
       def self.run(params)
-        violations = {}
+        violations = Hash.new([])
 
         loop do
-          violations = self.run_linter(params)
+          # If we did `violations = self.run...` we'd lose the default value for missing key being `[]` that we set above with `Hash.new`.
+          # We want that default value so that we can use `+=` when adding the duplicate keys violations below.
+          violations = violations.merge(self.run_linter(params))
 
           if params[:check_duplicate_keys]
             find_duplicated_keys(params).each do |language, duplicates|

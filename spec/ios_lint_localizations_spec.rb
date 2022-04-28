@@ -117,6 +117,10 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       run_l10n_linter_test(data_file: 'violations-and-duplicate-keys')
     end
 
+    it 'when there are only duplications, it reports them' do
+      run_l10n_linter_test(data_file: 'duplicate-keys-only')
+    end
+
     it 'detects both inconsistencies and duplicated strings when asked to do so' do
       run_l10n_linter_test(data_file: 'violations-and-duplicate-keys', check_duplicate_keys: true)
     end

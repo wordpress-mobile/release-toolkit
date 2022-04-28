@@ -1,0 +1,28 @@
+test_data:
+  en: |
+    "okay_key" = "value";
+    "duplicate_key" = "value";
+    "other_duplicate_key" = "other value";
+    "yet_another_duplicate_key" = "yet another value";
+    "other_okay_key" = "other value";
+  fr: |
+    "okay_key" = "value";
+    "duplicate_key" = "value";
+    "duplicate_key" = "value";
+    "other_duplicate_key" = "other value";
+    "other_okay_key" = "other value";
+  it: |
+    "okay_key" = "value";
+    "duplicate_key" = "value";
+    "other_duplicate_key" = "other value";
+    "other_duplicate_key" = "other value";
+    "yet_another_duplicate_key" = "yet another value";
+    "yet_another_duplicate_key" = "yet another value";
+    "other_okay_key" = "other value";
+
+result:
+  fr:
+    - "`duplicate_key` was found at multiple lines: 2, 3"
+  it:
+    - "`other_duplicate_key` was found at multiple lines: 3, 4"
+    - "`yet_another_duplicate_key` was found at multiple lines: 5, 6"
