@@ -8,9 +8,8 @@ module Fastlane
           violations = self.run_linter(params)
 
           if params[:check_duplicate_keys]
-            find_duplicated_keys(params).each do |language, _|
-              # if we're in here, there's violations
-              violations[language] += ['there were duplicates']
+            find_duplicated_keys(params).each do |language, duplicates|
+              violations[language] += duplicates
             end
           end
 
@@ -59,7 +58,7 @@ module Fastlane
 
         files_to_lint.each do |file|
           duplicates = Fastlane::Helper::Ios::StringsFileValidationHelper.find_duplicated_keys(file: file[:path])
-          duplicate_keys[file[:language]] = duplicates unless duplicates.empty?
+          duplicate_keys[file[:language]] = duplicates.map { |key, value| "`#{key}` was found at multiple lines: #{value.join(', ')}" } unless duplicates.empty?
         end
 
         duplicate_keys
