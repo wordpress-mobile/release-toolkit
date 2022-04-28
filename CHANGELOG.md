@@ -10,6 +10,9 @@ _None_
 
 ### New Features
 
+* The `ios_lint_localizations` action now also checks for duplicated keys in the `.strings` files.
+  The behavior is optional via the `check_duplicate_keys` parameter and enabled by default [#360]
+
 _None_
 
 ### Bug Fixes
