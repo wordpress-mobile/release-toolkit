@@ -6,30 +6,16 @@ module Fastlane
 
         loop do
           violations = self.run_linter(params)
-          report(violations: violations, base_lang: params[:base_lang])
-          break unless !violations.empty? && params[:allow_retry] && UI.confirm(RETRY_MESSAGE)
-        end
 
-        duplicate_keys = {}
-        if params[:check_duplicate_keys]
-          files_to_lint = Dir.chdir(params[:input_dir]) do
-            Dir.glob('*.lproj/Localizable.strings').map do |file|
-              {
-                language: File.basename(File.dirname(file), '.lproj'),
-                path: File.join(params[:input_dir], file)
-              }
+          if params[:check_duplicate_keys]
+            find_duplicated_keys(params).each do |language, _|
+              # if we're in here, there's violations
+              violations[language] += ['there were duplicates']
             end
           end
 
-          files_to_lint.each do |file|
-            duplicates = Fastlane::Helper::Ios::StringsFileValidationHelper.find_duplicated_keys(file: file[:path])
-            duplicate_keys[file[:language]] = duplicates unless duplicates.empty?
-          end
-
-          duplicate_keys.each do |language, duplicates|
-            # if we're in here, there's violations
-            violations[language] += ['there were duplicates']
-          end
+          report(violations: violations, base_lang: params[:base_lang])
+          break unless !violations.empty? && params[:allow_retry] && UI.confirm(RETRY_MESSAGE)
         end
 
         UI.abort_with_message!(ABORT_MESSAGE) if !violations.empty? && params[:abort_on_violations]
@@ -57,6 +43,26 @@ module Fastlane
         violations.each do |lang, lang_violations|
           UI.error "Inconsistencies found between '#{base_lang}' and '#{lang}':\n\n#{lang_violations.join("\n")}\n"
         end
+      end
+
+      def self.find_duplicated_keys(params)
+        duplicate_keys = {}
+
+        files_to_lint = Dir.chdir(params[:input_dir]) do
+          Dir.glob('*.lproj/Localizable.strings').map do |file|
+            {
+              language: File.basename(File.dirname(file), '.lproj'),
+              path: File.join(params[:input_dir], file)
+            }
+          end
+        end
+
+        files_to_lint.each do |file|
+          duplicates = Fastlane::Helper::Ios::StringsFileValidationHelper.find_duplicated_keys(file: file[:path])
+          duplicate_keys[file[:language]] = duplicates unless duplicates.empty?
+        end
+
+        duplicate_keys
       end
 
       RETRY_MESSAGE = <<~MSG
