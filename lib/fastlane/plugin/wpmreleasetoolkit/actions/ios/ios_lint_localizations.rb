@@ -6,6 +6,7 @@ module Fastlane
 
         loop do
           violations = self.run_linter(params)
+          report(violations: violations, base_lang: params[:base_lang])
           break unless !violations.empty? && params[:allow_retry] && UI.confirm(RETRY_MESSAGE)
         end
 
@@ -44,17 +45,18 @@ module Fastlane
           install_path: resolve_path(params[:install_path]),
           version: params[:version]
         )
-        all_violations = helper.run(
+
+        helper.run(
           input_dir: resolve_path(params[:input_dir]),
           base_lang: params[:base_lang],
           only_langs: params[:only_langs]
         )
+      end
 
-        all_violations.each do |lang, lang_violations|
-          UI.error "Inconsistencies found between '#{params[:base_lang]}' and '#{lang}':\n\n#{lang_violations.join("\n")}\n"
+      def self.report(violations:, base_lang:)
+        violations.each do |lang, lang_violations|
+          UI.error "Inconsistencies found between '#{base_lang}' and '#{lang}':\n\n#{lang_violations.join("\n")}\n"
         end
-
-        all_violations
       end
 
       RETRY_MESSAGE = <<~MSG
