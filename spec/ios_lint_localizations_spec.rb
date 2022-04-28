@@ -57,8 +57,11 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     # Helper function that DRYs the code running each test.
     #
     # @param [String] data_file The name, without extension or "test-lint-ios-" prefix, of the YML file containing the test input and expected output.
+    # @param [Bool|nil] check_duplicate_keys If `nil`, the test will run the action with the default `check_duplicate_keys` parameter value.
+    #        If a `Bool` value is given, it will pass that.
+    #        Using either `Bool` or `nil` adds some cruft, but lets us validate the action default behavior, so it doesn't change unexpectedly.
     #
-    def run_l10n_linter_test(data_file:)
+    def run_l10n_linter_test(data_file:, check_duplicate_keys: nil)
       # Arrange: Prepare test files
       test_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', "test-lint-ios-#{data_file}.yaml")
       yml = YAML.load_file(test_file)
@@ -81,6 +84,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
         input_dir: @test_data_dir,
         base_lang: 'en'
       }
+      parameters[:check_duplicate_keys] = check_duplicate_keys unless check_duplicate_keys.nil?
       result = run_described_fastlane_action(parameters)
 
       # Assert
@@ -106,6 +110,19 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
 
     it 'properly handles misleading characters and placeholders in RTL languages' do
       run_l10n_linter_test(data_file: 'tricky-chars')
+    end
+
+    it 'detects both inconsistencies and duplicated strings by default' do
+      # "by defaul" = don't explicitly set the `:check_duplicate_keys` parameter
+      run_l10n_linter_test(data_file: 'violations-and-duplicate-keys')
+    end
+
+    it 'detects both inconsistencies and duplicated strings when asked to do so' do
+      run_l10n_linter_test(data_file: 'violations-and-duplicate-keys', check_duplicate_keys: true)
+    end
+
+    it 'ignores duplicated strings when asked to do so' do
+      run_l10n_linter_test(data_file: 'violations-and-duplicate-keys-reporting-violations-only', check_duplicate_keys: false)
     end
 
     it 'does not fail if a locale does not have any Localizable.strings' do

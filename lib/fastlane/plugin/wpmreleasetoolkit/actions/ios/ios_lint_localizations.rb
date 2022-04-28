@@ -9,6 +9,28 @@ module Fastlane
           break unless !violations.empty? && params[:allow_retry] && UI.confirm(RETRY_MESSAGE)
         end
 
+        duplicate_keys = {}
+        if params[:check_duplicate_keys]
+          files_to_lint = Dir.chdir(params[:input_dir]) do
+            Dir.glob('*.lproj/Localizable.strings').map do |file|
+              {
+                language: File.basename(File.dirname(file), '.lproj'),
+                path: File.join(params[:input_dir], file)
+              }
+            end
+          end
+
+          files_to_lint.each do |file|
+            duplicates = Fastlane::Helper::Ios::StringsFileValidationHelper.find_duplicated_keys(file: file[:path])
+            duplicate_keys[file[:language]] = duplicates unless duplicates.empty?
+          end
+
+          duplicate_keys.each do |language, duplicates|
+            # if we're in here, there's violations
+            violations[language] += ['there were duplicates']
+          end
+        end
+
         UI.abort_with_message!(ABORT_MESSAGE) if !violations.empty? && params[:abort_on_violations]
 
         violations
@@ -138,6 +160,14 @@ module Fastlane
             description: 'If any violations are found, show an interactive prompt allowing the user to manually fix the issues locally and retry the linting',
             optional: true,
             default_value: false,
+            is_string: false # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :check_duplicate_keys,
+            env_name: 'FL_IOS_LINT_TRANSLATIONS_CHECK_DUPLICATE_KEYS',
+            description: 'Checks the input files for duplicate keys',
+            optional: true,
+            default_value: true,
             is_string: false # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
           ),
         ]
