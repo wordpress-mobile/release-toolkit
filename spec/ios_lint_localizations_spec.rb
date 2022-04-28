@@ -76,11 +76,12 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       #       remove this after the test ends, so that further executions of the test run faster.
       #       Only the first execution of the tests might take longer if it needs to install SwiftGen first to be able to run the tests.
       install_dir = "vendor/swiftgen/#{Fastlane::Helper::Ios::L10nLinterHelper::SWIFTGEN_VERSION}"
-      result = run_described_fastlane_action(
+      parameters = {
         install_path: install_dir,
         input_dir: @test_data_dir,
         base_lang: 'en'
-      )
+      }
+      result = run_described_fastlane_action(parameters)
 
       # Assert
       expect(result).to eq(yml['result'])
