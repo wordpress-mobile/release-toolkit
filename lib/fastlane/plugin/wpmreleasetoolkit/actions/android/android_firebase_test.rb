@@ -3,10 +3,8 @@ require 'securerandom'
 module Fastlane
   module Actions
     module SharedValues
-      FIREBASE_TEST_RESULT = :FIREBASE_TEST_ACTION_RESULT
-      FIREBASE_TEST_LOG_FILE = :FIREBASE_TEST_LOG_FILE
+      FIREBASE_TEST_RESULT = :FIREBASE_TEST_LOG_FILE
       FIREBASE_TEST_LOG_FILE_PATH = :FIREBASE_TEST_LOG_FILE_PATH
-      FIREBASE_TEST_RESULTS_FILE_PATH = :FIREBASE_TEST_LOG_FILE_PATH
     end
 
     class AndroidFirebaseTestAction < Action
@@ -18,7 +16,7 @@ module Fastlane
         test_runner = Fastlane::FirebaseTestRunner.new(key_file: params[:key_file])
 
         # Set up the log file and output directory
-        Fastlane::Actions.lane_context[:FIREBASE_TEST_RESULTS_FILE_PATH] = params[:results_output_dir]
+        FileUtils.mkdir_p(params[:results_output_dir])
         Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE_PATH] = File.join(params[:results_output_dir], 'output.log')
 
         device = Fastlane::FirebaseDevice.new(
@@ -36,15 +34,19 @@ module Fastlane
         )
 
         # Download all of the outputs from the job to the local machine
-        test_runner.download_raw_results(params[:results_output_dir])
+        test_runner.download_result_files(
+          result: result,
+          destination: params[:results_output_dir],
+          project_id: params[:project_id],
+          key_file_path: params[:key_file]
+        )
 
-        if result == true
+        if result.success?
           UI.success 'Firebase Tests Complete'
           return
         end
 
-        log_file = Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE]
-        FastlaneCore::UI.test_failure! "Firebase Tests failed – more information can be found at #{log_file.more_details_url}"
+        FastlaneCore::UI.test_failure! "Firebase Tests failed – more information can be found at #{result.more_details_url}"
       end
 
       #####################################################

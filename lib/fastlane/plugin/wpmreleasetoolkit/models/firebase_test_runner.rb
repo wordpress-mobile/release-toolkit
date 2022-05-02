@@ -1,5 +1,6 @@
 require 'json'
 require 'uri'
+require 'fileutils'
 
 module Fastlane
   class FirebaseTestRunner
@@ -34,29 +35,29 @@ module Fastlane
       ].join(' ')
 
       log_file_path = Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE_PATH]
+
       UI.message "Streaming log output to #{log_file_path}"
       Action.sh("#{command} 2>&1 | tee #{log_file_path}")
 
       # Make the file object available to other tasks
-      file = FirebaseTestLabLogFile.new(path: log_file_path)
-      Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE] = file
+      result = FirebaseTestLabResult.new(log_file_path: log_file_path)
+      Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE] = result
 
-      # Return `true` if it looks like the test passed
-      !file.indicates_failure
+      result
     end
 
-    def download_raw_results(log_file:, destination:)
-      raise unless log_file.is_a? Fastlane::FirebaseTestLabLogFile
+    def download_result_files(result:, destination:, project_id:, key_file_path:)
+      raise unless result.is_a? Fastlane::FirebaseTestLabResult
 
-      paths = log_file.raw_results_paths
+      paths = result.raw_results_paths
       raise "Log File doesn't contain a raw results URL" if paths.nil?
 
       FileUtils.mkdir_p(destination) unless File.directory? destination
 
       require 'google/cloud/storage'
       storage = Google::Cloud::Storage.new(
-        project_id: Fastlane::Actions.lane_context[:FIREBASE_PROJECT_ID],
-        credentials: Fastlane::Actions.lane_context[:FIREBASE_CREDENTIALS]
+        project_id: project_id,
+        credentials: key_file_path
       )
 
       # Set up the download

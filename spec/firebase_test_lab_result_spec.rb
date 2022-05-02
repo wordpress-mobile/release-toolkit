@@ -4,13 +4,19 @@ EMPTY_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'empty.json')
 FAILED_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'firebase', 'failed-firebase-test-lab-run.log')
 INVALID_TEST_LOG_PATH = 'foo'.freeze
 
-describe Fastlane::FirebaseTestLabLogFile do
-  let(:empty_test_log) { described_class.new(path: EMPTY_FIREBASE_TEST_LOG_PATH) }
-  let(:failed_test_log) { described_class.new(path: FAILED_FIREBASE_TEST_LOG_PATH) }
+describe Fastlane::FirebaseTestLabResult do
+  let(:empty_test_log) { described_class.new(log_file_path: EMPTY_FIREBASE_TEST_LOG_PATH) }
+  let(:failed_test_log) { described_class.new(log_file_path: FAILED_FIREBASE_TEST_LOG_PATH) }
 
   describe 'initialize' do
     it 'raises for an invalid file path' do
-      expect { described_class.new(path: INVALID_TEST_LOG_PATH) }.to raise_exception 'No log file found at path foo'
+      expect { described_class.new(log_file_path: INVALID_TEST_LOG_PATH) }.to raise_exception 'No log file found at path foo'
+    end
+  end
+
+  describe 'success?' do
+    it 'returns false for failure' do
+      expect(failed_test_log.success?).to be false
     end
   end
 

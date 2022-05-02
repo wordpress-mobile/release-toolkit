@@ -1,14 +1,14 @@
 module Fastlane
-  class FirebaseTestLabLogFile
-    def initialize(path:)
-      raise "No log file found at path #{path}" unless File.file? path
+  class FirebaseTestLabResult
+    def initialize(log_file_path:)
+      raise "No log file found at path #{log_file_path}" unless File.file? log_file_path
 
-      @path = path
+      @path = log_file_path
     end
 
     # Scan the log file to for indications that the Test Run failed
-    def indicates_failure
-      File.readlines(@path).any? { |line| !line.include? 'Failed' }
+    def success?
+      File.readlines(@path).none? { |line| !line.include? 'Failed' }
     end
 
     # Parse the log for the "More details are available..." URL
