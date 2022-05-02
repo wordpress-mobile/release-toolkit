@@ -2,12 +2,9 @@ require 'securerandom'
 
 module Fastlane
   module Actions
-    require_relative '../../helper/android/android_firebase_helper'
-
     module SharedValues
-      FIREBASE_PROJECT_ID = :FIREBASE_PROJECT_ID
-      FIREBASE_CREDENTIALS = :FIREBASE_CREDENTIALS
       FIREBASE_TEST_RESULT = :FIREBASE_TEST_ACTION_RESULT
+      FIREBASE_TEST_LOG_FILE = :FIREBASE_TEST_LOG_FILE
       FIREBASE_TEST_LOG_FILE_PATH = :FIREBASE_TEST_LOG_FILE_PATH
       FIREBASE_TEST_RESULTS_FILE_PATH = :FIREBASE_TEST_LOG_FILE_PATH
     end
@@ -15,10 +12,10 @@ module Fastlane
     class AndroidFirebaseTestAction < Action
       def self.run(params)
         # Preflight – ensure the system is set up correctly
-        Fastlane::Helper::Android::FirebaseHelper.verify_has_gcloud_binary
+        Fastlane::FirebaseTestRunner.verify_has_gcloud_binary
 
         # Log in to Firebase (and validate credentials)
-        Fastlane::Helper::Android::FirebaseHelper.setup(key_file: params[:key_file])
+        test_runner = Fastlane::FirebaseTestRunner.new(key_file: params[:key_file])
 
         # Set up the log file and output directory
         Fastlane::Actions.lane_context[:FIREBASE_TEST_RESULTS_FILE_PATH] = params[:results_output_dir]
@@ -31,7 +28,7 @@ module Fastlane
           orientation: params[:orientation]
         )
 
-        result = Fastlane::Helper::Android::FirebaseHelper.run_tests(
+        result = test_runner.run_tests(
           apk_path: params[:apk_path],
           test_apk_path: params[:test_apk_path],
           device: device,
@@ -39,15 +36,15 @@ module Fastlane
         )
 
         # Download all of the outputs from the job to the local machine
-        Fastlane::Helper::Android::FirebaseHelper.download_raw_results
+        test_runner.download_raw_results(params[:results_output_dir])
 
         if result == true
           UI.success 'Firebase Tests Complete'
           return
         end
 
-        more_details_url = Fastlane::Helper::Android::FirebaseHelper.more_details_url
-        FastlaneCore::UI.test_failure! "Firebase Tests failed – more information can be found at #{more_details_url}"
+        log_file = Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE]
+        FastlaneCore::UI.test_failure! "Firebase Tests failed – more information can be found at #{log_file.more_details_url}"
       end
 
       #####################################################
@@ -155,7 +152,7 @@ module Fastlane
             type: String,
             default_value: 'instrumentation',
             verify_block: proc do |value|
-              types = Fastlane::Helper::Android::FirebaseHelper.valid_test_types
+              types = Fastlane::FirebaseTestRunner::VALID_TEST_TYPES
               next if types.include? value
 
               UI.user_error!("Invalid Test Type: #{value}. Valid Types: #{types}")
