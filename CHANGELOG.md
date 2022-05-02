@@ -28,6 +28,7 @@ _None_
   If provided, that identifier will be added as an `a8c-src-lib` XML attribute to the `<string>` nodes being updated with strings from said library.
   This can be useful to help identify where each string come from in the resulting, merged `strings.xml`. [#351]
 * Add the option for `an_localize_libs` to set the `tools:ignore="UnusedResources"` XML attribute for each string being merged from a library. [#354]
+* Add the ability to run Firebase Test Lab tests [#355]
 
 ### Bug Fixes
 
