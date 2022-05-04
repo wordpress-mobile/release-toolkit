@@ -151,7 +151,7 @@ module Fastlane
           begin
             IO.copy_stream(uri.open(options), destination)
           rescue StandardError => e
-            UI.error "Error downloading locale `#{locale}` — #{e.message}"
+            UI.error "Error downloading locale `#{locale}` — #{e.message} (#{uri})"
             return nil
           end
         end
