@@ -187,10 +187,31 @@ describe Fastlane::Helper::Ios::L10nHelper do
   describe '#download_glotpress_export_file' do
     let(:gp_fake_url) { 'https://stub.glotpress.com/rspec-fake-project' }
 
+    it 'sets a predefined User Agent so GlotPress will not rate-limit us' do
+      # Arrange
+      stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations/")
+             .with(
+               query: { format: 'strings' },
+               # Note that the syntax below merely checks that the given headers are present in the request,
+               # it does not restrict the request to have only those headers.
+               #
+               # See:
+               # - https://github.com/bblimke/webmock/tree/33d8810c2828fc17010e15cc3f21ad2c726a966f#matching-requests
+               # - https://github.com/bblimke/webmock/issues/276#issuecomment-28625436
+               headers: { 'User-Agent' => 'Automattic App Release Automator; https://github.com/wordpress-mobile/release-toolkit/' }
+             ).to_return(body: 'content')
+      dest = StringIO.new
+      # Act
+      described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: nil, destination: dest)
+      # Assert
+      expect(stub).to have_been_made.once
+      expect(dest.string).to eq('content')
+    end
+
     describe 'request query parameters' do
       it 'passes the expected params when no filters are provided' do
         # Arrange
-        stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations").with(query: { format: 'strings' }).to_return(body: 'content')
+        stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations/").with(query: { format: 'strings' }).to_return(body: 'content')
         dest = StringIO.new
         # Act
         described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: nil, destination: dest)
@@ -201,7 +222,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
 
       it 'passes the expected params when a list of filters is provided' do
         # Arrange
-        stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations")
+        stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations/")
                .with(query: { format: 'strings', 'filters[status]': 'current', 'filters[term]': 'foobar' }).to_return(body: 'content')
         dest = StringIO.new
         # Act
@@ -221,7 +242,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
           # Note: in practice it seems that GlotPress's `.strings` exports are using UTF-8 (but served as `application/octet-stream`)
           #       but it does not hurt to ensure the download to a file can work with UTF-16 (and copy the binary stream verbatim)
           body = File.read(fixture('Localizable-utf16.strings'))
-          stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations").with(query: { format: 'strings' }).to_return(body: body)
+          stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations/").with(query: { format: 'strings' }).to_return(body: body)
           dest = File.join(tmp_dir, 'export.strings')
           # Act
           described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: nil, destination: dest)
@@ -236,7 +257,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
     describe 'invalid parameters' do
       it 'prints an `UI.error` if passed a non-existing locale (or any other 404)' do
         # Arrange
-        stub = stub_request(:get, "#{gp_fake_url}/invalid/default/export-translations").with(query: { format: 'strings' }).to_return(status: [404, 'Not Found'])
+        stub = stub_request(:get, "#{gp_fake_url}/invalid/default/export-translations/").with(query: { format: 'strings' }).to_return(status: [404, 'Not Found'])
         error_messages = []
         allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
         dest = StringIO.new
@@ -249,7 +270,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
 
       it 'prints an `UI.error` if the destination cannot be written to' do
         # Arrange
-        stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations").with(query: { format: 'strings' }).to_return(body: 'content')
+        stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations/").with(query: { format: 'strings' }).to_return(body: 'content')
         error_messages = []
         allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
         dest = '/these/are/not/the/droids/you/are/looking/for.strings'
