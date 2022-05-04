@@ -283,8 +283,12 @@ module Fastlane
         def self.download_glotpress_export_file(project_url:, locale:, filters:)
           query_params = filters.transform_keys { |k| "filters[#{k}]" }.merge(format: 'android')
           uri = URI.parse("#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}")
+
+          # Set an unambiguous User Agent so GlotPress won't rate-limit us
+          options = { 'User-Agent' => 'Automattic App Release Automator; https://github.com/wordpress-mobile/release-toolkit/' }
+
           begin
-            uri.open { |f| Nokogiri::XML(f.read.gsub("\t", '    '), nil, Encoding::UTF_8.to_s) }
+            uri.open(options) { |f| Nokogiri::XML(f.read.gsub("\t", '    '), nil, Encoding::UTF_8.to_s) }
           rescue StandardError => e
             UI.error "Error downloading #{locale} - #{e.message}"
             return nil

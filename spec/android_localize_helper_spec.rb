@@ -264,5 +264,36 @@ describe Fastlane::Helper::Android::LocalizeHelper do
         expect(File.read(generated_file_path)).to eq(expected_merged_content)
       end
     end
+
+    it 'sets a predefined User Agent so GlotPress will not rate-limit us' do
+      # Arrange
+      #
+      # Note that in this test we don't care about what is downloaded or how it's processed,
+      # only whether the request is made with the expected User Agent.
+      # Therefore there is only minimum fixtures setup, unlike in the examples before
+      FileUtils.mkdir_p(File.dirname(generated_file(nil)))
+      FileUtils.cp(expected_file(nil), generated_file(nil))
+
+      stub = stub_request(:get, "#{gp_fake_url}fr/default/export-translations/")
+             .with(
+               query: { format: 'android', 'filters[status]': 'current' },
+               # Note that the syntax below merely checks that the given headers are present in the request,
+               # it does not restrict the request to have only those headers.
+               #
+               # See:
+               # - https://github.com/bblimke/webmock/tree/33d8810c2828fc17010e15cc3f21ad2c726a966f#matching-requests
+               # - https://github.com/bblimke/webmock/issues/276#issuecomment-28625436
+               headers: { 'User-Agent' => 'Automattic App Release Automator; https://github.com/wordpress-mobile/release-toolkit/' }
+             ).to_return(status: 200, body: '')
+
+      # Act
+      described_class.download_from_glotpress(
+        res_dir: tmpdir,
+        glotpress_project_url: gp_fake_url,
+        locales_map: TEST_LOCALES_MAP.select { |l| l[:android] == 'fr' } # only run for `fr` because we only stubbed that
+      )
+
+      expect(stub).to have_been_made.once
+    end
   end
 end
