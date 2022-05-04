@@ -1,0 +1,29 @@
+test_data:
+  en: |
+    "string_no_pos" = "String %@ here.";
+    "repeated_placeholder" = "String %1$@, yes, I repeat, that's %1$@ indeed, I said %@.";
+    "duplicate_key" = "value";
+    "other_duplicate_key" = "other value";
+    "yet_another_duplicate_key" = "yet another value";
+  fr: |
+    "string_no_pos" = "String %@ here and %@ here too.";
+    "duplicate_key" = "value";
+    "duplicate_key" = "value";
+    "other_duplicate_key" = "other value";
+  it: |
+    "string_no_pos" = "String %@ here.";
+    "repeated_placeholder" = "String %1$@, yes, and not %2%@, I repeat, that's not %2$@.";
+    "duplicate_key" = "value";
+    "other_duplicate_key" = "other value";
+    "other_duplicate_key" = "other value";
+    "yet_another_duplicate_key" = "yet another value";
+    "yet_another_duplicate_key" = "yet another value";
+
+result:
+  fr:
+    - "`string_no_pos` expected placeholders for [String] but found [String,String] instead."
+    - "`duplicate_key` was found at multiple lines: 2, 3"
+  it:
+    - "`repeated_placeholder` expected placeholders for [String] but found [String,String] instead."
+    - "`other_duplicate_key` was found at multiple lines: 4, 5"
+    - "`yet_another_duplicate_key` was found at multiple lines: 6, 7"

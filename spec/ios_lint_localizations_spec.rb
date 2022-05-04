@@ -54,7 +54,14 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
   end
 
   context 'Linter' do
-    def run_l10n_linter_test(data_file)
+    # Helper function that DRYs the code running each test.
+    #
+    # @param [String] data_file The name, without extension or "test-lint-ios-" prefix, of the YML file containing the test input and expected output.
+    # @param [Bool|nil] check_duplicate_keys If `nil`, the test will run the action with the default `check_duplicate_keys` parameter value.
+    #        If a `Bool` value is given, it will pass that.
+    #        Using either `Bool` or `nil` adds some cruft, but lets us validate the action default behavior, so it doesn't change unexpectedly.
+    #
+    def run_l10n_linter_test(data_file:, check_duplicate_keys: nil)
       # Arrange: Prepare test files
       test_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', "test-lint-ios-#{data_file}.yaml")
       yml = YAML.load_file(test_file)
@@ -72,11 +79,13 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       #       remove this after the test ends, so that further executions of the test run faster.
       #       Only the first execution of the tests might take longer if it needs to install SwiftGen first to be able to run the tests.
       install_dir = "vendor/swiftgen/#{Fastlane::Helper::Ios::L10nLinterHelper::SWIFTGEN_VERSION}"
-      result = run_described_fastlane_action(
+      parameters = {
         install_path: install_dir,
         input_dir: @test_data_dir,
         base_lang: 'en'
-      )
+      }
+      parameters[:check_duplicate_keys] = check_duplicate_keys unless check_duplicate_keys.nil?
+      result = run_described_fastlane_action(parameters)
 
       # Assert
       expect(result).to eq(yml['result'])
@@ -88,23 +97,40 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     end
 
     it 'succeeds when there are no violations' do
-      run_l10n_linter_test('no-violations')
+      run_l10n_linter_test(data_file: 'no-violations')
     end
 
     it 'detects inconsistent placeholder count' do
-      run_l10n_linter_test('wrong-placeholder-count')
+      run_l10n_linter_test(data_file: 'wrong-placeholder-count')
     end
 
     it 'detects inconsistent placeholder types' do
-      run_l10n_linter_test('wrong-placeholder-types')
+      run_l10n_linter_test(data_file: 'wrong-placeholder-types')
     end
 
     it 'properly handles misleading characters and placeholders in RTL languages' do
-      run_l10n_linter_test('tricky-chars')
+      run_l10n_linter_test(data_file: 'tricky-chars')
+    end
+
+    it 'detects both inconsistencies and duplicated strings by default' do
+      # "by default" = don't explicitly set the `:check_duplicate_keys` parameter
+      run_l10n_linter_test(data_file: 'violations-and-duplicate-keys')
+    end
+
+    it 'detects when there are only duplications and reports them' do
+      run_l10n_linter_test(data_file: 'duplicate-keys-only')
+    end
+
+    it 'detects both inconsistencies and duplicated strings when asked to do so' do
+      run_l10n_linter_test(data_file: 'violations-and-duplicate-keys', check_duplicate_keys: true)
+    end
+
+    it 'ignores duplicated strings when asked to do so' do
+      run_l10n_linter_test(data_file: 'violations-and-duplicate-keys-reporting-violations-only', check_duplicate_keys: false)
     end
 
     it 'does not fail if a locale does not have any Localizable.strings' do
-      run_l10n_linter_test('no-strings')
+      run_l10n_linter_test(data_file: 'no-strings')
     end
 
     after(:each) do
