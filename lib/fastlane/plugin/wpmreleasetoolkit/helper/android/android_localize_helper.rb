@@ -285,7 +285,7 @@ module Fastlane
           uri = URI.parse("#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}")
 
           # Set an unambiguous User Agent so GlotPress won't rate-limit us
-          options = { 'User-Agent' => 'Automattic App Release Automator; https://github.com/wordpress-mobile/release-toolkit/' }
+          options = { 'User-Agent' => Wpmreleasetoolkit::USER_AGENT }
 
           begin
             uri.open(options) { |f| Nokogiri::XML(f.read.gsub("\t", '    '), nil, Encoding::UTF_8.to_s) }
