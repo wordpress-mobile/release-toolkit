@@ -117,7 +117,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       run_l10n_linter_test(data_file: 'violations-and-duplicate-keys')
     end
 
-    it 'when there are only duplications, it reports them' do
+    it 'detects when there are only duplications and reports them' do
       run_l10n_linter_test(data_file: 'duplicate-keys-only')
     end
 
