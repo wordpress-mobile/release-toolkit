@@ -265,7 +265,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
         described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'invalid', filters: nil, destination: dest)
         # Assert
         expect(stub).to have_been_made.once
-        expect(error_messages).to eq(['Error downloading locale `invalid` — 404 Not Found'])
+        expect(error_messages).to eq(["Error downloading locale `invalid` — 404 Not Found (#{gp_fake_url}/invalid/default/export-translations/?format=strings)"])
       end
 
       it 'prints an `UI.error` if the destination cannot be written to' do
@@ -279,7 +279,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
         # Assert
         expect(stub).to have_been_made.once
         expect(File).not_to exist(dest)
-        expect(error_messages).to eq(["Error downloading locale `fr` — No such file or directory @ rb_sysopen - #{dest}"])
+        expect(error_messages).to eq(["Error downloading locale `fr` — No such file or directory @ rb_sysopen - #{dest} (#{gp_fake_url}/fr/default/export-translations/?format=strings)"])
       end
     end
   end
