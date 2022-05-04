@@ -61,7 +61,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
         Dir[File.join(stubs_dir, '*.xml')].each do |path|
           # Each file in stubs_dir is a `{locale_code}.xml` whose content is what we want to use as stub for glotpress requests to `locale_code`
           locale_code = File.basename(path, '.xml')
-          url = "#{gp_fake_url.chomp('/')}/#{locale_code}/default/export-translations?filters%5Bstatus%5D=current&format=android"
+          url = "#{gp_fake_url.chomp('/')}/#{locale_code}/default/export-translations/?filters%5Bstatus%5D=current&format=android"
           stub_request(:get, url).to_return(status: 200, body: File.read(path))
         end
 
@@ -215,7 +215,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
 
         # Arrange: Prepare request stubs
         custom_gp_urls = TEST_LOCALES_MAP.map do |locale|
-          "#{gp_fake_url.chomp('/')}/#{locale[:glotpress]}/default/export-translations?filters%5Bstatus%5D=custom-status&filters%5Bwarnings%5D=yes&format=android"
+          "#{gp_fake_url.chomp('/')}/#{locale[:glotpress]}/default/export-translations/?filters%5Bstatus%5D=custom-status&filters%5Bwarnings%5D=yes&format=android"
         end
         custom_gp_urls.each do |url|
           stub_request(:get, url)
@@ -244,7 +244,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
         statuses = %w[current waiting fuzzy]
         statuses.each do |status|
           stub_path = File.join(fixtures_dir, 'filters', "#{status}.xml")
-          stub_request(:get, "#{gp_fake_url.chomp('/')}/fakegploc/default/export-translations?filters%5Bstatus%5D=#{status}&format=android")
+          stub_request(:get, "#{gp_fake_url.chomp('/')}/fakegploc/default/export-translations/?filters%5Bstatus%5D=#{status}&format=android")
             .to_return(status: 200, body: File.read(stub_path))
         end
 

@@ -282,7 +282,7 @@ module Fastlane
         #
         def self.download_glotpress_export_file(project_url:, locale:, filters:)
           query_params = filters.transform_keys { |k| "filters[#{k}]" }.merge(format: 'android')
-          uri = URI.parse("#{project_url.chomp('/')}/#{locale}/default/export-translations?#{URI.encode_www_form(query_params)}")
+          uri = URI.parse("#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}")
           begin
             uri.open { |f| Nokogiri::XML(f.read.gsub("\t", '    '), nil, Encoding::UTF_8.to_s) }
           rescue StandardError => e
