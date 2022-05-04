@@ -113,7 +113,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     end
 
     it 'detects both inconsistencies and duplicated strings by default' do
-      # "by defaul" = don't explicitly set the `:check_duplicate_keys` parameter
+      # "by default" = don't explicitly set the `:check_duplicate_keys` parameter
       run_l10n_linter_test(data_file: 'violations-and-duplicate-keys')
     end
 
