@@ -7,7 +7,7 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
   let(:locales_subset) { { 'fr-FR': 'fr', 'zh-cn': 'zh-Hans' } }
 
   def gp_stub(locale:, query:)
-    stub_request(:get, "#{gp_fake_url}/#{locale}/default/export-translations").with(query: query)
+    stub_request(:get, "#{gp_fake_url}/#{locale}/default/export-translations/").with(query: query)
   end
 
   describe 'downloading export files from GlotPress' do
