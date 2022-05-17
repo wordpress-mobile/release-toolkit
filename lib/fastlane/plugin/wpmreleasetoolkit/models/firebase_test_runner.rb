@@ -6,24 +6,29 @@ module Fastlane
   class FirebaseTestRunner
     VALID_TEST_TYPES = %w[instrumentation robo].freeze
 
-    def initialize(key_file:, automatic_login: true)
+    def initialize(key_file:)
       raise "Unable to find key file: #{key_file}" unless File.file? key_file
-
       @key_file = key_file
-      authenticate if automatic_login
+      @has_authenticated = false
     end
 
-    def authenticate
+    def authenticate_if_needed
+      return if @has_authenticated
+
       Action.sh(
         'gcloud', 'auth', 'activate-service-account',
         '--key-file', @key_file
       )
+
+      @has_authenticated = true
     end
 
     def run_tests(apk_path:, test_apk_path:, device:, type: 'instrumentation')
       raise "Unable to find apk: #{apk_path}" unless File.file? apk_path
       raise "Unable to find apk: #{test_apk_path}" unless File.file? test_apk_path
       raise "Invalid Type: #{type}" unless VALID_TEST_TYPES.include? type
+
+      authenticate_if_needed
 
       command = [
         'gcloud', 'firebase', 'test', 'android', 'run',
