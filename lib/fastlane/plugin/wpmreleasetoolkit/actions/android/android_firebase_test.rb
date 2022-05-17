@@ -9,9 +9,6 @@ module Fastlane
 
     class AndroidFirebaseTestAction < Action
       def self.run(params)
-        # Preflight – ensure the system is set up correctly
-        Fastlane::FirebaseTestRunner.verify_has_gcloud_binary
-
         # Log in to Firebase (and validate credentials)
         test_runner = Fastlane::FirebaseTestRunner.new(key_file: params[:key_file])
 
