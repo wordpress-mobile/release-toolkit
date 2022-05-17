@@ -1,11 +1,13 @@
 require 'spec_helper'
 
 EMPTY_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'empty.json')
-FAILED_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'firebase', 'failed-firebase-test-lab-run.log')
+PASSED_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-test-lab-run-passed.log')
+FAILED_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-test-lab-run-failure.log')
 INVALID_TEST_LOG_PATH = 'foo'.freeze
 
 describe Fastlane::FirebaseTestLabResult do
   let(:empty_test_log) { described_class.new(log_file_path: EMPTY_FIREBASE_TEST_LOG_PATH) }
+  let(:passed_test_log) { described_class.new(log_file_path: PASSED_FIREBASE_TEST_LOG_PATH) }
   let(:failed_test_log) { described_class.new(log_file_path: FAILED_FIREBASE_TEST_LOG_PATH) }
 
   describe 'initialize' do
@@ -15,6 +17,10 @@ describe Fastlane::FirebaseTestLabResult do
   end
 
   describe 'success?' do
+    it 'returns true for success' do
+      expect(passed_test_log.success?).to be true
+    end
+
     it 'returns false for failure' do
       expect(failed_test_log.success?).to be false
     end

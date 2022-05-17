@@ -8,7 +8,7 @@ module Fastlane
 
     # Scan the log file to for indications that the Test Run failed
     def success?
-      File.readlines(@path).none? { |line| !line.include? 'Failed' }
+      File.readlines(@path).any? { |line| line.include? '0 test cases failed' }
     end
 
     # Parse the log for the "More details are available..." URL
