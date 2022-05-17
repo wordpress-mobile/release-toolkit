@@ -24,30 +24,31 @@ describe Fastlane::FirebaseTestRunner do
   end
 
   describe '.authenticate_if_needed' do
+    subject(:runner) { described_class.new(key_file: __FILE__, verify_gcloud_binary: false) }
+
     it 'only runs if needed' do
-      test_runner = described_class.new(key_file: __FILE__)
-      test_runner.instance_variable_set(:@has_authenticated, true)
+      runner.instance_variable_set(:@has_authenticated, true)
       expect(Fastlane::Action).not_to receive('sh')
 
-      test_runner.authenticate_if_needed
+      runner.authenticate_if_needed
     end
 
     it 'runs the right command' do
       allow(Fastlane::Action).to receive('sh').with('gcloud', 'auth', 'activate-service-account', '--key-file', __FILE__)
-      described_class.new(key_file: __FILE__).authenticate_if_needed
+      runner.authenticate_if_needed
     end
   end
 
   describe '.run_tests' do
-    subject(:runner) {
-      runner = described_class.new(key_file: __FILE__)
+    subject(:runner) do
+      runner = described_class.new(key_file: __FILE__, verify_gcloud_binary: false)
       runner.instance_variable_set(:@has_authenticated, true)
 
       runner
-    }
+    end
 
     it 'logs in if needed' do
-      expect(subject).to receive('authenticate_if_needed')
+      expect(runner).to receive('authenticate_if_needed')
       run_tests
     end
 

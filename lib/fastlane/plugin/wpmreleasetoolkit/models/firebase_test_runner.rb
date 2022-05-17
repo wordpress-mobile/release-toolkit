@@ -6,10 +6,13 @@ module Fastlane
   class FirebaseTestRunner
     VALID_TEST_TYPES = %w[instrumentation robo].freeze
 
-    def initialize(key_file:)
+    def initialize(key_file:, verify_gcloud_binary: true)
       raise "Unable to find key file: #{key_file}" unless File.file? key_file
+
       @key_file = key_file
       @has_authenticated = false
+
+      FirebaseTestRunner.verify_has_gcloud_binary if verify_gcloud_binary
     end
 
     def authenticate_if_needed
