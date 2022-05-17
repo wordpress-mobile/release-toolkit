@@ -14,11 +14,8 @@ module Fastlane
     # Parse the log for the "More details are available..." URL
     def more_details_url
       File.readlines(@path)
-          .map { |line| URI.extract(line) }
-          .flatten
-          .compact
-          .filter { |string| string.include? 'matrices' }
-          .first
+          .flat_map { |line| URI.extract(line) }
+          .find { |url| URI(url).host == 'console.firebase.google.com' && url.include?('/matrices/') }
     end
 
     # Parse the log for the Google Cloud Storage Bucket URL
