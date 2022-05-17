@@ -41,12 +41,9 @@ module Fastlane
           key_file_path: params[:key_file]
         )
 
-        if result.success?
-          UI.success 'Firebase Tests Complete'
-          return
-        end
+        FastlaneCore::UI.test_failure! "Firebase Tests failed – more information can be found at #{result.more_details_url}" unless result.success?
 
-        FastlaneCore::UI.test_failure! "Firebase Tests failed – more information can be found at #{result.more_details_url}"
+        UI.success 'Firebase Tests Complete'
       end
 
       #####################################################
@@ -164,13 +161,15 @@ module Fastlane
             key: :test_run_id,
             description: 'A unique ID used to identify this test run',
             type: String,
-            default_value: run_uuid
+            default_value: run_uuid,
+            default_value_dynamic: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :results_output_dir,
             description: 'Where should we store the results of this test run?',
             type: String,
-            default_value: File.join(Dir.tmpdir(), run_uuid)
+            default_value: File.join(Dir.tmpdir(), run_uuid),
+            default_value_dynamic: true
           ),
         ]
       end
