@@ -21,12 +21,9 @@ module Fastlane
     # Parse the log for the Google Cloud Storage Bucket URL
     def raw_results_paths
       uri = File.readlines(@path)
-                .map { |line| URI.extract(line) }
-                .flatten
-                .compact
+                .flat_map { |line| URI.extract(line) }
                 .map { |string| URI(string) }
-                .filter { |u| u.scheme == 'gs' }
-                .first
+                .find { |u| u.scheme == 'gs' }
 
       return nil if uri.nil?
 
