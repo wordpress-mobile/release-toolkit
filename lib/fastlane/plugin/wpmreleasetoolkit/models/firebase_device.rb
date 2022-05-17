@@ -2,6 +2,10 @@ module Fastlane
   class FirebaseDevice
     attr_reader :model, :version, :locale, :orientation
 
+    @@locale_data = nil
+    @@model_data = nil
+    @@version_data = nil
+
     def initialize(model:, version:, orientation:, locale: 'en')
       raise 'Invalid Model' unless FirebaseDevice.valid_model_names.include? model
       raise 'Invalid Version' unless FirebaseDevice.valid_version_numbers.include? version
