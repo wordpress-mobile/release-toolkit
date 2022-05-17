@@ -47,11 +47,6 @@ describe Fastlane::FirebaseTestRunner do
       runner
     end
 
-    it 'logs in if needed' do
-      expect(runner).to receive('authenticate_if_needed')
-      run_tests
-    end
-
     it 'runs the correct command' do
       allow(Fastlane::Action).to receive('sh').with("gcloud firebase test android run --type instrumentation --app #{DEFAULT_FILE} --test #{DEFAULT_FILE} --device device --verbosity info 2>&1 | tee #{RUNNER_TEMP_FILE}")
       run_tests
