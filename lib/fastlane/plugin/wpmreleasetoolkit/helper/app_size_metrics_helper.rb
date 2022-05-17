@@ -49,12 +49,12 @@ module Fastlane
       #
       # Must conform to the API described in https://github.com/Automattic/apps-metrics/wiki/Queue-Group-of-Metrics
       #
-      # @param [String,URI] base_url The base URL of the App Metrics service
+      # @param [String,URI] to The URL of the App Metrics service, or a `file://` URL to write the payload to disk
       # @param [String] api_token The API bearer token to use to register the metric.
       # @return [Integer] the HTTP response code
       #
-      def send_metrics(base_url:, api_token:, use_gzip: true)
-        uri = URI(base_url)
+      def send_metrics(to:, api_token:, use_gzip: true)
+        uri = URI(to)
         json_payload = use_gzip ? Zlib.gzip(to_h.to_json) : to_h.to_json
 
         # Allow using a `file:` URI for debugging

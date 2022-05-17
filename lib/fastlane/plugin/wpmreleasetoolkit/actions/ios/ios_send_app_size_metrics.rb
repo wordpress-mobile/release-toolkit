@@ -6,10 +6,10 @@ module Fastlane
     class IosSendAppSizeMetricsAction < Action
       def self.run(params)
         # Check input parameters
-        base_url = URI(params[:api_base_url])
+        api_url = URI(params[:api_url])
         api_token = params[:api_token]
-        if (api_token.nil? || api_token.empty?) && !base_url.is_a?(URI::File)
-          UI.user_error!('An API token is required when using an `api_base_url` with a scheme other than `file://`')
+        if (api_token.nil? || api_token.empty?) && !api_url.is_a?(URI::File)
+          UI.user_error!('An API token is required when using an `api_url` with a scheme other than `file://`')
         end
 
         # Build the payload base
@@ -38,7 +38,7 @@ module Fastlane
 
         # Send the payload
         metrics_helper.send_metrics(
-          base_url: base_url,
+          to: api_url,
           api_token: api_token,
           use_gzip: params[:use_gzip_content_encoding]
         )
@@ -66,7 +66,7 @@ module Fastlane
 
           See https://github.com/Automattic/apps-metrics for the API contract expected by the Metrics server you are expected to send those metrics to.
 
-          Tip: If you provide a `file://` URL for the `api_base_url`, the action will write the payload on disk at the specified path instead of sending
+          Tip: If you provide a `file://` URL for the `api_url`, the action will write the payload on disk at the specified path instead of sending
           the data to a endpoint over network. This can be useful e.g. to inspect the payload and debug it, or to store the metrics data as CI artefacts.
         DETAILS
       end
@@ -74,8 +74,8 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(
-            key: :api_base_url,
-            env_name: 'FL_IOS_SEND_APP_SIZE_METRICS_API_BASE_URL',
+            key: :api_url,
+            env_name: 'FL_IOS_SEND_APP_SIZE_METRICS_API_URL',
             description: 'The endpoint API URL to publish metrics to. (Note: you can also point to a `file://` URL to write the payload to a file instead)',
             type: String,
             optional: false
@@ -83,7 +83,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :api_token,
             env_name: 'FL_IOS_SEND_APP_SIZE_METRICS_API_TOKEN',
-            description: 'The bearer token to call the API. Required, unless `api_base_url` is a `file://` URL',
+            description: 'The bearer token to call the API. Required, unless `api_url` is a `file://` URL',
             type: String,
             optional: true
           ),

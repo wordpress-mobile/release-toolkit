@@ -14,7 +14,7 @@ describe Fastlane::Actions::IosSendAppSizeMetricsAction do
 
       # Act
       code = run_described_fastlane_action(
-        api_base_url: File.join('file://localhost/', output_file),
+        api_url: File.join('file://localhost/', output_file),
         ipa_path: ipa_path,
         **other_action_args
       )

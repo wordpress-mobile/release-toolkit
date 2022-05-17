@@ -79,9 +79,9 @@ describe Fastlane::WPMRT::AppSizeMetricsHelper do
       it 'writes the payload uncompressed to a file when disabling gzip' do
         in_tmp_dir do |tmp_dir|
           output_file = File.join(tmp_dir, 'payload.json')
-          base_url = File.join('file://localhost/', output_file)
+          file_url = File.join('file://localhost/', output_file)
 
-          code = metrics_helper.send_metrics(base_url: base_url, api_token: nil, use_gzip: false)
+          code = metrics_helper.send_metrics(to: file_url, api_token: nil, use_gzip: false)
 
           expect(code).to eq(201)
           expect(File).to exist(output_file)
@@ -93,9 +93,9 @@ describe Fastlane::WPMRT::AppSizeMetricsHelper do
       it 'writes the payload compressed to a file when enabling gzip' do
         in_tmp_dir do |tmp_dir|
           output_file = File.join(tmp_dir, 'payload.json.gz')
-          base_url = File.join('file://localhost/', output_file)
+          file_url = File.join('file://localhost/', output_file)
 
-          code = metrics_helper.send_metrics(base_url: base_url, api_token: nil, use_gzip: true)
+          code = metrics_helper.send_metrics(to: file_url, api_token: nil, use_gzip: true)
 
           expect(code).to eq(201)
           expect(File).to exist(output_file)
@@ -106,7 +106,7 @@ describe Fastlane::WPMRT::AppSizeMetricsHelper do
     end
 
     context 'when using non-file:// scheme for the URL' do
-      let(:base_url) { 'https://fake-metrics-server/api/grouped-metrics' }
+      let(:api_url) { 'https://fake-metrics-server/api/grouped-metrics' }
       let(:token) { 'fake#tokn' }
 
       it 'sends the payload uncompressed to the server and with the right headers when disabling gzip' do
@@ -116,11 +116,11 @@ describe Fastlane::WPMRT::AppSizeMetricsHelper do
           'Content-Type': 'application/json'
         }
         last_received_body = nil
-        stub = stub_request(:post, base_url).with(headers: expected_headers) do |req|
+        stub = stub_request(:post, api_url).with(headers: expected_headers) do |req|
           last_received_body = req.body
         end.to_return(status: 201)
 
-        code = metrics_helper.send_metrics(base_url: base_url, api_token: token, use_gzip: false)
+        code = metrics_helper.send_metrics(to: api_url, api_token: token, use_gzip: false)
 
         expect(code).to eq(201)
         expect(stub).to have_been_made.once
@@ -135,11 +135,11 @@ describe Fastlane::WPMRT::AppSizeMetricsHelper do
           'Content-Encoding': 'gzip'
         }
         last_received_body = nil
-        stub = stub_request(:post, base_url).with(headers: expected_headers) do |req|
+        stub = stub_request(:post, api_url).with(headers: expected_headers) do |req|
           last_received_body = req.body
         end.to_return(status: 201)
 
-        code = metrics_helper.send_metrics(base_url: base_url, api_token: token, use_gzip: true)
+        code = metrics_helper.send_metrics(to: api_url, api_token: token, use_gzip: true)
 
         expect(code).to eq(201)
         expect(stub).to have_been_made.once
