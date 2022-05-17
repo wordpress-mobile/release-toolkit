@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'nokogiri', '~> 1.11' # Needed for AndroidLocalizeHelper
   spec.add_dependency 'octokit', '~> 4.18'
   spec.add_dependency 'buildkit', '~> 1.5'
+  spec.add_dependency 'plist', '~> 3.1'
   spec.add_dependency 'git', '~> 1.3'
   spec.add_dependency 'jsonlint', '~> 0.3'
   spec.add_dependency 'rake', '>= 12.3', '< 14.0'
