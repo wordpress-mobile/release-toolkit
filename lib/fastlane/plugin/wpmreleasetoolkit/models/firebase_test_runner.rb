@@ -1,6 +1,7 @@
 require 'json'
 require 'uri'
 require 'fileutils'
+require 'google/cloud/storage'
 
 module Fastlane
   class FirebaseTestRunner
@@ -62,7 +63,6 @@ module Fastlane
 
       FileUtils.mkdir_p(destination) unless File.directory? destination
 
-      require 'google/cloud/storage'
       storage = Google::Cloud::Storage.new(
         project_id: project_id,
         credentials: key_file_path
