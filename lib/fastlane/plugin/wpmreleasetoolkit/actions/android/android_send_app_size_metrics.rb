@@ -35,7 +35,7 @@ module Fastlane
 
             apks.each do |apk|
               UI.message("[App Size Metrics] Computing file and download size of #{File.basename(apk)}...")
-              split_name = File.basename(apk, '.apk').delete_prefix('base-')
+              split_name = File.basename(apk, '.apk')
               file_size = Action.sh(apkanalyzer_bin, 'apk', 'file-size', apk, print_command: false, print_command_output: false).chomp.to_i
               download_size = Action.sh(apkanalyzer_bin, 'apk', 'download-size', apk, print_command: false, print_command_output: false).chomp.to_i
               metrics_helper.add_metric(name: 'APK File Size', value: file_size, meta: { split: split_name })
