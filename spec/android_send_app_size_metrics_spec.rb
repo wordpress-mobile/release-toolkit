@@ -51,87 +51,107 @@ describe Fastlane::Actions::AndroidSendAppSizeMetricsAction do
   end
 
   context 'when `include_split_sizes` is turned off' do
-    it 'generates the expected payload compressed by default' do
-      expected = {
-        meta: [
-          { name: 'Platform', value: 'Android' },
-          { name: 'App Name', value: 'my-app' },
-          { name: 'App Version', value: '10.2-rc-3' },
-          { name: 'Product Flavor', value: 'Vanilla' },
-          { name: 'Build Type', value: 'Release' },
-          { name: 'Source', value: 'unit-test' },
-        ],
-        metrics: [
-          { name: 'AAB File Size', value: 123_456 },
-        ]
-      }
+    context 'when only providing an `aab_path`' do
+      it 'generates the expected payload compressed by default' do
+        expected = {
+          meta: [
+            { name: 'Platform', value: 'Android' },
+            { name: 'App Name', value: 'my-app' },
+            { name: 'App Version', value: '10.2-rc-3' },
+            { name: 'Product Flavor', value: 'Vanilla' },
+            { name: 'Build Type', value: 'Release' },
+            { name: 'Source', value: 'unit-test' },
+          ],
+          metrics: [
+            { name: 'AAB File Size', value: 123_456 },
+          ]
+        }
 
-      test_app_size_action(
-        fake_aab_size: 123_456,
-        fake_apks: {},
-        expected_payload: expected,
-        app_name: 'my-app',
-        app_version_name: '10.2-rc-3',
-        product_flavor: 'Vanilla',
-        build_type: 'Release',
-        source: 'unit-test',
-        include_split_sizes: false
-      )
+        test_app_size_action(
+          fake_aab_size: 123_456,
+          fake_apks: {},
+          expected_payload: expected,
+          app_name: 'my-app',
+          app_version_name: '10.2-rc-3',
+          product_flavor: 'Vanilla',
+          build_type: 'Release',
+          source: 'unit-test',
+          include_split_sizes: false
+        )
+      end
+
+      it 'generates the expected payload uncompressed when disabling gzip' do
+        expected = {
+          meta: [
+            { name: 'Platform', value: 'Android' },
+            { name: 'App Name', value: 'my-app' },
+            { name: 'App Version', value: '10.2-rc-3' },
+            { name: 'Product Flavor', value: 'Vanilla' },
+            { name: 'Build Type', value: 'Release' },
+            { name: 'Source', value: 'unit-test' },
+          ],
+          metrics: [
+            { name: 'AAB File Size', value: 123_456 },
+          ]
+        }
+
+        test_app_size_action(
+          fake_aab_size: 123_456,
+          fake_apks: {},
+          expected_payload: expected,
+          app_name: 'my-app',
+          app_version_name: '10.2-rc-3',
+          product_flavor: 'Vanilla',
+          build_type: 'Release',
+          source: 'unit-test',
+          include_split_sizes: false,
+          use_gzip_content_encoding: false
+        )
+      end
     end
 
-    it 'generates the expected payload uncompressed when disabling gzip' do
-      expected = {
-        meta: [
-          { name: 'Platform', value: 'Android' },
-          { name: 'App Name', value: 'my-app' },
-          { name: 'App Version', value: '10.2-rc-3' },
-          { name: 'Product Flavor', value: 'Vanilla' },
-          { name: 'Build Type', value: 'Release' },
-          { name: 'Source', value: 'unit-test' },
-        ],
-        metrics: [
-          { name: 'AAB File Size', value: 123_456 },
-        ]
-      }
+    context 'when only providing an `universal_apk_path`' do
+      it 'generates the expected payload containing the apk file size'
+    end
 
-      test_app_size_action(
-        fake_aab_size: 123_456,
-        fake_apks: {},
-        expected_payload: expected,
-        app_name: 'my-app',
-        app_version_name: '10.2-rc-3',
-        product_flavor: 'Vanilla',
-        build_type: 'Release',
-        source: 'unit-test',
-        include_split_sizes: false,
-        use_gzip_content_encoding: false
-      )
+    context 'when providing both an `aab_path` and an `universal_apk_path`' do
+      it 'generates the expected payload containing the aab and universal apk file size'
     end
   end
 
   context 'when keeping the default value of `include_split_sizes` turned on' do
-    it 'generates the expected payload containing the aab file size and optimized split sizes' do
-      expected_fixture = File.join(test_data_dir, 'android-metrics-payload.json')
-      expected = JSON.parse(File.read(expected_fixture))
+    context 'when only providing an `aab_path`' do
+      it 'generates the expected payload containing the aab file size and optimized split sizes' do
+        expected_fixture = File.join(test_data_dir, 'android-metrics-payload.json')
+        expected = JSON.parse(File.read(expected_fixture))
 
-      test_app_size_action(
-        fake_aab_size: 987_654_321,
-        fake_apks: {
-          'base-arm64_v8a.apk': [164_080, 64_080],
-          'base-arm64_v8a_2.apk': [164_082, 64_082],
-          'base-armeabi.apk': [150_000, 50_000],
-          'base-armeabi_2.apk': [150_002, 50_002],
-          'base-armeabi_v7a.apk': [150_070, 50_070],
-          'base-armeabi_v7a_2.apk': [150_072, 50_072]
-        },
-        expected_payload: expected,
-        app_name: 'wordpress',
-        app_version_name: '19.8-rc-3',
-        app_version_code: 1214,
-        product_flavor: 'Vanilla',
-        build_type: 'Release',
-        source: 'unit-test'
-      )
+        test_app_size_action(
+          fake_aab_size: 987_654_321,
+          fake_apks: {
+            'base-arm64_v8a.apk': [164_080, 64_080],
+            'base-arm64_v8a_2.apk': [164_082, 64_082],
+            'base-armeabi.apk': [150_000, 50_000],
+            'base-armeabi_2.apk': [150_002, 50_002],
+            'base-armeabi_v7a.apk': [150_070, 50_070],
+            'base-armeabi_v7a_2.apk': [150_072, 50_072]
+          },
+          expected_payload: expected,
+          app_name: 'wordpress',
+          app_version_name: '19.8-rc-3',
+          app_version_code: 1214,
+          product_flavor: 'Vanilla',
+          build_type: 'Release',
+          source: 'unit-test'
+        )
+      end
+    end
+
+    context 'when only providing an `universal_apk_path`' do
+      it 'generates the expected payload containing the apk file size and optimized file and download sizes'
+    end
+
+    context 'when providing both an `aab_path` and an `universal_apk_path`' do
+      it 'generates the expected payload containing the aab and universal apk file size and optimized file and download sizes for all splits'
     end
   end
 end

@@ -10,6 +10,9 @@ module Fastlane
         if (api_token.nil? || api_token.empty?) && !api_url.is_a?(URI::File)
           UI.user_error!('An API token is required when using an `api_url` with a scheme other than `file://`')
         end
+        if params[:aab_path].nil? && params[:universal_apk_path].nil?
+          UI.user_error!('You must provide at least an `aab_path` or an `universal_apk_path`, or both')
+        end
 
         # Build the payload base
         metrics_helper = Fastlane::Helper::AppSizeMetricsHelper.new(
@@ -21,28 +24,32 @@ module Fastlane
           'Build Type': params[:build_type],
           Source: params[:source]
         )
-        metrics_helper.add_metric(name: 'AAB File Size', value: File.size(params[:aab_path]))
+        # Add AAB file size
+        metrics_helper.add_metric(name: 'AAB File Size', value: File.size(params[:aab_path])) unless params[:aab_path].nil?
+        # Add Universal APK file size
+        metrics_helper.add_metric(name: 'Universal APK File Size', value: File.size(params[:universal_apk_path])) unless params[:universal_apk_path].nil?
 
-        # Add device-specific 'splits' metrics to the payload if a `:include_split_sizes` is enabled
+        # Add optimized file and download sizes for each split `.apk` metrics to the payload if a `:include_split_sizes` is enabled
         if params[:include_split_sizes]
-          check_bundletool_installed!
           apkanalyzer_bin = params[:apkanalyzer_binary] || find_apkanalyzer_binary!
-          UI.message("[App Size Metrics] Generating the various APK splits from #{params[:aab_path]}...")
-          Dir.mktmpdir('release-toolkit-android-app-size-metrics') do |tmp_dir|
-            Action.sh('bundletool', 'build-apks', '--bundle', params[:aab_path], '--output-format', 'DIRECTORY', '--output', tmp_dir)
-            apks = Dir.glob('splits/*.apk', base: tmp_dir).map { |f| File.join(tmp_dir, f) }
-            UI.message("[App Size Metrics] Generated #{apks.length} APKs.")
+          unless params[:aab_path].nil?
+            check_bundletool_installed!
+            UI.message("[App Size Metrics] Generating the various APK splits from #{params[:aab_path]}...")
+            Dir.mktmpdir('release-toolkit-android-app-size-metrics') do |tmp_dir|
+              Action.sh('bundletool', 'build-apks', '--bundle', params[:aab_path], '--output-format', 'DIRECTORY', '--output', tmp_dir)
+              apks = Dir.glob('splits/*.apk', base: tmp_dir).map { |f| File.join(tmp_dir, f) }
+              UI.message("[App Size Metrics] Generated #{apks.length} APKs.")
 
-            apks.each do |apk|
-              UI.message("[App Size Metrics] Computing file and download size of #{File.basename(apk)}...")
-              split_name = File.basename(apk, '.apk')
-              file_size = Action.sh(apkanalyzer_bin, 'apk', 'file-size', apk, print_command: false, print_command_output: false).chomp.to_i
-              download_size = Action.sh(apkanalyzer_bin, 'apk', 'download-size', apk, print_command: false, print_command_output: false).chomp.to_i
-              metrics_helper.add_metric(name: 'APK File Size', value: file_size, metadata: { split: split_name })
-              metrics_helper.add_metric(name: 'Download Size', value: download_size, metadata: { split: split_name })
+              apks.each do |apk|
+                split_name = File.basename(apk, '.apk')
+                add_apk_size_metrics(helper: metrics_helper, apkanalyzer_bin: apkanalyzer_bin, apk: apk, split_name: split_name)
+              end
+
+              UI.message('[App Size Metrics] Done computing splits sizes.')
             end
-
-            UI.message('[App Size Metrics] Done computing splits sizes.')
+          end
+          unless params[:universal_apk_path].nil?
+            add_apk_size_metrics(helper: metrics_helper, apkanalyzer_bin: apkanalyzer_bin, apk: params[:universal_apk_path], split_name: 'Universal')
           end
         end
 
@@ -76,6 +83,14 @@ module Fastlane
         apkanalyzer_bin
       end
 
+      def self.add_apk_size_metrics(helper:, apkanalyzer_bin:, apk:, split_name:)
+        UI.message("[App Size Metrics] Computing file and download size of #{File.basename(apk)}...")
+        file_size = Action.sh(apkanalyzer_bin, 'apk', 'file-size', apk, print_command: false, print_command_output: false).chomp.to_i
+        download_size = Action.sh(apkanalyzer_bin, 'apk', 'download-size', apk, print_command: false, print_command_output: false).chomp.to_i
+        helper.add_metric(name: 'APK File Size', value: file_size, metadata: { split: split_name })
+        helper.add_metric(name: 'Download Size', value: download_size, metadata: { split: split_name })
+      end
+
       #####################################################
       # @!group Documentation
       #####################################################
@@ -95,6 +110,7 @@ module Fastlane
         DETAILS
       end
 
+      # rubocop:disable Metrics/MethodLength
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(
@@ -165,7 +181,7 @@ module Fastlane
             env_name: 'FL_ANDROID_SEND_APP_SIZE_METRICS_AAB_PATH',
             description: 'The path to the .aab to extract size information from',
             type: String,
-            optional: false,
+            optional: true, # We can have `aab_path` only, or `universal_apk_path` only, or both (but not none)
             verify_block: proc do |value|
               UI.user_error!('You must provide an path to an existing `.aab` file') unless File.exist?(value)
             end
@@ -177,6 +193,16 @@ module Fastlane
               + 'Setting this to `true` adds a bit of extra time to generate the `.apk` and extract the data, but provides more detailed metrics',
             type: FastlaneCore::Boolean,
             default_value: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :universal_apk_path,
+            env_name: 'FL_ANDROID_SEND_APP_SIZE_METRICS_UNIVERSAL_APK_PATH',
+            description: 'The path to the Universal .apk to extract size information from',
+            type: String,
+            optional: true, # We can have `aab_path` only, or `universal_apk_path` only, or both (but not none)
+            verify_block: proc do |value|
+              UI.user_error!('You must provide an path to an existing `.apk` file') unless File.exist?(value)
+            end
           ),
           FastlaneCore::ConfigItem.new(
             key: :apkanalyzer_binary,
@@ -191,6 +217,7 @@ module Fastlane
           ),
         ]
       end
+      # rubocop:enable Metrics/MethodLength
 
       def self.return_type
         :integer
