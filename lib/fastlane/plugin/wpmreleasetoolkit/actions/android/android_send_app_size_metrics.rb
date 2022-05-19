@@ -3,6 +3,13 @@ require_relative '../../helper/app_size_metrics_helper'
 module Fastlane
   module Actions
     class AndroidSendAppSizeMetricsAction < Action
+      # Keys used by the metrics payload
+      AAB_FILE_SIZE_KEY = 'AAB File Size'.freeze                     # value from `File.size` of the `.aab`
+      UNIVERSAL_APK_FILE_SIZE_KEY = 'Universal APK File Size'.freeze # value from `File.size` of the Universal `.apk`
+      UNIVERSAL_APK_SPLIT_NAME = 'Universal'.freeze                  # pseudo-name of the split representing the Universal `.apk`
+      APK_OPTIMIZED_FILE_SIZE_KEY = 'Optimized APK File Size'.freeze # value from `apkanalyzer apk file-size`
+      APK_OPTIMIZED_DOWNLOAD_SIZE_KEY = 'Download Size'.freeze       # value from `apkanalyzer apk download-size`
+
       def self.run(params)
         # Check input parameters
         api_url = URI(params[:api_url])
@@ -25,9 +32,9 @@ module Fastlane
           Source: params[:source]
         )
         # Add AAB file size
-        metrics_helper.add_metric(name: 'AAB File Size', value: File.size(params[:aab_path])) unless params[:aab_path].nil?
+        metrics_helper.add_metric(name: AAB_FILE_SIZE_KEY, value: File.size(params[:aab_path])) unless params[:aab_path].nil?
         # Add Universal APK file size
-        metrics_helper.add_metric(name: 'Universal APK File Size', value: File.size(params[:universal_apk_path])) unless params[:universal_apk_path].nil?
+        metrics_helper.add_metric(name: UNIVERSAL_APK_FILE_SIZE_KEY, value: File.size(params[:universal_apk_path])) unless params[:universal_apk_path].nil?
 
         # Add optimized file and download sizes for each split `.apk` metrics to the payload if a `:include_split_sizes` is enabled
         if params[:include_split_sizes]
@@ -49,7 +56,7 @@ module Fastlane
             end
           end
           unless params[:universal_apk_path].nil?
-            add_apk_size_metrics(helper: metrics_helper, apkanalyzer_bin: apkanalyzer_bin, apk: params[:universal_apk_path], split_name: 'Universal')
+            add_apk_size_metrics(helper: metrics_helper, apkanalyzer_bin: apkanalyzer_bin, apk: params[:universal_apk_path], split_name: UNIVERSAL_APK_SPLIT_NAME)
           end
         end
 
@@ -87,8 +94,8 @@ module Fastlane
         UI.message("[App Size Metrics] Computing file and download size of #{File.basename(apk)}...")
         file_size = Action.sh(apkanalyzer_bin, 'apk', 'file-size', apk, print_command: false, print_command_output: false).chomp.to_i
         download_size = Action.sh(apkanalyzer_bin, 'apk', 'download-size', apk, print_command: false, print_command_output: false).chomp.to_i
-        helper.add_metric(name: 'APK File Size', value: file_size, metadata: { split: split_name })
-        helper.add_metric(name: 'Download Size', value: download_size, metadata: { split: split_name })
+        helper.add_metric(name: APK_OPTIMIZED_FILE_SIZE_KEY, value: file_size, metadata: { split: split_name })
+        helper.add_metric(name: APK_OPTIMIZED_DOWNLOAD_SIZE_KEY, value: download_size, metadata: { split: split_name })
       end
 
       #####################################################
