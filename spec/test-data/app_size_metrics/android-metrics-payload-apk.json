@@ -1,0 +1,16 @@
+{
+  "meta": [
+    { "name": "Platform", "value": "Android" },
+    { "name": "App Name", "value": "wordpress" },
+    { "name": "App Version", "value": "19.8-rc-3" },
+    { "name": "Version Code", "value": 1214 },
+    { "name": "Product Flavor", "value": "Vanilla" },
+    { "name": "Build Type", "value": "Release" },
+    { "name": "Source", "value": "unit-test" }
+  ],
+  "metrics": [
+    { "name": "Universal APK File Size", "value": 567654321 },
+    { "name": "Optimized APK File Size", "value": 555000, "meta": [{ "name": "split", "value": "Universal" }] },
+    { "name": "Download Size", "value": 533000, "meta": [{ "name": "split", "value": "Universal" }] }
+  ]
+}
