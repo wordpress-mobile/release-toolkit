@@ -80,7 +80,7 @@ module Fastlane
         end
 
         if response.is_a?(Net::HTTPSuccess)
-          UI.message("Metrics sent. (#{response.code} #{response.message})")
+          UI.success("Metrics sent. (#{response.code} #{response.message})")
         else
           UI.error("Metrics failed to send. Received: #{response.code} #{response.message}")
           UI.message("Request was #{request.method} to #{request.uri}")
