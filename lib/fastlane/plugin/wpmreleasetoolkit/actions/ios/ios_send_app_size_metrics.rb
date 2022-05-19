@@ -4,6 +4,11 @@ require_relative '../../helper/app_size_metrics_helper'
 module Fastlane
   module Actions
     class IosSendAppSizeMetricsAction < Action
+      # Keys used by the metrics payload
+      IPA_FILE_SIZE_KEY = 'File Size'.freeze         # value from `File.size` of the Universal `.ipa`
+      IPA_DOWNLOAD_SIZE_KEY = 'Download Size'.freeze # value from `app-thinning.plist`
+      IPA_INSTALL_SIZE_KEY = 'Install Size'.freeze   # value from `app-thinning.plist`
+
       def self.run(params)
         # Check input parameters
         api_url = URI(params[:api_url])
@@ -20,7 +25,7 @@ module Fastlane
           'Build Type': params[:build_type],
           Source: params[:source]
         )
-        metrics_helper.add_metric(name: 'File Size', value: File.size(params[:ipa_path]))
+        metrics_helper.add_metric(name: IPA_FILE_SIZE_KEY, value: File.size(params[:ipa_path]))
 
         # Add app-thinning metrics to the payload if a `.plist` is provided
         app_thinning_plist_path = params[:app_thinning_plist_path] || File.join(File.dirname(params[:ipa_path]), 'app-thinning.plist')
@@ -30,8 +35,8 @@ module Fastlane
             variant_descriptors = variant['variantDescriptors'] || [{ 'device' => 'Universal' }]
             variant_descriptors.each do |desc|
               variant_metadata = { device: desc['device'], 'OS Version': desc['os-version'] }
-              metrics_helper.add_metric(name: 'Download Size', value: variant['sizeCompressedApp'], metadata: variant_metadata)
-              metrics_helper.add_metric(name: 'Install Size', value: variant['sizeUncompressedApp'], metadata: variant_metadata)
+              metrics_helper.add_metric(name: IPA_DOWNLOAD_SIZE_KEY, value: variant['sizeCompressedApp'], metadata: variant_metadata)
+              metrics_helper.add_metric(name: IPA_INSTALL_SIZE_KEY, value: variant['sizeUncompressedApp'], metadata: variant_metadata)
             end
           end
         end
