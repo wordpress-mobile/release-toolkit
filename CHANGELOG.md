@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-* Introduce new `ios_send_app_size_metrics` and `android_send_app_size_metrics` actions. [#364]
+* Introduce new `ios_send_app_size_metrics` and `android_send_app_size_metrics` actions. [#364] [#365]
 
 ### Bug Fixes
 
