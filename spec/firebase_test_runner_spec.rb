@@ -69,4 +69,33 @@ describe Fastlane::FirebaseTestRunner do
       subject.run_tests(apk_path: apk_path, test_apk_path: test_apk_path, device: device, type: type)
     end
   end
+
+  describe '.download_result_files' do
+    subject(:runner) do
+      runner = described_class.new(key_file: __FILE__, verify_gcloud_binary: false)
+      runner.instance_variable_set(:@has_authenticated, true)
+
+      runner
+    end
+
+    let(:empty_test_log) { Fastlane::FirebaseTestLabResult.new(log_file_path: EMPTY_FIREBASE_TEST_LOG_PATH) }
+    let(:passed_test_log) { Fastlane::FirebaseTestLabResult.new(log_file_path: PASSED_FIREBASE_TEST_LOG_PATH) }
+
+    it 'raises for invalid result' do
+      expect { run_download(result: 'foo') }.to raise_exception('You must pass a `FirebaseTestLabResult` to this method')
+    end
+
+    it 'raises for invalid destination' do
+      expect { run_download(result: empty_test_log) }.to raise_exception('Log File doesn\'t contain a raw results URL')
+    end
+
+    def run_download(result: passed_test_log, destination: '/tmp/test', project_id: 0, key_file_path: 'invalid')
+      subject.download_result_files(
+        result: result,
+        destination: destination,
+        project_id: project_id,
+        key_file_path: key_file_path
+      )
+    end
+  end
 end

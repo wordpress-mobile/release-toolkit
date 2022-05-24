@@ -1,8 +1,5 @@
 require 'spec_helper'
 
-EMPTY_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'empty.json')
-PASSED_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-test-lab-run-passed.log')
-FAILED_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-test-lab-run-failure.log')
 INVALID_TEST_LOG_PATH = 'foo'.freeze
 
 describe Fastlane::FirebaseTestLabResult do

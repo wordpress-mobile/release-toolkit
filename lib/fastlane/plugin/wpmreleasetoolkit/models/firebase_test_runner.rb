@@ -70,10 +70,10 @@ module Fastlane
     # @param [String] key_file_path The path to the key file – required for Google Cloud Storage access.
     #
     def download_result_files(result:, destination:, project_id:, key_file_path:)
-      raise unless result.is_a? Fastlane::FirebaseTestLabResult
+      UI.user_error! 'You must pass a `FirebaseTestLabResult` to this method' unless result.is_a? Fastlane::FirebaseTestLabResult
 
       paths = result.raw_results_paths
-      raise "Log File doesn't contain a raw results URL" if paths.nil?
+      UI.user_error! "Log File doesn't contain a raw results URL" if paths.nil?
 
       FileUtils.mkdir_p(destination) unless File.directory?(destination)
 
