@@ -10,10 +10,10 @@ module Fastlane
     # https://github.com/Automattic/apps-metrics
     #
     class AppSizeMetricsHelper
-      # @param [Hash] group_meta Metadata common to all the metrics. Can be any arbitrary set of key/value pairs.
+      # @param [Hash] metadata Metadata common to all the metrics. Can be any arbitrary set of key/value pairs.
       #
-      def initialize(group_meta = {})
-        self.meta = group_meta
+      def initialize(metadata = {})
+        self.metadata = metadata
         @metrics = []
       end
 
@@ -21,26 +21,26 @@ module Fastlane
       #
       # @param [Hash] hash The metadata common to all the metrics of the payload built by that helper instance. Can be any arbitrary set of key/value pairs
       #
-      def meta=(hash)
-        @meta = (hash.compact || {}).map { |key, value| { name: key.to_s, value: value } }
+      def metadata=(hash)
+        @metadata = (hash.compact || {}).map { |key, value| { name: key.to_s, value: value } }
       end
 
       # Adds a single metric to the group of metrics
       #
       # @param [String] name The metric name
       # @param [Integer] value The metric value
-      # @param [Hash] meta The arbitrary dictionary of metadata to associate to that metric entry
+      # @param [Hash] metadata The arbitrary dictionary of metadata to associate to that metric entry
       #
-      def add_metric(name:, value:, meta: nil)
+      def add_metric(name:, value:, metadata: nil)
         metric = { name: name, value: value }
-        meta = meta&.compact || {} # Remove nil values if any (and use empty Hash if nil was provided)
-        metric[:meta] = meta.map { |meta_key, meta_value| { name: meta_key.to_s, value: meta_value } } unless meta.empty?
+        metadata = metadata&.compact || {} # Remove nil values if any (and use empty Hash if nil was provided)
+        metric[:meta] = metadata.map { |meta_key, meta_value| { name: meta_key.to_s, value: meta_value } } unless metadata.empty?
         @metrics.append(metric)
       end
 
       def to_h
         {
-          meta: @meta,
+          meta: @metadata,
           metrics: @metrics
         }
       end

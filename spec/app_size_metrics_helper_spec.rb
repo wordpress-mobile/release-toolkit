@@ -7,9 +7,9 @@ describe Fastlane::Helper::AppSizeMetricsHelper do
                                              'Group Metadata 1': 'Group Value 1',
                                              'Group Metadata 2': 'Group Value 2'
                                            })
-      metrics_helper.add_metric(name: 'Metric 1', value: 12_345, meta: { m1a: 'Metric 1 Metadata A' })
+      metrics_helper.add_metric(name: 'Metric 1', value: 12_345, metadata: { m1a: 'Metric 1 Metadata A' })
       metrics_helper.add_metric(name: 'Metric 2', value: 67_890)
-      metrics_helper.add_metric(name: 'Metric 3', value: 13_579, meta: { m3a: 'Metric 3 Metadata A', m3b: 'Metric 3 Metadata B' })
+      metrics_helper.add_metric(name: 'Metric 3', value: 13_579, metadata: { m3a: 'Metric 3 Metadata A', m3b: 'Metric 3 Metadata B' })
 
       expected_hash = {
         meta: [
@@ -31,9 +31,9 @@ describe Fastlane::Helper::AppSizeMetricsHelper do
                                              'Group Metadata 2': nil,
                                              'Group Metadata 3': 'Group Value 3'
                                            })
-      metrics_helper.add_metric(name: 'Metric 1', value: 12_345, meta: { m1a: 'Metric 1 Metadata A', m1b: nil, m1c: 'Metric 1 Metadata C' })
-      metrics_helper.add_metric(name: 'Metric 2', value: 67_890, meta: { m2a: nil })
-      metrics_helper.add_metric(name: 'Metric 3', value: 13_579, meta: { m3a: 'Metric 3 Metadata A', m3b: 'Metric 3 Metadata B' })
+      metrics_helper.add_metric(name: 'Metric 1', value: 12_345, metadata: { m1a: 'Metric 1 Metadata A', m1b: nil, m1c: 'Metric 1 Metadata C' })
+      metrics_helper.add_metric(name: 'Metric 2', value: 67_890, metadata: { m2a: nil })
+      metrics_helper.add_metric(name: 'Metric 3', value: 13_579, metadata: { m3a: 'Metric 3 Metadata A', m3b: 'Metric 3 Metadata B' })
 
       expected_hash = {
         meta: [
@@ -56,9 +56,9 @@ describe Fastlane::Helper::AppSizeMetricsHelper do
                                              'Group Metadata 1': 'Group Value 1',
                                              'Group Metadata 2': 'Group Value 2'
                                            })
-      metrics_helper.add_metric(name: 'Metric 1', value: 12_345, meta: { m1a: 'Metric 1 Metadata A' })
+      metrics_helper.add_metric(name: 'Metric 1', value: 12_345, metadata: { m1a: 'Metric 1 Metadata A' })
       metrics_helper.add_metric(name: 'Metric 2', value: 67_890)
-      metrics_helper.add_metric(name: 'Metric 3', value: 13_579, meta: { m3a: 'Metric 3 Metadata A', m3b: 'Metric 3 Metadata B' })
+      metrics_helper.add_metric(name: 'Metric 3', value: 13_579, metadata: { m3a: 'Metric 3 Metadata A', m3b: 'Metric 3 Metadata B' })
       metrics_helper
     end
     let(:expected_data) do

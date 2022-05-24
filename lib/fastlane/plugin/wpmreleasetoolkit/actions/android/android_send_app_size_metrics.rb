@@ -38,8 +38,8 @@ module Fastlane
               split_name = File.basename(apk, '.apk')
               file_size = Action.sh(apkanalyzer_bin, 'apk', 'file-size', apk, print_command: false, print_command_output: false).chomp.to_i
               download_size = Action.sh(apkanalyzer_bin, 'apk', 'download-size', apk, print_command: false, print_command_output: false).chomp.to_i
-              metrics_helper.add_metric(name: 'APK File Size', value: file_size, meta: { split: split_name })
-              metrics_helper.add_metric(name: 'Download Size', value: download_size, meta: { split: split_name })
+              metrics_helper.add_metric(name: 'APK File Size', value: file_size, metadata: { split: split_name })
+              metrics_helper.add_metric(name: 'Download Size', value: download_size, metadata: { split: split_name })
             end
 
             UI.message('[App Size Metrics] Done computing splits sizes.')

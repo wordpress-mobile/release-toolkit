@@ -30,8 +30,8 @@ module Fastlane
             variant_descriptors = variant['variantDescriptors'] || [{ 'device' => 'Universal' }]
             variant_descriptors.each do |desc|
               variant_metadata = { device: desc['device'], 'OS Version': desc['os-version'] }
-              metrics_helper.add_metric(name: 'Download Size', value: variant['sizeCompressedApp'], meta: variant_metadata)
-              metrics_helper.add_metric(name: 'Install Size', value: variant['sizeUncompressedApp'], meta: variant_metadata)
+              metrics_helper.add_metric(name: 'Download Size', value: variant['sizeCompressedApp'], metadata: variant_metadata)
+              metrics_helper.add_metric(name: 'Install Size', value: variant['sizeUncompressedApp'], metadata: variant_metadata)
             end
           end
         end
