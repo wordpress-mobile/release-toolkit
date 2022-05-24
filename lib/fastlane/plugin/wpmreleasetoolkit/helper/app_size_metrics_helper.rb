@@ -33,7 +33,7 @@ module Fastlane
       #
       def add_metric(name:, value:, meta: nil)
         metric = { name: name, value: value }
-        meta = (meta || {}).compact # Remove nil values if any
+        meta = meta&.compact || {} # Remove nil values if any (and use empty Hash if nil was provided)
         metric[:meta] = meta.map { |meta_key, meta_value| { name: meta_key.to_s, value: meta_value } } unless meta.empty?
         @metrics.append(metric)
       end
