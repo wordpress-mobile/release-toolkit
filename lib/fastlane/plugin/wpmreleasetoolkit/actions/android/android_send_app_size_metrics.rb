@@ -58,15 +58,24 @@ module Fastlane
         )
       end
 
+      #####################################################
       # @!group Small helper methods
+      #####################################################
       class << self
+        # @raise if `bundletool` can not be found in `$PATH`
         def check_bundletool_installed!
           Action.sh('command', '-v', 'bundletool', print_command: false, print_command_output: false)
         rescue StandardError
-          UI.user_error!('bundletool is required to build the split APKs. Install it with `brew install bundletool`')
+          UI.user_error!('`bundletool` is required to build the split APKs. Install it with `brew install bundletool`')
           raise
         end
 
+        # The path where the `apkanalyzer` binary was found, after searching it:
+        #  - in priority in `$ANDROID_SDK_ROOT` (or `$ANDROID_HOME` for legacy setups), under `cmdline-tools/latest/bin/` or `cmdline-tools/tools/bin`
+        #  - and falling back by trying to find it in `$PATH`
+        #
+        # @return [String,Nil] The path to `apkanalyzer`, or `nil` if it wasn't found in any of the above tested paths.
+        #
         def find_apkanalyzer_binary
           sdk_root = ENV['ANDROID_SDK_ROOT'] || ENV['ANDROID_HOME']
           if sdk_root
@@ -76,12 +85,26 @@ module Fastlane
           apkanalyzer_bin || Action.sh('command', '-v', 'apkanalyzer', print_command_output: false) { |_| nil }
         end
 
+        # The path where the `apkanalyzer` binary was found, after searching it:
+        #  - in priority in `$ANDROID_SDK_ROOT` (or `$ANDROID_HOME` for legacy setups), under `cmdline-tools/latest/bin/` or `cmdline-tools/tools/bin`
+        #  - and falling back by trying to find it in `$PATH`
+        #
+        # @return [String] The path to `apkanalyzer`
+        # @raise [FastlaneCore::Interface::FastlaneError] if it wasn't found in any of the above tested paths.
+        #
         def find_apkanalyzer_binary!
           apkanalyzer_bin = find_apkanalyzer_binary
           UI.user_error!('Unable to find `apkanalyzer` executable in `$PATH` nor `$ANDROID_SDK_ROOT`. Make sure you installed the Android SDK Command-line Tools') if apkanalyzer_bin.nil?
           apkanalyzer_bin
         end
 
+        # Add the `file-size` and `download-size` values of an APK to the helper, as reported by the corresponding `apkanalyzer apk …` commands
+        #
+        # @param [Fastlane::Helper::AppSizeMetricsHelper] helper The helper to add the metrics to
+        # @param [String] apkanalyzer_bin The path to the `apkanalyzer` binary to use to extract those file and download sizes from the `.apk`
+        # @param [String] apk The path to the `.apk` file to extract the sizes from
+        # @param [String] split_name The name to use for the value of the `split` metadata key in the metrics being added
+        #
         def add_apk_size_metrics(helper:, apkanalyzer_bin:, apk:, split_name:)
           UI.message("[App Size Metrics] Computing file and download size of #{File.basename(apk)}...")
           file_size = Action.sh(apkanalyzer_bin, 'apk', 'file-size', apk, print_command: false, print_command_output: false).chomp.to_i
@@ -90,6 +113,13 @@ module Fastlane
           helper.add_metric(name: APK_OPTIMIZED_DOWNLOAD_SIZE_KEY, value: download_size, metadata: { split: split_name })
         end
 
+        # Generates all the split `.apk` files (typically one per device architecture) from a given `.aab` file, then yield for each apk produced.
+        #
+        # @note The split `.apk` files are generated in a temporary directory and are thus all deleted after each of them has been `yield`ed to the provided block.
+        # @param [String] aab_path The path to the `.aab` file to generate split `.apk` files for
+        # @yield [apk] Calls the provided block once for each split `.apk` that was generated from the `.aab`
+        # @yieldparam apk [String] The path to one of the split `.apk` temporary file generated from the `.aab`
+        #
         def generate_split_apks(aab_path:, &block)
           check_bundletool_installed!
           UI.message("[App Size Metrics] Generating the various APK splits from #{aab_path}...")
