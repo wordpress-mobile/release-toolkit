@@ -11,10 +11,12 @@ module Fastlane
       def self.run(params)
         # Log in to Firebase (and validate credentials)
         test_runner = Fastlane::FirebaseTestRunner.new(key_file: params[:key_file])
+        test_uuid = params.fetch(:test_run_id, SecureRandom.uuid)
+        test_dir = params.fetch(:results_output_dir, File.join(Dir.tmpdir(), run_uuid))
 
         # Set up the log file and output directory
-        FileUtils.mkdir_p(params[:results_output_dir])
-        Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE_PATH] = File.join(params[:results_output_dir], 'output.log')
+        FileUtils.mkdir_p(test_dir)
+        Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE_PATH] = File.join(test_dir, 'output.log')
 
         device = Fastlane::FirebaseDevice.new(
           model: params[:model],
@@ -33,7 +35,7 @@ module Fastlane
         # Download all of the outputs from the job to the local machine
         test_runner.download_result_files(
           result: result,
-          destination: params[:results_output_dir],
+          destination: test_dir,
           project_id: params[:project_id],
           key_file_path: params[:key_file]
         )
@@ -56,8 +58,6 @@ module Fastlane
       end
 
       def self.available_options
-        run_uuid = SecureRandom.uuid
-
         [
           FastlaneCore::ConfigItem.new(
             key: :project_id,
@@ -141,16 +141,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :test_run_id,
             description: 'A unique ID used to identify this test run',
-            type: String,
-            default_value: run_uuid,
-            default_value_dynamic: true
+            type: String
           ),
           FastlaneCore::ConfigItem.new(
             key: :results_output_dir,
             description: 'Where should we store the results of this test run?',
-            type: String,
-            default_value: File.join(Dir.tmpdir(), run_uuid),
-            default_value_dynamic: true
+            type: String
           ),
         ]
       end
