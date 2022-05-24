@@ -26,7 +26,7 @@ module Fastlane
         # Add device-specific 'splits' metrics to the payload if a `:include_split_sizes` is enabled
         if params[:include_split_sizes]
           check_bundletool_installed!
-          apkanalyzer_bin = find_apkanalyzer_binary!
+          apkanalyzer_bin = params[:apkanalyzer_binary] || find_apkanalyzer_binary!
           UI.message("[App Size Metrics] Generating the various APK splits from #{params[:aab_path]}...")
           Dir.mktmpdir('release-toolkit-android-app-size-metrics') do |tmp_dir|
             Action.sh('bundletool', 'build-apks', '--bundle', params[:aab_path], '--output-format', 'DIRECTORY', '--output', tmp_dir)
@@ -61,10 +61,18 @@ module Fastlane
         raise
       end
 
-      def self.find_apkanalyzer_binary!
+      def self.find_apkanalyzer_binary
         sdk_root = ENV['ANDROID_SDK_ROOT'] || ENV['ANDROID_HOME']
-        apkanalyzer_bin = sdk_root.nil? ? Action.sh('command', '-v', 'apkanalyzer') : File.join(sdk_root, 'cmdline-tools', 'latest', 'bin', 'apkanalyzer')
-        UI.user_error!('Unable to find apkanalyzer executable. Make sure you installed the Android SDK Command-line Tools') unless File.executable?(apkanalyzer_bin)
+        if sdk_root
+          pattern = File.join(sdk_root, 'cmdline-tools', '{latest,tools}', 'bin', 'apkanalyzer')
+          apkanalyzer_bin = Dir.glob(pattern).find { |path| File.executable?(path) }
+        end
+        apkanalyzer_bin || Action.sh('command', '-v', 'apkanalyzer', print_command_output: false) { |_| nil }
+      end
+
+      def self.find_apkanalyzer_binary!
+        apkanalyzer_bin = find_apkanalyzer_binary
+        UI.user_error!('Unable to find `apkanalyzer` executable in `$PATH` nor `$ANDROID_SDK_ROOT`. Make sure you installed the Android SDK Command-line Tools') if apkanalyzer_bin.nil?
         apkanalyzer_bin
       end
 
@@ -169,6 +177,17 @@ module Fastlane
               + 'Setting this to `true` adds a bit of extra time to generate the `.apk` and extract the data, but provides more detailed metrics',
             type: FastlaneCore::Boolean,
             default_value: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :apkanalyzer_binary,
+            env_name: 'FL_ANDROID_SEND_APP_SIZE_METRICS_APKANALYZER_BINARY',
+            description: 'The path to the `apkanalyzer` binary to use. If not provided explicitly, we will use `$PATH` and `$ANDROID_SDK_HOME` to try to find it',
+            type: String,
+            default_value: find_apkanalyzer_binary,
+            default_value_dynamic: true,
+            verify_block: proc do |value|
+              UI.user_error!('You must provide a path to an existing executable for `apkanalyzer`') unless File.executable?(value)
+            end
           ),
         ]
       end

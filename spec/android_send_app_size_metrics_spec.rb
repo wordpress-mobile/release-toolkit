@@ -13,8 +13,8 @@ describe Fastlane::Actions::AndroidSendAppSizeMetricsAction do
 
       if other_action_args[:include_split_sizes] != false
         # Arrange: fake that apkanalyzer exists
-        ENV['ANDROID_SDK_ROOT'] = '__ANDROID_SDK_ROOT__FOR_TESTS__'
         apkanalyzer_bin = File.join('__ANDROID_SDK_ROOT__FOR_TESTS__', 'cmdline-tools', 'latest', 'bin', 'apkanalyzer')
+        allow(described_class).to receive(:find_apkanalyzer_binary).and_return(apkanalyzer_bin)
         allow(File).to receive(:executable?).with(apkanalyzer_bin).and_return(true)
 
         # Arrange: fake that bundletool exists and mock its call to create fake apks with corresponding apkanalyzer calls mocks
