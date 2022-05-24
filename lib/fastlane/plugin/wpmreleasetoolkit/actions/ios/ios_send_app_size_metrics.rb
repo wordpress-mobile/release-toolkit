@@ -97,35 +97,35 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :app_name,
             env_name: 'FL_IOS_SEND_APP_SIZE_METRICS_APP_NAME',
-            description: 'The name of the app for which we are publishing metrics, to help filter by app in the dashboard',
+            description: 'The name of the app for which we are publishing metrics, to help with filtering and grouping',
             type: String,
             optional: false
           ),
           FastlaneCore::ConfigItem.new(
             key: :app_version,
             env_name: 'FL_IOS_SEND_APP_SIZE_METRICS_APP_VERSION',
-            description: 'The version of the app for which we are publishing metrics, to help filter by version in the dashboard',
+            description: 'The version of the app for which we are publishing metrics, to help with filtering and grouping',
             type: String,
             optional: false
           ),
           FastlaneCore::ConfigItem.new(
             key: :build_type,
             env_name: 'FL_IOS_SEND_APP_SIZE_METRICS_BUILD_TYPE',
-            description: 'The build configuration for which we are publishing metrics, to help filter by build config in the dashboard. E.g. `Debug`, `Release`',
+            description: 'The build configuration for which we are publishing metrics, to help with filtering and grouping. E.g. `Debug`, `Release`',
             type: String,
             optional: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :source,
             env_name: 'FL_IOS_SEND_APP_SIZE_METRICS_SOURCE',
-            description: 'The type of event at the origin of that build, to help filter data in the dashboard. E.g. `pr`, `beta`, `final-release`',
+            description: 'The type of event at the origin of that build, to help with filtering and grouping. E.g. `pr`, `beta`, `final-release`',
             type: String,
             optional: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :ipa_path,
             env_name: 'FL_IOS_SEND_APP_SIZE_METRICS_IPA_PATH',
-            description: 'The path to the .ipa to extract size information from',
+            description: 'The path to the `.ipa` to extract size information from',
             type: String,
             optional: false,
             default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
@@ -158,7 +158,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        platform == :ios
       end
     end
   end

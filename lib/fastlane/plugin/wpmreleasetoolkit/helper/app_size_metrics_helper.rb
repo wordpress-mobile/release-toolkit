@@ -59,7 +59,7 @@ module Fastlane
 
         # Allow using a `file:` URI for debugging
         if uri.is_a?(URI::File)
-          UI.message("Writing metrics payload to file #{uri.path} (instead of sending it to a server)")
+          UI.message("Writing metrics payload to file #{uri.path} (instead of sending it to a remote API endpoint)")
           File.write(uri.path, json_payload)
           return 201 # To make it easy at call site to check for pseudo-status code 200 even in non-HTTP cases
         end
