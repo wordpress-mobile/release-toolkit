@@ -12,14 +12,14 @@ describe Fastlane::FirebaseTestRunner do
 
   describe '#verify_has_gcloud_binary' do
     it 'runs the correct command' do
-      expect(Fastlane::Action).to receive('sh').with('command -v gcloud > /dev/null')
-      described_class.verify_has_gcloud_binary
+      expect(Fastlane::Action).to receive('sh').with('command', '-v', 'gcloud', { print_command: false, print_command_output: false })
+      described_class.verify_has_gcloud_binary!
     end
 
     it 'raises for missing binary' do
-      allow(Fastlane::Action).to receive('sh').with('command -v gcloud > /dev/null').and_raise
+      allow(Fastlane::Action).to receive('sh').with('command', '-v', 'gcloud', { print_command: false, print_command_output: false }).and_raise
       expect(Fastlane::UI).to receive(:user_error!)
-      described_class.verify_has_gcloud_binary
+      described_class.verify_has_gcloud_binary!
     end
   end
 

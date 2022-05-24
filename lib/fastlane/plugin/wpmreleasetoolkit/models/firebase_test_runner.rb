@@ -13,7 +13,7 @@ module Fastlane
       @key_file = key_file
       @has_authenticated = false
 
-      FirebaseTestRunner.verify_has_gcloud_binary if verify_gcloud_binary
+      FirebaseTestRunner.verify_has_gcloud_binary! if verify_gcloud_binary
     end
 
     def authenticate_if_needed
@@ -107,7 +107,7 @@ module Fastlane
     end
 
     def self.verify_has_gcloud_binary!
-      Action.sh('command', '-v', gcloud', print_command: false, print_command_output: false)
+      Action.sh('command', '-v', 'gcloud', print_command: false, print_command_output: false)
     rescue StandardError
       UI.user_error!("The `gcloud` binary isn't available on this machine. Unable to continue.")
     end
