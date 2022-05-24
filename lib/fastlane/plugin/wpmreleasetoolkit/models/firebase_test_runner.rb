@@ -41,14 +41,14 @@ module Fastlane
 
       authenticate_if_needed
 
-      command = [
+      command = Shellwords.join [
         'gcloud', 'firebase', 'test', 'android', 'run',
         '--type', Shellwords.escape(type),
         '--app', Shellwords.escape(apk_path),
         '--test', Shellwords.escape(test_apk_path),
         '--device', Shellwords.escape(device.to_s),
         '--verbosity', 'info',
-      ].join(' ')
+      ]
 
       log_file_path = Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE_PATH]
 
