@@ -50,6 +50,6 @@ module Fastlane
       def version_data
         @version_data ||= Fastlane::Actions.sh('gcloud firebase test android versions list --format="json"', log: false)
       end
-  end
+    end
   end
 end
