@@ -71,9 +71,7 @@ module Fastlane
             description: 'The key file used to authorize with Google Cloud',
             type: String,
             verify_block: proc do |value|
-              next if File.file? value
-
-              UI.user_error!("Invalid key file path: #{value}")
+              UI.user_error!("Invalid key file path: #{value}") unless File.exist?(value)
             end
           ),
           FastlaneCore::ConfigItem.new(
@@ -81,9 +79,7 @@ module Fastlane
             description: 'The application APK',
             type: String,
             verify_block: proc do |value|
-              next if File.file? value
-
-              UI.user_error!("Invalid application APK: #{value}")
+              UI.user_error!("Invalid application APK: #{value}") unless File.exist?(value)
             end
           ),
           FastlaneCore::ConfigItem.new(
@@ -91,9 +87,7 @@ module Fastlane
             description: 'The test APK',
             type: String,
             verify_block: proc do |value|
-              next if File.file? value
-
-              UI.user_error!("Invalid test APK: #{value}")
+              UI.user_error!("Invalid test APK: #{value}") unless File.exist?(value)
             end
           ),
           FastlaneCore::ConfigItem.new(
@@ -102,9 +96,7 @@ module Fastlane
             type: String,
             verify_block: proc do |value|
               model_names = Fastlane::FirebaseDevice.valid_model_names
-              next if model_names.include? value
-
-              UI.user_error!("Invalid Model Name: #{value}. Valid Model Names: #{model_names}")
+              UI.user_error!("Invalid Model Name: #{value}. Valid Model Names: #{model_names}") unless model_names.include?(value)
             end
           ),
           FastlaneCore::ConfigItem.new(
@@ -113,9 +105,7 @@ module Fastlane
             type: Integer,
             verify_block: proc do |value|
               version_numbers = Fastlane::FirebaseDevice.valid_version_numbers
-              next if version_numbers.include? value
-
-              UI.user_error!("Invalid Version Number: #{value}. Valid Verison Numbers: #{version_numbers}")
+              UI.user_error!("Invalid Version Number: #{value}. Valid Verison Numbers: #{version_numbers}") unless version_numbers.include?(value)
             end
           ),
           FastlaneCore::ConfigItem.new(
@@ -125,9 +115,7 @@ module Fastlane
             default_value: 'en',
             verify_block: proc do |value|
               locale_codes = Fastlane::FirebaseDevice.valid_locales
-              next if locale_codes.include? value
-
-              UI.user_error!("Invalid Locale: #{value}. Valid Locales: #{locale_codes}")
+              UI.user_error!("Invalid Locale: #{value}. Valid Locales: #{locale_codes}") unless locale_codes.include?(value)
             end
           ),
           FastlaneCore::ConfigItem.new(
@@ -137,9 +125,7 @@ module Fastlane
             default_value: 'portrait',
             verify_block: proc do |value|
               orientations = Fastlane::FirebaseDevice.valid_orientations
-              next if orientations.include? value
-
-              UI.user_error!("Invalid Orientation: #{value}. Valid Orientations: #{orientations}")
+              UI.user_error!("Invalid Orientation: #{value}. Valid Orientations: #{orientations}") unless orientations.include?(value)
             end
           ),
           FastlaneCore::ConfigItem.new(
@@ -149,9 +135,7 @@ module Fastlane
             default_value: 'instrumentation',
             verify_block: proc do |value|
               types = Fastlane::FirebaseTestRunner::VALID_TEST_TYPES
-              next if types.include? value
-
-              UI.user_error!("Invalid Test Type: #{value}. Valid Types: #{types}")
+              UI.user_error!("Invalid Test Type: #{value}. Valid Types: #{types}") unless types.include?(value)
             end
           ),
           FastlaneCore::ConfigItem.new(

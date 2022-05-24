@@ -40,15 +40,15 @@ module Fastlane
       end
 
       def locale_data
-        @locale_data || Fastlane::Actions.sh('gcloud firebase test android locales list --format="json"', log: false)
+        @locale_data ||= Fastlane::Actions.sh('gcloud firebase test android locales list --format="json"', log: false)
       end
 
       def model_data
-        @model_data || Fastlane::Actions.sh('gcloud firebase test android models list --format="json"', log: false)
+        @model_data ||= Fastlane::Actions.sh('gcloud firebase test android models list --format="json"', log: false)
       end
 
       def version_data
-        @version_data || Fastlane::Actions.sh('gcloud firebase test android versions list --format="json"', log: false)
+        @version_data ||= Fastlane::Actions.sh('gcloud firebase test android versions list --format="json"', log: false)
       end
   end
   end

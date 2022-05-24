@@ -35,9 +35,9 @@ module Fastlane
     # @param [String] type The type of test to run.
     #
     def run_tests(apk_path:, test_apk_path:, device:, type: 'instrumentation')
-      raise "Unable to find apk: #{apk_path}" unless File.file? apk_path
-      raise "Unable to find apk: #{test_apk_path}" unless File.file? test_apk_path
-      raise "Invalid Type: #{type}" unless VALID_TEST_TYPES.include? type
+      raise "Unable to find apk: #{apk_path}" unless File.file?(apk_path)
+      raise "Unable to find apk: #{test_apk_path}" unless File.file?(test_apk_path)
+      raise "Invalid Type: #{type}" unless VALID_TEST_TYPES.include?(type)
 
       authenticate_if_needed
 
@@ -75,7 +75,7 @@ module Fastlane
       paths = result.raw_results_paths
       raise "Log File doesn't contain a raw results URL" if paths.nil?
 
-      FileUtils.mkdir_p(destination) unless File.directory? destination
+      FileUtils.mkdir_p(destination) unless File.directory?(destination)
 
       storage = Google::Cloud::Storage.new(
         project_id: project_id,
@@ -106,8 +106,8 @@ module Fastlane
       file.download(destination)
     end
 
-    def self.verify_has_gcloud_binary
-      Action.sh('command -v gcloud > /dev/null')
+    def self.verify_has_gcloud_binary!
+      Action.sh('command', '-v', gcloud', print_command: false, print_command_output: false)
     rescue StandardError
       UI.user_error!("The `gcloud` binary isn't available on this machine. Unable to continue.")
     end

@@ -6,7 +6,7 @@ module Fastlane
       @path = log_file_path
     end
 
-    # Scan the log file to for indications that the Test Run failed
+    # Scan the log file to for indications that no test cases failed
     def success?
       File.readlines(@path).any? { |line| line.include?('Passed') && line.include?('test cases passed') }
     end
