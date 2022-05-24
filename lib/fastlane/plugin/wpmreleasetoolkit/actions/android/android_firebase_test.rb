@@ -141,11 +141,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :test_run_id,
             description: 'A unique ID used to identify this test run',
+            default_value_dynamic: true,
             type: String
           ),
           FastlaneCore::ConfigItem.new(
             key: :results_output_dir,
             description: 'Where should we store the results of this test run?',
+            default_value_dynamic: true,
             type: String
           ),
         ]
