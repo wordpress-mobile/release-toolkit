@@ -1,16 +1,17 @@
 require 'spec_helper'
 
-LOCALE_SAMPLE_DATA_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-locale-list.json')
-MODEL_SAMPLE_DATA_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-model-list.json')
-VERSION_SAMPLE_DATA_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-version-list.json')
-
 describe Fastlane::FirebaseDevice do
+
+  let(:locale_sample_data) { File.read(File.join(__dir__, 'test-data', 'firebase', 'firebase-locale-list.json')) }
+  let(:model_sample_data) { File.read(File.join(__dir__, 'test-data', 'firebase', 'firebase-model-list.json')) }
+  let(:version_sample_data) { File.read(File.join(__dir__, 'test-data', 'firebase', 'firebase-version-list.json')) }
+
   before do |test|
     next if test.metadata[:calls_data_providers]
 
-    allow(described_class).to receive(:locale_data).and_return(File.read(LOCALE_SAMPLE_DATA_PATH))
-    allow(described_class).to receive(:model_data).and_return(File.read(MODEL_SAMPLE_DATA_PATH))
-    allow(described_class).to receive(:version_data).and_return(File.read(VERSION_SAMPLE_DATA_PATH))
+    allow(described_class).to receive(:locale_data).and_return(locale_sample_data)
+    allow(described_class).to receive(:model_data).and_return(model_sample_data)
+    allow(described_class).to receive(:version_data).and_return(version_sample_data)
   end
 
   def create_model(model: 'Nexus5', version: 27, locale: 'en', orientation: 'portrait')

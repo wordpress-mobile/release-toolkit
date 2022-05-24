@@ -1,15 +1,15 @@
 require 'spec_helper'
 
-INVALID_TEST_LOG_PATH = 'foo'.freeze
-
 describe Fastlane::FirebaseTestLabResult do
   let(:empty_test_log) { described_class.new(log_file_path: EMPTY_FIREBASE_TEST_LOG_PATH) }
   let(:passed_test_log) { described_class.new(log_file_path: PASSED_FIREBASE_TEST_LOG_PATH) }
   let(:failed_test_log) { described_class.new(log_file_path: FAILED_FIREBASE_TEST_LOG_PATH) }
 
+  let(:invalid_test_log_path) { 'foo' }
+
   describe 'initialize' do
     it 'raises for an invalid file path' do
-      expect { described_class.new(log_file_path: INVALID_TEST_LOG_PATH) }.to raise_exception 'No log file found at path foo'
+      expect { described_class.new(log_file_path: invalid_test_log_path) }.to raise_exception 'No log file found at path foo'
     end
   end
 
