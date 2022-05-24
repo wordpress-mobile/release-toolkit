@@ -13,7 +13,7 @@ module Fastlane
         end
 
         # Build the payload base
-        metrics_helper = Fastlane::WPMRT::AppSizeMetricsHelper.new(
+        metrics_helper = Fastlane::Helper::AppSizeMetricsHelper.new(
           Platform: 'iOS',
           'App Name': params[:app_name],
           'App Version': params[:app_version],

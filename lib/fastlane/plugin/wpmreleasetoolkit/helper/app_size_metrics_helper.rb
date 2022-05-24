@@ -3,7 +3,7 @@ require 'net/http'
 require 'zlib'
 
 module Fastlane
-  module WPMRT
+  module Helper
     # A helper class to build an App Size Metrics payload and send it to a server (or write it to disk)
     #
     # The payload generated (and sent) by this helper conforms to the API for grouped metrics described in

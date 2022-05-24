@@ -1,6 +1,6 @@
 require_relative './spec_helper'
 
-describe Fastlane::WPMRT::AppSizeMetricsHelper do
+describe Fastlane::Helper::AppSizeMetricsHelper do
   describe '#to_h' do
     it 'generates the right payload from raw data' do
       metrics_helper = described_class.new({
