@@ -95,6 +95,7 @@ module Fastlane
             description: 'The device model to run',
             type: String,
             verify_block: proc do |value|
+              FirebaseTestRunner.verify_has_gcloud_binary!
               model_names = Fastlane::FirebaseDevice.valid_model_names
               UI.user_error!("Invalid Model Name: #{value}. Valid Model Names: #{model_names}") unless model_names.include?(value)
             end
@@ -104,8 +105,9 @@ module Fastlane
             description: 'The device version to run',
             type: Integer,
             verify_block: proc do |value|
+              FirebaseTestRunner.verify_has_gcloud_binary!
               version_numbers = Fastlane::FirebaseDevice.valid_version_numbers
-              UI.user_error!("Invalid Version Number: #{value}. Valid Verison Numbers: #{version_numbers}") unless version_numbers.include?(value)
+              UI.user_error!("Invalid Version Number: #{value}. Valid Version Numbers: #{version_numbers}") unless version_numbers.include?(value)
             end
           ),
           FastlaneCore::ConfigItem.new(
@@ -114,6 +116,7 @@ module Fastlane
             type: String,
             default_value: 'en',
             verify_block: proc do |value|
+              FirebaseTestRunner.verify_has_gcloud_binary!
               locale_codes = Fastlane::FirebaseDevice.valid_locales
               UI.user_error!("Invalid Locale: #{value}. Valid Locales: #{locale_codes}") unless locale_codes.include?(value)
             end
