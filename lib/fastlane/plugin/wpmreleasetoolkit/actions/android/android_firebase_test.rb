@@ -11,7 +11,7 @@ module Fastlane
       def self.run(params)
         # Log in to Firebase (and validate credentials)
         test_runner = Fastlane::FirebaseTestRunner.new(key_file: params[:key_file])
-        test_uuid = params.fetch(:test_run_id, SecureRandom.uuid)
+        run_uuid = params.fetch(:test_run_id, SecureRandom.uuid)
         test_dir = params.fetch(:results_output_dir, File.join(Dir.tmpdir(), run_uuid))
 
         # Set up the log file and output directory
