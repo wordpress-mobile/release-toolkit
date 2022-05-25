@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Fastlane::FirebaseDevice do
-
   let(:locale_sample_data) { File.read(File.join(__dir__, 'test-data', 'firebase', 'firebase-locale-list.json')) }
   let(:model_sample_data) { File.read(File.join(__dir__, 'test-data', 'firebase', 'firebase-model-list.json')) }
   let(:version_sample_data) { File.read(File.join(__dir__, 'test-data', 'firebase', 'firebase-version-list.json')) }

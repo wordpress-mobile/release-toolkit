@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Fastlane::FirebaseTestRunner do
-
   let(:default_file) { '/etc/hosts' }
   let(:runner_temp_file) { Tempfile.new(%w[output log]).path }
 
