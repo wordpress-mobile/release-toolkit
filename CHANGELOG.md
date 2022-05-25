@@ -18,6 +18,7 @@ _None_
 ### Bug Fixes
 
 * Update GlotPress `export-translations` requests to avoid rate limiting. [#361] [#362]
+* Fix bugs with the shell command in `promo_screenshots_helper`. [#366]
 
 ### Internal Changes
 
