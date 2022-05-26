@@ -239,11 +239,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :universal_apk_path,
             env_name: 'FL_ANDROID_SEND_APP_SIZE_METRICS_UNIVERSAL_APK_PATH',
-            description: 'The path to the Universal .apk to extract size information from',
+            description: 'The path to the Universal `.apk` to extract size information from',
             type: String,
             optional: true, # We can have `aab_path` only, or `universal_apk_path` only, or both (but not none)
             verify_block: proc do |value|
-              UI.user_error!('You must provide an path to an existing `.apk` file') unless File.exist?(value)
+              UI.user_error!('You must provide a path to an existing `.apk` file') unless File.exist?(value)
             end
           ),
           FastlaneCore::ConfigItem.new(
