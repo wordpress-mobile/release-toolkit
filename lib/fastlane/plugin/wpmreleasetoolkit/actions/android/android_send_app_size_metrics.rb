@@ -94,7 +94,7 @@ module Fastlane
         #
         def find_apkanalyzer_binary!
           apkanalyzer_bin = find_apkanalyzer_binary
-          UI.user_error!('Unable to find `apkanalyzer` executable in `$PATH` nor `$ANDROID_SDK_ROOT`. Make sure you installed the Android SDK Command-line Tools') if apkanalyzer_bin.nil?
+          UI.user_error!('Unable to find `apkanalyzer` executable in either `$PATH` or `$ANDROID_SDK_ROOT`. Make sure you installed the Android SDK Command-line Tools') if apkanalyzer_bin.nil?
           apkanalyzer_bin
         end
 
