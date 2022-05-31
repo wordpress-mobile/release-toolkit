@@ -12,6 +12,7 @@ PATH
       nokogiri (~> 1.11)
       octokit (~> 4.18)
       parallel (~> 1.14)
+      plist (~> 3.1)
       progress_bar (~> 1.3)
       rake (>= 12.3, < 14.0)
       rake-compiler (~> 1.0)
@@ -427,4 +428,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   2.3.11
+   2.3.13
