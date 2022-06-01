@@ -1,4 +1,3 @@
-require 'fastlane/action'
 require_relative '../../helper/metadata_update_helper'
 
 module Fastlane

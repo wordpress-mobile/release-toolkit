@@ -1,0 +1,26 @@
+{
+  "meta": [
+    { "name": "Platform", "value": "Android" },
+    { "name": "App Name", "value": "wordpress" },
+    { "name": "App Version", "value": "19.8-rc-3" },
+    { "name": "Version Code", "value": 1214 },
+    { "name": "Product Flavor", "value": "Vanilla" },
+    { "name": "Build Type", "value": "Release" },
+    { "name": "Source", "value": "unit-test" }
+  ],
+  "metrics": [
+    { "name": "AAB File Size", "value": 987654321 },
+    { "name": "Optimized APK File Size", "value": 164082, "meta": [{ "name": "split", "value": "base-arm64_v8a_2" }] },
+    { "name": "Download Size", "value": 64082, "meta": [{ "name": "split", "value": "base-arm64_v8a_2" }] },
+    { "name": "Optimized APK File Size", "value": 150072, "meta": [{ "name": "split", "value": "base-armeabi_v7a_2" }] },
+    { "name": "Download Size", "value": 50072, "meta": [{ "name": "split", "value": "base-armeabi_v7a_2" }] },
+    { "name": "Optimized APK File Size", "value": 150002, "meta": [{ "name": "split", "value": "base-armeabi_2" }] },
+    { "name": "Download Size", "value": 50002, "meta": [{ "name": "split", "value": "base-armeabi_2" }] },
+    { "name": "Optimized APK File Size", "value": 164080, "meta": [{ "name": "split", "value": "base-arm64_v8a" }] },
+    { "name": "Download Size", "value": 64080, "meta": [{ "name": "split", "value": "base-arm64_v8a" }] },
+    { "name": "Optimized APK File Size", "value": 150000, "meta": [{ "name": "split", "value": "base-armeabi" }] },
+    { "name": "Download Size", "value": 50000, "meta": [{ "name": "split", "value": "base-armeabi" }] },
+    { "name": "Optimized APK File Size", "value": 150070, "meta": [{ "name": "split", "value": "base-armeabi_v7a" }] },
+    { "name": "Download Size", "value": 50070, "meta": [{ "name": "split", "value": "base-armeabi_v7a" }] }
+  ]
+}

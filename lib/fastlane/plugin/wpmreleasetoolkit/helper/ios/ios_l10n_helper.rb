@@ -143,11 +143,15 @@ module Fastlane
         #
         def self.download_glotpress_export_file(project_url:, locale:, filters:, destination:)
           query_params = (filters || {}).transform_keys { |k| "filters[#{k}]" }.merge(format: 'strings')
-          uri = URI.parse("#{project_url.chomp('/')}/#{locale}/default/export-translations?#{URI.encode_www_form(query_params)}")
+          uri = URI.parse("#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}")
+
+          # Set an unambiguous User Agent so GlotPress won't rate-limit us
+          options = { 'User-Agent' => Wpmreleasetoolkit::USER_AGENT }
+
           begin
-            IO.copy_stream(uri.open, destination)
+            IO.copy_stream(uri.open(options), destination)
           rescue StandardError => e
-            UI.error "Error downloading locale `#{locale}` — #{e.message}"
+            UI.error "Error downloading locale `#{locale}` — #{e.message} (#{uri})"
             return nil
           end
         end

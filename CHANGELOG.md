@@ -10,7 +10,8 @@ _None_
 
 ### New Features
 
-_None_
+* Introduce new `ios_send_app_size_metrics` and `android_send_app_size_metrics` actions. [#364] [#365]
+* Add the ability to run Firebase Test Lab tests. [#355]
 
 ### Bug Fixes
 
@@ -20,6 +21,18 @@ _None_
 
 _None_
 
+## 4.2.0
+
+### New Features
+
+* The `ios_lint_localizations` action now also checks for duplicated keys in the `.strings` files.
+  The behavior is optional via the `check_duplicate_keys` parameter and enabled by default. [#360]
+
+### Bug Fixes
+
+* Update GlotPress `export-translations` requests to avoid rate limiting. [#361] [#362]
+* Fix bugs with the shell command in `promo_screenshots_helper`. [#366]
+
 ## 4.1.0
 
 ### New Features
@@ -28,7 +41,6 @@ _None_
   If provided, that identifier will be added as an `a8c-src-lib` XML attribute to the `<string>` nodes being updated with strings from said library.
   This can be useful to help identify where each string come from in the resulting, merged `strings.xml`. [#351]
 * Add the option for `an_localize_libs` to set the `tools:ignore="UnusedResources"` XML attribute for each string being merged from a library. [#354]
-* Add the ability to run Firebase Test Lab tests. [#355]
 
 ### Bug Fixes
 
