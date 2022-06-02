@@ -5,8 +5,8 @@ require 'fastlane/plugin/wpmreleasetoolkit/version'
 Gem::Specification.new do |spec|
   spec.name          = 'fastlane-plugin-wpmreleasetoolkit'
   spec.version       = Fastlane::Wpmreleasetoolkit::VERSION
-  spec.author        = 'Lorenzo Mattei'
-  spec.email         = 'lore.mattei@gmail.com'
+  spec.author        = 'Automattic'
+  spec.email         = 'mobile@automattic.com'
 
   spec.summary       = 'GitHub helper functions'
   spec.homepage      = 'https://github.com/wordpress-mobile/release-toolkit'

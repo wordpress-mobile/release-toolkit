@@ -33,7 +33,7 @@ module Fastlane
       end
 
       def self.authors
-        ['Jeremy Massel']
+        ['Automattic']
       end
 
       def self.return_value

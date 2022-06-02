@@ -60,7 +60,7 @@ module Fastlane
       end
 
       def self.authors
-        ['Olivier Halligon']
+        ['Automattic']
       end
 
       def self.return_value

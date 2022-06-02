@@ -70,7 +70,7 @@ module Fastlane
       end
 
       def self.authors
-        ['loremattei']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)

@@ -159,7 +159,7 @@ module Fastlane
       end
 
       def self.authors
-        ['automattic']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)
