@@ -86,7 +86,7 @@ module Fastlane
 
               # Look at the transitions table for the current context, and find the first transition matching the current character
               (_, next_context) = TRANSITIONS[state.context].find { |regex, _| c.match?(regex) } || [nil, nil]
-              raise "Invalid character `#{c}` found on line #{line_no + 1}, col #{col_no + 1}" if next_context.nil?
+              raise "Invalid character `#{c}` found on line #{line_no + 1}, col #{col_no + 1}, file #{file}" if next_context.nil?
 
               state.context = next_context.is_a?(Proc) ? next_context.call(state, c) : next_context
               next unless state.found_key
