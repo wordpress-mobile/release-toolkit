@@ -31,6 +31,8 @@ steps:
       git-lfs install
 
       echo "--- :rubygems: Setting up Gems"
+      # https://github.com/Automattic/bash-cache-buildkite-plugin/issues/16
+      gem install bundler
       install_gems
 
       echo "--- :rspec: Run Rspec"
