@@ -43,10 +43,10 @@ module Fastlane
 
       command = Shellwords.join [
         'gcloud', 'firebase', 'test', 'android', 'run',
-        '--type', Shellwords.escape(type),
-        '--app', Shellwords.escape(apk_path),
-        '--test', Shellwords.escape(test_apk_path),
-        '--device', Shellwords.escape(device.to_s),
+        '--type', type,
+        '--app', apk_path,
+        '--test', test_apk_path,
+        '--device', device.to_s,
         '--verbosity', 'info',
       ]
 
