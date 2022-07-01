@@ -76,7 +76,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :apk_path,
-            description: 'The application APK',
+            description: 'Path to the application APK on the local machine',
             type: String,
             verify_block: proc do |value|
               UI.user_error!("Invalid application APK: #{value}") unless File.exist?(value)
@@ -84,7 +84,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :test_apk_path,
-            description: 'The test APK',
+            description: 'Path to the test bundle APK on the local machine',
             type: String,
             verify_block: proc do |value|
               UI.user_error!("Invalid test APK: #{value}") unless File.exist?(value)
