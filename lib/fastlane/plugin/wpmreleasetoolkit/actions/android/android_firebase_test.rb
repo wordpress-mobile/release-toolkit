@@ -61,6 +61,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(
             key: :project_id,
+            # `env_name` comes from the Google Cloud default: https://cloud.google.com/functions/docs/configuring/env-var
             env_name: 'GCP_PROJECT',
             description: 'The Project ID to test in',
             type: String
