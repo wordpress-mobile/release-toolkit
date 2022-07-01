@@ -92,7 +92,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :model,
-            description: 'The device model to run',
+            description: 'The device model to use to run the test',
             type: String,
             verify_block: proc do |value|
               FirebaseTestRunner.verify_has_gcloud_binary!
@@ -102,7 +102,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :version,
-            description: 'The device version to run',
+            description: 'The Android version (API Level) to use to run the test',
             type: Integer,
             verify_block: proc do |value|
               FirebaseTestRunner.verify_has_gcloud_binary!
@@ -112,7 +112,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :locale,
-            description: 'The locale code to run in',
+            description: 'The locale code to use when running the test',
             type: String,
             default_value: 'en',
             verify_block: proc do |value|
@@ -133,7 +133,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :type,
-            description: 'Which type of test are we running?',
+            description: 'The type of test to run (e.g. `instrumentation` or `robo`)',
             type: String,
             default_value: 'instrumentation',
             verify_block: proc do |value|
@@ -149,7 +149,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :results_output_dir,
-            description: 'Where should we store the results of this test run?',
+            description: 'The path to the folder where we will store the results of this test run',
             default_value_dynamic: true,
             type: String
           ),

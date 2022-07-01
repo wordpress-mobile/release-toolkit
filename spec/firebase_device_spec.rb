@@ -76,21 +76,21 @@ describe Fastlane::FirebaseDevice do
 
   describe '.locale_data' do
     it 'runs the right command', :calls_data_providers do
-      expect(Fastlane::Actions).to receive('sh').with('gcloud firebase test android locales list --format="json"', log: false)
+      expect(Fastlane::Actions).to receive('sh').with('gcloud', 'firebase', 'test', 'android', 'locales', 'list', '--format="json"', log: false)
       described_class.locale_data
     end
   end
 
   describe '.model_data' do
     it 'runs the right command', :calls_data_providers do
-      expect(Fastlane::Actions).to receive('sh').with('gcloud firebase test android models list --format="json"', log: false)
+      expect(Fastlane::Actions).to receive('sh').with('gcloud', 'firebase', 'test', 'android', 'models', 'list', '--format="json"', log: false)
       described_class.model_data
     end
   end
 
   describe '.version_data' do
     it 'runs the right command', :calls_data_providers do
-      expect(Fastlane::Actions).to receive('sh').with('gcloud firebase test android versions list --format="json"', log: false)
+      expect(Fastlane::Actions).to receive('sh').with('gcloud', 'firebase', 'test', 'android', 'versions', 'list', '--format="json"', log: false)
       described_class.version_data
     end
   end
