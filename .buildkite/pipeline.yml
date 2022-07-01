@@ -1,7 +1,7 @@
 # Nodes with values to reuse in the pipeline.
 common_params:
   env: &xcode_image
-    IMAGE_ID: xcode-12.5.1
+    IMAGE_ID: xcode-13.4.1
   plugins:
   - &docker_plugin
     docker#v3.8.0:
@@ -31,6 +31,8 @@ steps:
       git-lfs install
 
       echo "--- :rubygems: Setting up Gems"
+      # https://github.com/Automattic/bash-cache-buildkite-plugin/issues/16
+      gem install bundler
       install_gems
 
       echo "--- :rspec: Run Rspec"

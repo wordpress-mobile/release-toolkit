@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-_None_
+* Update the version of Ruby required from `2.6.4` to `2.7.4`. [#377]
 
 ### New Features
 

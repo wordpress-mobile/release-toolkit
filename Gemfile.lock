@@ -91,7 +91,7 @@ GEM
       public_suffix (~> 4.0)
       typhoeus (~> 1.0)
     cocoapods-deintegrate (1.0.5)
-    cocoapods-downloader (1.5.1)
+    cocoapods-downloader (1.6.3)
     cocoapods-plugins (1.0.0)
       nap
     cocoapods-search (1.0.1)
@@ -129,7 +129,7 @@ GEM
       rubocop (~> 1.0)
     declarative (0.0.20)
     diff-lcs (1.4.4)
-    diffy (3.4.0)
+    diffy (3.4.2)
     digest-crc (0.6.4)
       rake (>= 12.0.0, < 14.0.0)
     docile (1.4.0)
@@ -211,7 +211,7 @@ GEM
     fourflusher (2.3.1)
     fuzzy_match (2.0.4)
     gh_inspector (1.1.3)
-    git (1.9.1)
+    git (1.11.0)
       rchardet (~> 1.8)
     google-apis-androidpublisher_v3 (0.12.0)
       google-apis-core (>= 0.4, < 2.a)
@@ -258,7 +258,7 @@ GEM
     httpclient (2.8.3)
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
-    jmespath (1.4.0)
+    jmespath (1.6.1)
     json (2.6.0)
     jsonlint (0.3.0)
       oj (~> 3)
@@ -282,7 +282,7 @@ GEM
     naturally (2.2.1)
     netrc (0.11.0)
     no_proxy_fix (0.1.2)
-    nokogiri (1.13.3)
+    nokogiri (1.13.6)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     octokit (4.21.0)
@@ -324,6 +324,11 @@ GEM
       rspec-core (~> 3.10.0)
       rspec-expectations (~> 3.10.0)
       rspec-mocks (~> 3.10.0)
+    rspec-buildkite-analytics (0.8.1)
+      activesupport (>= 5.2, < 8)
+      rspec-core (~> 3.10)
+      rspec-expectations (~> 3.10)
+      websocket (~> 1.2)
     rspec-core (3.10.1)
       rspec-support (~> 3.10.0)
     rspec-expectations (3.10.1)
@@ -394,6 +399,7 @@ GEM
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
     webrick (1.7.0)
+    websocket (1.2.9)
     word_wrap (1.0.0)
     xcodeproj (1.21.0)
       CFPropertyList (>= 2.3.3, < 4.0)
@@ -422,6 +428,7 @@ DEPENDENCIES
   pry (~> 0.12.2)
   rmagick (~> 4.1)
   rspec (~> 3.8)
+  rspec-buildkite-analytics (~> 0.8.1)
   rspec_junit_formatter (~> 0.4.1)
   rubocop (~> 1.0)
   rubocop-require_tools (~> 0.1.2)
@@ -431,4 +438,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   2.3.11
+   2.3.16
