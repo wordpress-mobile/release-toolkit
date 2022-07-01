@@ -152,7 +152,6 @@ module Fastlane
         DETAILS
       end
 
-      # rubocop:disable Metrics/MethodLength
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(
@@ -259,7 +258,6 @@ module Fastlane
           ),
         ]
       end
-      # rubocop:enable Metrics/MethodLength
 
       def self.return_type
         :integer
