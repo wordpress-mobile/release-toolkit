@@ -68,7 +68,6 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :key_file,
-            env_name: 'GOOGLE_APPLICATION_CREDENTIALS',
             description: 'The key file used to authorize with Google Cloud',
             type: String,
             verify_block: proc do |value|
