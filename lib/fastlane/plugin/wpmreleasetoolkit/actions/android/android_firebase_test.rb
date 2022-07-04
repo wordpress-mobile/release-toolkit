@@ -11,8 +11,8 @@ module Fastlane
       def self.run(params)
         # Log in to Firebase (and validate credentials)
         test_runner = Fastlane::FirebaseTestRunner.new(key_file: params[:key_file])
-        run_uuid = params.fetch(:test_run_id, SecureRandom.uuid)
-        test_dir = params.fetch(:results_output_dir, File.join(Dir.tmpdir(), run_uuid))
+        run_uuid = params[:test_run_id] || SecureRandom.uuid
+        test_dir = params[:results_output_dir] || File.join(Dir.tmpdir(), run_uuid)
 
         # Set up the log file and output directory
         FileUtils.mkdir_p(test_dir)
@@ -145,12 +145,14 @@ module Fastlane
             key: :test_run_id,
             description: 'A unique ID used to identify this test run',
             default_value_dynamic: true,
+            optional: true,
             type: String
           ),
           FastlaneCore::ConfigItem.new(
             key: :results_output_dir,
             description: 'The path to the folder where we will store the results of this test run',
             default_value_dynamic: true,
+            optional: true,
             type: String
           ),
         ]
