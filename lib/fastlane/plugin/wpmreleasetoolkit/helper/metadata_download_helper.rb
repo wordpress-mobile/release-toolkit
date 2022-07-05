@@ -72,7 +72,7 @@ module Fastlane
             UI.message("#{target_locale} translation for #{key} exceeds maximum length (#{message_len}). Switching to the alternate translation.")
             @alternates[data[:alternate_key]] = { desc: data[:desc], max_size: 0 }
           else
-            UI.message("Rejecting #{target_locale} traslation for #{key}: translation length: #{message_len} - max allowed length: #{data[:max_size]}")
+            UI.message("Rejecting #{target_locale} translation for #{key}: translation length: #{message_len} - max allowed length: #{data[:max_size]}")
           end
         else
           save_metadata(target_locale, file[1][:desc], msg)
