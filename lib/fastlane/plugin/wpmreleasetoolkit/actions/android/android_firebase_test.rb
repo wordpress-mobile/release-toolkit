@@ -13,6 +13,11 @@ module Fastlane
         test_runner = Fastlane::FirebaseTestRunner.new(key_file: params[:key_file])
         run_uuid = params[:test_run_id] || SecureRandom.uuid
         test_dir = params[:results_output_dir] || File.join(Dir.tmpdir(), run_uuid)
+        # Ask all those values early even if they are only used later (`download_result_files`) in the action,
+        # so that if it's not provided by the caller, fastlane's interactive prompt will be asked early and
+        # before the tests run, instead of blocking the lane only way later after it started.
+        project_id = params[:project_id]
+        key_file = params[:key_file]
 
         # Set up the log file and output directory
         FileUtils.mkdir_p(test_dir)
@@ -36,8 +41,8 @@ module Fastlane
         test_runner.download_result_files(
           result: result,
           destination: test_dir,
-          project_id: params[:project_id],
-          key_file_path: params[:key_file]
+          project_id: project_id,
+          key_file_path: key_file
         )
 
         FastlaneCore::UI.test_failure! "Firebase Tests failed – more information can be found at #{result.more_details_url}" unless result.success?
