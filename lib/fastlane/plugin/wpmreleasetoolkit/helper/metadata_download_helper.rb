@@ -40,7 +40,7 @@ module Fastlane
           target_files.each do |file|
             if file[0].to_s == key
               data = file[1]
-              msg = is_source ? source : d[1]
+              msg = is_source ? source : d[1].first || '' # In the JSON, each Hash value is an array, with zero or one entry
               update_key(target_locale, key, file, data, msg)
             end
           end
@@ -58,7 +58,7 @@ module Fastlane
             if file[0].to_s == key
               puts "Alternate: #{key}"
               data = file[1]
-              msg = is_source ? source : d[1]
+              msg = is_source ? source : d[1].first || '' # In the JSON, each Hash value is an array, with zero or one entry
               update_key(target_locale, key, file, data, msg)
             end
           end
@@ -66,7 +66,7 @@ module Fastlane
       end
 
       def update_key(target_locale, key, file, data, msg)
-        message_len = msg.to_s.length - 4 # Don't count JSON delimiters.
+        message_len = msg.length
         if (data.key?(:max_size)) && (data[:max_size] != 0) && ((message_len) > data[:max_size])
           if data.key?(:alternate_key)
             UI.message("#{target_locale} translation for #{key} exceeds maximum length (#{message_len}). Switching to the alternate translation.")
