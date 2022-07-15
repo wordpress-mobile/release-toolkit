@@ -38,8 +38,8 @@ module Fastlane
         test_runner.download_result_files(
           result: result,
           destination: test_dir,
-          project_id: project_id,
-          key_file_path: key_file
+          project_id: params[:project_id],
+          key_file_path: params[:key_file]
         )
 
         FastlaneCore::UI.test_failure! "Firebase Tests failed – more information can be found at #{result.more_details_url}" unless result.success?
