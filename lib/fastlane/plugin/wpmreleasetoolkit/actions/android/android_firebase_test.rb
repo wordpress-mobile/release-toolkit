@@ -9,15 +9,12 @@ module Fastlane
 
     class AndroidFirebaseTestAction < Action
       def self.run(params)
+        validate_options(params)
+
         # Log in to Firebase (and validate credentials)
         test_runner = Fastlane::FirebaseTestRunner.new(key_file: params[:key_file])
         run_uuid = params[:test_run_id] || SecureRandom.uuid
         test_dir = params[:results_output_dir] || File.join(Dir.tmpdir(), run_uuid)
-        # Ask all those values early even if they are only used later (`download_result_files`) in the action,
-        # so that if it's not provided by the caller, fastlane's interactive prompt will be asked early and
-        # before the tests run, instead of blocking the lane only way later after it started.
-        project_id = params[:project_id]
-        key_file = params[:key_file]
 
         # Set up the log file and output directory
         FileUtils.mkdir_p(test_dir)
@@ -50,6 +47,15 @@ module Fastlane
         UI.success 'Firebase Tests Complete'
       end
 
+      # Fastlane doesn't eagerly validate options for us, so we'll do it first to have control over
+      # when they're evalutated.
+      def self.validate_options(params)
+        available_options
+          .reject { |opt| opt.optional || !opt.default_value.nil? }
+          .map { |opt| opt.key }
+          .each { |k| params[k] }
+      end
+
       #####################################################
       # @!group Documentation
       #####################################################
@@ -76,7 +82,8 @@ module Fastlane
             description: 'The key file used to authorize with Google Cloud',
             type: String,
             verify_block: proc do |value|
-              UI.user_error!("Invalid key file path: #{value}") unless File.exist?(value)
+              UI.user_error!("The `:key_file` parameter is required") if value.empty?
+              UI.user_error!("No Google Cloud Key file found at: #{value}") unless File.exist?(value)
             end
           ),
           FastlaneCore::ConfigItem.new(
@@ -84,6 +91,7 @@ module Fastlane
             description: 'Path to the application APK on the local machine',
             type: String,
             verify_block: proc do |value|
+              UI.user_error!("The `:apk_path` parameter is required") if value.empty?
               UI.user_error!("Invalid application APK: #{value}") unless File.exist?(value)
             end
           ),
@@ -92,6 +100,7 @@ module Fastlane
             description: 'Path to the test bundle APK on the local machine',
             type: String,
             verify_block: proc do |value|
+              UI.user_error!("The `:test_apk_path` parameter is required") if value.empty?
               UI.user_error!("Invalid test APK: #{value}") unless File.exist?(value)
             end
           ),
@@ -100,6 +109,7 @@ module Fastlane
             description: 'The device model to use to run the test',
             type: String,
             verify_block: proc do |value|
+              UI.user_error!("The `:model` parameter is required") if value.empty?
               FirebaseTestRunner.verify_has_gcloud_binary!
               model_names = Fastlane::FirebaseDevice.valid_model_names
               UI.user_error!("Invalid Model Name: #{value}. Valid Model Names: #{model_names}") unless model_names.include?(value)
