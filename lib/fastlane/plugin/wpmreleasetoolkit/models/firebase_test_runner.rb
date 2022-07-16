@@ -7,24 +7,9 @@ module Fastlane
   class FirebaseTestRunner
     VALID_TEST_TYPES = %w[instrumentation robo].freeze
 
-    def initialize(key_file:, verify_gcloud_binary: true)
-      raise "Unable to find key file: #{key_file}" unless File.file? key_file
-
-      @key_file = key_file
-      @has_authenticated = false
-
+    def initialize(verify_gcloud_binary: true, verify_logged_in: true)
       FirebaseTestRunner.verify_has_gcloud_binary! if verify_gcloud_binary
-    end
-
-    def authenticate_if_needed
-      return if @has_authenticated
-
-      Action.sh(
-        'gcloud', 'auth', 'activate-service-account',
-        '--key-file', @key_file
-      )
-
-      @has_authenticated = true
+      FirebaseTestRunner.verify_logged_in! if verify_logged_in
     end
 
     # Run a given APK and Test Bundle on the given device type.
@@ -38,8 +23,6 @@ module Fastlane
       raise "Unable to find apk: #{apk_path}" unless File.file?(apk_path)
       raise "Unable to find apk: #{test_apk_path}" unless File.file?(test_apk_path)
       raise "Invalid Type: #{type}" unless VALID_TEST_TYPES.include?(type)
-
-      authenticate_if_needed
 
       command = Shellwords.join [
         'gcloud', 'firebase', 'test', 'android', 'run',
@@ -110,6 +93,10 @@ module Fastlane
       Action.sh('command', '-v', 'gcloud', print_command: false, print_command_output: false)
     rescue StandardError
       UI.user_error!("The `gcloud` binary isn't available on this machine. Unable to continue.")
+    end
+
+    def self.verify_logged_in!
+      UI.user_error!('You are not logged into Firebase on this machine. Unable to continue.') unless FirebaseAccount.authenticated?
     end
   end
 end

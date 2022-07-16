@@ -40,15 +40,22 @@ module Fastlane
       end
 
       def locale_data
+        FirebaseDevice.verify_logged_in!
         @locale_data ||= Fastlane::Actions.sh('gcloud', 'firebase', 'test', 'android', 'locales', 'list', '--format="json"', log: false)
       end
 
       def model_data
+        FirebaseDevice.verify_logged_in!
         @model_data ||= Fastlane::Actions.sh('gcloud', 'firebase', 'test', 'android', 'models', 'list', '--format="json"', log: false)
       end
 
       def version_data
+        FirebaseDevice.verify_logged_in!
         @version_data ||= Fastlane::Actions.sh('gcloud', 'firebase', 'test', 'android', 'versions', 'list', '--format="json"', log: false)
+      end
+
+      def verify_logged_in!
+        UI.user_error!('You must call `firebase_login` before creating a FirebaseDevice object') unless FirebaseAccount.authenticated?
       end
     end
   end

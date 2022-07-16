@@ -4,13 +4,7 @@ describe Fastlane::FirebaseTestRunner do
   let(:default_file) { Tempfile.new('file').path }
   let(:runner_temp_file) { Tempfile.new(%w[output log]).path }
 
-  describe '#initialize' do
-    it 'raises for missing key file' do
-      expect { described_class.new(key_file: 'foo') }.to raise_exception('Unable to find key file: foo')
-    end
-  end
-
-  describe '#verify_has_gcloud_binary' do
+  describe '#verify_has_gcloud_binary!' do
     it 'runs the correct command' do
       expect(Fastlane::Action).to receive('sh').with('command', '-v', 'gcloud', { print_command: false, print_command_output: false })
       described_class.verify_has_gcloud_binary!
@@ -23,28 +17,17 @@ describe Fastlane::FirebaseTestRunner do
     end
   end
 
-  describe '.authenticate_if_needed' do
-    subject(:runner) { described_class.new(key_file: __FILE__, verify_gcloud_binary: false) }
-
-    it 'only runs if needed' do
-      runner.instance_variable_set(:@has_authenticated, true)
-      expect(Fastlane::Action).not_to receive('sh')
-
-      runner.authenticate_if_needed
-    end
-
-    it 'runs the right command' do
-      allow(Fastlane::Action).to receive('sh').with('gcloud', 'auth', 'activate-service-account', '--key-file', __FILE__)
-      runner.authenticate_if_needed
+  describe '#verify_logged_in!' do
+    it 'raises if not logged in' do
+      allow(Fastlane::FirebaseAccount).to receive(:authenticated?).and_return(false)
+      expect(Fastlane::UI).to receive(:user_error!)
+      described_class.verify_logged_in!
     end
   end
 
   describe '.run_tests' do
     subject(:runner) do
-      runner = described_class.new(key_file: __FILE__, verify_gcloud_binary: false)
-      runner.instance_variable_set(:@has_authenticated, true)
-
-      runner
+      described_class.new(verify_gcloud_binary: false, verify_logged_in: false)
     end
 
     it 'runs the correct command' do
@@ -95,10 +78,7 @@ describe Fastlane::FirebaseTestRunner do
 
   describe '.download_result_files' do
     subject(:runner) do
-      runner = described_class.new(key_file: __FILE__, verify_gcloud_binary: false)
-      runner.instance_variable_set(:@has_authenticated, true)
-
-      runner
+      described_class.new(verify_gcloud_binary: false, verify_logged_in: false)
     end
 
     let(:empty_test_log) { Fastlane::FirebaseTestLabResult.new(log_file_path: EMPTY_FIREBASE_TEST_LOG_PATH) }
