@@ -472,7 +472,3 @@ Style/ZeroLengthPredicate:
 Style/ClassVars:
   Exclude:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/github_helper.rb'
-
-RSpec/AnyInstance:
-  Exclude:
-    - 'spec/android_firebase_test_spec.rb'

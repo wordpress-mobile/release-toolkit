@@ -83,16 +83,16 @@ describe Fastlane::Actions::AndroidFirebaseTestAction do
 
     it 'raises on test failure' do
       allow(Fastlane::FirebaseAccount).to receive(:authenticated?).and_return(true)
-      allow_any_instance_of(Fastlane::FirebaseTestRunner).to receive(:run_tests).and_return(failed_result)
-      allow_any_instance_of(Fastlane::FirebaseTestRunner).to receive(:download_result_files)
+      allow(Fastlane::FirebaseTestRunner).to receive(:run_tests).and_return(failed_result)
+      allow(Fastlane::FirebaseTestRunner).to receive(:download_result_files)
 
       expect { run_described_fastlane_action(defaults) }.to raise_error(/Firebase Tests failed – more information can be found at /)
     end
 
     it 'prints success message on completion' do
       allow(Fastlane::FirebaseAccount).to receive(:authenticated?).and_return(true)
-      allow_any_instance_of(Fastlane::FirebaseTestRunner).to receive(:run_tests).and_return(success_result)
-      allow_any_instance_of(Fastlane::FirebaseTestRunner).to receive(:download_result_files)
+      allow(Fastlane::FirebaseTestRunner).to receive(:run_tests).and_return(success_result)
+      allow(Fastlane::FirebaseTestRunner).to receive(:download_result_files)
       allow(Fastlane::UI).to receive('success').with('Firebase Tests Complete')
     end
 

@@ -25,11 +25,7 @@ describe Fastlane::FirebaseTestRunner do
     end
   end
 
-  describe '.run_tests' do
-    subject(:runner) do
-      described_class.new(verify_gcloud_binary: false, verify_logged_in: false)
-    end
-
+  describe '#run_tests' do
     it 'runs the correct command' do
       allow(Fastlane::Action).to receive('sh').with("gcloud firebase test android run --type instrumentation --app #{default_file} --test #{default_file} --device device --verbosity info 2>&1 | tee #{runner_temp_file}")
       run_tests
@@ -72,15 +68,11 @@ describe Fastlane::FirebaseTestRunner do
 
     def run_tests(apk_path: default_file, test_apk_path: default_file, device: 'device', type: 'instrumentation')
       Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE_PATH] = runner_temp_file
-      subject.run_tests(apk_path: apk_path, test_apk_path: test_apk_path, device: device, type: type)
+      described_class.run_tests(apk_path: apk_path, test_apk_path: test_apk_path, device: device, type: type)
     end
   end
 
-  describe '.download_result_files' do
-    subject(:runner) do
-      described_class.new(verify_gcloud_binary: false, verify_logged_in: false)
-    end
-
+  describe '#download_result_files' do
     let(:empty_test_log) { Fastlane::FirebaseTestLabResult.new(log_file_path: EMPTY_FIREBASE_TEST_LOG_PATH) }
     let(:passed_test_log) { Fastlane::FirebaseTestLabResult.new(log_file_path: PASSED_FIREBASE_TEST_LOG_PATH) }
 
@@ -93,7 +85,7 @@ describe Fastlane::FirebaseTestRunner do
     end
 
     def run_download(result: passed_test_log, destination: '/tmp/test', project_id: 0, key_file_path: 'invalid')
-      subject.download_result_files(
+      described_class.download_result_files(
         result: result,
         destination: destination,
         project_id: project_id,

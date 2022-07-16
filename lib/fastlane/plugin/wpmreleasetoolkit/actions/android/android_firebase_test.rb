@@ -14,7 +14,6 @@ module Fastlane
         UI.user_error!('You must be logged in to Firebase prior to calling this action. Use the `FirebaseLogin` Action to log in if needed') unless Fastlane::FirebaseAccount.authenticated?
 
         # Log in to Firebase (and validate credentials)
-        test_runner = Fastlane::FirebaseTestRunner.new
         run_uuid = params[:test_run_id] || SecureRandom.uuid
         test_dir = params[:results_output_dir] || File.join(Dir.tmpdir(), run_uuid)
 
@@ -29,7 +28,7 @@ module Fastlane
           orientation: params[:orientation]
         )
 
-        result = test_runner.run_tests(
+        result = FirebaseTestRunner.run_tests(
           apk_path: params[:apk_path],
           test_apk_path: params[:test_apk_path],
           device: device,
@@ -37,7 +36,7 @@ module Fastlane
         )
 
         # Download all of the outputs from the job to the local machine
-        test_runner.download_result_files(
+        FirebaseTestRunner.download_result_files(
           result: result,
           destination: test_dir,
           project_id: params[:project_id],
