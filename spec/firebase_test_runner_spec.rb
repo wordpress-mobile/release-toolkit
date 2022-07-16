@@ -27,7 +27,7 @@ describe Fastlane::FirebaseTestRunner do
 
   describe '#run_tests' do
     it 'runs the correct command' do
-      allow(Fastlane::Action).to receive('sh').with("gcloud firebase test android run --type instrumentation --app #{default_file} --test #{default_file} --device device --verbosity info 2>&1 | tee #{runner_temp_file}")
+      allow(Fastlane::Action).to receive('sh').with("gcloud firebase test android run --project foo-bar-baz --type instrumentation --app #{default_file} --test #{default_file} --device device --verbosity info 2>&1 | tee #{runner_temp_file}")
       run_tests
     end
 
@@ -36,7 +36,7 @@ describe Fastlane::FirebaseTestRunner do
       expected_temp_file_path = File.join(Dir.tmpdir(), 'path\ with\ spaces.txt')
       File.write(temp_file_path, '')
 
-      allow(Fastlane::Action).to receive('sh').with("gcloud firebase test android run --type instrumentation --app #{expected_temp_file_path} --test #{default_file} --device device --verbosity info 2>&1 | tee #{runner_temp_file}")
+      allow(Fastlane::Action).to receive('sh').with("gcloud firebase test android run --project foo-bar-baz --type instrumentation --app #{expected_temp_file_path} --test #{default_file} --device device --verbosity info 2>&1 | tee #{runner_temp_file}")
       run_tests(apk_path: temp_file_path)
     end
 
@@ -45,12 +45,12 @@ describe Fastlane::FirebaseTestRunner do
       expected_temp_file_path = File.join(Dir.tmpdir(), 'path\ with\ spaces.txt')
       File.write(temp_file_path, '')
 
-      allow(Fastlane::Action).to receive('sh').with("gcloud firebase test android run --type instrumentation --app #{default_file} --test #{expected_temp_file_path} --device device --verbosity info 2>&1 | tee #{runner_temp_file}")
+      allow(Fastlane::Action).to receive('sh').with("gcloud firebase test android run --project foo-bar-baz --type instrumentation --app #{default_file} --test #{expected_temp_file_path} --device device --verbosity info 2>&1 | tee #{runner_temp_file}")
       run_tests(test_apk_path: temp_file_path)
     end
 
     it 'properly escapes the device name' do
-      allow(Fastlane::Action).to receive('sh').with("gcloud firebase test android run --type instrumentation --app #{default_file} --test #{default_file} --device Nexus\\ 5 --verbosity info 2>&1 | tee #{runner_temp_file}")
+      allow(Fastlane::Action).to receive('sh').with("gcloud firebase test android run --project foo-bar-baz --type instrumentation --app #{default_file} --test #{default_file} --device Nexus\\ 5 --verbosity info 2>&1 | tee #{runner_temp_file}")
       run_tests(device: 'Nexus 5')
     end
 
@@ -66,9 +66,15 @@ describe Fastlane::FirebaseTestRunner do
       expect { run_tests(type: 'foo') }.to raise_exception('Invalid Type: foo')
     end
 
-    def run_tests(apk_path: default_file, test_apk_path: default_file, device: 'device', type: 'instrumentation')
+    def run_tests(project_id: 'foo-bar-baz', apk_path: default_file, test_apk_path: default_file, device: 'device', type: 'instrumentation')
       Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE_PATH] = runner_temp_file
-      described_class.run_tests(apk_path: apk_path, test_apk_path: test_apk_path, device: device, type: type)
+      described_class.run_tests(
+        project_id: project_id,
+        apk_path: apk_path,
+        test_apk_path: test_apk_path,
+        device: device,
+        type: type
+      )
     end
   end
 
@@ -84,7 +90,7 @@ describe Fastlane::FirebaseTestRunner do
       expect { run_download(result: empty_test_log) }.to raise_exception('Log File doesn\'t contain a raw results URL')
     end
 
-    def run_download(result: passed_test_log, destination: '/tmp/test', project_id: 0, key_file_path: 'invalid')
+    def run_download(result: passed_test_log, destination: '/tmp/test', project_id: 'foo-bar-baz', key_file_path: 'invalid')
       described_class.download_result_files(
         result: result,
         destination: destination,

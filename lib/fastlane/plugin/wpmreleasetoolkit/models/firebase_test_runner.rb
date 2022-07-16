@@ -14,18 +14,20 @@ module Fastlane
 
     # Run a given APK and Test Bundle on the given device type.
     #
+    # @param [String] project_id The Google Firebase Console Project ID.
     # @param [String] apk_path Path to the application APK on disk.
     # @param [String] test_apk_path Path to the test runner APK on disk.
     # @param [FirebaseDevice] device The virtual device to run tests on.
     # @param [String] type The type of test to run.
     #
-    def self.run_tests(apk_path:, test_apk_path:, device:, type: 'instrumentation')
+    def self.run_tests(project_id:, apk_path:, test_apk_path:, device:, type: 'instrumentation')
       raise "Unable to find apk: #{apk_path}" unless File.file?(apk_path)
       raise "Unable to find apk: #{test_apk_path}" unless File.file?(test_apk_path)
       raise "Invalid Type: #{type}" unless VALID_TEST_TYPES.include?(type)
 
       command = Shellwords.join [
         'gcloud', 'firebase', 'test', 'android', 'run',
+        '--project', project_id,
         '--type', type,
         '--app', apk_path,
         '--test', test_apk_path,

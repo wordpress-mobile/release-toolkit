@@ -29,6 +29,7 @@ module Fastlane
         )
 
         result = FirebaseTestRunner.run_tests(
+          project_id: params[:project_id],
           apk_path: params[:apk_path],
           test_apk_path: params[:test_apk_path],
           device: device,
