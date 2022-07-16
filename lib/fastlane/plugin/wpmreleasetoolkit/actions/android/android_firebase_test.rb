@@ -11,7 +11,7 @@ module Fastlane
       def self.run(params)
         validate_options(params)
 
-        UI.user_error!('You must be logged in to Firebase prior to calling this action. Use the `FirebaseLogin` Action to log in if needed.') unless Fastlane::FirebaseAccount.authenticated?
+        UI.user_error!('You must be logged in to Firebase prior to calling this action. Use the `FirebaseLogin` Action to log in if needed') unless Fastlane::FirebaseAccount.authenticated?
 
         # Log in to Firebase (and validate credentials)
         test_runner = Fastlane::FirebaseTestRunner.new
@@ -78,6 +78,15 @@ module Fastlane
             env_name: 'GCP_PROJECT',
             description: 'The Project ID to test in',
             type: String
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :key_file,
+            description: 'The key file used to authorize with Google Cloud',
+            type: String,
+            verify_block: proc do |value|
+              UI.user_error!('The `:key_file` parameter is required') if value.empty?
+              UI.user_error!("No Google Cloud Key file found at: #{value}") unless File.exist?(value)
+            end
           ),
           FastlaneCore::ConfigItem.new(
             key: :apk_path,
