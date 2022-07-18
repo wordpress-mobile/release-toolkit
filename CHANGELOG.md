@@ -6,6 +6,24 @@
 
 ### Breaking Changes
 
+_None_
+
+### New Features
+
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 5.0.0
+
+### Breaking Changes
+
 * Update the version of Ruby required from `2.6.4` to `2.7.4`. [#377]
 
 ### New Features
