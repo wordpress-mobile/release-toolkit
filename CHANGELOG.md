@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Fix metadata length computation logic [[#383](https://github.com/wordpress-mobile/release-toolkit/pull/383)]
 
 ### Internal Changes
 
@@ -55,7 +55,7 @@ _None_
 
 ### New Features
 
-* Add the option for `an_localize_libs` to provide a `source_id` for each library being merged.  
+* Add the option for `an_localize_libs` to provide a `source_id` for each library being merged.
   If provided, that identifier will be added as an `a8c-src-lib` XML attribute to the `<string>` nodes being updated with strings from said library.
   This can be useful to help identify where each string come from in the resulting, merged `strings.xml`. [#351]
 * Add the option for `an_localize_libs` to set the `tools:ignore="UnusedResources"` XML attribute for each string being merged from a library. [#354]
