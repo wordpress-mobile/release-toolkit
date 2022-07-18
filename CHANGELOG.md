@@ -6,11 +6,30 @@
 
 ### Breaking Changes
 
+_None_
+
+### New Features
+
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 5.0.0
+
+### Breaking Changes
+
 * Update the version of Ruby required from `2.6.4` to `2.7.4`. [#377]
 
 ### New Features
 
 * Introduce new `ios_send_app_size_metrics` and `android_send_app_size_metrics` actions. [#364] [#365]
+* Add the ability to run Firebase Test Lab tests. [#355]
 
 ### Bug Fixes
 

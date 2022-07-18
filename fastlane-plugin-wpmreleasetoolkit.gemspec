@@ -38,6 +38,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'progress_bar', '~> 1.3'
   spec.add_dependency 'rake', '>= 12.3', '< 14.0'
   spec.add_dependency 'rake-compiler', '~> 1.0'
+
+  # `google-cloud-storage` is required by fastlane, but we pin it in case it's not in the future
+  spec.add_dependency 'google-cloud-storage', '~> 1.31'
+
   # Some of the upstream code uses `BigDecimal.new` which version 2.0 of the
   # `bigdecimal` gem removed. Until we'll find the time to identify the
   # dependencies and see if we can move them to something compatible with
