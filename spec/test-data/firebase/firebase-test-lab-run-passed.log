@@ -1,0 +1,58 @@
+INFO: Test Service endpoint: [None]
+INFO: Tool Results endpoint: [None]
+
+Have questions, feedback, or issues? Get support by visiting:
+  https://firebase.google.com/support/
+
+INFO: Raw results root path is: [gs://test-lab-wjdmcn8vd90jx-wfb9uburfx80m/2022-04-05_18:37:28.338803_oTen/]
+Uploading [/Users/jkmassel/Projects/woocommerce-android/WooCommerce/build/outputs/apk/vanilla/debug/WooCommerce-vanilla-debug.apk] to Firebase Test Lab...
+Uploading [/Users/jkmassel/Projects/woocommerce-android/WooCommerce/build/outputs/apk/androidTest/vanilla/debug/WooCommerce-vanilla-debug-androidTest.apk] to Firebase Test Lab...
+Raw results will be stored in your GCS bucket at [https://console.developers.google.com/storage/browser/test-lab-wjdmcn8vd90jx-wfb9uburfx80m/2022-04-05_18:37:28.338803_oTen/]
+
+Test [matrix-kxvyandoeuq4a] has been created in the Google Cloud.
+Firebase Test Lab will execute your instrumentation test on 1 device(s).
+Creating individual test executions...
+..............................................................done.
+
+Test results will be streamed to [https://console.firebase.google.com/project/redacted/testlab/histories/bh.edfd947f2636efe3/matrices/4770383643393920434].
+18:37:57 Test is Pending
+18:42:37 Starting attempt 1.
+18:42:37 Test is Running
+18:44:15 Started logcat recording.
+18:44:15 Started crash monitoring.
+18:44:15 Preparing device.
+18:44:51 Logging in to Google account on device.
+18:44:51 Installing apps.
+18:45:52 Retrieving Performance Environment information from the device.
+18:45:52 Setting up Android test.
+18:45:52 Started crash detection.
+18:45:52 Started Out of memory detection
+18:45:52 Started performance monitoring.
+18:45:52 Starting Android test.
+18:46:05 Completed Android test.
+18:46:17 Stopped performance monitoring.
+18:46:17 Tearing down Android test.
+18:46:17 Logging out of Google account on device.
+18:46:29 Stopped crash monitoring.
+18:46:29 Stopped logcat recording.
+18:46:29 Done. Test time = 3 (secs)
+18:46:29 Starting results processing. Attempt: 1
+18:46:41 Completed results processing. Time taken = 6 (secs)
+18:46:41 Test is Finished
+INFO: Test matrix completed in state: FINISHED
+
+Instrumentation testing complete.
+
+More details are available at [https://console.firebase.google.com/project/redacted/testlab/histories/bh.edfd947f2636efe3/matrices/4770383643393920434].
+INFO: Display format: "
+          table[box](
+            outcome.color(red=Fail, green=Pass, blue=Flaky, yellow=Inconclusive),
+            axis_value:label=TEST_AXIS_VALUE,
+            test_details:label=TEST_DETAILS
+          )
+"
+┌─────────┬───────────────────────┬──────────────────────────────────┐
+│ OUTCOME │    TEST_AXIS_VALUE    │           TEST_DETAILS           │
+├─────────┼───────────────────────┼──────────────────────────────────┤
+│ Passed  │ Pixel2-28-en-portrait │ 118 test cases passed, 5 skipped │
+└─────────┴───────────────────────┴──────────────────────────────────┘

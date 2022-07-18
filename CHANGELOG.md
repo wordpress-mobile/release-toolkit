@@ -11,6 +11,7 @@
 ### New Features
 
 * Introduce new `ios_send_app_size_metrics` and `android_send_app_size_metrics` actions. [#364] [#365]
+* Add the ability to run Firebase Test Lab tests. [#355]
 
 ### Bug Fixes
 

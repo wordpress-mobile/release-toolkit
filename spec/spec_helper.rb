@@ -98,3 +98,8 @@ def with_tmp_file(named: nil, content: '')
     File.delete(file_path)
   end
 end
+
+# File Path Helpers
+EMPTY_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'empty.json')
+PASSED_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-test-lab-run-passed.log')
+FAILED_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-test-lab-run-failure.log')
