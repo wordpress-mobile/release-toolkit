@@ -1,7 +1,7 @@
 # Nodes with values to reuse in the pipeline.
 common_params:
   env: &xcode_image
-    IMAGE_ID: xcode-13.4.1
+    IMAGE_ID: xcode-13.4
   plugins:
   - &docker_plugin
     docker#v3.8.0:
@@ -79,7 +79,7 @@ steps:
      - test
      - rubocop
      - danger
-    # Note: We intentionally call a separate `.sh` script here (as opposed to having all the 
+    # Note: We intentionally call a separate `.sh` script here (as opposed to having all the
     # commands written inline) to avoid leaking a key used in the process in clear in the
     # BUILDKITE_COMMAND environment variable.
     command: .buildkite/gem-push.sh
