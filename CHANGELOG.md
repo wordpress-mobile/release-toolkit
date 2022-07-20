@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+* Allow using the `BUILDKITE_API_TOKEN` environment variable for the `buildkite_trigger_build` action. [#386]
 
 ### Bug Fixes
 

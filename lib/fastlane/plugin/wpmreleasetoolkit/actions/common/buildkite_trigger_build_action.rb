@@ -36,7 +36,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(
             key: :buildkite_token,
-            env_name: 'BUILDKITE_TOKEN',
+            env_names: %w[BUILDKITE_TOKEN BUILDKITE_API_TOKEN],
             description: 'Buildkite Personal Access Token',
             type: String,
             sensitive: true
