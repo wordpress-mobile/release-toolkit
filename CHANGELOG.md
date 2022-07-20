@@ -14,11 +14,17 @@ _None_
 
 ### Bug Fixes
 
-- Fix metadata length computation logic [[#383](https://github.com/wordpress-mobile/release-toolkit/pull/383)]
+_None_
 
 ### Internal Changes
 
 _None_
+
+## 5.0.1
+
+### Bug Fixes
+
+- Fix metadata length computation logic [[#383](https://github.com/wordpress-mobile/release-toolkit/pull/383)]
 
 ## 5.0.0
 
