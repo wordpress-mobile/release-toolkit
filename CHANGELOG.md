@@ -10,15 +10,25 @@ _None_
 
 ### New Features
 
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 5.1.0
+
+### New Features
+
 * Allow using the `BUILDKITE_API_TOKEN` environment variable for the `buildkite_trigger_build` action. [#386]
 
 ### Bug Fixes
 
 - Fix metadata length computation logic [[#383](https://github.com/wordpress-mobile/release-toolkit/pull/383)]
-
-### Internal Changes
-
-_None_
 
 ## 5.0.0
 
