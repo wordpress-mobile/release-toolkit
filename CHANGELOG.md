@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Add `tools:ignore="InconsistentArrays"` to `available_languages.xml` to avoid a linter warning on repos hosting multiple app flavors. [#390]
 
 ### Bug Fixes
 

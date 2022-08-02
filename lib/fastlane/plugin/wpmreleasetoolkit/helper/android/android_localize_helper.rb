@@ -212,8 +212,8 @@ module Fastlane
         def self.create_available_languages_file(res_dir:, locale_codes:)
           doc = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
             xml.comment('Warning: Auto-generated file, do not edit.')
-            xml.resources do
-              xml.send(:'string-array', name: 'available_languages', translatable: 'false') do
+            xml.resources('xmlns:tools': 'http://schemas.android.com/tools') do
+              xml.send(:'string-array', name: 'available_languages', translatable: 'false', 'tools:ignore': 'InconsistentArrays') do
                 locale_codes.each { |code| xml.item(code.gsub('-r', '_')) }
               end
             end
