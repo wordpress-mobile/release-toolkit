@@ -60,6 +60,8 @@ module Fastlane
         options[:state] = 'open'
 
         milestones = github_client().list_milestones(repository, options)
+        puts "milestones:"
+        puts "#{milestones}"
         return nil if milestones.nil?
 
         last_stone = nil
