@@ -11,14 +11,17 @@ module Fastlane
         }
 
         client = Buildkit.new(token: params[:buildkite_token])
+        options = {
+          branch: params[:branch],
+          commit: params[:commit],
+          env: params[:environment].merge(pipeline_name),
+          message: params[:message]
+        }.compact # remove entries with `nil` values from the Hash, if any
+
         response = client.create_build(
           params[:buildkite_organization],
           params[:buildkite_pipeline],
-          {
-            branch: params[:branch],
-            commit: params[:commit],
-            env: params[:environment].merge(pipeline_name)
-          }
+          options
         )
 
         response.state == 'scheduled' ? UI.message('Done!') : UI.crash!("Failed to start job\nError: [#{response}]")
@@ -63,6 +66,13 @@ module Fastlane
             description: 'The commit hash you want to build',
             type: String,
             default_value: 'HEAD'
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :message,
+            description: 'A custom message to show for the build in Buildkite\'s UI',
+            type: String,
+            optional: true,
+            default_value: nil
           ),
           FastlaneCore::ConfigItem.new(
             key: :pipeline_file,
