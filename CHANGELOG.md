@@ -28,9 +28,8 @@ _None_
 - Add the ability to provide a custom message for builds triggered via `buildkite_trigger_build` action [#392]
 
 ### Bug Fixes
-* Fixes milestones being compared as strings instead of integers in `github_helper.get_last_milestone` [#391]
 
-_None_
+* Fixes milestones being compared as strings instead of integers in `github_helper.get_last_milestone` [#391]
 
 ## 5.1.0
 
