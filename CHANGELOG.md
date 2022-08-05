@@ -13,6 +13,7 @@ _None_
 _None_
 
 ### Bug Fixes
+* Fixes milestones being compared as strings instead of integers in `github_helper.get_last_milestone` [#391]
 
 _None_
 
