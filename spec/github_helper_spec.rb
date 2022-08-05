@@ -92,6 +92,30 @@ describe Fastlane::Helper::GithubHelper do
     end
   end
 
+  describe 'get_last_milestone' do
+    let(:test_repo) { 'repo-test/project-test' }
+    let(:last_stone) { mock_milestone('10.0') }
+    let(:client) do
+      instance_double(
+        Octokit::Client,
+        list_milestones: ['9.8 ❄️', '9.9'].map { |title| mock_milestone(title) }.append(last_stone)
+      )
+    end
+
+    before do
+      allow(described_class).to receive(:github_client).and_return(client)
+    end
+
+    it 'returns correct milestone' do
+      expect(client).to receive(:list_milestones)
+      expect(described_class.get_last_milestone(repository: test_repo)).to eq(last_stone)
+    end
+
+    def mock_milestone(title)
+      { title: title }
+    end
+  end
+
   describe 'comment_on_pr' do
     let(:client) do
       instance_double(

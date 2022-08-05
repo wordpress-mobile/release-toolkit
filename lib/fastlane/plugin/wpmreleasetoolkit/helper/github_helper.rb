@@ -70,7 +70,7 @@ module Fastlane
           else
             begin
               last_vcomps = last_stone[:title].split[0].split('.')
-              last_stone = mile if mile_vcomps[0] > last_vcomps[0] || mile_vcomps[1] > last_vcomps[1]
+              last_stone = mile if Integer(mile_vcomps[0]) > Integer(last_vcomps[0]) || Integer(mile_vcomps[1]) > Integer(last_vcomps[1])
             rescue StandardError
               puts 'Found invalid milestone'
             end

@@ -13,6 +13,7 @@ _None_
 - Add `tools:ignore="InconsistentArrays"` to `available_languages.xml` to avoid a linter warning on repos hosting multiple app flavors. [#390]
 
 ### Bug Fixes
+* Fixes milestones being compared as strings instead of integers in `github_helper.get_last_milestone` [#391]
 
 _None_
 
