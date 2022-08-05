@@ -11,6 +11,7 @@ _None_
 ### New Features
 
 - Add `tools:ignore="InconsistentArrays"` to `available_languages.xml` to avoid a linter warning on repos hosting multiple app flavors. [#390]
+- Add the ability to provide a custom message for builds triggered via `buildkite_trigger_build` action [#392]
 
 ### Bug Fixes
 * Fixes milestones being compared as strings instead of integers in `github_helper.get_last_milestone` [#391]
