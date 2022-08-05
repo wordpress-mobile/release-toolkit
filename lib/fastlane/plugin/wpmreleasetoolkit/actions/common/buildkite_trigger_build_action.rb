@@ -9,8 +9,6 @@ module Fastlane
         pipeline_name = {
           PIPELINE: params[:pipeline_file]
         }
-
-        client = Buildkit.new(token: params[:buildkite_token])
         options = {
           branch: params[:branch],
           commit: params[:commit],
@@ -18,6 +16,7 @@ module Fastlane
           message: params[:message]
         }.compact # remove entries with `nil` values from the Hash, if any
 
+        client = Buildkit.new(token: params[:buildkite_token])
         response = client.create_build(
           params[:buildkite_organization],
           params[:buildkite_pipeline],
