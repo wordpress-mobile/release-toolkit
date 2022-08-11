@@ -13,6 +13,7 @@ describe Fastlane::Actions::AndroidUpdateReleaseNotesAction do
 
     CONTENT
   end
+
   let(:content) do
     <<~CONTENT
       1.0
