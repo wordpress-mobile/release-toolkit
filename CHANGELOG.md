@@ -24,6 +24,7 @@ _None_
 
 ### New Features
 
+- Add optional `release_notes_file_path` to `ios_update_release_notes` and `android_update_release_notes` [#396]
 - Adds support for custom milestone duration [#397]
 
 ## 5.2.0
@@ -32,7 +33,6 @@ _None_
 
 - Add `tools:ignore="InconsistentArrays"` to `available_languages.xml` to avoid a linter warning on repos hosting multiple app flavors. [#390]
 - Add the ability to provide a custom message for builds triggered via `buildkite_trigger_build` action [#392]
-- Add optional `release_notes_file_path` to `ios_update_release_notes` and `android_update_release_notes` [#396]
 
 ### Bug Fixes
 
