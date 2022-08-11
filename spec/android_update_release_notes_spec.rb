@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe Fastlane::Actions::AndroidUpdateReleaseNotesAction do
+  after do
+    ENV['PROJECT_ROOT_FOLDER'] = nil
+  end
+
   describe '#android_update_release_notes' do
     it 'adds a new section on RELEASE-NOTES.txt' do
       in_tmp_dir do |tmp_dir|
