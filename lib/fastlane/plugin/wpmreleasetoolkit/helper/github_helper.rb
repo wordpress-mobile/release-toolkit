@@ -80,9 +80,13 @@ module Fastlane
         last_stone
       end
 
-      def self.create_milestone(repository, newmilestone_number, newmilestone_duedate, need_submission)
-        submission_date = need_submission ? newmilestone_duedate.to_datetime.next_day(11) : newmilestone_duedate.to_datetime.next_day(14)
-        release_date = newmilestone_duedate.to_datetime.next_day(14)
+      def self.create_milestone(repository, newmilestone_number, newmilestone_duedate, newmilestone_duration, number_of_days_from_code_freeze_to_release, need_submission)
+        # If there is a review process, we want to submit the binary 3 days before its release
+        #
+        # Using 3 days is mostly for historical reasons where we release the apps on Monday and submit them on Friday.
+        days_until_submission = need_submission ? (number_of_days_from_code_freeze_to_release - 3) : newmilestone_duration
+        submission_date = newmilestone_duedate.to_datetime.next_day(days_until_submission)
+        release_date = newmilestone_duedate.to_datetime.next_day(number_of_days_from_code_freeze_to_release)
         comment = "Code freeze: #{newmilestone_duedate.to_datetime.strftime('%B %d, %Y')} App Store submission: #{submission_date.strftime('%B %d, %Y')} Release: #{release_date.strftime('%B %d, %Y')}"
 
         options = {}
