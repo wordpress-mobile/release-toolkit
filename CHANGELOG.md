@@ -22,6 +22,10 @@ _None_
 
 ## 5.3.0
 
+### New Features
+
+- Adds support for custom milestone duration [#397]
+
 ## 5.2.0
 
 ### New Features
