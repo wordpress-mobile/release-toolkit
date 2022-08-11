@@ -37,25 +37,25 @@ describe Fastlane::Actions::IosUpdateReleaseNotesAction do
       end
     end
   end
-
-  FAKE_CONTENT = <<~CONTENT
-    1.0
-    -----
-    - Item 1 for v1.0
-    - Item 2 for v1.0
-
-    // Comment in the middle
-
-    0.9.0
-    -----
-    - Item 1 for v0.9.0
-    - Item 2 for v0.9.0
-  CONTENT
-
-  NEW_SECTION = <<~CONTENT
-    1.1
-    -----
-
-
-  CONTENT
 end
+
+FAKE_CONTENT = <<~CONTENT.freeze
+  1.0
+  -----
+  - Item 1 for v1.0
+  - Item 2 for v1.0
+
+  // Comment in the middle
+
+  0.9.0
+  -----
+  - Item 1 for v0.9.0
+  - Item 2 for v0.9.0
+CONTENT
+
+NEW_SECTION = <<~CONTENT.freeze
+  1.1
+  -----
+
+
+CONTENT
