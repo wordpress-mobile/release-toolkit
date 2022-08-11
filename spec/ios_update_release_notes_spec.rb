@@ -7,7 +7,7 @@ describe Fastlane::Actions::IosUpdateReleaseNotesAction do
         # Arrange
         ENV['PROJECT_ROOT_FOLDER'] = tmp_dir
         release_notes_txt = File.join(tmp_dir, 'RELEASE-NOTES.txt')
-        File.write(release_notes_txt, FAKE_CONTENT)
+        File.write(release_notes_txt, IOS_FAKE_CONTENT)
 
         # Act
         run_described_fastlane_action(
@@ -15,7 +15,7 @@ describe Fastlane::Actions::IosUpdateReleaseNotesAction do
         )
 
         # Assert
-        expect(File.read(release_notes_txt)).to eq(NEW_SECTION + FAKE_CONTENT)
+        expect(File.read(release_notes_txt)).to eq(IOS_NEW_SECTION + IOS_FAKE_CONTENT)
       end
     end
 
@@ -24,7 +24,7 @@ describe Fastlane::Actions::IosUpdateReleaseNotesAction do
         # Arrange
         ENV['PROJECT_ROOT_FOLDER'] = tmp_dir
         changelog_md = File.join(tmp_dir, 'CHANGELOG.md')
-        File.write(changelog_md, FAKE_CONTENT)
+        File.write(changelog_md, IOS_FAKE_CONTENT)
 
         # Act
         run_described_fastlane_action(
@@ -33,13 +33,13 @@ describe Fastlane::Actions::IosUpdateReleaseNotesAction do
         )
 
         # Assert
-        expect(File.read(changelog_md)).to eq(NEW_SECTION + FAKE_CONTENT)
+        expect(File.read(changelog_md)).to eq(IOS_NEW_SECTION + IOS_FAKE_CONTENT)
       end
     end
   end
 end
 
-FAKE_CONTENT = <<~CONTENT.freeze
+IOS_FAKE_CONTENT = <<~CONTENT.freeze
   1.0
   -----
   - Item 1 for v1.0
@@ -53,7 +53,7 @@ FAKE_CONTENT = <<~CONTENT.freeze
   - Item 2 for v0.9.0
 CONTENT
 
-NEW_SECTION = <<~CONTENT.freeze
+IOS_NEW_SECTION = <<~CONTENT.freeze
   1.1
   -----
 
