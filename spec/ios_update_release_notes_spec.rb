@@ -1,10 +1,6 @@
 require 'spec_helper'
 
 describe Fastlane::Actions::IosUpdateReleaseNotesAction do
-  after do
-    ENV['PROJECT_ROOT_FOLDER'] = nil
-  end
-
   let(:new_section) do
     <<~CONTENT
       1.1
@@ -34,7 +30,6 @@ describe Fastlane::Actions::IosUpdateReleaseNotesAction do
     it 'adds a new section on RELEASE-NOTES.txt' do
       in_tmp_dir do |tmp_dir|
         # Arrange
-        ENV['PROJECT_ROOT_FOLDER'] = tmp_dir
         release_notes_txt = File.join(tmp_dir, 'RELEASE-NOTES.txt')
         File.write(release_notes_txt, content)
 
@@ -51,7 +46,6 @@ describe Fastlane::Actions::IosUpdateReleaseNotesAction do
     it 'adds a new section on the given file' do
       in_tmp_dir do |tmp_dir|
         # Arrange
-        ENV['PROJECT_ROOT_FOLDER'] = tmp_dir
         changelog_md = File.join(tmp_dir, 'CHANGELOG.md')
         File.write(changelog_md, content)
 
