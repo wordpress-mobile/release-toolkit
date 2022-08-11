@@ -12,10 +12,11 @@ module Fastlane
         last_stone = Fastlane::Helper::GithubHelper.get_last_milestone(repository)
         UI.message("Last detected milestone: #{last_stone[:title]} due on #{last_stone[:due_on]}.")
         milestone_duedate = last_stone[:due_on]
-        newmilestone_duedate = (milestone_duedate.to_datetime.next_day(14).to_time).utc
+        newmilestone_duration = params[:milestone_duration]
+        newmilestone_duedate = (milestone_duedate.to_datetime.next_day(newmilestone_duration).to_time).utc
         newmilestone_number = Fastlane::Helper::Ios::VersionHelper.calc_next_release_version(last_stone[:title])
         UI.message("Next milestone: #{newmilestone_number} due on #{newmilestone_duedate}.")
-        Fastlane::Helper::GithubHelper.create_milestone(repository, newmilestone_number, newmilestone_duedate, params[:need_appstore_submission])
+        Fastlane::Helper::GithubHelper.create_milestone(repository, newmilestone_number, newmilestone_duedate, newmilestone_duration, params[:need_appstore_submission])
       end
 
       def self.description
@@ -48,6 +49,12 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        default_value: false),
+          FastlaneCore::ConfigItem.new(key: :milestone_duration,
+                                       env_name: 'GHHELPER_MILESTONE_DURATION',
+                                       description: 'Milestone duration in number of days',
+                                       optional: true,
+                                       is_string: false,
+                                       default_value: 14),
         ]
       end
 
