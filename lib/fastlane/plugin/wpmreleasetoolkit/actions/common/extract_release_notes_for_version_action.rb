@@ -58,7 +58,7 @@ module Fastlane
 
       def self.details
         # Optional:
-        'Creates a release and uploads the provided assets'
+        'Given a file containing release notes and a version, extracts the notes for that version into a dedicated file.'
       end
 
       def self.available_options
