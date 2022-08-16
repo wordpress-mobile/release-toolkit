@@ -73,43 +73,20 @@ module Fastlane
         end
       end
 
-      # Process a JSON export downloaded from GlotPress, extract keys and translations from it based on the passed `MetadataRules`, and yield each found entry to the caller
+      # Takes a GlotPress JSON export and transform it to a simple `Hash` of key => value pairs
       #
-      # @param [#read] io
-      # @param [Array<MetadataRule>] rules List of rules for each key
-      # @param [Block] rule_for_unknown_key An optional block called when a key that does not match any of the rules is encountered.
-      #        The block will receive a [String] (key) and must return a `MetadataRule` instance (or nil)
+      # Since the JSON format for GlotPress exports is a bit odd, with JSON keys actually being a concatenation of actual
+      # copy key and source copy, and values being an array, this allows us to convert this odd export format to a more
+      # usable structure.
       #
-      # @yield [String, MetadataRule, String] yield each (key,matching_rule,value) tuple found in the JSON, after resolving alternates for values exceeding max length
-      #
-      def self.process_json_export(io:, rules:, rule_for_unknown_key:)
+      # @param [#read] io The `File` or `IO` to read the JSON data exported from GlotPress
+      def parse_json_export(io:)
         json = JSON.parse(io.read)
-        json.each do |composite_key, values|
-          key = composite_key.split(/\u0004/).first # composite_key is a concatenation of key + \u0004 + source
-          next if key.nil? || key.end_with?('_short') # skip if alternate key
+        json.map do |composite_key, values|
+          key = composite_key.split(/\u0004/).first # composite_key is a concatenation of key + \u0004 + source]
           value = values.first # Each value in the JSON Hash is an Array of all the translations; but if we provided the right filter, the first one should always be the right one
-
-          rule = rules.find { |r| r.key == key }
-          rule = rule_for_unknown_key.call(key) if rule.nil? && !rule_for_unknown_key.nil?
-          next if rule.nil?
-
-          if rule.max_len != nil && value.length > rule.max_len
-            UI.warning "Translation for #{key} is too long (#{value.length}), trying shorter alternate #{key}."
-            short_key = "#{key}_short"
-            value = json[short_key]&.first
-            if value.nil?
-              UI.warning "No shorter alternate (#{short_key}) available, skipping entirely."
-              yield key, rule, nil
-              next
-            end
-            if value.length > rule.max_len
-              UI.warning "Translation alternate for #{short_key} was too long too (#{value.length}), skipping entirely."
-              yield short_key, rule, nil
-              next
-            end
-          end
-          yield key, rule, value
-        end
+          [key, value]
+        end.to_h
       end
     end # class
   end # module
