@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Add a `test_targets` parameter to the `android_firebase_test` action to be able to filter the tests to be run. [#403]
 
 ### Bug Fixes
 
