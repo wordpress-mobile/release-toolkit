@@ -70,6 +70,7 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
         stub = gp_stub(locale: 'unknown-locale', query: { 'filters[status]': 'current', format: 'strings' }).to_return(status: [404, 'Not Found'])
         error_messages = []
         allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+        allow(FastlaneCore::UI).to receive(:confirm).and_return(false) # as we will be asked if we want to retry when getting a network error
 
         # Act
         run_described_fastlane_action(
