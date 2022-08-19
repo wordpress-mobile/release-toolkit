@@ -33,6 +33,7 @@ module Fastlane
           apk_path: params[:apk_path],
           test_apk_path: params[:test_apk_path],
           device: device,
+          test_targets: params[:test_targets],
           type: params[:type]
         )
 
@@ -105,6 +106,13 @@ module Fastlane
               UI.user_error!('The `:test_apk_path` parameter is required') if value.empty?
               UI.user_error!("Invalid test APK: #{value}") unless File.exist?(value)
             end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :test_targets,
+            description: 'A list of one or more test target filters to apply',
+            type: String,
+            optional: true,
+            default_value: nil
           ),
           FastlaneCore::ConfigItem.new(
             key: :model,

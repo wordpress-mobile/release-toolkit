@@ -31,6 +31,13 @@ describe Fastlane::FirebaseTestRunner do
       run_tests
     end
 
+    it 'includes and properly escapes the test targets if any are provided' do
+      allow(Fastlane::Action).to receive('sh').with(
+        "gcloud firebase test android run --project foo-bar-baz --type instrumentation --app #{default_file} --test #{default_file} --test-targets notPackage\\ org.wordpress.android.ui.screenshots --device device --verbosity info 2>&1 | tee #{runner_temp_file}"
+      )
+      run_tests(test_targets: 'notPackage org.wordpress.android.ui.screenshots')
+    end
+
     it 'properly escapes the app path' do
       temp_file_path = File.join(Dir.tmpdir(), 'path with spaces.txt')
       expected_temp_file_path = File.join(Dir.tmpdir(), 'path\ with\ spaces.txt')
@@ -66,13 +73,14 @@ describe Fastlane::FirebaseTestRunner do
       expect { run_tests(type: 'foo') }.to raise_exception('Invalid Type: foo')
     end
 
-    def run_tests(project_id: 'foo-bar-baz', apk_path: default_file, test_apk_path: default_file, device: 'device', type: 'instrumentation')
+    def run_tests(project_id: 'foo-bar-baz', apk_path: default_file, test_apk_path: default_file, device: 'device', test_targets: nil, type: 'instrumentation')
       Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE_PATH] = runner_temp_file
       described_class.run_tests(
         project_id: project_id,
         apk_path: apk_path,
         test_apk_path: test_apk_path,
         device: device,
+        test_targets: test_targets,
         type: type
       )
     end

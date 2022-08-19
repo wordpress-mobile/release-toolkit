@@ -20,20 +20,21 @@ module Fastlane
     # @param [FirebaseDevice] device The virtual device to run tests on.
     # @param [String] type The type of test to run.
     #
-    def self.run_tests(project_id:, apk_path:, test_apk_path:, device:, type: 'instrumentation')
+    def self.run_tests(project_id:, apk_path:, test_apk_path:, device:, test_targets: nil, type: 'instrumentation')
       raise "Unable to find apk: #{apk_path}" unless File.file?(apk_path)
       raise "Unable to find apk: #{test_apk_path}" unless File.file?(test_apk_path)
       raise "Invalid Type: #{type}" unless VALID_TEST_TYPES.include?(type)
 
-      command = Shellwords.join [
-        'gcloud', 'firebase', 'test', 'android', 'run',
-        '--project', project_id,
-        '--type', type,
-        '--app', apk_path,
-        '--test', test_apk_path,
-        '--device', device.to_s,
-        '--verbosity', 'info',
-      ]
+      params = {
+        project: project_id,
+        type: type,
+        app: apk_path,
+        test: test_apk_path,
+        'test-targets': test_targets,
+        device: device.to_s,
+        verbosity: 'info'
+      }.compact.flat_map { |k, v| ["--#{k}", v] }
+      command = Shellwords.join(['gcloud', 'firebase', 'test', 'android', 'run', *params])
 
       log_file_path = Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE_PATH]
 
