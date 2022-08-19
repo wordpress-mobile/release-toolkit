@@ -10,8 +10,7 @@ _None_
 
 ### New Features
 
-- Propose to retry when the download of GlotPress translations failed for a locale (especially useful for occurrences of `429 - Too Many Requests` quota limits) [#402]
-- Add a `test_targets` parameter to the `android_firebase_test` action to be able to filter the tests to be run. [#403]
+_None_
 
 ### Bug Fixes
 
@@ -20,6 +19,13 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 5.4.0
+
+### New Features
+
+- Propose to retry when the download of GlotPress translations failed for a locale (especially useful for occurrences of `429 - Too Many Requests` quota limits) [#402]
+- Add a `test_targets` parameter to the `android_firebase_test` action to be able to filter the tests to be run. [#403]
 
 ## 5.3.0
 
