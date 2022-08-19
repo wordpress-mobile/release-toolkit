@@ -31,7 +31,7 @@ describe Fastlane::FirebaseTestRunner do
       run_tests
     end
 
-    it 'includes and properly escape the test filters if any are provided' do
+    it 'includes and properly escapes the test targets if any are provided' do
       allow(Fastlane::Action).to receive('sh').with(
         "gcloud firebase test android run --project foo-bar-baz --type instrumentation --app #{default_file} --test #{default_file} --test-targets notPackage\\ org.wordpress.android.ui.screenshots --device device --verbosity info 2>&1 | tee #{runner_temp_file}"
       )
