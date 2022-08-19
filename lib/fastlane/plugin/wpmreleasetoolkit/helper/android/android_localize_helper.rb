@@ -291,6 +291,7 @@ module Fastlane
             uri.open(options) { |f| Nokogiri::XML(f.read.gsub("\t", '    '), nil, Encoding::UTF_8.to_s) }
           rescue StandardError => e
             UI.error "Error downloading #{locale} - #{e.message}"
+            retry if e.is_a?(OpenURI::HTTPError) && UI.confirm("Retry downloading `#{locale}`?")
             return nil
           end
         end

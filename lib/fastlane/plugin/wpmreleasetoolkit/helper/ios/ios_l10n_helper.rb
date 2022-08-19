@@ -152,6 +152,7 @@ module Fastlane
             IO.copy_stream(uri.open(options), destination)
           rescue StandardError => e
             UI.error "Error downloading locale `#{locale}` — #{e.message} (#{uri})"
+            retry if e.is_a?(OpenURI::HTTPError) && UI.confirm("Retry downloading `#{locale}`?")
             return nil
           end
         end
