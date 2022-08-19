@@ -260,6 +260,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
         stub = stub_request(:get, "#{gp_fake_url}/invalid/default/export-translations/").with(query: { format: 'strings' }).to_return(status: [404, 'Not Found'])
         error_messages = []
         allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+        allow(FastlaneCore::UI).to receive(:confirm).and_return(false) # as we will be asked if we want to retry when getting a network error
         dest = StringIO.new
         # Act
         described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'invalid', filters: nil, destination: dest)

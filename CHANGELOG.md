@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Propose to retry when the download of GlotPress translations failed for a locale (especially useful for occurrences of `429 - Too Many Requests` quota limits) [#402]
 
 ### Bug Fixes
 
