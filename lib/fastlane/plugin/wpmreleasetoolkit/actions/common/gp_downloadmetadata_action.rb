@@ -20,13 +20,13 @@ module Fastlane
         params[:locales].each do |loc|
           if loc.is_a?(Array)
             UI.message "Downloading language: #{loc[1]}"
-            complete_url = "#{params[:project_url]}#{loc[0]}/default/export-translations?filters[status]=current&format=json"
+            complete_url = "#{params[:project_url]}#{loc[0]}/default/export-translations/?filters[status]=current&format=json"
             downloader.download(loc[1], complete_url, loc[1] == params[:source_locale])
           end
 
           if loc.is_a?(String)
             UI.message "Downloading language: #{loc}"
-            complete_url = "#{params[:project_url]}#{loc}/default/export-translations?filters[status]=current&format=json"
+            complete_url = "#{params[:project_url]}#{loc}/default/export-translations/?filters[status]=current&format=json"
             downloader.download(loc, complete_url, loc == params[:source_locale])
           end
         end
