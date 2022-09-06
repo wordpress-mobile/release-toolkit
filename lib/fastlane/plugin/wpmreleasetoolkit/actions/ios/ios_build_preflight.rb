@@ -33,7 +33,6 @@ module Fastlane
           raise
         end
 
-        Action.sh('rake dependencies:pod:clean')
         other_action.cocoapods()
       end
 
