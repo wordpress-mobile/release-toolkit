@@ -102,22 +102,24 @@ module Fastlane
         case response.code
         when '200'
           # All good, parse the result
+          UI.success("Successfully downloaded `#{locale}`.")
           @alternates.clear
           loc_data = JSON.parse(response.body) rescue loc_data = nil
           parse_data(locale, loc_data, is_source)
           reparse_alternates(target_locale, loc_data, is_source) unless @alternates.length == 0
         when '301'
           # Follow the redirect
+          UI.message("Received 301 for `#{locale}`. Following redirect...")
           download(locale, response.header['location'], is_source)
         when '429'
           # We got rate-limited, offer to try again
           if UI.confirm("Retry downloading `#{locale}` after receiving 429 from the API?")
             download(locale, response.uri, is_source)
           else
-            UI.message("Giving up on attempting to download #{locale}.")
+            UI.error("Abandoning `#{locale}` download as requested.")
           end
         else
-          UI.error("Received unexpected #{response.code} from request to URI #{response.uri}")
+          UI.error("Received unexpected #{response.code} from request to URI #{response.uri}.")
         end
       end
     end
