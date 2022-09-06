@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-_None_
+- Propose to retry when `gp_downloadmetadata` receives a `429 - Too Many Requests` error. [#406]
 
 ### New Features
 
@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Update the URL used by `gp_downloadmetadata` to prevent consistent `301` responses. [#406]
 
 ### Internal Changes
 
