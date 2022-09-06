@@ -119,7 +119,8 @@ module Fastlane
             UI.error("Abandoning `#{locale}` download as requested.")
           end
         else
-          UI.error("Received unexpected #{response.code} from request to URI #{response.uri}.")
+          message = "Received unexpected #{response.code} from request to URI #{response.uri}."
+          UI.abort_with_message!(message) unless UI.confirm("#{message} Continue anyway?")
         end
       end
     end
