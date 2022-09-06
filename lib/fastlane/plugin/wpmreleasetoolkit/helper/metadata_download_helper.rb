@@ -16,12 +16,7 @@ module Fastlane
       def download(target_locale, glotpress_url, is_source)
         uri = URI(glotpress_url)
         response = Net::HTTP.get_response(uri)
-        response = Net::HTTP.get_response(URI.parse(response.header['location'])) if response.code == '301'
-
-        @alternates.clear
-        loc_data = JSON.parse(response.body) rescue loc_data = nil
-        parse_data(target_locale, loc_data, is_source)
-        reparse_alternates(target_locale, loc_data, is_source) unless @alternates.length == 0
+        handle_glotpress_download(response: response, locale: target_locale, is_source: is_source)
       end
 
       # Parse JSON data and update the local files
@@ -99,6 +94,31 @@ module Fastlane
 
       def get_target_file_path(locale, file_name)
         "#{@target_folder}/#{locale}/#{file_name}"
+      end
+
+      private
+
+      def handle_glotpress_download(response:, locale:, is_source:)
+        case response.code
+        when '200'
+          # All good, parse the result
+          @alternates.clear
+          loc_data = JSON.parse(response.body) rescue loc_data = nil
+          parse_data(locale, loc_data, is_source)
+          reparse_alternates(target_locale, loc_data, is_source) unless @alternates.length == 0
+        when '301'
+          # Follow the redirect
+          download(locale, response.header['location'], is_source)
+        when '429'
+          # We got rate-limited, offer to try again
+          if UI.confirm("Retry downloading `#{locale}` after receiving 429 from the API?")
+            download(locale, response.uri, is_source)
+          else
+            UI.message("Giving up on attempting to download #{locale}.")
+          end
+        else
+          UI.error("Received unexpected #{response.code} from request to URI #{response.uri}")
+        end
       end
     end
   end
