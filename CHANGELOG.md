@@ -6,11 +6,11 @@
 
 ### Breaking Changes
 
-- Propose to retry when `gp_downloadmetadata` receives a `429 - Too Many Requests` error. [#406]
+_None_
 
 ### New Features
 
-_None_
+- Propose to retry when `gp_downloadmetadata` receives a `429 - Too Many Requests` error. [#406]
 
 ### Bug Fixes
 
@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Remove call to `rake dependencies:pod:clean` from `ios_build_preflight` [#407]
 
 ## 5.4.0
 
