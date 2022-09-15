@@ -10,6 +10,20 @@ _None_
 
 ### New Features
 
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 5.5.0
+
+### New Features
+
 - Propose to retry when `gp_downloadmetadata` receives a `429 - Too Many Requests` error. [#406]
 
 ### Bug Fixes
