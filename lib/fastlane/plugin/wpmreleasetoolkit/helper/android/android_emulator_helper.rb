@@ -1,0 +1,162 @@
+module Fastlane
+  module Helper
+    module Android
+      # Helper methods to manipulate System Images, AVDs and Android Emulators
+      #
+      class EmulatorHelper
+        BOOT_WAIT = 2
+        BOOT_TIMEOUT = 60
+
+        SHUTDOWN_WAIT = 2
+        SHUTDOWN_TIMEOUT = 60
+
+        def initialize
+          @tools = Fastlane::Helper::Android::ToolsPathHelper.new
+        end
+
+        # Installs the system-image suitable for a given Android `api`, with `google_apis`, and for the current machine's architecture
+        #
+        # @param [Integer] api The Android API level to use
+        #
+        # @return [String] The `sdkmanager` package specifier that has been installed
+        #
+        def install_system_image(api:)
+          package = system_image_package(api: api)
+
+          UI.message("Installing System Image for Android #{api} (#{package})")
+          Actions.sh(@tools.sdkmanager, '--install', package)
+          UI.success("System Image #{package} successfully installed.")
+          package
+        end
+
+        # Create an emulator (AVD) for a given `api` number and `device` model
+        #
+        # @param [Integer] api The Android API level to use for this AVD
+        # @param [String] device The Device Model to use for this AVD. Valid values can be found using `avdmanager list devices`
+        # @param [String] name The name to give for the created AVD. Defaults to `<device>_API_<api>`.
+        # @param [String] sdcard The size of the SD card for this device. Defaults to `512M`.
+        #
+        # @return [String] The device name (i.e. either `name` if provided, or the derived `<device>_API_<api>` if provided `name` was `nil``)
+        #
+        def create_avd(api:, device:, system_image: nil, name: nil, sdcard: '512M')
+          package = system_image || system_image_package(api: api)
+          device_name = name || "#{device.gsub(' ', '_').capitalize}_API_#{api}"
+
+          UI.message("Creating AVD `#{device_name}` (#{device}, API #{api})")
+
+          Actions.sh(
+            @tools.avdmanager, 'create', 'avd',
+            '--force',
+            '--package', package,
+            '--device', device,
+            '--sdcard', sdcard,
+            '--name', device_name
+          )
+
+          UI.success("AVD `#{device_name}` successfully created.")
+
+          device_name
+        end
+
+        # Launch the emulator for the given AVD, then return the emulator serial
+        #
+        # @param [String] name name of the AVD to launch
+        # @param [Boolean] cold_boot if true, will do a cold boot, if false will try to use a previous snapshot of the device
+        # @param [Boolean] wipe_data if true, will wipe the emulator (i.e. reset the user data image)
+        #
+        # @return [String] emulator serial number corresponding to the launched AVD
+        #
+        def launch_avd(name:, cold_boot: true, wipe_data: true)
+          port = '5554'.freeze
+          serial = "emulator-#{port}"
+
+          shut_down_emulators!(serials: [serial]) # To ensure we can launch one on the port 5554 (as it's hardcoded for simplicity)
+
+          UI.message("Launching emulator for #{name}")
+
+          params = ['-avd', name, '-port', port]
+          params << '-no-snapshot' if cold_boot
+          params << '-wipe-data' if wipe_data
+
+          command = [@tools.emulator, *params].shelljoin + ' >/dev/null 2>/dev/null &'
+          UI.command(command)
+          system(command) # We can't use Actions.sh here because it doesn't handle `&` to run the process in the background :/
+
+          UI.message('Waiting for device to finish booting...')
+          Actions.sh(@tools.adb, '-s', serial, 'wait-for-device')
+          retry_loop(time_between_retries: BOOT_WAIT, timeout: BOOT_TIMEOUT, description: 'waiting for device to finish booting') do
+            Actions.sh(@tools.adb, '-s', serial, 'shell', 'getprop', 'sys.boot_completed').chomp == '1'
+          end
+
+          UI.success("Emulator #{name} successfully booted as `#{serial}`.")
+
+          serial
+        end
+
+        # @return [Array<Fastlane::Helper::AdbDevice>] List of currently booted emulators
+        #
+        def running_emulators
+          helper = Fastlane::Helper::AdbHelper.new(adb_path: @tools.adb)
+          helper.load_all_devices.select { |device| device.serial.include?('emulator') }
+        end
+
+        # Trigger a shutdown for all running emulators, and wait until there is no more emulator running.
+        #
+        # @param [Array<String>] serials List of emulator serials to shut down. Will shut down all of them if `nil`.
+        #
+        def shut_down_emulators!(serials: nil)
+          UI.message("Shutting down #{serials || 'all'} emulator(s)...")
+
+          emulators_list = running_emulators.map(&:serial)
+          # Get the intersection of the set of running emulators with the ones we want to shut down
+          emulators_list &= serials unless serials.nil?
+          emulators_list.each do |e|
+            Actions.sh(@tools.adb, '-s', e, 'emu', 'kill') { |_| } # ignore error if no emulator with specified serial is running
+
+            # Note: Alternative way of shutting down emulator would be to call the following command instead, which shuts down the emulator more gracefully:
+            # `adb -s #{e} shell reboot -p` # In case you're wondering, `-p` is for "power-off"
+            # But this alternate command:
+            #  - Requires that `-no-snapshot` was used on boot (to avoid being prompted to save current state on shutdown)
+            #  - Disconnects the emulator from `adb` (and thus disappear from `adb devices -l`) for a short amount of time,
+            #    before reconnecting to it but in an `offline` state, until `emulator` finally completely quits and it disappears
+            #    again (for good) from `adb devices --list`.
+            # This means that so if we used alternative, we couldn't really retry_loop until emulator disappears from `running_emulators` to detect
+            # that the shutdown was really complete, as we might as well accidentally detect the intermediate disconnect instead.
+          end
+
+          # Wait until all emulators are killed
+          retry_loop(time_between_retries: SHUTDOWN_WAIT, timeout: SHUTDOWN_TIMEOUT, description: 'waiting for devices to shutdown') do
+            (emulators_list & running_emulators.map(&:serial)).empty?
+          end
+
+          UI.success('All emulators are now shut down.')
+        end
+
+        # Find the system-images package for the provided API, with Google APIs, and matching the current platform/architecture this lane is called from.
+        #
+        # @param [Integer] api The Android API level to use for this AVD
+        # @return [String] The `system-images;android-<N>;google_apis;<platform>` package specifier for `sdkmanager` to use in its install command
+        #
+        # @note Results from this method are memoized, to avoid repeating calls to `sdkmanager` when querying for the same api level multiple times.
+        #
+        def system_image_package(api:)
+          @system_image_packages ||= {}
+          @system_image_packages[api] ||= begin
+            platform = `uname -m`.chomp
+            package = `#{@tools.sdkmanager} --list`.match(/^ *(system-images;android-#{api};google_apis;#{platform}(-[^ ]*)?)/)&.captures&.first
+            UI.user_error!("Could not find system-image for API `#{api}` and your platform `#{platform}` in `sdkmanager --list`. Maybe Google removed it for download and it's time to update to a newer API?") if package.nil?
+            package
+          end
+        end
+
+        def retry_loop(time_between_retries:, timeout:, description:)
+          Timeout.timeout(timeout) do
+            sleep(time_between_retries) until yield
+          end
+        rescue Timeout::Error
+          UI.user_error!("Timed out #{description}")
+        end
+      end
+    end
+  end
+end
