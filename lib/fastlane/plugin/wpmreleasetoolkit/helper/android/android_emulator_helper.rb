@@ -51,7 +51,7 @@ module Fastlane
             '--device', device,
             '--sdcard', sdcard,
             '--name', device_name
-          ) { |_| UI.abort_with_message!("Failed to create AVD.") }
+          )
 
           UI.success("AVD `#{device_name}` successfully created.")
 
@@ -80,7 +80,7 @@ module Fastlane
           # We also want to filter the `stdout`+`stderr` emitted by the `emulator` process in the background,
           # to limit verbosity and only print error lines, and also prefix those clearly (because they might happen
           # at any moment in the background, so in parallel/the middle of other fastlane logs).
-          Thread.new do
+          t = Thread.new do
             Open3.popen2e(@tools.emulator, *params) do |i, oe, wait_thr|
               i.close
               until oe.eof?
@@ -89,6 +89,7 @@ module Fastlane
                 next unless line.include?('PANIC: Broken AVD system path')
 
                 UI.user_error! <<~HINT
+                  #{line}
                   Verify that your `sdkmanager/avdmanager` tools are not installed in a different SDK root than your `emulator` tool
                   (which can happen if you installed Android's command-line tools via `brew`, but the `emulator` via Android Studio, or vice-versa)
                 HINT
@@ -96,6 +97,7 @@ module Fastlane
               UI.error("📱 [emulator]: exited with non-zero status code: #{wait_thr.value.exitstatus}") unless wait_thr.value.success?
             end
           end
+          t.abort_on_exception = true # To bubble up any exception like `UI.user_error!` back to the main thread here
 
           UI.message('Waiting for device to finish booting...')
 
