@@ -113,7 +113,7 @@ module Fastlane
           emulators_list.each do |e|
             Actions.sh(@tools.adb, '-s', e, 'emu', 'kill') { |_| } # ignore error if no emulator with specified serial is running
 
-            # Note: Alternative way of shutting down emulator would be to call the following command instead, which shuts down the emulator more gracefully:
+            # NOTE: Alternative way of shutting down emulator would be to call the following command instead, which shuts down the emulator more gracefully:
             # `adb -s #{e} shell reboot -p` # In case you're wondering, `-p` is for "power-off"
             # But this alternate command:
             #  - Requires that `-no-snapshot` was used on boot (to avoid being prompted to save current state on shutdown)
