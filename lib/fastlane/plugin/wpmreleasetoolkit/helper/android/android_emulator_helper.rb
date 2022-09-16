@@ -99,16 +99,17 @@ module Fastlane
           end
           t.abort_on_exception = true # To bubble up any exception like `UI.user_error!` back to the main thread here
 
-          UI.message('Waiting for device to finish booting...')
-
-          serial = nil
+          UI.message('Waiting for emulator to start...')
           # Loop until the emulator has started and shows up in `adb devices -l` so we can find its serial
+          serial = nil
           retry_loop(time_between_retries: BOOT_WAIT, timeout: BOOT_TIMEOUT, description: 'waiting for emulator to start') do
             serial = find_serial(avd_name: name)
             !serial.nil?
           end
+          UI.message("Found device `#{name}` with serial `#{serial}`")
 
           # Once the emulator has started, wait for the device in the emulator to finish booting
+          UI.message('Waiting for device to finish booting...')
           retry_loop(time_between_retries: BOOT_WAIT, timeout: BOOT_TIMEOUT, description: 'waiting for device to finish booting') do
             Actions.sh(@tools.adb, '-s', serial, 'shell', 'getprop', 'sys.boot_completed').chomp == '1'
           end
@@ -127,8 +128,11 @@ module Fastlane
 
         def find_serial(avd_name:)
           running_emulators.find do |candidate|
-            Actions.sh(@tools.adb, '-s', candidate.serial, 'emu', 'avd', 'name').first.chomp == avd_name
-          end
+            command = [@tools.adb, '-s', candidate.serial, 'emu', 'avd', 'name']
+            UI.command(command.shelljoin)
+            candidate_name = Actions.sh(*command, log: false).split("\n").first.chomp
+            candidate_name == avd_name
+          end&.serial
         end
 
         # Trigger a shutdown for all running emulators, and wait until there is no more emulator running.
