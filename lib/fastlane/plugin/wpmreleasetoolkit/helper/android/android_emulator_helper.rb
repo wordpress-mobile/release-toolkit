@@ -125,7 +125,7 @@ module Fastlane
 
         def find_serial(avd_name:)
           running_emulators.find do |candidate|
-            Actions.sh(@tools.adb, '-s', candidate, 'emu', 'avd', 'name').first.chomp == avd_name
+            Actions.sh(@tools.adb, '-s', candidate.serial, 'emu', 'avd', 'name').first.chomp == avd_name
           end
         end
 
