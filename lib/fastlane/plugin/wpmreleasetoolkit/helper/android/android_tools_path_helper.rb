@@ -13,32 +13,45 @@ module Fastlane
           @android_sdk_root = sdk_root || ENV['ANDROID_HOME'] || ENV['ANDROID_SDK_ROOT'] || ENV['ANDROID_SDK']
         end
 
-        def tool(paths:, binary:)
+        def tool(binary:, search_paths:)
           bin_path = `command -v #{binary}`.chomp
+
           return bin_path unless bin_path.nil? || bin_path.empty? || !File.executable?(bin_path)
 
-          bin_path = paths
+          bin_path = search_paths
                      .map { |path| File.join(android_sdk_root, path, binary) }
-                     .first { |path| File.executable?(path) }
+                     .find { |path| File.executable?(path) }
 
-          UI.user_error!("Unable to find path for #{binary} in #{paths.inspect}. Verify you installed the proper Android tools.") if bin_path.nil?
+          UI.user_error!("Unable to find path for #{binary} in #{search_paths.inspect}. Verify you installed the proper Android tools.") if bin_path.nil?
           bin_path
         end
 
         def sdkmanager
-          @sdkmanager ||= tool(paths: %w[cmdline-tools latest bin], binary: 'sdkmanager')
+          @sdkmanager ||= tool(
+            binary: 'sdkmanager',
+            search_paths: [File.join('cmdline-tools', 'latest', 'bin')]
+          )
         end
 
         def avdmanager
-          @avdmanager ||= tool(paths: %w[cmdline-tools latest bin], binary: 'avdmanager')
+          @avdmanager ||= tool(
+            binary: 'avdmanager',
+            search_paths: [File.join('cmdline-tools', 'latest', 'bin')]
+          )
         end
 
         def emulator
-          @emulator ||= tool(paths: ['emulator'], binary: 'emulator')
+          @emulator ||= tool(
+            binary: 'emulator',
+            search_paths: [File.join('emulator')]
+          )
         end
 
         def adb
-          @adb ||= tool(paths: ['platform-tools'], binary: 'adb')
+          @adb ||= tool(
+            binary: 'adb',
+            search_paths: [File.join('platform-tools')]
+          )
         end
       end
     end
