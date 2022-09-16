@@ -24,7 +24,7 @@ module Fastlane
           package = system_image_package(api: api)
 
           UI.message("Installing System Image for Android #{api} (#{package})")
-          Actions.sh(@tools.sdkmanager, "--sdk_root=#{@tools.android_sdk_root}", '--install', package)
+          Actions.sh(@tools.sdkmanager, '--install', package)
           UI.success("System Image #{package} successfully installed.")
           package
         end
