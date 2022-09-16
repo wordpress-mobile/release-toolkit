@@ -78,16 +78,21 @@ module Fastlane
           params << '-no-snapshot' if cold_boot
           params << '-wipe-data' if wipe_data
 
-          # We can't use `Actions.sh` here because we want to:
-          # 1. Run the emulator command in the background (`(…)&`)
-          # 2. Mute the verbose messages printed by `emulator` to `stdin` (`>/dev/null`)
-          # 3. Keep only the `ERROR` and `PANIC` messages printed to `stderr` (`2>&1 | sed -nE 's/^(ERROR|PANIC)/…'`)…
-          # 4. …and prefix those to make it clear they come from the emulator (`s/…/[emulator]: \1/p`),
-          #     because they will be printed while the process runs in the background and can thus appear
-          #     in the middle of other fastlane logs.
-          # command = '(' + [@tools.emulator, *params].shelljoin + '>/dev/null 2>&1 | sed -nE \'s/^(ERROR|PANIC)/[emulator]: \1/p\'' + ')&'
-          UI.command(command)
-          system(command)
+          UI.command([@tools.emulator, *params].shelljoin)
+          # We want to launch emulator in the background to not block the rest of the code, so we can't use `Actions.sh` here
+          # We also want to filter the `stdout`+`stderr` emitted by the `emulator` process in the background,
+          # to limit verbosity and only print error lines, and also prefix those clearly (because they might happen
+          # at any moment in the background, so in parallel/the middle of other fastlane logs).
+          Thread.new do
+            Open3.popen2e(@tools.emulator, *params) do |i, oe, wait_thr|
+              i.close
+              until oe.eof?
+                line = oe.readline
+                puts "📱 [emulator]: #{line}" if line.start_with?(/ERROR|PANIC/)
+              end
+              puts "📱 [emulator]: exited with non-zero status code: #{wait_thr.value.exitstatus}" unless wait_thr.value.success?
+            end
+          end
 
           UI.message('Waiting for device to finish booting...')
           Actions.sh(@tools.adb, '-s', serial, 'wait-for-device')
