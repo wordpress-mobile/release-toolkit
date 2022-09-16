@@ -51,7 +51,7 @@ module Fastlane
             '--device', device,
             '--sdcard', sdcard,
             '--name', device_name
-          )
+          ) { |_| UI.abort_with_message!("Failed to create AVD.") }
 
           UI.success("AVD `#{device_name}` successfully created.")
 
@@ -85,9 +85,15 @@ module Fastlane
               i.close
               until oe.eof?
                 line = oe.readline
-                puts "📱 [emulator]: #{line}" if line.start_with?(/ERROR|PANIC/)
+                UI.error("📱 [emulator]: #{line}") if line.start_with?(/ERROR|PANIC/)
+                next unless line.include?('PANIC: Broken AVD system path')
+
+                UI.user_error! <<~HINT
+                  Verify that your `sdkmanager/avdmanager` tools are not installed in a different SDK root than your `emulator` tool
+                  (which can happen if you installed Android's command-line tools via `brew`, but the `emulator` via Android Studio, or vice-versa)
+                HINT
               end
-              puts "📱 [emulator]: exited with non-zero status code: #{wait_thr.value.exitstatus}" unless wait_thr.value.success?
+              UI.error("📱 [emulator]: exited with non-zero status code: #{wait_thr.value.exitstatus}") unless wait_thr.value.success?
             end
           end
 
