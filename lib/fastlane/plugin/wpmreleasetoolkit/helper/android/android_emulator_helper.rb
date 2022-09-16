@@ -78,9 +78,16 @@ module Fastlane
           params << '-no-snapshot' if cold_boot
           params << '-wipe-data' if wipe_data
 
-          command = [@tools.emulator, *params].shelljoin + ' >/dev/null 2>/dev/null &'
+          # We can't use `Actions.sh` here because we want to:
+          # 1. Run the emulator command in the background (`(…)&`)
+          # 2. Mute the verbose messages printed by `emulator` to `stdin` (`>/dev/null`)
+          # 3. Keep only the `ERROR` and `PANIC` messages printed to `stderr` (`2>&1 | sed -nE 's/^(ERROR|PANIC)/…'`)…
+          # 4. …and prefix those to make it clear they come from the emulator (`s/…/[emulator]: \1/p`),
+          #     because they will be printed while the process runs in the background and can thus appear
+          #     in the middle of other fastlane logs.
+          # command = '(' + [@tools.emulator, *params].shelljoin + '>/dev/null 2>&1 | sed -nE \'s/^(ERROR|PANIC)/[emulator]: \1/p\'' + ')&'
           UI.command(command)
-          system(command) # We can't use Actions.sh here because it doesn't handle `&` to run the process in the background :/
+          system(command)
 
           UI.message('Waiting for device to finish booting...')
           Actions.sh(@tools.adb, '-s', serial, 'wait-for-device')
