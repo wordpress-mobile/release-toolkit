@@ -24,7 +24,7 @@ module Fastlane
           package = system_image_package(api: api)
 
           UI.message("Installing System Image for Android #{api} (#{package})")
-          Actions.sh(@tools.sdkmanager, '--install', package)
+          Actions.sh(@tools.sdkmanager, "--sdk_root=#{@tools.android_sdk_root}", '--install', package)
           UI.success("System Image #{package} successfully installed.")
           package
         end
@@ -143,7 +143,8 @@ module Fastlane
           @system_image_packages ||= {}
           @system_image_packages[api] ||= begin
             platform = `uname -m`.chomp
-            package = `#{@tools.sdkmanager} --list`.match(/^ *(system-images;android-#{api};google_apis;#{platform}(-[^ ]*)?)/)&.captures&.first
+            all_packages = `#{@tools.sdkmanager} --sdk_root=#{@tools.android_sdk_root} --list`
+            package = all_packages.match(/^ *(system-images;android-#{api};google_apis;#{platform}(-[^ ]*)?)/)&.captures&.first
             UI.user_error!("Could not find system-image for API `#{api}` and your platform `#{platform}` in `sdkmanager --list`. Maybe Google removed it for download and it's time to update to a newer API?") if package.nil?
             package
           end
