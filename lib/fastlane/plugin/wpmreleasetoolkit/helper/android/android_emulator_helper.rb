@@ -61,20 +61,17 @@ module Fastlane
         # Launch the emulator for the given AVD, then return the emulator serial
         #
         # @param [String] name name of the AVD to launch
+        # @param [Int] port the TCP port to use to connect to the emulator via adb. If nil (default), will let `emulator` pick the first free one.
         # @param [Boolean] cold_boot if true, will do a cold boot, if false will try to use a previous snapshot of the device
         # @param [Boolean] wipe_data if true, will wipe the emulator (i.e. reset the user data image)
         #
         # @return [String] emulator serial number corresponding to the launched AVD
         #
-        def launch_avd(name:, cold_boot: true, wipe_data: true)
-          port = '5554'.freeze
-          serial = "emulator-#{port}"
-
-          shut_down_emulators!(serials: [serial]) # To ensure we can launch one on the port 5554 (as it's hardcoded for simplicity)
-
+        def launch_avd(name:, port: nil, cold_boot: true, wipe_data: true)
           UI.message("Launching emulator for #{name}")
 
-          params = ['-avd', name, '-port', port]
+          params = ['-avd', name]
+          params << ['-port', port.to_s] unless port.nil?
           params << '-no-snapshot' if cold_boot
           params << '-wipe-data' if wipe_data
 
@@ -95,7 +92,15 @@ module Fastlane
           end
 
           UI.message('Waiting for device to finish booting...')
-          Actions.sh(@tools.adb, '-s', serial, 'wait-for-device')
+
+          serial = nil
+          # Loop until the emulator has started and shows up in `adb devices -l` so we can find its serial
+          retry_loop(time_between_retries: BOOT_WAIT, timeout: BOOT_TIMEOUT, description: 'waiting for emulator to start') do
+            serial = find_serial(avd_name: name)
+            !serial.nil?
+          end
+
+          # Once the emulator has started, wait for the device in the emulator to finish booting
           retry_loop(time_between_retries: BOOT_WAIT, timeout: BOOT_TIMEOUT, description: 'waiting for device to finish booting') do
             Actions.sh(@tools.adb, '-s', serial, 'shell', 'getprop', 'sys.boot_completed').chomp == '1'
           end
@@ -110,6 +115,12 @@ module Fastlane
         def running_emulators
           helper = Fastlane::Helper::AdbHelper.new(adb_path: @tools.adb)
           helper.load_all_devices.select { |device| device.serial.include?('emulator') }
+        end
+
+        def find_serial(avd_name:)
+          running_emulators.find do |candidate|
+            Actions.sh(@tools.adb, '-s', candidate, 'emu', 'avd', 'name').first.chomp == avd_name
+          end
         end
 
         # Trigger a shutdown for all running emulators, and wait until there is no more emulator running.
