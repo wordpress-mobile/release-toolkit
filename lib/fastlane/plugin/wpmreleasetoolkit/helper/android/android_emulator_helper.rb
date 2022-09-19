@@ -135,7 +135,7 @@ module Fastlane
           end&.serial
         end
 
-        # Trigger a shutdown for all running emulators, and wait until there is no more emulator running.
+        # Trigger a shutdown for all running emulators, and wait until there is no more emulators running.
         #
         # @param [Array<String>] serials List of emulator serials to shut down. Will shut down all of them if `nil`.
         #
