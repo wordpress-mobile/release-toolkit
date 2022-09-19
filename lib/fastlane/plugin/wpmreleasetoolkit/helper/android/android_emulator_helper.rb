@@ -14,7 +14,7 @@ module Fastlane
           @tools = Fastlane::Helper::Android::ToolsPathHelper.new
         end
 
-        # Installs the system-image suitable for a given Android `api`, with `google_apis`, and for the current machine's architecture
+        # Installs the system-image suitable for a given Android `api`, with Google APIs, and for the current machine's architecture
         #
         # @param [Integer] api The Android API level to use
         #
@@ -167,7 +167,7 @@ module Fastlane
           UI.success('All emulators are now shut down.')
         end
 
-        # Find the system-images package for the provided API, with Google APIs, and matching the current platform/architecture this lane is called from.
+        # Find the system-images package for the provided `api`, with Google APIs, and matching the current platform/architecture this lane is called from.
         #
         # @param [Integer] api The Android API level to use for this AVD
         # @return [String] The `system-images;android-<N>;google_apis;<platform>` package specifier for `sdkmanager` to use in its install command
