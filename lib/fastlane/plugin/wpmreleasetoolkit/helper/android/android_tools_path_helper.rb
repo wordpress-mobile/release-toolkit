@@ -4,13 +4,13 @@ module Fastlane
   module Helper
     module Android
       # Helper to find the paths of common Android build and SDK tools on the current machine
-      # Based on `$ANDROID_SDK_ROOT` and the common relative paths those tools are installed in.
+      # Based on `$ANDROID_HOME` and the common relative paths those tools are installed in.
       #
       class ToolsPathHelper
-        attr_reader :android_sdk_root
+        attr_reader :android_home
 
         def initialize(sdk_root: nil)
-          @android_sdk_root = sdk_root || ENV['ANDROID_HOME'] || ENV['ANDROID_SDK_ROOT'] || ENV['ANDROID_SDK']
+          @android_home = sdk_root || ENV['ANDROID_HOME'] || ENV['ANDROID_SDK_ROOT'] || ENV['ANDROID_SDK']
         end
 
         def tool(binary:, search_paths:)
@@ -19,7 +19,7 @@ module Fastlane
           return bin_path unless bin_path.nil? || bin_path.empty? || !File.executable?(bin_path)
 
           bin_path = search_paths
-                     .map { |path| File.join(android_sdk_root, path, binary) }
+                     .map { |path| File.join(android_home, path, binary) }
                      .find { |path| File.executable?(path) }
 
           UI.user_error!("Unable to find path for #{binary} in #{search_paths.inspect}. Verify you installed the proper Android tools.") if bin_path.nil?
