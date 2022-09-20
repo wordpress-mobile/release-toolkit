@@ -107,6 +107,8 @@ module Fastlane
 
         UI.user_error!("Could not find Git commit #{configure_file_commit_hash} from `.configure` file in local secrets repository. Please verify your local copy is up to date with the remote.") if index_of_configure_hash.nil?
 
+        # No need to check for this to be `nil` because it comes by reading the
+        # local `.mobile-secrets` repo itself.
         index_of_repo_commit_hash = hashes.find_index(repo_commit_hash)
 
         return 0 if index_of_configure_hash >= index_of_repo_commit_hash
