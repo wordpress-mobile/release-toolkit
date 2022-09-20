@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Require Fastlane `~> 2.210` to ensure Xcode 14 compatibility
 
 ## 5.5.0
 
