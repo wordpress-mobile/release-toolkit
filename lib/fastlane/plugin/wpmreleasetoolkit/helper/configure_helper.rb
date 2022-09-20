@@ -104,6 +104,9 @@ module Fastlane
         hashes = result.each_line.map { |s| s.strip }.reverse
 
         index_of_configure_hash = hashes.find_index(configure_file_commit_hash)
+
+        UI.user_error!("Could not find Git commit #{configure_file_commit_hash} from `.configure` file in local secrets repository. Please verify your local copy is up to date with the remote.") if index_of_configure_hash.nil?
+
         index_of_repo_commit_hash = hashes.find_index(repo_commit_hash)
 
         return 0 if index_of_configure_hash >= index_of_repo_commit_hash
