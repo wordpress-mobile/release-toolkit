@@ -3,7 +3,7 @@ module Fastlane
     class AndroidShutdownEmulatorAction < Action
       def self.run(params)
         helper = Fastlane::Helper::Android::EmulatorHelper.new
-        helper.shut_down_emulators!(serials: params[:serial])
+        helper.shut_down_emulators!(serials: params[:serials])
       end
 
       #####################################################
@@ -20,8 +20,8 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :serial,
-                                       env_name: 'FL_ANDROID_SHUTDOWN_EMULATOR_SERIAL',
+          FastlaneCore::ConfigItem.new(key: :serials,
+                                       env_name: 'FL_ANDROID_SHUTDOWN_EMULATOR_SERIALS',
                                        description: 'The serial(s) of the emulators to shut down. If not provided (nil), will shut them all down',
                                        type: Array,
                                        optional: true,
