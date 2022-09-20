@@ -178,7 +178,7 @@ module Fastlane
           @system_image_packages ||= {}
           @system_image_packages[api] ||= begin
             platform = `uname -m`.chomp
-            all_packages = `#{@tools.sdkmanager} --sdk_root=#{@tools.android_sdk_root} --list`
+            all_packages = `#{@tools.sdkmanager} --list`
             package = all_packages.match(/^ *(system-images;android-#{api};google_apis;#{platform}(-[^ ]*)?)/)&.captures&.first
             UI.user_error!("Could not find system-image for API `#{api}` and your platform `#{platform}` in `sdkmanager --list`. Maybe Google removed it for download and it's time to update to a newer API?") if package.nil?
             package
