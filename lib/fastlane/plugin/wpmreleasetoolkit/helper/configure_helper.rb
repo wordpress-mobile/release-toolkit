@@ -99,7 +99,7 @@ module Fastlane
       end
 
       def self.configure_file_commits_behind_repo
-        # Get a sily number of revisions to ensure we don't miss any
+        # Get a large number of revisions to ensure we don't miss any
         result = `cd #{repository_path} && git --no-pager log -10000 --pretty=format:"%H" && echo`
         hashes = result.each_line.map { |s| s.strip }.reverse
 
