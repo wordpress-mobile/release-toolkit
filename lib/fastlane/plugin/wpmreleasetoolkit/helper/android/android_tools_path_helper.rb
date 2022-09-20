@@ -25,10 +25,10 @@ module Fastlane
                      end
 
           # If not found in any of the `search_paths`, try to look for it in $PATH
-          bin_path ||= Action.sh('command', '-v', binary, print_command_output: false) { |_| nil }.chomp
+          bin_path ||= Actions.sh('command', '-v', binary) { |err, res, _| res if err&.success? }&.chomp
 
-          # Normalize return value to `nil` if it was not found or is not an executable
-          bin_path = nil if bin_path.empty? || !File.executable?(bin_path)
+          # Normalize return value to `nil` if it was not found, empty, or is not an executable
+          bin_path = nil if !bin_path.nil? && (bin_path.empty? || !File.executable?(bin_path))
 
           bin_path
         end
