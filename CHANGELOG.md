@@ -10,11 +10,21 @@ _None_
 
 ### New Features
 
-- Add `android_create_avd`, `android_launch_emulator` and `android_shutdown_emulator` actions. [#409]
+_None_
 
 ### Bug Fixes
 
 _None_
+
+### Internal Changes
+
+_None_
+
+## 5.6.0
+
+### New Features
+
+- Add `android_create_avd`, `android_launch_emulator` and `android_shutdown_emulator` actions. [#409]
 
 ### Internal Changes
 
