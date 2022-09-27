@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Add `android_create_avd`, `android_launch_emulator` and `android_shutdown_emulator` actions. [#409]
 
 ### Bug Fixes
 
