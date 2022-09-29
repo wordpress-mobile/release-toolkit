@@ -4,9 +4,10 @@ require 'gettext/po'
 module Fastlane
   module Actions
     class AnGeneratePoFileFromMetadataAction < Action
+      REQUIRED_KEYS = %w[description keywords name release_notes name].freeze
+      REQUIRED_FILES = REQUIRED_KEYS.map { |key| "#{key}.txt" }.freeze
       def self.run(params)
         @metadata_folder = params[:metadata_directory]
-        Fastlane::Helper::GeneratePoFileMetadataHelper.verify_all_required_files_exist(metadata_folder: @metadata_folder)
         # TODO: delegate most of the logic down below to `../../helper/generate_po_file_from_metadata_helper`
 
         @po = GetText::PO.new
@@ -60,6 +61,12 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("No metadata_directory path for AnGeneratePoFileFromMetadataAction given, pass using `metadata_directory: 'directory'`") unless value && (!value.empty?)
                                          UI.user_error!("Couldn't find path '#{value}'") unless Dir.exist?(value)
+
+                                         # Check that all required files are in metadata_directory
+                                         @txt_files_in_metadata_directory = Dir[File.join(value, '*.txt')].map { |file| File.basename(file, '.txt') }.to_set
+                                         intersection = @txt_files_in_metadata_directory.intersection(REQUIRED_KEYS.to_set)
+                                         UI.user_error!('One or more mandatory files are missing') unless intersection.length == REQUIRED_KEYS.length
+                                         # TODO: tell what files are missing
                                        end),
           FastlaneCore::ConfigItem.new(key: :release_version,
                                        env_name: "#{env_name_prefix}_RELEASE_VERSION",
