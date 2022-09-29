@@ -1,12 +1,45 @@
 require 'fastlane/action'
+require 'gettext/po'
 
 module Fastlane
   module Actions
     class AnGeneratePoFileFromMetadataAction < Action
       def self.run(params)
         # Testing helper function
-        require_relative '../../helper/generate_po_file_from_metadata_helper'
-        Fastlane::Helper::GeneratePoFileMetadataHelper.test_function(path: params[:metadata_directory])
+        # require_relative '../../helper/generate_po_file_from_metadata_helper'
+        # po = GetText::PO.new
+        # Fastlane::Helper::GeneratePoFileMetadataHelper.add_to_po(folder_path: params[:metadata_directory], prefix: 'play_store', po_object: po);
+        # TODO: delegate most of the logic down below to `../../helper/generate_po_file_from_metadata_helper`
+
+        @po = GetText::PO.new
+        folder_path = params[:metadata_directory]
+        release_version = params[:release_version]
+        prefix = 'play_store'
+        @rel_note_key = 'release_note'
+        Dir[File.join(folder_path, '*.txt')].each do |txt_file|
+
+          file_name = File.basename(txt_file, '.*')
+          if file_name == 'release_notes'
+            values = release_version.split('.')
+            version_major = Integer(values[0])
+            version_minor = Integer(values[1])
+            # Keeps theis shenanigan?
+            key = "#{@rel_note_key}_#{version_major.to_s.rjust(2, '0')}#{version_minor}"
+
+            content = <<~TMP
+              #{release_version}
+              #{File.open(txt_file).read}
+            TMP
+          else
+            # Standard key handling
+            content = File.open(txt_file).read
+            key = "#{prefix}_#{file_name}"
+          end
+          @po[key, content] = ''
+        end
+
+        po_file = File.join(params[:metadata_directory], 'PlayStoreStrings.po')
+        File.write(po_file, @po.to_s)
       end
 
       def self.description
