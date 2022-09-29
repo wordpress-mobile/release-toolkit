@@ -19,7 +19,8 @@ module Fastlane
         Dir[File.join(folder_path, '*.txt')].each do |txt_file|
 
           file_name = File.basename(txt_file, '.*')
-          if file_name == 'release_notes'
+          case file_name
+          when 'release_notes'
             values = release_version.split('.')
             version_major = Integer(values[0])
             version_minor = Integer(values[1])
