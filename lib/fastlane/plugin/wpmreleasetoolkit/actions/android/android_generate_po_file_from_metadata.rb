@@ -15,7 +15,6 @@ module Fastlane
         folder_path = params[:metadata_directory]
         release_version = params[:release_version]
         prefix = 'play_store'
-        @rel_note_key = 'release_note'
         Dir[File.join(folder_path, '*.txt')].each do |txt_file|
 
           file_name = File.basename(txt_file, '.*')
@@ -25,7 +24,7 @@ module Fastlane
             version_major = Integer(values[0])
             version_minor = Integer(values[1])
             # Keeps theis shenanigan?
-            key = "#{@rel_note_key}_#{version_major.to_s.rjust(2, '0')}#{version_minor}"
+            key = "release_note_#{version_major.to_s.rjust(2, '0')}#{version_minor}"
 
             content = <<~TMP
               #{release_version}
