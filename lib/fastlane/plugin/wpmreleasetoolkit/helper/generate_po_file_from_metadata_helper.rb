@@ -6,24 +6,20 @@ module Fastlane
     #
     module GeneratePoFileMetadataHelper
 
-
-      def self.add_to_po(folder_path: path, prefix: '', po_object: GetText::PO)
-
-        # Get just the .txt files, there might be the .po as well
-        # Dir[File.join(folder_path, '*.txt')].each do |txt_file|
-        #
-        #   file_name = File.basename(txt_file, '.*')
-        #   content = File.open(txt_file).read
-        #   key = "#{prefix}_#{file_name}"
-        #   po_object[key] = content
-        #   # po_object.set_comment("#{prefix}file_name", content)
-        # end
-        # po_object.set_comment('foo', 'bar')
-        # UI.message(po_object.to_s)
-
-
+      # @return [Array<String>]
+      # files that should exist for both iOS and Android
+      def self.get_common_keys
+        # Not sure if keywords should be included
+        %w[description keywords name release_notes name]
       end
 
+      def self.verify_all_required_files_exist(metadata_folder: path)
+        txt_files_in_metadata_folder = Dir[File.join(metadata_folder, '*.txt')]
+        # If a required file/keys is missing, bail out.
+        get_common_keys.each do |must_exist_key|
+          puts("file #{must_exist_key}.txt in #{metadata_folder} not found.") unless txt_files_in_metadata_folder.include? "#{must_exist_key}.txt"
+        end
+      end
     end
   end
 end

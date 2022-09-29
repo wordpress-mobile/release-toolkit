@@ -5,17 +5,15 @@ module Fastlane
   module Actions
     class AnGeneratePoFileFromMetadataAction < Action
       def self.run(params)
-        # Testing helper function
-        # require_relative '../../helper/generate_po_file_from_metadata_helper'
-        # po = GetText::PO.new
-        # Fastlane::Helper::GeneratePoFileMetadataHelper.add_to_po(folder_path: params[:metadata_directory], prefix: 'play_store', po_object: po);
+        @metadata_folder = params[:metadata_directory]
+        Fastlane::Helper::GeneratePoFileMetadataHelper.verify_all_required_files_exist(metadata_folder: @metadata_folder)
         # TODO: delegate most of the logic down below to `../../helper/generate_po_file_from_metadata_helper`
 
         @po = GetText::PO.new
-        folder_path = params[:metadata_directory]
+
         release_version = params[:release_version]
         prefix = 'play_store'
-        Dir[File.join(folder_path, '*.txt')].each do |txt_file|
+        Dir[File.join(@metadata_folder, '*.txt')].each do |txt_file|
 
           file_name = File.basename(txt_file, '.*')
           case file_name
