@@ -1,6 +1,5 @@
 require 'fastlane/action'
 require 'gettext/po'
-require 'set'
 
 module Fastlane
   module Actions
