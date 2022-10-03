@@ -1,42 +1,44 @@
 require 'fastlane/action'
 require 'gettext/po'
+require 'set'
 
 module Fastlane
   module Actions
     class AnGeneratePoFileFromMetadataAction < Action
-      REQUIRED_KEYS = %w[description keywords name release_notes name].freeze
+      REQUIRED_KEYS = %w[description keywords name release_notes].freeze
+      SPECIAL_KEYS = %w[release_notes].freeze
       def self.run(params)
-        @metadata_folder = params[:metadata_directory]
-        # TODO: delegate most of the logic down below to `../../helper/generate_po_file_from_metadata_helper`
+        @metadata_directory = params[:metadata_directory]
+        @release_version = params[:release_version]
 
-        @po = GetText::PO.new
-
-        release_version = params[:release_version]
         prefix = 'play_store'
-        Dir[File.join(@metadata_folder, '*.txt')].each do |txt_file|
+        all_keys = Dir[File.join(@metadata_directory, '*.txt')]
 
-          file_name = File.basename(txt_file, '.*')
-          case file_name
-          when 'release_notes'
-            values = release_version.split('.')
-            version_major = Integer(values[0])
-            version_minor = Integer(values[1])
-            # Keeps theis shenanigan?
-            key = "release_note_#{version_major.to_s.rjust(2, '0')}#{version_minor}"
-            msgctxt = "#{prefix}_#{key}"
-
-            msgid = <<~MSGID
-              #{release_version}
-              #{File.open(txt_file).read}
-            MSGID
-          else
-            # Standard key handling
-            msgid = File.open(txt_file).read
-            msgctxt = "#{prefix}_#{file_name}"
-          end
-          @po[msgctxt, msgid] = ''
+        # Remove from all_keys the special keys as they need to be treated specially
+        standard_files = []
+        all_keys.each do |key|
+          standard_files.append(key) unless SPECIAL_KEYS.include? File.basename(key, '.txt')
         end
+        # Let the helper handle standard files
+        @po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_file_to_po(prefix, files: standard_files)
 
+        # Now handle release_notes.txt
+        release_notes_file = Dir[File.join(@metadata_directory, 'release_notes.txt')][0]
+
+        values = @release_version.split('.')
+        version_major = Integer(values[0])
+        version_minor = Integer(values[1])
+        # TODO: Keeps theis shenanigan?
+        key = "release_note_#{version_major.to_s.rjust(2, '0')}#{version_minor}"
+
+        msgctxt = "#{prefix}_#{key}"
+        msgid = <<~MSGID
+          #{@release_version}
+          #{File.open(release_notes_file).read}
+        MSGID
+        @po[msgctxt, msgid] = ''
+
+        # Finally dump the po into PlayStoreStrings.po
         po_file = File.join(params[:metadata_directory], 'PlayStoreStrings.po')
         File.write(po_file, @po.to_s)
       end
