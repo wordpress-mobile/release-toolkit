@@ -5,7 +5,6 @@ module Fastlane
   module Actions
     class AnGeneratePoFileFromMetadataAction < Action
       REQUIRED_KEYS = %w[description keywords name release_notes name].freeze
-      REQUIRED_FILES = REQUIRED_KEYS.map { |key| "#{key}.txt" }.freeze
       def self.run(params)
         @metadata_folder = params[:metadata_directory]
         # TODO: delegate most of the logic down below to `../../helper/generate_po_file_from_metadata_helper`
@@ -65,7 +64,7 @@ module Fastlane
                                          # Check that all required files are in metadata_directory
                                          @txt_files_in_metadata_directory = Dir[File.join(value, '*.txt')].map { |file| File.basename(file, '.txt') }.to_set
                                          intersection = @txt_files_in_metadata_directory.intersection(REQUIRED_KEYS.to_set)
-                                         UI.user_error!('One or more mandatory files are missing') unless intersection.length == REQUIRED_KEYS.length
+                                         UI.user_error!('One or more mandatory files are missing') unless intersection.length == REQUIRED_KEYS.to_set.length
                                          # TODO: tell what files are missing
                                        end),
           FastlaneCore::ConfigItem.new(key: :release_version,
