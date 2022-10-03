@@ -23,17 +23,18 @@ module Fastlane
             version_minor = Integer(values[1])
             # Keeps theis shenanigan?
             key = "release_note_#{version_major.to_s.rjust(2, '0')}#{version_minor}"
+            msgctxt = "#{prefix}_#{key}"
 
-            content = <<~TMP
+            msgid = <<~MSGID
               #{release_version}
               #{File.open(txt_file).read}
-            TMP
+            MSGID
           else
             # Standard key handling
-            content = File.open(txt_file).read
-            key = "#{prefix}_#{file_name}"
+            msgid = File.open(txt_file).read
+            msgctxt = "#{prefix}_#{file_name}"
           end
-          @po[key, content] = ''
+          @po[msgctxt, msgid] = ''
         end
 
         po_file = File.join(params[:metadata_directory], 'PlayStoreStrings.po')
