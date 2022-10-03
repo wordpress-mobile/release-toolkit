@@ -24,18 +24,18 @@ describe Fastlane::Actions::AnGeneratePoFileFromMetadataAction do
         msgid "value keywords"
         msgstr ""
 
-        msgctxt "play_store_release_note_010"
-        msgid ""
-        "1.0\\n"
-        "value release_notes\\n"
-        msgstr ""
-
         msgctxt "play_store_name"
         msgid "value name"
         msgstr ""
 
         msgctxt "play_store_description"
         msgid "value description"
+        msgstr ""
+
+        msgctxt "play_store_release_note_010"
+        msgid ""
+        "1.0\\n"
+        "value release_notes\\n"
         msgstr ""
       PO
 
