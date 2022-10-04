@@ -4,8 +4,8 @@ require 'gettext/po'
 module Fastlane
   module Actions
     class AnGeneratePoFileFromMetadataAction < Action
-      REQUIRED_KEYS = %w[description keywords name release_notes].freeze
-      SPECIAL_KEYS = %w[release_notes].freeze
+      REQUIRED_KEYS = %w[description keywords name release_notes release_notes_previous].freeze
+      SPECIAL_KEYS = %w[release_notes release_notes_previous].freeze
       def self.run(params)
         @metadata_directory = params[:metadata_directory]
         @release_version = params[:release_version]
@@ -36,6 +36,25 @@ module Fastlane
           #{File.open(release_notes_file).read}
         MSGID
         @po[msgctxt, msgid] = ''
+
+
+
+        # Handle release_notes_previous.txt
+        release_notes_previous_file = Dir[File.join(@metadata_directory, 'release_notes_previous.txt')][0]
+        version_minus_one = Fastlane::Helper::Android::VersionHelper.calc_prev_release_version(@release_version)
+        values = version_minus_one.split('.')
+        version_major = Integer(values[0])
+        version_minor = Integer(values[1])
+        # TODO: Keeps theis shenanigan?
+        key = "release_note_#{version_major.to_s.rjust(2, '0')}#{version_minor}"
+
+        msgctxt = "#{prefix}_#{key}"
+        msgid = <<~MSGID
+          #{version_minus_one}
+          #{File.open(release_notes_previous_file).read}
+        MSGID
+        @po[msgctxt, msgid] = ''
+
 
         # Finally dump the po into PlayStoreStrings.po
         po_file = File.join(params[:metadata_directory], 'PlayStoreStrings.po')
