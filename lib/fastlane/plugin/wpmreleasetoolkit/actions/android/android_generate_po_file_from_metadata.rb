@@ -3,7 +3,7 @@ require 'gettext/po'
 
 module Fastlane
   module Actions
-    class AnGeneratePoFileFromMetadataAction < Action
+    class AndroidGeneratePoFileFromMetadataAction < Action
       REQUIRED_KEYS = %w[description keywords name release_notes release_notes_previous].freeze
       SPECIAL_KEYS = %w[release_notes release_notes_previous].freeze
       def self.run(params)
