@@ -17,6 +17,22 @@ module Fastlane
         end
         po_obj
       end
+
+      def self.add_release_notes_to_po(release_notes_path, version, prefix, po_obj)
+        values = version.split('.')
+        version_major = Integer(values[0])
+        version_minor = Integer(values[1])
+        key = "release_note_#{version_major.to_s.rjust(2, '0')}#{version_minor}"
+
+        msgctxt = "#{prefix}_#{key}"
+        msgid = <<~MSGID
+          #{version}
+          #{File.open(release_notes_path).read}
+        MSGID
+
+        po_obj[msgctxt, msgid] = ''
+        po_obj
+      end
     end
   end
 end

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Fastlane::Actions::AnGeneratePoFileFromMetadataAction do
   it 'create the .po files based on the .txt files in metadata_directory' do
     in_tmp_dir do |dir|
-      required_keys = %w[description keywords name release_notes].freeze
+      required_keys = %w[description keywords name release_notes release_notes_previous].freeze
       # required_files = required_keys.map { |key| File.join(dir, "#{key}.txt") }
 
       # For each key create a key.txt file whose content is "value key"
@@ -36,6 +36,12 @@ describe Fastlane::Actions::AnGeneratePoFileFromMetadataAction do
         msgid ""
         "1.0\\n"
         "value release_notes\\n"
+        msgstr ""
+
+        msgctxt "play_store_release_note_009"
+        msgid ""
+        "0.9\\n"
+        "value release_notes_previous\\n"
         msgstr ""
       PO
 
