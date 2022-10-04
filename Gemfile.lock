@@ -438,7 +438,7 @@ DEPENDENCIES
   danger-rubocop (~> 0.6)
   fastlane (~> 2)
   fastlane-plugin-wpmreleasetoolkit!
-  gettext (~> 3.4.3)
+  gettext (~> 3.4)
   pry (~> 0.12.2)
   rmagick (~> 4.1)
   rspec (~> 3.8)
