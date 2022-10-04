@@ -23,37 +23,12 @@ module Fastlane
 
         # Now handle release_notes.txt
         release_notes_file = Dir[File.join(@metadata_directory, 'release_notes.txt')][0]
-
-        values = @release_version.split('.')
-        version_major = Integer(values[0])
-        version_minor = Integer(values[1])
-        # TODO: Keeps theis shenanigan?
-        key = "release_note_#{version_major.to_s.rjust(2, '0')}#{version_minor}"
-
-        msgctxt = "#{prefix}_#{key}"
-        msgid = <<~MSGID
-          #{@release_version}
-          #{File.open(release_notes_file).read}
-        MSGID
-        @po[msgctxt, msgid] = ''
-
-
+        @po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_release_notes_to_po(release_notes_file, @release_version, prefix, @po)
 
         # Handle release_notes_previous.txt
         release_notes_previous_file = Dir[File.join(@metadata_directory, 'release_notes_previous.txt')][0]
         version_minus_one = Fastlane::Helper::Android::VersionHelper.calc_prev_release_version(@release_version)
-        values = version_minus_one.split('.')
-        version_major = Integer(values[0])
-        version_minor = Integer(values[1])
-        # TODO: Keeps theis shenanigan?
-        key = "release_note_#{version_major.to_s.rjust(2, '0')}#{version_minor}"
-
-        msgctxt = "#{prefix}_#{key}"
-        msgid = <<~MSGID
-          #{version_minus_one}
-          #{File.open(release_notes_previous_file).read}
-        MSGID
-        @po[msgctxt, msgid] = ''
+        @po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_release_notes_to_po(release_notes_previous_file, version_minus_one, prefix, @po)
 
 
         # Finally dump the po into PlayStoreStrings.po
