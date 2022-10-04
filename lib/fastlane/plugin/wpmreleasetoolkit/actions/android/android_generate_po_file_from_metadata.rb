@@ -92,7 +92,7 @@ module Fastlane
                                        env_name: "#{env_name_prefix}_RELEASE_VERSION",
                                        description: 'The release version of the app (to use to mark the release notes)',
                                        verify_block: proc do |value|
-                                         UI.user_error!("No relase version for AnGeneratePoFileFromMetadataAction given, pass using `release_version: 'version'`") unless value && (!value.empty?)
+                                         UI.user_error!("No release version for AnGeneratePoFileFromMetadataAction given, pass using `release_version: 'version'`") unless value && (!value.empty?)
                                        end)
 
         ]
