@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
   it 'create the .po files based on the .txt files in metadata_directory' do
     in_tmp_dir do |dir|
-      required_keys = %w[description keywords name release_notes release_notes_previous].freeze
+      required_keys = %w[full_description title short_description release_notes release_notes_short release_notes_previous].freeze
       # required_files = required_keys.map { |key| File.join(dir, "#{key}.txt") }
 
       # For each key create a key.txt file whose content is "value key"
@@ -20,16 +20,20 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
       )
 
       expected = <<~PO
-        msgctxt "play_store_keywords"
-        msgid "value keywords"
+        msgctxt "play_store_full_description"
+        msgid "value full_description"
         msgstr ""
 
-        msgctxt "play_store_name"
-        msgid "value name"
+        msgctxt "play_store_release_notes_short"
+        msgid "value release_notes_short"
         msgstr ""
 
-        msgctxt "play_store_description"
-        msgid "value description"
+        msgctxt "play_store_title"
+        msgid "value title"
+        msgstr ""
+
+        msgctxt "play_store_short_description"
+        msgid "value short_description"
         msgstr ""
 
         msgctxt "play_store_release_note_010"
@@ -44,7 +48,8 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         "value release_notes_previous\\n"
         msgstr ""
       PO
-
+      File.write('/Users/juza/Projects/release-toolkit/Test/po', File.read(output_po_path))
+      File.write('/Users/juza/Projects/release-toolkit/Test/expected', expected)
       expect(File.read(output_po_path)).to eq(expected)
     end
   end
