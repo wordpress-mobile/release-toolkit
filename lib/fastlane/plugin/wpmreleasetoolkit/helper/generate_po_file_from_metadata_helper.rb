@@ -1,4 +1,5 @@
 require 'gettext/po'
+require 'gettext/po_entry'
 
 module Fastlane
   module Helper
@@ -8,12 +9,17 @@ module Fastlane
 
       # Return a GetText::PO object
       # standard_keys is the list of files
-      def self.add_standard_file_to_po(prefix, files: [])
+      def self.add_standard_files_to_po(prefix, files: [])
         po_obj = GetText::PO.new
         files.each do |file_name|
           msgid = File.open(file_name).read
           msgctxt = "#{prefix}_#{File.basename(file_name, '.txt')}"
-          po_obj[msgctxt, msgid] = ''
+          entry = GetText::POEntry.new(:msgctxt)
+          entry.msgid = msgid
+          entry.msgctxt = msgctxt
+          entry.msgstr = ''
+          # entry.translator_comment = "It's the translator comment."
+          po_obj[entry.msgctxt, entry.msgid] = entry
         end
         po_obj
       end

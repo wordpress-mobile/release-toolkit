@@ -19,7 +19,7 @@ module Fastlane
           standard_files.append(key) unless SPECIAL_KEYS.include? File.basename(key, '.txt')
         end
         # Let the helper handle standard files
-        @po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_file_to_po(prefix, files: standard_files)
+        w        @po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_files_to_po(prefix, files: standard_files)
 
         # Now handle release_notes.txt
         release_notes_file = Dir[File.join(@metadata_directory, 'release_notes.txt')][0]
@@ -68,7 +68,7 @@ module Fastlane
                                        description: 'The release version of the app (to use to mark the release notes)',
                                        verify_block: proc do |value|
                                          UI.user_error!("No release version for AnGeneratePoFileFromMetadataAction given, pass using `release_version: 'version'`") unless value && (!value.empty?)
-                                       end)
+                                       end),
 
         ]
       end
