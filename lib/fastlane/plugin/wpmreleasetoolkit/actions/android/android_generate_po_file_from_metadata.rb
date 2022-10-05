@@ -19,7 +19,7 @@ module Fastlane
           standard_files.append(key) unless SPECIAL_KEYS.include? File.basename(key, '.txt')
         end
         # Let the helper handle standard files
-        @po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_files_to_po(prefix, files: standard_files)
+        @po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_files_to_po(prefix, keys_to_comment_hash: @keys_to_comment_hash, files: standard_files)
 
         # Now handle release_notes.txt
         release_notes_file = Dir[File.join(@metadata_directory, 'release_notes.txt')][0]
@@ -64,7 +64,13 @@ module Fastlane
                                          # TODO: tell what files are missing
 
                                          # Warn if comments.json is not present
-                                         UI.message('comments.json files not present!') unless File.exist? File.join(value, 'comments.json')
+                                         keys_to_comment_hash_path = File.join(value, 'comments.json')
+                                         if File.exists? keys_to_comment_hash_path
+                                           # TODO: do not use eval
+                                           @keys_to_comment_hash = eval(File.read(keys_to_comment_hash_path))
+                                         else
+                                           UI.message('comments.json files not present!') unless File.exist? File.join(value, 'comments.json')
+                                         end
                                        end),
           FastlaneCore::ConfigItem.new(key: :release_version,
                                        env_name: "#{env_name_prefix}_RELEASE_VERSION",

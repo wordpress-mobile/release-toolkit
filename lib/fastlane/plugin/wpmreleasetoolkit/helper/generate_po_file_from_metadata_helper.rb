@@ -9,15 +9,18 @@ module Fastlane
 
       # Return a GetText::PO object
       # standard_keys is the list of files
-      def self.add_standard_files_to_po(prefix, files: [])
+      def self.add_standard_files_to_po(prefix, keys_to_comment_hash: Hash, files: [])
         po_obj = GetText::PO.new
         files.each do |file_name|
-          msgid = File.open(file_name).read
-          msgctxt = "#{prefix}_#{File.basename(file_name, '.txt')}"
+          key = File.basename(file_name, '.txt')
           entry = GetText::POEntry.new(:msgctxt)
-          entry.msgid = msgid
-          entry.msgctxt = msgctxt
+          entry.msgid = File.open(file_name).read
+          entry.msgctxt = "#{prefix}_#{File.basename(file_name, '.txt')}"
           entry.msgstr = ''
+          # if we have comment whose key matches our translation key
+          if keys_to_comment_hash.key? key.to_sym
+            entry.translator_comment = ".translators: #{keys_to_comment_hash[key.to_sym]}"
+          end
           # entry.translator_comment = "It's the translator comment."
           po_obj[entry.msgctxt, entry.msgid] = entry
         end
