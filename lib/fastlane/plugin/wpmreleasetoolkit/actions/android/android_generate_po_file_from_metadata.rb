@@ -19,7 +19,7 @@ module Fastlane
           standard_files.append(key) unless SPECIAL_KEYS.include? File.basename(key, '.txt')
         end
         # Let the helper handle standard files
-        @po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_file_to_po(prefix, files: standard_files)
+        @po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_files_to_po(prefix, keys_to_comment_hash: @keys_to_comment_hash, files: standard_files)
 
         # Now handle release_notes.txt
         release_notes_file = Dir[File.join(@metadata_directory, 'release_notes.txt')][0]
@@ -62,13 +62,22 @@ module Fastlane
                                          intersection = @txt_files_in_metadata_directory.intersection(REQUIRED_KEYS.to_set)
                                          UI.user_error!('One or more mandatory files are missing') unless intersection.length == REQUIRED_KEYS.to_set.length
                                          # TODO: tell what files are missing
+
+                                         # Warn if comments.json is not present
+                                         keys_to_comment_hash_path = File.join(value, 'comments.json')
+                                         if File.exists? keys_to_comment_hash_path
+                                           # TODO: do not use eval
+                                           @keys_to_comment_hash = eval(File.read(keys_to_comment_hash_path))
+                                         else
+                                           UI.message('comments.json files not present!') unless File.exist? File.join(value, 'comments.json')
+                                         end
                                        end),
           FastlaneCore::ConfigItem.new(key: :release_version,
                                        env_name: "#{env_name_prefix}_RELEASE_VERSION",
                                        description: 'The release version of the app (to use to mark the release notes)',
                                        verify_block: proc do |value|
                                          UI.user_error!("No release version for AnGeneratePoFileFromMetadataAction given, pass using `release_version: 'version'`") unless value && (!value.empty?)
-                                       end)
+                                       end),
 
         ]
       end
