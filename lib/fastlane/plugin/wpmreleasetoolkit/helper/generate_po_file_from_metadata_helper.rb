@@ -8,7 +8,7 @@ module Fastlane
 
       # Return a GetText::PO object
       # standard_keys is the list of files
-      def self.add_standard_file_to_po(prefix, files: [])
+      def self.add_standard_files_to_po(prefix, files: [])
         po_obj = GetText::PO.new
         files.each do |file_name|
           msgid = File.open(file_name).read
