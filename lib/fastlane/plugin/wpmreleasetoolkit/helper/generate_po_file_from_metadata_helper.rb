@@ -6,25 +6,31 @@ module Fastlane
     #
     module GeneratePoFileMetadataHelper
 
+      def self.add_poentry_to_po(msgctxt, msgid, translator_comment, po_obj)
+        entry = GetText::POEntry.new(:msgctxt)
+        entry.msgid = msgid
+        entry.msgctxt = msgctxt
+        entry.translator_comment = translator_comment
+        entry.msgstr = ''
+        po_obj[entry.msgctxt, entry.msgid] = entry
+        po_obj
+      end
+
       # Return a GetText::PO object
       # standard_keys is the list of files
       def self.add_standard_file_to_po(prefix, files: [], keys_to_comment_hash: {})
-        po_obj = GetText::PO.new
+        po = GetText::PO.new
         files.each do |file_name|
-          msgid = File.open(file_name).read
           key = File.basename(file_name, '.txt')
           msgctxt = "#{prefix}_#{key}"
-          entry = GetText::POEntry.new(:msgctxt)
-          entry.msgid = msgid
-          entry.msgctxt = msgctxt
-          entry.msgstr = ''
+          msgid = File.open(file_name).read
+          translator_comment = ''
           if keys_to_comment_hash.key? key.to_sym
-            entry.translator_comment = ".translators: #{keys_to_comment_hash[key.to_sym]}"
+            translator_comment = ".translators: #{keys_to_comment_hash[key.to_sym]}"
           end
-          # entry.translator_comment = "It's the translator comment."
-          po_obj[entry.msgctxt, entry.msgid] = entry
+          po = add_poentry_to_po(msgctxt, msgid, translator_comment, po)
         end
-        po_obj
+        po
       end
 
       def self.add_release_notes_to_po(release_notes_path, version, prefix, po_obj, keys_to_comment_hash: {})
@@ -39,18 +45,14 @@ module Fastlane
           #{File.open(release_notes_path).read}
         MSGID
 
-        entry = GetText::POEntry.new(:msgctxt)
-        entry.msgid = msgid
-        entry.msgctxt = msgctxt
-        entry.msgstr = ''
+        translator_comment = ''
         key = File.basename(release_notes_path, '.txt')
         if keys_to_comment_hash.key? key.to_sym
-          entry.translator_comment = ".translators: #{keys_to_comment_hash[key.to_sym]}"
+          translator_comment = ".translators: #{keys_to_comment_hash[key.to_sym]}"
         end
-        po_obj[entry.msgctxt, entry.msgid] = entry
 
-        po_obj[msgctxt, msgid] = ''
-        po_obj
+        add_poentry_to_po(msgctxt, msgid, translator_comment, po_obj)
+
       end
     end
   end
