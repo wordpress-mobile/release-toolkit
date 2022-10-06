@@ -18,8 +18,8 @@ module Fastlane
 
       # Return a GetText::PO object
       # standard_keys is the list of files
-      def self.add_standard_files_to_po(prefix, files: [], keys_to_comment_hash: {})
-        po = GetText::PO.new
+      def self.add_standard_files_to_po(prefix, files: [], keys_to_comment_hash: {}, po_obj: GetText::PO)
+        # po = GetText::PO.new
         files.each do |file_name|
           key = File.basename(file_name, '.txt')
           msgctxt = "#{prefix}_#{key}"
@@ -30,9 +30,9 @@ module Fastlane
               translator_comment = ".translators: #{keys_to_comment_hash[key.to_sym]}"
             end
           end
-          po = add_poentry_to_po(msgctxt, msgid, translator_comment, po)
+          po_obj = add_poentry_to_po(msgctxt, msgid, translator_comment, po_obj)
         end
-        po
+        po_obj
       end
 
       def self.add_release_notes_to_po(release_notes_path, version, prefix, po_obj, keys_to_comment_hash: {})
