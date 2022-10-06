@@ -14,10 +14,21 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
 
       output_po_path = File.join(dir, 'PlayStoreStrings.po')
 
-      run_described_fastlane_action(
-        metadata_directory: dir,
-        release_version: '1.0'
-      )
+      in_tmp_dir do |another_dir|
+
+        # Create another_file file in another_dir to test out other_sources API parameter
+        another_file = File.join(another_dir, 'foo.txt')
+        File.write(another_file, 'What you are reading is coming from another source')
+
+        run_described_fastlane_action(
+          metadata_directory: dir,
+          release_version: '1.0',
+          other_sources: [
+            { file_name: another_file, comment: 'A comment for translators about foo' },
+          ]
+        )
+      end
+
 
       expected = <<~PO
         # .translators: Multi-paragraph text used to display in the Play Store. Limit to 4000 characters including spaces and commas!
@@ -39,6 +50,11 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         msgid "value short_description"
         msgstr ""
 
+        # .translators: A comment for translators about foo
+        msgctxt "play_store_foo"
+        msgid "What you are reading is coming from another source"
+        msgstr ""
+
         # .translators: Release notes for this version to be displayed in the Play Store. Limit to 500 characters including spaces and commas!
         msgctxt "play_store_release_note_010"
         msgid ""
@@ -52,6 +68,8 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         "value release_notes_previous\\n"
         msgstr ""
       PO
+      File.write('/Users/juza/Projects/release-toolkit/Test/po', File.read(output_po_path))
+      File.write('/Users/juza/Projects/release-toolkit/Test/expected', expected)
       expect(File.read(output_po_path)).to eq(expected)
     end
   end

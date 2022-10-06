@@ -36,6 +36,17 @@ module Fastlane
         @po = GetText::PO.new
         @po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_files_to_po(prefix, files: standard_files, keys_to_comment_hash: KEYS_TO_COMMENT_HASH, po_obj: @po)
 
+        other_sources_files = []
+        other_sources_keys_to_comment_hash = {}
+
+        @other_sources.each do |hash|
+          other_sources_files.append(hash[:file_name])
+          other_sources_keys_to_comment_hash[File.basename(hash[:file_name], '.txt').to_sym] = hash[:comment]
+        end
+        @po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_files_to_po(prefix, files: other_sources_files, keys_to_comment_hash: other_sources_keys_to_comment_hash, po_obj: @po)
+
+
+
         # Now handle release_notes.txt
         release_notes_file = File.join(@metadata_directory, 'release_notes.txt')
         @po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_release_notes_to_po(release_notes_file, @release_version, prefix, @po, keys_to_comment_hash: KEYS_TO_COMMENT_HASH)
