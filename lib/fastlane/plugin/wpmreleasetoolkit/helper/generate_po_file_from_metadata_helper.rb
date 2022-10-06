@@ -13,7 +13,12 @@ module Fastlane
         files.each do |file_name|
           msgid = File.open(file_name).read
           msgctxt = "#{prefix}_#{File.basename(file_name, '.txt')}"
-          po_obj[msgctxt, msgid] = ''
+          entry = GetText::POEntry.new(:msgctxt)
+          entry.msgid = msgid
+          entry.msgctxt = msgctxt
+          entry.msgstr = ''
+          # entry.translator_comment = "It's the translator comment."
+          po_obj[entry.msgctxt, entry.msgid] = entry
         end
         po_obj
       end
