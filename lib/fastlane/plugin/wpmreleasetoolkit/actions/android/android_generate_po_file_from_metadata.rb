@@ -15,7 +15,7 @@ module Fastlane
         release_notes: 'Release notes for this version to be displayed in the Play Store. Limit to 500 characters including spaces and commas!',
         release_notes_previous: ''
       }.freeze
-      REQUIRED_KEYS = KEYS_TO_COMMENT_HASH.keys.map { |key| key.to_s }
+      REQUIRED_KEYS = KEYS_TO_COMMENT_HASH.keys.map(&:to_s)
 
       def self.run(params)
         @metadata_directory = params[:metadata_directory]
