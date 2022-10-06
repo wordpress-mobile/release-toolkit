@@ -18,8 +18,8 @@ module Fastlane
 
       # Return a GetText::PO object
       # standard_keys is the list of files
-      def self.add_standard_file_to_po(prefix, files: [], keys_to_comment_hash: {})
-        po = GetText::PO.new
+      def self.add_standard_files_to_po(prefix, files: [])
+        po_obj = GetText::PO.new
         files.each do |file_name|
           key = File.basename(file_name, '.txt')
           msgctxt = "#{prefix}_#{key}"
