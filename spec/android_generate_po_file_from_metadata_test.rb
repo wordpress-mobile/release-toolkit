@@ -20,6 +20,7 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
       )
 
       expected = <<~PO
+        # .translators: Multi-paragraph text used to display in the Play Store. Limit to 4000 characters including spaces and commas!
         msgctxt "play_store_full_description"
         msgid "value full_description"
         msgstr ""
@@ -28,14 +29,17 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         msgid "value release_notes_short"
         msgstr ""
 
+        # .translators: Title to be displayed in the Play Store. Limit to 30 characters including spaces and commas!
         msgctxt "play_store_title"
         msgid "value title"
         msgstr ""
 
+        # .translators: Short description of the app to be displayed in the Play Store. Limit to 80 characters including spaces and commas!
         msgctxt "play_store_short_description"
         msgid "value short_description"
         msgstr ""
 
+        # .translators: Release notes for this version to be displayed in the Play Store. Limit to 500 characters including spaces and commas!
         msgctxt "play_store_release_note_010"
         msgid ""
         "1.0\\n"
