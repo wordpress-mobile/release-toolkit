@@ -77,6 +77,16 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("No release version for AnGeneratePoFileFromMetadataAction given, pass using `release_version: 'version'`") unless value && (!value.empty?)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :other_sources,
+                                       type: Array,
+                                       default_value: [],
+                                       env_name: "#{env_name_prefix}_OTHER_SOURCES",
+                                       description: 'Other directories that contain files to be added to the po',
+                                       verify_block: proc do |value|
+                                         value.each do |other_sources_entry|
+                                           UI.user_error!("#{other_sources_entry['file_name'.to_sym]} file in other_sources parameter  does not exist") unless File.exists? other_sources_entry['file_name'.to_sym]
+                                         end
+                                       end),
 
         ]
       end
