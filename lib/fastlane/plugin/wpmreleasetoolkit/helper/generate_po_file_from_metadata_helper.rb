@@ -26,7 +26,9 @@ module Fastlane
           msgid = File.open(file_name).read
           translator_comment = ''
           if keys_to_comment_hash.key? key.to_sym
-            translator_comment = ".translators: #{keys_to_comment_hash[key.to_sym]}"
+            unless keys_to_comment_hash[key.to_sym].empty?
+              translator_comment = ".translators: #{keys_to_comment_hash[key.to_sym]}"
+            end
           end
           po = add_poentry_to_po(msgctxt, msgid, translator_comment, po)
         end
@@ -48,7 +50,9 @@ module Fastlane
         translator_comment = ''
         key = File.basename(release_notes_path, '.txt')
         if keys_to_comment_hash.key? key.to_sym
-          translator_comment = ".translators: #{keys_to_comment_hash[key.to_sym]}"
+          unless keys_to_comment_hash[key.to_sym].empty?
+            translator_comment = ".translators: #{keys_to_comment_hash[key.to_sym]}"
+          end
         end
 
         add_poentry_to_po(msgctxt, msgid, translator_comment, po_obj)
