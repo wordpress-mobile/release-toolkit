@@ -52,8 +52,6 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         "value release_notes_previous\\n"
         msgstr ""
       PO
-      File.write('/Users/juza/Projects/release-toolkit/Test/po', File.read(output_po_path))
-      File.write('/Users/juza/Projects/release-toolkit/Test/expected', expected)
       expect(File.read(output_po_path)).to eq(expected)
     end
   end
