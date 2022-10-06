@@ -26,8 +26,12 @@ module Fastlane
           msgid = File.open(file_name).read
           translator_comment = ''
           if keys_to_comment_hash.key? key.to_sym
-            unless keys_to_comment_hash[key.to_sym].empty?
-              translator_comment = ".translators: #{keys_to_comment_hash[key.to_sym]}"
+            # The comment might not exist at all
+            unless keys_to_comment_hash[key.to_sym].nil?
+              # Or it might be empty string
+              unless keys_to_comment_hash[key.to_sym].empty?
+                translator_comment = ".translators: #{keys_to_comment_hash[key.to_sym]}"
+              end
             end
           end
           po_obj = add_poentry_to_po(msgctxt, msgid, translator_comment, po_obj)

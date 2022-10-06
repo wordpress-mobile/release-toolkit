@@ -18,13 +18,16 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
 
         # Create another_file file in another_dir to test out other_sources API parameter
         another_file = File.join(another_dir, 'foo.txt')
+        another_file_again = File.join(another_dir, 'bar.txt')
         File.write(another_file, 'What you are reading is coming from another source')
+        File.write(another_file_again, 'What you are reading is coming from another source again')
 
         run_described_fastlane_action(
           metadata_directory: dir,
           release_version: '1.0',
           other_sources: [
             { file_name: another_file, comment: 'A comment for translators about foo' },
+            { file_name: another_file_again },
           ]
         )
       end
