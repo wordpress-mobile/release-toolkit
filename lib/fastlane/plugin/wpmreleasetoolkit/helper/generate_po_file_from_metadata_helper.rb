@@ -5,7 +5,6 @@ module Fastlane
     # Helper methods to execute PO related operations
     #
     module GeneratePoFileMetadataHelper
-
       def self.add_poentry_to_po(msgctxt, msgid, translator_comment, po_obj)
         entry = GetText::POEntry.new(:msgctxt)
         entry.msgid = msgid
@@ -60,7 +59,6 @@ module Fastlane
         end
 
         add_poentry_to_po(msgctxt, msgid, translator_comment, po_obj)
-
       end
     end
   end

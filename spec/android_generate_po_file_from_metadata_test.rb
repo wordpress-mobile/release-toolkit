@@ -14,7 +14,6 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
       output_po_path = File.join(dir, 'PlayStoreStrings.po')
 
       in_tmp_dir do |another_dir|
-
         # Create other files in another_dir to test out other_sources API parameter
         another_file = File.join(another_dir, 'promo_screenshot_1.txt')
         another_file_again = File.join(another_dir, 'promo_screenshot_2.txt')
@@ -29,7 +28,6 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
           ]
         )
       end
-
 
       expected = <<~PO
         msgctxt "play_store_release_note_009"
@@ -109,7 +107,6 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
 
       output_po_path = File.join(dir, 'PlayStoreStrings.po')
 
-
       another_file = File.join(dir, 'promo_screenshot_1.txt')
       another_file_again = File.join(dir, 'promo_screenshot_2.txt')
       File.write(another_file, 'What you are reading is coming from another source')
@@ -117,7 +114,7 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
 
       run_described_fastlane_action(
         metadata_directory: dir,
-        release_version: '1.0',
+        release_version: '1.0'
       )
 
       expected = <<~PO
