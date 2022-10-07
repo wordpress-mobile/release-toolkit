@@ -77,9 +77,6 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         msgstr ""
       PO
 
-      # TODO: remove these line when PR is ready
-      # File.write('/Users/juza/Projects/release-toolkit/Test/po', File.read(output_po_path))
-      # File.write('/Users/juza/Projects/release-toolkit/Test/expected', expected)
       expect(File.read(output_po_path)).to eq(expected)
     end
   end
@@ -171,10 +168,6 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         msgstr ""
       PO
 
-      # TODO: remove these line when PR is ready
-      File.write('/Users/juza/Projects/release-toolkit/Test/po', File.read(output_po_path))
-      File.write('/Users/juza/Projects/release-toolkit/Test/expected', expected)
-      expect(File.read(output_po_path)).to eq(expected)
     end
   end
 end
