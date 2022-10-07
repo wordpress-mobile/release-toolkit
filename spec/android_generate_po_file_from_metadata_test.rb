@@ -93,7 +93,6 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         write_to = File.join(dir, "#{key}.txt")
         File.write(write_to, "value #{key}")
       end
-      # expect { run_described_fastlane_action({}) }.to raise_error 'The `:key_file` parameter is required'
       expect do
         run_described_fastlane_action(
           metadata_directory: dir,
