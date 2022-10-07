@@ -75,6 +75,8 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         msgid "value full_description"
         msgstr ""
       PO
+
+      # TODO: remove these line when PR is ready
       # File.write('/Users/juza/Projects/release-toolkit/Test/po', File.read(output_po_path))
       # File.write('/Users/juza/Projects/release-toolkit/Test/expected', expected)
       expect(File.read(output_po_path)).to eq(expected)
