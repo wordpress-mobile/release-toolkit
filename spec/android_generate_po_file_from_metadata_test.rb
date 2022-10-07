@@ -16,9 +16,9 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
 
       in_tmp_dir do |another_dir|
 
-        # Create another_file file in another_dir to test out other_sources API parameter
-        another_file = File.join(another_dir, 'foo.txt')
-        another_file_again = File.join(another_dir, 'bar.txt')
+        # Create other files in another_dir to test out other_sources API parameter
+        another_file = File.join(another_dir, 'promo_screenshot_1.txt')
+        another_file_again = File.join(another_dir, 'promo_screenshot_2.txt')
         File.write(another_file, 'What you are reading is coming from another source')
         File.write(another_file_again, 'What you are reading is coming from another source again')
 
@@ -26,17 +26,17 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
           metadata_directory: dir,
           release_version: '1.0',
           other_sources: [
-            { file_name: another_file, comment: 'A comment for translators about foo' },
-            { file_name: another_file_again },
+            another_dir,
           ]
         )
       end
 
 
       expected = <<~PO
-        # .translators: Multi-paragraph text used to display in the Play Store. Limit to 4000 characters including spaces and commas!
-        msgctxt "play_store_full_description"
-        msgid "value full_description"
+        msgctxt "play_store_release_note_009"
+        msgid ""
+        "0.9\\n"
+        "value release_notes_previous\\n"
         msgstr ""
 
         msgctxt "play_store_release_notes_short"
@@ -53,9 +53,14 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         msgid "value short_description"
         msgstr ""
 
-        # .translators: A comment for translators about foo
-        msgctxt "play_store_foo"
+        # .translators: Description for the first app store image
+        msgctxt "play_store_promo_screenshot_1"
         msgid "What you are reading is coming from another source"
+        msgstr ""
+
+        # .translators: Description for the second app store image
+        msgctxt "play_store_promo_screenshot_2"
+        msgid "What you are reading is coming from another source again"
         msgstr ""
 
         # .translators: Release notes for this version to be displayed in the Play Store. Limit to 500 characters including spaces and commas!
@@ -65,14 +70,13 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         "value release_notes\\n"
         msgstr ""
 
-        msgctxt "play_store_release_note_009"
-        msgid ""
-        "0.9\\n"
-        "value release_notes_previous\\n"
+        # .translators: Multi-paragraph text used to display in the Play Store. Limit to 4000 characters including spaces and commas!
+        msgctxt "play_store_full_description"
+        msgid "value full_description"
         msgstr ""
       PO
-      File.write('/Users/juza/Projects/release-toolkit/Test/po', File.read(output_po_path))
-      File.write('/Users/juza/Projects/release-toolkit/Test/expected', expected)
+      # File.write('/Users/juza/Projects/release-toolkit/Test/po', File.read(output_po_path))
+      # File.write('/Users/juza/Projects/release-toolkit/Test/expected', expected)
       expect(File.read(output_po_path)).to eq(expected)
     end
   end
