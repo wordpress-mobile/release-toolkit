@@ -82,4 +82,22 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
       expect(File.read(output_po_path)).to eq(expected)
     end
   end
+
+  it 'test missing required .txt file' do
+    in_tmp_dir do |dir|
+      required_keys = %w[full_description title].freeze
+      # required_files = required_keys.map { |key| File.join(dir, "#{key}.txt") }
+
+      # For each key create a key.txt file whose content is "value key"
+      required_keys.each do |key|
+        write_to = File.join(dir, "#{key}.txt")
+        File.write(write_to, "value #{key}")
+      end
+
+      run_described_fastlane_action(
+        metadata_directory: dir,
+        release_version: '1.0'
+      ).to raise_error(FastlaneCore::Interface::FastlaneError)
+    end
+  end
 end
