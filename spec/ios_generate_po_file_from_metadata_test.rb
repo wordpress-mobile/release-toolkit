@@ -40,7 +40,7 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         msgstr ""
 
         # .translators: Keywords used in the App Store search engine to find the app.
-        # #. Delimit with a comma between each keyword. Limit to 100 characters including spaces and commas.
+        # .Delimit with a comma between each keyword. Limit to 100 characters including spaces and commas.
         msgctxt "app_store_keywords"
         msgid "value keywords"
         msgstr ""
@@ -146,7 +146,7 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         msgstr ""
 
         # .translators: Keywords used in the App Store search engine to find the app.
-        # #. Delimit with a comma between each keyword. Limit to 100 characters including spaces and commas.
+        # .Delimit with a comma between each keyword. Limit to 100 characters including spaces and commas.
         msgctxt "app_store_keywords"
         msgid "value keywords"
         msgstr ""

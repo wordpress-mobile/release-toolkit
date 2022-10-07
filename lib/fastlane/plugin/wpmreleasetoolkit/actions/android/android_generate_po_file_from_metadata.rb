@@ -19,7 +19,6 @@ module Fastlane
 
       REQUIRED_KEYS = REQUIRED_KEYS_TO_COMMENT_HASH.keys.map(&:to_s).freeze
 
-      # TODO: this is needed for Ios not Android, we'll move it when we have the Ios action
       KEYS_TO_COMMENT_HASH = REQUIRED_KEYS_TO_COMMENT_HASH.merge(
         {
           promo_screenshot_1: 'Description for the first app store image',
