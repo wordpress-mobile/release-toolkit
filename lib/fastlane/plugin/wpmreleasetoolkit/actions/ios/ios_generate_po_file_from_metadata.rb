@@ -14,7 +14,8 @@ module Fastlane
         subtitle: 'Subtitle to be displayed below the application name in the Apple App Store. Limit to 30 characters including spaces and commas!',
         description: 'Multi-paragraph text used to display in the Apple App Store.',
         keywords: 'Keywords used in the App Store search engine to find the app.
-.Delimit with a comma between each keyword. Limit to 100 characters including spaces and commas.'
+.Delimit with a comma between each keyword. Limit to 100 characters including spaces and commas.',
+        release_notes_previous: ''
       }.freeze
 
       REQUIRED_KEYS = REQUIRED_KEYS_TO_COMMENT_HASH.keys.map(&:to_s).freeze
@@ -29,6 +30,10 @@ module Fastlane
           promo_screenshot_6: 'Description for the sixth app store image'
         }
       ).freeze
+
+      def self.required_keys
+        REQUIRED_KEYS
+      end
 
       def self.run(params)
         @metadata_directory = params[:metadata_directory]
