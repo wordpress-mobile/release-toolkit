@@ -10,5 +10,4 @@ gem 'gettext', '~> 3.4'
 gem 'webmock', require: false
 gem 'yard'
 
-
 gem 'rspec-buildkite-analytics', '~> 0.8.1'

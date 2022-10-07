@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
+describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
   it 'create the .po files based on the .txt files in metadata_directory' do
     in_tmp_dir do |dir|
-      required_keys = %w[full_description title short_description release_notes release_notes_short release_notes_previous].freeze
+      required_keys = %w[release_notes name subtitle description keywords release_notes_previous].freeze
 
       # For each key create a key.txt file whose content is "value key"
       required_keys.each do |key|
@@ -14,7 +14,6 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
       output_po_path = File.join(dir, 'PlayStoreStrings.po')
 
       in_tmp_dir do |another_dir|
-
         # Create other files in another_dir to test out other_sources API parameter
         another_file = File.join(another_dir, 'promo_screenshot_1.txt')
         another_file_again = File.join(another_dir, 'promo_screenshot_2.txt')
@@ -30,48 +29,49 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         )
       end
 
-
       expected = <<~PO
-        msgctxt "play_store_release_note_009"
+        msgctxt "app_store_release_note_009"
         msgid ""
         "0.9\\n"
         "value release_notes_previous\\n"
         msgstr ""
 
-        msgctxt "play_store_release_notes_short"
-        msgid "value release_notes_short"
+        # .translators: Keywords used in the App Store search engine to find the app.
+        # .Delimit with a comma between each keyword. Limit to 100 characters including spaces and commas.
+        msgctxt "app_store_keywords"
+        msgid "value keywords"
         msgstr ""
 
-        # .translators: Title to be displayed in the Play Store. Limit to 30 characters including spaces and commas!
-        msgctxt "play_store_title"
-        msgid "value title"
+        # .translators: The application name in the Apple App Store. Please keep the brand names ('Jetpack' and WordPress') verbatim. Limit to 30 characters including spaces and punctuation!
+        msgctxt "app_store_name"
+        msgid "value name"
         msgstr ""
 
-        # .translators: Short description of the app to be displayed in the Play Store. Limit to 80 characters including spaces and commas!
-        msgctxt "play_store_short_description"
-        msgid "value short_description"
+        # .translators: Multi-paragraph text used to display in the Apple App Store.
+        msgctxt "app_store_description"
+        msgid "value description"
         msgstr ""
 
         # .translators: Description for the first app store image
-        msgctxt "play_store_promo_screenshot_1"
+        msgctxt "app_store_promo_screenshot_1"
         msgid "What you are reading is coming from another source"
         msgstr ""
 
         # .translators: Description for the second app store image
-        msgctxt "play_store_promo_screenshot_2"
+        msgctxt "app_store_promo_screenshot_2"
         msgid "What you are reading is coming from another source again"
         msgstr ""
 
-        # .translators: Release notes for this version to be displayed in the Play Store. Limit to 500 characters including spaces and commas!
-        msgctxt "play_store_release_note_010"
+        # .translators: Multi-paragraph text used to display in the Play Store. Limit to 4000 characters including spaces and commas!
+        msgctxt "app_store_release_note_010"
         msgid ""
         "1.0\\n"
         "value release_notes\\n"
         msgstr ""
 
-        # .translators: Multi-paragraph text used to display in the Play Store. Limit to 4000 characters including spaces and commas!
-        msgctxt "play_store_full_description"
-        msgid "value full_description"
+        # .translators: Subtitle to be displayed below the application name in the Apple App Store. Limit to 30 characters including spaces and commas!
+        msgctxt "app_store_subtitle"
+        msgid "value subtitle"
         msgstr ""
       PO
 
@@ -99,7 +99,7 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
 
   it 'test additional `.txt` files in `metadata_directory`' do
     in_tmp_dir do |dir|
-      required_keys = %w[full_description title short_description release_notes release_notes_short release_notes_previous].freeze
+      required_keys = %w[release_notes name subtitle description keywords release_notes_previous].freeze
 
       # For each key create a key.txt file whose content is "value key"
       required_keys.each do |key|
@@ -109,7 +109,6 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
 
       output_po_path = File.join(dir, 'PlayStoreStrings.po')
 
-
       another_file = File.join(dir, 'promo_screenshot_1.txt')
       another_file_again = File.join(dir, 'promo_screenshot_2.txt')
       File.write(another_file, 'What you are reading is coming from another source')
@@ -117,49 +116,51 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
 
       run_described_fastlane_action(
         metadata_directory: dir,
-        release_version: '1.0',
+        release_version: '1.0'
       )
 
       expected = <<~PO
-        msgctxt "play_store_release_note_009"
+        msgctxt "app_store_release_note_009"
         msgid ""
         "0.9\\n"
         "value release_notes_previous\\n"
         msgstr ""
 
         # .translators: Description for the second app store image
-        msgctxt "play_store_promo_screenshot_2"
+        msgctxt "app_store_promo_screenshot_2"
         msgid "What you are reading is coming from another source again"
         msgstr ""
 
+        # .translators: Subtitle to be displayed below the application name in the Apple App Store. Limit to 30 characters including spaces and commas!
+        msgctxt "app_store_subtitle"
+        msgid "value subtitle"
+        msgstr ""
+
+        # .translators: Keywords used in the App Store search engine to find the app.
+        # .Delimit with a comma between each keyword. Limit to 100 characters including spaces and commas.
+        msgctxt "app_store_keywords"
+        msgid "value keywords"
+        msgstr ""
+
+        # .translators: The application name in the Apple App Store. Please keep the brand names ('Jetpack' and WordPress') verbatim. Limit to 30 characters including spaces and punctuation!
+        msgctxt "app_store_name"
+        msgid "value name"
+        msgstr ""
+
+        # .translators: Multi-paragraph text used to display in the Apple App Store.
+        msgctxt "app_store_description"
+        msgid "value description"
+        msgstr ""
+
         # .translators: Multi-paragraph text used to display in the Play Store. Limit to 4000 characters including spaces and commas!
-        msgctxt "play_store_full_description"
-        msgid "value full_description"
-        msgstr ""
-
-        msgctxt "play_store_release_notes_short"
-        msgid "value release_notes_short"
-        msgstr ""
-
-        # .translators: Title to be displayed in the Play Store. Limit to 30 characters including spaces and commas!
-        msgctxt "play_store_title"
-        msgid "value title"
-        msgstr ""
-
-        # .translators: Short description of the app to be displayed in the Play Store. Limit to 80 characters including spaces and commas!
-        msgctxt "play_store_short_description"
-        msgid "value short_description"
-        msgstr ""
-
-        # .translators: Release notes for this version to be displayed in the Play Store. Limit to 500 characters including spaces and commas!
-        msgctxt "play_store_release_note_010"
+        msgctxt "app_store_release_note_010"
         msgid ""
         "1.0\\n"
         "value release_notes\\n"
         msgstr ""
 
         # .translators: Description for the first app store image
-        msgctxt "play_store_promo_screenshot_1"
+        msgctxt "app_store_promo_screenshot_1"
         msgid "What you are reading is coming from another source"
         msgstr ""
       PO

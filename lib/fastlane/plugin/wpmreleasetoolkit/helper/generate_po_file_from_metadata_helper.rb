@@ -5,7 +5,6 @@ module Fastlane
     # Helper methods to execute PO related operations
     #
     module GeneratePoFileMetadataHelper
-
       def self.add_poentry_to_po(msgctxt, msgid, translator_comment, po_obj)
         entry = GetText::POEntry.new(:msgctxt)
         entry.msgid = msgid
@@ -16,6 +15,14 @@ module Fastlane
         po_obj
       end
 
+      def self.whatever(key:, keys_to_comment_hash:)
+        if (keys_to_comment_hash.key? key.to_sym) && (!keys_to_comment_hash[key.to_sym].nil? && !keys_to_comment_hash[key.to_sym].empty?)
+          ".translators: #{keys_to_comment_hash[key.to_sym]}"
+        else
+          ''
+        end
+      end
+
       # Return a GetText::PO object
       # standard_keys is the list of files
       def self.add_standard_files_to_po(prefix, files: [], keys_to_comment_hash: {}, po_obj: GetText::PO)
@@ -24,16 +31,7 @@ module Fastlane
           key = File.basename(file_name, '.txt')
           msgctxt = "#{prefix}_#{key}"
           msgid = File.open(file_name).read
-          translator_comment = ''
-          if keys_to_comment_hash.key? key.to_sym
-            # The comment might not exist at all
-            unless keys_to_comment_hash[key.to_sym].nil?
-              # Or it might be empty string
-              unless keys_to_comment_hash[key.to_sym].empty?
-                translator_comment = ".translators: #{keys_to_comment_hash[key.to_sym]}"
-              end
-            end
-          end
+          translator_comment = whatever(key: key, keys_to_comment_hash: keys_to_comment_hash)
           po_obj = add_poentry_to_po(msgctxt, msgid, translator_comment, po_obj)
         end
         po_obj
@@ -51,16 +49,10 @@ module Fastlane
           #{File.open(release_notes_path).read}
         MSGID
 
-        translator_comment = ''
         key = File.basename(release_notes_path, '.txt')
-        if keys_to_comment_hash.key? key.to_sym
-          unless keys_to_comment_hash[key.to_sym].empty?
-            translator_comment = ".translators: #{keys_to_comment_hash[key.to_sym]}"
-          end
-        end
+        translator_comment = whatever(key: key, keys_to_comment_hash: keys_to_comment_hash)
 
         add_poentry_to_po(msgctxt, msgid, translator_comment, po_obj)
-
       end
     end
   end
