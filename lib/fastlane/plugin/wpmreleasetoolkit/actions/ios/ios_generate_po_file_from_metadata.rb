@@ -1,4 +1,4 @@
-require_relative '../../helper/poextended.rb'
+require_relative '../../helper/poextended'
 require 'fastlane/action'
 require 'gettext/po'
 

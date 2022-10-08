@@ -74,9 +74,7 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         msgid "value subtitle"
         msgstr ""
       PO
-      # TODO: remove these line when PR is ready
-      File.write('/Users/juza/Projects/release-toolkit/Test/po1', File.read(output_po_path))
-      File.write('/Users/juza/Projects/release-toolkit/Test/expected1', expected)
+      PO
 
       expect(File.read(output_po_path)).to eq(expected)
     end
@@ -166,9 +164,7 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         msgid "value subtitle"
         msgstr ""
       PO
-      # TODO: remove these line when PR is ready
-      File.write('/Users/juza/Projects/release-toolkit/Test/po2', File.read(output_po_path))
-      File.write('/Users/juza/Projects/release-toolkit/Test/expected2', expected)
+      PO
 
       expect(File.read(output_po_path)).to eq(expected)
     end

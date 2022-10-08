@@ -1,5 +1,6 @@
 require 'gettext/po'
 
+## Extend GetText::PO to allow sorting by msgctxt
 class POEXTENDED < GetText::PO
   def sort_by_msgctxt(entries)
     entries.sort_by do |msgid_entry|
