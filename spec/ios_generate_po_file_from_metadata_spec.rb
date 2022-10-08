@@ -30,10 +30,9 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
       end
 
       expected = <<~PO
-        msgctxt "app_store_release_note_009"
-        msgid ""
-        "0.9\\n"
-        "value release_notes_previous\\n"
+        # .translators: Multi-paragraph text used to display in the Apple App Store.
+        msgctxt "app_store_description"
+        msgid "value description"
         msgstr ""
 
         # .translators: Keywords used in the App Store search engine to find the app.
@@ -47,11 +46,6 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         msgid "value name"
         msgstr ""
 
-        # .translators: Multi-paragraph text used to display in the Apple App Store.
-        msgctxt "app_store_description"
-        msgid "value description"
-        msgstr ""
-
         # .translators: Description for the first app store image
         msgctxt "app_store_promo_screenshot_1"
         msgid "What you are reading is coming from another source"
@@ -60,6 +54,12 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         # .translators: Description for the second app store image
         msgctxt "app_store_promo_screenshot_2"
         msgid "What you are reading is coming from another source again"
+        msgstr ""
+
+        msgctxt "app_store_release_note_009"
+        msgid ""
+        "0.9\\n"
+        "value release_notes_previous\\n"
         msgstr ""
 
         # .translators: Multi-paragraph text used to display in the Play Store. Limit to 4000 characters including spaces and commas!
@@ -74,6 +74,9 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         msgid "value subtitle"
         msgstr ""
       PO
+      # TODO: remove these line when PR is ready
+      File.write('/Users/juza/Projects/release-toolkit/Test/po1', File.read(output_po_path))
+      File.write('/Users/juza/Projects/release-toolkit/Test/expected1', expected)
 
       expect(File.read(output_po_path)).to eq(expected)
     end
@@ -119,20 +122,9 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
       )
 
       expected = <<~PO
-        msgctxt "app_store_release_note_009"
-        msgid ""
-        "0.9\\n"
-        "value release_notes_previous\\n"
-        msgstr ""
-
-        # .translators: Description for the second app store image
-        msgctxt "app_store_promo_screenshot_2"
-        msgid "What you are reading is coming from another source again"
-        msgstr ""
-
-        # .translators: Subtitle to be displayed below the application name in the Apple App Store. Limit to 30 characters including spaces and commas!
-        msgctxt "app_store_subtitle"
-        msgid "value subtitle"
+        # .translators: Multi-paragraph text used to display in the Apple App Store.
+        msgctxt "app_store_description"
+        msgid "value description"
         msgstr ""
 
         # .translators: Keywords used in the App Store search engine to find the app.
@@ -146,9 +138,20 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         msgid "value name"
         msgstr ""
 
-        # .translators: Multi-paragraph text used to display in the Apple App Store.
-        msgctxt "app_store_description"
-        msgid "value description"
+        # .translators: Description for the first app store image
+        msgctxt "app_store_promo_screenshot_1"
+        msgid "What you are reading is coming from another source"
+        msgstr ""
+
+        # .translators: Description for the second app store image
+        msgctxt "app_store_promo_screenshot_2"
+        msgid "What you are reading is coming from another source again"
+        msgstr ""
+
+        msgctxt "app_store_release_note_009"
+        msgid ""
+        "0.9\\n"
+        "value release_notes_previous\\n"
         msgstr ""
 
         # .translators: Multi-paragraph text used to display in the Play Store. Limit to 4000 characters including spaces and commas!
@@ -158,11 +161,14 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         "value release_notes\\n"
         msgstr ""
 
-        # .translators: Description for the first app store image
-        msgctxt "app_store_promo_screenshot_1"
-        msgid "What you are reading is coming from another source"
+        # .translators: Subtitle to be displayed below the application name in the Apple App Store. Limit to 30 characters including spaces and commas!
+        msgctxt "app_store_subtitle"
+        msgid "value subtitle"
         msgstr ""
       PO
+      # TODO: remove these line when PR is ready
+      File.write('/Users/juza/Projects/release-toolkit/Test/po2', File.read(output_po_path))
+      File.write('/Users/juza/Projects/release-toolkit/Test/expected2', expected)
 
       expect(File.read(output_po_path)).to eq(expected)
     end
