@@ -1,4 +1,4 @@
-require_relative '../../helper/poextended'
+require_relative '../../helper/po_extended'
 require 'fastlane/action'
 require 'gettext/po'
 
@@ -50,7 +50,7 @@ module Fastlane
           standard_files.append(key) unless SPECIAL_KEYS.include? File.basename(key, '.txt')
         end
         # Let the helper handle standard files
-        po = POEXTENDED.new(:msgctxt)
+        po = PoExtended.new(:msgctxt)
         po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_files_to_po(prefix, files: standard_files, keys_to_comment_hash: KEYS_TO_COMMENT_HASH, po_obj: po)
 
         other_sources_files = []
