@@ -50,27 +50,26 @@ module Fastlane
           standard_files.append(key) unless SPECIAL_KEYS.include? File.basename(key, '.txt')
         end
         # Let the helper handle standard files
-        @po = POEXTENDED.new(:msgctxt)
-        @po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_files_to_po(prefix, files: standard_files, keys_to_comment_hash: KEYS_TO_COMMENT_HASH, po_obj: @po)
+        po = POEXTENDED.new(:msgctxt)
+        po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_files_to_po(prefix, files: standard_files, keys_to_comment_hash: KEYS_TO_COMMENT_HASH, po_obj: po)
 
         other_sources_files = []
         @other_sources.each do |other_source|
           other_sources_files.append(Dir[File.join(other_source, '*.txt')]).flatten!
         end
-        @po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_files_to_po(prefix, files: other_sources_files, keys_to_comment_hash: KEYS_TO_COMMENT_HASH, po_obj: @po)
+        po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_files_to_po(prefix, files: other_sources_files, keys_to_comment_hash: KEYS_TO_COMMENT_HASH, po_obj: po)
 
         # Now handle release_notes.txt
         release_notes_file = File.join(@metadata_directory, 'release_notes.txt')
-        @po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_release_notes_to_po(release_notes_file, @release_version, prefix, @po, keys_to_comment_hash: KEYS_TO_COMMENT_HASH)
+        po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_release_notes_to_po(release_notes_file, @release_version, prefix, po, keys_to_comment_hash: KEYS_TO_COMMENT_HASH)
 
         # Handle release_notes_previous.txt
         release_notes_previous_file = File.join(@metadata_directory, 'release_notes_previous.txt')
         version_minus_one = Fastlane::Helper::Android::VersionHelper.calc_prev_release_version(@release_version)
-        @po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_release_notes_to_po(release_notes_previous_file, version_minus_one, prefix, @po, keys_to_comment_hash: KEYS_TO_COMMENT_HASH)
+        po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_release_notes_to_po(release_notes_previous_file, version_minus_one, prefix, po, keys_to_comment_hash: KEYS_TO_COMMENT_HASH)
         ``
         # Finally dump the po into PlayStoreStrings.po
-        po_file = File.join(params[:metadata_directory], 'PlayStoreStrings.po')
-        File.write(po_file, @po.to_s)
+        File.write(File.join(@metadata_directory, 'PlayStoreStrings.po'), po.to_s)
       end
 
       def self.description
