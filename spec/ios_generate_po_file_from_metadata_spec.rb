@@ -74,7 +74,6 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         msgid "value subtitle"
         msgstr ""
       PO
-      PO
 
       expect(File.read(output_po_path)).to eq(expected)
     end
@@ -163,7 +162,6 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         msgctxt "app_store_subtitle"
         msgid "value subtitle"
         msgstr ""
-      PO
       PO
 
       expect(File.read(output_po_path)).to eq(expected)
