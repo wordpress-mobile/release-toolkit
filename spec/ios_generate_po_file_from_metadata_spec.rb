@@ -11,7 +11,7 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         File.write(write_to, "value #{key}")
       end
 
-      output_po_path = File.join(dir, 'PlayStoreStrings.po')
+      output_po_path = File.join(dir, 'AppStoreStrings.po')
 
       in_tmp_dir do |another_dir|
         # Create other files in another_dir to test out other_sources API parameter
@@ -106,7 +106,7 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         File.write(write_to, "value #{key}")
       end
 
-      output_po_path = File.join(dir, 'PlayStoreStrings.po')
+      output_po_path = File.join(dir, 'AppStoreStrings.po')
 
       another_file = File.join(dir, 'promo_screenshot_1.txt')
       another_file_again = File.join(dir, 'promo_screenshot_2.txt')
