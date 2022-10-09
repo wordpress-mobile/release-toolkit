@@ -13,9 +13,9 @@ module Fastlane
         full_description: 'Multi-paragraph text used to display in the Play Store. Limit to 4000 characters including spaces and commas!',
         title: 'Title to be displayed in the Play Store. Limit to 30 characters including spaces and commas!',
         short_description: 'Short description of the app to be displayed in the Play Store. Limit to 80 characters including spaces and commas!',
-        release_notes_short: '',
+        release_notes_short: nil,
         release_notes: 'Release notes for this version to be displayed in the Play Store. Limit to 500 characters including spaces and commas!',
-        release_notes_previous: ''
+        release_notes_previous: nil
       }.freeze
 
       REQUIRED_KEYS = REQUIRED_KEYS_TO_COMMENT_HASH.keys.map(&:to_s).freeze

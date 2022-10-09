@@ -16,7 +16,7 @@ module Fastlane
         description: 'Multi-paragraph text used to display in the Apple App Store.',
         keywords: 'Keywords used in the App Store search engine to find the app.
 .Delimit with a comma between each keyword. Limit to 100 characters including spaces and commas.',
-        release_notes_previous: ''
+        release_notes_previous: nil
       }.freeze
 
       REQUIRED_KEYS = REQUIRED_KEYS_TO_COMMENT_HASH.keys.map(&:to_s).freeze
