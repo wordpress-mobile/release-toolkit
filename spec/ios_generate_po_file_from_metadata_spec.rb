@@ -30,6 +30,20 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
       end
 
       expected = <<~PO
+        # Translation of Release Notes & Apple Store Description in English (US)
+        # This file is distributed under the same license as the Release Notes & Apple Store Description package.
+        msgid ""
+        msgstr ""
+        "MIME-Version: 1.0\\n"
+        "Content-Type: text/plain; charset=UTF-8\\n"
+        "Content-Transfer-Encoding: 8bit\\n"
+        "Plural-Forms: nplurals=2; plural=n != 1;\\n"
+        "Project-Id-Version: Release Notes & Apple Store Description\\n"
+        "POT-Creation-Date:\\n"
+        "Last-Translator:\\n"
+        "Language-Team:\\n"
+        "Language-Team:\\n"
+
         # .translators: Multi-paragraph text used to display in the Apple App Store.
         msgctxt "app_store_description"
         msgid "value description"
@@ -119,6 +133,20 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
       )
 
       expected = <<~PO
+        # Translation of Release Notes & Apple Store Description in English (US)
+        # This file is distributed under the same license as the Release Notes & Apple Store Description package.
+        msgid ""
+        msgstr ""
+        "MIME-Version: 1.0\\n"
+        "Content-Type: text/plain; charset=UTF-8\\n"
+        "Content-Transfer-Encoding: 8bit\\n"
+        "Plural-Forms: nplurals=2; plural=n != 1;\\n"
+        "Project-Id-Version: Release Notes & Apple Store Description\\n"
+        "POT-Creation-Date:\\n"
+        "Last-Translator:\\n"
+        "Language-Team:\\n"
+        "Language-Team:\\n"
+
         # .translators: Multi-paragraph text used to display in the Apple App Store.
         msgctxt "app_store_description"
         msgid "value description"

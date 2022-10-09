@@ -52,6 +52,7 @@ module Fastlane
         end
         # Let the helper handle standard files
         po = PoExtended.new(:msgctxt)
+        po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_header_to_po(po)
         po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_files_to_po(prefix, files: standard_files, keys_to_comment_hash: KEYS_TO_COMMENT_HASH, po_obj: po)
 
         other_sources_files = []

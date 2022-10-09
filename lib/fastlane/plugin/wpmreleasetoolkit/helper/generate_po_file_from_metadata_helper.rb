@@ -5,6 +5,27 @@ module Fastlane
     # Helper methods to execute PO related operations
     #
     module GeneratePoFileMetadataHelper
+
+      def self.add_header_to_po(po_obj)
+        po_obj[''] = <<~HEADER
+          MIME-Version: 1.0
+          Content-Type: text/plain; charset=UTF-8
+          Content-Transfer-Encoding: 8bit
+          Plural-Forms: nplurals=2; plural=n != 1;
+          Project-Id-Version: Release Notes & Apple Store Description
+          POT-Creation-Date:
+          Last-Translator:
+          Language-Team:
+          Language-Team:
+        HEADER
+
+        po_obj[''].translator_comment = <<~HEADER_COMMENT
+          Translation of Release Notes & Apple Store Description in English (US)
+          This file is distributed under the same license as the Release Notes & Apple Store Description package.
+        HEADER_COMMENT
+        po_obj
+      end
+
       def self.add_poentry_to_po(msgctxt, msgid, translator_comment, po_obj)
         entry = GetText::POEntry.new(:msgctxt)
         entry.msgid = msgid
