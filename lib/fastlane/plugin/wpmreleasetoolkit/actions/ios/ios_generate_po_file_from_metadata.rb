@@ -41,24 +41,7 @@ module Fastlane
         @other_sources = params[:other_sources]
 
         prefix = 'app_store'
-        all_keys = Dir[File.join(@metadata_directory, '*.txt')]
-
-        # Remove from all_keys the special keys as they need to be treated specially
-        standard_files = []
-        all_keys.each do |key|
-          standard_files.append(key) unless SPECIAL_KEYS.include? File.basename(key, '.txt')
-        end
-        # Let the helper handle standard files
-        po = PoExtended.new(:msgctxt)
-        po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_header_to_po(po)
-        po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_files_to_po(prefix, files: standard_files, keys_to_comment_hash: KEYS_TO_COMMENT_HASH, po_obj: po)
-
-        other_sources_files = []
-        @other_sources.each do |other_source|
-          other_sources_files.append(Dir[File.join(other_source, '*.txt')]).flatten!
-        end
-        po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_files_to_po(prefix, files: other_sources_files, keys_to_comment_hash: KEYS_TO_COMMENT_HASH, po_obj: po)
-
+        po = Fastlane::Helper::GeneratePoFileMetadataHelper.do(prefix: prefix, metadata_directory:@metadata_directory, special_keys: SPECIAL_KEYS, keys_to_comment_hash: KEYS_TO_COMMENT_HASH, other_sources: @other_sources)
         # Now handle release_notes.txt
         release_notes_file = File.join(@metadata_directory, 'release_notes.txt')
         po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_release_notes_to_po(release_notes_file, @release_version, prefix, po, keys_to_comment_hash: KEYS_TO_COMMENT_HASH)

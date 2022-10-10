@@ -1,4 +1,5 @@
 require 'gettext/po'
+require_relative '../helper/po_extended'
 
 module Fastlane
   module Helper
@@ -6,7 +7,28 @@ module Fastlane
     #
     module GeneratePoFileMetadataHelper
 
-      def self.add_header_to_po(po_obj)
+      def self.do(prefix:, metadata_directory:, special_keys:, keys_to_comment_hash:, other_sources:)
+        all_keys = Dir[File.join(metadata_directory, '*.txt')]
+
+        # Remove from all_keys the special keys as they need to be treated specially
+        standard_files = []
+        all_keys.each do |key|
+          standard_files.append(key) unless special_keys.include? File.basename(key, '.txt')
+        end
+        # Let the helper handle standard files
+        po = PoExtended.new(:msgctxt)
+        po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_header_to_po(po_obj: po)
+        po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_files_to_po(prefix, files: standard_files, keys_to_comment_hash: keys_to_comment_hash, po_obj: po)
+
+        other_sources_files = []
+        other_sources.each do |other_source|
+          other_sources_files.append(Dir[File.join(other_source, '*.txt')]).flatten!
+        end
+        add_standard_files_to_po(prefix, files: other_sources_files, keys_to_comment_hash: keys_to_comment_hash, po_obj: po)
+
+      end
+
+      def self.add_header_to_po(po_obj:)
         po_obj[''] = <<~HEADER
           MIME-Version: 1.0
           Content-Type: text/plain; charset=UTF-8
