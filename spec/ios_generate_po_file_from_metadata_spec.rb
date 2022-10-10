@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
-  it 'create the .po files based on the .txt files in metadata_directory' do
+  it 'create the .po file based on the `.txt` files in `metadata_directory` along with `other_sources` param' do
     in_tmp_dir do |dir|
       required_keys = described_class.required_keys
 
@@ -111,7 +111,7 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
     end
   end
 
-  it 'test additional `.txt` files in `metadata_directory`' do
+  it 'test additional loose `.txt` files in `metadata_directory`' do
     in_tmp_dir do |dir|
       required_keys = described_class.required_keys
       # For each key create a key.txt file whose content is "value key"
