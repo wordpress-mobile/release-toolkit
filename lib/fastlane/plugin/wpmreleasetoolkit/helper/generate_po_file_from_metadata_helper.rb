@@ -6,7 +6,6 @@ module Fastlane
     # Helper methods to execute PO related operations
     #
     module GeneratePoFileMetadataHelper
-
       def self.do(prefix:, metadata_directory:, special_keys:, keys_to_comment_hash:, other_sources:)
         all_keys = Dir[File.join(metadata_directory, '*.txt')]
 
@@ -25,7 +24,6 @@ module Fastlane
           other_sources_files.append(Dir[File.join(other_source, '*.txt')]).flatten!
         end
         add_standard_files_to_po(prefix, files: other_sources_files, keys_to_comment_hash: keys_to_comment_hash, po_obj: po)
-
       end
 
       def self.add_header_to_po(po_obj:)

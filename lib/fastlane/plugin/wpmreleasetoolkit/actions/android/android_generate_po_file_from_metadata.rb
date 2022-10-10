@@ -4,7 +4,6 @@ require 'gettext/po'
 module Fastlane
   module Actions
     class AndroidGeneratePoFileFromMetadataAction < Action
-
       # SPECIAL_KEYS are keys that need to be treated specially
       SPECIAL_KEYS = %w[release_notes release_notes_previous].freeze
       REQUIRED_KEYS_TO_COMMENT_HASH = {
@@ -20,11 +19,10 @@ module Fastlane
       # rubocop: disable Naming/VariableNumber
       OPTIONAL_KEYS_TO_LABELS_HASH = {
         promo_screenshot_1: 'Description for the first app store image',
-        promo_screenshot_2: 'Description for the second app store image',
+        promo_screenshot_2: 'Description for the second app store image'
       }.freeze
       # rubocop: enable Naming/VariableNumber
       KEYS_TO_COMMENT_HASH = REQUIRED_KEYS_TO_COMMENT_HASH.merge(OPTIONAL_KEYS_TO_LABELS_HASH).freeze
-
 
       def self.required_keys
         REQUIRED_KEYS
@@ -37,7 +35,7 @@ module Fastlane
 
         prefix = 'play_store'
 
-        po = Fastlane::Helper::GeneratePoFileMetadataHelper.do(prefix: prefix, metadata_directory:@metadata_directory, special_keys: SPECIAL_KEYS, keys_to_comment_hash: KEYS_TO_COMMENT_HASH, other_sources: @other_sources)
+        po = Fastlane::Helper::GeneratePoFileMetadataHelper.do(prefix: prefix, metadata_directory: @metadata_directory, special_keys: SPECIAL_KEYS, keys_to_comment_hash: KEYS_TO_COMMENT_HASH, other_sources: @other_sources)
 
         # Now handle release_notes.txt
         release_notes_file = File.join(@metadata_directory, 'release_notes.txt')

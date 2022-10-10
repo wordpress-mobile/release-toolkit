@@ -5,7 +5,6 @@ require 'gettext/po'
 module Fastlane
   module Actions
     class IosGeneratePoFileFromMetadataAction < Action
-
       # SPECIAL_KEYS are keys that need to be treated specially
       SPECIAL_KEYS = %w[release_notes release_notes_previous].freeze
       REQUIRED_KEYS_TO_COMMENT_HASH = {
@@ -41,7 +40,7 @@ module Fastlane
         @other_sources = params[:other_sources]
 
         prefix = 'app_store'
-        po = Fastlane::Helper::GeneratePoFileMetadataHelper.do(prefix: prefix, metadata_directory:@metadata_directory, special_keys: SPECIAL_KEYS, keys_to_comment_hash: KEYS_TO_COMMENT_HASH, other_sources: @other_sources)
+        po = Fastlane::Helper::GeneratePoFileMetadataHelper.do(prefix: prefix, metadata_directory: @metadata_directory, special_keys: SPECIAL_KEYS, keys_to_comment_hash: KEYS_TO_COMMENT_HASH, other_sources: @other_sources)
         # Now handle release_notes.txt
         release_notes_file = File.join(@metadata_directory, 'release_notes.txt')
         po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_release_notes_to_po(release_notes_file, @release_version, prefix, po, keys_to_comment_hash: KEYS_TO_COMMENT_HASH)
