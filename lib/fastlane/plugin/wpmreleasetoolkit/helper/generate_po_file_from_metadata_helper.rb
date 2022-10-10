@@ -36,7 +36,7 @@ module Fastlane
         po_obj
       end
 
-      def self.whatever(key:, keys_to_comment_hash:)
+      def self.add_comment_to_poentry(key:, keys_to_comment_hash:)
         if (keys_to_comment_hash.key? key.to_sym) && (!keys_to_comment_hash[key.to_sym].nil? && !keys_to_comment_hash[key.to_sym].empty?)
           ".translators: #{keys_to_comment_hash[key.to_sym]}"
         else
@@ -52,7 +52,7 @@ module Fastlane
           key = File.basename(file_name, '.txt')
           msgctxt = "#{prefix}_#{key}"
           msgid = File.open(file_name).read
-          translator_comment = whatever(key: key, keys_to_comment_hash: keys_to_comment_hash)
+          translator_comment = add_comment_to_poentry(key: key, keys_to_comment_hash: keys_to_comment_hash)
           po_obj = add_poentry_to_po(msgctxt, msgid, translator_comment, po_obj)
         end
         po_obj
@@ -71,7 +71,7 @@ module Fastlane
         MSGID
 
         key = File.basename(release_notes_path, '.txt')
-        translator_comment = whatever(key: key, keys_to_comment_hash: keys_to_comment_hash)
+        translator_comment = add_comment_to_poentry(key: key, keys_to_comment_hash: keys_to_comment_hash)
 
         add_poentry_to_po(msgctxt, msgid, translator_comment, po_obj)
       end
