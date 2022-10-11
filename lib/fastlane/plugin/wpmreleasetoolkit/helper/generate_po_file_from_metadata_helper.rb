@@ -5,13 +5,15 @@ module Fastlane
   module Helper
     class GeneratePoFileMetadataHelper
 
-      def initialize(keys_to_comment_hash:, other_sources:)
+      def initialize(keys_to_comment_hash:, other_sources:, prefix: '')
         @po = PoExtended.new(:msgctxt)
         @keys_to_comment_hash = keys_to_comment_hash
         @other_sources = other_sources
+        @prefix = prefix
+
       end
 
-      def do(prefix:, metadata_directory:, special_keys:)
+      def do(metadata_directory:, special_keys:)
         @po = PoExtended.new(:msgctxt)
         @po[''] = <<~HEADER
           MIME-Version: 1.0
@@ -40,13 +42,13 @@ module Fastlane
         end
 
         # Let the helper handle standard files
-        add_standard_files_to_po(prefix, files: standard_files)
+        add_standard_files_to_po(files: standard_files)
 
         other_sources_files = []
         @other_sources.each do |other_source|
           other_sources_files.append(Dir[File.join(other_source, '*.txt')]).flatten!
         end
-        add_standard_files_to_po(prefix, files: other_sources_files)
+        add_standard_files_to_po(files: other_sources_files)
       end
 
       def add_poentry_to_po(msgctxt, msgid, translator_comment)
@@ -66,23 +68,23 @@ module Fastlane
         end
       end
 
-      def add_standard_files_to_po(prefix, files: [])
+      def add_standard_files_to_po(files: [])
         files.each do |file_name|
           key = File.basename(file_name, '.txt')
-          msgctxt = "#{prefix}#{key}"
+          msgctxt = "#{@prefix}#{key}"
           msgid = File.open(file_name).read
           translator_comment = comment(key: key)
           add_poentry_to_po(msgctxt, msgid, translator_comment)
         end
       end
 
-      def add_release_notes_to_po(release_notes_path, version, prefix)
+      def add_release_notes_to_po(release_notes_path, version)
         values = version.split('.')
         version_major = Integer(values[0])
         version_minor = Integer(values[1])
         interpolated_key = "release_note_#{version_major.to_s.rjust(2, '0')}#{version_minor}"
 
-        msgctxt = "#{prefix}#{interpolated_key}"
+        msgctxt = "#{@prefix}#{interpolated_key}"
         msgid = <<~MSGID
           #{version}
           #{File.open(release_notes_path).read}
