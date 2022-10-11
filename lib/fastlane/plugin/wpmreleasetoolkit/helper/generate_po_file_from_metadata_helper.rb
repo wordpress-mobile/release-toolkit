@@ -4,11 +4,11 @@ require_relative '../helper/po_extended'
 module Fastlane
   module Helper
     # Helper methods to execute PO related operations
-    #
+    @po = PoExtended.new(:msgctxt)
     module GeneratePoFileMetadataHelper
       def self.do(prefix:, metadata_directory:, special_keys:, keys_to_comment_hash:, other_sources:)
-        po = PoExtended.new(:msgctxt)
-        po[''] = <<~HEADER
+        @po = PoExtended.new(:msgctxt)
+        @po[''] = <<~HEADER
           MIME-Version: 1.0
           Content-Type: text/plain; charset=UTF-8
           Content-Transfer-Encoding: 8bit
@@ -20,7 +20,7 @@ module Fastlane
           Language-Team:
         HEADER
 
-        po[''].translator_comment = <<~HEADER_COMMENT
+        @po[''].translator_comment = <<~HEADER_COMMENT
           Translation of Release Notes & Apple Store Description in English (US)
           This file is distributed under the same license as the Release Notes & Apple Store Description package.
         HEADER_COMMENT
@@ -35,7 +35,7 @@ module Fastlane
         end
 
         # Let the helper handle standard files
-        po = add_standard_files_to_po(prefix, files: standard_files, keys_to_comment_hash: keys_to_comment_hash, po_obj: po)
+        po = add_standard_files_to_po(prefix, files: standard_files, keys_to_comment_hash: keys_to_comment_hash, po_obj: @po)
 
         other_sources_files = []
         other_sources.each do |other_source|
