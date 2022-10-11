@@ -7,13 +7,14 @@ module Fastlane
     #
     module GeneratePoFileMetadataHelper
       def self.do(prefix:, metadata_directory:, special_keys:, keys_to_comment_hash:, other_sources:)
-        all_keys = Dir[File.join(metadata_directory, '*.txt')]
+        all_files_in_metadata_directory = Dir[File.join(metadata_directory, '*.txt')]
 
-        # Remove from all_keys the special keys as they need to be treated specially
+        # Remove from all_files_in_metadata_directory the special keys as they need to be treated specially
         standard_files = []
-        all_keys.each do |key|
+        all_files_in_metadata_directory.each do |key|
           standard_files.append(key) unless special_keys.include? File.basename(key, '.txt')
         end
+
         # Let the helper handle standard files
         po = PoExtended.new(:msgctxt)
         po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_header_to_po(po_obj: po)
