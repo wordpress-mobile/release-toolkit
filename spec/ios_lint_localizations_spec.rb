@@ -155,7 +155,6 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       expect(FastlaneCore::UI).to receive(:confirm) do
         # Simulate manual fix between the confirm prompt being asked and replying to it
         File.write(File.join(fr_lproj, 'Localizable.strings'), valid_content)
-        puts "File manually fixed!"
         true
       end
 
@@ -198,7 +197,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
         base_lang: 'en'
       )
 
-      expect(result).to eq({'fr'=>['`key3` expected placeholders for [Int] but found [] instead.']})
+      expect(result).to eq({ 'fr' => ['`key3` expected placeholders for [Int] but found [] instead.'] })
     end
 
     after(:each) do
