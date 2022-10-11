@@ -48,18 +48,13 @@ module Fastlane
       def self.find_duplicated_keys(params)
         duplicate_keys = {}
 
-        files_to_lint = Dir.chdir(params[:input_dir]) do
-          Dir.glob('*.lproj/Localizable.strings').map do |file|
-            {
-              language: File.basename(File.dirname(file), '.lproj'),
-              path: File.join(params[:input_dir], file)
-            }
-          end
-        end
-
+        files_to_lint = Dir.glob('*.lproj/Localizable.strings', base: params[:input_dir])
         files_to_lint.each do |file|
-          duplicates = Fastlane::Helper::Ios::StringsFileValidationHelper.find_duplicated_keys(file: file[:path])
-          duplicate_keys[file[:language]] = duplicates.map { |key, value| "`#{key}` was found at multiple lines: #{value.join(', ')}" } unless duplicates.empty?
+          language = File.basename(File.dirname(file), '.lproj')
+          path = File.join(params[:input_dir], file)
+
+          duplicates = Fastlane::Helper::Ios::StringsFileValidationHelper.find_duplicated_keys(file: path)
+          duplicate_keys[language] = duplicates.map { |key, value| "`#{key}` was found at multiple lines: #{value.join(', ')}" } unless duplicates.empty?
         end
 
         duplicate_keys
