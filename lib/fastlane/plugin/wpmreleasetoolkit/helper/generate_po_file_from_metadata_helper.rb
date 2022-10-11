@@ -43,8 +43,6 @@ module Fastlane
           other_sources_files.append(Dir[File.join(other_source, '*.txt')]).flatten!
         end
         add_standard_files_to_po(prefix, files: other_sources_files, keys_to_comment_hash: keys_to_comment_hash)
-        @po
-
       end
 
       def self.add_poentry_to_po(msgctxt, msgid, translator_comment)
@@ -64,8 +62,6 @@ module Fastlane
         end
       end
 
-      # Return a GetText::PO object
-      # standard_keys is the list of files
       def self.add_standard_files_to_po(prefix, files: [], keys_to_comment_hash: {})
         files.each do |file_name|
           key = File.basename(file_name, '.txt')
@@ -92,7 +88,10 @@ module Fastlane
         translator_comment = add_comment_to_poentry(key: key, keys_to_comment_hash: keys_to_comment_hash)
 
         add_poentry_to_po(msgctxt, msgid, translator_comment)
-        @po
+      end
+
+      def self.write(write_to:)
+        File.write(write_to, @po.to_s)
       end
     end
   end
