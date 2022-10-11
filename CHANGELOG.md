@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+ - Improve resilience of the `ios_lint_localizations` action to support UTF16 files, and to warn and skip files in XML format when trying to detect duplicate keys on `.strings` files. [#418]
 
 ### Internal Changes
 
