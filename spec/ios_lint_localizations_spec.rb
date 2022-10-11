@@ -172,6 +172,35 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       expect(result).to eq({}) # No violations anymore after manual fix and first retry
     end
 
+    it 'warns if input files are not in ASCII-plist format' do
+      # Arrange: Prepare test files
+      en_lproj = File.join(@test_data_dir, 'en.lproj')
+      ascii_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', 'ios_l10n_helper', 'Localizable-utf16.strings')
+      FileUtils.mkdir_p(en_lproj)
+      File.write(File.join(en_lproj, 'Localizable.strings'), File.read(ascii_file))
+
+      fr_lproj = File.join(@test_data_dir, 'fr.lproj')
+      xml_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', 'ios_l10n_helper', 'xml-format.strings')
+      FileUtils.mkdir_p(fr_lproj)
+      File.write(File.join(fr_lproj, 'Localizable.strings'), File.read(xml_file))
+
+      expected_message = <<~EXPECTED_WARNING
+        File `#{fr_lproj}/Localizable.strings` is in xml format, while finding duplicate keys only make sense on files that are in ASCII-plist format.
+        Since your files are in xml format, you should probably disable the `check_duplicate_keys` option from this `ios_lint_localizations` call.
+      EXPECTED_WARNING
+      expect(FastlaneCore::UI).to receive(:warning).with(expected_message)
+
+      # Act
+      install_dir = "vendor/swiftgen/#{Fastlane::Helper::Ios::L10nLinterHelper::SWIFTGEN_VERSION}"
+      result = run_described_fastlane_action(
+        install_path: install_dir,
+        input_dir: @test_data_dir,
+        base_lang: 'en'
+      )
+
+      expect(result).to eq({'fr'=>['`key3` expected placeholders for [Int] but found [] instead.']})
+    end
+
     after(:each) do
       FileUtils.remove_entry @test_data_dir
     end
