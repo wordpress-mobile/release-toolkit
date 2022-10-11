@@ -39,7 +39,7 @@ module Fastlane
         @release_version = params[:release_version]
         @other_sources = params[:other_sources]
 
-        prefix = 'app_store'
+        prefix = 'app_store_'
         po = Fastlane::Helper::GeneratePoFileMetadataHelper.do(prefix: prefix, metadata_directory: @metadata_directory, special_keys: SPECIAL_KEYS, keys_to_comment_hash: KEYS_TO_COMMENT_HASH, other_sources: @other_sources)
         # Now handle release_notes.txt
         release_notes_file = File.join(@metadata_directory, 'release_notes.txt')

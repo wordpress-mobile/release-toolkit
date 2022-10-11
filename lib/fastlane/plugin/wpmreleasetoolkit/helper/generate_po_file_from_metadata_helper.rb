@@ -70,7 +70,7 @@ module Fastlane
         # po = GetText::PO.new
         files.each do |file_name|
           key = File.basename(file_name, '.txt')
-          msgctxt = "#{prefix}_#{key}"
+          msgctxt = "#{prefix}#{key}"
           msgid = File.open(file_name).read
           translator_comment = add_comment_to_poentry(key: key, keys_to_comment_hash: keys_to_comment_hash)
           po_obj = add_poentry_to_po(msgctxt, msgid, translator_comment, po_obj)
@@ -84,7 +84,7 @@ module Fastlane
         version_minor = Integer(values[1])
         interpolated_key = "release_note_#{version_major.to_s.rjust(2, '0')}#{version_minor}"
 
-        msgctxt = "#{prefix}_#{interpolated_key}"
+        msgctxt = "#{prefix}#{interpolated_key}"
         msgid = <<~MSGID
           #{version}
           #{File.open(release_notes_path).read}
