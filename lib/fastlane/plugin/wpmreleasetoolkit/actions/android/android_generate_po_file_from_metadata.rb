@@ -45,9 +45,7 @@ module Fastlane
         release_notes_previous_file = File.join(metadata_directory, 'release_notes_previous.txt')
         version_minus_one = Fastlane::Helper::Android::VersionHelper.calc_prev_release_version(release_version)
         po.add_release_notes_to_po(release_notes_previous_file, version_minus_one, prefix)
-        ``
-        # Finally dump the po into PlayStoreStrings.po
-        # File.write(File.join(metadata_directory, 'PlayStoreStrings.po'), po.to_s)
+
         po.write(write_to: File.join(metadata_directory, 'PlayStoreStrings.po'))
       end
 

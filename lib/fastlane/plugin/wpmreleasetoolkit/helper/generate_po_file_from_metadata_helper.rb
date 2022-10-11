@@ -3,7 +3,6 @@ require_relative '../helper/po_extended'
 
 module Fastlane
   module Helper
-    # Helper methods to execute PO related operations
     class GeneratePoFileMetadataHelper
 
       def initialize(keys_to_comment_hash:)
