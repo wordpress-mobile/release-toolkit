@@ -70,8 +70,8 @@ module Fastlane
 
           state = State.new(context: :root, buffer: StringIO.new, in_escaped_ctx: false, found_key: nil)
 
-          File.readlines(file).each_with_index do |line, line_no|
-            line.chars.each_with_index do |c, col_no|
+          File.readlines(file, mode: 'rb:BOM|UTF-8').each_with_index do |line, line_no|
+            line.encode('UTF-8').chars.each_with_index do |c, col_no|
               # Handle escaped characters at a global level.
               # This is more straightforward than having to account for it in the `TRANSITIONS` table.
               if state.in_escaped_ctx || c == '\\'
