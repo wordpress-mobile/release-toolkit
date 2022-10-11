@@ -19,7 +19,7 @@ module Fastlane
 
       REQUIRED_KEYS = REQUIRED_KEYS_TO_COMMENT_HASH.keys.map(&:to_s).freeze
       # rubocop: disable Naming/VariableNumber
-      OPTIONAL_KEYS_TO_LABELS_HASH = {
+      OPTIONAL_KEYS_TO_COMMENT_HASH = {
         promo_screenshot_1: 'Description for the first app store image',
         promo_screenshot_2: 'Description for the second app store image',
         promo_screenshot_3: 'Description for the third app store image',
@@ -28,7 +28,7 @@ module Fastlane
         promo_screenshot_6: 'Description for the sixth app store image'
       }.freeze
       # rubocop: enable Naming/VariableNumber
-      KEYS_TO_COMMENT_HASH = REQUIRED_KEYS_TO_COMMENT_HASH.merge(OPTIONAL_KEYS_TO_LABELS_HASH).freeze
+      KEYS_TO_COMMENT_HASH = REQUIRED_KEYS_TO_COMMENT_HASH.merge(OPTIONAL_KEYS_TO_COMMENT_HASH).freeze
 
       def self.required_keys
         REQUIRED_KEYS
