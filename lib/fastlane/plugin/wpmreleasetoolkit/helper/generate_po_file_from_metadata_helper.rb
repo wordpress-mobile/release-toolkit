@@ -7,28 +7,8 @@ module Fastlane
     #
     module GeneratePoFileMetadataHelper
       def self.do(prefix:, metadata_directory:, special_keys:, keys_to_comment_hash:, other_sources:)
-        all_files_in_metadata_directory = Dir[File.join(metadata_directory, '*.txt')]
-
-        # Remove from all_files_in_metadata_directory the special keys as they need to be treated specially
-        standard_files = []
-        all_files_in_metadata_directory.each do |key|
-          standard_files.append(key) unless special_keys.include? File.basename(key, '.txt')
-        end
-
-        # Let the helper handle standard files
         po = PoExtended.new(:msgctxt)
-        po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_header_to_po(po_obj: po)
-        po = Fastlane::Helper::GeneratePoFileMetadataHelper.add_standard_files_to_po(prefix, files: standard_files, keys_to_comment_hash: keys_to_comment_hash, po_obj: po)
-
-        other_sources_files = []
-        other_sources.each do |other_source|
-          other_sources_files.append(Dir[File.join(other_source, '*.txt')]).flatten!
-        end
-        add_standard_files_to_po(prefix, files: other_sources_files, keys_to_comment_hash: keys_to_comment_hash, po_obj: po)
-      end
-
-      def self.add_header_to_po(po_obj:)
-        po_obj[''] = <<~HEADER
+        po[''] = <<~HEADER
           MIME-Version: 1.0
           Content-Type: text/plain; charset=UTF-8
           Content-Transfer-Encoding: 8bit
@@ -40,11 +20,28 @@ module Fastlane
           Language-Team:
         HEADER
 
-        po_obj[''].translator_comment = <<~HEADER_COMMENT
+        po[''].translator_comment = <<~HEADER_COMMENT
           Translation of Release Notes & Apple Store Description in English (US)
           This file is distributed under the same license as the Release Notes & Apple Store Description package.
         HEADER_COMMENT
-        po_obj
+
+
+        all_files_in_metadata_directory = Dir[File.join(metadata_directory, '*.txt')]
+
+        # Remove from all_files_in_metadata_directory the special keys as they need to be treated specially
+        standard_files = []
+        all_files_in_metadata_directory.each do |key|
+          standard_files.append(key) unless special_keys.include? File.basename(key, '.txt')
+        end
+
+        # Let the helper handle standard files
+        po = add_standard_files_to_po(prefix, files: standard_files, keys_to_comment_hash: keys_to_comment_hash, po_obj: po)
+
+        other_sources_files = []
+        other_sources.each do |other_source|
+          other_sources_files.append(Dir[File.join(other_source, '*.txt')]).flatten!
+        end
+        add_standard_files_to_po(prefix, files: other_sources_files, keys_to_comment_hash: keys_to_comment_hash, po_obj: po)
       end
 
       def self.add_poentry_to_po(msgctxt, msgid, translator_comment, po_obj)
