@@ -5,12 +5,13 @@ module Fastlane
   module Helper
     class GeneratePoFileMetadataHelper
 
-      def initialize(keys_to_comment_hash:)
+      def initialize(keys_to_comment_hash:, other_sources:)
         @po = PoExtended.new(:msgctxt)
         @keys_to_comment_hash = keys_to_comment_hash
+        @other_sources = other_sources
       end
 
-      def do(prefix:, metadata_directory:, special_keys:,  other_sources:)
+      def do(prefix:, metadata_directory:, special_keys:)
         @po = PoExtended.new(:msgctxt)
         @po[''] = <<~HEADER
           MIME-Version: 1.0
@@ -42,7 +43,7 @@ module Fastlane
         add_standard_files_to_po(prefix, files: standard_files)
 
         other_sources_files = []
-        other_sources.each do |other_source|
+        @other_sources.each do |other_source|
           other_sources_files.append(Dir[File.join(other_source, '*.txt')]).flatten!
         end
         add_standard_files_to_po(prefix, files: other_sources_files)
