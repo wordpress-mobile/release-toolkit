@@ -35,16 +35,16 @@ module Fastlane
 
         prefix = 'play_store_'
         po = Fastlane::Helper::GeneratePoFileMetadataHelper.new(keys_to_comment_hash: KEYS_TO_COMMENT_HASH)
-        po.do(prefix: prefix, metadata_directory: metadata_directory, special_keys: SPECIAL_KEYS, keys_to_comment_hash: KEYS_TO_COMMENT_HASH, other_sources: other_sources)
+        po.do(prefix: prefix, metadata_directory: metadata_directory, special_keys: SPECIAL_KEYS, other_sources: other_sources)
 
         # Now handle release_notes.txt
         release_notes_file = File.join(metadata_directory, 'release_notes.txt')
-        po.add_release_notes_to_po(release_notes_file, release_version, prefix, keys_to_comment_hash: KEYS_TO_COMMENT_HASH)
+        po.add_release_notes_to_po(release_notes_file, release_version, prefix)
 
         # Handle release_notes_previous.txt
         release_notes_previous_file = File.join(metadata_directory, 'release_notes_previous.txt')
         version_minus_one = Fastlane::Helper::Android::VersionHelper.calc_prev_release_version(release_version)
-        po.add_release_notes_to_po(release_notes_previous_file, version_minus_one, prefix, keys_to_comment_hash: KEYS_TO_COMMENT_HASH)
+        po.add_release_notes_to_po(release_notes_previous_file, version_minus_one, prefix)
         ``
         # Finally dump the po into PlayStoreStrings.po
         # File.write(File.join(metadata_directory, 'PlayStoreStrings.po'), po.to_s)

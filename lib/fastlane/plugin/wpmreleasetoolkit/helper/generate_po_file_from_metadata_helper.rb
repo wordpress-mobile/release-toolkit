@@ -11,7 +11,7 @@ module Fastlane
         @keys_to_comment_hash = keys_to_comment_hash
       end
 
-      def do(prefix:, metadata_directory:, special_keys:, keys_to_comment_hash:, other_sources:)
+      def do(prefix:, metadata_directory:, special_keys:,  other_sources:)
         @po = PoExtended.new(:msgctxt)
         @po[''] = <<~HEADER
           MIME-Version: 1.0
@@ -40,13 +40,13 @@ module Fastlane
         end
 
         # Let the helper handle standard files
-        add_standard_files_to_po(prefix, files: standard_files, keys_to_comment_hash: keys_to_comment_hash)
+        add_standard_files_to_po(prefix, files: standard_files)
 
         other_sources_files = []
         other_sources.each do |other_source|
           other_sources_files.append(Dir[File.join(other_source, '*.txt')]).flatten!
         end
-        add_standard_files_to_po(prefix, files: other_sources_files, keys_to_comment_hash: keys_to_comment_hash)
+        add_standard_files_to_po(prefix, files: other_sources_files)
       end
 
       def add_poentry_to_po(msgctxt, msgid, translator_comment)
@@ -58,25 +58,25 @@ module Fastlane
         @po[entry.msgctxt, entry.msgid] = entry
       end
 
-      def add_comment_to_poentry(key:, keys_to_comment_hash:)
-        if (keys_to_comment_hash.key? key.to_sym) && (!keys_to_comment_hash[key.to_sym].nil? && !keys_to_comment_hash[key.to_sym].empty?)
-          ".translators: #{keys_to_comment_hash[key.to_sym]}"
+      def add_comment_to_poentry(key:)
+        if (@keys_to_comment_hash.key? key.to_sym) && (!@keys_to_comment_hash[key.to_sym].nil? && !@keys_to_comment_hash[key.to_sym].empty?)
+          ".translators: #{@keys_to_comment_hash[key.to_sym]}"
         else
           ''
         end
       end
 
-      def add_standard_files_to_po(prefix, files: [], keys_to_comment_hash: {})
+      def add_standard_files_to_po(prefix, files: [])
         files.each do |file_name|
           key = File.basename(file_name, '.txt')
           msgctxt = "#{prefix}#{key}"
           msgid = File.open(file_name).read
-          translator_comment = add_comment_to_poentry(key: key, keys_to_comment_hash: keys_to_comment_hash)
+          translator_comment = add_comment_to_poentry(key: key)
           add_poentry_to_po(msgctxt, msgid, translator_comment)
         end
       end
 
-      def add_release_notes_to_po(release_notes_path, version, prefix, keys_to_comment_hash: {})
+      def add_release_notes_to_po(release_notes_path, version, prefix)
         values = version.split('.')
         version_major = Integer(values[0])
         version_minor = Integer(values[1])
@@ -89,7 +89,7 @@ module Fastlane
         MSGID
 
         key = File.basename(release_notes_path, '.txt')
-        translator_comment = add_comment_to_poentry(key: key, keys_to_comment_hash: keys_to_comment_hash)
+        translator_comment = add_comment_to_poentry(key: key)
 
         add_poentry_to_po(msgctxt, msgid, translator_comment)
       end
