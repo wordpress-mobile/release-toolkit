@@ -65,7 +65,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :metadata_directory,
             env_name: "#{env_name_prefix}_METADATA_DIRECTORY",
-            description: 'The path containing the .txt files ',
+            description: 'The path containing the .txt files',
             is_string: true,
             verify_block: proc do |value|
               UI.user_error!("No metadata_directory path for AnGeneratePoFileFromMetadataAction given, pass using `metadata_directory: 'directory'`") unless value && !value.empty?
