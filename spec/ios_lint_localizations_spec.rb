@@ -63,7 +63,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     #
     def run_l10n_linter_test(data_file:, check_duplicate_keys: nil)
       # Arrange: Prepare test files
-      test_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', "test-lint-ios-#{data_file}.yaml")
+      test_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', 'ios_lint_localizations', "#{data_file}.yaml")
       yml = YAML.load_file(test_file)
 
       files = yml['test_data']
