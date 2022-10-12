@@ -11,13 +11,9 @@ module Fastlane
         title: 'Title to be displayed in the Play Store. Limit to 30 characters including spaces and commas!',
         short_description: 'Short description of the app to be displayed in the Play Store. Limit to 80 characters including spaces and commas!',
         release_notes_short: 'Shorter Release notes for this version to be displayed in the Play Store. Limit to 500 characters including spaces and commas!',
-        release_notes: 'Release notes for this version to be displayed in the Play Store. Limit to 500 characters including spaces and commas!',
+        release_notes: 'Release notes for this version to be displayed in the Play Store. Limit to 500 characters including spaces and commas!'
       }.freeze
-      REQUIRED_KEYS = %w[full_description title short_description release_notes_short release_notes release_notes_previous].freeze
-
-      def self.required_keys
-        REQUIRED_KEYS
-      end
+      REQUIRED_KEYS = %w[full_description title short_description release_notes].freeze
 
       def self.run(params)
         metadata_directory = params[:metadata_directory]
@@ -36,12 +32,20 @@ module Fastlane
 
         # Now handle release_notes_short.txt
         release_notes_file = File.join(metadata_directory, 'release_notes_short.txt')
-        po.add_release_notes_to_po(release_notes_file, release_version, short: true)
+        if File.exist? release_notes_file
+          po.add_release_notes_to_po(release_notes_file, release_version, short: true)
+        else
+          UI.important("#{release_notes_file} does not exist!")
+        end
 
         # Handle release_notes_previous.txt
         release_notes_previous_file = File.join(metadata_directory, 'release_notes_previous.txt')
-        version_minus_one = Fastlane::Helper::Android::VersionHelper.calc_prev_release_version(release_version)
-        po.add_release_notes_to_po(release_notes_previous_file, version_minus_one)
+        if File.exist? release_notes_previous_file
+          version_minus_one = Fastlane::Helper::Android::VersionHelper.calc_prev_release_version(release_version)
+          po.add_release_notes_to_po(release_notes_previous_file, version_minus_one)
+        else
+          UI.important("#{release_notes_previous_file} does not exist!")
+        end
 
         po.write
       end

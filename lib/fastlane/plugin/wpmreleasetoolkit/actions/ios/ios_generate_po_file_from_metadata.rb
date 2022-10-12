@@ -13,15 +13,10 @@ module Fastlane
         subtitle: 'Subtitle to be displayed below the application name in the Apple App Store. Limit to 30 characters including spaces and commas!',
         description: 'Multi-paragraph text used to display in the Apple App Store.',
         keywords: 'Keywords used in the App Store search engine to find the app.
-.Delimit with a comma between each keyword. Limit to 100 characters including spaces and commas.',
-        release_notes_previous: nil
+.Delimit with a comma between each keyword. Limit to 100 characters including spaces and commas.'
       }.freeze
 
-      REQUIRED_KEYS = %w[release_notes name subtitle description keywords release_notes_previous].freeze
-
-      def self.required_keys
-        REQUIRED_KEYS
-      end
+      REQUIRED_KEYS = %w[name subtitle description keywords release_notes].freeze
 
       def self.run(params)
         metadata_directory = params[:metadata_directory]
@@ -40,8 +35,12 @@ module Fastlane
 
         # Handle release_notes_previous.txt
         release_notes_previous_file = File.join(metadata_directory, 'release_notes_previous.txt')
-        version_minus_one = Fastlane::Helper::Android::VersionHelper.calc_prev_release_version(release_version)
-        po.add_release_notes_to_po(release_notes_previous_file, version_minus_one)
+        if File.exist? release_notes_previous_file
+          version_minus_one = Fastlane::Helper::Android::VersionHelper.calc_prev_release_version(release_version)
+          po.add_release_notes_to_po(release_notes_previous_file, version_minus_one)
+        else
+          UI.important("#{release_notes_previous_file} does not exist!")
+        end
 
         po.write
       end
