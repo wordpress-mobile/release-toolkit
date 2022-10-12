@@ -4,13 +4,13 @@ require_relative '../helper/po_extended'
 module Fastlane
   module Helper
     class GeneratePoFileMetadataHelper
-
-      def initialize(keys_to_comment_hash:, other_sources:, prefix: '')
+      def initialize(keys_to_comment_hash:, other_sources:, metadata_directory:, release_version:, prefix: '')
         @po = PoExtended.new(:msgctxt)
         @keys_to_comment_hash = keys_to_comment_hash
         @other_sources = other_sources
+        @metadata_directory = metadata_directory
+        @release_version = release_version
         @prefix = prefix
-
       end
 
       def do(metadata_directory:, special_keys:)
@@ -32,7 +32,6 @@ module Fastlane
           This file is distributed under the same license as the Release Notes & Apple Store Description package.
         HEADER_COMMENT
 
-
         all_files_in_metadata_directory = Dir[File.join(metadata_directory, '*.txt')]
 
         # Remove from all_files_in_metadata_directory the special keys as they need to be treated specially
@@ -49,6 +48,7 @@ module Fastlane
           other_sources_files.append(Dir[File.join(other_source, '*.txt')]).flatten!
         end
         add_standard_files_to_po(files: other_sources_files)
+        add_release_notes_to_po(File.join(@metadata_directory, 'release_notes.txt'), @release_version)
       end
 
       def add_poentry_to_po(msgctxt, msgid, translator_comment)
@@ -73,8 +73,7 @@ module Fastlane
           key = File.basename(file_name, '.txt')
           msgctxt = "#{@prefix}#{key}"
           msgid = File.open(file_name).read
-          translator_comment = comment(key: key)
-          add_poentry_to_po(msgctxt, msgid, translator_comment)
+          add_poentry_to_po(msgctxt, msgid, comment(key: key))
         end
       end
 
@@ -94,11 +93,8 @@ module Fastlane
           #{version}
           #{File.open(release_notes_path).read}
         MSGID
-
         key = File.basename(release_notes_path, '.txt')
-        translator_comment = comment(key: key)
-
-        add_poentry_to_po(msgctxt, msgid, translator_comment)
+        add_poentry_to_po(msgctxt, msgid, comment(key: key))
       end
 
       def write(write_to:)
