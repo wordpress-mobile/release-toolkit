@@ -6,23 +6,18 @@ module Fastlane
     class AndroidGeneratePoFileFromMetadataAction < Action
       # SPECIAL_KEYS are keys that need to be treated specially
       SPECIAL_KEYS = %w[release_notes release_notes_previous release_notes_short].freeze
-      REQUIRED_KEYS_TO_COMMENT_HASH = {
+      # rubocop: disable Naming/VariableNumber
+      KNOWN_KEYS_TO_COMMENTS = {
         full_description: 'Multi-paragraph text used to display in the Play Store. Limit to 4000 characters including spaces and commas!',
         title: 'Title to be displayed in the Play Store. Limit to 30 characters including spaces and commas!',
         short_description: 'Short description of the app to be displayed in the Play Store. Limit to 80 characters including spaces and commas!',
         release_notes_short: 'Shorter Release notes for this version to be displayed in the Play Store. Limit to 500 characters including spaces and commas!',
         release_notes: 'Release notes for this version to be displayed in the Play Store. Limit to 500 characters including spaces and commas!',
-        release_notes_previous: nil
-      }.freeze
-
-      REQUIRED_KEYS = REQUIRED_KEYS_TO_COMMENT_HASH.keys.map(&:to_s).freeze
-      # rubocop: disable Naming/VariableNumber
-      OPTIONAL_KEYS_TO_COMMENT_HASH = {
         promo_screenshot_1: 'Description for the first app store image',
         promo_screenshot_2: 'Description for the second app store image'
       }.freeze
-      # rubocop: enable Naming/VariableNumber
-      KEYS_TO_COMMENT_HASH = REQUIRED_KEYS_TO_COMMENT_HASH.merge(OPTIONAL_KEYS_TO_COMMENT_HASH).freeze
+      # rubocop: disable Naming/VariableNumber
+      REQUIRED_KEYS = %w[full_description title short_description release_notes_short release_notes release_notes_previous].freeze
 
       def self.required_keys
         REQUIRED_KEYS
@@ -34,7 +29,7 @@ module Fastlane
         other_sources = params[:other_sources]
 
         po = Fastlane::Helper::GeneratePoFileMetadataHelper.new(
-          keys_to_comment_hash: KEYS_TO_COMMENT_HASH,
+          keys_to_comment_hash: KNOWN_KEYS_TO_COMMENTS,
           other_sources: other_sources,
           release_version: release_version,
           metadata_directory: metadata_directory,
