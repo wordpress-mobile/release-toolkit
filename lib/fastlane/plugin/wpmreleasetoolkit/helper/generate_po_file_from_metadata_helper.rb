@@ -4,9 +4,19 @@ require_relative '../helper/po_extended'
 module Fastlane
   module Helper
     class GeneratePoFileMetadataHelper
+      # rubocop: disable Naming/VariableNumber
+      KNOWN_OPTIONAL_KEYS_TO_COMMENT_HASH = {
+        promo_screenshot_1: 'Description for the first app store image',
+        promo_screenshot_2: 'Description for the second app store image',
+        promo_screenshot_3: 'Description for the third app store image',
+        promo_screenshot_4: 'Description for the fourth app store image',
+        promo_screenshot_5: 'Description for the fifth app store image',
+        promo_screenshot_6: 'Description for the sixth app store image'
+      }.freeze
+      # rubocop: enable Naming/VariableNumber
       def initialize(keys_to_comment_hash:, other_sources:, metadata_directory:, release_version:, po_output_file:, prefix: '')
         @po = PoExtended.new(:msgctxt)
-        @keys_to_comment_hash = keys_to_comment_hash
+        @keys_to_comment_hash = keys_to_comment_hash.merge(KNOWN_OPTIONAL_KEYS_TO_COMMENT_HASH)
         @other_sources = other_sources
         @metadata_directory = metadata_directory
         @release_version = release_version

@@ -7,7 +7,7 @@ module Fastlane
     class IosGeneratePoFileFromMetadataAction < Action
       # SPECIAL_KEYS are keys that need to be treated specially
       SPECIAL_KEYS = %w[release_notes release_notes_previous].freeze
-      REQUIRED_KEYS_TO_COMMENT_HASH = {
+      KNOWN_KEYS_TO_COMMENTS = {
         release_notes: 'Multi-paragraph text used to display in the Play Store. Limit to 4000 characters including spaces and commas!',
         name: 'The application name in the Apple App Store. Please keep the brand names (\'Jetpack\' and WordPress\') verbatim. Limit to 30 characters including spaces and punctuation!',
         subtitle: 'Subtitle to be displayed below the application name in the Apple App Store. Limit to 30 characters including spaces and commas!',
@@ -17,18 +17,7 @@ module Fastlane
         release_notes_previous: nil
       }.freeze
 
-      REQUIRED_KEYS = REQUIRED_KEYS_TO_COMMENT_HASH.keys.map(&:to_s).freeze
-      # rubocop: disable Naming/VariableNumber
-      OPTIONAL_KEYS_TO_COMMENT_HASH = {
-        promo_screenshot_1: 'Description for the first app store image',
-        promo_screenshot_2: 'Description for the second app store image',
-        promo_screenshot_3: 'Description for the third app store image',
-        promo_screenshot_4: 'Description for the fourth app store image',
-        promo_screenshot_5: 'Description for the fifth app store image',
-        promo_screenshot_6: 'Description for the sixth app store image'
-      }.freeze
-      # rubocop: enable Naming/VariableNumber
-      KEYS_TO_COMMENT_HASH = REQUIRED_KEYS_TO_COMMENT_HASH.merge(OPTIONAL_KEYS_TO_COMMENT_HASH).freeze
+      REQUIRED_KEYS = %w[release_notes name subtitle description keywords release_notes_previous].freeze
 
       def self.required_keys
         REQUIRED_KEYS
@@ -40,7 +29,7 @@ module Fastlane
         other_sources = params[:other_sources]
 
         po = Fastlane::Helper::GeneratePoFileMetadataHelper.new(
-          keys_to_comment_hash: KEYS_TO_COMMENT_HASH,
+          keys_to_comment_hash: KNOWN_KEYS_TO_COMMENTS,
           other_sources: other_sources,
           release_version: release_version,
           metadata_directory: metadata_directory,
