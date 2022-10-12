@@ -5,12 +5,12 @@ module Fastlane
   module Actions
     class AndroidGeneratePoFileFromMetadataAction < Action
       # SPECIAL_KEYS are keys that need to be treated specially
-      SPECIAL_KEYS = %w[release_notes release_notes_previous].freeze
+      SPECIAL_KEYS = %w[release_notes release_notes_previous release_notes_short].freeze
       REQUIRED_KEYS_TO_COMMENT_HASH = {
         full_description: 'Multi-paragraph text used to display in the Play Store. Limit to 4000 characters including spaces and commas!',
         title: 'Title to be displayed in the Play Store. Limit to 30 characters including spaces and commas!',
         short_description: 'Short description of the app to be displayed in the Play Store. Limit to 80 characters including spaces and commas!',
-        release_notes_short: nil,
+        release_notes_short: 'Shorter Release notes for this version to be displayed in the Play Store. Limit to 500 characters including spaces and commas!',
         release_notes: 'Release notes for this version to be displayed in the Play Store. Limit to 500 characters including spaces and commas!',
         release_notes_previous: nil
       }.freeze
@@ -43,6 +43,10 @@ module Fastlane
         # Now handle release_notes.txt
         release_notes_file = File.join(metadata_directory, 'release_notes.txt')
         po.add_release_notes_to_po(release_notes_file, release_version)
+
+        # Now handle release_notes_short.txt
+        release_notes_file = File.join(metadata_directory, 'release_notes_short.txt')
+        po.add_release_notes_to_po(release_notes_file, release_version, short: true)
 
         # Handle release_notes_previous.txt
         release_notes_previous_file = File.join(metadata_directory, 'release_notes_previous.txt')

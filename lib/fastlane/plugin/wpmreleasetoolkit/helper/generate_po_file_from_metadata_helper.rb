@@ -78,11 +78,16 @@ module Fastlane
         end
       end
 
-      def add_release_notes_to_po(release_notes_path, version)
+      def add_release_notes_to_po(release_notes_path, version, short: false)
         values = version.split('.')
         version_major = Integer(values[0])
         version_minor = Integer(values[1])
-        interpolated_key = "release_note_#{version_major.to_s.rjust(2, '0')}#{version_minor}"
+        key_start = 'release_note_'
+        if short
+          key_start += 'short_'
+        end
+
+        interpolated_key = "#{key_start}#{version_major.to_s.rjust(2, '0')}#{version_minor}"
 
         msgctxt = "#{@prefix}#{interpolated_key}"
         msgid = <<~MSGID

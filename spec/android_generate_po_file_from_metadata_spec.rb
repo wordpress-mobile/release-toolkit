@@ -72,8 +72,11 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         "value release_notes\\n"
         msgstr ""
 
-        msgctxt "play_store_release_notes_short"
-        msgid "value release_notes_short"
+        # .translators: Shorter Release notes for this version to be displayed in the Play Store. Limit to 500 characters including spaces and commas!
+        msgctxt "play_store_release_note_short_010"
+        msgid ""
+        "1.0\\n"
+        "value release_notes_short\\n"
         msgstr ""
 
         # .translators: Short description of the app to be displayed in the Play Store. Limit to 80 characters including spaces and commas!
@@ -86,6 +89,9 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         msgid "value title"
         msgstr ""
       PO
+
+      File.write('/Users/juza/Projects/release-toolkit/Test/po1', File.read(output_po_path))
+      File.write('/Users/juza/Projects/release-toolkit/Test/expected1', expected)
 
       expect(File.read(output_po_path)).to eq(expected)
     end
@@ -174,8 +180,11 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         "value release_notes\\n"
         msgstr ""
 
-        msgctxt "play_store_release_notes_short"
-        msgid "value release_notes_short"
+        # .translators: Shorter Release notes for this version to be displayed in the Play Store. Limit to 500 characters including spaces and commas!
+        msgctxt "play_store_release_note_short_010"
+        msgid ""
+        "1.0\\n"
+        "value release_notes_short\\n"
         msgstr ""
 
         # .translators: Short description of the app to be displayed in the Play Store. Limit to 80 characters including spaces and commas!
