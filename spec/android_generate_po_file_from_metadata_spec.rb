@@ -95,10 +95,6 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         msgid "value title"
         msgstr ""
       PO
-
-      File.write('/Users/juza/Projects/release-toolkit/Test/po1', File.read(output_po_path))
-      File.write('/Users/juza/Projects/release-toolkit/Test/expected1', expected)
-
       expect(File.read(output_po_path)).to eq(expected)
     end
   end
