@@ -44,6 +44,7 @@ module Fastlane
           other_sources: other_sources,
           release_version: release_version,
           metadata_directory: metadata_directory,
+          po_output_file: 'AppStoreStrings.po',
           prefix: 'app_store_'
         )
         po.do(metadata_directory: metadata_directory, special_keys: SPECIAL_KEYS)
@@ -52,7 +53,8 @@ module Fastlane
         release_notes_previous_file = File.join(metadata_directory, 'release_notes_previous.txt')
         version_minus_one = Fastlane::Helper::Android::VersionHelper.calc_prev_release_version(release_version)
         po.add_release_notes_to_po(release_notes_previous_file, version_minus_one)
-        po.write(write_to: File.join(metadata_directory, 'AppStoreStrings.po'))
+
+        po.write
       end
 
       def self.description

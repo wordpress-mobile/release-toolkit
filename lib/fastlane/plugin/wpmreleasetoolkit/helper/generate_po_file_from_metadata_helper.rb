@@ -4,12 +4,13 @@ require_relative '../helper/po_extended'
 module Fastlane
   module Helper
     class GeneratePoFileMetadataHelper
-      def initialize(keys_to_comment_hash:, other_sources:, metadata_directory:, release_version:, prefix: '')
+      def initialize(keys_to_comment_hash:, other_sources:, metadata_directory:, release_version:, po_output_file:, prefix: '')
         @po = PoExtended.new(:msgctxt)
         @keys_to_comment_hash = keys_to_comment_hash
         @other_sources = other_sources
         @metadata_directory = metadata_directory
         @release_version = release_version
+        @po_output_file = po_output_file
         @prefix = prefix
       end
 
@@ -97,8 +98,8 @@ module Fastlane
         add_poentry_to_po(msgctxt, msgid, comment(key: key))
       end
 
-      def write(write_to:)
-        File.write(write_to, @po.to_s)
+      def write
+        File.write(File.join(@metadata_directory, @po_output_file), @po.to_s)
       end
     end
   end
