@@ -187,7 +187,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
         File `#{fr_lproj}/Localizable.strings` is in xml format, while finding duplicate keys only make sense on files that are in ASCII-plist format.
         Since your files are in xml format, you should probably disable the `check_duplicate_keys` option from this `ios_lint_localizations` call.
       EXPECTED_WARNING
-      expect(FastlaneCore::UI).to receive(:warning).with(expected_message)
+      expect(FastlaneCore::UI).to receive(:important).with(expected_message)
 
       # Act
       install_dir = "vendor/swiftgen/#{Fastlane::Helper::Ios::L10nLinterHelper::SWIFTGEN_VERSION}"

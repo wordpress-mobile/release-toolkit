@@ -58,7 +58,7 @@ module Fastlane
             duplicates = Fastlane::Helper::Ios::StringsFileValidationHelper.find_duplicated_keys(file: path)
             duplicate_keys[language] = duplicates.map { |key, value| "`#{key}` was found at multiple lines: #{value.join(', ')}" } unless duplicates.empty?
           else
-            UI.warning <<~WRONG_FORMAT
+            UI.important <<~WRONG_FORMAT
               File `#{path}` is in #{file_type} format, while finding duplicate keys only make sense on files that are in ASCII-plist format.
               Since your files are in #{file_type} format, you should probably disable the `check_duplicate_keys` option from this `#{self.action_name}` call.
             WRONG_FORMAT
