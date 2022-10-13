@@ -101,7 +101,7 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
 
   it 'test missing required .txt file' do
     in_tmp_dir do |dir|
-      # For each key create a key.txt file whose content is "value key"
+      # Drop the first item!
       required_keys[1..].each do |key|
         write_to = File.join(dir, "#{key}.txt")
         File.write(write_to, "value #{key}")
