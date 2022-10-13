@@ -28,7 +28,6 @@ module Fastlane
           other_sources: other_sources,
           release_version: release_version,
           metadata_directory: metadata_directory,
-          po_output_file: 'AppStoreStrings.po',
           prefix: 'app_store_'
         )
         po.do(metadata_directory: metadata_directory, special_keys: SPECIAL_KEYS)
@@ -42,7 +41,7 @@ module Fastlane
           UI.important("#{release_notes_previous_file} does not exist!")
         end
 
-        po.write
+        po.write(po_output_file: 'AppStoreStrings.po')
       end
 
       def self.description

@@ -14,13 +14,12 @@ module Fastlane
         promo_screenshot_6: 'Description for the sixth app store image'
       }.freeze
       # rubocop: enable Naming/VariableNumber
-      def initialize(keys_to_comment_hash:, other_sources:, metadata_directory:, release_version:, po_output_file:, prefix: '')
+      def initialize(keys_to_comment_hash:, other_sources:, metadata_directory:, release_version:, prefix: '')
         @po = PoExtended.new(:msgctxt)
         @keys_to_comment_hash = keys_to_comment_hash.merge(KNOWN_OPTIONAL_KEYS_TO_COMMENT_HASH)
         @other_sources = other_sources
         @metadata_directory = metadata_directory
         @release_version = release_version
-        @po_output_file = po_output_file
         @prefix = prefix
       end
 
@@ -108,8 +107,8 @@ module Fastlane
         add_poentry_to_po(msgctxt, msgid, comment(key: key))
       end
 
-      def write
-        File.write(File.join(@metadata_directory, @po_output_file), @po.to_s)
+      def write(po_output_file:)
+        File.write(File.join(@metadata_directory, po_output_file), @po.to_s)
       end
     end
   end
