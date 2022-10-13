@@ -63,12 +63,12 @@ module Fastlane
             description: 'The path containing the .txt files ',
             is_string: true,
             verify_block: proc do |value|
-              UI.user_error!("No metadata_directory path for AnGeneratePoFileFromMetadataAction given, pass using `metadata_directory: 'directory'`") unless value && !value.empty?
+              UI.user_error!("No metadata_directory path for `IosGeneratePoFileFromMetadataAction` given, pass using `metadata_directory: 'directory'`") unless value && !value.empty?
               UI.user_error!("Couldn't find path '#{value}'") unless Dir.exist?(value)
 
               # Check that all required files are in metadata_directory
-              @txt_files_in_metadata_directory = Dir[File.join(value, '*.txt')].map { |file| File.basename(file, '.txt') }.to_set
-              intersection = @txt_files_in_metadata_directory.intersection(REQUIRED_KEYS.to_set)
+              txt_files_in_metadata_directory = Dir[File.join(value, '*.txt')].map { |file| File.basename(file, '.txt') }.to_set
+              intersection = txt_files_in_metadata_directory.intersection(REQUIRED_KEYS.to_set)
               UI.user_error!("One or more mandatory files are missing. You need to have all #{REQUIRED_KEYS.map { |el| "#{el}.txt" }.join(', ')}") unless intersection.length == REQUIRED_KEYS.to_set.length
             end
           ),
@@ -77,7 +77,7 @@ module Fastlane
             env_name: "#{env_name_prefix}_RELEASE_VERSION",
             description: 'The release version of the app (to use to mark the release notes)',
             verify_block: proc do |value|
-              UI.user_error!("No release version for AnGeneratePoFileFromMetadataAction given, pass using `release_version: 'version'`") unless value && !value.empty?
+              UI.user_error!("No release version for `IosGeneratePoFileFromMetadataAction given`, pass using `release_version: 'version'`") unless value && !value.empty?
             end
           ),
           FastlaneCore::ConfigItem.new(
@@ -92,7 +92,6 @@ module Fastlane
               end
             end
           ),
-
         ]
       end
 
