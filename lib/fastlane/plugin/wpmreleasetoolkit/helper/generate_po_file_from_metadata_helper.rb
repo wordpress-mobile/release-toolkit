@@ -24,7 +24,6 @@ module Fastlane
       end
 
       def do(metadata_directory:, special_keys:)
-        @po = PoExtended.new(:msgctxt)
         @po[''] = <<~HEADER
           MIME-Version: 1.0
           Content-Type: text/plain; charset=UTF-8
