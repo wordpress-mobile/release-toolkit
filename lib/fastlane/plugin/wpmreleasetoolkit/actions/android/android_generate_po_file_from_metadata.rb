@@ -71,9 +71,10 @@ module Fastlane
               UI.user_error!("No metadata_directory path for AnGeneratePoFileFromMetadataAction given, pass using `metadata_directory: 'directory'`") unless value && !value.empty?
               UI.user_error!("Couldn't find path '#{value}'") unless Dir.exist?(value)
               # Check that all required files are in metadata_directory
-              txt_files_in_metadata_directory = Dir[File.join(value, '*.txt')].map { |file| File.basename(file, '.txt') }.to_set
-              intersection = txt_files_in_metadata_directory.intersection(REQUIRED_KEYS.to_set)
-              UI.user_error!("One or more mandatory files are missing. You need to have all #{REQUIRED_KEYS.map { |el| "#{el}.txt" }.join(', ')}") unless intersection.length == REQUIRED_KEYS.to_set.length
+              keys_in_metadata_directory = Dir[File.join(value, '*.txt')].map { |file| File.basename(file, '.txt') }.to_set
+              missing_keys = (REQUIRED_KEYS.to_set - keys_in_metadata_directory).to_a.map { |key| "#{key}.txt" }
+              test = "#{missing_keys.join(', ')} file(s) is/are required and are missing from `metadata_directory`"
+              UI.user_error!(test) unless missing_keys.empty?
             end
           ),
           FastlaneCore::ConfigItem.new(

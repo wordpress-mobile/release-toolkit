@@ -99,7 +99,7 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
     end
   end
 
-  it 'test missing required .txt file' do
+  it 'test that a missing required .txt file raises a proper error' do
     in_tmp_dir do |dir|
       # For each key create a key.txt file whose content is "value key"
       required_keys[1..].each do |key|
@@ -111,7 +111,23 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
           metadata_directory: dir,
           release_version: '1.0'
         )
-      end.to raise_error(FastlaneCore::Interface::FastlaneError)
+      end.to raise_error 'full_description.txt file(s) is/are required and are missing from `metadata_directory`'
+    end
+  end
+
+  it 'test that two missing required .txt file raise a proper error' do
+    in_tmp_dir do |dir|
+      # For each key create a key.txt file whose content is "value key"
+      required_keys[2..].each do |key|
+        write_to = File.join(dir, "#{key}.txt")
+        File.write(write_to, "value #{key}")
+      end
+      expect do
+        run_described_fastlane_action(
+          metadata_directory: dir,
+          release_version: '1.0'
+        )
+      end.to raise_error 'full_description.txt, title.txt file(s) is/are required and are missing from `metadata_directory`'
     end
   end
 
