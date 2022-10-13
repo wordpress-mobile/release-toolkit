@@ -68,13 +68,11 @@ module Fastlane
             description: 'The path containing the .txt files',
             is_string: true,
             verify_block: proc do |value|
-              UI.user_error!("No metadata_directory path for AnGeneratePoFileFromMetadataAction given, pass using `metadata_directory: 'directory'`") unless value && !value.empty?
+              UI.user_error!("No metadata_directory path for `AnGeneratePoFileFromMetadataAction` given, pass using `metadata_directory: 'directory'`") unless value && !value.empty?
               UI.user_error!("Couldn't find path '#{value}'") unless Dir.exist?(value)
-              # Check that all required files are in metadata_directory
-              keys_in_metadata_directory = Dir[File.join(value, '*.txt')].map { |file| File.basename(file, '.txt') }.to_set
-              missing_keys = (REQUIRED_KEYS.to_set - keys_in_metadata_directory).to_a.map { |key| "#{key}.txt" }
-              test = "#{missing_keys.join(', ')} file(s) is/are required and are missing from `metadata_directory`"
-              UI.user_error!(test) unless missing_keys.empty?
+
+              required_keys_exist, message = Fastlane::Helper::GeneratePoFileMetadataHelper.do_required_keys_exist(metadata_folder: value, required_keys: REQUIRED_KEYS)
+              UI.user_error!(message) unless required_keys_exist
             end
           ),
           FastlaneCore::ConfigItem.new(
@@ -82,7 +80,7 @@ module Fastlane
             env_name: "#{env_name_prefix}_RELEASE_VERSION",
             description: 'The release version of the app (to use to mark the release notes)',
             verify_block: proc do |value|
-              UI.user_error!("No release version for AnGeneratePoFileFromMetadataAction given, pass using `release_version: 'version'`") unless value && !value.empty?
+              UI.user_error!("No release version for `AnGeneratePoFileFromMetadataAction` given, pass using `release_version: 'version'`") unless value && !value.empty?
             end
           ),
           FastlaneCore::ConfigItem.new(

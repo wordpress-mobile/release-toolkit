@@ -109,6 +109,17 @@ module Fastlane
       def write(po_output_file:)
         File.write(File.join(@metadata_directory, po_output_file), @po.to_s)
       end
+
+      def self.do_required_keys_exist(metadata_folder:, required_keys:)
+        keys_in_metadata_directory = Dir[File.join(metadata_folder, '*.txt')].map { |file| File.basename(file, '.txt') }.to_set
+        missing_required_keys = (required_keys.to_set - keys_in_metadata_directory).to_a.map { |key| "#{key}.txt" }
+
+        if missing_required_keys.empty?
+          [true, '']
+        else
+          [false, "#{missing_required_keys.join(', ')} file(s) is/are required and are missing from `metadata_directory`"]
+        end
+      end
     end
   end
 end
