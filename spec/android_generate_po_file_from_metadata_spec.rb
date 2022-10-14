@@ -55,12 +55,12 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         msgid "value full_description"
         msgstr ""
 
-        # .translators: Description for the first app store image
+        # .translators: Text that will be used to decorate the screenshot 1
         msgctxt "play_store_promo_screenshot_1"
         msgid "What you are reading is coming from another source"
         msgstr ""
 
-        # .translators: Description for the second app store image
+        # .translators: Text that will be used to decorate the screenshot 2
         msgctxt "play_store_promo_screenshot_2"
         msgid "What you are reading is coming from another source again"
         msgstr ""
@@ -177,12 +177,12 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         msgid "value full_description"
         msgstr ""
 
-        # .translators: Description for the first app store image
+        # .translators: Text that will be used to decorate the screenshot 1
         msgctxt "play_store_promo_screenshot_1"
         msgid "What you are reading is coming from another source"
         msgstr ""
 
-        # .translators: Description for the second app store image
+        # .translators: Text that will be used to decorate the screenshot 2
         msgctxt "play_store_promo_screenshot_2"
         msgid "What you are reading is coming from another source again"
         msgstr ""
@@ -217,7 +217,6 @@ describe Fastlane::Actions::AndroidGeneratePoFileFromMetadataAction do
         msgid "value title"
         msgstr ""
       PO
-
       expect(File.read(output_po_path)).to eq(expected)
     end
   end
