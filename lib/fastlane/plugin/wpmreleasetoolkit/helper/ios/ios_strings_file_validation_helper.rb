@@ -11,25 +11,25 @@ module Fastlane
 
         TRANSITIONS = {
           root: {
-            /\s/ => :root,
+            /\s/u => :root,
             '/' => :maybe_comment_start,
             '"' => :in_quoted_key
           },
           maybe_comment_start: {
             '/' => :in_line_comment,
-            /\*/ => :in_block_comment
+            /\*/u => :in_block_comment
           },
           in_line_comment: {
             "\n" => :root,
-            /./ => :in_line_comment
+            /./u => :in_line_comment
           },
           in_block_comment: {
             /\*/ => :maybe_block_comment_end,
-            /./m => :in_block_comment
+            /./mu => :in_block_comment
           },
           maybe_block_comment_end: {
             '/' => :root,
-            /./m => :in_block_comment
+            /./mu => :in_block_comment
           },
           in_quoted_key: {
             '"' => lambda do |state, _|
@@ -37,25 +37,25 @@ module Fastlane
               state.buffer.string = ''
               :after_quoted_key_before_eq
             end,
-            /./ => lambda do |state, c|
+            /./u => lambda do |state, c|
               state.buffer.write(c)
               :in_quoted_key
             end
           },
           after_quoted_key_before_eq: {
-            /\s/ => :after_quoted_key_before_eq,
+            /\s/u => :after_quoted_key_before_eq,
             '=' => :after_quoted_key_and_eq
           },
           after_quoted_key_and_eq: {
-            /\s/ => :after_quoted_key_and_eq,
+            /\s/u => :after_quoted_key_and_eq,
             '"' => :in_quoted_value
           },
           in_quoted_value: {
             '"' => :after_quoted_value,
-            /./m => :in_quoted_value
+            /./mu => :in_quoted_value
           },
           after_quoted_value: {
-            /\s/ => :after_quoted_value,
+            /\s/u => :after_quoted_value,
             ';' => :root
           }
         }.freeze
@@ -70,8 +70,11 @@ module Fastlane
 
           state = State.new(context: :root, buffer: StringIO.new, in_escaped_ctx: false, found_key: nil)
 
-          File.readlines(file, mode: 'rb:BOM|UTF-8').each_with_index do |line, line_no|
-            line.encode('UTF-8').chars.each_with_index do |c, col_no|
+          # Using our `each_utf8_line` helper instead of `File.readlines` ensures we can also read files that are
+          # encoded in UTF-16, yet process each of their lines as a UTF-8 string, so that `RegExp#match?` don't throw
+          # an `Encoding::CompatibilityError` exception. (Note how all our `RegExp`s in `TRANSITIONS` have the `u` flag)
+          Fastlane::Helper::Ios::L10nHelper.read_utf8_lines(file).each_with_index do |line, line_no|
+            line.chars.each_with_index do |c, col_no|
               # Handle escaped characters at a global level.
               # This is more straightforward than having to account for it in the `TRANSITIONS` table.
               if state.in_escaped_ctx || c == '\\'

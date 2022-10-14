@@ -36,6 +36,28 @@ module Fastlane
           end
         end
 
+        # Read a file line by line and iterate over it (just like `File.readlines` does),
+        # except that it also detects the encoding used by the file (using the BOM if present) when reading it,
+        # and then convert each line to UTF-8 before yielding it
+        #
+        # This is particularly useful if you need to then use a `RegExp` to match part of the lines you're iterating over,
+        # as the `RegExp` (which will typically be UTF-8) and the string you're matching with it have to use the same encoding
+        # (otherwise we would get a `Encoding::CompatibilityError`)
+        #
+        # @important If you are then using a `RegExp` to match the UTF-8 lines you iterate on,
+        # remember to use the `u` flag on it (`/…/u`) to make it UTF-8-aware too.
+        #
+        # @param [String] file The path to the file to read
+        # @yield each line read from the file, after converting it to the UTF-8 encoding
+        #
+        def self.read_utf8_lines(file)
+          # Be sure to guess file encoding using the Byte-Order-Mark, and fallback to UTF-8 if there's no BOM.
+          File.readlines(file, mode: 'rb:BOM|UTF-8').map do |line|
+            # Ensure the line is re-encoded to UTF-8 regardless of the encoding that was used in the input file
+            line.encode(Encoding::UTF_8)
+          end
+        end
+
         # Merge the content of multiple `.strings` files into a new `.strings` text file.
         #
         # @param [Hash<String, String>] paths The paths of the `.strings` files to merge together, associated with the prefix to prepend to each of their respective keys
@@ -68,11 +90,9 @@ module Fastlane
               all_keys_found += string_keys
 
               tmp_file.write("/* MARK: - #{File.basename(input_file)} */\n\n")
-              # Read line-by-line to reduce memory footprint during content copy; Be sure to guess file encoding using the Byte-Order-Mark.
-              File.readlines(input_file, mode: 'rb:BOM|UTF-8').each do |line|
+              # Read line-by-line to reduce memory footprint during content copy
+              read_utf8_lines(input_file).each do |line|
                 unless prefix.nil? || prefix.empty?
-                  # We need to ensure the line and RegExp are using the same encoding, so we transcode everything to UTF-8.
-                  line.encode!(Encoding::UTF_8)
                   # The `/u` modifier on the RegExps is to make them UTF-8
                   line.gsub!(/^(\s*")/u, "\\1#{prefix}") # Lines starting with a quote are considered to be start of a key; add prefix right after the quote
                   line.gsub!(/^(\s*)([A-Z0-9_]+)(\s*=\s*")/ui, "\\1\"#{prefix}\\2\"\\3") # Lines starting with an identifier followed by a '=' are considered to be an unquoted key (typical in InfoPlist.strings files for example)
