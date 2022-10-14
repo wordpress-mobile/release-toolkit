@@ -66,12 +66,12 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         msgid "value name"
         msgstr ""
 
-        # .translators: Description for the first app store image
+        # .translators: Text that will be used to decorate the screenshot 1
         msgctxt "app_store_promo_screenshot_1"
         msgid "What you are reading is coming from another source"
         msgstr ""
 
-        # .translators: Description for the second app store image
+        # .translators: Text that will be used to decorate the screenshot 2
         msgctxt "app_store_promo_screenshot_2"
         msgid "What you are reading is coming from another source again"
         msgstr ""
@@ -172,12 +172,12 @@ describe Fastlane::Actions::IosGeneratePoFileFromMetadataAction do
         msgid "value name"
         msgstr ""
 
-        # .translators: Description for the first app store image
+        # .translators: Text that will be used to decorate the screenshot 1
         msgctxt "app_store_promo_screenshot_1"
         msgid "What you are reading is coming from another source"
         msgstr ""
 
-        # .translators: Description for the second app store image
+        # .translators: Text that will be used to decorate the screenshot 2
         msgctxt "app_store_promo_screenshot_2"
         msgid "What you are reading is coming from another source again"
         msgstr ""
