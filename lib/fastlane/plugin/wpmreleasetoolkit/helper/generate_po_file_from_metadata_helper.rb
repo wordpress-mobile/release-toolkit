@@ -12,6 +12,7 @@ module Fastlane
       def initialize(keys_to_comment_hash:, other_sources:, metadata_directory:, release_version:, prefix: '')
         @po = PoExtended.new(:msgctxt)
         @keys_to_comment_hash = keys_to_comment_hash.merge(KNOWN_OPTIONAL_KEYS_TO_COMMENT_HASH)
+        @regexp_to_comment_hash = @keys_to_comment_hash.filter { |k| k.instance_of?(Regexp) }
         @other_sources = other_sources
         @metadata_directory = metadata_directory
         @release_version = release_version
@@ -68,7 +69,7 @@ module Fastlane
         translator_prefix = '.translators:'
         (return "#{translator_prefix} #{@keys_to_comment_hash[key.to_sym]}") if (@keys_to_comment_hash.key? key.to_sym) && (!@keys_to_comment_hash[key.to_sym].nil? && !@keys_to_comment_hash[key.to_sym].empty?)
 
-        @keys_to_comment_hash.filter { |k| k.instance_of?(Regexp) }.each do |keytemp, value|
+        @regexp_to_comment_hash.each do |keytemp, value|
           regexp = Regexp.new(keytemp)
           next unless key.match?(regexp)
 
