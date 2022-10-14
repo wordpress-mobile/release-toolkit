@@ -63,11 +63,10 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     #
     def run_l10n_linter_test(data_file:, check_duplicate_keys: nil)
       # Arrange: Prepare test files
-      test_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', "test-lint-ios-#{data_file}.yaml")
+      test_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', 'ios_lint_localizations', "#{data_file}.yaml")
       yml = YAML.load_file(test_file)
 
       files = yml['test_data']
-      FileUtils.mkdir_p(@test_data_dir)
       files.each do |lang, content|
         lproj = File.join(@test_data_dir, "#{lang}.lproj")
         FileUtils.mkdir_p(lproj)
@@ -131,6 +130,74 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
 
     it 'does not fail if a locale does not have any Localizable.strings' do
       run_l10n_linter_test(data_file: 'no-strings')
+    end
+
+    it 'allows to retry after manual fix' do
+      # Arrange: Prepare test files
+      valid_content = <<~FIXED_CONTENT
+        "string_placeholder" = "String %@ here.";
+      FIXED_CONTENT
+
+      invalid_content = <<~INVALID_CONTENT
+        "string_placeholder" = "Int %d here.";
+      INVALID_CONTENT
+
+      en_lproj = File.join(@test_data_dir, 'en.lproj')
+      FileUtils.mkdir_p(en_lproj)
+      File.write(File.join(en_lproj, 'Localizable.strings'), valid_content)
+
+      fr_lproj = File.join(@test_data_dir, 'fr.lproj')
+      FileUtils.mkdir_p(fr_lproj)
+      File.write(File.join(fr_lproj, 'Localizable.strings'), invalid_content)
+
+      # Assert: Ask to retry after first failure reported and simulated manual fix in between
+      expect(FastlaneCore::UI).to receive(:error).once
+      expect(FastlaneCore::UI).to receive(:confirm) do
+        # Simulate manual fix between the confirm prompt being asked and replying to it
+        File.write(File.join(fr_lproj, 'Localizable.strings'), valid_content)
+        true
+      end
+
+      # Act
+      install_dir = "vendor/swiftgen/#{Fastlane::Helper::Ios::L10nLinterHelper::SWIFTGEN_VERSION}"
+      result = run_described_fastlane_action(
+        install_path: install_dir,
+        input_dir: @test_data_dir,
+        base_lang: 'en',
+        allow_retry: true
+      )
+
+      # Assert
+      expect(result).to eq({}) # No violations anymore after manual fix and first retry
+    end
+
+    it 'warns if input files are not in ASCII-plist format' do
+      # Arrange: Prepare test files
+      en_lproj = File.join(@test_data_dir, 'en.lproj')
+      ascii_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', 'ios_l10n_helper', 'Localizable-utf16.strings')
+      FileUtils.mkdir_p(en_lproj)
+      File.write(File.join(en_lproj, 'Localizable.strings'), File.read(ascii_file))
+
+      fr_lproj = File.join(@test_data_dir, 'fr.lproj')
+      xml_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', 'ios_l10n_helper', 'xml-format.strings')
+      FileUtils.mkdir_p(fr_lproj)
+      File.write(File.join(fr_lproj, 'Localizable.strings'), File.read(xml_file))
+
+      expected_message = <<~EXPECTED_WARNING
+        File `#{fr_lproj}/Localizable.strings` is in xml format, while finding duplicate keys only make sense on files that are in ASCII-plist format.
+        Since your files are in xml format, you should probably disable the `check_duplicate_keys` option from this `ios_lint_localizations` call.
+      EXPECTED_WARNING
+      expect(FastlaneCore::UI).to receive(:important).with(expected_message)
+
+      # Act
+      install_dir = "vendor/swiftgen/#{Fastlane::Helper::Ios::L10nLinterHelper::SWIFTGEN_VERSION}"
+      result = run_described_fastlane_action(
+        install_path: install_dir,
+        input_dir: @test_data_dir,
+        base_lang: 'en'
+      )
+
+      expect(result).to eq({ 'fr' => ['`key3` expected placeholders for [Int] but found [] instead.'] })
     end
 
     after(:each) do
