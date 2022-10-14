@@ -6,12 +6,7 @@ module Fastlane
     class GeneratePoFileMetadataHelper
       # rubocop: disable Naming/VariableNumber
       KNOWN_OPTIONAL_KEYS_TO_COMMENT_HASH = {
-        promo_screenshot_1: 'Description for the first app store image',
-        promo_screenshot_2: 'Description for the second app store image',
-        promo_screenshot_3: 'Description for the third app store image',
-        promo_screenshot_4: 'Description for the fourth app store image',
-        promo_screenshot_5: 'Description for the fifth app store image',
-        promo_screenshot_6: 'Description for the sixth app store image'
+        /screenshot_(.*)/i => 'Text that will be used to decorate the screenshot %<shot>s',
       }.freeze
       # rubocop: enable Naming/VariableNumber
       def initialize(keys_to_comment_hash:, other_sources:, metadata_directory:, release_version:, prefix: '')
@@ -70,11 +65,20 @@ module Fastlane
       end
 
       def comment(key:)
+        translator_prefix = '.translators:'
         if (@keys_to_comment_hash.key? key.to_sym) && (!@keys_to_comment_hash[key.to_sym].nil? && !@keys_to_comment_hash[key.to_sym].empty?)
-          ".translators: #{@keys_to_comment_hash[key.to_sym]}"
+          return "#{translator_prefix} #{@keys_to_comment_hash[key.to_sym]}"
         else
-          ''
+          @keys_to_comment_hash.filter { |k| k.instance_of?(Regexp) }.each do |keytemp, value|
+
+            regexp = Regexp.new(keytemp)
+            next unless key.match(regexp)
+
+            shot_number = key.match(regexp).captures[0]
+            return "#{translator_prefix} #{format(value, shot: shot_number)}"
+          end
         end
+        ''
       end
 
       def add_standard_files_to_po(files: [])
