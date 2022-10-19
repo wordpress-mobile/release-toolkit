@@ -15,6 +15,7 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     before do
+      allow(described_class).to receive(:github_token!).and_return('')
       allow(described_class).to receive(:github_client).and_return(client)
     end
 
@@ -72,7 +73,6 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     before do
-      allow(described_class).to receive(:github_token!).and_return('')
       allow(Octokit::Client).to receive(:new).and_return(client)
     end
 
@@ -82,13 +82,13 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     it 'is not nil' do
-      expect(described_class.github_client).not_to be_nil
+      expect(described_class.github_client('')).not_to be_nil
     end
 
     it 'memoizes the client' do
       expect(Octokit::Client).to receive(:new).once
-      described_class.github_client
-      described_class.github_client
+      described_class.github_client('')
+      described_class.github_client('')
     end
   end
 
@@ -103,6 +103,7 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     before do
+      allow(described_class).to receive(:github_token!).and_return('')
       allow(described_class).to receive(:github_client).and_return(client)
     end
 
@@ -128,6 +129,7 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     before do
+      allow(described_class).to receive(:github_token!).and_return('')
       allow(described_class).to receive(:github_client).and_return(client)
     end
 

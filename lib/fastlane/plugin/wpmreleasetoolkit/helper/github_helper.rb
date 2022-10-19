@@ -19,9 +19,13 @@ module Fastlane
         token || UI.user_error!('Please provide a GitHub authentication token via the `GITHUB_TOKEN` environment variable')
       end
 
-      def self.github_client
+      # Creates a client for the GitHub API
+      #
+      # @param [String] accesstoken GitHub OAuth access token
+      #
+      def self.github_client(accesstoken)
         @@client ||= begin
-          client = Octokit::Client.new(access_token: github_token!)
+          client = Octokit::Client.new(access_token: accesstoken)
 
           # Fetch the current user
           user = client.user
@@ -35,7 +39,7 @@ module Fastlane
       end
 
       def self.get_milestone(repository, release)
-        miles = github_client().list_milestones(repository)
+        miles = github_client(github_token!).list_milestones(repository)
         mile = nil
 
         miles&.each do |mm|
@@ -52,14 +56,14 @@ module Fastlane
       # @return [<Sawyer::Resource>] A list of the PRs for the given milestone, sorted by number
       #
       def self.get_prs_for_milestone(repository, milestone)
-        github_client.search_issues(%(type:pr milestone:"#{milestone}" repo:#{repository}))[:items].sort_by(&:number)
+        github_client(github_token!).search_issues(%(type:pr milestone:"#{milestone}" repo:#{repository}))[:items].sort_by(&:number)
       end
 
       def self.get_last_milestone(repository)
         options = {}
         options[:state] = 'open'
 
-        milestones = github_client().list_milestones(repository, options)
+        milestones = github_client(github_token!).list_milestones(repository, options)
         return nil if milestones.nil?
 
         last_stone = nil
@@ -92,7 +96,7 @@ module Fastlane
         options = {}
         options[:due_on] = newmilestone_duedate
         options[:description] = comment
-        github_client().create_milestone(repository, newmilestone_number, options)
+        github_client(github_token!).create_milestone(repository, newmilestone_number, options)
       end
 
       # Creates a Release on GitHub as a Draft
@@ -106,8 +110,8 @@ module Fastlane
       # @param [Array<String>] assets List of file paths to attach as assets to the release
       # @param [TrueClass|FalseClass] prerelease Indicates if this should be created as a pre-release (i.e. for alpha/beta)
       #
-      def self.create_release(repository:, version:, target: nil, description:, assets:, prerelease:)
-        release = github_client().create_release(
+      def self.create_release(repository:, version:, target: nil, description:, assets:, prerelease:, githubtoken: nil)
+        release = github_client(github_token!).create_release(
           repository,
           version, # tag name
           name: version, # release name
@@ -117,7 +121,7 @@ module Fastlane
           body: description
         )
         assets.each do |file_path|
-          github_client().upload_asset(release[:url], file_path, content_type: 'application/octet-stream')
+          github_client(github_token!).upload_asset(release[:url], file_path, content_type: 'application/octet-stream')
         end
       end
 
@@ -135,9 +139,9 @@ module Fastlane
         file_name = File.basename(file_path)
         download_path = File.join(download_folder, file_name)
 
-        download_url = github_client.contents(repository,
-                                              path: file_path,
-                                              ref: tag).download_url
+        download_url = github_client(github_token!).contents(repository,
+                                                             path: file_path,
+                                                             ref: tag).download_url
         begin
           uri = URI.parse(download_url)
           uri.open do |remote_file|
@@ -152,7 +156,7 @@ module Fastlane
 
       # Creates (or updates an existing) GitHub PR Comment
       def self.comment_on_pr(project_slug:, pr_number:, body:, reuse_identifier: SecureRandom.uuid)
-        client = github_client
+        client = github_client(github_token!)
         comments = client.issue_comments(project_slug, pr_number)
 
         reuse_marker = "<!-- REUSE_ID: #{reuse_identifier} -->"
