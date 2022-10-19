@@ -27,7 +27,8 @@ module Fastlane
           target: params[:target],
           description: release_notes,
           assets: assets,
-          prerelease: prerelease
+          prerelease: prerelease,
+          githubtoken: params[:githubtoken]
         )
         UI.message('Done')
       end
@@ -82,6 +83,11 @@ module Fastlane
                                        optional: true,
                                        default_value: false,
                                        is_string: false),
+          FastlaneCore::ConfigItem.new(key: :githubtoken,
+                                       env_name: 'GITHUB_TOKEN',
+                                       description: 'The GitHub OAuth access token',
+                                       optional: true,
+                                       type: String),
         ]
       end
 
