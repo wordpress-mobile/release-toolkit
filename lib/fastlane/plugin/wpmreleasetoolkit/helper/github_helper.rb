@@ -90,7 +90,18 @@ module Fastlane
         comment = "Code freeze: #{newmilestone_duedate.to_datetime.strftime('%B %d, %Y')} App Store submission: #{submission_date.strftime('%B %d, %Y')} Release: #{release_date.strftime('%B %d, %Y')}"
 
         options = {}
-        options[:due_on] = newmilestone_duedate
+        # == Workaround for GitHub API bug ==
+        #
+        # It seems that whatever date we send to the API, GitHub will 'floor' it to the date that seems to be at
+        # 00:00 PST/PDT and then discard the time component of the date we sent.
+        # This means that, when we cross the November DST change date, where the due date of the previous milestone
+        # was e.g. `2022-10-31T07:00:00Z` and `.next_day(14)` returns `2022-11-14T07:00:00Z` and we send that value
+        # for the `due_on` field via the API, GitHub ends up creating a milestone with a due of `2022-11-13T08:00:00Z`
+        # instead, introducing an off-by-one error on that due date.
+        #
+        # This is a bug in the GitHub API, not in our date computation logic.
+        # To solve this, we trick it by forcing the time component of the ISO date we send to be `12:00:00Z`.
+        options[:due_on] = newmilestone_duedate.strftime("%Y-%m-%dT12:00:00Z")
         options[:description] = comment
         github_client().create_milestone(repository, newmilestone_number, options)
       end
