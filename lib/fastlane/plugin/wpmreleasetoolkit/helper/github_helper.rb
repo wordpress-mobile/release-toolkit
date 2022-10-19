@@ -87,7 +87,11 @@ module Fastlane
         days_until_submission = need_submission ? (number_of_days_from_code_freeze_to_release - 3) : newmilestone_duration
         submission_date = newmilestone_duedate.to_datetime.next_day(days_until_submission)
         release_date = newmilestone_duedate.to_datetime.next_day(number_of_days_from_code_freeze_to_release)
-        comment = "Code freeze: #{newmilestone_duedate.to_datetime.strftime('%B %d, %Y')} App Store submission: #{submission_date.strftime('%B %d, %Y')} Release: #{release_date.strftime('%B %d, %Y')}"
+        comment = <<~MILESTONE_DESCRIPTION
+          Code freeze: #{newmilestone_duedate.to_datetime.strftime('%B %d, %Y')}
+          App Store submission: #{submission_date.strftime('%B %d, %Y')}
+          Release: #{release_date.strftime('%B %d, %Y')}
+        MILESTONE_DESCRIPTION
 
         options = {}
         # == Workaround for GitHub API bug ==
