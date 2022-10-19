@@ -173,4 +173,55 @@ describe Fastlane::Helper::GithubHelper do
       instance_double('Comment', id: 1234, body: body, user: instance_double('User', id: user_id))
     end
   end
+
+  describe 'create_release' do
+    let(:client) do
+      instance_double(
+        Octokit::Client,
+        user: instance_double('User', name: 'test')
+      )
+    end
+
+    before do
+      allow(described_class).to receive(:github_client).and_return(client)
+      allow(client).to receive(:create_release)
+    end
+
+    after do
+      ENV['GITHUB_TOKEN'] = nil
+    end
+
+    it 'use the githubtoken when is passed as argument' do
+      expect(described_class).to receive(:github_client).with('PARAM_TOKEN')
+      create_release('PARAM_TOKEN')
+    end
+
+    it 'when githubtoken is nil uses the one from the environment' do
+      ENV['GITHUB_TOKEN'] = 'GITHUB_TOKEN'
+      expect(described_class).to receive(:github_client).with('GITHUB_TOKEN')
+      create_release(nil)
+    end
+
+    it 'prioritizes argument `githubtoken` over env variable `GITHUB_TOKEN` if both are present' do
+      ENV['GITHUB_TOKEN'] = 'GITHUB_TOKEN'
+      expect(described_class).to receive(:github_client).with('PARAM_TOKEN')
+      create_release('PARAM_TOKEN')
+    end
+
+    it 'prints an error if neither `githubtoken` nor `GITHUB_TOKEN` are present' do
+      expect { create_release(nil) }.to raise_error(FastlaneCore::Interface::FastlaneError)
+    end
+
+    def create_release(token)
+      described_class.create_release(
+        repository: '',
+        version: '',
+        target: '',
+        description: '',
+        assets: [],
+        prerelease: false,
+        githubtoken: token
+      )
+    end
+  end
 end

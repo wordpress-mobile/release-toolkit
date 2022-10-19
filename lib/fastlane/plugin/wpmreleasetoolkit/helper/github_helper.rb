@@ -109,9 +109,11 @@ module Fastlane
       # @param [String] description The text to use as the release's body / description (typically the release notes)
       # @param [Array<String>] assets List of file paths to attach as assets to the release
       # @param [TrueClass|FalseClass] prerelease Indicates if this should be created as a pre-release (i.e. for alpha/beta)
+      # @param [String?] githubtoken GitHub OAuth access token
       #
       def self.create_release(repository:, version:, target: nil, description:, assets:, prerelease:, githubtoken: nil)
-        release = github_client(github_token!).create_release(
+        token = githubtoken || github_token!
+        release = github_client(token).create_release(
           repository,
           version, # tag name
           name: version, # release name
@@ -121,7 +123,7 @@ module Fastlane
           body: description
         )
         assets.each do |file_path|
-          github_client(github_token!).upload_asset(release[:url], file_path, content_type: 'application/octet-stream')
+          github_client(token).upload_asset(release[:url], file_path, content_type: 'application/octet-stream')
         end
       end
 
