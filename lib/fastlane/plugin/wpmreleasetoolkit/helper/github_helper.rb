@@ -105,7 +105,7 @@ module Fastlane
         #
         # This is a bug in the GitHub API, not in our date computation logic.
         # To solve this, we trick it by forcing the time component of the ISO date we send to be `12:00:00Z`.
-        options[:due_on] = newmilestone_duedate.strftime("%Y-%m-%dT12:00:00Z")
+        options[:due_on] = newmilestone_duedate.strftime('%Y-%m-%dT12:00:00Z')
         options[:description] = comment
         github_client().create_milestone(repository, newmilestone_number, options)
       end
