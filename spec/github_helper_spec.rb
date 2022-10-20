@@ -15,8 +15,7 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     before do
-      allow(described_class).to receive(:github_token!).and_return('')
-      allow(described_class).to receive(:github_client).and_return(client)
+      described_class.instance_variable_set(:@client, client)
     end
 
     it 'fails if it does not find the right release on GitHub' do
@@ -36,62 +35,6 @@ describe Fastlane::Helper::GithubHelper do
     end
   end
 
-  describe 'github_token' do
-    after do
-      ENV['GHHELPER_ACCESS'] = nil
-      ENV['GITHUB_TOKEN'] = nil
-    end
-
-    it 'can use `GHHELPER_ACCESS`' do
-      ENV['GHHELPER_ACCESS'] = 'GHHELPER_ACCESS'
-      expect(described_class.github_token!).to eq('GHHELPER_ACCESS')
-    end
-
-    it 'can use `GITHUB_TOKEN`' do
-      ENV['GITHUB_TOKEN'] = 'GITHUB_TOKEN'
-      expect(described_class.github_token!).to eq('GITHUB_TOKEN')
-    end
-
-    it 'prioritizes GHHELPER_ACCESS` over `GITHUB_TOKEN` if both are present' do
-      ENV['GITHUB_TOKEN'] = 'GITHUB_TOKEN'
-      ENV['GHHELPER_ACCESS'] = 'GHHELPER_ACCESS'
-      expect(described_class.github_token!).to eq('GHHELPER_ACCESS')
-    end
-
-    it 'prints an error if no environment variable is present' do
-      expect { described_class.github_token! }.to raise_error(FastlaneCore::Interface::FastlaneError)
-    end
-  end
-
-  describe 'github_client' do
-    let(:client) do
-      instance_double(
-        Octokit::Client,
-        user: instance_double('User', name: 'test'),
-        'auto_paginate=': nil
-      )
-    end
-
-    before do
-      allow(Octokit::Client).to receive(:new).and_return(client)
-    end
-
-    after do
-      # Clean up the client memoization between runs to ensure it's re-initialized in each test
-      described_class.remove_class_variable(:@@client) if described_class.class_variable_defined?(:@@client)
-    end
-
-    it 'is not nil' do
-      expect(described_class.github_client('')).not_to be_nil
-    end
-
-    it 'memoizes the client' do
-      expect(Octokit::Client).to receive(:new).once
-      described_class.github_client('')
-      described_class.github_client('')
-    end
-  end
-
   describe 'get_last_milestone' do
     let(:test_repo) { 'repo-test/project-test' }
     let(:last_stone) { mock_milestone('10.0') }
@@ -103,8 +46,7 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     before do
-      allow(described_class).to receive(:github_token!).and_return('')
-      allow(described_class).to receive(:github_client).and_return(client)
+      described_class.instance_variable_set(:@client, client)
     end
 
     it 'returns correct milestone' do
@@ -129,8 +71,7 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     before do
-      allow(described_class).to receive(:github_token!).and_return('')
-      allow(described_class).to receive(:github_client).and_return(client)
+      described_class.instance_variable_set(:@client, client)
     end
 
     it 'will create a new comment if an existing one is not found' do
@@ -171,57 +112,6 @@ describe Fastlane::Helper::GithubHelper do
 
     def mock_comment(body: '<!-- REUSE_ID: test-id --> Test', user_id: 1234)
       instance_double('Comment', id: 1234, body: body, user: instance_double('User', id: user_id))
-    end
-  end
-
-  describe 'create_release' do
-    let(:client) do
-      instance_double(
-        Octokit::Client,
-        user: instance_double('User', name: 'test')
-      )
-    end
-
-    before do
-      allow(described_class).to receive(:github_client).and_return(client)
-      allow(client).to receive(:create_release)
-    end
-
-    after do
-      ENV['GITHUB_TOKEN'] = nil
-    end
-
-    it 'use the githubtoken when is passed as argument' do
-      expect(described_class).to receive(:github_client).with('PARAM_TOKEN')
-      create_release('PARAM_TOKEN')
-    end
-
-    it 'when githubtoken is nil uses the one from the environment' do
-      ENV['GITHUB_TOKEN'] = 'GITHUB_TOKEN'
-      expect(described_class).to receive(:github_client).with('GITHUB_TOKEN')
-      create_release(nil)
-    end
-
-    it 'prioritizes argument `githubtoken` over env variable `GITHUB_TOKEN` if both are present' do
-      ENV['GITHUB_TOKEN'] = 'GITHUB_TOKEN'
-      expect(described_class).to receive(:github_client).with('PARAM_TOKEN')
-      create_release('PARAM_TOKEN')
-    end
-
-    it 'prints an error if neither `githubtoken` nor `GITHUB_TOKEN` are present' do
-      expect { create_release(nil) }.to raise_error(FastlaneCore::Interface::FastlaneError)
-    end
-
-    def create_release(token)
-      described_class.create_release(
-        repository: '',
-        version: '',
-        target: '',
-        description: '',
-        assets: [],
-        prerelease: false,
-        githubtoken: token
-      )
     end
   end
 end
