@@ -14,6 +14,7 @@ module Fastlane
         # Replace full URLS to PRs/Issues with shorthand, because GitHub does not render them properly otherwise.
         release_notes.gsub!(%r{https://github.com/([^/]*/[^/]*)/(pulls?|issues?)/([0-9]*)}, '\1#\3')
         prerelease = params[:prerelease]
+        token = params[:github_token]
 
         UI.message("Creating draft release #{version} in #{repository}.")
         # Verify assets
@@ -21,14 +22,15 @@ module Fastlane
           UI.user_error!("Can't find file #{file_path}!") unless File.exist?(file_path)
         end
 
-        Fastlane::Helper::GithubHelper.create_release(
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: token)
+
+        github_helper.create_release(
           repository: repository,
           version: version,
           target: params[:target],
           description: release_notes,
           assets: assets,
-          prerelease: prerelease,
-          githubtoken: params[:githubtoken]
+          prerelease: prerelease
         )
         UI.message('Done')
       end
@@ -83,10 +85,11 @@ module Fastlane
                                        optional: true,
                                        default_value: false,
                                        is_string: false),
-          FastlaneCore::ConfigItem.new(key: :githubtoken,
+          FastlaneCore::ConfigItem.new(key: :github_token,
                                        env_name: 'GITHUB_TOKEN',
                                        description: 'The GitHub OAuth access token',
-                                       optional: true,
+                                       optional: false,
+                                       default_value: false,
                                        type: String),
         ]
       end

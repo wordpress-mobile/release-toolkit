@@ -14,8 +14,9 @@ module Fastlane
         branch_prot[:enforce_admins] = nil
         branch_prot[:required_pull_request_reviews] = { url: "#{branch_url}/protection/required_pull_request_reviews", dismiss_stale_reviews: false, require_code_owner_reviews: false }
 
-        token = Fastlane::Helper::GithubHelper.github_token
-        Fastlane::Helper::GithubHelper.github_client(token).unprotect_branch(repository, branch_name, branch_prot)
+        token = params[:github_token]
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: token)
+        github_helper.unprotect_branch(repository, branch_name, branch_prot)
       end
 
       def self.description
@@ -46,6 +47,12 @@ module Fastlane
                                        env_name: 'GHHELPER_BRANCH',
                                        description: 'The branch to unprotect',
                                        optional: false,
+                                       type: String),
+          FastlaneCore::ConfigItem.new(key: :github_token,
+                                       env_name: 'GITHUB_TOKEN',
+                                       description: 'The GitHub OAuth access token',
+                                       optional: false,
+                                       default_value: false,
                                        type: String),
         ]
       end

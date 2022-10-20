@@ -9,12 +9,13 @@ module Fastlane
       def self.run(params)
         repository = params[:repository]
         milestone_title = params[:milestone]
+        token = params[:github_token]
 
-        milestone = Fastlane::Helper::GithubHelper.get_milestone(repository, milestone_title)
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: token)
+
+        milestone = github_helper.get_milestone(repository, milestone_title)
         UI.user_error!("Milestone #{milestone_title} not found.") if milestone.nil?
-
-        token = Fastlane::Helper::GithubHelper.github_token
-        Fastlane::Helper::GithubHelper.github_client(token).update_milestone(repository, milestone[:number], state: 'closed')
+        github_helper.update_milestone(repository, milestone[:number], state: 'closed')
       end
 
       def self.description
@@ -45,6 +46,12 @@ module Fastlane
                                        env_name: 'GHHELPER_MILESTONE',
                                        description: 'The GitHub milestone',
                                        optional: false,
+                                       type: String),
+          FastlaneCore::ConfigItem.new(key: :github_token,
+                                       env_name: 'GITHUB_TOKEN',
+                                       description: 'The GitHub OAuth access token',
+                                       optional: false,
+                                       default_value: false,
                                        type: String),
         ]
       end

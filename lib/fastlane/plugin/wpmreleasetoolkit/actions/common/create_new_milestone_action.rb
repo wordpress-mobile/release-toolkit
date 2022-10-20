@@ -8,8 +8,11 @@ module Fastlane
     class CreateNewMilestoneAction < Action
       def self.run(params)
         repository = params[:repository]
+        token = params[:github_token]
 
-        last_stone = Fastlane::Helper::GithubHelper.get_last_milestone(repository)
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: token)
+
+        last_stone = github_helper.get_last_milestone(repository)
         UI.message("Last detected milestone: #{last_stone[:title]} due on #{last_stone[:due_on]}.")
         milestone_duedate = last_stone[:due_on]
         milestone_duration = params[:milestone_duration]
@@ -17,7 +20,7 @@ module Fastlane
         newmilestone_number = Fastlane::Helper::Ios::VersionHelper.calc_next_release_version(last_stone[:title])
         number_of_days_from_code_freeze_to_release = params[:number_of_days_from_code_freeze_to_release]
         UI.message("Next milestone: #{newmilestone_number} due on #{newmilestone_duedate}.")
-        Fastlane::Helper::GithubHelper.create_milestone(repository, newmilestone_number, newmilestone_duedate, milestone_duration, number_of_days_from_code_freeze_to_release, params[:need_appstore_submission])
+        github_helper.create_milestone(repository, newmilestone_number, newmilestone_duedate, milestone_duration, number_of_days_from_code_freeze_to_release, params[:need_appstore_submission])
       end
 
       def self.description
@@ -62,6 +65,12 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        default_value: 14),
+          FastlaneCore::ConfigItem.new(key: :github_token,
+                                       env_name: 'GITHUB_TOKEN',
+                                       description: 'The GitHub OAuth access token',
+                                       optional: false,
+                                       default_value: false,
+                                       type: String),
         ]
       end
 

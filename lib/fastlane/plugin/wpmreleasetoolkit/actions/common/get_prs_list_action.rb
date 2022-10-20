@@ -8,9 +8,12 @@ module Fastlane
         repository = params[:repository]
         report_path = File.expand_path(params[:report_path])
         milestone = params[:milestone]
+        token = params[:github_token]
+
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: token)
 
         # Get commit list
-        pr_list = Fastlane::Helper::GithubHelper.get_prs_for_milestone(repository, milestone)
+        pr_list = github_helper.get_prs_for_milestone(repository, milestone)
 
         File.open(report_path, 'w') do |file|
           pr_list.each do |data|
@@ -53,6 +56,12 @@ module Fastlane
                                        description: 'The name of the milestone we want to fetch the list of PRs for (e.g.: `16.9`)',
                                        optional: false,
                                        is_string: true),
+          FastlaneCore::ConfigItem.new(key: :github_token,
+                                       env_name: 'GITHUB_TOKEN',
+                                       description: 'The GitHub OAuth access token',
+                                       optional: false,
+                                       default_value: false,
+                                       type: String),
         ]
       end
 
