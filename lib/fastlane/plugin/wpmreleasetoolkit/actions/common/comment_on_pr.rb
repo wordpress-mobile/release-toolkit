@@ -10,8 +10,8 @@ module Fastlane
       def self.run(params)
         require_relative '../../helper/github_helper'
 
-        token = params[:access_token]
-        github_helper = Fastlane::Helper::GithubHelper.new(github_token: token)
+        access_token = params[:access_token]
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: access_token)
 
         reuse_identifier = github_helper.comment_on_pr(
           project_slug: params[:project],

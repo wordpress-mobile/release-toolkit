@@ -9,8 +9,8 @@ module Fastlane
         UI.user_error!("Can't find any reference for key #{params[:import_key]}") if version.nil?
         UI.message "Downloading #{params[:file_path]} from #{params[:repository]} at version #{version} to #{params[:download_folder]}"
 
-        token = params[:github_token]
-        github_helper = Fastlane::Helper::GithubHelper.new(github_token: token)
+        access_token = params[:access_token]
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: access_token)
 
         github_helper.download_file_from_tag(
           repository: params[:repository],
@@ -60,7 +60,7 @@ module Fastlane
                                        description: 'The prefix which is used in the GitHub release title',
                                        type: String,
                                        optional: true),
-          FastlaneCore::ConfigItem.new(key: :github_token,
+          FastlaneCore::ConfigItem.new(key: :access_token,
                                        env_name: 'GITHUB_TOKEN',
                                        description: 'The GitHub OAuth access token',
                                        optional: false,

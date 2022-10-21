@@ -10,7 +10,7 @@ module Fastlane
     class GithubHelper
       # Helper for GitHub Actions
       #
-      # @param [String?] githubtoken GitHub OAuth access token
+      # @param [String?] github_token GitHub OAuth access token
       #
       def initialize(github_token:)
         @client = Octokit::Client.new(access_token: github_token)

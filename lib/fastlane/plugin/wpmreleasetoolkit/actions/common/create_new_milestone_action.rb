@@ -8,9 +8,9 @@ module Fastlane
     class CreateNewMilestoneAction < Action
       def self.run(params)
         repository = params[:repository]
-        token = params[:github_token]
+        access_token = params[:access_token]
 
-        github_helper = Fastlane::Helper::GithubHelper.new(github_token: token)
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: access_token)
 
         last_stone = github_helper.get_last_milestone(repository)
         UI.message("Last detected milestone: #{last_stone[:title]} due on #{last_stone[:due_on]}.")
@@ -65,7 +65,7 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        default_value: 14),
-          FastlaneCore::ConfigItem.new(key: :github_token,
+          FastlaneCore::ConfigItem.new(key: :access_token,
                                        env_name: 'GITHUB_TOKEN',
                                        description: 'The GitHub OAuth access token',
                                        optional: false,
