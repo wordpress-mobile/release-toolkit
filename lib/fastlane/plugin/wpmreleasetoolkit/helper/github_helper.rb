@@ -13,7 +13,7 @@ module Fastlane
       # @param [String?] githubtoken GitHub OAuth access token
       #
       def initialize(github_token:)
-        @client = Octokit::Client.new(access_token: access_token)
+        @client = Octokit::Client.new(access_token: github_token)
 
         # Fetch the current user
         user = @client.user
