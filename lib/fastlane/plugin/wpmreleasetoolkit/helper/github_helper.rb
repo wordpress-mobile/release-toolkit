@@ -8,6 +8,8 @@ module Fastlane
 
   module Helper
     class GithubHelper
+      attr_reader :client
+
       # Helper for GitHub Actions
       #
       # @param [String?] github_token GitHub OAuth access token
@@ -24,7 +26,7 @@ module Fastlane
       end
 
       def self.get_milestone(repository, release)
-        miles = @client.list_milestones(repository)
+        miles = client.list_milestones(repository)
         mile = nil
 
         miles&.each do |mm|
@@ -41,14 +43,14 @@ module Fastlane
       # @return [<Sawyer::Resource>] A list of the PRs for the given milestone, sorted by number
       #
       def self.get_prs_for_milestone(repository, milestone)
-        @client.search_issues(%(type:pr milestone:"#{milestone}" repo:#{repository}))[:items].sort_by(&:number)
+        client.search_issues(%(type:pr milestone:"#{milestone}" repo:#{repository}))[:items].sort_by(&:number)
       end
 
       def self.get_last_milestone(repository)
         options = {}
         options[:state] = 'open'
 
-        milestones = @client.list_milestones(repository, options)
+        milestones = client.list_milestones(repository, options)
         return nil if milestones.nil?
 
         last_stone = nil
@@ -81,7 +83,7 @@ module Fastlane
         options = {}
         options[:due_on] = newmilestone_duedate
         options[:description] = comment
-        @client.create_milestone(repository, newmilestone_number, options)
+        client.create_milestone(repository, newmilestone_number, options)
       end
 
       # Creates a Release on GitHub as a Draft
@@ -96,7 +98,7 @@ module Fastlane
       # @param [TrueClass|FalseClass] prerelease Indicates if this should be created as a pre-release (i.e. for alpha/beta)
       #
       def self.create_release(repository:, version:, target: nil, description:, assets:, prerelease:)
-        release = @client.create_release(
+        release = client.create_release(
           repository,
           version, # tag name
           name: version, # release name
@@ -106,7 +108,7 @@ module Fastlane
           body: description
         )
         assets.each do |file_path|
-          @client.upload_asset(release[:url], file_path, content_type: 'application/octet-stream')
+          client.upload_asset(release[:url], file_path, content_type: 'application/octet-stream')
         end
       end
 
@@ -124,7 +126,7 @@ module Fastlane
         file_name = File.basename(file_path)
         download_path = File.join(download_folder, file_name)
 
-        download_url = @client.contents(repository, path: file_path, ref: tag).download_url
+        download_url = client.contents(repository, path: file_path, ref: tag).download_url
 
         begin
           uri = URI.parse(download_url)
@@ -140,21 +142,21 @@ module Fastlane
 
       # Creates (or updates an existing) GitHub PR Comment
       def self.comment_on_pr(project_slug:, pr_number:, body:, reuse_identifier: SecureRandom.uuid)
-        comments = @client.issue_comments(project_slug, pr_number)
+        comments = client.issue_comments(project_slug, pr_number)
 
         reuse_marker = "<!-- REUSE_ID: #{reuse_identifier} -->"
 
         existing_comment = comments.find do |comment|
           # Only match comments posted by the owner of the GitHub Token, and with the given reuse ID
-          comment.user.id == @client.user.id and comment.body.include?(reuse_marker)
+          comment.user.id == client.user.id and comment.body.include?(reuse_marker)
         end
 
         comment_body = reuse_marker + body
 
         if existing_comment.nil?
-          @client.add_comment(project_slug, pr_number, comment_body)
+          client.add_comment(project_slug, pr_number, comment_body)
         else
-          @client.update_comment(project_slug, existing_comment.id, comment_body)
+          client.update_comment(project_slug, existing_comment.id, comment_body)
         end
 
         reuse_identifier

@@ -2,6 +2,30 @@ require 'spec_helper'
 require 'webmock/rspec'
 
 describe Fastlane::Helper::GithubHelper do
+  describe '#initialize' do
+    let(:client) do
+      instance_double(
+        Octokit::Client,
+        user: instance_double('User', name: 'test'),
+        'auto_paginate=': nil
+      )
+    end
+
+    before do
+      allow(Octokit::Client).to receive(:new).and_return(client)
+    end
+
+    it 'with the correct github_token' do
+      expect(described_class).to receive(:new).with(github_token: 'GITHUB_TOKEN')
+      described_class.new(github_token: 'GITHUB_TOKEN')
+    end
+
+    it 'Octokit client receives the correct github_token' do
+      expect(Octokit::Client).to receive(:new).with(access_token: 'GITHUB_TOKEN')
+      described_class.new(github_token: 'GITHUB_TOKEN')
+    end
+  end
+
   describe 'download_file_from_tag' do
     let(:test_repo) { 'repo-test/project-test' }
     let(:test_tag) { '1.0' }
@@ -15,7 +39,7 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     before do
-      described_class.instance_variable_set(:@client, client)
+      allow(described_class).to receive(:client).and_return(client)
     end
 
     it 'fails if it does not find the right release on GitHub' do
@@ -46,7 +70,7 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     before do
-      described_class.instance_variable_set(:@client, client)
+      allow(described_class).to receive(:client).and_return(client)
     end
 
     it 'returns correct milestone' do
@@ -71,7 +95,7 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     before do
-      described_class.instance_variable_set(:@client, client)
+      allow(described_class).to receive(:client).and_return(client)
     end
 
     it 'will create a new comment if an existing one is not found' do
