@@ -138,4 +138,119 @@ describe Fastlane::Helper::GithubHelper do
       instance_double('Comment', id: 1234, body: body, user: instance_double('User', id: user_id))
     end
   end
+
+  describe 'get_milestone' do
+    let(:test_repo) { 'repo-test/project-test' }
+    let(:release_name) { '10.0' }
+    let(:client) do
+      instance_double(
+        Octokit::Client,
+        list_milestones: []
+      )
+    end
+
+    before do
+      allow(described_class).to receive(:client).and_return(client)
+    end
+
+    it 'receives the correct repository' do
+      expect(client).to receive(:list_milestones).with(test_repo)
+      described_class.get_milestone(test_repo, release_name)
+    end
+
+    it 'returns nil when no milestone exists' do
+      expect(described_class.get_milestone(test_repo, release_name)).to be_nil
+    end
+
+    it 'returns milestone from repo' do
+      allow(client).to receive(:list_milestones).and_return([{ title: 'release/10.0' }])
+      expect(described_class.get_milestone(test_repo, release_name)).to be_nil
+    end
+  end
+
+  describe 'create_milestone' do
+    let(:test_repo) { 'repo-test/project-test' }
+    let(:test_milestone_number) { '10.0' }
+    let(:test_milestone_duedate) { '2022-10-22T23:39:01Z' }
+    let(:client) do
+      instance_double(
+        Octokit::Client,
+        create_milestone: nil
+      )
+    end
+
+    before do
+      allow(described_class).to receive(:client).and_return(client)
+    end
+
+    it 'has the correct dates to code freeze without submission' do
+      comment = 'Code freeze: October 22, 2022 App Store submission: November 15, 2022 Release: October 25, 2022'
+      options = { due_on: test_milestone_duedate, description: comment }
+
+      expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
+      create_milestone(need_submission: false, milestone_duration: 24, days_code_freeze: 3)
+    end
+
+    it 'has the correct dates to code freeze with submission' do
+      comment = 'Code freeze: October 22, 2022 App Store submission: October 22, 2022 Release: October 25, 2022'
+      options = { due_on: test_milestone_duedate, description: comment }
+
+      expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
+      create_milestone(need_submission: true, milestone_duration: 19, days_code_freeze: 3)
+    end
+
+    def create_milestone(need_submission:, milestone_duration:, days_code_freeze:)
+      described_class.create_milestone(
+        test_repo,
+        test_milestone_number,
+        test_milestone_duedate,
+        milestone_duration,
+        days_code_freeze,
+        need_submission
+      )
+    end
+  end
+
+  describe 'create_release' do
+    let(:test_repo) { 'repo-test/project-test' }
+    let(:test_tag) { '1.0' }
+    let(:test_target) { 'dummysha123456' }
+    let(:test_description) { 'Hey Im a Test Description' }
+    let(:client) do
+      instance_double(
+        Octokit::Client,
+        create_release: nil
+      )
+    end
+
+    before do
+      allow(described_class).to receive(:client).and_return(client)
+    end
+
+    it 'has the correct options' do
+      options = { body: test_description, draft: true, name: test_tag, prerelease: false, target_commitish: test_target }
+      expect(client).to receive(:create_release).with(test_repo, test_tag, options)
+      mockrelease
+    end
+
+    it 'upload the assets to the correct location' do
+      test_assets = 'test-file.xml'
+      test_url = '/test/url'
+
+      allow(client).to receive(:create_release).and_return({ url: test_url })
+      expect(client).to receive(:upload_asset).with(test_url, test_assets, { content_type: 'application/octet-stream' })
+      mockrelease([test_assets])
+    end
+
+    def mockrelease(assets = [])
+      described_class.create_release(
+        repository: test_repo,
+        version: test_tag,
+        target: test_target,
+        description: test_description,
+        assets: assets,
+        prerelease: false
+      )
+    end
+  end
 end
