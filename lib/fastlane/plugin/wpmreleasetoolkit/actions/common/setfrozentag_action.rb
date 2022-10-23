@@ -11,6 +11,7 @@ module Fastlane
 
         github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
         milestone = github_helper.get_milestone(repository, milestone_title)
+
         UI.user_error!("Milestone #{milestone_title} not found.") if milestone.nil?
 
         mile_title = milestone[:title]
@@ -28,7 +29,6 @@ module Fastlane
         end
 
         UI.message("New milestone: #{mile_title}")
-
         github_helper.client.update_milestone(repository, milestone[:number], title: mile_title)
       end
 

@@ -9,9 +9,8 @@ module Fastlane
         report_path = File.expand_path(params[:report_path])
         milestone = params[:milestone]
 
-        github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
-
         # Get commit list
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
         pr_list = github_helper.get_prs_for_milestone(repository, milestone)
 
         File.open(report_path, 'w') do |file|

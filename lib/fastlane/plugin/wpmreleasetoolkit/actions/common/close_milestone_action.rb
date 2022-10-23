@@ -9,9 +9,12 @@ module Fastlane
       def self.run(params)
         repository = params[:repository]
         milestone_title = params[:milestone]
+
         github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
         milestone = github_helper.get_milestone(repository, milestone_title)
+
         UI.user_error!("Milestone #{milestone_title} not found.") if milestone.nil?
+
         github_helper.client.update_milestone(repository, milestone[:number], state: 'closed')
       end
 
