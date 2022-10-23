@@ -8,9 +8,8 @@ module Fastlane
         repository = params[:repository]
         report_path = File.expand_path(params[:report_path])
         milestone = params[:milestone]
-        access_token = params[:access_token]
 
-        github_helper = Fastlane::Helper::GithubHelper.new(github_token: access_token)
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
 
         # Get commit list
         pr_list = github_helper.get_prs_for_milestone(repository, milestone)
