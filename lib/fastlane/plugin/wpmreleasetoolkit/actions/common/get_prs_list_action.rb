@@ -56,12 +56,7 @@ module Fastlane
                                        description: 'The name of the milestone we want to fetch the list of PRs for (e.g.: `16.9`)',
                                        optional: false,
                                        is_string: true),
-          FastlaneCore::ConfigItem.new(key: :access_token,
-                                       env_name: 'GITHUB_TOKEN',
-                                       description: 'The GitHub OAuth access token',
-                                       optional: false,
-                                       default_value: false,
-                                       type: String),
+          Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
 

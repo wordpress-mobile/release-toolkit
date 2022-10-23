@@ -44,12 +44,7 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(
-            key: :access_token,
-            env_name: 'GITHUB_TOKEN',
-            description: 'The GitHub token to use for posting the comment',
-            type: String
-          ),
+          Fastlane::Helper::GithubHelper.github_token_config_item,
           FastlaneCore::ConfigItem.new(
             key: :reuse_identifier,
             description: 'If provided, the reuse identifier can identify an existing comment to overwrite',

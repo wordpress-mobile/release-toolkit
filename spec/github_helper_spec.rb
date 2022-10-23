@@ -253,4 +253,22 @@ describe Fastlane::Helper::GithubHelper do
       )
     end
   end
+
+  describe 'github_token_config_item' do
+    it 'has the correct key' do
+      expect(described_class.github_token_config_item.key).to eq(:github_token)
+    end
+    it 'has the correct env_name' do
+      expect(described_class.github_token_config_item.env_name).to eq('GITHUB_TOKEN')
+    end
+    it 'has the correct description' do
+      expect(described_class.github_token_config_item.description).to eq('The GitHub OAuth access token')
+    end
+    it 'is not optional' do
+      expect(described_class.github_token_config_item.optional).to eq(false)
+    end
+    it 'has String as data_type' do
+      expect(described_class.github_token_config_item.data_type).to eq(String)
+    end
+  end
 end

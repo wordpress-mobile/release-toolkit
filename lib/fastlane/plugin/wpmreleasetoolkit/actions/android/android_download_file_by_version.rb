@@ -60,12 +60,7 @@ module Fastlane
                                        description: 'The prefix which is used in the GitHub release title',
                                        type: String,
                                        optional: true),
-          FastlaneCore::ConfigItem.new(key: :access_token,
-                                       env_name: 'GITHUB_TOKEN',
-                                       description: 'The GitHub OAuth access token',
-                                       optional: false,
-                                       default_value: false,
-                                       type: String),
+          Fastlane::Helper::GithubHelper.github_token_config_item
         ]
       end
 

@@ -74,12 +74,7 @@ module Fastlane
                                        optional: false,
                                        default_value: true,
                                        is_string: false),
-          FastlaneCore::ConfigItem.new(key: :access_token,
-                                       env_name: 'GITHUB_TOKEN',
-                                       description: 'The GitHub OAuth access token',
-                                       optional: false,
-                                       default_value: false,
-                                       type: String),
+          Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
 

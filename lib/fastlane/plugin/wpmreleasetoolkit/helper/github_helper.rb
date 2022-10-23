@@ -161,6 +161,20 @@ module Fastlane
 
         reuse_identifier
       end
+
+      # Creates a GithubToken Fastlane ConfigItem
+      #
+      # @return [FastlaneCore::ConfigItem] The Fastlane ConfigItem for GitHub OAuth access token
+      #
+      def self.github_token_config_item
+        return FastlaneCore::ConfigItem.new(
+          key: :github_token,
+          env_name: 'GITHUB_TOKEN',
+          description: 'The GitHub OAuth access token',
+          optional: false,
+          type: String
+        )
+      end
     end
   end
 end
