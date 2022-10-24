@@ -172,6 +172,56 @@ module Fastlane
 
         reuse_identifier
       end
+<<<<<<< HEAD
+=======
+
+      # Update a milestone for a repository
+      #
+      # @param [String] repository The repository name (including the organization)
+      # @param [String] number The number of the milestone we want to fetch
+      # @param options [Hash] A customizable set of options.
+      # @option options [String] :title A unique title.
+      # @option options [String] :state
+      # @option options [String] :description A meaningful description
+      # @option options [Time] :due_on Set if the milestone has a due date
+      # @return [Milestone] A single milestone object
+      #
+      def self.update_milestone(repository:, number:, options: {})
+        client.update_milestone(repository, number, options)
+      end
+
+      # Unlock a single branch from a repository
+      #
+      # @param [String] repository The repository name (including the organization)
+      # @param [String] number The branch name
+      #
+      def self.remove_branch_protection(repository:, branch:, options:)
+        client.unprotect_branch(repository, branch_name, options)
+      end
+
+      # Lock a single branch from a repository
+      #
+      # @param [String] repository The repository name (including the organization)
+      # @param [String] number The branch name
+      #
+      def self.set_branch_protection(repository:, branch:, options:)
+        client.protect_branch(repository, branch_name, options)
+      end
+
+      # Creates a GithubToken Fastlane ConfigItem
+      #
+      # @return [FastlaneCore::ConfigItem] The Fastlane ConfigItem for GitHub OAuth access token
+      #
+      def self.github_token_config_item
+        return FastlaneCore::ConfigItem.new(
+          key: :github_token,
+          env_name: 'GITHUB_TOKEN',
+          description: 'The GitHub OAuth access token',
+          optional: false,
+          type: String
+        )
+      end
+>>>>>>> Actions: All Acess to OktoClient is done by GithubHelper
     end
   end
 end
