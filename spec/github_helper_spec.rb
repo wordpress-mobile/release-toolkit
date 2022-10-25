@@ -184,16 +184,16 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     it 'has the correct dates to code freeze without submission' do
-      comment = 'Code freeze: October 22, 2022 App Store submission: November 15, 2022 Release: October 25, 2022'
-      options = { due_on: test_milestone_duedate, description: comment }
+      comment = "Code freeze: October 22, 2022\nApp Store submission: November 15, 2022\nRelease: October 25, 2022\n"
+      options = { due_on: '2022-10-22T12:00:00Z', description: comment }
 
       expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
       create_milestone(need_submission: false, milestone_duration: 24, days_code_freeze: 3)
     end
 
     it 'has the correct dates to code freeze with submission' do
-      comment = 'Code freeze: October 22, 2022 App Store submission: October 22, 2022 Release: October 25, 2022'
-      options = { due_on: test_milestone_duedate, description: comment }
+      comment = "Code freeze: October 22, 2022\nApp Store submission: October 22, 2022\nRelease: October 25, 2022\n"
+      options = { due_on: '2022-10-22T12:00:00Z', description: comment }
 
       expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
       create_milestone(need_submission: true, milestone_duration: 19, days_code_freeze: 3)
@@ -203,7 +203,7 @@ describe Fastlane::Helper::GithubHelper do
       described_class.create_milestone(
         test_repo,
         test_milestone_number,
-        test_milestone_duedate,
+        test_milestone_duedate.to_time.utc,
         milestone_duration,
         days_code_freeze,
         need_submission
