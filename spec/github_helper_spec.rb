@@ -136,7 +136,7 @@ describe Fastlane::Helper::GithubHelper do
 
   describe 'get_milestone' do
     let(:test_repo) { 'repo-test/project-test' }
-    let(:test_milestone) { [{title: 'release/10.0'}, {title: 'release/10.1'}, {title: 'hotfix/10.2'}] }
+    let(:test_milestone) { [{ title: 'release/10.0' }, { title: 'release/10.1' }, { title: 'hotfix/10.2' }] }
     let(:client) do
       instance_double(
         Octokit::Client,
@@ -164,14 +164,13 @@ describe Fastlane::Helper::GithubHelper do
 
     it 'returns a milestone when the milestone title starts with search term' do
       allow(client).to receive(:list_milestones).and_return(test_milestone)
-      expect(described_class.get_milestone(test_repo, 'hotfix')).to eq({title: 'hotfix/10.2'})
+      expect(described_class.get_milestone(test_repo, 'hotfix')).to eq({ title: 'hotfix/10.2' })
     end
 
     it 'returns the newest of milestones where the title matches with search term' do
       allow(client).to receive(:list_milestones).and_return(test_milestone)
-      expect(described_class.get_milestone(test_repo, 'release')).to eq({title: 'release/10.1'})
+      expect(described_class.get_milestone(test_repo, 'release')).to eq({ title: 'release/10.1' })
     end
-
   end
 
   describe 'create_milestone' do
