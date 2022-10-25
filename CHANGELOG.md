@@ -15,6 +15,7 @@ _None_
 ### Bug Fixes
 
  - Improve resilience of the `ios_lint_localizations` action to support UTF16 files, and to warn and skip files in XML format when trying to detect duplicate keys on `.strings` files. [#418]
+ - Work around GitHub API bug when creating a new milestone, where their interpretation of the milestone's due date sent during API call is incorrect when we cross DST change dates — leading to milestones created after Oct 30 having due dates set on Sunday instead of Monday. [#419]
 
 ### Internal Changes
 
