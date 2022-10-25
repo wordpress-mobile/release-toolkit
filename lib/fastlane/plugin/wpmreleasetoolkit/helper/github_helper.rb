@@ -172,8 +172,6 @@ module Fastlane
 
         reuse_identifier
       end
-<<<<<<< HEAD
-=======
 
       # Update a milestone for a repository
       #
@@ -221,7 +219,6 @@ module Fastlane
           type: String
         )
       end
->>>>>>> Actions: All Acess to OktoClient is done by GithubHelper
     end
   end
 end
