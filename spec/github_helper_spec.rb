@@ -15,14 +15,9 @@ describe Fastlane::Helper::GithubHelper do
       allow(Octokit::Client).to receive(:new).and_return(client)
     end
 
-    it 'with the correct github_token' do
-      expect(described_class).to receive(:new).with(github_token: 'GITHUB_TOKEN')
-      described_class.new(github_token: 'GITHUB_TOKEN')
-    end
-
-    it 'Octokit client receives the correct github_token' do
-      expect(Octokit::Client).to receive(:new).with(access_token: 'GITHUB_TOKEN')
-      described_class.new(github_token: 'GITHUB_TOKEN')
+    it 'properly passes the token all the way down to the Octokit::Client' do
+      expect(Octokit::Client).to receive(:new).with(access_token: 'Fake-GitHubToken-123')
+      described_class.new(github_token: 'Fake-GitHubToken-123')
     end
   end
 
@@ -141,7 +136,7 @@ describe Fastlane::Helper::GithubHelper do
 
   describe 'get_milestone' do
     let(:test_repo) { 'repo-test/project-test' }
-    let(:release_name) { '10.0' }
+    let(:test_milestone) { [{title: 'release/10.0'}, {title: 'release/10.1'}, {title: 'hotfix/10.2'}] }
     let(:client) do
       instance_double(
         Octokit::Client,
@@ -153,19 +148,30 @@ describe Fastlane::Helper::GithubHelper do
       allow(described_class).to receive(:client).and_return(client)
     end
 
-    it 'receives the correct repository' do
+    it 'properly passes the repository all the way down to the Octokit::Client' do
       expect(client).to receive(:list_milestones).with(test_repo)
-      described_class.get_milestone(test_repo, release_name)
+      described_class.get_milestone(test_repo, 'test')
     end
 
-    it 'returns nil when no milestone exists' do
-      expect(described_class.get_milestone(test_repo, release_name)).to be_nil
+    it 'returns nil when no milestone is returned from the api' do
+      expect(described_class.get_milestone(test_repo, 'release')).to be_nil
     end
 
-    it 'returns milestone from repo' do
-      allow(client).to receive(:list_milestones).and_return([{ title: 'release/10.0' }])
-      expect(described_class.get_milestone(test_repo, release_name)).to be_nil
+    it 'returns nil when no milestone title starts with the searched term' do
+      allow(client).to receive(:list_milestones).and_return(test_milestone)
+      expect(described_class.get_milestone(test_repo, '10.0')).to be_nil
     end
+
+    it 'returns a milestone when the milestone title starts with search term' do
+      allow(client).to receive(:list_milestones).and_return(test_milestone)
+      expect(described_class.get_milestone(test_repo, 'hotfix')).to eq({title: 'hotfix/10.2'})
+    end
+
+    it 'returns the newest of milestones where the title matches with search term' do
+      allow(client).to receive(:list_milestones).and_return(test_milestone)
+      expect(described_class.get_milestone(test_repo, 'release')).to eq({title: 'release/10.1'})
+    end
+
   end
 
   describe 'create_milestone' do
@@ -258,15 +264,19 @@ describe Fastlane::Helper::GithubHelper do
     it 'has the correct key' do
       expect(described_class.github_token_config_item.key).to eq(:github_token)
     end
+
     it 'has the correct env_name' do
       expect(described_class.github_token_config_item.env_name).to eq('GITHUB_TOKEN')
     end
+
     it 'has the correct description' do
       expect(described_class.github_token_config_item.description).to eq('The GitHub OAuth access token')
     end
+
     it 'is not optional' do
-      expect(described_class.github_token_config_item.optional).to eq(false)
+      expect(described_class.github_token_config_item.optional).to be(false)
     end
+
     it 'has String as data_type' do
       expect(described_class.github_token_config_item.data_type).to eq(String)
     end

@@ -187,8 +187,9 @@ module Fastlane
       # @option options [String] :description A meaningful description
       # @option options [Time] :due_on Set if the milestone has a due date
       # @return [Milestone] A single milestone object
+      # @see http://developer.github.com/v3/issues/milestones/#update-a-milestone
       #
-      def self.update_milestone(repository:, number:, options: {})
+      def self.update_milestone(repository:, number:, options:)
         client.update_milestone(repository, number, options)
       end
 
@@ -196,6 +197,8 @@ module Fastlane
       #
       # @param [String] repository The repository name (including the organization)
       # @param [String] number The branch name
+      # @param [Hash] options A customizable set of options.
+      # @see https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
       #
       def self.remove_branch_protection(repository:, branch:, options:)
         client.unprotect_branch(repository, branch_name, options)
@@ -205,6 +208,8 @@ module Fastlane
       #
       # @param [String] repository The repository name (including the organization)
       # @param [String] number The branch name
+      # @param options [Hash] A customizable set of options.
+      # @see https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
       #
       def self.set_branch_protection(repository:, branch:, options:)
         client.protect_branch(repository, branch_name, options)
@@ -215,7 +220,7 @@ module Fastlane
       # @return [FastlaneCore::ConfigItem] The Fastlane ConfigItem for GitHub OAuth access token
       #
       def self.github_token_config_item
-        return FastlaneCore::ConfigItem.new(
+        FastlaneCore::ConfigItem.new(
           key: :github_token,
           env_name: 'GITHUB_TOKEN',
           description: 'The GitHub OAuth access token',
