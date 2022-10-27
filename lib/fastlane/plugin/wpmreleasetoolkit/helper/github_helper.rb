@@ -193,7 +193,7 @@ module Fastlane
         client.update_milestone(repository, number, options)
       end
 
-      # Unlock a single branch from a repository
+      # Remove the protection of a single branch from a repository
       #
       # @param [String] repository The repository name (including the organization)
       # @param [String] number The branch name
@@ -204,7 +204,7 @@ module Fastlane
         client.unprotect_branch(repository, branch_name, options)
       end
 
-      # Lock a single branch from a repository
+      # Protects a single branch from a repository
       #
       # @param [String] repository The repository name (including the organization)
       # @param [String] number The branch name
