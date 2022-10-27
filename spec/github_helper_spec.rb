@@ -39,7 +39,8 @@ describe Fastlane::Helper::GithubHelper do
 
     it 'fails if it does not find the right release on GitHub' do
       stub = stub_request(:get, content_url).to_return(status: [404, 'Not Found'])
-      expect(described_class.download_file_from_tag(repository: test_repo, tag: test_tag, file_path: test_file, download_folder: './')).to be_nil
+      donwloaded_file = described_class.download_file_from_tag(repository: test_repo, tag: test_tag, file_path: test_file, download_folder: './')
+      expect(donwloaded_file).to be_nil
       expect(stub).to have_been_made.once
     end
 
@@ -47,7 +48,8 @@ describe Fastlane::Helper::GithubHelper do
       stub = stub_request(:get, content_url).to_return(status: 200, body: 'my-test-content')
       Dir.mktmpdir('a8c-download-repo-file-') do |tmpdir|
         dst_file = File.join(tmpdir, 'test-file.xml')
-        expect(described_class.download_file_from_tag(repository: test_repo, tag: test_tag, file_path: test_file, download_folder: tmpdir)).to eq(dst_file)
+        donwloaded_file = described_class.download_file_from_tag(repository: test_repo, tag: test_tag, file_path: test_file, download_folder: tmpdir)
+        expect(donwloaded_file).to eq(dst_file)
         expect(stub).to have_been_made.once
         expect(File.read(dst_file)).to eq('my-test-content')
       end
@@ -70,7 +72,8 @@ describe Fastlane::Helper::GithubHelper do
 
     it 'returns correct milestone' do
       expect(client).to receive(:list_milestones)
-      expect(described_class.get_last_milestone(repository: test_repo)).to eq(last_stone)
+      last_milestone = described_class.get_last_milestone(repository: test_repo)
+      expect(last_milestone).to eq(last_stone)
     end
 
     def mock_milestone(title)
@@ -136,7 +139,7 @@ describe Fastlane::Helper::GithubHelper do
 
   describe 'get_milestone' do
     let(:test_repo) { 'repo-test/project-test' }
-    let(:test_milestone) { [{ title: 'release/10.0' }, { title: 'release/10.1' }, { title: 'hotfix/10.2' }] }
+    let(:test_milestones) { [{ title: '9.8' }, { title: '10.1' }, { title: '10.1.3 ❄️' }] }
     let(:client) do
       instance_double(
         Octokit::Client,
@@ -154,22 +157,26 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     it 'returns nil when no milestone is returned from the api' do
-      expect(described_class.get_milestone(test_repo, 'release')).to be_nil
+      milestone = described_class.get_milestone(test_repo, '10')
+      expect(milestone).to be_nil
     end
 
     it 'returns nil when no milestone title starts with the searched term' do
-      allow(client).to receive(:list_milestones).and_return(test_milestone)
-      expect(described_class.get_milestone(test_repo, '10.0')).to be_nil
+      allow(client).to receive(:list_milestones).and_return(test_milestones)
+      milestone = described_class.get_milestone(test_repo, '8.5')
+      expect(milestone).to be_nil
     end
 
     it 'returns a milestone when the milestone title starts with search term' do
-      allow(client).to receive(:list_milestones).and_return(test_milestone)
-      expect(described_class.get_milestone(test_repo, 'hotfix')).to eq({ title: 'hotfix/10.2' })
+      allow(client).to receive(:list_milestones).and_return(test_milestones)
+      milestone = described_class.get_milestone(test_repo, '9')
+      expect(milestone).to eq({ title: '9.8' })
     end
 
-    it 'returns the newest of milestones where the title matches with search term' do
-      allow(client).to receive(:list_milestones).and_return(test_milestone)
-      expect(described_class.get_milestone(test_repo, 'release')).to eq({ title: 'release/10.1' })
+    it 'returns the milestone with the latest due date matching the search term when there are more than one' do
+      allow(client).to receive(:list_milestones).and_return(test_milestones)
+      milestone = described_class.get_milestone(test_repo, '10.1')
+      expect(milestone).to eq({ title: '10.1.3 ❄️' })
     end
   end
 
@@ -235,7 +242,7 @@ describe Fastlane::Helper::GithubHelper do
     it 'has the correct options' do
       options = { body: test_description, draft: true, name: test_tag, prerelease: false, target_commitish: test_target }
       expect(client).to receive(:create_release).with(test_repo, test_tag, options)
-      mockrelease
+      create_release
     end
 
     it 'upload the assets to the correct location' do
@@ -244,10 +251,10 @@ describe Fastlane::Helper::GithubHelper do
 
       allow(client).to receive(:create_release).and_return({ url: test_url })
       expect(client).to receive(:upload_asset).with(test_url, test_assets, { content_type: 'application/octet-stream' })
-      mockrelease([test_assets])
+      create_release(assets: [test_assets])
     end
 
-    def mockrelease(assets = [])
+    def create_release(assets: [])
       described_class.create_release(
         repository: test_repo,
         version: test_tag,
