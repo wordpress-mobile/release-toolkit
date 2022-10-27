@@ -39,8 +39,8 @@ describe Fastlane::Helper::GithubHelper do
 
     it 'fails if it does not find the right release on GitHub' do
       stub = stub_request(:get, content_url).to_return(status: [404, 'Not Found'])
-      donwloaded_file = described_class.download_file_from_tag(repository: test_repo, tag: test_tag, file_path: test_file, download_folder: './')
-      expect(donwloaded_file).to be_nil
+      downloaded_file = described_class.download_file_from_tag(repository: test_repo, tag: test_tag, file_path: test_file, download_folder: './')
+      expect(downloaded_file).to be_nil
       expect(stub).to have_been_made.once
     end
 
@@ -48,8 +48,8 @@ describe Fastlane::Helper::GithubHelper do
       stub = stub_request(:get, content_url).to_return(status: 200, body: 'my-test-content')
       Dir.mktmpdir('a8c-download-repo-file-') do |tmpdir|
         dst_file = File.join(tmpdir, 'test-file.xml')
-        donwloaded_file = described_class.download_file_from_tag(repository: test_repo, tag: test_tag, file_path: test_file, download_folder: tmpdir)
-        expect(donwloaded_file).to eq(dst_file)
+        downloaded_file = described_class.download_file_from_tag(repository: test_repo, tag: test_tag, file_path: test_file, download_folder: tmpdir)
+        expect(downloaded_file).to eq(dst_file)
         expect(stub).to have_been_made.once
         expect(File.read(dst_file)).to eq('my-test-content')
       end

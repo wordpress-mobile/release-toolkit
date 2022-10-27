@@ -58,7 +58,7 @@ module Fastlane
                                        description: 'The prefix which is used in the GitHub release title',
                                        type: String,
                                        optional: true),
-          Fastlane::Helper::GithubHelper.github_token_config_item
+          Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
 

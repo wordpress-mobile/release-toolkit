@@ -196,7 +196,7 @@ module Fastlane
       # Remove the protection of a single branch from a repository
       #
       # @param [String] repository The repository name (including the organization)
-      # @param [String] number The branch name
+      # @param [String] branch The branch name
       # @param [Hash] options A customizable set of options.
       # @see https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
       #
@@ -207,7 +207,7 @@ module Fastlane
       # Protects a single branch from a repository
       #
       # @param [String] repository The repository name (including the organization)
-      # @param [String] number The branch name
+      # @param [String] branch The branch name
       # @param options [Hash] A customizable set of options.
       # @see https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
       #
