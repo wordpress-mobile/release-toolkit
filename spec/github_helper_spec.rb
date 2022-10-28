@@ -29,17 +29,19 @@ describe Fastlane::Helper::GithubHelper do
     let(:client) do
       instance_double(
         Octokit::Client,
-        contents: double(download_url: content_url) # rubocop:disable RSpec/VerifiedDoubles
+        contents: double(download_url: content_url), # rubocop:disable RSpec/VerifiedDoubles
+        user: instance_double('User', name: 'test'),
+        'auto_paginate=': nil
       )
     end
 
     before do
-      allow(described_class).to receive(:client).and_return(client)
+      allow(Octokit::Client).to receive(:new).and_return(client)
     end
 
     it 'fails if it does not find the right release on GitHub' do
       stub = stub_request(:get, content_url).to_return(status: [404, 'Not Found'])
-      downloaded_file = described_class.download_file_from_tag(repository: test_repo, tag: test_tag, file_path: test_file, download_folder: './')
+      downloaded_file = download_file_from_tag(download_folder: './')
       expect(downloaded_file).to be_nil
       expect(stub).to have_been_made.once
     end
@@ -48,11 +50,16 @@ describe Fastlane::Helper::GithubHelper do
       stub = stub_request(:get, content_url).to_return(status: 200, body: 'my-test-content')
       Dir.mktmpdir('a8c-download-repo-file-') do |tmpdir|
         dst_file = File.join(tmpdir, 'test-file.xml')
-        downloaded_file = described_class.download_file_from_tag(repository: test_repo, tag: test_tag, file_path: test_file, download_folder: tmpdir)
+        downloaded_file = download_file_from_tag(download_folder: tmpdir)
         expect(downloaded_file).to eq(dst_file)
         expect(stub).to have_been_made.once
         expect(File.read(dst_file)).to eq('my-test-content')
       end
+    end
+
+    def download_file_from_tag(download_folder:)
+      helper = described_class.new(github_token: 'Fake-GitHubToken-123')
+      helper.download_file_from_tag(repository: test_repo, tag: test_tag, file_path: test_file, download_folder: download_folder)
     end
   end
 
@@ -62,22 +69,29 @@ describe Fastlane::Helper::GithubHelper do
     let(:client) do
       instance_double(
         Octokit::Client,
-        list_milestones: ['9.8 ❄️', '9.9'].map { |title| mock_milestone(title) }.append(last_stone)
+        list_milestones: ['9.8 ❄️', '9.9'].map { |title| mock_milestone(title) }.append(last_stone),
+        user: instance_double('User', name: 'test'),
+        'auto_paginate=': nil
       )
     end
 
     before do
-      allow(described_class).to receive(:client).and_return(client)
+      allow(Octokit::Client).to receive(:new).and_return(client)
     end
 
     it 'returns correct milestone' do
       expect(client).to receive(:list_milestones)
-      last_milestone = described_class.get_last_milestone(repository: test_repo)
+      last_milestone = get_last_milestone(repository: test_repo)
       expect(last_milestone).to eq(last_stone)
     end
 
     def mock_milestone(title)
       { title: title }
+    end
+
+    def get_last_milestone(repository:)
+      helper = described_class.new(github_token: 'Fake-GitHubToken-123')
+      helper.get_last_milestone(repository: repository)
     end
   end
 
@@ -88,12 +102,13 @@ describe Fastlane::Helper::GithubHelper do
         issue_comments: [],
         add_comment: nil,
         update_comment: nil,
-        user: instance_double('User', id: 1234)
+        user: instance_double('User', id: 1234, name: 'test'),
+        'auto_paginate=': nil
       )
     end
 
     before do
-      allow(described_class).to receive(:client).and_return(client)
+      allow(Octokit::Client).to receive(:new).and_return(client)
     end
 
     it 'will create a new comment if an existing one is not found' do
@@ -124,7 +139,8 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     def comment_on_pr
-      described_class.comment_on_pr(
+      helper = described_class.new(github_token: 'Fake-GitHubToken-123')
+      helper.comment_on_pr(
         project_slug: 'test/test',
         pr_number: 1234,
         body: 'Test',
@@ -143,40 +159,47 @@ describe Fastlane::Helper::GithubHelper do
     let(:client) do
       instance_double(
         Octokit::Client,
-        list_milestones: []
+        list_milestones: [],
+        user: instance_double('User', name: 'test'),
+        'auto_paginate=': nil
       )
     end
 
     before do
-      allow(described_class).to receive(:client).and_return(client)
+      allow(Octokit::Client).to receive(:new).and_return(client)
     end
 
     it 'properly passes the repository all the way down to the Octokit::Client' do
       expect(client).to receive(:list_milestones).with(test_repo)
-      described_class.get_milestone(test_repo, 'test')
+      get_milestone(milestone_name: 'test')
     end
 
     it 'returns nil when no milestone is returned from the api' do
-      milestone = described_class.get_milestone(test_repo, '10')
+      milestone = get_milestone(milestone_name: '10')
       expect(milestone).to be_nil
     end
 
     it 'returns nil when no milestone title starts with the searched term' do
       allow(client).to receive(:list_milestones).and_return(test_milestones)
-      milestone = described_class.get_milestone(test_repo, '8.5')
+      milestone = get_milestone(milestone_name: '8.5')
       expect(milestone).to be_nil
     end
 
     it 'returns a milestone when the milestone title starts with search term' do
       allow(client).to receive(:list_milestones).and_return(test_milestones)
-      milestone = described_class.get_milestone(test_repo, '9')
+      milestone = get_milestone(milestone_name: '9')
       expect(milestone).to eq({ title: '9.8' })
     end
 
     it 'returns the milestone with the latest due date matching the search term when there are more than one' do
       allow(client).to receive(:list_milestones).and_return(test_milestones)
-      milestone = described_class.get_milestone(test_repo, '10.1')
+      milestone = get_milestone(milestone_name: '10.1')
       expect(milestone).to eq({ title: '10.1.3 ❄️' })
+    end
+
+    def get_milestone(milestone_name:)
+      helper = described_class.new(github_token: 'Fake-GitHubToken-123')
+      helper.get_milestone(test_repo, milestone_name)
     end
   end
 
@@ -187,12 +210,14 @@ describe Fastlane::Helper::GithubHelper do
     let(:client) do
       instance_double(
         Octokit::Client,
-        create_milestone: nil
+        create_milestone: nil,
+        user: instance_double('User', name: 'test'),
+        'auto_paginate=': nil
       )
     end
 
     before do
-      allow(described_class).to receive(:client).and_return(client)
+      allow(Octokit::Client).to receive(:new).and_return(client)
     end
 
     it 'has the correct dates to code freeze without submission' do
@@ -212,7 +237,8 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     def create_milestone(need_submission:, milestone_duration:, days_code_freeze:)
-      described_class.create_milestone(
+      helper = described_class.new(github_token: 'Fake-GitHubToken-123')
+      helper.create_milestone(
         test_repo,
         test_milestone_number,
         test_milestone_duedate.to_time.utc,
@@ -231,12 +257,14 @@ describe Fastlane::Helper::GithubHelper do
     let(:client) do
       instance_double(
         Octokit::Client,
-        create_release: nil
+        create_release: nil,
+        user: instance_double('User', name: 'test'),
+        'auto_paginate=': nil
       )
     end
 
     before do
-      allow(described_class).to receive(:client).and_return(client)
+      allow(Octokit::Client).to receive(:new).and_return(client)
     end
 
     it 'has the correct options' do
@@ -255,7 +283,8 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     def create_release(assets: [])
-      described_class.create_release(
+      helper = described_class.new(github_token: 'Fake-GitHubToken-123')
+      helper.create_release(
         repository: test_repo,
         version: test_tag,
         target: test_target,

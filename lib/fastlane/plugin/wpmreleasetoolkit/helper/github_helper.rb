@@ -25,7 +25,7 @@ module Fastlane
         @client.auto_paginate = true
       end
 
-      def self.get_milestone(repository, release)
+      def get_milestone(repository, release)
         miles = client.list_milestones(repository)
         mile = nil
 
@@ -42,11 +42,11 @@ module Fastlane
       # @param [String] milestone The name of the milestone we want to fetch the list of PRs for (e.g.: `16.9`)
       # @return [<Sawyer::Resource>] A list of the PRs for the given milestone, sorted by number
       #
-      def self.get_prs_for_milestone(repository, milestone)
+      def get_prs_for_milestone(repository, milestone)
         client.search_issues(%(type:pr milestone:"#{milestone}" repo:#{repository}))[:items].sort_by(&:number)
       end
 
-      def self.get_last_milestone(repository)
+      def get_last_milestone(repository)
         options = {}
         options[:state] = 'open'
 
@@ -71,7 +71,7 @@ module Fastlane
         last_stone
       end
 
-      def self.create_milestone(repository, newmilestone_number, newmilestone_duedate, newmilestone_duration, number_of_days_from_code_freeze_to_release, need_submission)
+      def create_milestone(repository, newmilestone_number, newmilestone_duedate, newmilestone_duration, number_of_days_from_code_freeze_to_release, need_submission)
         # If there is a review process, we want to submit the binary 3 days before its release
         #
         # Using 3 days is mostly for historical reasons where we release the apps on Monday and submit them on Friday.
@@ -112,7 +112,7 @@ module Fastlane
       # @param [Array<String>] assets List of file paths to attach as assets to the release
       # @param [TrueClass|FalseClass] prerelease Indicates if this should be created as a pre-release (i.e. for alpha/beta)
       #
-      def self.create_release(repository:, version:, target: nil, description:, assets:, prerelease:)
+      def create_release(repository:, version:, target: nil, description:, assets:, prerelease:)
         release = client.create_release(
           repository,
           version, # tag name
@@ -135,7 +135,7 @@ module Fastlane
       # @param [String] download_folder The folder which the file should be downloaded into
       # @return [String] The path of the downloaded file, or nil if something went wrong
       #
-      def self.download_file_from_tag(repository:, tag:, file_path:, download_folder:)
+      def download_file_from_tag(repository:, tag:, file_path:, download_folder:)
         repository = repository.delete_prefix('/').chomp('/')
         file_path = file_path.delete_prefix('/').chomp('/')
         file_name = File.basename(file_path)
@@ -156,7 +156,7 @@ module Fastlane
       end
 
       # Creates (or updates an existing) GitHub PR Comment
-      def self.comment_on_pr(project_slug:, pr_number:, body:, reuse_identifier: SecureRandom.uuid)
+      def comment_on_pr(project_slug:, pr_number:, body:, reuse_identifier: SecureRandom.uuid)
         comments = client.issue_comments(project_slug, pr_number)
 
         reuse_marker = "<!-- REUSE_ID: #{reuse_identifier} -->"
@@ -189,7 +189,7 @@ module Fastlane
       # @return [Milestone] A single milestone object
       # @see http://developer.github.com/v3/issues/milestones/#update-a-milestone
       #
-      def self.update_milestone(repository:, number:, options:)
+      def update_milestone(repository:, number:, options:)
         client.update_milestone(repository, number, options)
       end
 
@@ -200,7 +200,7 @@ module Fastlane
       # @param [Hash] options A customizable set of options.
       # @see https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
       #
-      def self.remove_branch_protection(repository:, branch:, options:)
+      def remove_branch_protection(repository:, branch:, options:)
         client.unprotect_branch(repository, branch_name, options)
       end
 
@@ -211,7 +211,7 @@ module Fastlane
       # @param options [Hash] A customizable set of options.
       # @see https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
       #
-      def self.set_branch_protection(repository:, branch:, options:)
+      def set_branch_protection(repository:, branch:, options:)
         client.protect_branch(repository, branch_name, options)
       end
 
