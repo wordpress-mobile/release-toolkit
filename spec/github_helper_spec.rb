@@ -2,25 +2,6 @@ require 'spec_helper'
 require 'webmock/rspec'
 
 describe Fastlane::Helper::GithubHelper do
-  describe '#initialize' do
-    let(:client) do
-      instance_double(
-        Octokit::Client,
-        user: instance_double('User', name: 'test'),
-        'auto_paginate=': nil
-      )
-    end
-
-    before do
-      allow(Octokit::Client).to receive(:new).and_return(client)
-    end
-
-    it 'properly passes the token all the way down to the Octokit::Client' do
-      expect(Octokit::Client).to receive(:new).with(access_token: 'Fake-GitHubToken-123')
-      described_class.new(github_token: 'Fake-GitHubToken-123')
-    end
-  end
-
   describe 'download_file_from_tag' do
     let(:test_repo) { 'repo-test/project-test' }
     let(:test_tag) { '1.0' }
@@ -150,6 +131,25 @@ describe Fastlane::Helper::GithubHelper do
 
     def mock_comment(body: '<!-- REUSE_ID: test-id --> Test', user_id: 1234)
       instance_double('Comment', id: 1234, body: body, user: instance_double('User', id: user_id))
+    end
+  end
+
+  describe '#initialize' do
+    let(:client) do
+      instance_double(
+        Octokit::Client,
+        user: instance_double('User', name: 'test'),
+        'auto_paginate=': nil
+      )
+    end
+
+    before do
+      allow(Octokit::Client).to receive(:new).and_return(client)
+    end
+
+    it 'properly passes the token all the way down to the Octokit::Client' do
+      expect(Octokit::Client).to receive(:new).with(access_token: 'Fake-GitHubToken-123')
+      described_class.new(github_token: 'Fake-GitHubToken-123')
     end
   end
 
