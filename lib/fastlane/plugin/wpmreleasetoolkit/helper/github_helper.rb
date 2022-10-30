@@ -201,7 +201,7 @@ module Fastlane
       # @see https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
       #
       def remove_branch_protection(repository:, branch:, options:)
-        client.unprotect_branch(repository, branch_name, options)
+        client.unprotect_branch(repository, branch, options)
       end
 
       # Protects a single branch from a repository
@@ -212,7 +212,7 @@ module Fastlane
       # @see https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
       #
       def set_branch_protection(repository:, branch:, options:)
-        client.protect_branch(repository, branch_name, options)
+        client.protect_branch(repository, branch, options)
       end
 
       # Creates a GithubToken Fastlane ConfigItem
