@@ -143,11 +143,8 @@ describe Fastlane::Helper::GithubHelper do
       )
     end
 
-    before do
-      allow(Octokit::Client).to receive(:new).and_return(client)
-    end
-
     it 'properly passes the token all the way down to the Octokit::Client' do
+      allow(Octokit::Client).to receive(:new).and_return(client)
       expect(Octokit::Client).to receive(:new).with(access_token: 'Fake-GitHubToken-123')
       described_class.new(github_token: 'Fake-GitHubToken-123')
     end
@@ -273,7 +270,7 @@ describe Fastlane::Helper::GithubHelper do
       create_release
     end
 
-    it 'upload the assets to the correct location' do
+    it 'uploads the assets to the correct location' do
       test_assets = 'test-file.xml'
       test_url = '/test/url'
 
