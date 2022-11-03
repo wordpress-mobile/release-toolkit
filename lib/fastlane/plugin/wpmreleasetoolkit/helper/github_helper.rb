@@ -200,7 +200,7 @@ module Fastlane
       # @param [Hash] options A customizable set of options.
       # @see https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
       #
-      def remove_branch_protection(repository:, branch:, options:)
+      def remove_branch_protection(repository:, branch:, **options)
         client.unprotect_branch(repository, branch, options)
       end
 
