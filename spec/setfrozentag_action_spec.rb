@@ -66,11 +66,11 @@ describe Fastlane::Actions::SetfrozentagAction do
       end
 
       it 'froze the milestone when the parameter `:freeze` is not present' do
-        default_freeze_milestone = { title: '10.1 ❄️' }
+        default_freeze_milestone = '10.1 ❄️'
         expect(glithub_helper).to receive(:update_milestone).with(
           repository: anything,
           number: anything,
-          options: default_freeze_milestone
+          title: default_freeze_milestone
         )
         run_described_fastlane_action(mock_params)
       end
