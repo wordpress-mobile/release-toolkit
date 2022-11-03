@@ -189,7 +189,7 @@ module Fastlane
       # @return [Milestone] A single milestone object
       # @see http://developer.github.com/v3/issues/milestones/#update-a-milestone
       #
-      def update_milestone(repository:, number:, options:)
+      def update_milestone(repository:, number:, **options)
         client.update_milestone(repository, number, options)
       end
 
