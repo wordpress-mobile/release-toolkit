@@ -8,34 +8,25 @@ module Fastlane
 
   module Helper
     class GithubHelper
-      def self.github_token!
-        token = [
-          'GHHELPER_ACCESS', # For historical reasons / backward compatibility
-          'GITHUB_TOKEN',    # Used by the `gh` CLI tool
-        ].map { |key| ENV[key] }
-                .compact
-                .first
+      attr_reader :client
 
-        token || UI.user_error!('Please provide a GitHub authentication token via the `GITHUB_TOKEN` environment variable')
+      # Helper for GitHub Actions
+      #
+      # @param [String?] github_token GitHub OAuth access token
+      #
+      def initialize(github_token:)
+        @client = Octokit::Client.new(access_token: github_token)
+
+        # Fetch the current user
+        user = @client.user
+        UI.message("Logged in as: #{user.name}")
+
+        # Auto-paginate to ensure we're not missing data
+        @client.auto_paginate = true
       end
 
-      def self.github_client
-        @@client ||= begin
-          client = Octokit::Client.new(access_token: github_token!)
-
-          # Fetch the current user
-          user = client.user
-          UI.message("Logged in as: #{user.name}")
-
-          # Auto-paginate to ensure we're not missing data
-          client.auto_paginate = true
-
-          client
-        end
-      end
-
-      def self.get_milestone(repository, release)
-        miles = github_client().list_milestones(repository)
+      def get_milestone(repository, release)
+        miles = client.list_milestones(repository)
         mile = nil
 
         miles&.each do |mm|
@@ -51,15 +42,15 @@ module Fastlane
       # @param [String] milestone The name of the milestone we want to fetch the list of PRs for (e.g.: `16.9`)
       # @return [<Sawyer::Resource>] A list of the PRs for the given milestone, sorted by number
       #
-      def self.get_prs_for_milestone(repository, milestone)
-        github_client.search_issues(%(type:pr milestone:"#{milestone}" repo:#{repository}))[:items].sort_by(&:number)
+      def get_prs_for_milestone(repository, milestone)
+        client.search_issues(%(type:pr milestone:"#{milestone}" repo:#{repository}))[:items].sort_by(&:number)
       end
 
-      def self.get_last_milestone(repository)
+      def get_last_milestone(repository)
         options = {}
         options[:state] = 'open'
 
-        milestones = github_client().list_milestones(repository, options)
+        milestones = client.list_milestones(repository, options)
         return nil if milestones.nil?
 
         last_stone = nil
@@ -80,7 +71,7 @@ module Fastlane
         last_stone
       end
 
-      def self.create_milestone(repository, newmilestone_number, newmilestone_duedate, newmilestone_duration, number_of_days_from_code_freeze_to_release, need_submission)
+      def create_milestone(repository, newmilestone_number, newmilestone_duedate, newmilestone_duration, number_of_days_from_code_freeze_to_release, need_submission)
         # If there is a review process, we want to submit the binary 3 days before its release
         #
         # Using 3 days is mostly for historical reasons where we release the apps on Monday and submit them on Friday.
@@ -107,7 +98,7 @@ module Fastlane
         # To solve this, we trick it by forcing the time component of the ISO date we send to be `12:00:00Z`.
         options[:due_on] = newmilestone_duedate.strftime('%Y-%m-%dT12:00:00Z')
         options[:description] = comment
-        github_client().create_milestone(repository, newmilestone_number, options)
+        client.create_milestone(repository, newmilestone_number, options)
       end
 
       # Creates a Release on GitHub as a Draft
@@ -121,8 +112,8 @@ module Fastlane
       # @param [Array<String>] assets List of file paths to attach as assets to the release
       # @param [TrueClass|FalseClass] prerelease Indicates if this should be created as a pre-release (i.e. for alpha/beta)
       #
-      def self.create_release(repository:, version:, target: nil, description:, assets:, prerelease:)
-        release = github_client().create_release(
+      def create_release(repository:, version:, target: nil, description:, assets:, prerelease:)
+        release = client.create_release(
           repository,
           version, # tag name
           name: version, # release name
@@ -132,7 +123,7 @@ module Fastlane
           body: description
         )
         assets.each do |file_path|
-          github_client().upload_asset(release[:url], file_path, content_type: 'application/octet-stream')
+          client.upload_asset(release[:url], file_path, content_type: 'application/octet-stream')
         end
       end
 
@@ -144,15 +135,14 @@ module Fastlane
       # @param [String] download_folder The folder which the file should be downloaded into
       # @return [String] The path of the downloaded file, or nil if something went wrong
       #
-      def self.download_file_from_tag(repository:, tag:, file_path:, download_folder:)
+      def download_file_from_tag(repository:, tag:, file_path:, download_folder:)
         repository = repository.delete_prefix('/').chomp('/')
         file_path = file_path.delete_prefix('/').chomp('/')
         file_name = File.basename(file_path)
         download_path = File.join(download_folder, file_name)
 
-        download_url = github_client.contents(repository,
-                                              path: file_path,
-                                              ref: tag).download_url
+        download_url = client.contents(repository, path: file_path, ref: tag).download_url
+
         begin
           uri = URI.parse(download_url)
           uri.open do |remote_file|
@@ -166,8 +156,7 @@ module Fastlane
       end
 
       # Creates (or updates an existing) GitHub PR Comment
-      def self.comment_on_pr(project_slug:, pr_number:, body:, reuse_identifier: SecureRandom.uuid)
-        client = github_client
+      def comment_on_pr(project_slug:, pr_number:, body:, reuse_identifier: SecureRandom.uuid)
         comments = client.issue_comments(project_slug, pr_number)
 
         reuse_marker = "<!-- REUSE_ID: #{reuse_identifier} -->"
@@ -186,6 +175,58 @@ module Fastlane
         end
 
         reuse_identifier
+      end
+
+      # Update a milestone for a repository
+      #
+      # @param [String] repository The repository name (including the organization)
+      # @param [String] number The number of the milestone we want to fetch
+      # @param options [Hash] A customizable set of options.
+      # @option options [String] :title A unique title.
+      # @option options [String] :state
+      # @option options [String] :description A meaningful description
+      # @option options [Time] :due_on Set if the milestone has a due date
+      # @return [Milestone] A single milestone object
+      # @see http://developer.github.com/v3/issues/milestones/#update-a-milestone
+      #
+      def update_milestone(repository:, number:, options:)
+        client.update_milestone(repository, number, options)
+      end
+
+      # Remove the protection of a single branch from a repository
+      #
+      # @param [String] repository The repository name (including the organization)
+      # @param [String] branch The branch name
+      # @param [Hash] options A customizable set of options.
+      # @see https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
+      #
+      def remove_branch_protection(repository:, branch:, options:)
+        client.unprotect_branch(repository, branch, options)
+      end
+
+      # Protects a single branch from a repository
+      #
+      # @param [String] repository The repository name (including the organization)
+      # @param [String] branch The branch name
+      # @param options [Hash] A customizable set of options.
+      # @see https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
+      #
+      def set_branch_protection(repository:, branch:, options:)
+        client.protect_branch(repository, branch, options)
+      end
+
+      # Creates a GithubToken Fastlane ConfigItem
+      #
+      # @return [FastlaneCore::ConfigItem] The Fastlane ConfigItem for GitHub OAuth access token
+      #
+      def self.github_token_config_item
+        FastlaneCore::ConfigItem.new(
+          key: :github_token,
+          env_name: 'GITHUB_TOKEN',
+          description: 'The GitHub OAuth access token',
+          optional: false,
+          type: String
+        )
       end
     end
   end

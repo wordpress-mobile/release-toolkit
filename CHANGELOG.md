@@ -6,7 +6,9 @@
 
 ### Breaking Changes
 
-_None_
+- Removed support for the deprecated `GHHELPER_ACCESS` in favor of `GITHUB_TOKEN` as the default environment variable to set the GitHub API token. [#420]
+- The `github_token:` parameter (aka `ConfigItem`)–or using the corresponding `GITHUB_TOKEN` env var to provide it a value–is now mandatory for all Fastlane actions that use the GitHub API. [#420]
+- The Fastlane action `comment_on_pr` has the parameter `access_key:` replaced by `github_token:`. [#420]
 
 ### New Features
 

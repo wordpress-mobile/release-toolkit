@@ -10,7 +10,8 @@ module Fastlane
       def self.run(params)
         require_relative '../../helper/github_helper'
 
-        reuse_identifier = Fastlane::Helper::GithubHelper.comment_on_pr(
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
+        reuse_identifier = github_helper.comment_on_pr(
           project_slug: params[:project],
           pr_number: params[:pr_number],
           body: params[:body],
@@ -41,12 +42,7 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(
-            key: :access_token,
-            env_name: 'GITHUB_TOKEN',
-            description: 'The GitHub token to use for posting the comment',
-            type: String
-          ),
+          Fastlane::Helper::GithubHelper.github_token_config_item,
           FastlaneCore::ConfigItem.new(
             key: :reuse_identifier,
             description: 'If provided, the reuse identifier can identify an existing comment to overwrite',

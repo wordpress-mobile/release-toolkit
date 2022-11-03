@@ -21,7 +21,8 @@ module Fastlane
           UI.user_error!("Can't find file #{file_path}!") unless File.exist?(file_path)
         end
 
-        Fastlane::Helper::GithubHelper.create_release(
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
+        github_helper.create_release(
           repository: repository,
           version: version,
           target: params[:target],
@@ -82,6 +83,7 @@ module Fastlane
                                        optional: true,
                                        default_value: false,
                                        is_string: false),
+          Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
 

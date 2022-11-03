@@ -7,14 +7,15 @@ module Fastlane
       def self.run(params)
         repository = params[:repository]
         branch_name = params[:branch]
-        branch_prot = {}
 
+        branch_prot = {}
         branch_url = "https://api.github.com/repos/#{repository}/branches/#{branch_name}"
         branch_prot[:restrictions] = { url: "#{branch_url}/protection/restrictions", users_url: "#{branch_url}/protection/restrictions/users", teams_url: "#{branch_url}/protection/restrictions/teams", users: [], teams: [] }
         branch_prot[:enforce_admins] = nil
         branch_prot[:required_pull_request_reviews] = { url: "#{branch_url}/protection/required_pull_request_reviews", dismiss_stale_reviews: false, require_code_owner_reviews: false }
 
-        Fastlane::Helper::GithubHelper.github_client().unprotect_branch(repository, branch_name, branch_prot)
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
+        github_helper.remove_branch_protection(repository: repository, branch: branch_name, options: branch_prot)
       end
 
       def self.description
@@ -46,6 +47,7 @@ module Fastlane
                                        description: 'The branch to unprotect',
                                        optional: false,
                                        type: String),
+          Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
 
