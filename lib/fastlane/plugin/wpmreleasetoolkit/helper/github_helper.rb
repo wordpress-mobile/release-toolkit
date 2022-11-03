@@ -189,7 +189,7 @@ module Fastlane
       # @return [Milestone] A single milestone object
       # @see http://developer.github.com/v3/issues/milestones/#update-a-milestone
       #
-      def update_milestone(repository:, number:, options:)
+      def update_milestone(repository:, number:, **options)
         client.update_milestone(repository, number, options)
       end
 
@@ -200,7 +200,7 @@ module Fastlane
       # @param [Hash] options A customizable set of options.
       # @see https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
       #
-      def remove_branch_protection(repository:, branch:, options:)
+      def remove_branch_protection(repository:, branch:, **options)
         client.unprotect_branch(repository, branch, options)
       end
 
@@ -211,7 +211,7 @@ module Fastlane
       # @param options [Hash] A customizable set of options.
       # @see https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
       #
-      def set_branch_protection(repository:, branch:, options:)
+      def set_branch_protection(repository:, branch:, **options)
         client.protect_branch(repository, branch, options)
       end
 
