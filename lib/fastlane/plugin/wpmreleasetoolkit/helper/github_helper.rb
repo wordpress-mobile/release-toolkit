@@ -211,7 +211,7 @@ module Fastlane
       # @param options [Hash] A customizable set of options.
       # @see https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
       #
-      def set_branch_protection(repository:, branch:, options:)
+      def set_branch_protection(repository:, branch:, **options)
         client.protect_branch(repository, branch, options)
       end
 
