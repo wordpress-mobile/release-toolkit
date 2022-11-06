@@ -15,7 +15,6 @@ module Fastlane
         UI.user_error!("Milestone #{milestone_title} not found.") if milestone.nil?
 
         mile_title = milestone[:title]
-        puts freeze
         if freeze
           # Check if the state needs changes
           if is_frozen(milestone)
