@@ -76,7 +76,7 @@ module Fastlane
       # @param [String] repository The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`)
       # @param [String] newmilestone_number The name of the milestone we want to create (e.g.: `16.9`)
       # @param [Time] newmilestone_duedate milestone due date (e.g. `2022-10-22T12:00:00Z`)
-      # @param [Integer] newmilestone_duration Milestone duration in number of days
+      # @param [Integer] newmilestone_duration Number of days that a milestone extents
       # @param [Integer] number_of_days_from_code_freeze_to_release Number of days from code freeze to release
       # @param [Boolean] need_submission The app needs to be submitted?
       #  if `true`, will subtract 3 days from the `:number_of_days_from_code_freeze_to_release`.
