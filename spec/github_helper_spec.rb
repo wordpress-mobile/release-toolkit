@@ -236,12 +236,12 @@ describe Fastlane::Helper::GithubHelper do
     def create_milestone(need_submission:, milestone_duration:, days_code_freeze:)
       helper = described_class.new(github_token: 'Fake-GitHubToken-123')
       helper.create_milestone(
-        test_repo,
-        test_milestone_number,
-        test_milestone_duedate.to_time.utc,
-        milestone_duration,
-        days_code_freeze,
-        need_submission
+        repository: test_repo,
+        newmilestone_number: test_milestone_number,
+        newmilestone_duedate: test_milestone_duedate.to_time.utc,
+        newmilestone_duration: milestone_duration,
+        number_of_days_from_code_freeze_to_release: days_code_freeze,
+        need_submission: need_submission
       )
     end
   end
