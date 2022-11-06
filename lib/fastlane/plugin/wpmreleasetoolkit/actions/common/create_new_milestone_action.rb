@@ -18,7 +18,14 @@ module Fastlane
         newmilestone_number = Fastlane::Helper::Ios::VersionHelper.calc_next_release_version(last_stone[:title])
         number_of_days_from_code_freeze_to_release = params[:number_of_days_from_code_freeze_to_release]
         UI.message("Next milestone: #{newmilestone_number} due on #{newmilestone_duedate}.")
-        github_helper.create_milestone(repository, newmilestone_number, newmilestone_duedate, milestone_duration, number_of_days_from_code_freeze_to_release, params[:need_appstore_submission])
+        github_helper.create_milestone(
+          repository: repository,
+          newmilestone_number: newmilestone_number,
+          newmilestone_duedate: newmilestone_duedate,
+          newmilestone_duration: milestone_duration,
+          number_of_days_from_code_freeze_to_release: number_of_days_from_code_freeze_to_release,
+          need_submission: params[:need_appstore_submission]
+        )
       end
 
       def self.description
