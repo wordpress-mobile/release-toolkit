@@ -11,20 +11,26 @@ module Fastlane
 
         github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
         last_stone = github_helper.get_last_milestone(repository)
+
         UI.message("Last detected milestone: #{last_stone[:title]} due on #{last_stone[:due_on]}.")
+
         milestone_duedate = last_stone[:due_on]
         milestone_duration = params[:milestone_duration]
         newmilestone_duedate = (milestone_duedate.to_datetime.next_day(milestone_duration).to_time).utc
         newmilestone_number = Fastlane::Helper::Ios::VersionHelper.calc_next_release_version(last_stone[:title])
         number_of_days_from_code_freeze_to_release = params[:number_of_days_from_code_freeze_to_release]
+        # If there is a review process, we want to submit the binary 3 days before its release
+        # Using 3 days is mostly for historical reasons where we release the apps on Monday and submit them on Friday.
+        days_until_submission = params[:need_appstore_submission] ? (number_of_days_from_code_freeze_to_release - 3) : milestone_duration
+
         UI.message("Next milestone: #{newmilestone_number} due on #{newmilestone_duedate}.")
+
         github_helper.create_milestone(
           repository: repository,
-          newmilestone_number: newmilestone_number,
-          newmilestone_duedate: newmilestone_duedate,
-          newmilestone_duration: milestone_duration,
-          number_of_days_from_code_freeze_to_release: number_of_days_from_code_freeze_to_release,
-          need_submission: params[:need_appstore_submission]
+          title: newmilestone_number,
+          due_date: newmilestone_duedate,
+          days_until_submission: days_until_submission,
+          days_until_release: number_of_days_from_code_freeze_to_release
         )
       end
 

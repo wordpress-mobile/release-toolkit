@@ -74,23 +74,16 @@ module Fastlane
       # Creates a new milestone
       #
       # @param [String] repository The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`)
-      # @param [String] newmilestone_number The name of the milestone we want to create (e.g.: `16.9`)
-      # @param [Time] newmilestone_duedate milestone due date (e.g. `2022-10-22T12:00:00Z`)
-      # @param [Integer] newmilestone_duration Number of days that a milestone extents
-      # @param [Integer] number_of_days_from_code_freeze_to_release Number of days from code freeze to release
-      # @param [Boolean] need_submission The app needs to be submitted?
-      #  if `true`, will subtract 3 days from the `:number_of_days_from_code_freeze_to_release`.
-      #  if `false`, will use the days of `:newmilestone_duration`
+      # @param [String] title The name of the milestone we want to create (e.g.: `16.9`)
+      # @param [Time] due_date milestone due date (e.g. `2022-10-22T12:00:00Z`)
+      # @param [Integer] days_until_submission Number of days until submission
+      # @param [Integer] days_until_release Number of days from code freeze to release
       #
-      def create_milestone(repository:, newmilestone_number:, newmilestone_duedate:, newmilestone_duration:, number_of_days_from_code_freeze_to_release:, need_submission:)
-        # If there is a review process, we want to submit the binary 3 days before its release
-        #
-        # Using 3 days is mostly for historical reasons where we release the apps on Monday and submit them on Friday.
-        days_until_submission = need_submission ? (number_of_days_from_code_freeze_to_release - 3) : newmilestone_duration
-        submission_date = newmilestone_duedate.to_datetime.next_day(days_until_submission)
-        release_date = newmilestone_duedate.to_datetime.next_day(number_of_days_from_code_freeze_to_release)
+      def create_milestone(repository:, title:, due_date:, days_until_submission:, days_until_release:)
+        submission_date = due_date.to_datetime.next_day(days_until_submission)
+        release_date = due_date.to_datetime.next_day(days_until_release)
         comment = <<~MILESTONE_DESCRIPTION
-          Code freeze: #{newmilestone_duedate.to_datetime.strftime('%B %d, %Y')}
+          Code freeze: #{due_date.to_datetime.strftime('%B %d, %Y')}
           App Store submission: #{submission_date.strftime('%B %d, %Y')}
           Release: #{release_date.strftime('%B %d, %Y')}
         MILESTONE_DESCRIPTION
@@ -107,9 +100,9 @@ module Fastlane
         #
         # This is a bug in the GitHub API, not in our date computation logic.
         # To solve this, we trick it by forcing the time component of the ISO date we send to be `12:00:00Z`.
-        options[:due_on] = newmilestone_duedate.strftime('%Y-%m-%dT12:00:00Z')
+        options[:due_on] = due_date.strftime('%Y-%m-%dT12:00:00Z')
         options[:description] = comment
-        client.create_milestone(repository, newmilestone_number, options)
+        client.create_milestone(repository, title, options)
       end
 
       # Creates a Release on GitHub as a Draft
