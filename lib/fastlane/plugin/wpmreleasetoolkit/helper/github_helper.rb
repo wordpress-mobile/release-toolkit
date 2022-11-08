@@ -75,11 +75,15 @@ module Fastlane
       #
       # @param [String] repository The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`)
       # @param [String] title The name of the milestone we want to create (e.g.: `16.9`)
-      # @param [Time] due_date milestone due date (e.g. `2022-10-22T12:00:00Z`)
-      # @param [Integer] days_until_submission Number of days until submission
+      # @param [Time] due_date Milestone due date—which will also correspond to the code freeze date
+      # @param [Integer] days_until_submission Number of days from code freeze to submission to the App Store / Play Store
       # @param [Integer] days_until_release Number of days from code freeze to release
       #
       def create_milestone(repository:, title:, due_date:, days_until_submission:, days_until_release:)
+        UI.user_error!('days_until_release must be greater than zero.') if days_until_release <= 0
+        UI.user_error!('days_until_submission must be greater than zero.') if days_until_submission <= 0
+        UI.user_error!('days_until_release must be greather than days_until_submission') if days_until_submission >= days_until_release
+
         submission_date = due_date.to_datetime.next_day(days_until_submission)
         release_date = due_date.to_datetime.next_day(days_until_release)
         comment = <<~MILESTONE_DESCRIPTION
