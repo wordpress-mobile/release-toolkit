@@ -111,7 +111,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :skip_if_exists,
-            description: 'If the file already exists in the S3 bucket, just log the error instead of failing with `user_error!`',
+            description: 'If the file already exists in the S3 bucket, skip the upload (and report it in the logs), instead of failing with `user_error!`',
             optional: true,
             default_value: false,
             type: Boolean
