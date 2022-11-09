@@ -24,10 +24,10 @@ module Fastlane
           message = "File already exists in S3 bucket #{bucket} at #{key}"
           if params[:skip_if_exists]
             UI.important("#{message}. Skipping upload.")
+            return key
           else
             UI.user_error!(message)
           end
-          return key
         end
 
         UI.message("Uploading #{file_path} to: #{key}")
