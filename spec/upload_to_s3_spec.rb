@@ -167,13 +167,14 @@ describe Fastlane::Actions::UploadToS3Action do
       allow(FastlaneCore::UI).to receive(:important) { |message| warnings << message }
 
       with_tmp_file(named: 'key') do |file_path|
-        run_described_fastlane_action(
+        key = run_described_fastlane_action(
           bucket: test_bucket,
           key: 'key',
           file: file_path,
           skip_if_exists: true
         )
-        expect(warnings).to eq ["File already exists in S3 bucket #{test_bucket} at #{expected_key}. Skipping upload."]
+        expect(warnings).to eq(["File already exists in S3 bucket #{test_bucket} at #{expected_key}. Skipping upload."])
+        expect(key).to eq(expected_key)
       end
     end
   end

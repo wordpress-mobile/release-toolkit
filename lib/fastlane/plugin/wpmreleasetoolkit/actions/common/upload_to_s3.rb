@@ -27,7 +27,7 @@ module Fastlane
           else
             UI.user_error!(message)
           end
-          return
+          return key
         end
 
         UI.message("Uploading #{file_path} to: #{key}")
