@@ -12,7 +12,7 @@
 
 ### New Features
 
-_None_
+- Allow `upload_to_s3` action to just log instead of crash (using new `skip_if_exists` parameter) when the file already exists in the S3 bucket. [#427]
 
 ### Bug Fixes
 
