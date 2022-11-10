@@ -11,6 +11,10 @@ module Fastlane
 
         github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
         last_stone = github_helper.get_last_milestone(repository)
+
+        UI.user_error!('No milestone found on the repository.') if last_stone.nil?
+        UI.user_error!("Milestone #{last_stone[:title]} has no due date.") if last_stone[:due_on].nil?
+
         UI.message("Last detected milestone: #{last_stone[:title]} due on #{last_stone[:due_on]}.")
         milestone_duedate = last_stone[:due_on]
         milestone_duration = params[:milestone_duration]
@@ -49,19 +53,19 @@ module Fastlane
                                        env_name: 'GHHELPER_NEED_APPSTORE_SUBMISSION',
                                        description: 'True if the app needs to be submitted',
                                        optional: true,
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :milestone_duration,
                                        env_name: 'GHHELPER_MILESTONE_DURATION',
                                        description: 'Milestone duration in number of days',
                                        optional: true,
-                                       is_string: false,
+                                       type: Integer,
                                        default_value: 14),
           FastlaneCore::ConfigItem.new(key: :number_of_days_from_code_freeze_to_release,
                                        env_name: 'GHHELPER_NUMBER_OF_DAYS_FROM_CODE_FREEZE_TO_RELEASE',
                                        description: 'Number of days from code freeze to release',
                                        optional: true,
-                                       is_string: false,
+                                       type: Integer,
                                        default_value: 14),
           Fastlane::Helper::GithubHelper.github_token_config_item,
         ]

@@ -15,7 +15,6 @@ module Fastlane
         UI.user_error!("Milestone #{milestone_title} not found.") if milestone.nil?
 
         mile_title = milestone[:title]
-        puts freeze
         if freeze
           # Check if the state needs changes
           if is_frozen(milestone)
@@ -71,7 +70,7 @@ module Fastlane
                                        description: 'The GitHub milestone',
                                        optional: false,
                                        default_value: true,
-                                       is_string: false),
+                                       type: Boolean),
           Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
