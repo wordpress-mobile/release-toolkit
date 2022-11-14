@@ -240,7 +240,7 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     it 'computes the correct dates when the due date is on the verge of a DST day change' do
-      # DST starts on the last Sunday of March and ends on the last Sunday of October
+      # Europe DST starts on the last Sunday of March, and ends on the last Sunday of October
       Time.use_zone('Europe/London') do
         due_date = Time.zone.parse('2022-03-27 23:00:00Z')
         options = {
@@ -254,7 +254,7 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     it 'computes the correct dates when the due date is on DST but has no day change' do
-      # DST starts on the last Sunday of March and ends on the last Sunday of October
+      # Europe DST starts on the last Sunday of March, and ends on the last Sunday of October
       Time.use_zone('Europe/London') do
         due_date = Time.zone.parse('2022-03-26 23:00:00Z')
         options = {
@@ -264,6 +264,64 @@ describe Fastlane::Helper::GithubHelper do
 
         expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
         create_milestone(due_date: due_date, days_until_submission: 2, days_until_release: 3)
+      end
+    end
+
+    it 'computes the correct dates when the offset is between DST endings' do
+      # Europe DST starts on the last Sunday of March, and ends on the last Sunday of October
+      Time.use_zone('Europe/London') do
+        due_date = Time.zone.parse('2022-10-30 23:00:00Z')
+        options = {
+          due_on: '2022-10-30T12:00:00Z',
+          description: "Code freeze: October 30, 2022\nApp Store submission: March 19, 2023\nRelease: March 25, 2023\n"
+        }
+
+        expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
+        create_milestone(due_date: due_date, days_until_submission: 140, days_until_release: 146)
+      end
+    end
+
+    it 'computes the correct dates when the release and submission dates are at the last day of a DST change' do
+      # Europe DST starts on the last Sunday of March, and ends on the last Sunday of October
+      Time.use_zone('Europe/London') do
+        due_date = Time.zone.parse('2022-03-27 23:00:00Z')
+        options = {
+          due_on: '2022-03-28T12:00:00Z',
+          description: "Code freeze: March 28, 2022\nApp Store submission: October 30, 2022\nRelease: October 31, 2022\n"
+        }
+
+        expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
+        create_milestone(due_date: due_date, days_until_submission: 216, days_until_release: 217)
+      end
+    end
+
+    it 'computes the correct dates when the due date is before Europe and USA DST changes and ends inside a DST period on Europe' do
+      # USA DST starts on the second Sunday in March. and ends on the first Sunday in November
+      # Europe DST starts on the last Sunday of March, and ends on the last Sunday in October
+      Time.use_zone('Europe/London') do
+        due_date = Time.zone.parse('2022-03-05 23:00:00Z')
+        options = {
+          due_on: '2022-03-05T12:00:00Z',
+          description: "Code freeze: March 05, 2022\nApp Store submission: May 04, 2022\nRelease: May 05, 2022\n"
+        }
+
+        expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
+        create_milestone(due_date: due_date, days_until_submission: 60, days_until_release: 61)
+      end
+    end
+
+    it 'computes the correct dates when the due date is before Europe and USA DST changes and ends inside a DST period on USA' do
+      # USA DST starts on the second Sunday in March. and ends on the first Sunday in November
+      # Europe DST starts on the last Sunday of March, and ends on the last Sunday in October
+      Time.use_zone('America/Los_Angeles') do
+        due_date = Time.zone.parse('2022-03-05 23:00:00Z')
+        options = {
+          due_on: '2022-03-05T12:00:00Z',
+          description: "Code freeze: March 05, 2022\nApp Store submission: May 04, 2022\nRelease: May 05, 2022\n"
+        }
+
+        expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
+        create_milestone(due_date: due_date, days_until_submission: 60, days_until_release: 61)
       end
     end
 
