@@ -218,66 +218,71 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     it 'computes the correct dates for standard period' do
-      due_date = '2022-10-20T08:00:00Z'.to_time.utc
+      due_date = '2022-12-02T08:00:00Z'.to_time.utc
       options = {
-        due_on: '2022-10-20T12:00:00Z',
-        description: "Code freeze: October 20, 2022\nApp Store submission: October 24, 2022\nRelease: October 27, 2022\n"
+        due_on: '2022-12-02T12:00:00Z',
+        description: "Code freeze: December 02, 2022\nApp Store submission: December 06, 2022\nRelease: December 09, 2022\n"
       }
 
       expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
       create_milestone(due_date: due_date, days_until_submission: 4, days_until_release: 7)
     end
 
-    it 'computes the correct dates when the due date is on the verge of a DST day change' do
-      # The PST to PDT (DST) change is made on the second Sunday in March and finishes on the first Sunday in November
-      Time.zone = 'Pacific Time (US & Canada)'
-      due_date = '2022-06-18T23:00:00Z'.to_time
+    it 'computes the correct dates when submission and release dates are in the same day' do
+      due_date = '2022-12-02T08:00:00Z'.to_time.utc
       options = {
-        due_on: '2022-06-19T12:00:00Z',
-        description: "Code freeze: June 19, 2022\nApp Store submission: June 21, 2022\nRelease: June 22, 2022\n"
+        due_on: '2022-12-02T12:00:00Z',
+        description: "Code freeze: December 02, 2022\nApp Store submission: December 03, 2022\nRelease: December 03, 2022\n"
       }
 
       expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
-      create_milestone(due_date: due_date, days_until_submission: 2, days_until_release: 3)
+      create_milestone(due_date: due_date, days_until_submission: 1, days_until_release: 1)
+    end
+
+    it 'computes the correct dates when the due date is on the verge of a DST day change' do
+      # DST starts on the last Sunday of March and ends on the last Sunday of October
+      Time.use_zone('Europe/London') do
+        due_date = Time.zone.parse('2022-03-27 23:00:00Z')
+        options = {
+          due_on: '2022-03-28T12:00:00Z',
+          description: "Code freeze: March 28, 2022\nApp Store submission: March 30, 2022\nRelease: March 31, 2022\n"
+        }
+
+        expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
+        create_milestone(due_date: due_date, days_until_submission: 2, days_until_release: 3)
+      end
     end
 
     it 'computes the correct dates when the due date is on DST but has no day change' do
-      # The PST to PDT (DST) change is made on the second Sunday in March and finishes on the first Sunday in November
-      Time.zone = 'Pacific Time (US & Canada)'
-      due_date = '2022-06-18T22:00:00Z'.to_time
-      options = {
-        due_on: '2022-06-18T12:00:00Z',
-        description: "Code freeze: June 18, 2022\nApp Store submission: June 20, 2022\nRelease: June 21, 2022\n"
-      }
+      # DST starts on the last Sunday of March and ends on the last Sunday of October
+      Time.use_zone('Europe/London') do
+        due_date = Time.zone.parse('2022-03-26 23:00:00Z')
+        options = {
+          due_on: '2022-03-26T12:00:00Z',
+          description: "Code freeze: March 26, 2022\nApp Store submission: March 28, 2022\nRelease: March 29, 2022\n"
+        }
 
-      expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
-      create_milestone(due_date: due_date, days_until_submission: 2, days_until_release: 3)
+        expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
+        create_milestone(due_date: due_date, days_until_submission: 2, days_until_release: 3)
+      end
     end
 
-    context 'with input validation' do
-      it 'raises an error if days_until_submission is less than or equal zero' do
-        due_date = '2022-10-20T08:00:00Z'.to_time.utc
-        expect { create_milestone(due_date: due_date, days_until_submission: 0, days_until_release: 5) }
-          .to raise_error(FastlaneCore::Interface::FastlaneError, 'days_until_submission must be greater than zero.')
-      end
+    it 'raises an error if days_until_submission is less than or equal zero' do
+      due_date = '2022-10-20T08:00:00Z'.to_time.utc
+      expect { create_milestone(due_date: due_date, days_until_submission: 0, days_until_release: 5) }
+        .to raise_error(FastlaneCore::Interface::FastlaneError, 'days_until_submission must be greater than zero.')
+    end
 
-      it 'raises an error if days_until_release is less than or equal zero' do
-        due_date = '2022-10-20T08:00:00Z'.to_time.utc
-        expect { create_milestone(due_date: due_date, days_until_submission: 12, days_until_release: -8) }
-          .to raise_error(FastlaneCore::Interface::FastlaneError, 'days_until_release must be greater than zero.')
-      end
+    it 'raises an error if days_until_release is less than or equal zero' do
+      due_date = '2022-10-20T08:00:00Z'.to_time.utc
+      expect { create_milestone(due_date: due_date, days_until_submission: 12, days_until_release: -8) }
+        .to raise_error(FastlaneCore::Interface::FastlaneError, 'days_until_release must be greater than zero.')
+    end
 
-      it 'raises an error if submission date is after the release date' do
-        due_date = '2022-10-20T08:00:00Z'.to_time.utc
-        expect { create_milestone(due_date: due_date, days_until_submission: 14, days_until_release: 3) }
-          .to raise_error(FastlaneCore::Interface::FastlaneError, 'days_until_release must be greather than days_until_submission')
-      end
-
-      it 'raises an error if submission date is equal to release date' do
-        due_date = '2022-10-20T08:00:00Z'.to_time.utc
-        expect { create_milestone(due_date: due_date, days_until_submission: 1, days_until_release: 1) }
-          .to raise_error(FastlaneCore::Interface::FastlaneError, 'days_until_release must be greather than days_until_submission')
-      end
+    it 'raises an error if days_until_submission is greater than days_until_release' do
+      due_date = '2022-10-20T08:00:00Z'.to_time.utc
+      expect { create_milestone(due_date: due_date, days_until_submission: 14, days_until_release: 3) }
+        .to raise_error(FastlaneCore::Interface::FastlaneError, 'days_until_release must be greater or equal to days_until_submission.')
     end
 
     def create_milestone(due_date:, days_until_submission:, days_until_release:)
