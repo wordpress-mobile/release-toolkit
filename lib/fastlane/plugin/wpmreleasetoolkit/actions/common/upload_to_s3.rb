@@ -20,7 +20,15 @@ module Fastlane
           key = [file_name_hash, key].join('/')
         end
 
-        UI.user_error!("File already exists in S3 bucket #{bucket} at #{key}") if file_is_already_uploaded?(bucket, key)
+        if file_is_already_uploaded?(bucket, key)
+          message = "File already exists in S3 bucket #{bucket} at #{key}"
+          if params[:skip_if_exists]
+            UI.important("#{message}. Skipping upload.")
+            return key
+          else
+            UI.user_error!(message)
+          end
+        end
 
         UI.message("Uploading #{file_path} to: #{key}")
 
@@ -99,6 +107,13 @@ module Fastlane
             description: 'Generate a derived prefix based on the filename that makes it harder to guess the URL of the uploaded object',
             optional: true,
             default_value: true,
+            type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :skip_if_exists,
+            description: 'If the file already exists in the S3 bucket, skip the upload (and report it in the logs), instead of failing with `user_error!`',
+            optional: true,
+            default_value: false,
             type: Boolean
           ),
         ]
