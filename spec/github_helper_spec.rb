@@ -242,6 +242,9 @@ describe Fastlane::Helper::GithubHelper do
     it 'computes the correct dates when the due date is on the verge of a DST day change' do
       # Europe DST starts on the last Sunday of March, and ends on the last Sunday of October
       Time.use_zone('Europe/London') do
+        # March 27th, 2022 is the exact day that London switches to the DST (+1h)
+        # If the due date is too close to the next day, a day change will happen
+        # So, 2022-03-27 23:00:00Z will be exactly 2022-03-28 00:00:00 +0100 at the DST change
         due_date = Time.zone.parse('2022-03-27 23:00:00Z')
         options = {
           due_on: '2022-03-28T12:00:00Z',
@@ -256,6 +259,25 @@ describe Fastlane::Helper::GithubHelper do
     it 'computes the correct dates when the due date is on DST but has no day change' do
       # Europe DST starts on the last Sunday of March, and ends on the last Sunday of October
       Time.use_zone('Europe/London') do
+        # March 27th, 2022 is the exact day that London switches to the DST (+1h)
+        # If the due date is not close enough at the day change, nothing will occur.
+        # So, 2022-03-27 22:00:00Z will be exactly 2022-03-27 23:00:00 +0100 at the DST change.
+        due_date = Time.zone.parse('2022-03-27 22:00:00Z')
+        options = {
+          due_on: '2022-03-27T12:00:00Z',
+          description: "Code freeze: March 27, 2022\nApp Store submission: March 29, 2022\nRelease: March 30, 2022\n"
+        }
+
+        expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
+        create_milestone(due_date: due_date, days_until_submission: 2, days_until_release: 3)
+      end
+    end
+
+    it 'computes the correct dates when the due date is one day before a DST change' do
+      # Europe DST starts on the last Sunday of March, and ends on the last Sunday of October
+      Time.use_zone('Europe/London') do
+        # As London changes to DST on March 27th, the date shouldn't be changed
+        # So, 2022-03-26 23:00:00Z will be exactly 2022-03-26 23:00:00 +0000 at this Timezone.
         due_date = Time.zone.parse('2022-03-26 23:00:00Z')
         options = {
           due_on: '2022-03-26T12:00:00Z',
