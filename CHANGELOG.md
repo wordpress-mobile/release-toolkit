@@ -6,6 +6,24 @@
 
 ### Breaking Changes
 
+_None_
+
+### New Features
+
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 6.0.0
+
+### Breaking Changes
+
 - Removed support for the deprecated `GHHELPER_ACCESS` in favor of `GITHUB_TOKEN` as the default environment variable to set the GitHub API token. [#420]
 - The `github_token:` parameter (aka `ConfigItem`)–or using the corresponding `GITHUB_TOKEN` env var to provide it a value–is now mandatory for all Fastlane actions that use the GitHub API. [#420]
 - The Fastlane action `comment_on_pr` has the parameter `access_key:` replaced by `github_token:`. [#420]
@@ -18,10 +36,6 @@
 
  - Improve resilience of the `ios_lint_localizations` action to support UTF16 files, and to warn and skip files in XML format when trying to detect duplicate keys on `.strings` files. [#418]
  - Work around GitHub API bug when creating a new milestone, where their interpretation of the milestone's due date sent during API call is incorrect when we cross DST change dates — leading to milestones created after Oct 30 having due dates set on Sunday instead of Monday. [#419]
-
-### Internal Changes
-
-_None_
 
 ## 5.6.0
 
