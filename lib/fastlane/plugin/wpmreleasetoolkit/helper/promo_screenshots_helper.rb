@@ -7,6 +7,7 @@ rescue LoadError
 end
 require 'json'
 require 'tempfile'
+require 'open3'
 require 'optparse'
 require 'pathname'
 require 'progress_bar'
@@ -43,6 +44,54 @@ module Fastlane
           linter.display_errors
 
           UI.user_error!('Invalid JSON configuration. See errors in log.')
+        end
+      end
+
+      # Checks that all required fonts are installed
+      #  - Visits the JSON config to find all the stylesheets referenced in it
+      #  - For each stylesheet, extract the first font of each `font-family` attribute found
+      #  - Finally, for each of those fonts, check that they exist and are activated.
+      #
+      # @param [Hash] config The promo screenshots configuration, as returned by #read_json
+      # @return [Boolean] True if all necessary fonts are installed, false if at least one font is missing.
+      #
+      def check_fonts_installed(config:)
+        # Find all stylesheets in the config
+        all_stylesheets = ([config['stylesheet']] + config['entries'].flat_map do |entry|
+          entry['attachments']&.map { |att| att['stylesheet'] }
+        end).compact.uniq
+
+        # Parse the first font in each `font-family` attribute found in all found CSS files.
+        # Only the first in each `font-family` font list matters, as others are fallbacks we don't want to use anyway.
+        font_families = all_stylesheets.flat_map do |s|
+          File.readlines(s).flat_map do |line|
+            attr = line.match(/font-family: (.*);/)&.captures&.first
+            attr.split(',').first.strip.gsub(/'(.*)'/, '\1').gsub(/"(.*)"/, '\1') unless attr.nil?
+          end
+        end.compact.uniq
+
+        # Verify that all fonts exists and are active—using a small swift script as there's no nice CLI for that
+        swift_script = <<~SWIFT
+          import AppKit
+
+          var exitCode: Int32 = 0
+          for fontName in CommandLine.arguments.dropFirst() {
+              if NSFont(name: fontName, size: NSFont.systemFontSize) != nil {
+                  print(" ✅ Font \\"\\(fontName)\\" found and active")
+              } else {
+                  print(" ❌ Font \\"\\(fontName)\\" not found, it is either not installed or disabled. Please install it using FontBook first.")
+                  exitCode = 1
+              }
+          }
+          exit(exitCode)
+        SWIFT
+
+        Tempfile.create(['fonts-check-', '.swift']) do |f|
+          f.write(swift_script)
+          f.close
+          oe, s = Open3.capture2e('/usr/bin/env', 'xcrun', 'swift', f.path, *font_families)
+          UI.command_output(oe)
+          s.success?
         end
       end
 

@@ -13,6 +13,8 @@ module Fastlane
 
         config = helper.read_json(params[:config_file])
 
+        helper.check_fonts_installed(config: config) unless params[:skip_font_check]
+
         translationDirectories = subdirectories_for_path(params[:metadata_folder])
         imageDirectories = subdirectories_for_path(params[:orig_folder])
 
@@ -141,31 +143,34 @@ module Fastlane
                                        env_name: 'PROMOSS_ORIG',
                                        description: 'The directory containing the original screenshots',
                                        optional: false,
-                                       is_string: true),
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :output_folder,
                                        env_name: 'PROMOSS_OUTPUT',
                                        description: 'The path of the folder to save the promo screenshots',
                                        optional: false,
-                                       is_string: true),
-
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :metadata_folder,
                                        env_name: 'PROMOSS_METADATA_FOLDER',
                                        description: 'The directory containing the translation data',
                                        optional: false,
-                                       is_string: true),
-
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :config_file,
                                        env_name: 'PROMOSS_CONFIG_FILE',
                                        description: 'The path to the file containing the promo screenshot configuration',
                                        optional: true,
-                                       is_string: true,
+                                       type: String,
                                        default_value: 'screenshots.json'),
-
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: 'PROMOSS_FORCE_CREATION',
                                        description: 'Overwrite existing promo screenshots without asking first?',
                                        optional: true,
-                                       is_string: false,
+                                       type: Boolean,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :skip_font_check,
+                                       env_name: 'PROMOSS_SKIP_FONT_CHECK',
+                                       description: 'Skip the check verifying that needed fonts are installed and active',
+                                       optional: true,
+                                       type: Boolean,
                                        default_value: false),
         ]
       end
