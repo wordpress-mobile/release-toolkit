@@ -12,7 +12,6 @@ require 'optparse'
 require 'pathname'
 require 'progress_bar'
 require 'parallel'
-require 'jsonlint'
 require 'chroma'
 require 'securerandom'
 
@@ -33,17 +32,14 @@ module Fastlane
         UI.user_error!('`drawText` not found – install it using `brew install automattic/build-tools/drawText`.') unless system('command -v drawText')
       end
 
-      def read_json(configFilePath)
+      def read_config(configFilePath)
         configFilePath = resolve_path(configFilePath)
 
         begin
-          return JSON.parse(open(configFilePath).read)
-        rescue
-          linter = JsonLint::Linter.new
-          linter.check(configFilePath)
-          linter.display_errors
-
-          UI.user_error!('Invalid JSON configuration. See errors in log.')
+          return YAML.load_file(configFilePath)
+        rescue StandardError => e
+          UI.error(e)
+          UI.user_error!('Invalid JSON/YAML configuration. Please lint your config file to check for syntax errors.')
         end
       end
 
@@ -52,7 +48,7 @@ module Fastlane
       #  - For each stylesheet, extract the first font of each `font-family` attribute found
       #  - Finally, for each of those fonts, check that they exist and are activated.
       #
-      # @param [Hash] config The promo screenshots configuration, as returned by #read_json
+      # @param [Hash] config The promo screenshots configuration, as returned by #read_config
       # @return [Boolean] True if all necessary fonts are installed, false if at least one font is missing.
       #
       def check_fonts_installed(config:)

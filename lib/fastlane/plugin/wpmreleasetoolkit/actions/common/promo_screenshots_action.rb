@@ -11,7 +11,7 @@ module Fastlane
         UI.message "#{self.check_path(params[:orig_folder])} Original Screenshot Source: #{params[:orig_folder]}"
         UI.message "#{self.check_path(params[:metadata_folder])} Translation source: #{params[:metadata_folder]}"
 
-        config = helper.read_json(params[:config_file])
+        config = helper.read_config(params[:config_file])
 
         helper.check_fonts_installed(config: config) unless params[:skip_font_check]
 
