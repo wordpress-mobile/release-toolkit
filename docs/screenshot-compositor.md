@@ -69,7 +69,7 @@ This key defines the default background color of each screenshot. This must be a
 
 **`stylesheet`**
 
-This key defines the default stylesheet used for text formatting. It should be a path to the stylesheet, either absolute, or relative to the configuration file.
+This key defines the default stylesheet used for text formatting. It should be a path to the stylesheet, either absolute, or relative to the `fastlane` folder.
 
 A sample stylesheet looks like this:
 
@@ -143,7 +143,7 @@ Sets the origin of the original screenshot image. This must be provided as an ar
 
 **`device_frame`**
 
-A path to the device frame image (if applicable). This path can be absolute or relative to the configuration file.
+A path to the device frame image (if applicable). This path can be absolute or relative to the `fastlane` folder.
 
 **`device_frame_size`**
 
@@ -194,7 +194,7 @@ Allows you to customize the exported filename for this entry.
 
 **`background`** (optional)
 
-Specifies the path to a background image for this entry. This path can be absolute or relative to the configuration file. The background image **will not** be automatically resized, and it will be placed at `(0,0)`.  If not provided, the image will use the background color defined in the preamble.
+Specifies the path to a background image for this entry. This path can be absolute, or relative to the `fastlane` folder. The background image **will not** be automatically resized, and it will be placed at `(0,0)`.  If not provided, the image will use the background color defined in the preamble.
 
 **`screenshot`** (optional)
 
@@ -253,7 +253,7 @@ Text attachments use the following keys:
 
 **`text`**
 
-Specifies the path to the text file for this attachment. The path should be specified relative to the configuration file, and can contain the `{locale}` placeholder to allow for localization.
+Specifies the path to the text file for this attachment. The path should be specified relative to the `fastlane` folder, and can contain the `{locale}` placeholder to allow for localization.
 
 **`size`**
 
@@ -269,7 +269,7 @@ Specifies the font size for the text of this attachment. If this number is too l
 
 **`stylesheet`**
 
-Specifies a stylesheet used for this attachment. It should contain a path to the stylesheet, either absolute, or relative to the configuration file.
+Specifies a stylesheet used for this attachment. It should contain a path to the stylesheet, either absolute, or relative to the `fastlane` folder.
 
 **Image Attachment**
 ```json
@@ -284,7 +284,7 @@ Image attachments use the following keys:
 
 **`file`**
 
-Specifies the path to the attachment image. The path should be specified relative to the configuration file, and can contain the `{locale}` placeholder to allow for localization.
+Specifies the path to the attachment image. The path should be specified relative to the `fastlane` folder, and can contain the `{locale}` placeholder to allow for localization.
 
 **`size`**
 
