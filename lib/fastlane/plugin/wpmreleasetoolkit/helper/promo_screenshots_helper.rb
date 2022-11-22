@@ -388,8 +388,8 @@ module Fastlane
       def open_image(path)
         path = resolve_path(path)
 
-        Magick::Image.read(path)  do
-          self.background_color = 'transparent'
+        Magick::Image.read(path) do |image|
+          image.background_color = 'transparent'
         end.first
       end
 
