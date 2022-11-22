@@ -16,7 +16,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Fix deprecation warning in `RMagick` call used by `promo_screenshots` action. [#429]
 
 ### Internal Changes
 
