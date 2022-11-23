@@ -12,7 +12,6 @@ _None_
 
 - `promo_screenshots` now checks that the fonts—referenced via `font-family` in all the stylesheets referenced in the config file—are installed before starting, and prompt to install them if they are not. This check is enabled by default now but can be disabled/skipped if it causes any issue. [#429]
 - `promo_screenshots` now supports config files to be written in `YAML` in addition to still supporting `JSON`. [#429]  
-  Note that while this is technically not a breaking change—because YAML is a superset of JSON—the old way of parsing the JSON file had a loophole that incorrectly allowed `// comments` in the JSON file (despite this not being allowed in the JSON standard). If your config files relied on this bug and used `// comments`, you will have to replace them with `# comments` instead so that they can be parsed correctly by the YAML parser.
 
 ### Bug Fixes
 

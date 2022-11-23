@@ -36,7 +36,10 @@ module Fastlane
         configFilePath = resolve_path(configFilePath)
 
         begin
-          return YAML.load_file(configFilePath)
+          # NOTE: While JSON is a subset of YAML and thus YAML.load_file would technically cover both cases at once, in practice
+          # `JSON.parse` is more lenient with JSON files than `YAML.load_file` is — especially, it accepts `// comments` in the
+          # JSON file, despite this not being allowed in the spec — hence why we still try with `JSON.parse` for `.json` files.
+          return File.extname(configFilePath) == '.json' ? JSON.parse(File.read(configFilePath)) : YAML.load_file(configFilePath)
         rescue StandardError => e
           UI.error(e)
           UI.user_error!('Invalid JSON/YAML configuration. Please lint your config file to check for syntax errors.')
