@@ -3,8 +3,9 @@ require 'securerandom'
 module Fastlane
   module Actions
     module SharedValues
-      FIREBASE_TEST_RESULT = :FIREBASE_TEST_LOG_FILE
+      FIREBASE_TEST_RESULT = :FIREBASE_TEST_LOG_FILE # FirebaseTestLabResult object, for internal consumption
       FIREBASE_TEST_LOG_FILE_PATH = :FIREBASE_TEST_LOG_FILE_PATH
+      FIREBASE_TEST_MORE_DETAILS_URL = :FIREBASE_TEST_MORE_DETAILS_URL
     end
 
     class AndroidFirebaseTestAction < Action
@@ -45,13 +46,20 @@ module Fastlane
           key_file_path: params[:key_file]
         )
 
-        FastlaneCore::UI.test_failure! "Firebase Tests failed – more information can be found at #{result.more_details_url}" unless result.success?
+        Fastlane::Actions.lane_context[SharedValues::FIREBASE_TEST_MORE_DETAILS_URL] = result.more_details_url
 
-        UI.success 'Firebase Tests Complete'
+        if result.success?
+          UI.success 'Firebase Tests Complete'
+          return true
+        else
+          ui_method = params[:crash_on_test_failure] ? :test_failure! : :error
+          FastlaneCore::UI.send(ui_method, "Firebase Tests failed – more information can be found at #{result.more_details_url}")
+          return false
+        end
       end
 
       # Fastlane doesn't eagerly validate options for us, so we'll do it first to have control over
-      # when they're evalutated.
+      # when they're evaluated.
       def self.validate_options(params)
         available_options
           .reject { |opt| opt.optional || !opt.default_value.nil? }
@@ -180,7 +188,26 @@ module Fastlane
             optional: true,
             type: String
           ),
+          FastlaneCore::ConfigItem.new(
+            key: :crash_on_test_failure,
+            description: 'If set to `true` (the default), will stop fastlane with `test_failure!`. ' \
+              + 'If `false`, the action will return the test status, without interrupting the rest of your Fastlane run on failure, letting the caller handle the failure on their side',
+            optional: true,
+            type: Boolean,
+            default_value: true
+          ),
         ]
+      end
+
+      def self.output
+        [
+          ['FIREBASE_TEST_LOG_FILE_PATH', 'Path to the `output.log` file containing the logs or invoking the tests'],
+          ['FIREBASE_TEST_MORE_DETAILS_URL', 'URL to the Firebase Console dashboard showing the details of the test run (and failures, if any)'],
+        ]
+      end
+
+      def self.return_value
+        'True if the test succeeded, false if they failed'
       end
 
       def self.authors
