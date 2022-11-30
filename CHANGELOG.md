@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-* All `android_firebase_test` to not crash on failure, allowing the caller to do custom failure handling (e.g. Buildkite Annotations, etc) on their side. [#430]
+* Allow `android_firebase_test` to not crash on failure, letting the caller do custom failure handling (e.g. Buildkite Annotations, etc) on their side. [#430]
 
 ### Bug Fixes
 
