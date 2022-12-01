@@ -10,6 +10,20 @@ _None_
 
 ### New Features
 
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 6.1.0
+
+### New Features
+
 - Allow `android_firebase_test` to not crash on failure, letting the caller do custom failure handling (e.g. Buildkite Annotations, etc) on their side. [#430]
 - `promo_screenshots` now checks that the fonts—referenced via `font-family` in all the stylesheets referenced in the config file—are installed before starting, and prompt to install them if they are not. This check is enabled by default now but can be disabled/skipped if it causes any issue. [#429]
 - `promo_screenshots` now supports config files to be written in `YAML` in addition to still supporting `JSON`. [#429]  
@@ -17,10 +31,6 @@ _None_
 ### Bug Fixes
 
 - Fix deprecation warning in `RMagick` call used by `promo_screenshots` action. [#429]
-
-### Internal Changes
-
-_None_
 
 ## 6.0.0
 
