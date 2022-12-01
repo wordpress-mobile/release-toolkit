@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Update the CI image used to build this project to use `xcode-14.1`. [#431]
 
 ## 6.1.0
 
