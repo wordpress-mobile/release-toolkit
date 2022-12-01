@@ -165,7 +165,7 @@ Each entry looks something like this:
 ```json
 {
     "device": "Pixel 2 XL",
-    "text": "../metadata/%s/play_store_screenshot_7.html",
+    "text": "metadata/%s/play_store_screenshot_7.html",
     "screenshot": "images/phoneScreenshots/1-build-and-manage-your-website.png",
     "background": "screenshots/assets/backgrounds/01-background-phone.png",
     "attachments": [
