@@ -30,7 +30,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'chroma', '0.2.0'
   spec.add_dependency 'diffy', '~> 3.3'
   spec.add_dependency 'git', '~> 1.3'
-  spec.add_dependency 'jsonlint', '~> 0.3'
   spec.add_dependency 'nokogiri', '~> 1.11' # Needed for AndroidLocalizeHelper
   spec.add_dependency 'octokit', '~> 4.18'
   spec.add_dependency 'parallel', '~> 1.14'
