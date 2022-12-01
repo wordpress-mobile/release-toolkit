@@ -52,9 +52,9 @@ module Fastlane
       #  - Finally, for each of those fonts, check that they exist and are activated.
       #
       # @param [Hash] config The promo screenshots configuration, as returned by #read_config
-      # @return [Boolean] True if all necessary fonts are installed, false if at least one font is missing.
+      # @raise [UserError] Raises if at least one font is missing.
       #
-      def check_fonts_installed(config:)
+      def check_fonts_installed!(config:)
         # Find all stylesheets in the config
         all_stylesheets = ([config['stylesheet']] + config['entries'].flat_map do |entry|
           entry['attachments']&.map { |att| att['stylesheet'] }
@@ -90,7 +90,7 @@ module Fastlane
           f.close
           oe, s = Open3.capture2e('/usr/bin/env', 'xcrun', 'swift', f.path, *font_families)
           UI.command_output(oe)
-          s.success?
+          UI.user_error!('Some fonts required by your stylesheets are missing. Please install them and try again.') unless s.success?
         end
       end
 
