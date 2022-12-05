@@ -119,14 +119,15 @@ module Fastlane
       # @param [String] description The text to use as the release's body / description (typically the release notes)
       # @param [Array<String>] assets List of file paths to attach as assets to the release
       # @param [TrueClass|FalseClass] prerelease Indicates if this should be created as a pre-release (i.e. for alpha/beta)
+      # @param [TrueClass|FalseClass] is_draft Indicates if this should be created as a draft release (defaults to true)
       #
-      def create_release(repository:, version:, target: nil, description:, assets:, prerelease:)
+      def create_release(repository:, version:, target: nil, description:, assets:, prerelease:, is_draft: true)
         release = client.create_release(
           repository,
           version, # tag name
           name: version, # release name
           target_commitish: target || Git.open(Dir.pwd).log.first.sha,
-          draft: true,
+          draft: is_draft,
           prerelease: prerelease,
           body: description
         )
