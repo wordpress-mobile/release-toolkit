@@ -418,7 +418,8 @@ describe Fastlane::Helper::GithubHelper do
         target: test_target,
         description: test_description,
         assets: assets,
-        prerelease: false
+        prerelease: false,
+        is_draft: true
       )
     end
   end
