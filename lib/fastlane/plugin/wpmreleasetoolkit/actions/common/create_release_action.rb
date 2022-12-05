@@ -84,11 +84,11 @@ module Fastlane
                                        default_value: false,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :is_draft,
-                                        env_name: 'GHHELPER_CREATE_RELEASE_IS_DRAFT',
-                                        description: 'True if this is a draft release',
-                                        optional: true,
-                                        default_value: true,
-                                        is_string: false),                                      
+                                       env_name: 'GHHELPER_CREATE_RELEASE_IS_DRAFT',
+                                       description: 'True if this is a draft release',
+                                       optional: true,
+                                       default_value: true,
+                                       is_string: false),
           Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
