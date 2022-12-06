@@ -14,6 +14,7 @@ module Fastlane
         # Replace full URLS to PRs/Issues with shorthand, because GitHub does not render them properly otherwise.
         release_notes.gsub!(%r{https://github.com/([^/]*/[^/]*)/(pulls?|issues?)/([0-9]*)}, '\1#\3')
         prerelease = params[:prerelease]
+        is_draft = params[:is_draft]
 
         UI.message("Creating draft release #{version} in #{repository}.")
         # Verify assets
@@ -28,7 +29,8 @@ module Fastlane
           target: params[:target],
           description: release_notes,
           assets: assets,
-          prerelease: prerelease
+          prerelease: prerelease,
+          is_draft: is_draft
         )
         UI.message('Done')
       end
