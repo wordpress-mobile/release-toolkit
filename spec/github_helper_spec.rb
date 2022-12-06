@@ -411,16 +411,16 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     it 'creates a draft release if is_draft is set to true' do
-      options = { body: test_description, draft: true, name: test_tag, prerelease: false, target_commitish: test_target }
-      expect(client).to receive(:create_release).with(test_repo, test_tag, options)
+      options_draft_release = { body: test_description, draft: true, name: test_tag, prerelease: false, target_commitish: test_target }
+      expect(client).to receive(:create_release).with(test_repo, test_tag, options_draft_release)
       create_release
     end
 
     it 'creates a final (non-draft) release if is_draft is set to false' do
-      options = { body: test_description, draft: false, name: test_tag, prerelease: false, target_commitish: test_target }
-      expect(client).to receive(:create_release).with(test_repo, test_tag, options)
+      options_final_release = { body: test_description, draft: false, name: test_tag, prerelease: false, target_commitish: test_target }
+      expect(client).to receive(:create_release).with(test_repo, test_tag, options_final_release)
       create_release(is_draft: false)
-    end
+    # end
 
     def create_release(assets: [], is_draft: true)
       helper = described_class.new(github_token: 'Fake-GitHubToken-123')
