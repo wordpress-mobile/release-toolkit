@@ -88,7 +88,7 @@ module Fastlane
                                        description: 'True to create the GitHub release as a draft (instead of publishing it immediately)',
                                        optional: true,
                                        default_value: true,
-                                       is_string: false),
+                                       type: Boolean),
           Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
