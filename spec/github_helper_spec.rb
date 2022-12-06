@@ -420,7 +420,7 @@ describe Fastlane::Helper::GithubHelper do
       options_final_release = { body: test_description, draft: false, name: test_tag, prerelease: false, target_commitish: test_target }
       expect(client).to receive(:create_release).with(test_repo, test_tag, options_final_release)
       create_release(is_draft: false)
-    # end
+    end
 
     def create_release(assets: [], is_draft: true)
       helper = described_class.new(github_token: 'Fake-GitHubToken-123')
