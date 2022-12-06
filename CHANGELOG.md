@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Add a `is_draft` parameter to the `create_release` action to specify whether the release should be created as a draft. [#433]
 
 ### Bug Fixes
 
@@ -19,12 +19,6 @@ _None_
 ### Internal Changes
 
 - Update the CI image used to build this project to use `xcode-14.1`. [#431]
-
-## 6.2.0
-
-### New Features
-
-- Add a `is_draft` parameter to the `create_release` action to specify whether the release should be created as a draft.
 
 ## 6.1.0
 
