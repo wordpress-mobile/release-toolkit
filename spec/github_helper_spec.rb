@@ -398,7 +398,7 @@ describe Fastlane::Helper::GithubHelper do
     it 'has the correct options' do
       options = { body: test_description, draft: true, name: test_tag, prerelease: false, target_commitish: test_target }
       expect(client).to receive(:create_release).with(test_repo, test_tag, options)
-      create_release
+      create_release(is_draft: true)
     end
 
     it 'uploads the assets to the correct location' do
@@ -407,10 +407,22 @@ describe Fastlane::Helper::GithubHelper do
 
       allow(client).to receive(:create_release).and_return({ url: test_url })
       expect(client).to receive(:upload_asset).with(test_url, test_assets, { content_type: 'application/octet-stream' })
-      create_release(assets: [test_assets])
+      create_release(is_draft: true, assets: [test_assets])
     end
 
-    def create_release(assets: [])
+    it 'creates a draft release if is_draft is set to true' do
+      options_draft_release = { body: test_description, draft: true, name: test_tag, prerelease: false, target_commitish: test_target }
+      expect(client).to receive(:create_release).with(test_repo, test_tag, options_draft_release)
+      create_release(is_draft: true)
+    end
+
+    it 'creates a final (non-draft) release if is_draft is set to false' do
+      options_final_release = { body: test_description, draft: false, name: test_tag, prerelease: false, target_commitish: test_target }
+      expect(client).to receive(:create_release).with(test_repo, test_tag, options_final_release)
+      create_release(is_draft: false)
+    end
+
+    def create_release(is_draft:, assets: [])
       helper = described_class.new(github_token: 'Fake-GitHubToken-123')
       helper.create_release(
         repository: test_repo,
@@ -418,7 +430,8 @@ describe Fastlane::Helper::GithubHelper do
         target: test_target,
         description: test_description,
         assets: assets,
-        prerelease: false
+        prerelease: false,
+        is_draft: is_draft
       )
     end
   end

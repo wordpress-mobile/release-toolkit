@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Add a `is_draft` parameter to the `create_release` action to specify whether the release should be created as a draft. [#433]
 
 ### Bug Fixes
 
