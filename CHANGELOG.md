@@ -10,11 +10,21 @@ _None_
 
 ### New Features
 
-- Add a `is_draft` parameter to the `create_release` action to specify whether the release should be created as a draft. [#433]
+_None_
 
 ### Bug Fixes
 
 _None_
+
+### Internal Changes
+
+_None_
+
+## 6.2.0
+
+### New Features
+
+- Add a `is_draft` parameter to the `create_release` action to specify whether the release should be created as a draft. [#433]
 
 ### Internal Changes
 
