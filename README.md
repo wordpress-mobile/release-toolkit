@@ -26,7 +26,7 @@ This guide also includes some tips about configuring your environment and IDE (e
 
 ## Doing a new Release
 
-When you need to do a new release of the `release-toolkit`, simply run `rake new_release` and follow the instructions.
+When you need to do a new release of the `release-toolkit`, simply run `bundle exec rake new_release` and follow the instructions.
 
 > This task will:
 >  - Show you the CHANGELOG/release notes it's about to use for that version
