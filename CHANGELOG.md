@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- Added Mac support to all `common` actions and any relevant `ios` actions [#439]
+_None_
 
 ### Bug Fixes
 
@@ -19,6 +19,12 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 6.3.0
+
+### New Features
+
+- Added Mac support to all `common` actions and any relevant `ios` actions [#439]
 
 ## 6.2.0
 
