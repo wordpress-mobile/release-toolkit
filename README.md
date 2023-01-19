@@ -1,7 +1,11 @@
 # release-toolkit
-Release-toolkit is a collection of [Fastlane](https://fastlane.tools/) actions used to automate some of the steps of the WordPress release process.  
+Release-toolkit is a collection of [Fastlane](https://fastlane.tools/) actions used to automate some of the steps of the WordPress release process.
 
-## Integrating the Library 
+## Getting Started
+1. Run `brew install imagemagick git-lfs`. `imagemagick` is needed before running `bundle install`. `git-lfs` is needed before running the Release Toolkit tests.
+2. Run `bundle install`
+
+## Integrating the Library
 
 To install the library, simply add the following lines to your Fastlane Pluginfile:
 
@@ -11,7 +15,7 @@ gem 'fastlane-plugin-wpmreleasetoolkit', git: 'https://github.com/wordpress-mobi
 
 ## Usage
 
-You can use the actions in the library as common Fastlane actions. 
+You can use the actions in the library as common Fastlane actions.
 More details about the actions can be found [here](lib/fastlane/plugin/wpmreleasetoolkit/actions/).
 
 ## Contributing
@@ -29,7 +33,7 @@ When you need to do a new release of the `release-toolkit`, simply run `rake new
 >  - Deduce which version number to use according to [SemVer](https://semver.org/) rules, and ask you to confirm that version number
 >  - Create a `release/<x.y>` branch, update the version number in all the right places, and create a PR for those changes
 
-Submit the PR, adding the `Releases` label to it and adding the `owl-team` as reviewers.
+Submit the PR, adding the `Releases` label to it and adding the `wordpress-mobile/apps-infrastructure` team as reviewers.
 
 Once that PR is approved and merged, create a new GitHub Release, copy/pasting the CHANGELOG entries for that GH release's description.
 
