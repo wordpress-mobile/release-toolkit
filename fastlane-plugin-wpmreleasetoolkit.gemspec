@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   # since this would cause a circular dependency
 
   # spec.add_dependency 'your-dependency', '~> 1.0.0'
-  spec.add_dependency 'activesupport', '~> 5'
+  spec.add_dependency 'activesupport', '>= 5', '< 8'
   spec.add_dependency 'buildkit', '~> 1.5'
   spec.add_dependency 'chroma', '0.2.0'
   spec.add_dependency 'diffy', '~> 3.3'
