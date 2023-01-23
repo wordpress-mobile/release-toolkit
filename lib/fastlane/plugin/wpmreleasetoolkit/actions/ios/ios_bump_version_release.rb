@@ -21,10 +21,6 @@ module Fastlane
         Fastlane::Helper::GitHelper.create_branch(@new_release_branch, from: default_branch)
         UI.message 'Done!'
 
-        UI.message 'Updating glotPressKeys...' unless params[:skip_glotpress]
-        update_glotpress_key unless params[:skip_glotpress]
-        UI.message 'Done' unless params[:skip_glotpress]
-
         UI.message 'Updating Fastlane deliver file...' unless params[:skip_deliver]
         Fastlane::Helper::Ios::VersionHelper.update_fastlane_deliver(@new_short_version) unless params[:skip_deliver]
         UI.message 'Done!' unless params[:skip_deliver]
@@ -35,7 +31,7 @@ module Fastlane
 
         Fastlane::Helper::Ios::GitHelper.commit_version_bump(
           include_deliverfile: !params[:skip_deliver],
-          include_metadata: !params[:skip_glotpress]
+          include_metadata: false
         )
 
         UI.message 'Done.'
@@ -55,16 +51,11 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :skip_glotpress,
-                                       env_name: 'FL_IOS_CODEFREEZE_BUMP_SKIPGLOTPRESS',
-                                       description: 'Skips GlotPress key update',
-                                       is_string: false, # true: verifies the input is a string, false: every kind of value
-                                       default_value: false), # the default value if the user didn't provide one
           FastlaneCore::ConfigItem.new(key: :skip_deliver,
                                        env_name: 'FL_IOS_CODEFREEZE_BUMP_SKIPDELIVER',
                                        description: 'Skips Deliver key update',
-                                       is_string: false, # true: verifies the input is a string, false: every kind of value
-                                       default_value: false), # the default value if the user didn't provide one
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :default_branch,
                                        env_name: 'FL_RELEASE_TOOLKIT_DEFAULT_BRANCH',
                                        description: 'Default branch of the repository',
@@ -104,15 +95,6 @@ module Fastlane
         UI.message("New internal version: #{@new_version_internal}") unless ENV['INTERNAL_CONFIG_FILE'].nil?
         UI.message("New short version: #{@new_short_version}")
         UI.message("Release branch: #{@new_release_branch}")
-      end
-
-      def self.update_glotpress_key
-        dm_file = ENV['DOWNLOAD_METADATA']
-        if File.exist?(dm_file)
-          sh("sed -i '' \"s/let glotPressWhatsNewKey.*/let glotPressWhatsNewKey = \\\"v#{@new_short_version}-whats-new\\\"/\" #{dm_file}")
-        else
-          UI.user_error!("Can't find #{dm_file}.")
-        end
       end
     end
   end
