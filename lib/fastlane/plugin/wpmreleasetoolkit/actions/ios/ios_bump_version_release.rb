@@ -30,8 +30,7 @@ module Fastlane
         UI.message 'Done!'
 
         Fastlane::Helper::Ios::GitHelper.commit_version_bump(
-          include_deliverfile: !params[:skip_deliver],
-          include_metadata: false
+          include_deliverfile: !params[:skip_deliver]
         )
 
         UI.message 'Done.'

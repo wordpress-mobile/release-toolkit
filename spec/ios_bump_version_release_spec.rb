@@ -23,7 +23,7 @@ describe Fastlane::Actions::IosBumpVersionReleaseAction do
       skip_deliver = false
 
       expect(Fastlane::Helper::Ios::VersionHelper).to receive(:update_fastlane_deliver).with(next_version_short)
-      expect(Fastlane::Helper::Ios::GitHelper).to receive(:commit_version_bump).with(include_deliverfile: !skip_deliver, include_metadata: false)
+      expect(Fastlane::Helper::Ios::GitHelper).to receive(:commit_version_bump).with(include_deliverfile: !skip_deliver)
 
       run_described_fastlane_action(
         skip_deliver: skip_deliver,
@@ -35,7 +35,7 @@ describe Fastlane::Actions::IosBumpVersionReleaseAction do
       skip_deliver = true
 
       expect(Fastlane::Helper::Ios::VersionHelper).not_to receive(:update_fastlane_deliver)
-      expect(Fastlane::Helper::Ios::GitHelper).to receive(:commit_version_bump).with(include_deliverfile: !skip_deliver, include_metadata: false)
+      expect(Fastlane::Helper::Ios::GitHelper).to receive(:commit_version_bump).with(include_deliverfile: !skip_deliver)
 
       run_described_fastlane_action(
         skip_deliver: skip_deliver,
