@@ -9,21 +9,14 @@ module Fastlane
         # This typically commits:
         #  - The files in `./config/*` – especially `Version.*.xcconfig` files
         #  - The `fastlane/Deliverfile` file (which contains the `app_version` line)
-        #  - The `<ProjectRoot>/<ProjectName>/Resources/AppStoreStrings.pot` file, containing a key for that version's release notes
         #
         # @env PROJECT_ROOT_FOLDER The path to the git root of the project
-        # @env PROJECT_NAME The name of the directory containing the project code (especially containing the Resources/ subfolder)
         #
         # @param [Bool] include_deliverfile If true (the default), includes the `fastlane/Deliverfile` in files being commited
-        # @param [Bool] include_metadata If true (the default), includes the `fastlane/download_metadata.swift` file and the `.pot` file (which typically contains an entry or release notes for the new version)
         #
-        def self.commit_version_bump(include_deliverfile: true, include_metadata: true)
+        def self.commit_version_bump(include_deliverfile: true)
           files_list = [File.join(ENV['PROJECT_ROOT_FOLDER'], 'config', '.')]
           files_list.append File.join('fastlane', 'Deliverfile') if include_deliverfile
-          if include_metadata
-            files_list.append File.join('fastlane', 'download_metadata.swift')
-            files_list.append File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'Resources', ENV['APP_STORE_STRINGS_FILE_NAME'])
-          end
 
           Fastlane::Helper::GitHelper.commit(message: 'Bump version number', files: files_list)
         end
