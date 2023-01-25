@@ -71,7 +71,7 @@ describe Fastlane::Actions::BuildkiteAnnotateAction do
   end
 
   describe 'annotation deletion' do
-    it 'generates the right command to delete an annotation with no message is provided' do
+    it 'generates the right command to delete an annotation when no message is provided' do
       cmd = run_described_fastlane_action(
         context: 'some ctx',
         message: nil
