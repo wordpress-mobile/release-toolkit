@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Updates `activesupport` to `6.1.7.1`, addressing [a security issue](https://github.com/advisories/GHSA-j6gc-792m-qgm2). This is a major version change, but as the dependency is internal-only, it shouldn't be a breaking change for clients. [#441]
 
 ## 6.3.0
 
