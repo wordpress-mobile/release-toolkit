@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   # since this would cause a circular dependency
 
   # spec.add_dependency 'your-dependency', '~> 1.0.0'
-  spec.add_dependency 'activesupport', '>= 5', '< 8'
+  spec.add_dependency 'activesupport', '>= 6.1.7.1'
   spec.add_dependency 'buildkit', '~> 1.5'
   spec.add_dependency 'chroma', '0.2.0'
   spec.add_dependency 'diffy', '~> 3.3'
@@ -50,7 +50,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'bundler', '~> 2.0'
   spec.add_development_dependency 'cocoapods', '~> 1.10'
-  # Use at least Fastlene 2.210.0 to ensure compatibility with the Xcode 14 toolchain
+  # Use at least Fastlane 2.210.0 to ensure compatibility with the Xcode 14 toolchain
   # See https://github.com/fastlane/fastlane/releases/tag/2.210.0
   spec.add_development_dependency 'fastlane', '~> 2.210'
   spec.add_development_dependency 'pry', '~> 0.12.2'

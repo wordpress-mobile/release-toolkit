@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     fastlane-plugin-wpmreleasetoolkit (6.3.0)
-      activesupport (>= 5, < 8)
+      activesupport (>= 6.1.7.1)
       bigdecimal (~> 1.4)
       buildkit (~> 1.5)
       chroma (= 0.2.0)
