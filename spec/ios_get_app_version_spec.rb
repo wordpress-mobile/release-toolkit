@@ -5,8 +5,8 @@ describe Fastlane::Actions::IosGetAppVersionAction do
     it 'parses the xcconfig file format correctly and gets the public version' do
       xcconfig_mock_content = <<~CONTENT
         // a comment
-        VERSION_SHORT=6
-        VERSION_LONG=6.30.0
+        VERSION_SHORT = 6
+        VERSION_LONG = 6.30.0
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
@@ -16,14 +16,37 @@ describe Fastlane::Actions::IosGetAppVersionAction do
 
     it 'parses the xcconfig file format correctly and gets the public hotfix version' do
       xcconfig_mock_content = <<~CONTENT
-        VERSION_SHORT=6
+        VERSION_SHORT = 6
         // a comment
-        VERSION_LONG=6.30.1
+        VERSION_LONG = 6.30.1
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
 
       expect_version(xcconfig_mock_content: xcconfig_mock_content, expected_version: '6.30.1')
+    end
+
+    it 'throws an error when the file is not found' do
+      file_path = 'file/not/found'
+
+      expect do
+        run_described_fastlane_action(
+          public_version_xcconfig_file: file_path
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError)
+    end
+
+    it "throws an error when there isn't a version configured in the .xcconfig file" do
+      xcconfig_mock_content = <<~CONTENT
+        VERSION_SHORT = 6
+        // a comment
+      CONTENT
+
+      allow(File).to receive(:exist?).and_return(true)
+
+      expect do
+        expect_version(xcconfig_mock_content: xcconfig_mock_content, expected_version: 'n/a')
+      end.to raise_error(FastlaneCore::Interface::FastlaneError)
     end
 
     def expect_version(xcconfig_mock_content:, expected_version:)
