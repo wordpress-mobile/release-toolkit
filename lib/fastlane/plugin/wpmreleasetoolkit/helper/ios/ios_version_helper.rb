@@ -23,6 +23,9 @@ module Fastlane
         #
         def self.get_xcconfig_public_version(xcconfig_file:)
           version = read_long_version_from_config_file(xcconfig_file)
+
+          UI.user_error!(".xcconfig file doesn't have a version configured") if version.nil?
+
           vp = get_version_parts(version)
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
 
@@ -306,15 +309,22 @@ module Fastlane
         # Read the value of a given key from an `.xcconfig` file.
         #
         # @param [String] key The xcconfig key to get the value for
-        # @param [String] filePath The path to the `.xcconfig` file to read the value from
+        # @param [String] file_path The path to the `.xcconfig` file to read the value from
         #
         # @return [String] The value for the given key, or `nil` if the key was not found.
         #
-        def self.read_from_config_file(key, filePath)
-          File.open(filePath, 'r') do |f|
+        def self.read_from_config_file(key, file_path)
+          UI.user_error!("File #{file_path} not found") unless File.exist?(file_path)
+
+          File.open(file_path, 'r') do |f|
             f.each_line do |line|
-              line = line.strip()
-              return line.split('=')[1] if line.start_with?("#{key}=")
+              line.strip!
+              next if line.nil? || line.empty?
+
+              key_value = line.split(/\s*=\s*/)
+              if key_value[0].strip() == key
+                return key_value[1].strip()
+              end
             end
           end
 
