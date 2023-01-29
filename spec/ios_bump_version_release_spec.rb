@@ -11,34 +11,17 @@ describe Fastlane::Actions::IosBumpVersionReleaseAction do
       other_action_mock = double()
       allow(Fastlane::Action).to receive(:other_action).and_return(other_action_mock)
       allow(other_action_mock).to receive(:ensure_git_branch).with(branch: default_branch)
-
-      allow(Fastlane::Helper::GitHelper).to receive(:checkout_and_pull).with(default_branch)
-      allow(Fastlane::Helper::GitHelper).to receive(:create_branch).with("release/#{next_version_short}", from: default_branch)
-
       allow(Fastlane::Helper::Ios::VersionHelper).to receive(:read_from_config_file).and_return(version)
-      allow(Fastlane::Helper::Ios::VersionHelper).to receive(:update_xc_configs).with(next_version, next_version_short, nil)
     end
 
-    it 'does the fastlane deliver update' do
-      skip_deliver = false
+    it 'correctly uses the next version, short and long' do
+      expect(Fastlane::Helper::GitHelper).to receive(:checkout_and_pull).with(default_branch)
+      expect(Fastlane::Helper::GitHelper).to receive(:create_branch).with("release/#{next_version_short}", from: default_branch)
 
-      expect(Fastlane::Helper::Ios::VersionHelper).to receive(:update_fastlane_deliver).with(next_version_short)
-      expect(Fastlane::Helper::Ios::GitHelper).to receive(:commit_version_bump).with(include_deliverfile: !skip_deliver)
-
-      run_described_fastlane_action(
-        skip_deliver: skip_deliver,
-        default_branch: default_branch
-      )
-    end
-
-    it 'skips the fastlane deliver update properly' do
-      skip_deliver = true
-
-      expect(Fastlane::Helper::Ios::VersionHelper).not_to receive(:update_fastlane_deliver)
-      expect(Fastlane::Helper::Ios::GitHelper).to receive(:commit_version_bump).with(include_deliverfile: !skip_deliver)
+      expect(Fastlane::Helper::Ios::VersionHelper).to receive(:update_xc_configs).with(next_version, next_version_short, nil)
+      expect(Fastlane::Helper::Ios::GitHelper).to receive(:commit_version_bump)
 
       run_described_fastlane_action(
-        skip_deliver: skip_deliver,
         default_branch: default_branch
       )
     end

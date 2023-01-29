@@ -215,20 +215,6 @@ module Fastlane
           return verified_version
         end
 
-        # Updates the `app_version` entry in the `Deliverfile`
-        #
-        # @param [String] new_version The new value to set the `app_version` entry to.
-        # @raise [UserError] If the Deliverfile was not found.
-        #
-        def self.update_fastlane_deliver(new_version)
-          fd_file = './fastlane/Deliverfile'
-          if File.exist?(fd_file)
-            Action.sh("sed -i '' \"s/app_version.*/app_version \\\"#{new_version}\\\"/\" #{fd_file}")
-          else
-            UI.user_error!("Can't find #{fd_file}.")
-          end
-        end
-
         # Update the `.xcconfig` files (the public one, and the internal one if it exists) with the new version strings.
         #
         # @env PUBLIC_CONFIG_FILE The path to the xcconfig file containing the public version numbers.
