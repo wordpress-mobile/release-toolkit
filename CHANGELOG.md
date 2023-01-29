@@ -7,6 +7,7 @@
 ### Breaking Changes
 
 - Remove the `skip_glotpress` parameter from the `ios_bump_version_release` action [#443]
+- Remove the actions `ios_localize_project` and `ios_update_metadata`
 
 ### New Features
 
