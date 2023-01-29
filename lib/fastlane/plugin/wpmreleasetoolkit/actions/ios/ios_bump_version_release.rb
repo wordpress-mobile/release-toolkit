@@ -21,17 +21,11 @@ module Fastlane
         Fastlane::Helper::GitHelper.create_branch(@new_release_branch, from: default_branch)
         UI.message 'Done!'
 
-        UI.message 'Updating Fastlane deliver file...' unless params[:skip_deliver]
-        Fastlane::Helper::Ios::VersionHelper.update_fastlane_deliver(@new_short_version) unless params[:skip_deliver]
-        UI.message 'Done!' unless params[:skip_deliver]
-
         UI.message 'Updating XcConfig...'
         Fastlane::Helper::Ios::VersionHelper.update_xc_configs(@new_version, @new_short_version, @new_version_internal)
         UI.message 'Done!'
 
-        Fastlane::Helper::Ios::GitHelper.commit_version_bump(
-          include_deliverfile: !params[:skip_deliver]
-        )
+        Fastlane::Helper::Ios::GitHelper.commit_version_bump()
 
         UI.message 'Done.'
       end
@@ -50,11 +44,6 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :skip_deliver,
-                                       env_name: 'FL_IOS_CODEFREEZE_BUMP_SKIPDELIVER',
-                                       description: 'Skips Deliver key update',
-                                       type: Boolean,
-                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :default_branch,
                                        env_name: 'FL_RELEASE_TOOLKIT_DEFAULT_BRANCH',
                                        description: 'Default branch of the repository',
