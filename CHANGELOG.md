@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-_None_
+- Remove the `skip_glotpress` parameter from the `ios_bump_version_release` action [#443]
 
 ### New Features
 
