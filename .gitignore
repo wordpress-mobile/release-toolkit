@@ -4,6 +4,9 @@
 # JetBrains IDE files
 .idea
 
+# VSCode IDE files
+.vscode
+
 # Ruby / Bundler
 vendor/bundle
 
