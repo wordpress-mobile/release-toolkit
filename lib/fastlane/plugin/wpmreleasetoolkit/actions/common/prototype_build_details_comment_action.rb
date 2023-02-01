@@ -13,7 +13,7 @@ module Fastlane
         qr_code_url = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=#{CGI.escape(install_url)}&choe=UTF-8"
 
         metadata_rows = metadata.map do |key, value|
-          "<tr><td><b>#{key}</b></td><td><tt>#{value}</tt></td></tr>"
+          "<tr><td><b>#{key}</b></td><td>#{value}</td></tr>"
         end.join("\n")
 
         <<~COMMENT_BODY
