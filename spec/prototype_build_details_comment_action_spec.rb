@@ -114,8 +114,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         appcenter_app_name: 'BestApp',
         appcenter_release_id: 8888,
         download_url: 'https://bestfront.cloudfront.net/feed42/bestapp-pr1357-a1b2c3f.apk',
-        metadata: metadata,
-        footnote: '<em>Note: Google Sign-In in not available in those builds</em>'
+        metadata: metadata
       )
 
       expect(comment).to eq <<~EXPECTED_COMMENT
@@ -131,7 +130,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         <tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/BestOrg/apps/BestApp/releases/8888'>Build \#8888</a></td></tr>
         <tr><td><b>Commit</b></td><td><tt>a1b2c3f</tt></td></tr>
         </table>
-        <em>Note: Google Sign-In in not available in those builds</em>
+        <em>Automatticians: You can use our internal self-serve MC tool to give yourself access to App Center if needed.</em>
       EXPECTED_COMMENT
     end
 
@@ -146,7 +145,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
       comment = run_described_fastlane_action(
         appcenter_org_name: 'BestOrg',
         appcenter_app_name: 'BestApp',
-        appcenter_release_id: 8888,
+        appcenter_release_id: 1234,
         fold: true,
         metadata: metadata,
         footnote: '<em>Note: Google Sign-In in not available in those builds</em>'
@@ -156,14 +155,14 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         <details><summary>📲 You can test the changes from this Pull Request by scanning the QR code below with your phone to install the corresponding <strong>BestApp</strong> build from App Center.</summary>
         <table>
         <tr>
-          <td rowspan='7'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FBestApp%2Freleases%2F8888&choe=UTF-8' width='250' height='250' /></td>
+          <td rowspan='7'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FBestApp%2Freleases%2F1234&choe=UTF-8' width='250' height='250' /></td>
           <td width='150px'><b>App</b></td><td><tt>BestApp</tt></td>
         </tr>
         <tr><td><b>Version:Short</b></td><td>28.2</td></tr>
         <tr><td><b>Version:Long</b></td><td>28.2.0.108</td></tr>
         <tr><td><b>Flavor</b></td><td>Celray</td></tr>
         <tr><td><b>Configuration</b></td><td>Debug</td></tr>
-        <tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/BestOrg/apps/BestApp/releases/8888'>Build \#8888</a></td></tr>
+        <tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/BestOrg/apps/BestApp/releases/1234'>Build \#1234</a></td></tr>
         <tr><td><b>Commit</b></td><td><tt>a1b2c3f</tt></td></tr>
         </table>
         <em>Note: Google Sign-In in not available in those builds</em>
