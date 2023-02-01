@@ -6,18 +6,16 @@ module Fastlane
         appcenter_app_name = params[:appcenter_app_name]
         appcenter_release_id = params[:appcenter_release_id]
         commit = params[:commit] || other_action.last_git_commit[:abbreviated_commit_hash]
-
         metadata = params[:metadata] # e.g. {'Build Config':… , 'Version': …, 'Short Version': …}
 
         install_url = "https://install.appcenter.ms/orgs/#{appcenter_org_name}/apps/#{appcenter_app_name}/releases/#{appcenter_release_id}"
         qr_code_url = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=#{CGI.escape(install_url)}&choe=UTF-8"
-
         metadata_rows = metadata.map do |key, value|
           "<tr><td><b>#{key}</b></td><td>#{value}</td></tr>"
         end.join("\n")
 
-        <<~COMMENT_BODY
-          <p>📲 You can test the changes from this Pull Request by scanning the QR code below with your phone to install the corresponding <strong>#{appcenter_app_name}</strong> build from App Center.</p>
+        intro = "📲 You can test the changes from this Pull Request by scanning the QR code below with your phone to install the corresponding <strong>#{appcenter_app_name}</strong> build from App Center."
+        body = <<~COMMENT_BODY
           <table>
           <tr>
             <td rowspan='#{metadata.count + 3}'><img src='#{qr_code_url}' width='250' height='250' /></td>
@@ -29,6 +27,12 @@ module Fastlane
           </table>
           #{params[:footnote]}
         COMMENT_BODY
+
+        if params[:fold]
+          "<details>#{intro}</details>\n<summary>\n#{body}</summary>\n"
+        else
+          "<p>#{intro}</p>\n#{body}"
+        end
       end
 
       #####################################################
@@ -58,6 +62,13 @@ module Fastlane
             env_name: 'FL_PROTOTYPE_BUILD_APPCENTER_RELEASE_ID',
             description: 'The release ID/Number in App Center',
             type: Integer
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :fold,
+            env_name: 'FL_PROTOTYPE_BUILD_DETAILS_COMMENT_FOLD',
+            description: 'If true, will wrap the HTML table inside a <details> block (hidden by default)',
+            type: Boolean,
+            default_value: false
           ),
           FastlaneCore::ConfigItem.new(
             key: :metadata,
