@@ -36,7 +36,7 @@ module Fastlane
         COMMENT_BODY
 
         if params[:fold]
-          "<details>#{intro}</details>\n<summary>\n#{body}</summary>\n"
+          "<details><summary>#{intro}</summary>\n#{body}</details>\n"
         else
           "<p>#{intro}</p>\n#{body}"
         end

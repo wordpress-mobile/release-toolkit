@@ -153,8 +153,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
       )
 
       expect(comment).to eq <<~EXPECTED_COMMENT
-        <details>📲 You can test the changes from this Pull Request by scanning the QR code below with your phone to install the corresponding <strong>BestApp</strong> build from App Center.</details>
-        <summary>
+        <details><summary>📲 You can test the changes from this Pull Request by scanning the QR code below with your phone to install the corresponding <strong>BestApp</strong> build from App Center.</summary>
         <table>
         <tr>
           <td rowspan='7'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FBestApp%2Freleases%2F8888&choe=UTF-8' width='250' height='250' /></td>
@@ -168,7 +167,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         <tr><td><b>Commit</b></td><td><tt>a1b2c3f</tt></td></tr>
         </table>
         <em>Note: Google Sign-In in not available in those builds</em>
-        </summary>
+        </details>
       EXPECTED_COMMENT
     end
   end
