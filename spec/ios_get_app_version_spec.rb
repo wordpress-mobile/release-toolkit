@@ -9,8 +9,6 @@ describe Fastlane::Actions::IosGetAppVersionAction do
         VERSION_LONG = 6.30.0
       CONTENT
 
-      allow(File).to receive(:exist?).and_return(true)
-
       expect_version(xcconfig_mock_content: xcconfig_mock_content, expected_version: '6.30')
     end
 
@@ -20,8 +18,6 @@ describe Fastlane::Actions::IosGetAppVersionAction do
         // a comment
         VERSION_LONG = 6.30.1
       CONTENT
-
-      allow(File).to receive(:exist?).and_return(true)
 
       expect_version(xcconfig_mock_content: xcconfig_mock_content, expected_version: '6.30.1')
     end
@@ -42,23 +38,21 @@ describe Fastlane::Actions::IosGetAppVersionAction do
         // a comment
       CONTENT
 
-      allow(File).to receive(:exist?).and_return(true)
-
       expect do
         expect_version(xcconfig_mock_content: xcconfig_mock_content, expected_version: 'n/a')
       end.to raise_error(FastlaneCore::Interface::FastlaneError)
     end
 
     def expect_version(xcconfig_mock_content:, expected_version:)
-      xcconfig_mock_file_path = File.join('mock', 'file', 'path')
+      allow(File).to receive(:exist?).and_return(true)
 
-      allow(File).to receive(:open).with(xcconfig_mock_file_path, 'r').and_yield(StringIO.new(xcconfig_mock_content))
+      with_tmp_file(named: 'mock_xcconfig.xcconfig', content: xcconfig_mock_content) do |tmp_file_path|
+        version_result = run_described_fastlane_action(
+          public_version_xcconfig_file: tmp_file_path
+        )
 
-      version_result = run_described_fastlane_action(
-        public_version_xcconfig_file: xcconfig_mock_file_path
-      )
-
-      expect(version_result).to eq(expected_version)
+        expect(version_result).to eq(expected_version)
+      end
     end
   end
 end
