@@ -87,7 +87,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
       )
 
       expect(comment).to eq <<~EXPECTED_COMMENT
-        <p>📲 You can test the changes from this Pull Request by scanning the QR code below with your phone to install the corresponding <strong>BestApp</strong> build from App Center.</p>
+        <p>📲 You can test the changes from this Pull Request in <strong>BestApp</strong> by scanning the QR code below to install the corresponding build via App Center.</p>
         <table>
         <tr>
           <td rowspan='6'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FBestApp%2Freleases%2F8888&choe=UTF-8' width='250' height='250' /></td>
@@ -118,7 +118,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
       )
 
       expect(comment).to eq <<~EXPECTED_COMMENT
-        <p>📲 You can test the changes from this Pull Request by scanning the QR code below with your phone to install the corresponding <strong>BestApp</strong> build from App Center.</p>
+        <p>📲 You can test the changes from this Pull Request in <strong>BestApp</strong> by scanning the QR code below to install the corresponding build via App Center.</p>
         <table>
         <tr>
           <td rowspan='6'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FBestApp%2Freleases%2F8888&choe=UTF-8' width='250' height='250' /></td>
@@ -152,7 +152,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
       )
 
       expect(comment).to eq <<~EXPECTED_COMMENT
-        <details><summary>📲 You can test the changes from this Pull Request by scanning the QR code below with your phone to install the corresponding <strong>BestApp</strong> build from App Center.</summary>
+        <details><summary>📲 You can test the changes from this Pull Request in <strong>BestApp</strong> by scanning the QR code below to install the corresponding build via App Center.</summary>
         <table>
         <tr>
           <td rowspan='7'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FBestApp%2Freleases%2F1234&choe=UTF-8' width='250' height='250' /></td>

@@ -21,7 +21,7 @@ module Fastlane
           "<tr><td><b>#{key}</b></td><td>#{value}</td></tr>"
         end
 
-        intro = "📲 You can test the changes from this Pull Request by scanning the QR code below with your phone to install the corresponding <strong>#{appcenter_app_name}</strong> build from App Center."
+        intro = "📲 You can test the changes from this Pull Request in <strong>#{appcenter_app_name}</strong> by scanning the QR code below to install the corresponding build via App Center."
         body = <<~COMMENT_BODY
           <table>
           <tr>
