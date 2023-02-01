@@ -1,3 +1,5 @@
+require 'xcodeproj'
+
 module Fastlane
   module Helper
     module Ios
@@ -300,21 +302,10 @@ module Fastlane
         # @return [String] The value for the given key, or `nil` if the key was not found.
         #
         def self.read_from_config_file(key, file_path)
-          UI.user_error!("File #{file_path} not found") unless File.exist?(file_path)
+          UI.user_error!(".xcconfig file #{file_path} not found") unless File.exist?(file_path)
 
-          File.open(file_path, 'r') do |f|
-            f.each_line do |line|
-              line.strip!
-              next if line.nil? || line.empty?
-
-              key_value = line.split(/\s*=\s*/)
-              if key_value[0].strip() == key
-                return key_value[1].strip()
-              end
-            end
-          end
-
-          return nil
+          config = Xcodeproj::Config.new(file_path)
+          config.attributes[key]
         end
 
         # Ensure that the version provided is only composed of number parts and return the validated string
