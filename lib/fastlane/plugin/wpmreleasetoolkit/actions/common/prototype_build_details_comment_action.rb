@@ -67,7 +67,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :appcenter_release_id,
             env_name: 'FL_PROTOTYPE_BUILD_APPCENTER_RELEASE_ID',
-            description: 'The release ID/Number in App Center',
+            description: "The release ID/Number in App Center; can be obtained using `lane_context[SharedValues::APPCENTER_BUILD_INFORMATION]['id']`",
             type: Integer
           ),
           FastlaneCore::ConfigItem.new(
