@@ -10,7 +10,8 @@
 
 ### New Features
 
-_None_
+- Add new `buildkite_annotate` action to add/remove annotations from the current build. [#442]
+- Add new `buildkite_metadata` action to set/get metadata from the current build. [#442]
 
 ### Bug Fixes
 
@@ -24,7 +25,7 @@ _None_
 
 ### New Features
 
-- Added Mac support to all `common` actions and any relevant `ios` actions [#439]
+- Add Mac support to all `common` actions and any relevant `ios` actions [#439]
 
 ## 6.2.0
 
