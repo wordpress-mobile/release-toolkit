@@ -1,0 +1,94 @@
+require_relative './spec_helper'
+
+describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
+  before do
+    ENV['APPCENTER_OWNER_NAME'] = 'My-Org'
+    ENV['BUILDKITE_COMMIT'] = 'a1b2c3f'
+  end
+
+  it 'generates the proper AppCenter link and QR code given an org, app name and release ID' do
+    comment = run_described_fastlane_action(
+      appcenter_app_name: 'MyApp',
+      appcenter_release_id: 1337
+    )
+    expect(comment).to include "<a href='https://install.appcenter.ms/orgs/My-Org/apps/MyApp/releases/1337'>Build #1337</a>"
+    expect(comment).to include 'https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FMy-Org%2Fapps%2FMyApp%2Freleases%2F1337&choe=UTF-8'
+  end
+
+  it 'includes the commit as part of the default rows' do
+    comment = run_described_fastlane_action(
+      appcenter_app_name: 'MyApp',
+      appcenter_release_id: 1337
+    )
+    expect(comment).to include '<td><b>Commit</b></td><td><tt>a1b2c3f</tt></td>'
+  end
+
+  it 'correctly includes additional metadata when some are provided' do
+    metadata = {
+      'Version:Short': '28.1',
+      'Version:Long': '281003',
+      'Build Config': 'Prototype'
+    }
+    comment = run_described_fastlane_action(
+      appcenter_app_name: 'MyApp',
+      appcenter_release_id: 1337,
+      metadata: metadata
+    )
+    expect(comment).to include "<td rowspan='6'>"
+    expect(comment).to include '<td><b>Version:Short</b></td><td><tt>28.1</tt></td>'
+    expect(comment).to include '<td><b>Version:Long</b></td><td><tt>281003</tt></td>'
+    expect(comment).to include '<td><b>Build Config</b></td><td><tt>Prototype</tt></td>'
+  end
+
+  it 'includes the default footnote by default' do
+    comment = run_described_fastlane_action(
+      appcenter_org_name: 'BestOrg',
+      appcenter_app_name: 'MyApp',
+      appcenter_release_id: 1337
+    )
+    expect(comment).to include '<em>Automatticians: You can use our internal self-serve MC tool to give yourself access to App Center if needed.</em>'
+  end
+
+  it 'includes the provided footnote if any' do
+    comment = run_described_fastlane_action(
+      appcenter_app_name: 'MyApp',
+      appcenter_release_id: 1337,
+      footnote: '<em>Note that Google Sign-In in not available in those builds</em>'
+    )
+    expect(comment).to include '<em>Note that Google Sign-In in not available in those builds</em>'
+  end
+
+  it 'generates a fully formatted HTML comment with all the information provided' do
+    metadata = {
+      'Version:Short': '28.2',
+      'Version:Long': '28.2.0.108',
+      Flavor: 'Celray',
+      Panel: false
+    }
+
+    comment = run_described_fastlane_action(
+      appcenter_org_name: 'BestOrg',
+      appcenter_app_name: 'BestApp',
+      appcenter_release_id: 8888,
+      metadata: metadata,
+      footnote: '<em>Note: Google Sign-In in not available in those builds</em>'
+    )
+
+    expect(comment).to eq <<~EXPECTED_COMMENT
+      <p>📲 You can test the changes from this Pull Request by scanning the QR code below with your phone to install the corresponding <strong>BestApp</strong> build from App Center.</p>
+      <table>
+      <tr>
+        <td rowspan='7'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FBestApp%2Freleases%2F8888&choe=UTF-8' width='250' height='250' /></td>
+        <td width='150px'><b>App</b></td><td><tt>BestApp</tt></td>
+      </tr>
+      <tr><td><b>Version:Short</b></td><td><tt>28.2</tt></td></tr>
+      <tr><td><b>Version:Long</b></td><td><tt>28.2.0.108</tt></td></tr>
+      <tr><td><b>Flavor</b></td><td><tt>Celray</tt></td></tr>
+      <tr><td><b>Panel</b></td><td><tt>false</tt></td></tr>
+      <tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/BestOrg/apps/BestApp/releases/8888'>Build \#8888</a></td></tr>
+      <tr><td><b>Commit</b></td><td><tt>a1b2c3f</tt></td></tr>
+      </table>
+      <em>Note: Google Sign-In in not available in those builds</em>
+    EXPECTED_COMMENT
+  end
+end
