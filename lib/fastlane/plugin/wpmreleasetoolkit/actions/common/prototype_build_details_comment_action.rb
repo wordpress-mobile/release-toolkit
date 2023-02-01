@@ -26,7 +26,7 @@ module Fastlane
           <table>
           <tr>
             <td rowspan='#{metadata.count + 3}'><img src='#{qr_code_url}' width='250' height='250' /></td>
-            <td width='150px'><b>App</b></td><td><tt>#{appcenter_app_name}</tt></td>
+            <td width='150px'><b>App Name</b></td><td><tt>#{appcenter_app_name}</tt></td>
           </tr>
           #{metadata_rows.join("\n")}
           <tr><td><b>App Center Build</b></td><td><a href='#{install_url}'>Build \##{appcenter_release_id}</a></td></tr>

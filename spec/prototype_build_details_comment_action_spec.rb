@@ -91,7 +91,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         <table>
         <tr>
           <td rowspan='6'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FBestApp%2Freleases%2F8888&choe=UTF-8' width='250' height='250' /></td>
-          <td width='150px'><b>App</b></td><td><tt>BestApp</tt></td>
+          <td width='150px'><b>App Name</b></td><td><tt>BestApp</tt></td>
         </tr>
         <tr><td><b>Version:Short</b></td><td>28.2</td></tr>
         <tr><td><b>Version:Long</b></td><td>28.2.0.108</td></tr>
@@ -122,7 +122,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         <table>
         <tr>
           <td rowspan='6'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FBestApp%2Freleases%2F8888&choe=UTF-8' width='250' height='250' /></td>
-          <td width='150px'><b>App</b></td><td><tt>BestApp</tt></td>
+          <td width='150px'><b>App Name</b></td><td><tt>BestApp</tt></td>
         </tr>
         <tr><td><b>Version:Short</b></td><td>28.2</td></tr>
         <tr><td><b>Version:Long</b></td><td>28.2.0.108</td></tr>
@@ -156,7 +156,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         <table>
         <tr>
           <td rowspan='7'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FBestApp%2Freleases%2F1234&choe=UTF-8' width='250' height='250' /></td>
-          <td width='150px'><b>App</b></td><td><tt>BestApp</tt></td>
+          <td width='150px'><b>App Name</b></td><td><tt>BestApp</tt></td>
         </tr>
         <tr><td><b>Version:Short</b></td><td>28.2</td></tr>
         <tr><td><b>Version:Long</b></td><td>28.2.0.108</td></tr>
