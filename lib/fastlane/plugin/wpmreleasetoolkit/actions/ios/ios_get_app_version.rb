@@ -24,7 +24,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(
             key: :public_version_xcconfig_file,
-            env_name: 'FL_IOS_GET_APP_VERSION_PUBLIC_VERSION_XCCONFIG_FILE',
+            env_name: 'FL_IOS_PUBLIC_VERSION_XCCONFIG_FILE',
             description: 'Path to the .xcconfig file containing the public app version',
             type: String,
             optional: false
