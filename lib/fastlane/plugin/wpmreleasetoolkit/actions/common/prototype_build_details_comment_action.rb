@@ -102,7 +102,8 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :commit,
-            env_name: 'BUILDKITE_COMMIT',
+            # Buildkite ENV var: https://buildkite.com/docs/pipelines/environment-variables#BUILDKITE_COMMIT
+            env_names: ['BUILDKITE_COMMIT'], # Feel free to add more CI-specific env vars for other CI providers
             description: 'The commit this prototype build was build from; usually not passed explicitly, but derived from the environment variable instead',
             type: String,
             optional: true
