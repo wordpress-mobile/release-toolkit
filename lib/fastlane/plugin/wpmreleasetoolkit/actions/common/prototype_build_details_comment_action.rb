@@ -47,7 +47,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Generates the nicely-formatted string providing all the details of a prototype build, ready to be used as a PR comment (e.g. via `comment_on_pr`).'
+        'Generates a string providing all the details of a prototype build, nicely-formatted and ready to be used as a PR comment (e.g. via `comment_on_pr`).'
       end
 
       def self.available_options
