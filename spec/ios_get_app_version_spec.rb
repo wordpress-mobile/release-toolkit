@@ -44,8 +44,6 @@ describe Fastlane::Actions::IosGetAppVersionAction do
     end
 
     def expect_version(xcconfig_mock_content:, expected_version:)
-      allow(File).to receive(:exist?).and_return(true)
-
       with_tmp_file(named: 'mock_xcconfig.xcconfig', content: xcconfig_mock_content) do |tmp_file_path|
         version_result = run_described_fastlane_action(
           public_version_xcconfig_file: tmp_file_path
