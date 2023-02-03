@@ -11,7 +11,7 @@ module Fastlane
         metadata = params[:metadata] # e.g. {'Build Config':… , 'Version': …, 'Short Version': …}
         direct_link = params[:download_url]
         unless direct_link.nil?
-          metadata['Direct Link'] = "<a href='#{direct_link}'><tt>#{File.basename(direct_link)}</tt></a>"
+          metadata['Direct Link'] = "<a href='#{direct_link}'><code>#{File.basename(direct_link)}</code></a>"
         end
 
         # Build the comment parts
@@ -26,11 +26,11 @@ module Fastlane
           <table>
           <tr>
             <td rowspan='#{metadata.count + 3}'><img src='#{qr_code_url}' width='250' height='250' /></td>
-            <td width='150px'><b>App Name</b></td><td><tt>#{appcenter_app_name}</tt></td>
+            <td width='150px'><b>App Name</b></td><td><code>#{appcenter_app_name}</code></td>
           </tr>
           #{metadata_rows.join("\n")}
           <tr><td><b>App Center Build</b></td><td><a href='#{install_url}'>Build \##{appcenter_release_id}</a></td></tr>
-          <tr><td><b>Commit</b></td><td><tt>#{commit}</tt></td></tr>
+          <tr><td><b>Commit</b></td><td><code>#{commit}</code></td></tr>
           </table>
           #{params[:footnote]}
         COMMENT_BODY
