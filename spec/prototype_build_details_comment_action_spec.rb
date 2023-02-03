@@ -7,7 +7,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
   end
 
   describe 'expected info is included' do
-    it 'generates the proper AppCenter link and QR code given an org, app name and release ID' do
+    it 'generates the proper App Center link and QR code given an org, app name and release ID' do
       comment = run_described_fastlane_action(
         appcenter_app_name: 'MyApp',
         appcenter_release_id: 1337
