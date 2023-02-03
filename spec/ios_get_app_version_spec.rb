@@ -22,6 +22,37 @@ describe Fastlane::Actions::IosGetAppVersionAction do
       expect_version(xcconfig_mock_content: xcconfig_mock_content, expected_version: '6.30.1')
     end
 
+    it 'parses the xcconfig with keys without spacing and gets the public version' do
+      xcconfig_mock_content = <<~CONTENT
+        // a comment
+        VERSION_SHORT=6
+        VERSION_LONG=6.30.0
+      CONTENT
+
+      expect_version(xcconfig_mock_content: xcconfig_mock_content, expected_version: '6.30')
+    end
+
+    it 'parses the xcconfig with keys without spacing and gets the public hotfix version' do
+      xcconfig_mock_content = <<~CONTENT
+        VERSION_SHORT=6
+        // a comment
+        VERSION_LONG=6.30.1
+      CONTENT
+
+      expect_version(xcconfig_mock_content: xcconfig_mock_content, expected_version: '6.30.1')
+    end
+
+    it 'fails to extract the version from an xcconfig file with an invalid format' do
+      xcconfig_mock_content = <<~CONTENT
+        VERSION_SHORT = 6
+        VERSION_LONG 6.30.1
+      CONTENT
+
+      expect do
+        expect_version(xcconfig_mock_content: xcconfig_mock_content, expected_version: 'n/a')
+      end.to raise_error(FastlaneCore::Interface::FastlaneError)
+    end
+
     it 'throws an error when the file is not found' do
       file_path = 'file/not/found'
 
