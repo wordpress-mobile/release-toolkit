@@ -26,11 +26,11 @@ module Fastlane
           <table>
           <tr>
             <td rowspan='#{metadata.count + 3}'><img src='#{qr_code_url}' width='250' height='250' /></td>
-            <td width='150px'><b>App Name</b></td><td><code>#{appcenter_app_name}</code></td>
+            <td width='150px'><b>App Name</b></td><td>#{appcenter_app_name}</td>
           </tr>
           #{metadata_rows.join("\n")}
           <tr><td><b>App Center Build</b></td><td><a href='#{install_url}'>Build \##{appcenter_release_id}</a></td></tr>
-          <tr><td><b>Commit</b></td><td><code>#{commit}</code></td></tr>
+          <tr><td><b>Commit</b></td><td>#{commit}</td></tr>
           </table>
           #{params[:footnote]}
         COMMENT_BODY
