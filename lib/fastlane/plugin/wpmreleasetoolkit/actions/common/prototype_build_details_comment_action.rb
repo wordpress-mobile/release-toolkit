@@ -15,7 +15,7 @@ module Fastlane
         app_center_release_id = params[:app_center_release_id] || app_center_info['id']
 
         # Consolidate the list of Metadata to display with some implicit metadata if available
-        metadata = params[:metadata] || {}
+        metadata = params[:metadata]&.transform_keys(&:to_s) || {}
         metadata['Build Number'] ||= app_center_info['version']
         metadata['Version'] ||= app_center_info['short_version']
         metadata[app_center_info['app_os'] == 'Android' ? 'Application ID' : 'Bundle ID'] = app_center_info['bundle_identifier']
@@ -39,12 +39,12 @@ module Fastlane
         icon_img_tag = img_tag(params[:app_icon] || app_center_info['app_icon_url'], alt: app_display_name)
         metadata_rows = metadata.compact.map { |key, value| "<tr><td><b>#{key}</b></td><td>#{value}</td></tr>" }
         intro = "#{icon_img_tag}📲 You can test the changes from this Pull Request in <b>#{app_display_name}</b> by scanning the QR code below to install the corresponding build."
-        footnote = params[:footnote] || (app_center_info.nil? ? '' : '<em>Automatticians: You can use our internal self-serve MC tool to give yourself access to App Center if needed.</em>')
+        footnote = params[:footnote] || (app_center_org_name.nil? ? '' : '<em>Automatticians: You can use our internal self-serve MC tool to give yourself access to App Center if needed.</em>')
         body = <<~COMMENT_BODY
           <table>
           <tr>
             <td rowspan='#{metadata_rows.count + 1}' width='260px'><img src='#{qr_code_url}' width='250' height='250' /></td>
-            <td width='150px'><b>App Name</b></td><td>#{icon_img_tag} #{app_display_name}</td>
+            <td><b>App Name</b></td><td>#{icon_img_tag} #{app_display_name}</td>
           </tr>
           #{metadata_rows.join("\n")}
           </table>
