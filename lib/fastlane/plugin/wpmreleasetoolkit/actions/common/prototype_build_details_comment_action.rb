@@ -5,7 +5,11 @@ module Fastlane
         app_display_name = params[:app_display_name]
 
         app_center_org_name = params[:app_center_org_name]
-        app_center_info = app_center_org_name.nil? ? {} : lane_context[SharedValues::APPCENTER_BUILD_INFORMATION] || {}
+        app_center_info = if app_center_org_name && defined?(SharedValues::APPCENTER_BUILD_INFORMATION)
+                            lane_context[SharedValues::APPCENTER_BUILD_INFORMATION] || {}
+                          else
+                            {}
+                          end
         app_center_app_name = params[:app_center_app_name] || app_center_info['app_name']
         app_center_app_display_name = app_center_info['app_display_name'] || app_center_app_name
         app_center_release_id = params[:app_center_release_id] || app_center_info['id']
@@ -39,7 +43,7 @@ module Fastlane
         body = <<~COMMENT_BODY
           <table>
           <tr>
-            <td rowspan='#{metadata.count + 1}' width='260px'><img src='#{qr_code_url}' width='250' height='250' /></td>
+            <td rowspan='#{metadata_rows.count + 1}' width='260px'><img src='#{qr_code_url}' width='250' height='250' /></td>
             <td width='150px'><b>App Name</b></td><td>#{icon_img_tag} #{app_display_name}</td>
           </tr>
           #{metadata_rows.join("\n")}
