@@ -276,7 +276,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
 
     before do
       stub_const('Fastlane::Actions::SharedValues::APPCENTER_BUILD_INFORMATION', :fake_app_center_build_info)
-      allow(described_class).to receive(:lane_context).and_return({ fake_app_center_build_info: fake_lane_context })
+      allow(Fastlane::Actions).to receive(:lane_context).and_return({ fake_app_center_build_info: fake_lane_context })
     end
 
     describe 'checking specific content is present' do

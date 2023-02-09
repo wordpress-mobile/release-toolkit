@@ -3,25 +3,17 @@ module Fastlane
     class PrototypeBuildDetailsCommentAction < Action
       def self.run(params)
         app_display_name = params[:app_display_name]
-
-        app_center_org_name = params[:app_center_org_name]
-        app_center_info = extract_app_center_info(app_center_org_name)
-        app_center_app_name = params[:app_center_app_name] || app_center_info['app_name']
-        app_center_app_display_name = app_center_info['app_display_name'] || app_center_app_name
-        app_center_release_id = params[:app_center_release_id] || app_center_info['id']
-
-        # Assemble explicit metadata passed as params with implicit metadata derived from App Center params or lane_context
+        app_center_info = AppCenterInfo.from_params(params)
         metadata = consolidate_metadata(params, app_center_info)
 
-        # Installation Link(s) -- either download_url param, or App Center Build link, or both
-        qr_code_url, extra_metadata = build_install_links(params[:download_url], app_center_org_name, app_center_app_name, app_center_app_display_name, app_center_release_id)
+        qr_code_url, extra_metadata = build_install_links(app_center_info, params[:download_url])
         metadata.merge!(extra_metadata)
 
         # Build the comment parts
-        icon_img_tag = img_tag(params[:app_icon] || app_center_info['app_icon_url'], alt: app_display_name)
+        icon_img_tag = img_tag(params[:app_icon] || app_center_info.icon, alt: app_display_name)
         metadata_rows = metadata.compact.map { |key, value| "<tr><td><b>#{key}</b></td><td>#{value}</td></tr>" }
         intro = "#{icon_img_tag}📲 You can test the changes from this Pull Request in <b>#{app_display_name}</b> by scanning the QR code below to install the corresponding build."
-        footnote = params[:footnote] || (app_center_org_name.nil? ? '' : DEFAULT_APP_CENTER_FOOTNOTE)
+        footnote = params[:footnote] || (app_center_info.org_name.nil? ? '' : DEFAULT_APP_CENTER_FOOTNOTE)
         body = <<~COMMENT_BODY
           <table>
           <tr>
@@ -52,40 +44,80 @@ module Fastlane
 
       DEFAULT_APP_CENTER_FOOTNOTE = '<em>Automatticians: You can use our internal self-serve MC tool to give yourself access to App Center if needed.</em>'.freeze
 
-      def self.extract_app_center_info(app_center_org_name)
-        if app_center_org_name && defined?(SharedValues::APPCENTER_BUILD_INFORMATION)
-          lane_context[SharedValues::APPCENTER_BUILD_INFORMATION] || {}
-        else
-          {}
+      # A small model struct to consolidate and pack all the values related to App Center
+      #
+      AppCenterInfo = Struct.new(:org_name, :app_name, :display_name, :release_id, :icon, :version, :short_version, :os, :bundle_id) do
+        # A method to construct an AppCenterInfo instance from the action params, and infer the rest from the `lane_context` if available
+        def self.from_params(params)
+          org_name = params[:app_center_org_name]
+          ctx = if org_name && defined?(SharedValues::APPCENTER_BUILD_INFORMATION)
+                  Fastlane::Actions.lane_context[SharedValues::APPCENTER_BUILD_INFORMATION] || {}
+                else
+                  {}
+                end
+          app_name = params[:app_center_app_name] || ctx['app_name']
+          new(
+            org_name,
+            app_name,
+            ctx['app_display_name'] || app_name,
+            params[:app_center_release_id] || ctx['id'],
+            ctx['app_icon_url'],
+            ctx['version'],
+            ctx['short_version'],
+            ctx['app_os'],
+            ctx['bundle_identifier']
+          )
         end
       end
 
-      def self.build_install_links(download_url, app_center_org_name, app_center_app_name, app_center_app_display_name, app_center_release_id)
+      # Builds the installation link, QR code URL and extra metadata for download links from the available info
+      #
+      # @param [AppCenterInfo] app_center_info The struct containing all the values related to App Center info
+      # @param [String] download_url The `download_url` parameter passed to the action, if one exists
+      # @return [(String, Hash<String,String>)] A tuple containing:
+      #   - The URL for the QR Code
+      #   - A Hash of the extra metadata key/value pairs to add to the existing metadata, to enrich them with download/install links
+      #
+      def self.build_install_links(app_center_info, download_url)
         install_url = nil
         extra_metadata = {}
         if download_url
           install_url = download_url
           extra_metadata['Direct Download'] = "<a href='#{install_url}'><code>#{File.basename(install_url)}</code></a>"
         end
-        if app_center_org_name && app_center_app_name
-          install_url = "https://install.appcenter.ms/orgs/#{app_center_org_name}/apps/#{app_center_app_name}/releases/#{app_center_release_id}"
-          extra_metadata['App Center Build'] = "<a href='#{install_url}'>#{app_center_app_display_name} \##{app_center_release_id}</a>"
+        if app_center_info.org_name && app_center_info.app_name
+          install_url = "https://install.appcenter.ms/orgs/#{app_center_info.org_name}/apps/#{app_center_info.app_name}/releases/#{app_center_info.release_id}"
+          extra_metadata['App Center Build'] = "<a href='#{install_url}'>#{app_center_info.display_name} \##{app_center_info.release_id}</a>"
         end
         UI.user_error!(NO_INSTALL_URL_ERROR_MESSAGE) if install_url.nil?
         qr_code_url = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=#{CGI.escape(install_url)}&choe=UTF-8"
         [qr_code_url, extra_metadata]
       end
 
+      # A method to build the Hash of metadata, based on the explicit ones passed by the user as parameter + the implicit ones from `AppCenterInfo`
+      #
+      # @param [Hash<Symbol, Any>] params The action's parameters, as received by `self.run`
+      # @param [AppCenterInfo] app_center_info The model object containing all the values related to App Center information
+      # @return [Hash<String, String>] A hash of all the metadata, gathered from both the explicit and the implicit ones
+      #
       def self.consolidate_metadata(params, app_center_info)
         metadata = params[:metadata]&.transform_keys(&:to_s) || {}
-        metadata['Build Number'] ||= app_center_info['version']
-        metadata['Version'] ||= app_center_info['short_version']
-        metadata[app_center_info['app_os'] == 'Android' ? 'Application ID' : 'Bundle ID'] ||= app_center_info['bundle_identifier']
+        metadata['Build Number'] ||= app_center_info.version
+        metadata['Version'] ||= app_center_info.short_version
+        metadata[app_center_info.os == 'Android' ? 'Application ID' : 'Bundle ID'] ||= app_center_info.bundle_id
         # (Feel free to add more CI-specific env vars in the line below to support other CI providers if you need)
         metadata['Commit'] ||= ENV.fetch('BUILDKITE_COMMIT', nil) || other_action.last_git_commit[:abbreviated_commit_hash]
         metadata
       end
 
+      # Creates an HTML `<img>` tag for an icon URL or the image URL to represent a given Buildkite emoji
+      #
+      # @param [String] url_or_emoji A `String` which can be:
+      #  - Either a valid URI to an image
+      #  - Or a string formatted like `:emojiname:`, using a valid Buildite emoji name as defined in https://github.com/buildkite/emojis
+      # @param [String] alt The alt text to use for the `<img>` tag
+      # @return [String] The `<img …>` tag with the proper image and alt tag
+      #
       def self.img_tag(url_or_emoji, alt: '')
         return nil if url_or_emoji.nil?
 
