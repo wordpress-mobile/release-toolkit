@@ -5,35 +5,17 @@ module Fastlane
         app_display_name = params[:app_display_name]
 
         app_center_org_name = params[:app_center_org_name]
-        app_center_info = if app_center_org_name && defined?(SharedValues::APPCENTER_BUILD_INFORMATION)
-                            lane_context[SharedValues::APPCENTER_BUILD_INFORMATION] || {}
-                          else
-                            {}
-                          end
+        app_center_info = extract_app_center_info(app_center_org_name)
         app_center_app_name = params[:app_center_app_name] || app_center_info['app_name']
         app_center_app_display_name = app_center_info['app_display_name'] || app_center_app_name
         app_center_release_id = params[:app_center_release_id] || app_center_info['id']
 
-        # Consolidate the list of Metadata to display with some implicit metadata if available
-        metadata = params[:metadata]&.transform_keys(&:to_s) || {}
-        metadata['Build Number'] ||= app_center_info['version']
-        metadata['Version'] ||= app_center_info['short_version']
-        metadata[app_center_info['app_os'] == 'Android' ? 'Application ID' : 'Bundle ID'] ||= app_center_info['bundle_identifier']
-        # (Feel free to add more CI-specific env vars in the line below to support other CI providers if you need)
-        metadata['Commit'] ||= ENV.fetch('BUILDKITE_COMMIT', nil) || other_action.last_git_commit[:abbreviated_commit_hash]
+        # Assemble explicit metadata passed as params with implicit metadata derived from App Center params or lane_context
+        metadata = consolidate_metadata(params, app_center_info)
 
         # Installation Link(s) -- either download_url param, or App Center Build link, or both
-        install_url = nil
-        if params[:download_url]
-          install_url = params[:download_url]
-          metadata['Direct Download'] = "<a href='#{install_url}'><code>#{File.basename(install_url)}</code></a>"
-        end
-        if app_center_org_name && app_center_app_name
-          install_url = "https://install.appcenter.ms/orgs/#{app_center_org_name}/apps/#{app_center_app_name}/releases/#{app_center_release_id}"
-          metadata['App Center Build'] = "<a href='#{install_url}'>#{app_center_app_display_name} \##{app_center_release_id}</a>"
-        end
-        UI.user_error!(NO_INSTALL_URL_ERROR_MESSAGE) if install_url.nil?
-        qr_code_url = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=#{CGI.escape(install_url)}&choe=UTF-8"
+        qr_code_url, extra_metadata = build_install_links(params[:download_url], app_center_org_name, app_center_app_name, app_center_app_display_name, app_center_release_id)
+        metadata.merge!(extra_metadata)
 
         # Build the comment parts
         icon_img_tag = img_tag(params[:app_icon] || app_center_info['app_icon_url'], alt: app_display_name)
@@ -69,6 +51,40 @@ module Fastlane
       NO_URL_ERROR
 
       DEFAULT_APP_CENTER_FOOTNOTE = '<em>Automatticians: You can use our internal self-serve MC tool to give yourself access to App Center if needed.</em>'.freeze
+
+      def self.extract_app_center_info(app_center_org_name)
+        if app_center_org_name && defined?(SharedValues::APPCENTER_BUILD_INFORMATION)
+          lane_context[SharedValues::APPCENTER_BUILD_INFORMATION] || {}
+        else
+          {}
+        end
+      end
+
+      def self.build_install_links(download_url, app_center_org_name, app_center_app_name, app_center_app_display_name, app_center_release_id)
+        install_url = nil
+        extra_metadata = {}
+        if download_url
+          install_url = download_url
+          extra_metadata['Direct Download'] = "<a href='#{install_url}'><code>#{File.basename(install_url)}</code></a>"
+        end
+        if app_center_org_name && app_center_app_name
+          install_url = "https://install.appcenter.ms/orgs/#{app_center_org_name}/apps/#{app_center_app_name}/releases/#{app_center_release_id}"
+          extra_metadata['App Center Build'] = "<a href='#{install_url}'>#{app_center_app_display_name} \##{app_center_release_id}</a>"
+        end
+        UI.user_error!(NO_INSTALL_URL_ERROR_MESSAGE) if install_url.nil?
+        qr_code_url = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=#{CGI.escape(install_url)}&choe=UTF-8"
+        [qr_code_url, extra_metadata]
+      end
+
+      def self.consolidate_metadata(params, app_center_info)
+        metadata = params[:metadata]&.transform_keys(&:to_s) || {}
+        metadata['Build Number'] ||= app_center_info['version']
+        metadata['Version'] ||= app_center_info['short_version']
+        metadata[app_center_info['app_os'] == 'Android' ? 'Application ID' : 'Bundle ID'] ||= app_center_info['bundle_identifier']
+        # (Feel free to add more CI-specific env vars in the line below to support other CI providers if you need)
+        metadata['Commit'] ||= ENV.fetch('BUILDKITE_COMMIT', nil) || other_action.last_git_commit[:abbreviated_commit_hash]
+        metadata
+      end
 
       def self.img_tag(url_or_emoji, alt: '')
         return nil if url_or_emoji.nil?
