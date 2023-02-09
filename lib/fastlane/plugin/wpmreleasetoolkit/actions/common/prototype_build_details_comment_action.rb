@@ -18,7 +18,7 @@ module Fastlane
         metadata = params[:metadata]&.transform_keys(&:to_s) || {}
         metadata['Build Number'] ||= app_center_info['version']
         metadata['Version'] ||= app_center_info['short_version']
-        metadata[app_center_info['app_os'] == 'Android' ? 'Application ID' : 'Bundle ID'] = app_center_info['bundle_identifier']
+        metadata[app_center_info['app_os'] == 'Android' ? 'Application ID' : 'Bundle ID'] ||= app_center_info['bundle_identifier']
         # (Feel free to add more CI-specific env vars in the line below to support other CI providers if you need)
         metadata['Commit'] ||= ENV.fetch('BUILDKITE_COMMIT', nil) || other_action.last_git_commit[:abbreviated_commit_hash]
 
@@ -39,7 +39,7 @@ module Fastlane
         icon_img_tag = img_tag(params[:app_icon] || app_center_info['app_icon_url'], alt: app_display_name)
         metadata_rows = metadata.compact.map { |key, value| "<tr><td><b>#{key}</b></td><td>#{value}</td></tr>" }
         intro = "#{icon_img_tag}📲 You can test the changes from this Pull Request in <b>#{app_display_name}</b> by scanning the QR code below to install the corresponding build."
-        footnote = params[:footnote] || (app_center_org_name.nil? ? '' : '<em>Automatticians: You can use our internal self-serve MC tool to give yourself access to App Center if needed.</em>')
+        footnote = params[:footnote] || (app_center_org_name.nil? ? '' : DEFAULT_APP_CENTER_FOOTNOTE)
         body = <<~COMMENT_BODY
           <table>
           <tr>
@@ -67,6 +67,8 @@ module Fastlane
          - Either use this action right after using `appcenter_upload` and provide an `app_center_org_name` (so that this action can use the link to the App Center build)
          - Or provide an explicit value for the `download_url` parameter
       NO_URL_ERROR
+
+      DEFAULT_APP_CENTER_FOOTNOTE = '<em>Automatticians: You can use our internal self-serve MC tool to give yourself access to App Center if needed.</em>'.freeze
 
       def self.img_tag(url_or_emoji, alt: '')
         return nil if url_or_emoji.nil?
