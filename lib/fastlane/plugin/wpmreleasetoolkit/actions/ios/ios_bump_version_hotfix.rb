@@ -20,7 +20,7 @@ module Fastlane
         Fastlane::Helper::Ios::VersionHelper.update_xc_configs(@new_version, @new_short_version, @new_version_internal)
         UI.message 'Done!'
 
-        Fastlane::Helper::Ios::GitHelper.commit_version_bump(include_deliverfile: update_deliverfile, include_metadata: false)
+        Fastlane::Helper::Ios::GitHelper.commit_version_bump(include_deliverfile: update_deliverfile)
 
         UI.message 'Done.'
       end
