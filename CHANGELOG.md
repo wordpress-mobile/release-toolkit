@@ -22,6 +22,7 @@ _None_
 ### Internal Changes
 
 - Updates `activesupport` to `6.1.7.1`, addressing [a security issue](https://github.com/advisories/GHSA-j6gc-792m-qgm2). This is a major version change, but as the dependency is internal-only, it shouldn't be a breaking change for clients. [#441]
+- Add the explicit dependency to `xcodeproj (~> 1.22)`, used in this case to replace the previous manual parsing of `.xcconfig` files. [#451]
 
 ## 6.3.0
 
