@@ -9,6 +9,7 @@
 - Remove the `skip_glotpress` parameter from the `ios_bump_version_release` action [#443]
 - Add the `public_version_xcconfig_file` parameter to the `ios_get_app_version` action to replace the need for an environment variable [#445]
 - Remove the `ios_localize_project` and `ios_update_metadata` actions [#447]
+- Remove the `skip_deliver` parameter from `ios_bump_version_hotfix` and `ios_bump_version_release` actions [#450]
 
 ### New Features
 
