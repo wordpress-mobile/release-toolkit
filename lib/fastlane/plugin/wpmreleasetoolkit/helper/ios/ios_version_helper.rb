@@ -1,3 +1,5 @@
+require 'xcodeproj'
+
 module Fastlane
   module Helper
     module Ios
@@ -23,6 +25,9 @@ module Fastlane
         #
         def self.get_xcconfig_public_version(xcconfig_file:)
           version = read_long_version_from_config_file(xcconfig_file)
+
+          UI.user_error!(".xcconfig file doesn't have a version configured") if version.nil?
+
           vp = get_version_parts(version)
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
 
@@ -292,19 +297,15 @@ module Fastlane
         # Read the value of a given key from an `.xcconfig` file.
         #
         # @param [String] key The xcconfig key to get the value for
-        # @param [String] filePath The path to the `.xcconfig` file to read the value from
+        # @param [String] file_path The path to the `.xcconfig` file to read the value from
         #
         # @return [String] The value for the given key, or `nil` if the key was not found.
         #
-        def self.read_from_config_file(key, filePath)
-          File.open(filePath, 'r') do |f|
-            f.each_line do |line|
-              line = line.strip()
-              return line.split('=')[1] if line.start_with?("#{key}=")
-            end
-          end
+        def self.read_from_config_file(key, file_path)
+          UI.user_error!(".xcconfig file #{file_path} not found") unless File.exist?(file_path)
 
-          return nil
+          config = Xcodeproj::Config.new(file_path)
+          config.attributes[key]
         end
 
         # Ensure that the version provided is only composed of number parts and return the validated string
