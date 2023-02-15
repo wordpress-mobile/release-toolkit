@@ -12,6 +12,7 @@
 
 - Add new `buildkite_annotate` action to add/remove annotations from the current build. [#442]
 - Add new `buildkite_metadata` action to set/get metadata from the current build. [#442]
+- Add new `prototype_build_details_comment` action to make it easier to generate the HTML comment about Prototype Builds in PRs. [#449]
 
 ### Bug Fixes
 
