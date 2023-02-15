@@ -197,7 +197,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :app_icon,
             env_name: 'FL_PROTOTYPE_BUILD_DETAILS_COMMENT_APP_ICON',
-            description: "An `:emojicode:` or URL to use for the icon of the app in the message. #{app_center_auto}",
+            description: "The name of an emoji from the https://github.com/buildkite/emojis list or the full image URL to use for the icon of the app in the message. #{app_center_auto}",
             type: String,
             optional: true,
             default_value_dynamic: true # As it will be extracted from the `lane_context`` if you used `appcenter_upload``
