@@ -6,6 +6,24 @@
 
 ### Breaking Changes
 
+_None_
+
+### New Features
+
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 7.0.0
+
+### Breaking Changes
+
 - Remove the `skip_glotpress` parameter from the `ios_bump_version_release` action [#443]
 
 ### New Features
@@ -13,10 +31,6 @@
 - Add new `buildkite_annotate` action to add/remove annotations from the current build. [#442]
 - Add new `buildkite_metadata` action to set/get metadata from the current build. [#442]
 - Add new `prototype_build_details_comment` action to make it easier to generate the HTML comment about Prototype Builds in PRs. [#449]
-
-### Bug Fixes
-
-_None_
 
 ### Internal Changes
 
