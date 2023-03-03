@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Add "Mobile Secrets" to `configure_update` current branch message to clarify which repo it's referring to. [#455]
 
 ## 7.0.0
 
