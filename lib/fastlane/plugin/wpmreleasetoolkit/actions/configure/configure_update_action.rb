@@ -46,7 +46,7 @@ module Fastlane
 
       def self.prompt_to_switch_branches
         branch_name_to_display = current_branch.nil? ? current_hash : current_branch
-        if UI.confirm("The current branch is `#{branch_name_to_display}`. Would you like to switch branches?")
+        if UI.confirm("The current Mobile Secrets branch is `#{branch_name_to_display}`. Would you like to switch branches?")
           new_branch = UI.select("Select the branch you'd like to switch to: ", get_branches)
           checkout_branch(new_branch)
           update_configure_file
