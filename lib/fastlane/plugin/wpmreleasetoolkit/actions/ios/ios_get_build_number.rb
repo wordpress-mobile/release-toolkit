@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    class IosGetAppVersionAction < Action
+    class IosGetBuildNumberAction < Action
       def self.run(params)
         require_relative '../../helper/ios/ios_version_helper'
 
