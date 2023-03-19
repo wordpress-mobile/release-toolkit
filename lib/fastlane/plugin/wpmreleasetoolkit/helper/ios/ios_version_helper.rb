@@ -185,7 +185,7 @@ module Fastlane
         # @return [String] The current build number according to the public xcconfig file.
         #
         def self.get_build_number
-          get_version_strings()[3]
+          read_build_number_from_config_file(ENV['PUBLIC_CONFIG_FILE'])
         end
 
         # Prints the current and next release version numbers to stdout, then return the next release version
