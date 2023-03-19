@@ -180,6 +180,14 @@ module Fastlane
           get_version_strings()[1]
         end
 
+        # Returns the current value of the `BUILD_NUMBER` key from the public xcconfig file
+        #
+        # @return [String] The current build number according to the public xcconfig file.
+        #
+        def self.get_build_number
+          get_version_strings()[3]
+        end
+
         # Prints the current and next release version numbers to stdout, then return the next release version
         #
         # @return [String] The next release version to use after bumping the currently used public version.
