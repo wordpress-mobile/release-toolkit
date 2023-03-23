@@ -39,7 +39,7 @@ steps:
       bundle exec rspec --profile 10 --format progress
     env: *xcode_image
     plugins:
-      automattic/bash-cache#2.0.0: ~
+      - automattic/a8c-ci-toolkit#2.15.0
     agents:
       queue: "mac"
 
