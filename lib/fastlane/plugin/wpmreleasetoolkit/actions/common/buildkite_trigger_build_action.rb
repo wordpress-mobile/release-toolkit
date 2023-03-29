@@ -23,7 +23,11 @@ module Fastlane
           options
         )
 
-        response.state == 'scheduled' ? UI.message('Done!') : UI.crash!("Failed to start job\nError: [#{response}]")
+        if response.state == 'scheduled'
+          UI.message("Successfully scheduled new build. You can see it at '#{response.web_url}'")
+        else
+          UI.crash!("Failed to start job\nError: [#{response}]")
+        end
       end
 
       #####################################################
