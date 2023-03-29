@@ -16,7 +16,7 @@ module Fastlane
         prerelease = params[:prerelease]
         is_draft = params[:is_draft]
 
-        UI.message("Creating draft release #{version} in #{repository}.")
+        UI.message("Creating #{is_draft ? 'draft ' : ''}release #{version} in #{repository}.")
         # Verify assets
         assets.each do |file_path|
           UI.user_error!("Can't find file #{file_path}!") unless File.exist?(file_path)
