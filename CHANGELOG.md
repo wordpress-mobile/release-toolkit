@@ -19,6 +19,7 @@ _None_
 ### Internal Changes
 
 - Add "Mobile Secrets" to `configure_update` current branch message to clarify which repo it's referring to. [#455]
+- `buildkite_trigger_build` now prints the web URL of the newly scheduled build, to allow you to easily open it via cmd-click. [#460]
 
 ## 7.0.0
 
