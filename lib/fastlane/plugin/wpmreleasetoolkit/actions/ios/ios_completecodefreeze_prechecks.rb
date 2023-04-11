@@ -7,7 +7,7 @@ module Fastlane
         require_relative '../../helper/ios/ios_version_helper'
         require_relative '../../helper/ios/ios_git_helper'
 
-        UI.user_error!('This is not a release branch. Abort.') unless other_action.git_branch.start_with?('release/')
+        UI.user_error!("Current branch - '#{other_action.git_branch}' - is not a release branch. Abort.") unless other_action.git_branch.start_with?('release/')
 
         version = Fastlane::Helper::Ios::VersionHelper.get_public_version
         message = "Completing code freeze for: #{version}\n"
