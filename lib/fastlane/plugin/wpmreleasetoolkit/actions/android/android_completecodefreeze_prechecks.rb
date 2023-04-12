@@ -7,7 +7,7 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper'
         require_relative '../../helper/android/android_git_helper'
 
-        UI.user_error!('This is not a release branch. Abort.') unless other_action.git_branch.start_with?('release/')
+        UI.user_error!('This is not a release branch. Abort.') unless Fastlane::Helper::GitHelper::git_branch_name_using_HEAD.start_with?('release/')
 
         version = Fastlane::Helper::Android::VersionHelper.get_public_version
         message = "Completing code freeze for: #{version}\n"
