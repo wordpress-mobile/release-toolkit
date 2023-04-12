@@ -7,7 +7,8 @@ module Fastlane
         require_relative '../../helper/ios/ios_version_helper'
         require_relative '../../helper/ios/ios_git_helper'
 
-        UI.user_error!('This is not a release branch. Abort.') unless other_action.git_branch.start_with?('release/')
+        release_branch = "release/#{params[:code_freeze_version]}"
+        Fastlane::Helper::GitHelper.checkout_and_pull(release_branch)
 
         version = Fastlane::Helper::Ios::VersionHelper.get_public_version
         message = "Completing code freeze for: #{version}\n"
@@ -42,6 +43,9 @@ module Fastlane
                                        description: 'Skips confirmation',
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
                                        default_value: false), # the default value if the user didn't provide one
+          FastlaneCore::ConfigItem.new(key: :code_freeze_version,
+                                       description: 'Version that is being frozen',
+                                       type: String),
         ]
       end
 
