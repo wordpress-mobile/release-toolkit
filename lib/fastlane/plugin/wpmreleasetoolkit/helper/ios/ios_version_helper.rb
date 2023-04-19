@@ -184,7 +184,7 @@ module Fastlane
         #
         # @return [String] The current build number according to the public xcconfig file.
         #
-        def self.get_build_number
+        def self.get_build_number(xcconfig_file)
           read_build_number_from_config_file(xcconfig_file)
         end
 
