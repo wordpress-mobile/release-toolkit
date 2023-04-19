@@ -5,7 +5,7 @@ module Fastlane
         require_relative '../../helper/ios/ios_version_helper'
 
         public_version_xcconfig_file = params[:public_version_xcconfig_file]
-        Fastlane::Helper::Ios::VersionHelper.get_xcconfig_build_number(xcconfig_file: public_version_xcconfig_file)
+        Fastlane::Helper::Ios::VersionHelper.get_build_number(xcconfig_file: public_version_xcconfig_file)
       end
 
       #####################################################
