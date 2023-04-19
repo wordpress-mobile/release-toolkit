@@ -4,9 +4,8 @@ module Fastlane
       def self.run(params)
         require_relative '../../helper/ios/ios_version_helper'
 
-        UI.user_error!('You need to set at least the PUBLIC_CONFIG_FILE env var to the path to the public xcconfig file') unless ENV['PUBLIC_CONFIG_FILE']
-
-        Fastlane::Helper::Ios::VersionHelper.get_build_number
+        public_version_xcconfig_file = params[:public_version_xcconfig_file]
+        Fastlane::Helper::Ios::VersionHelper.get_xcconfig_build_number(xcconfig_file: public_version_xcconfig_file)
       end
 
       #####################################################
@@ -22,7 +21,15 @@ module Fastlane
       end
 
       def self.available_options
-        # Define all options your action supports.
+        [
+          FastlaneCore::ConfigItem.new(
+            key: :public_version_xcconfig_file,
+            env_name: 'FL_IOS_PUBLIC_VERSION_XCCONFIG_FILE',
+            description: 'Path to the .xcconfig file containing the public build number',
+            type: String,
+            optional: false
+          ),
+        ]
       end
 
       def self.output
