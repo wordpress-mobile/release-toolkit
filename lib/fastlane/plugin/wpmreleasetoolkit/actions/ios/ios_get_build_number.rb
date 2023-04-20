@@ -26,7 +26,7 @@ module Fastlane
             key: :xcconfig_file_path,
             env_name: 'FL_IOS_XCCONFIG_FILE_PATH',
             description: 'Path to the .xcconfig file containing the build number',
-            is_string: false,
+            type: String,
             optional: false
           ),
         ]
