@@ -28,7 +28,7 @@ module Fastlane
             description: 'Path to the .xcconfig file containing the build number',
             is_string: false,
             optional: false
-          )
+          ),
         ]
       end
 
