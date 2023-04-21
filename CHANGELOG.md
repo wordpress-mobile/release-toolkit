@@ -21,6 +21,7 @@ _None_
 - Add "Mobile Secrets" to `configure_update` current branch message to clarify which repo it's referring to. [#455]
 - `buildkite_trigger_build` now prints the web URL of the newly scheduled build, to allow you to easily open it via cmd-click. [#460]
 - Add the branch information to the 'This is not a release branch' error that's thrown from complete code freeze lane. [#461]
+- Use `git_branch_name_using_HEAD` instead of `git_branch` so that the return value is not modified by environment variables. This has no impact to our current release flow, that's why it's not in "Breaking changes" section. [#463]
 
 ## 7.0.0
 
