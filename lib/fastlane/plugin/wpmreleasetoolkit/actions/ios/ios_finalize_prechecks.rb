@@ -7,7 +7,11 @@ module Fastlane
         require_relative '../../helper/ios/ios_version_helper'
         require_relative '../../helper/ios/ios_git_helper'
 
-        UI.user_error!('This is not a release branch. Abort.') unless other_action.git_branch.start_with?('release/')
+        # We can't use `other_action.git_branch`, because it is modified by environment variables in Buildkite.
+        # We need to check which branch we are actually on and not the initial branch a CI build is started from.
+        # See https://docs.fastlane.tools/actions/git_branch/#git_branch
+        current_branch = Fastlane::Actions.git_branch_name_using_HEAD
+        UI.user_error!("Current branch - '#{current_branch}' - is not a release branch. Abort.") unless current_branch.start_with?('release/')
 
         version = Fastlane::Helper::Ios::VersionHelper.get_public_version
         message = "Finalizing release: #{version}\n"
