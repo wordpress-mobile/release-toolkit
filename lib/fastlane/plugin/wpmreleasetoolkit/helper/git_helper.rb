@@ -181,6 +181,23 @@ module Fastlane
         Action.sh('git', 'fetch', '--tags')
       end
 
+      # Returns the current git branch, or "HEAD" if it's not checked out to any branch
+      # Can NOT be replaced using the environment variables such as `GIT_BRANCH` or `BUILDKITE_BRANCH`
+      #
+      # `fastlane` already has a helper action for this called `git_branch`, however it's modified
+      # by CI environment variables. We need to check which branch we are actually on and not the
+      # initial branch a CI build is started from, so we are using the `git_branch_name_using_HEAD`
+      # helper instead.
+      #
+      # See https://docs.fastlane.tools/actions/git_branch/#git_branch
+      #
+      # @return [String] The current git branch, or "HEAD" if it's not checked out to any branch
+      #
+      def self.current_git_branch
+        # We can't use `other_action.git_branch`, because it is modified by environment variables in Buildkite.
+        Fastlane::Actions.git_branch_name_using_HEAD
+      end
+
       # Checks if a branch exists locally.
       #
       # @param [String] branch_name The name of the branch to check for

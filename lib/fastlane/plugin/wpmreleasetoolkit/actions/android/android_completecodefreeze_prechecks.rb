@@ -6,11 +6,9 @@ module Fastlane
 
         require_relative '../../helper/android/android_version_helper'
         require_relative '../../helper/android/android_git_helper'
+        require_relative '../../helper/git_helper'
 
-        # We can't use `other_action.git_branch`, because it is modified by environment variables in Buildkite.
-        # We need to check which branch we are actually on and not the initial branch a CI build is started from.
-        # See https://docs.fastlane.tools/actions/git_branch/#git_branch
-        current_branch = Fastlane::Actions.git_branch_name_using_HEAD
+        current_branch = Fastlane::Helper::GitHelper.current_git_branch
         UI.user_error!("Current branch - '#{current_branch}' - is not a release branch. Abort.") unless current_branch.start_with?('release/')
 
         version = Fastlane::Helper::Android::VersionHelper.get_public_version
