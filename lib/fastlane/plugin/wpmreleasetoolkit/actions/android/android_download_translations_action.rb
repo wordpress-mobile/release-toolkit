@@ -48,7 +48,7 @@ module Fastlane
             env_name: 'FL_DOWNLOAD_TRANSLATIONS_RES_DIR',
             description: "The path to the Android project's `res` dir (typically the `<project name>/src/main/res` directory) containing the `values-*` subdirs",
             type: String,
-            default_value: "#{ENV['PROJECT_NAME']}/src/main/res"
+            default_value: "#{ENV.fetch('PROJECT_NAME', nil)}/src/main/res"
           ),
           FastlaneCore::ConfigItem.new(
             key: :glotpress_url,

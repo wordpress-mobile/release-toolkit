@@ -16,13 +16,13 @@ module Fastlane
           if File.exist?(Fastlane::Helper::Android::VersionHelper.version_properties_file)
             Fastlane::Helper::GitHelper.commit(
               message: 'Bump version number',
-              files: File.join(ENV['PROJECT_ROOT_FOLDER'], 'version.properties'),
+              files: File.join(ENV.fetch('PROJECT_ROOT_FOLDER', nil), 'version.properties'),
               push: true
             )
           else
             Fastlane::Helper::GitHelper.commit(
               message: 'Bump version number',
-              files: File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'build.gradle'),
+              files: File.join(ENV.fetch('PROJECT_ROOT_FOLDER', nil), ENV.fetch('PROJECT_NAME', nil), 'build.gradle'),
               push: true
             )
           end

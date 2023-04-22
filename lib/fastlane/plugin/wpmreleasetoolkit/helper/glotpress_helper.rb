@@ -66,7 +66,7 @@ module Fastlane
       # @return [Integer] The percentage of the translated strings.
       #
       def self.extract_value_from_translation_info_data(data:, language_code:, status:)
-        regex = "\/#{language_code}\/.*#{status}.*>([0-9,]+)"
+        regex = "/#{language_code}/.*#{status}.*>([0-9,]+)"
 
         # 1. Grep the line with contains the required info.
         # 2. Match the info and extract the value in group 1.

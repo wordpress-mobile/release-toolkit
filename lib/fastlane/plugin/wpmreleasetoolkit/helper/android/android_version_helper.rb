@@ -465,9 +465,9 @@ module Fastlane
         # @return [String] The path of the `build.gradle` file inside the project subfolder in the project's repo
         #
         def self.gradle_path
-          UI.user_error!("You need to set the \`PROJECT_ROOT_FOLDER\` environment variable to the path to the project's root") if ENV['PROJECT_ROOT_FOLDER'].nil?
-          UI.user_error!("You need to set the \`PROJECT_NAME\` environment variable to the relative path to the project subfolder name") if ENV['PROJECT_NAME'].nil?
-          File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'build.gradle')
+          UI.user_error!("You need to set the `PROJECT_ROOT_FOLDER` environment variable to the path to the project's root") if ENV['PROJECT_ROOT_FOLDER'].nil?
+          UI.user_error!('You need to set the `PROJECT_NAME` environment variable to the relative path to the project subfolder name') if ENV['PROJECT_NAME'].nil?
+          File.join(ENV.fetch('PROJECT_ROOT_FOLDER', nil), ENV.fetch('PROJECT_NAME', nil), 'build.gradle')
         end
 
         # Update both the versionName and versionCode of the build.gradle file to the specified version.

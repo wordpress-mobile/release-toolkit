@@ -219,7 +219,7 @@ module Fastlane
         # @param [String] internal_version The new version number to use as `VERSION_LONG` for the interrnal xcconfig file, if it exists
         #
         def self.update_xc_configs(new_version, new_version_short, internal_version)
-          update_xc_config(ENV['PUBLIC_CONFIG_FILE'], new_version, new_version_short)
+          update_xc_config(ENV.fetch('PUBLIC_CONFIG_FILE', nil), new_version, new_version_short)
           update_xc_config(ENV['INTERNAL_CONFIG_FILE'], internal_version, new_version_short) unless ENV['INTERNAL_CONFIG_FILE'].nil?
         end
 
@@ -311,7 +311,7 @@ module Fastlane
         #         The second element is the version extracted from the internal config file, only present if one was provided.
         def self.get_version_strings
           version_strings = []
-          version_strings << read_long_version_from_config_file(ENV['PUBLIC_CONFIG_FILE'])
+          version_strings << read_long_version_from_config_file(ENV.fetch('PUBLIC_CONFIG_FILE', nil))
           version_strings << read_long_version_from_config_file(ENV['INTERNAL_CONFIG_FILE']) unless ENV['INTERNAL_CONFIG_FILE'].nil?
 
           return version_strings

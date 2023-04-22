@@ -42,7 +42,7 @@ task :new_release do
 
   ## Print current info
   Console.header "Current version is: #{Fastlane::Wpmreleasetoolkit::VERSION}"
-  Console.warning "Warning: Latest version number does not match latest version title in CHANGELOG (#{latest_version})!" unless Fastlane::Wpmreleasetoolkit::VERSION == latest_version
+  Console.warning "Warning: Latest version number does not match latest version title in CHANGELOG (#{latest_version})!" unless latest_version == Fastlane::Wpmreleasetoolkit::VERSION
 
   Console.header 'Pending CHANGELOG:'
   Console.print_indented_lines(parser.cleaned_pending_changelog_lines)
@@ -72,11 +72,11 @@ task :new_release do
     >>> WHAT'S NEXT
 
     1. Create a PR against `trunk`.
-    2. Once the PR is merged, publish a GitHub release for \`#{new_version}\`, targeting \`trunk\`,
-       creating a new \`#{new_version} tag in the process.
+    2. Once the PR is merged, publish a GitHub release for `#{new_version}`, targeting `trunk`,
+       creating a new `#{new_version} tag in the process.
 
     The creation of the new tag will trigger a CI workflow that will take care of doing the
-    \`gem push\` of the new version to RubyGems.
+    `gem push` of the new version to RubyGems.
 
   INSTRUCTIONS
 end

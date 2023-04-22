@@ -240,7 +240,7 @@ module Fastlane
           attributes_to_copy = %w[formatted] # Attributes that we want to replicate into translated `string.xml` files
           orig_file = File.join(res_dir, 'values', 'strings.xml')
           orig_xml = File.open(orig_file) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-          orig_attributes = orig_xml.xpath('//string').map { |tag| [tag['name'], tag.attributes.select { |k, _| attributes_to_copy.include?(k) }] }.to_h
+          orig_attributes = orig_xml.xpath('//string').to_h { |tag| [tag['name'], tag.attributes.select { |k, _| attributes_to_copy.include?(k) }] }
 
           locales_map.each do |lang_codes|
             all_xml_documents = glotpress_filters.map do |filters|
@@ -262,7 +262,7 @@ module Fastlane
 
             # Save
             lang_dir = File.join(res_dir, "values-#{lang_codes[:android]}")
-            FileUtils.mkdir(lang_dir) unless Dir.exist?(lang_dir)
+            FileUtils.mkdir_p(lang_dir)
             lang_file = File.join(lang_dir, 'strings.xml')
             File.open(lang_file, 'w') { |f| merged_xml.write_to(f, encoding: Encoding::UTF_8.to_s, indent: 4) }
           end

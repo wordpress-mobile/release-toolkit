@@ -12,7 +12,7 @@ module Fastlane
         UI.message "Path: #{params[:download_path]}"
 
         # Check download path
-        Dir.mkdir(params[:download_path]) unless File.exist?(params[:download_path])
+        FileUtils.mkdir_p(params[:download_path])
 
         # Download
         downloader = Fastlane::Helper::MetadataDownloader.new(params[:download_path], params[:target_files])

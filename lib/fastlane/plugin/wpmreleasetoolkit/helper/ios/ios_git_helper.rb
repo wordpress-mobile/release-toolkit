@@ -18,11 +18,11 @@ module Fastlane
         # @param [Bool] include_metadata If true (the default), includes the `fastlane/download_metadata.swift` file and the `.pot` file (which typically contains an entry or release notes for the new version)
         #
         def self.commit_version_bump(include_deliverfile: true, include_metadata: true)
-          files_list = [File.join(ENV['PROJECT_ROOT_FOLDER'], 'config', '.')]
+          files_list = [File.join(ENV.fetch('PROJECT_ROOT_FOLDER', nil), 'config', '.')]
           files_list.append File.join('fastlane', 'Deliverfile') if include_deliverfile
           if include_metadata
             files_list.append File.join('fastlane', 'download_metadata.swift')
-            files_list.append File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'Resources', ENV['APP_STORE_STRINGS_FILE_NAME'])
+            files_list.append File.join(ENV.fetch('PROJECT_ROOT_FOLDER', nil), ENV.fetch('PROJECT_NAME', nil), 'Resources', ENV.fetch('APP_STORE_STRINGS_FILE_NAME', nil))
           end
 
           Fastlane::Helper::GitHelper.commit(message: 'Bump version number', files: files_list, push: true)

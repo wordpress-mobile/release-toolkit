@@ -14,8 +14,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.7'
 
-  spec.files         = Dir['lib/**/*'] + %w[README.md LICENSE]
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.files = Dir['lib/**/*'] + %w[README.md LICENSE]
 
   # Bring in any generated executables
   spec.bindir = 'bin'
@@ -61,4 +60,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop-require_tools', '~> 0.1.2'
   spec.add_development_dependency 'rubocop-rspec', '2.3.0'
   spec.add_development_dependency 'simplecov', '~> 0.16.1'
+  spec.metadata['rubygems_mfa_required'] = 'true'
 end
