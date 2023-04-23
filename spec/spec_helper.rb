@@ -15,7 +15,7 @@ SimpleCov.formatter = SimpleCov::Formatter::Codecov if code_coverage_token
 
 # Buildkite Test Analytics
 WebMock.disable_net_connect!(allow: 'analytics-api.buildkite.com')
-Buildkite::TestCollector.configure(token: ENV.fetch('BUILDKITE_ANALYTICS_TOKEN', nil))
+Buildkite::TestCollector.configure(hook: :rspec)
 
 # This module is only used to check the environment is currently a testing env
 module SpecHelper
