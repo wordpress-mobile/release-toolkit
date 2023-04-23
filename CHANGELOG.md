@@ -22,6 +22,7 @@ _None_
 - `buildkite_trigger_build` now prints the web URL of the newly scheduled build, to allow you to easily open it via cmd-click. [#460]
 - Add the branch information to the 'This is not a release branch' error that's thrown from complete code freeze lane. [#461]
 - Update `octokit` to `5.6.1` and `danger` to `9.3.0`. These are both major version changes, but as the dependency is internal-only, it shouldn't be a breaking change for clients. [#464]
+- Replace `rspec-buildkite-analytics` with `buildkite-test_collector` (Buildkite renamed the gem) and update it to `2.2.0`. This is another internal-only change and is not a breaking change for clients. [#465]
 
 ## 7.0.0
 
