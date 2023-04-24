@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Add new `android_generate_apk_from_aab` action to generate an APK from a given AAB.
 
 ### Bug Fixes
 
