@@ -48,6 +48,14 @@ Style/AsciiComments:
 # which would be incorrect and not what we want
 Style/StringConcatenation:
   Enabled: false
+  
+########## Gemspec Rules
+
+# This was turned on by default after updating Rubocop to `1.50.2`. We want to disable this for now because
+# all the gem publishing is done within CI and doesn't allow for user input such as an MFA code. See
+# https://github.com/wordpress-mobile/release-toolkit/pull/464#pullrequestreview-1396569313 for more discussion
+Gemspec/RequireMFA:
+  Enabled: false
 
 ########## Metrics / Max Lengths Rules
 
