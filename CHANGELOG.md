@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Add `ios_register_ci_machine` action to register the current CI machine in the Apple Developer Portal.
 
 ### Bug Fixes
 
