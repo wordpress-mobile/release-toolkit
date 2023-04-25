@@ -6,8 +6,10 @@ module Fastlane
 
         require_relative '../../helper/ios/ios_version_helper'
         require_relative '../../helper/ios/ios_git_helper'
+        require_relative '../../helper/git_helper'
 
-        UI.user_error!('This is not a release branch. Abort.') unless other_action.git_branch.start_with?('release/')
+        current_branch = Fastlane::Actions.git_branch_name_using_HEAD
+        UI.user_error!("Current branch - '#{current_branch}' - is not a release branch. Abort.") unless current_branch.start_with?('release/')
 
         version = Fastlane::Helper::Ios::VersionHelper.get_public_version
         message = "Finalizing release: #{version}\n"
