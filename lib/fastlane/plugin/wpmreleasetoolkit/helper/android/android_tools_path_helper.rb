@@ -10,7 +10,7 @@ module Fastlane
         attr_reader :android_home
 
         def initialize(sdk_root: nil)
-          @android_home = sdk_root || ENV.fetch('ANDROID_HOME', nil) || ENV.fetch('ANDROID_SDK_ROOT', nil) || ENV.fetch('ANDROID_SDK', nil)
+          @android_home = sdk_root || ENV['ANDROID_HOME'] || ENV['ANDROID_SDK_ROOT'] || ENV['ANDROID_SDK']
         end
 
         # @param [String] binary The name of the binary to search for
