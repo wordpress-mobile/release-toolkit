@@ -84,7 +84,7 @@ end
 
 # Apply Monkey patch
 unless ENV['FASTLANE_PROMPT_REMINDER_DISABLE_AUTO_PATCH']
-  message = ENV.fetch('FASTLANE_PROMPT_REMINDER_MESSAGE', nil)
+  message = ENV['FASTLANE_PROMPT_REMINDER_MESSAGE']
   message = FastlaneCore::Shell::DEFAULT_PROMPT_REMINDER_MESSAGE if %w[default true yes 1].include?(message&.downcase)
   delays = ENV['FASTLANE_PROMPT_REMINDER_DELAYS']&.split(',')&.map(&:to_i) || FastlaneCore::Shell::DEFAULT_PROMPT_REMINDER_DELAYS
 
