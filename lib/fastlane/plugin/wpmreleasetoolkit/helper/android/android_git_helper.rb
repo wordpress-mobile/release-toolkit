@@ -17,13 +17,13 @@ module Fastlane
             Fastlane::Helper::GitHelper.commit(
               message: 'Bump version number',
               files: File.join(ENV['PROJECT_ROOT_FOLDER'], 'version.properties'),
-              push: true
+              push: false
             )
           else
             Fastlane::Helper::GitHelper.commit(
               message: 'Bump version number',
               files: File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'build.gradle'),
-              push: true
+              push: false
             )
           end
         end
