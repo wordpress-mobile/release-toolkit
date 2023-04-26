@@ -25,6 +25,7 @@ _None_
 - Update `danger` to `9.3.0`. This is an internal-only change and is not a breaking change for clients. [#464]
 - Replace `rspec-buildkite-analytics` with `buildkite-test_collector` (Buildkite renamed the gem) and update it to `2.2.0`. This is another internal-only change and is not a breaking change for clients. [#465]
 - Adds `ignore_pipeline_branch_filters=true` parameter to the API call triggering a Buildkite build [#468]
+- Replace all instances of `is_string` with `type` [#469]
 
 ## 7.0.0
 
