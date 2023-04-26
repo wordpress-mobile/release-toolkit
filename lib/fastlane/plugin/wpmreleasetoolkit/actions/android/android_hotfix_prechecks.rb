@@ -55,7 +55,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
                                        env_name: 'FL_ANDROID_HOTFIX_PRECHECKS_SKIPCONFIRM',
                                        description: 'Skips confirmation',
-                                       is_string: false, # Boolean
+                                       type: Boolean,
                                        default_value: false),
         ]
       end

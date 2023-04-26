@@ -55,7 +55,7 @@ module Fastlane
             key: :skip_deliver,
             env_name: 'FL_IOS_BUMP_VERSION_HOTFIX_SKIP_DELIVER',
             description: 'Skips Deliverfile key update',
-            is_string: false, # Boolean parameter
+            type: Boolean,
             optional: true,
             # Don't skip the Deliverfile by default. At the time of writing, 2 out of 3 consumers
             # still have a Deliverfile.

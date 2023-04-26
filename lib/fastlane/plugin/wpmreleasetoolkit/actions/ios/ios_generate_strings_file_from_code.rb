@@ -74,12 +74,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :quiet,
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_QUIET',
                                        description: 'In quiet mode, `genstrings` will log warnings about duplicate values, but not about duplicate comments',
-                                       is_string: false, # Boolean
+                                       type: Boolean,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :swiftui,
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_SWIFTUI',
                                        description: "Should we include SwiftUI's `Text()` when parsing code with `genstrings`",
-                                       is_string: false, # Boolean
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :output_dir,
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_OUTPUT_DIR',
@@ -88,7 +88,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :fail_on_error,
                                        env_name: 'FL_IOS_GENERATE_STRINGS_FILE_FROM_CODE_FAIL_ON_ERROR',
                                        description: 'If true, will fail with user_error! if `genstrings` printed any error while parsing',
-                                       is_string: false, # Boolean
+                                       type: Boolean,
                                        default_value: true),
         ]
       end

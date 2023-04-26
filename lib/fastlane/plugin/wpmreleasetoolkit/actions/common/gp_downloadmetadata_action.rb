@@ -67,7 +67,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :download_path,
                                        env_name: 'FL_DOWNLOAD_METADATA_DOWNLOAD_PATH',
                                        description: 'The path of the target files',
-                                       is_string: true),
+                                       type: String),
         ]
       end
 
