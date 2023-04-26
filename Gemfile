@@ -2,7 +2,7 @@ source('https://rubygems.org')
 
 gemspec
 
-gem 'danger', '~> 8.0'
+gem 'danger', '~> 9.3'
 gem 'danger-rubocop', '~> 0.6'
 
 gem 'codecov', require: false

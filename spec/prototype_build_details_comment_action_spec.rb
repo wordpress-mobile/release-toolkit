@@ -139,7 +139,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         expect(comment).to include '<td><b>Version:Long</b></td><td>281003</td>'
         expect(comment).to include '<td><b>Build Config</b></td><td>Prototype</td>'
         expect(comment).to include '<td><b>Commit</b></td><td>a1b2c3f</td>'
-        expect(comment).to include "<tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/My-Org/apps/My-App/releases/1337'>My-App \#1337</a></td></tr>"
+        expect(comment).to include "<tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/My-Org/apps/My-App/releases/1337'>My-App #1337</a></td></tr>"
         # Additional inferred metadata rows: App Name, Commit, App Center Build
         expect(comment).to include "<td rowspan='6'"
       end
@@ -183,7 +183,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           <tr><td><b>Version:Long</b></td><td>28.2.0.108</td></tr>
           <tr><td><b>Flavor</b></td><td>Celray</td></tr>
           <tr><td><b>Commit</b></td><td>a1b2c3f</td></tr>
-          <tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/BestOrg/apps/BestApp/releases/8888'>BestApp \#8888</a></td></tr>
+          <tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/BestOrg/apps/BestApp/releases/8888'>BestApp #8888</a></td></tr>
           </table>
           <em>Note: Google Sign-In in not available in those builds</em>
         EXPECTED_COMMENT
@@ -215,7 +215,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           <tr><td><b>Version:Long</b></td><td>28.2.0.108</td></tr>
           <tr><td><b>Commit</b></td><td>a1b2c3f</td></tr>
           <tr><td><b>Direct Download</b></td><td><a href='https://bestfront.cloudfront.net/feed42/bestapp-pr1357-a1b2c3f.apk'><code>bestapp-pr1357-a1b2c3f.apk</code></a></td></tr>
-          <tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/BestOrg/apps/BestApp/releases/8888'>BestApp \#8888</a></td></tr>
+          <tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/BestOrg/apps/BestApp/releases/8888'>BestApp #8888</a></td></tr>
           </table>
           <em>Automatticians: You can use our internal self-serve MC tool to give yourself access to App Center if needed.</em>
         EXPECTED_COMMENT
@@ -251,7 +251,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           <tr><td><b>Flavor</b></td><td>Celray</td></tr>
           <tr><td><b>Configuration</b></td><td>Debug</td></tr>
           <tr><td><b>Commit</b></td><td>a1b2c3f</td></tr>
-          <tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/BestOrg/apps/BestApp/releases/1234'>BestApp \#1234</a></td></tr>
+          <tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/BestOrg/apps/BestApp/releases/1234'>BestApp #1234</a></td></tr>
           </table>
           <em>Note: Google Sign-In in not available in those builds</em>
           </details>
@@ -394,7 +394,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           <tr><td><b>Version</b></td><td>28.7</td></tr>
           <tr><td><b>Application ID</b></td><td>com.stubfactory.myapp</td></tr>
           <tr><td><b>Commit</b></td><td>a1b2c3f</td></tr>
-          <tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/BestOrg/apps/My-App-Alpha/releases/1337'>My App (Alpha) \#1337</a></td></tr>
+          <tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/BestOrg/apps/My-App-Alpha/releases/1337'>My App (Alpha) #1337</a></td></tr>
           </table>
           <em>Note: Google Sign-In in not available in those builds</em>
         EXPECTED_COMMENT
@@ -419,7 +419,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           <tr><td><b>Application ID</b></td><td>com.stubfactory.myapp</td></tr>
           <tr><td><b>Commit</b></td><td>a1b2c3f</td></tr>
           <tr><td><b>Direct Download</b></td><td><a href='https://bestfront.cloudfront.net/feed42/bestapp-pr1357-a1b2c3f.apk'><code>bestapp-pr1357-a1b2c3f.apk</code></a></td></tr>
-          <tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/BestOrg/apps/My-App-Alpha/releases/1337'>My App (Alpha) \#1337</a></td></tr>
+          <tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/BestOrg/apps/My-App-Alpha/releases/1337'>My App (Alpha) #1337</a></td></tr>
           </table>
           <em>Automatticians: You can use our internal self-serve MC tool to give yourself access to App Center if needed.</em>
         EXPECTED_COMMENT
@@ -450,7 +450,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           <tr><td><b>Version</b></td><td>28.7</td></tr>
           <tr><td><b>Application ID</b></td><td>com.stubfactory.myapp</td></tr>
           <tr><td><b>Commit</b></td><td>a1b2c3f</td></tr>
-          <tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/BestOrg/apps/My-App-Alpha/releases/1337'>My App (Alpha) \#1337</a></td></tr>
+          <tr><td><b>App Center Build</b></td><td><a href='https://install.appcenter.ms/orgs/BestOrg/apps/My-App-Alpha/releases/1337'>My App (Alpha) #1337</a></td></tr>
           </table>
           <em>Note: Google Sign-In in not available in those builds</em>
           </details>

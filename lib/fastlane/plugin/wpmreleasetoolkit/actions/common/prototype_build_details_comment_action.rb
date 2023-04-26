@@ -87,7 +87,7 @@ module Fastlane
         end
         if app_center_info.org_name && app_center_info.app_name
           install_url = "https://install.appcenter.ms/orgs/#{app_center_info.org_name}/apps/#{app_center_info.app_name}/releases/#{app_center_info.release_id}"
-          extra_metadata['App Center Build'] = "<a href='#{install_url}'>#{app_center_info.display_name} \##{app_center_info.release_id}</a>"
+          extra_metadata['App Center Build'] = "<a href='#{install_url}'>#{app_center_info.display_name} ##{app_center_info.release_id}</a>"
         end
         UI.user_error!(NO_INSTALL_URL_ERROR_MESSAGE) if install_url.nil?
         qr_code_url = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=#{CGI.escape(install_url)}&choe=UTF-8"

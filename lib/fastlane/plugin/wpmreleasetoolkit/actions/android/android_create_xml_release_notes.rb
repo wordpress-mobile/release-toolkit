@@ -11,7 +11,7 @@ module Fastlane
             complete_path = "#{params[:download_path]}/#{loc[1]}/changelogs/#{params[:build_number]}.txt"
             if File.exist?(complete_path)
               f.puts("<#{loc[1]}>")
-              f.puts(File.open(complete_path).read)
+              f.puts(File.read(complete_path))
               f.puts("</#{loc[1]}>\n")
             else
               UI.message("File #{complete_path} not found. Skipping language #{loc[1]}")

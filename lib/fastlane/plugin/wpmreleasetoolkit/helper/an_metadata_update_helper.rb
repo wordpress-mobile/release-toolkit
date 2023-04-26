@@ -50,7 +50,7 @@ module Fastlane
 
         if line_count <= 1
           # Single line output
-          fw.puts("msgid \"#{File.open(@content_file_path, 'r').read.rstrip}\"")
+          fw.puts("msgid \"#{File.read(@content_file_path).rstrip}\"")
         else
           # Multiple line output
           fw.puts('msgid ""')
@@ -145,7 +145,7 @@ module Fastlane
       end
 
       def generate_block(fw)
-        super(fw) unless File.zero?(@content_file_path)
+        super(fw) unless File.empty?(@content_file_path)
       end
     end
   end
