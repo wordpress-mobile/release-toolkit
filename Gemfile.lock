@@ -413,7 +413,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  buildkite-test_collector (~> 2.1)
+  buildkite-test_collector (~> 2.2)
   bundler (~> 2.0)
   cocoapods (~> 1.10)
   codecov
