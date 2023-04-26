@@ -9,4 +9,4 @@ gem 'codecov', require: false
 gem 'webmock', require: false
 gem 'yard'
 
-gem 'rspec-buildkite-analytics', '~> 0.8.1'
+gem 'buildkite-test_collector', '~> 2.2'
