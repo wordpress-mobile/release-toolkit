@@ -71,7 +71,7 @@ module Fastlane
                                        description: 'The GitHub milestone',
                                        optional: false,
                                        default_value: true,
-                                       is_string: false),
+                                       type: Boolean),
           Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end

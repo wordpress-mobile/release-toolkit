@@ -46,7 +46,7 @@ module Fastlane
                                        env_name: 'CHECK_LIBS_STRINGS_PATH',
                                        description: 'The list of libs to merge',
                                        optional: false,
-                                       is_string: false),
+                                       type: Array),
           FastlaneCore::ConfigItem.new(key: :diff_url,
                                        env_name: 'CHECK_LIBS_DIFF_URL',
                                        description: 'The url of the diff to check',
