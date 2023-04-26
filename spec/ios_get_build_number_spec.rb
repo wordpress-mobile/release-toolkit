@@ -49,7 +49,7 @@ describe Fastlane::Actions::IosGetBuildNumberAction do
         run_described_fastlane_action(
           xcconfig_file_path: file_path
         )
-      # Ruby error for 'No such file or directory': https://ruby-doc.org/core-2.7.4/SystemCallError.html
+        # Ruby error for 'No such file or directory': https://ruby-doc.org/core-2.7.4/SystemCallError.html
       end.to raise_error(Errno::ENOENT)
     end
 
