@@ -43,7 +43,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        description: 'List of App Identifiers that should contain the new device identifier',
-                                       is_string: false,
+                                       type: Array,
                                        verify_block: proc do |value|
                                                        UI.user_error!('You must provide an array of bundle identifiers in `app_identifier`') if value.empty?
                                                      end),
