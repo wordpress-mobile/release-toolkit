@@ -63,7 +63,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :base_version,
                                        env_name: 'FL_IOS_BETABUILD_PRECHECKS_BASE_VERSION',
                                        description: 'The version to work on', # a short description of this parameter
-                                       is_string: true,
+                                       type: String,
                                        optional: true), # true: verifies the input is a string, false: every kind of value),
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
                                        env_name: 'FL_IOS_BETABUILD_PRECHECKS_SKIPCONFIRM',

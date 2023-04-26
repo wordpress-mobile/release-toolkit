@@ -43,13 +43,13 @@ module Fastlane
             key: :version,
             env_name: 'FL_IOS_BUMP_VERSION_HOTFIX_VERSION',
             description: 'The version of the hotfix',
-            is_string: true
+            type: String
           ),
           FastlaneCore::ConfigItem.new(
             key: :previous_version,
             env_name: 'FL_IOS_BUMP_VERSION_HOTFIX_PREVIOUS_VERSION',
             description: 'The version to branch from',
-            is_string: true
+            type: String
           ),
           FastlaneCore::ConfigItem.new(
             key: :skip_deliver,

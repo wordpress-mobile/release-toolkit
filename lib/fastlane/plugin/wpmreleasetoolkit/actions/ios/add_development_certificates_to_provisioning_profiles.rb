@@ -49,7 +49,7 @@ module Fastlane
                                                      end),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        description: 'The team_id for the provisioning profiles',
-                                       is_string: true,
+                                       type: String,
                                        verify_block: proc do |value|
                                                        UI.user_error!('You must provide a team ID in `team_id`') unless value && (!value.empty?)
                                                      end),

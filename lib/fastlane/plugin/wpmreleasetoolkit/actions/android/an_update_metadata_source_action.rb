@@ -131,7 +131,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :po_file_path,
                                        env_name: 'FL_UPDATE_METADATA_SOURCE_PO_FILE_PATH',
                                        description: 'The path of the .po file to update',
-                                       is_string: true,
+                                       type: String,
                                        verify_block: proc do |value|
                                          UI.user_error!("No .po file path for UpdateMetadataSourceAction given, pass using `po_file_path: 'file path'`") unless value && (!value.empty?)
                                          UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)

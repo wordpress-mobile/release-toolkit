@@ -43,14 +43,14 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version_name,
                                        env_name: 'FL_ANDROID_BUMP_VERSION_HOTFIX_VERSION',
                                        description: 'The version name for the hotfix',
-                                       is_string: true),
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :version_code,
                                        env_name: 'FL_ANDROID_BUMP_VERSION_HOTFIX_CODE',
                                        description: 'The version code for the hotfix'),
           FastlaneCore::ConfigItem.new(key: :previous_version_name,
                                        env_name: 'FL_ANDROID_BUMP_VERSION_HOTFIX_PREVIOUS_VERSION',
                                        description: 'The version to branch from',
-                                       is_string: true),
+                                       type: String),
         ]
       end
 

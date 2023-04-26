@@ -51,7 +51,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version_name,
                                        env_name: 'FL_ANDROID_HOTFIX_PRECHECKS_VERSION',
                                        description: 'The hotfix version number to create',
-                                       is_string: true),
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
                                        env_name: 'FL_ANDROID_HOTFIX_PRECHECKS_SKIPCONFIRM',
                                        description: 'Skips confirmation',

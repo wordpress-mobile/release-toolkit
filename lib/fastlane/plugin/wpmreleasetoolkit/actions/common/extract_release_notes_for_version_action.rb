@@ -67,17 +67,17 @@ module Fastlane
                                        env_name: 'GHHELPER_EXTRACT_NOTES_VERSION',
                                        description: 'The version of the release',
                                        optional: false,
-                                       is_string: true),
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :release_notes_file_path,
                                        env_name: 'GHHELPER_EXTRACT_NOTES_FILE_PATH',
                                        description: 'The path to the file that contains the release notes',
                                        optional: false,
-                                       is_string: true),
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :extracted_notes_file_path,
                                        env_name: 'GHHELPER_EXTRACT_NOTES_EXTRACTED_FILE_PATH',
                                        description: 'The path to the file that will contain the extracted release notes',
                                        optional: true,
-                                       is_string: true),
+                                       type: String),
         ]
       end
 

@@ -49,11 +49,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :report_path,
                                        description: 'The path where the list of PRs should be written to',
                                        optional: false,
-                                       is_string: true),
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :milestone,
                                        description: 'The name of the milestone we want to fetch the list of PRs for (e.g.: `16.9`)',
                                        optional: false,
-                                       is_string: true),
+                                       type: String),
           Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
