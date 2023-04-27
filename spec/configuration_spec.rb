@@ -12,7 +12,7 @@ describe Fastlane::Configuration do
   end
 
   describe 'file reading/writing' do
-    subject { Fastlane::Configuration.from_file(configure_path) }
+    subject { described_class.from_file(configure_path) }
 
     let(:configure_path) { 'path/to/.configure' }
 

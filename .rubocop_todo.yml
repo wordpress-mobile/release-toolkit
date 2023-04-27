@@ -108,19 +108,6 @@ RSpec/ContextWording:
     - 'spec/git_helper_spec.rb'
     - 'spec/ios_lint_localizations_spec.rb'
 
-# Offense count: 35
-# Cop supports --auto-correct.
-# Configuration parameters: SkipBlocks, EnforcedStyle.
-# SupportedStyles: described_class, explicit
-RSpec/DescribedClass:
-  Exclude:
-    - 'spec/ci_helper_spec.rb'
-    - 'spec/configuration_spec.rb'
-    - 'spec/encryption_helper_spec.rb'
-    - 'spec/file_reference_spec.rb'
-    - 'spec/git_helper_spec.rb'
-    - 'spec/ios_lint_localizations_spec.rb'
-
 # Offense count: 12
 # Configuration parameters: Include, CustomTransform, IgnoreMethods, SpecSuffixOnly.
 # Include: **/*_spec*rb*, **/spec/**/*
