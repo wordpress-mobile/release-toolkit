@@ -12,6 +12,8 @@ describe Fastlane::Configuration do
   end
 
   describe 'file reading/writing' do
+    subject { Fastlane::Configuration.from_file(configure_path) }
+
     let(:configure_path) { 'path/to/.configure' }
 
     let(:configure_json) do
@@ -24,8 +26,6 @@ describe Fastlane::Configuration do
       }
     end
     let(:configure_json_string) { JSON.pretty_generate(configure_json) }
-
-    subject { Fastlane::Configuration.from_file(configure_path) }
 
     before(:each) do
       allow(File).to receive(:read).with(configure_path).and_return(configure_json_string)

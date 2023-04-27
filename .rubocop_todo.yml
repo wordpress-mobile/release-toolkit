@@ -157,12 +157,6 @@ RSpec/InstanceVariable:
     - 'spec/ios_lint_localizations_spec.rb'
     - 'spec/ios_merge_translators_strings_spec.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-RSpec/LeadingSubject:
-  Exclude:
-    - 'spec/configuration_spec.rb'
-
 # Offense count: 24
 # Configuration parameters: .
 # SupportedStyles: have_received, receive
