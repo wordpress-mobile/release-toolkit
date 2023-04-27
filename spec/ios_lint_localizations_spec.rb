@@ -95,6 +95,10 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       allow(FastlaneCore::UI).to receive(:abort_with_message!)
     end
 
+    after(:each) do
+      FileUtils.remove_entry @test_data_dir
+    end
+
     it 'succeeds when there are no violations' do
       run_l10n_linter_test(data_file: 'no-violations')
     end
@@ -198,10 +202,6 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       )
 
       expect(result).to eq({ 'fr' => ['`key3` expected placeholders for [Int] but found [] instead.'] })
-    end
-
-    after(:each) do
-      FileUtils.remove_entry @test_data_dir
     end
   end
 end

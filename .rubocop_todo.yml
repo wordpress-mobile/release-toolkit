@@ -127,14 +127,6 @@ RSpec/HookArgument:
     - 'spec/git_helper_spec.rb'
     - 'spec/ios_lint_localizations_spec.rb'
 
-# Offense count: 3
-# Cop supports --auto-correct.
-RSpec/HooksBeforeExamples:
-  Exclude:
-    - 'spec/android_merge_translators_strings_spec.rb'
-    - 'spec/ios_lint_localizations_spec.rb'
-    - 'spec/ios_merge_translators_strings_spec.rb'
-
 # Offense count: 25
 # Configuration parameters: AssignmentOnly.
 RSpec/InstanceVariable:
