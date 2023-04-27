@@ -339,7 +339,7 @@ module Fastlane
         #
         # @return [Bool] true if the string is representing an integer value, false if not
         #
-        def self.is_int? string
+        def self.is_int?(string)
           true if Integer(string) rescue false
         end
       end
