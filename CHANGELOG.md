@@ -10,7 +10,8 @@ _None_
 
 ### New Features
 
-_None_
+- Add `ios_get_build_number` action to get the current build number from an `xcconfig` file. [#458]
+
 
 ### Bug Fixes
 
