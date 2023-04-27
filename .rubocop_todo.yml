@@ -230,15 +230,6 @@ Style/GuardClause:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/configure_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
 
-# Offense count: 4
-# Cop supports --auto-correct.
-Style/KeywordParametersOrder:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/github_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_adc_app_sizes_helper.rb'
-    - 'rakelib/changelog_parser.rake'
-
 # Offense count: 92
 # Cop supports --auto-correct.
 # Configuration parameters: IgnoredMethods.

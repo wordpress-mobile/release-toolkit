@@ -234,7 +234,7 @@ module Fastlane
         #        An array of locales to download. Each item in the array must be a Hash
         #        with keys `:glotpress` and `:android` containing the respective locale codes.
         #
-        def self.download_from_glotpress(res_dir:, glotpress_project_url:, glotpress_filters: { status: 'current' }, locales_map:)
+        def self.download_from_glotpress(res_dir:, glotpress_project_url:, locales_map:, glotpress_filters: { status: 'current' })
           glotpress_filters = [glotpress_filters] unless glotpress_filters.is_a?(Array)
 
           attributes_to_copy = %w[formatted] # Attributes that we want to replicate into translated `string.xml` files

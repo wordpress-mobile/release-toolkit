@@ -121,7 +121,7 @@ module Fastlane
       # @param [TrueClass|FalseClass] prerelease Indicates if this should be created as a pre-release (i.e. for alpha/beta)
       # @param [TrueClass|FalseClass] is_draft Indicates if this should be created as a draft release
       #
-      def create_release(repository:, version:, target: nil, description:, assets:, prerelease:, is_draft:)
+      def create_release(repository:, version:, description:, assets:, prerelease:, is_draft:, target: nil)
         release = client.create_release(
           repository,
           version, # tag name
