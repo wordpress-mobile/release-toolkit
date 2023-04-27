@@ -449,8 +449,8 @@ module Fastlane
             file.each_line do |line|
               if found_section
                 return line.split[1] if line.include?(keyword) && !line.include?("\"#{keyword}\"") && !line.include?("P#{keyword}")
-              else
-                found_section = true if line.include?(section)
+              elsif line.include?(section)
+                found_section = true
               end
             end
           end
