@@ -280,7 +280,7 @@ module Fastlane
 
       def draw_text_to_canvas(canvas, text, width, height, x_position, y_position, font_size, stylesheet_path, position = 'center')
         begin
-          tempTextFile = Tempfile.new()
+          tempTextFile = Tempfile.new
 
           Action.sh('drawText', "html=#{text}", "maxWidth=#{width}", "maxHeight=#{height}", "output=#{tempTextFile.path}", "fontSize=#{font_size}", "stylesheet=#{stylesheet_path}", "alignment=#{position}")
 

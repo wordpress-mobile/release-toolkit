@@ -53,7 +53,7 @@ module Fastlane
                                        description: 'The download folder',
                                        type: String,
                                        optional: true,
-                                       default_value: Dir.tmpdir()),
+                                       default_value: Dir.tmpdir),
           FastlaneCore::ConfigItem.new(key: :github_release_prefix,
                                        description: 'The prefix which is used in the GitHub release title',
                                        type: String,

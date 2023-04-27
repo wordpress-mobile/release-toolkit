@@ -8,7 +8,7 @@ describe Fastlane::Actions::IosBumpVersionReleaseAction do
 
   describe 'creates the release branch, bumps the app version and commits the changes' do
     before do
-      other_action_mock = double()
+      other_action_mock = double
       allow(Fastlane::Action).to receive(:other_action).and_return(other_action_mock)
       allow(other_action_mock).to receive(:ensure_git_branch).with(branch: default_branch)
 

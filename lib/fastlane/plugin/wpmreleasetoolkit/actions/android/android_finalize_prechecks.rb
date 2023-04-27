@@ -22,7 +22,7 @@ module Fastlane
         end
 
         # Check local repo status
-        other_action.ensure_git_status_clean()
+        other_action.ensure_git_status_clean
 
         version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]
       end

@@ -16,7 +16,7 @@ module Fastlane
 
         # Log in to Firebase (and validate credentials)
         run_uuid = params[:test_run_id] || SecureRandom.uuid
-        test_dir = params[:results_output_dir] || File.join(Dir.tmpdir(), run_uuid)
+        test_dir = params[:results_output_dir] || File.join(Dir.tmpdir, run_uuid)
 
         # Set up the log file and output directory
         FileUtils.mkdir_p(test_dir)

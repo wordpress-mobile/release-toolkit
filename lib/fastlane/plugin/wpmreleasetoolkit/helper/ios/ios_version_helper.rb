@@ -169,7 +169,7 @@ module Fastlane
         # @return [String] The current version according to the public xcconfig file.
         #
         def self.get_build_version
-          versions = get_version_strings()[0]
+          versions = get_version_strings[0]
         end
 
         # Returns the current value of the `VERSION_LONG` key from the internal xcconfig file
@@ -177,7 +177,7 @@ module Fastlane
         # @return [String] The current version according to the internal xcconfig file.
         #
         def self.get_internal_version
-          get_version_strings()[1]
+          get_version_strings[1]
         end
 
         # Prints the current and next release version numbers to stdout, then return the next release version
@@ -186,7 +186,7 @@ module Fastlane
         #
         def self.bump_version_release
           # Bump release
-          current_version = get_public_version()
+          current_version = get_public_version
           UI.message("Current version: #{current_version}")
           new_version = calc_next_release_version(current_version)
           UI.message("New version: #{new_version}")
@@ -293,7 +293,7 @@ module Fastlane
         def self.read_from_config_file(key, filePath)
           File.open(filePath, 'r') do |f|
             f.each_line do |line|
-              line = line.strip()
+              line = line.strip
               return line.split('=')[1] if line.start_with?("#{key}=")
             end
           end

@@ -77,7 +77,7 @@ module Fastlane
 
           # String not found, or removed because needing update and not in the exclusion list: add to the main file
           add_xml_attributes!(lib_string_node, library)
-          main_strings_xml.xpath('//string').last().add_next_sibling("\n#{' ' * 4}#{lib_string_node.to_xml().strip}")
+          main_strings_xml.xpath('//string').last.add_next_sibling("\n#{' ' * 4}#{lib_string_node.to_xml.strip}")
           return result
         end
 

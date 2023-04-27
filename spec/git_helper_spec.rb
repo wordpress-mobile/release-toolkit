@@ -68,7 +68,7 @@ describe Fastlane::Helper::GitHelper do
 
   context('commit(message:, files:, push:)') do
     before(:each) do
-      allow_fastlane_action_sh()
+      allow_fastlane_action_sh
       @message = 'Some commit message with spaces'
     end
 
@@ -160,7 +160,7 @@ describe Fastlane::Helper::GitHelper do
     # This test ensures we support the usecase of the `configure` tool, which can create new files by decrypting secrets.
     # We need the ability to tell if a path result is ignored, regardless of whether it exists yet.
     it 'returns false for files not yet created but part of the repository' do
-      setup_git_repo()
+      setup_git_repo
       expect(Fastlane::Helper::GitHelper.is_ignored?(path: path)).to be false
     end
 

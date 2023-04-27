@@ -43,7 +43,7 @@ module Fastlane
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_release_version
-          return get_version_from_properties() if File.exist?(version_properties_file)
+          return get_version_from_properties if File.exist?(version_properties_file)
 
           section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
           gradle_path = self.gradle_path
@@ -145,7 +145,7 @@ module Fastlane
         def self.calc_next_alpha_version(version, alpha_version)
           # Bump alpha name
           alpha_number = alpha_version[VERSION_NAME].sub(ALPHA_PREFIX, '')
-          alpha_name = "#{ALPHA_PREFIX}#{alpha_number.to_i() + 1}"
+          alpha_name = "#{ALPHA_PREFIX}#{alpha_number.to_i + 1}"
 
           # Bump alpha code
           alpha_code = version[VERSION_CODE] + 1

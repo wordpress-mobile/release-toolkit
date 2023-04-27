@@ -6,7 +6,7 @@ require 'yaml'
 describe Fastlane::Actions::IosLintLocalizationsAction do
   before do
     # Ensure `Action.sh` is not skipped during test – so that SwiftGen will be installed by our action as normal – See spec_helper.rb
-    allow_fastlane_action_sh()
+    allow_fastlane_action_sh
   end
 
   context 'SwiftGen Installation Logic' do

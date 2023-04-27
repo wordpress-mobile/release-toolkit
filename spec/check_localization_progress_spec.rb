@@ -58,7 +58,7 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
     described_class.run(
       glotpress_url: 'https://translate.wordpress.org/projects/apps/my-test-project/dev',
       # Invoke with 'es' which is not in the mocked message
-      language_codes: 'ar de es'.split(),
+      language_codes: 'ar de es'.split,
       min_acceptable_translation_percentage: 99,
       abort_on_violations: true,
       skip_confirm: true
@@ -84,7 +84,7 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
     described_class.run(
       glotpress_url: 'https://translate.wordpress.org/projects/apps/my-test-project/dev',
       # Invoke with 'es' which is not in the mocked message
-      language_codes: 'ar de es'.split(),
+      language_codes: 'ar de es'.split,
       min_acceptable_translation_percentage: 99,
       abort_on_violations: true,
       skip_confirm: true
@@ -113,7 +113,7 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
 
     described_class.run(
       glotpress_url: 'https://translate.wordpress.org/projects/apps/my-test-project/dev',
-      language_codes: 'ar de es'.split(),
+      language_codes: 'ar de es'.split,
       min_acceptable_translation_percentage: 99,
       abort_on_violations: true,
       skip_confirm: true
@@ -142,7 +142,7 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
 
     described_class.run(
       glotpress_url: 'https://translate.wordpress.org/projects/apps/my-test-project/dev',
-      language_codes: 'ar de es'.split(),
+      language_codes: 'ar de es'.split,
       min_acceptable_translation_percentage: 99,
       abort_on_violations: true,
       skip_confirm: true
@@ -178,7 +178,7 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
 
     described_class.run(
       glotpress_url: 'https://translate.wordpress.org/projects/apps/my-test-project/dev',
-      language_codes: 'ar de es'.split(),
+      language_codes: 'ar de es'.split,
       min_acceptable_translation_percentage: 99,
       abort_on_violations: false,
       skip_confirm: false
@@ -215,7 +215,7 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
 
     described_class.run(
       glotpress_url: 'https://translate.wordpress.org/projects/apps/my-test-project/dev',
-      language_codes: 'ar de es'.split(),
+      language_codes: 'ar de es'.split,
       min_acceptable_translation_percentage: 99,
       abort_on_violations: false,
       skip_confirm: false
@@ -251,7 +251,7 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
 
     described_class.run(
       glotpress_url: 'https://translate.wordpress.org/projects/apps/my-test-project/dev',
-      language_codes: 'ar de es'.split(),
+      language_codes: 'ar de es'.split,
       min_acceptable_translation_percentage: 99,
       abort_on_violations: false,
       skip_confirm: true
@@ -286,7 +286,7 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
 
     described_class.run(
       glotpress_url: 'https://translate.wordpress.org/projects/apps/my-test-project/dev',
-      language_codes: 'ar de es'.split(),
+      language_codes: 'ar de es'.split,
       min_acceptable_translation_percentage: 99,
       abort_on_violations: false,
       skip_confirm: true
@@ -298,7 +298,7 @@ end
 
 def generate_glotpress_response_body(languages:)
   response = ''
-  response << generate_glotpress_response_header()
+  response << generate_glotpress_response_header
   languages.each do |language|
     response << generate_glotpress_response_for_language(
       lang: language[:lang_name],
@@ -311,7 +311,7 @@ def generate_glotpress_response_body(languages:)
     )
   end
 
-  response << generate_glotpress_response_footer()
+  response << generate_glotpress_response_footer
   response
 end
 

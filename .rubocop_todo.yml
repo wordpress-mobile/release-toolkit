@@ -230,12 +230,6 @@ Style/GuardClause:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/configure_helper.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/promo_screenshots_helper.rb'
 
-# Offense count: 92
-# Cop supports --auto-correct.
-# Configuration parameters: IgnoredMethods.
-Style/MethodCallWithoutArgsParentheses:
-  Enabled: false
-
 # Offense count: 1
 Style/MixinUsage:
   Exclude:
