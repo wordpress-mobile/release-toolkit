@@ -43,11 +43,9 @@ describe Fastlane::Actions::IosGetBuildNumberAction do
     end
 
     it 'throws an error when the xcconfig file does not exist' do
-      file_path = 'file/not/found'
-
       expect do
         run_described_fastlane_action(
-          xcconfig_file_path: file_path
+          xcconfig_file_path: 'file/not/found'
         )
         # Ruby error for 'No such file or directory': https://ruby-doc.org/core-2.7.4/SystemCallError.html
       end.to raise_error(Errno::ENOENT)
