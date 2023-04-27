@@ -68,7 +68,7 @@ module Fastlane
                                        optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :freeze,
-                                       description: 'The GitHub milestone',
+                                       description: 'If true, the action will add the ❄️ emoji to the milestone title',
                                        optional: false,
                                        default_value: true,
                                        type: Boolean),
