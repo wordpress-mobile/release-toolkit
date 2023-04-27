@@ -248,7 +248,6 @@ module Fastlane
         end
 
         #----------------------------------------
-        private
 
         # Split a version string into its 4 parts, ensuring its parts count is valid
         #

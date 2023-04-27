@@ -349,7 +349,6 @@ module Fastlane
         end
 
         #----------------------------------------
-        private
 
         # Remove the beta suffix (part after the `-`) from a version string
         #
