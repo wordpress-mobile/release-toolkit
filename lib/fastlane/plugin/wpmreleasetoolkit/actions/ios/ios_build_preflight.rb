@@ -53,7 +53,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :derived_data_path,
             description: "The path to the DerivedData directory for the project. Should match what's used in the `gym` action",
-            is_string: true,
+            type: String,
             default_value: '~/Library/Developer/Xcode/DerivedData'
           ),
         ]

@@ -86,7 +86,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :skip_update_suggestion,
                                        env_name: 'CHECK_FOR_TOOLKIT_UPDATES_SKIP_UPDATE_SUGGESTION',
                                        description: 'If true, will still check for new versions, but will not ask if you want to run bundle update if an update is found',
-                                       is_string: false, # Boolean
+                                       type: Boolean,
                                        default_value: false),
         ]
       end

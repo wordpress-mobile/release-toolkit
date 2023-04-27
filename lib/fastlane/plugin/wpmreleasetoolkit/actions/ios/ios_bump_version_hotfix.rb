@@ -43,19 +43,19 @@ module Fastlane
             key: :version,
             env_name: 'FL_IOS_BUMP_VERSION_HOTFIX_VERSION',
             description: 'The version of the hotfix',
-            is_string: true
+            type: String
           ),
           FastlaneCore::ConfigItem.new(
             key: :previous_version,
             env_name: 'FL_IOS_BUMP_VERSION_HOTFIX_PREVIOUS_VERSION',
             description: 'The version to branch from',
-            is_string: true
+            type: String
           ),
           FastlaneCore::ConfigItem.new(
             key: :skip_deliver,
             env_name: 'FL_IOS_BUMP_VERSION_HOTFIX_SKIP_DELIVER',
             description: 'Skips Deliverfile key update',
-            is_string: false, # Boolean parameter
+            type: Boolean,
             optional: true,
             # Don't skip the Deliverfile by default. At the time of writing, 2 out of 3 consumers
             # still have a Deliverfile.
