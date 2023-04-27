@@ -6,6 +6,7 @@ module Fastlane
 
         require_relative '../../helper/android/android_git_helper'
         require_relative '../../helper/android/android_version_helper'
+        require_relative '../../helper/release_management_in_ci_helper.rb'
 
         Fastlane::Helper::GitHelper.ensure_on_branch!('release')
 
@@ -16,6 +17,10 @@ module Fastlane
 
         vname = Fastlane::Helper::Android::VersionHelper::VERSION_NAME
         vcode = Fastlane::Helper::Android::VersionHelper::VERSION_CODE
+
+        new_branch_name = Fastlane::Helper::ReleaseManagementInCIHelper.bump_version_beta_branch_name(new_version_beta[vname])
+        Fastlane::Helper::GitHelper.create_branch(new_branch_name)
+
         UI.message("Current version: #{current_version[vname]}(#{current_version[vcode]})")
         UI.message("Current alpha version: #{current_version_alpha[vname]}(#{current_version_alpha[vcode]})") unless current_version_alpha.nil?
         UI.message("New beta version: #{new_version_beta[vname]}(#{new_version_beta[vcode]})")
