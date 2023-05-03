@@ -37,7 +37,7 @@ module Fastlane
         target = self.create_target_file_path(orig)
 
         # Clear if older exists
-        File.delete(target) if File.exist? target
+        FileUtils.rm_f(target)
 
         # Create the new one
         begin
@@ -47,7 +47,7 @@ module Fastlane
             end
           end
         rescue
-          File.delete(target) if File.exist? target
+          FileUtils.rm_f(target)
           raise
         end
 
@@ -57,7 +57,7 @@ module Fastlane
       # Deletes the old po and moves the temp one
       # to the final location
       def self.swap_po(orig_file_path, temp_file_path)
-        File.delete(orig_file_path) if File.exist? orig_file_path
+        FileUtils.rm_f(orig_file_path)
         File.rename(temp_file_path, orig_file_path)
       end
 
@@ -131,7 +131,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :po_file_path,
                                        env_name: 'FL_UPDATE_METADATA_SOURCE_PO_FILE_PATH',
                                        description: 'The path of the .po file to update',
-                                       is_string: true,
+                                       type: String,
                                        verify_block: proc do |value|
                                          UI.user_error!("No .po file path for UpdateMetadataSourceAction given, pass using `po_file_path: 'file path'`") unless value && (!value.empty?)
                                          UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
@@ -145,7 +145,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :source_files,
                                        env_name: 'FL_UPDATE_METADATA_SOURCE_SOURCE_FILES',
                                        description: 'The hash with the path to the source files and the key to use to include their content',
-                                       is_string: false,
+                                       type: Hash,
                                        verify_block: proc do |value|
                                          UI.user_error!("No source file hash for UpdateMetadataSourceAction given, pass using `source_files: 'source file hash'`") unless value && (!value.empty?)
                                        end),

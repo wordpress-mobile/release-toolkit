@@ -34,11 +34,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :new_version,
                                        env_name: 'FL_ANDROID_UPDATE_RELEASE_NOTES_VERSION',
                                        description: 'The version we are currently freezing; An empty entry for the _next_ version after this one will be added to the release notes',
-                                       is_string: true),
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :release_notes_file_path,
                                        env_name: 'FL_ANDROID_UPDATE_RELEASE_NOTES_FILE_PATH',
                                        description: 'The path to the release notes file to be updated',
-                                       is_string: true,
+                                       type: String,
                                        default_value: File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'RELEASE-NOTES.txt')),
         ]
       end

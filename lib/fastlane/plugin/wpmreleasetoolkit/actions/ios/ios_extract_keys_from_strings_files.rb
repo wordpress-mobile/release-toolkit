@@ -45,10 +45,10 @@ module Fastlane
       # @return [Hash<String, Array<String>>] The hash listing the keys to extract for each target file
       #
       def self.keys_list_per_target_file(original_files)
-        original_files.map do |original_file|
+        original_files.to_h do |original_file|
           keys = Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: original_file).keys
           [original_file, keys]
-        end.to_h
+        end
       rescue StandardError => e
         UI.user_error!("Failed to read the keys to extract from originals file: #{e.message}")
       end

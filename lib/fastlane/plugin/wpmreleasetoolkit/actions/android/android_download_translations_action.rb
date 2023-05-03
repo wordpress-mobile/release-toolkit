@@ -91,7 +91,7 @@ module Fastlane
             key: :skip_commit,
             env_name: 'FL_DOWNLOAD_TRANSLATIONS_SKIP_COMMIT',
             description: 'If set to true, will skip the commit/push step. Otherwise, it will commit the changes and push them (the default)',
-            is_string: false, # Boolean
+            type: Boolean,
             default_value: false
           ),
         ]

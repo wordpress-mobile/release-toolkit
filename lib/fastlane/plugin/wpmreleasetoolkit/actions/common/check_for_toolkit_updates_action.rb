@@ -44,12 +44,12 @@ module Fastlane
         UI.important <<~BREAKING_CHANGE_MESSAGE
           The latest version available (#{latest_version}) introduces breaking changes compared to the #{current_version} you are currently using.
 
-           - To update to #{latest_version}, first edit your \`Pluginfile\` to use '#{new_semver_requirement}', run \`bundle update\`,
-             then be sure to make all the necessary changes to your \`Fastfile\` (see the toolkit's CHANGELOG)
+           - To update to #{latest_version}, first edit your `Pluginfile` to use '#{new_semver_requirement}', run `bundle update`,
+             then be sure to make all the necessary changes to your `Fastfile` (see the toolkit's CHANGELOG)
              to take those breaking changes into account.
 
            - If you are not ready to make the major version bump, you can still try to update to the latest compatible,
-             non-breaking version by running \`bundle update\` now. This will not update to the latest #{latest_version}, but
+             non-breaking version by running `bundle update` now. This will not update to the latest #{latest_version}, but
              might still update to a newer version compatible with '#{current_semver_requirement}' if one exists; which is still valuable
              to at least get bugfixes, until you are ready to jump to the next major version later.
         BREAKING_CHANGE_MESSAGE
@@ -86,7 +86,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :skip_update_suggestion,
                                        env_name: 'CHECK_FOR_TOOLKIT_UPDATES_SKIP_UPDATE_SUGGESTION',
                                        description: 'If true, will still check for new versions, but will not ask if you want to run bundle update if an update is found',
-                                       is_string: false, # Boolean
+                                       type: Boolean,
                                        default_value: false),
         ]
       end

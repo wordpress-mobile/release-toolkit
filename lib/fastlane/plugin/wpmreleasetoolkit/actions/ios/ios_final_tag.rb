@@ -30,7 +30,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: 'FL_IOS_FINAL_TAG_VERSION',
                                        description: 'The version of the release to finalize',
-                                       is_string: true),
+                                       type: String),
         ]
       end
 

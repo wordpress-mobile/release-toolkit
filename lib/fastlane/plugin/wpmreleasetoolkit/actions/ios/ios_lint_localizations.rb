@@ -163,7 +163,7 @@ module Fastlane
             description: 'Should we abort the rest of the lane with a global error if any violations are found?',
             optional: true,
             default_value: true,
-            is_string: false # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
+            type: Boolean
           ),
           FastlaneCore::ConfigItem.new(
             key: :allow_retry,
@@ -171,7 +171,7 @@ module Fastlane
             description: 'If any violations are found, show an interactive prompt allowing the user to manually fix the issues locally and retry the linting',
             optional: true,
             default_value: false,
-            is_string: false # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
+            type: Boolean
           ),
           FastlaneCore::ConfigItem.new(
             key: :check_duplicate_keys,
@@ -179,7 +179,7 @@ module Fastlane
             description: 'Checks the input files for duplicate keys',
             optional: true,
             default_value: true,
-            is_string: false # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
+            type: Boolean
           ),
         ]
       end

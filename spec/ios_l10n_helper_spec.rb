@@ -61,7 +61,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
       paths = [fixture('Localizable-utf16.strings'), fixture('InfoPlist-utf8.strings')]
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         paths.each { |f| FileUtils.cp(f, tmp_dir) }
-        paths = paths.map { |f| [File.join(tmp_dir, File.basename(f)), nil] }.to_h
+        paths = paths.to_h { |f| [File.join(tmp_dir, File.basename(f)), nil] }
         described_class.merge_strings(paths: paths, output_path: paths.keys.first)
         expect(File.read(paths.keys.first)).to eq(File.read(fixture('expected-merged.strings')))
       end

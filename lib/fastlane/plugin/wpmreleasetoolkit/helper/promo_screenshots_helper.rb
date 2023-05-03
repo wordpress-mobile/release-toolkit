@@ -24,7 +24,7 @@ module Fastlane
         if $skip_magick
           message = "PromoScreenshots feature is currently disabled.\n"
           message << "Please, install RMagick if you aim to generate the PromoScreenshots.\n"
-          message << "\'bundle install --with screenshots\' should do it if your project is configured for PromoScreenshots.\n"
+          message << "'bundle install --with screenshots' should do it if your project is configured for PromoScreenshots.\n"
           message << 'Aborting.'
           UI.user_error!(message)
         end

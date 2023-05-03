@@ -42,7 +42,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :po_file_path,
                                        env_name: 'FL_IOS_UPDATE_METADATA_SOURCE_PO_FILE_PATH',
                                        description: 'The path of the .po file to update',
-                                       is_string: true,
+                                       type: String,
                                        verify_block: proc do |value|
                                                        UI.user_error!("No .po file path for UpdateMetadataSourceAction given, pass using `po_file_path: 'file path'`") unless value && (!value.empty?)
                                                        UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
@@ -56,7 +56,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :source_files,
                                        env_name: 'FL_IOS_UPDATE_METADATA_SOURCE_SOURCE_FILES',
                                        description: 'The hash with the path to the source files and the key to use to include their content',
-                                       is_string: false,
+                                       type: Hash,
                                        verify_block: proc do |value|
                                                        UI.user_error!("No source file hash for UpdateMetadataSourceAction given, pass using `source_files: 'source file hash'`") unless value && (!value.empty?)
                                                      end),

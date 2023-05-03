@@ -48,7 +48,7 @@ module Fastlane
             extracted_dir = File.join(tmpdir, "swiftgen-#{version}")
             Action.sh('unzip', zipfile, '-d', extracted_dir)
 
-            FileUtils.rm_rf(install_path) if File.exist?(install_path)
+            FileUtils.rm_rf(install_path)
             FileUtils.mkdir_p(install_path)
             FileUtils.cp_r("#{extracted_dir}/.", install_path)
           end
