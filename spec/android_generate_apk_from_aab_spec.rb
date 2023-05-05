@@ -88,7 +88,7 @@ describe Fastlane::Actions::AndroidGenerateApkFromAabAction do
         run_described_fastlane_action(
           apk_output_file_path: apk_output_file_path
         )
-      end.to raise_error(described_class::NO_AAB_ERROR_MESSAGE)
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, described_class::NO_AAB_ERROR_MESSAGE)
 
       Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS] = nil
     end
@@ -122,38 +122,35 @@ describe Fastlane::Actions::AndroidGenerateApkFromAabAction do
   describe 'error handling' do
     it 'errors if bundletool is not installed' do
       allow(Fastlane::Action).to receive('sh').with('command', '-v', 'bundletool', any_args).and_raise
-      expect(Fastlane::UI).to receive(:user_error!).with(described_class::MISSING_BUNDLETOOL_ERROR_MESSAGE).and_raise
 
       expect do
         run_described_fastlane_action(
           aab_file_path: aab_file_path,
           apk_output_file_path: apk_output_file_path
         )
-      end.to raise_error(RuntimeError)
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, described_class::MISSING_BUNDLETOOL_ERROR_MESSAGE)
     end
 
     it 'errors if no input AAB file was provided nor can be inferred' do
       expect(Fastlane::Action).to receive('sh').with('command', '-v', 'bundletool', any_args)
-      expect(Fastlane::UI).to receive(:user_error!).with(described_class::NO_AAB_ERROR_MESSAGE).and_raise
 
       expect do
         run_described_fastlane_action(
           apk_output_file_path: apk_output_file_path
         )
-      end.to raise_error(RuntimeError)
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, described_class::NO_AAB_ERROR_MESSAGE)
     end
 
     it 'errors if the provided input AAB file does not exist' do
       expect(Fastlane::Action).to receive('sh').with('command', '-v', 'bundletool', any_args)
       allow(File).to receive(:file?).with(aab_file_path).and_return(false)
-      expect(Fastlane::UI).to receive(:user_error!).with("The file `#{aab_file_path}` was not found. Please provide a path to an existing file.").and_raise
 
       expect do
         run_described_fastlane_action(
           aab_file_path: aab_file_path,
           apk_output_file_path: apk_output_file_path
         )
-      end.to raise_error(RuntimeError)
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, "The file `#{aab_file_path}` was not found. Please provide a path to an existing file.")
     end
   end
 end
