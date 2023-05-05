@@ -84,7 +84,7 @@ module Fastlane
                                        description: 'True if this is a pre-release',
                                        optional: true,
                                        default_value: false,
-                                       is_string: false),
+                                       type: Boolean),
           FastlaneCore::ConfigItem.new(key: :is_draft,
                                        env_name: 'GHHELPER_CREATE_RELEASE_IS_DRAFT',
                                        description: 'True to create the GitHub release as a draft (instead of publishing it immediately)',

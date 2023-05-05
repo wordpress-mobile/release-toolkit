@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 require 'simplecov'
 require 'codecov'
 require 'webmock/rspec'
-require 'rspec/buildkite/analytics'
+require 'buildkite/test_collector'
 
 # SimpleCov.minimum_coverage 95
 SimpleCov.start
@@ -15,7 +15,7 @@ SimpleCov.formatter = SimpleCov::Formatter::Codecov if code_coverage_token
 
 # Buildkite Test Analytics
 WebMock.disable_net_connect!(allow: 'analytics-api.buildkite.com')
-RSpec::Buildkite::Analytics.configure(token: ENV['BUILDKITE_ANALYTICS_TOKEN'])
+Buildkite::TestCollector.configure(hook: :rspec)
 
 # This module is only used to check the environment is currently a testing env
 module SpecHelper

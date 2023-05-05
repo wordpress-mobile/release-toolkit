@@ -32,7 +32,7 @@ module Fastlane
             key: :internal,
             env_name: 'FL_IOS_BUILD_VERSION_INTERNAL',
             description: 'If true, returns the internal build version, otherwise returns the public one',
-            is_string: false, # Boolean
+            type: Boolean,
             default_value: false
           ),
         ]

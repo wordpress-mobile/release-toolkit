@@ -10,7 +10,8 @@ _None_
 
 ### New Features
 
-_None_
+- Add `ios_get_build_number` action to get the current build number from an `xcconfig` file. [#458]
+
 
 ### Bug Fixes
 
@@ -21,6 +22,11 @@ _None_
 - Add "Mobile Secrets" to `configure_update` current branch message to clarify which repo it's referring to. [#455]
 - `buildkite_trigger_build` now prints the web URL of the newly scheduled build, to allow you to easily open it via cmd-click. [#460]
 - Add the branch information to the 'This is not a release branch' error that's thrown from complete code freeze lane. [#461]
+- Update `octokit` to `5.6.1` This is a major version bump from version `4.18`, but is not a breaking change for the Release Toolkit because it doesn't change any public APIs for clients. [#464]
+- Update `danger` to `9.3.0`. This is an internal-only change and is not a breaking change for clients. [#464]
+- Replace `rspec-buildkite-analytics` with `buildkite-test_collector` (Buildkite renamed the gem) and update it to `2.2.0`. This is another internal-only change and is not a breaking change for clients. [#465]
+- Adds `ignore_pipeline_branch_filters=true` parameter to the API call triggering a Buildkite build [#468]
+- Replace all instances of `is_string` with `type` [#469]
 - Use `git_branch_name_using_HEAD` instead of `git_branch` so that the return value is not modified by environment variables. This has no impact to our current release flow, that's why it's not in "Breaking changes" section. [#463]
 
 ## 7.0.0
