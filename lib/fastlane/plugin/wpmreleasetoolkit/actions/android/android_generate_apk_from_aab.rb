@@ -11,16 +11,13 @@ module Fastlane
         # Parse input parameters
         aab_file_path = parse_aab_param(params)
         apk_output_file_path = params[:apk_output_file_path] || Pathname(aab_file_path).sub_ext('.apk').to_s
+        apk_output_file_path = File.join(apk_output_file_path, "#{File.basename(aab_file_path, '.aab')}.apk") if File.directory?(apk_output_file_path)
         code_sign_arguments = {
           '--ks': params[:keystore_path],
           '--ks-pass': params[:keystore_password],
           '--ks-key-alias': params[:keystore_key_alias],
           '--key-pass': params[:signing_key_password]
         }.compact.flatten.map(&:to_s)
-
-        if File.directory?(apk_output_file_path)
-          apk_output_file_path = File.join(apk_output_file_path, "#{File.basename(aab_file_path, '.aab')}.apk")
-        end
 
         Dir.mktmpdir('a8c-release-toolkit-bundletool-') do |tmpdir|
           sh(
