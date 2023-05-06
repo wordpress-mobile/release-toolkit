@@ -95,17 +95,15 @@ module Fastlane
       end
 
       # `git add` the specified files (if any provided) then commit them using the provided message.
-      # Optionally, push the commit to the remote too.
       #
       # @param [String] message The commit message to use
       # @param [String|Array<String>] files A file or array of files to git-add before creating the commit.
       #        Use `nil` or `[]` if you already added the files in a separate step and don't wan't this method to add any new file before commit.
       #        Also accepts the special symbol `:all` to add all the files (`git commit -a -m …`).
-      # @param [Bool] push If true, will `git push` to `origin` after the commit has been created. Defaults to `false`.
       #
-      # @return [Bool] True if commit and push were successful, false if there was an issue during commit & push (most likely being "nothing to commit").
+      # @return [Bool] True if commit was successful, false if there was an issue (most likely being "nothing to commit").
       #
-      def self.commit(message:, files: nil, push: false)
+      def self.commit(message:, files: nil)
         files = [files] if files.is_a?(String)
         args = []
         if files == :all
@@ -115,7 +113,6 @@ module Fastlane
         end
         begin
           Action.sh('git', 'commit', *args, '-m', message)
-          Action.sh('git', 'push', 'origin', 'HEAD') if push
           return true
         rescue
           return false
