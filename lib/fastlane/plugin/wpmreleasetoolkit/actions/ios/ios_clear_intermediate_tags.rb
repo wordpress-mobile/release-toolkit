@@ -28,11 +28,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Cleans all the intermediate tags for the given version'
+        '(DEPRECATED) Cleans all the intermediate tags for the given version'
       end
 
       def self.details
-        'Cleans all the intermediate tags for the given version'
+        '(DEPRECATED) Cleans all the intermediate tags for the given version'
       end
 
       def self.available_options

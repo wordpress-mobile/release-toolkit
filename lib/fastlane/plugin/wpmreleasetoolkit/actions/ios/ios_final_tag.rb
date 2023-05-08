@@ -20,11 +20,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Finalize a relasae'
+        '(DEPRECATED) Finalize a relasae'
       end
 
       def self.details
-        'Removes the temp tags and pushes the final one'
+        '(DEPRECATED) Removes the temp tags and pushes the final one'
       end
 
       def self.available_options
