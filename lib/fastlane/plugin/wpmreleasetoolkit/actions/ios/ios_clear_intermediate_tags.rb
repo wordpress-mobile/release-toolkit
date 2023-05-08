@@ -50,6 +50,10 @@ module Fastlane
       def self.return_value
       end
 
+      def self.category
+        :deprecated
+      end
+
       def self.deprecated_notes
         "This action is deprecated as we don't believe it's currently in use in our projects.
         However, just to be sure that it's not in use, we decided to deprecate it first. If you
