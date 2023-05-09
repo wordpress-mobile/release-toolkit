@@ -1,4 +1,6 @@
-###From `7.0.0` to `8.0.0`
+# Migration Instructions for Major Releases
+
+### From `7.0.0` to `8.0.0`
 
 We are no longer pushing to remote after creating a new commit or a branch. That means, developers need to manually push the changes or add push commands in the project's `Fastfile`. Most importantly, we can no longer immediately trigger beta/final builds after creating a new commit because the changes will not be in remote yet. If you want to keep the existing behavior, you'll need to add a push command before these triggers.
 
