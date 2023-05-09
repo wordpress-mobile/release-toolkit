@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-_None_
+- Remove git push commands after creating a new commit or branch. [#472] See `MIGRATION.md` for instructions.
 
 ### New Features
 
