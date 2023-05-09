@@ -11,7 +11,7 @@ _None_
 ### New Features
 
 - Add `ios_get_build_number` action to get the current build number from an `xcconfig` file. [#458]
-- Add new `android_generate_apk_from_aab` action to generate an APK from a given AAB.
+- Add new `android_generate_apk_from_aab` action to generate an APK from a given AAB. [#467]
 
 ### Bug Fixes
 
