@@ -28,7 +28,7 @@ _None_
 - Adds `ignore_pipeline_branch_filters=true` parameter to the API call triggering a Buildkite build [#468]
 - Replace all instances of `is_string` with `type` [#469]
 - Use `git_branch_name_using_HEAD` instead of `git_branch` so that the return value is not modified by environment variables. This has no impact to our current release flow, that's why it's not in "Breaking changes" section. [#463]
-- Deprecate `ios_clear_intermediate_tags` & `ios_final_tag` actions. [#470]
+- Deprecate `ios_clear_intermediate_tags` & `ios_final_tag` actions. [#471]
 
 ## 7.0.0
 
