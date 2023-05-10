@@ -4,11 +4,14 @@ require 'json'
 module Fastlane
   module Helper
     class MetadataDownloader
+      AUTO_RETRY_SLEEP_TIME = 20
+
       attr_reader :target_folder, :target_files
 
-      def initialize(target_folder, target_files)
+      def initialize(target_folder, target_files, auto_retry)
         @target_folder = target_folder
         @target_files = target_files
+        @auto_retry = auto_retry
         @alternates = {}
       end
 
@@ -112,8 +115,12 @@ module Fastlane
           UI.message("Received 301 for `#{locale}`. Following redirect...")
           download(locale, response.header['location'], is_source)
         when '429'
-          # We got rate-limited, offer to try again
-          if UI.confirm("Retry downloading `#{locale}` after receiving 429 from the API?")
+          # We got rate-limited, auto_retry or offer to try again with a prompt
+          if @auto_retry
+            UI.message("Received 429 for `#{locale}`. Auto retrying in #{AUTO_RETRY_SLEEP_TIME} seconds...")
+            sleep(AUTO_RETRY_SLEEP_TIME)
+            download(locale, response.uri, is_source)
+          elsif UI.confirm("Retry downloading `#{locale}` after receiving 429 from the API?")
             download(locale, response.uri, is_source)
           else
             UI.error("Abandoning `#{locale}` download as requested.")
