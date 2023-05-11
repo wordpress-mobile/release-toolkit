@@ -18,6 +18,12 @@ _None_
 
 ### Internal Changes
 
+_None_
+
+## 7.1.1
+
+### Internal Changes
+
 - Remove `rubygems_mfa_required` from the `gemspec`. [#475]
 
 ## 7.1.0
