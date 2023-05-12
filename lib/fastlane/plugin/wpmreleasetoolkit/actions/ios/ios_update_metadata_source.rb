@@ -18,7 +18,6 @@ module Fastlane
         repo_clean = repo_status.empty?
         unless repo_clean
           Action.sh('git commit -m "Update metadata strings"')
-          Action.sh('git push')
         end
       end
 
