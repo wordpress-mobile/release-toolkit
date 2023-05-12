@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-- Remove git push commands after creating a new commit or branch. [#472] See `MIGRATION.md` for instructions.
+_None_
 
 ### New Features
 
@@ -19,6 +19,12 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 8.0.0
+
+### Breaking Changes
+
+- Remove git push commands after creating a new commit or branch. [#472] See `MIGRATION.md` for instructions.
 
 ## 7.1.1
 
