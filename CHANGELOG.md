@@ -20,6 +20,12 @@ _None_
 
 _None_
 
+## 7.1.2
+
+### Bug Fixes
+
+- Revert the `gp_downloadmetadata_action` `locales` item type from `type: Hash` to `is_string: false`. [#480]
+
 ## 7.1.1
 
 ### Internal Changes
