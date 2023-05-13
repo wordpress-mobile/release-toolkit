@@ -66,7 +66,7 @@ describe Fastlane::Helper::GitHelper do
     expect(Fastlane::Helper::GitHelper.has_git_lfs?).to be false
   end
 
-  context('commit(message:, files:, push:)') do
+  context('commit(message:, files:)') do
     before(:each) do
       allow_fastlane_action_sh()
       @message = 'Some commit message with spaces'
@@ -107,18 +107,6 @@ describe Fastlane::Helper::GitHelper do
     it 'adds all pending file changes before commit if :all is provided as `files`' do
       expect_shell_command('git', 'commit', '-a', '-m', @message)
       Fastlane::Helper::GitHelper.commit(message: @message, files: :all)
-    end
-
-    it 'does not push to origin if not asked' do
-      expect_shell_command('git', 'commit', '-m', @message)
-      expect_shell_command('git', 'push', any_args).never
-      Fastlane::Helper::GitHelper.commit(message: @message)
-    end
-
-    it 'does push to origin if asked' do
-      expect_shell_command('git', 'commit', '-m', @message)
-      expect_shell_command('git', 'push', 'origin', 'HEAD').once
-      Fastlane::Helper::GitHelper.commit(message: @message, push: true)
     end
   end
 

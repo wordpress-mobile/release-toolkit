@@ -20,6 +20,18 @@ _None_
 
 _None_
 
+## 8.0.1
+
+### Bug Fixes
+
+- Revert the `gp_downloadmetadata_action` `locales` item type from `type: Hash` to `is_string: false`. [#478]
+
+## 8.0.0
+
+### Breaking Changes
+
+- Remove git push commands after creating a new commit or branch. [#472] See `MIGRATION.md` for instructions.
+
 ## 7.1.2
 
 ### Bug Fixes
