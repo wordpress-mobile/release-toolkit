@@ -32,6 +32,12 @@ _None_
 
 - Remove git push commands after creating a new commit or branch. [#472] See `MIGRATION.md` for instructions.
 
+## 7.1.2
+
+### Bug Fixes
+
+- Revert the `gp_downloadmetadata_action` `locales` item type from `type: Hash` to `is_string: false`. [#480]
+
 ## 7.1.1
 
 ### Internal Changes
