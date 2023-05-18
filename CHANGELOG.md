@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Adds auto_retry option to `gp_downloadmetadata_action`. [#474]
 
 ### Bug Fixes
 
