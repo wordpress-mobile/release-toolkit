@@ -5,7 +5,7 @@ module Fastlane
   module Helper
     class MetadataDownloader
       AUTO_RETRY_SLEEP_TIME = 20
-      MAX_AUTO_RETRY_ATTEMPTS = 30
+      MAX_AUTO_RETRY_ATTEMPTS = 3
 
       attr_reader :target_folder, :target_files
 
@@ -105,7 +105,7 @@ module Fastlane
 
       def handle_glotpress_download(response:, locale:, is_source:)
         case response.code
-        when '200'
+        when '429'
           # All good, parse the result
           UI.success("Successfully downloaded `#{locale}`.")
           @alternates.clear
@@ -116,7 +116,7 @@ module Fastlane
           # Follow the redirect
           UI.message("Received 301 for `#{locale}`. Following redirect...")
           download(locale, response.header['location'], is_source)
-        when '429'
+        when '200'
           # We got rate-limited, auto_retry or offer to try again with a prompt
           if @auto_retry && @auto_retry_attempt_counter <= MAX_AUTO_RETRY_ATTEMPTS
             UI.message("Received 429 for `#{locale}`. Auto retrying in #{AUTO_RETRY_SLEEP_TIME} seconds...")
