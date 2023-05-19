@@ -74,7 +74,7 @@ module Fastlane
                                        description: 'Whether to auto retry downloads after Too Many Requests error',
                                        type: FastlaneCore::Boolean,
                                        optional: true,
-                                       default_value: false),
+                                       default_value: true),
         ]
       end
 
