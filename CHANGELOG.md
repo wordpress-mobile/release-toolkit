@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- Adds auto_retry option to `gp_downloadmetadata_action`. [#474]
+_None_
 
 ### Bug Fixes
 
@@ -19,6 +19,12 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 8.1.0
+
+### New Features
+
+- Adds auto_retry option to `gp_downloadmetadata_action`. [#474]
 
 ## 8.0.1
 
