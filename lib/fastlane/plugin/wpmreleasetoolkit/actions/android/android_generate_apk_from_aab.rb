@@ -3,7 +3,7 @@ module Fastlane
     class AndroidGenerateApkFromAabAction < Action
       def self.run(params)
         begin
-          sh('command', '-v', 'bundletool', print_command: false, print_command_output: false)
+          sh('command', '-v', 'bundletool', print_command: true, print_command_output: true)
         rescue StandardError
           UI.user_error!(MISSING_BUNDLETOOL_ERROR_MESSAGE)
         end
