@@ -35,12 +35,23 @@ module Fastlane
         #         Corresponds to incrementing the minor part, except if it reached 10
         #         (in that case we go to the next major version, as decided in our versioning conventions)
         #
-        def self.calc_next_release_version(version)
+        def self.calc_next_release_version(version, version_scheme = 'rollover_versioning')
           vp = get_version_parts(version)
           vp[MINOR_NUMBER] += 1
-          if vp[MINOR_NUMBER] == 10
-            vp[MAJOR_NUMBER] += 1
-            vp[MINOR_NUMBER] = 0
+
+          case version_scheme
+          when 'calendar_versioning'
+            # We only want to bump the major version if the code freeze is for the first version of the next year
+            if Time.now.month == 12 && UI.confirm('Is this release the first release of next year?')
+              vp[MAJOR_NUMBER] += 1
+            end
+          when 'rollover_versioning'
+            if vp[MINOR_NUMBER] == 10
+              vp[MAJOR_NUMBER] += 1
+              vp[MINOR_NUMBER] = 0
+            end
+          else
+            UI.user_error!("Please set the Versioning Scheme to 'calendar_versioning' or 'rollover_versioning'")
           end
 
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}"
