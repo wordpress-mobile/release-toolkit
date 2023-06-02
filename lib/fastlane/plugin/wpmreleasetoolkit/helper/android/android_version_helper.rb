@@ -200,16 +200,23 @@ module Fastlane
         #
         # @return [Hash] Hash containing the next release version name ("X.Y") and code.
         #
-        def self.calc_next_release_base_version(version)
+        def self.calc_next_release_base_version(version, version_scheme = 'marketing_versioning')
           version_name = remove_beta_suffix(version[VERSION_NAME])
           vp = get_version_parts(version_name)
           vp[MINOR_NUMBER] += 1
-          if vp[MINOR_NUMBER] == 10
-            vp[MAJOR_NUMBER] += 1
-            vp[MINOR_NUMBER] = 0
+
+          next_release_base_version = ""
+
+          case version_scheme
+          when 'calendar_versioning'
+            next_release_base_version = Fastlane::Helper::VersionHelper.increment_version_using_calendar_versioning(vp)
+          when 'marketing_versioning'
+            next_release_base_version = Fastlane::Helper::VersionHelper.increment_version_using_marketing_versioning(vp)
+          else
+            UI.user_error!("Please set the versioning scheme to 'calendar_versioning' or 'marketing_versioning'")
           end
 
-          { VERSION_NAME => "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}", VERSION_CODE => version[VERSION_CODE] }
+          { VERSION_NAME => next_release_base_version, VERSION_CODE => version[VERSION_CODE] }
         end
 
         # Compute the name of the next version to use after code freeze, by incrementing the current version name and making it a `-rc-1`
