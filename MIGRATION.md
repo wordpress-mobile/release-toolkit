@@ -1,6 +1,6 @@
 # Migration Instructions for Major Releases
 
-## Migrating to Trunk
+## From `8.0.0` to `9.0.0`
 
 - Ensure that calls to `ios_bump_version_release` already passed `skip_glotpress: true`.
 In case of passing false as parameter or not providing a value (false being the default for this ConfigItem), you'll have to ensure that:
