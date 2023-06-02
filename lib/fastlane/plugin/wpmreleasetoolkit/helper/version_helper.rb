@@ -2,7 +2,6 @@ module Fastlane
   module Helper
     # Helper methods with shared logic between Android/iOS/macOS to execute version-related operations
     module VersionHelper
-
       # The index for the major version number part
       MAJOR_NUMBER = 0
       # The index for the minor version number part

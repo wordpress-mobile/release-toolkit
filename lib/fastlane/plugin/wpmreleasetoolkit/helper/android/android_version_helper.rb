@@ -205,7 +205,7 @@ module Fastlane
           vp = get_version_parts(version_name)
           vp[MINOR_NUMBER] += 1
 
-          next_release_base_version = ""
+          next_release_base_version = ''
 
           case version_scheme
           when 'calendar_versioning'
