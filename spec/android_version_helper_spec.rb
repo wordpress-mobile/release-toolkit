@@ -99,6 +99,83 @@ describe Fastlane::Helper::Android::VersionHelper do
     end
   end
 
+  describe 'calculates_the_next_release_base_version' do
+    context 'when using calendar_versioning' do
+      it 'increments the minor version number' do
+        version = {
+          'name' => '1995.5-rc-3',
+          'code' => '100'
+        }
+        next_version = described_class.calc_next_release_base_version(version, 'calendar_versioning')
+        expect(next_version['name']).to eq('1995.6')
+      end
+
+      it 'increments the major version number and resets the minor version number to 1 if it is the first release of the next year' do
+        allow(Time).to receive(:now).and_return(Time.new(2023, 12, 3))
+        allow(FastlaneCore::UI).to receive(:confirm).and_return(true)
+        version = {
+          'name' => '1995.26-rc-3',
+          'code' => '100'
+        }
+        next_version = described_class.calc_next_release_base_version(version, 'calendar_versioning')
+        expect(next_version['name']).to eq('1996.1')
+      end
+
+      it 'does not increment the major version number if it is not the first release of the next year' do
+        allow(Time).to receive(:now).and_return(Time.new(2023, 12, 1))
+        allow(FastlaneCore::UI).to receive(:confirm).and_return(false)
+        version = {
+          'name' => '1995.26-rc-1',
+          'code' => '100'
+        }
+        next_version = described_class.calc_next_release_base_version(version, 'calendar_versioning')
+        expect(next_version['name']).to eq('1995.27')
+      end
+    end
+
+    context 'when using marketing_versioning if the minor version number is 9 or less' do
+      it 'increments the minor version number' do
+        version = {
+          'name' => '1.0-rc-3',
+          'code' => '100'
+        }
+        next_version = described_class.calc_next_release_base_version(version, 'marketing_versioning')
+        expect(next_version['name']).to eq('1.1')
+      end
+
+      it 'resets the minor version number to 0 and increments the major version number if the minor number is 9' do
+        version = {
+          'name' => '1.9-rc-3',
+          'code' => '100'
+        }
+        next_version = described_class.calc_next_release_base_version(version, 'marketing_versioning')
+        expect(next_version['name']).to eq('2.0')
+      end
+
+      it 'does not reset the minor version number if it is less than 10' do
+        version = {
+          'name' => '1.5-rc-4',
+          'code' => '100'
+        }
+        next_version = described_class.calc_next_release_base_version(version, 'marketing_versioning')
+        expect(next_version['name']).to eq('1.6')
+      end
+    end
+
+    context 'when an invalid versioning scheme is provided' do
+      it 'raises an error' do
+        version = {
+          'name' => '1.0-rc-3',
+          'code' => '100'
+        }
+        error_message = "Please set the versioning scheme to 'calendar_versioning' or 'marketing_versioning'"
+        expect do
+          described_class.calc_next_release_base_version(version, 'invalid_scheme')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, error_message)
+      end
+    end
+  end
+
   describe 'get_library_version_from_gradle_config' do
     it 'returns nil when gradle file is not present' do
       allow(File).to receive(:exist?).and_return(false)
