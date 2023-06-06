@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Updates `octokit` to `6.1.1`, `danger` to `9.3.1` and `buildkite-test_collector` to `2.3.1`. [#491]
 
 ## 8.1.0
 
