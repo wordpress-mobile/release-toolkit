@@ -30,24 +30,25 @@ module Fastlane
         # Compute the name of the next release version.
         #
         # @param [String] version The current version that we want to increment
+        # @param [String] version_scheme The versioning scheme used by the app
         #
         # @return [String] The predicted next version, in the form of "X.Y".
         #         Corresponds to incrementing the minor part, except if it reached 10
         #         (in that case we go to the next major version, as decided in our versioning conventions)
         #
-        def self.calc_next_release_version(version, version_scheme = 'marketing_versioning')
+        def self.calc_next_release_version(version, version_scheme = 'marketing')
           vp = get_version_parts(version)
           vp[MINOR_NUMBER] += 1
 
           next_release_version = "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}"
 
           case version_scheme
-          when 'calendar_versioning'
+          when 'calendar'
             next_release_version = Fastlane::Helper::VersionHelper.increment_version_using_calendar_versioning(vp)
-          when 'marketing_versioning'
+          when 'marketing'
             next_release_version = Fastlane::Helper::VersionHelper.increment_version_using_marketing_versioning(vp)
           else
-            UI.user_error!("Please set the versioning scheme to 'calendar_versioning' or 'marketing_versioning'")
+            UI.user_error!("Please set the versioning scheme to 'calendar' or 'marketing'")
           end
 
           next_release_version
@@ -189,13 +190,15 @@ module Fastlane
 
         # Prints the current and next release version numbers to stdout, then return the next release version
         #
+        # @param [String] version_scheme The versioning scheme used by the app
+        #
         # @return [String] The next release version to use after bumping the currently used public version.
         #
-        def self.bump_version_release
+        def self.bump_version_release(version_scheme = 'marketing')
           # Bump release
           current_version = get_public_version()
           UI.message("Current version: #{current_version}")
-          new_version = calc_next_release_version(current_version)
+          new_version = calc_next_release_version(current_version, version_scheme)
           UI.message("New version: #{new_version}")
           verified_version = verify_version(new_version)
 

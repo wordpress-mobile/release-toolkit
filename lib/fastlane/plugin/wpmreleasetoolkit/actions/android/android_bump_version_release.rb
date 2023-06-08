@@ -12,7 +12,7 @@ module Fastlane
         other_action.ensure_git_branch(branch: default_branch)
 
         # Create new configuration
-        new_short_version = Fastlane::Helper::Android::VersionHelper.bump_version_release
+        new_short_version = Fastlane::Helper::Android::VersionHelper.bump_version_release(params[:version_scheme])
 
         current_version = Fastlane::Helper::Android::VersionHelper.get_release_version
         current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version
@@ -59,6 +59,11 @@ module Fastlane
                                        description: 'Default branch of the repository',
                                        type: String,
                                        default_value: Fastlane::Helper::GitHelper::DEFAULT_GIT_BRANCH),
+          FastlaneCore::ConfigItem.new(key: :version_scheme,
+                                       env_name: 'FL_RELEASE_TOOLKIT_VERSION_SCHEME',
+                                       description: 'Version scheme used by the app',
+                                       type: String,
+                                       default_value: 'marketing'),
         ]
       end
 

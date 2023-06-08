@@ -12,7 +12,7 @@ module Fastlane
         other_action.ensure_git_branch(branch: default_branch)
 
         # Create new configuration
-        @new_version = Fastlane::Helper::Ios::VersionHelper.bump_version_release()
+        @new_version = Fastlane::Helper::Ios::VersionHelper.bump_version_release(params[:version_scheme])
         create_config()
         show_config()
 
@@ -61,6 +61,11 @@ module Fastlane
                                        description: 'Default branch of the repository',
                                        type: String,
                                        default_value: Fastlane::Helper::GitHelper::DEFAULT_GIT_BRANCH),
+          FastlaneCore::ConfigItem.new(key: :version_scheme,
+                                       env_name: 'FL_RELEASE_TOOLKIT_VERSION_SCHEME',
+                                       description: 'Version scheme used by the app',
+                                       type: String,
+                                       default_value: 'marketing'),
         ]
       end
 

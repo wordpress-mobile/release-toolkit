@@ -106,7 +106,7 @@ describe Fastlane::Helper::Android::VersionHelper do
           'name' => '1995.5-rc-3',
           'code' => '100'
         }
-        next_version = described_class.calc_next_release_base_version(version, 'calendar_versioning')
+        next_version = described_class.calc_next_release_base_version(version, 'calendar')
         expect(next_version['name']).to eq('1995.6')
       end
 
@@ -117,7 +117,7 @@ describe Fastlane::Helper::Android::VersionHelper do
           'name' => '1995.26-rc-3',
           'code' => '100'
         }
-        next_version = described_class.calc_next_release_base_version(version, 'calendar_versioning')
+        next_version = described_class.calc_next_release_base_version(version, 'calendar')
         expect(next_version['name']).to eq('1996.1')
       end
 
@@ -128,18 +128,18 @@ describe Fastlane::Helper::Android::VersionHelper do
           'name' => '1995.26-rc-1',
           'code' => '100'
         }
-        next_version = described_class.calc_next_release_base_version(version, 'calendar_versioning')
+        next_version = described_class.calc_next_release_base_version(version, 'calendar')
         expect(next_version['name']).to eq('1995.27')
       end
     end
 
-    context 'when using marketing_versioning if the minor version number is 9 or less' do
+    context 'when using marketing versioning if the minor version number is 9 or less' do
       it 'increments the minor version number' do
         version = {
           'name' => '1.0-rc-3',
           'code' => '100'
         }
-        next_version = described_class.calc_next_release_base_version(version, 'marketing_versioning')
+        next_version = described_class.calc_next_release_base_version(version, 'marketing')
         expect(next_version['name']).to eq('1.1')
       end
 
@@ -148,7 +148,7 @@ describe Fastlane::Helper::Android::VersionHelper do
           'name' => '1.9-rc-3',
           'code' => '100'
         }
-        next_version = described_class.calc_next_release_base_version(version, 'marketing_versioning')
+        next_version = described_class.calc_next_release_base_version(version, 'marketing')
         expect(next_version['name']).to eq('2.0')
       end
 
@@ -157,7 +157,7 @@ describe Fastlane::Helper::Android::VersionHelper do
           'name' => '1.5-rc-4',
           'code' => '100'
         }
-        next_version = described_class.calc_next_release_base_version(version, 'marketing_versioning')
+        next_version = described_class.calc_next_release_base_version(version, 'marketing')
         expect(next_version['name']).to eq('1.6')
       end
     end
@@ -168,7 +168,7 @@ describe Fastlane::Helper::Android::VersionHelper do
           'name' => '1.0-rc-3',
           'code' => '100'
         }
-        error_message = "Please set the versioning scheme to 'calendar_versioning' or 'marketing_versioning'"
+        error_message = "Please set the versioning scheme to 'calendar' or 'marketing'"
         expect do
           described_class.calc_next_release_base_version(version, 'invalid_scheme')
         end.to raise_error(FastlaneCore::Interface::FastlaneError, error_message)

@@ -186,8 +186,8 @@ module Fastlane
         #
         # @return [String] The version name for the next release
         #
-        def self.calc_next_release_short_version(version)
-          v = self.calc_next_release_base_version(VERSION_NAME => version, VERSION_CODE => nil)
+        def self.calc_next_release_short_version(version, version_scheme = 'marketing')
+          v = self.calc_next_release_base_version({ VERSION_NAME => version, VERSION_CODE => nil }, version_scheme)
           return v[VERSION_NAME]
         end
 
@@ -200,7 +200,7 @@ module Fastlane
         #
         # @return [Hash] Hash containing the next release version name ("X.Y") and code.
         #
-        def self.calc_next_release_base_version(version, version_scheme = 'marketing_versioning')
+        def self.calc_next_release_base_version(version, version_scheme = 'marketing')
           version_name = remove_beta_suffix(version[VERSION_NAME])
           vp = get_version_parts(version_name)
           vp[MINOR_NUMBER] += 1
@@ -208,12 +208,12 @@ module Fastlane
           next_release_base_version = ''
 
           case version_scheme
-          when 'calendar_versioning'
+          when 'calendar'
             next_release_base_version = Fastlane::Helper::VersionHelper.increment_version_using_calendar_versioning(vp)
-          when 'marketing_versioning'
+          when 'marketing'
             next_release_base_version = Fastlane::Helper::VersionHelper.increment_version_using_marketing_versioning(vp)
           else
-            UI.user_error!("Please set the versioning scheme to 'calendar_versioning' or 'marketing_versioning'")
+            UI.user_error!("Please set the versioning scheme to 'calendar' or 'marketing'")
           end
 
           { VERSION_NAME => next_release_base_version, VERSION_CODE => version[VERSION_CODE] }
@@ -231,8 +231,8 @@ module Fastlane
         #
         # @return [Hash] The hash containing the version name and code to use after release cut
         #
-        def self.calc_next_release_version(version, alpha_version = nil)
-          nv = calc_next_release_base_version(VERSION_NAME => version[VERSION_NAME], VERSION_CODE => alpha_version.nil? ? version[VERSION_CODE] : [version[VERSION_CODE], alpha_version[VERSION_CODE]].max)
+        def self.calc_next_release_version(version, alpha_version = nil, version_scheme)
+          nv = calc_next_release_base_version({ VERSION_NAME => version[VERSION_NAME], VERSION_CODE => alpha_version.nil? ? version[VERSION_CODE] : [version[VERSION_CODE], alpha_version[VERSION_CODE]].max }, version_scheme)
           calc_next_beta_version(nv)
         end
 
@@ -285,13 +285,15 @@ module Fastlane
 
         # Prints the current and next release version names to stdout, then returns the next release version
         #
+        # @param [String] version_scheme The versioning scheme used by the app
+        #
         # @return [String] The next release version name to use after bumping the currently used release version.
         #
-        def self.bump_version_release
+        def self.bump_version_release(version_scheme)
           # Bump release
           current_version = self.get_release_version
           UI.message("Current version: #{current_version[VERSION_NAME]}")
-          new_version = calc_next_release_base_version(current_version)
+          new_version = calc_next_release_base_version(current_version, version_scheme)
           UI.message("New version: #{new_version[VERSION_NAME]}")
           verified_version = verify_version(new_version[VERSION_NAME])
 
