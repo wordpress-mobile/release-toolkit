@@ -10,12 +10,13 @@ module Fastlane
         UI.message "Locales: #{params[:locales].inspect}"
         UI.message "Source locale: #{params[:source_locale].nil? ? '-' : params[:source_locale]}"
         UI.message "Path: #{params[:download_path]}"
+        UI.message "Auto-retry: #{params[:auto_retry]}"
 
         # Check download path
         FileUtils.mkdir_p(params[:download_path])
 
         # Download
-        downloader = Fastlane::Helper::MetadataDownloader.new(params[:download_path], params[:target_files])
+        downloader = Fastlane::Helper::MetadataDownloader.new(params[:download_path], params[:target_files], params[:auto_retry])
 
         params[:locales].each do |loc|
           if loc.is_a?(Array)
@@ -68,6 +69,12 @@ module Fastlane
                                        env_name: 'FL_DOWNLOAD_METADATA_DOWNLOAD_PATH',
                                        description: 'The path of the target files',
                                        type: String),
+          FastlaneCore::ConfigItem.new(key: :auto_retry,
+                                       env_name: 'FL_DOWNLOAD_METADATA_AUTO_RETRY',
+                                       description: 'Whether to auto retry downloads after Too Many Requests error',
+                                       type: FastlaneCore::Boolean,
+                                       optional: true,
+                                       default_value: true),
         ]
       end
 
