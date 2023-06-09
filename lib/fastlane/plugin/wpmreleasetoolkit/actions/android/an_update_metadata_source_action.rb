@@ -1,5 +1,5 @@
 require 'fastlane/action'
-require_relative '../../helper/an_metadata_update_helper.rb'
+require_relative '../../helper/an_metadata_update_helper'
 
 module Fastlane
   module Actions
@@ -20,10 +20,10 @@ module Fastlane
         UI.message "File #{params[:po_file_path]} updated!"
       end
 
-      # Verifies that all the source files are available  
+      # Verifies that all the source files are available
       # to this action
       def self.check_source_files(source_files)
-        source_files.values.each do | file_path |
+        source_files.each_value do |file_path|
           UI.user_error!("Couldn't find file at path '#{file_path}'") unless File.exist?(file_path)
         end
       end
@@ -37,70 +37,68 @@ module Fastlane
         target = self.create_target_file_path(orig)
 
         # Clear if older exists
-        File.delete(target) if File.exists? target 
+        FileUtils.rm_f(target)
 
         # Create the new one
         begin
-          File.open(target, "a") do |fw|
-            File.open(orig, "r").each do |fr|
+          File.open(target, 'a') do |fw|
+            File.open(orig, 'r').each do |fr|
               write_target_block(fw, fr)
-            end 
+            end
           end
-        rescue 
-          File.delete(target) if File.exists? target 
-          raise 
-        end 
+        rescue
+          FileUtils.rm_f(target)
+          raise
+        end
 
-        target 
+        target
       end
 
       # Deletes the old po and moves the temp one
       # to the final location
       def self.swap_po(orig_file_path, temp_file_path)
-        File.delete(orig_file_path) if File.exists? orig_file_path
+        FileUtils.rm_f(orig_file_path)
         File.rename(temp_file_path, orig_file_path)
       end
 
-      # Generates the temp file path 
+      # Generates the temp file path
       def self.create_target_file_path(orig_file_path)
-        "#{File.dirname(orig_file_path)}/#{File.basename(orig_file_path, ".*")}.tmp"
+        "#{File.dirname(orig_file_path)}/#{File.basename(orig_file_path, '.*')}.tmp"
       end
 
       # Creates the block instances
       def self.create_block_parsers(release_version, block_files)
-        @blocks = Array.new
+        @blocks = []
 
         # Inits default handler
-        @blocks.push (Fastlane::Helper::UnknownMetadataBlock.new)
+        @blocks.push Fastlane::Helper::UnknownMetadataBlock.new
 
         # Init special handlers
-        block_files.each do | key, file_path |
+        block_files.each do |key, file_path|
           case key
           when :release_note
-            @blocks.push (Fastlane::Helper::ReleaseNoteMetadataBlock.new(key, file_path, release_version))
+            @blocks.push Fastlane::Helper::ReleaseNoteMetadataBlock.new(key, file_path, release_version)
           when :release_note_short
-            @blocks.push (Fastlane::Helper::ReleaseNoteShortMetadataBlock.new(key, file_path, release_version))
+            @blocks.push Fastlane::Helper::ReleaseNoteShortMetadataBlock.new(key, file_path, release_version)
           else
-            @blocks.push (Fastlane::Helper::StandardMetadataBlock.new(key, file_path))
+            @blocks.push Fastlane::Helper::StandardMetadataBlock.new(key, file_path)
           end
         end
 
-        # Sets the default 
+        # Sets the default
         @current_block = @blocks[0]
       end
 
       # Manages tags depending on the type
       def self.write_target_block(fw, line)
-        if (is_block_id(line))
-          key = line.split(' ')[1].tr('\"', '')
-          @blocks.each do | block |
+        if is_block_id(line)
+          key = line.split[1].tr('\"', '')
+          @blocks.each do |block|
             @current_block = block if block.is_handler_for(key)
           end
         end
 
-        if (is_comment(line))
-          @current_block = @blocks.first
-        end
+        @current_block = @blocks.first if is_comment(line)
 
         @current_block.handle_line(fw, line)
       end
@@ -113,51 +111,48 @@ module Fastlane
         line.start_with?('#')
       end
 
-
-
       #####################################################
       # @!group Documentation
       #####################################################
 
       def self.description
-        "Updates a .po file with new data from .txt files"
+        'Updates a .po file with new data from .txt files'
       end
 
       def self.details
-        "You can use this action to update the .po file that contains the string to load to GlotPress for localization."
+        'You can use this action to update the .po file that contains the string to load to GlotPress for localization.'
       end
 
       def self.available_options
-        # Define all options your action supports. 
-        
+        # Define all options your action supports.
+
         # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :po_file_path,
-                                       env_name: "FL_UPDATE_METADATA_SOURCE_PO_FILE_PATH", 
-                                       description: "The path of the .po file to update", 
-                                       is_string: true,
+                                       env_name: 'FL_UPDATE_METADATA_SOURCE_PO_FILE_PATH',
+                                       description: 'The path of the .po file to update',
+                                       type: String,
                                        verify_block: proc do |value|
-                                          UI.user_error!("No .po file path for UpdateMetadataSourceAction given, pass using `po_file_path: 'file path'`") unless (value and not value.empty?)
-                                          UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
+                                         UI.user_error!("No .po file path for UpdateMetadataSourceAction given, pass using `po_file_path: 'file path'`") unless value && (!value.empty?)
+                                         UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :release_version,
-                                       env_name: "FL_UPDATE_METADATA_SOURCE_RELEASE_VERSION",
-                                       description: "The release version of the app (to use to mark the release notes)",
+                                       env_name: 'FL_UPDATE_METADATA_SOURCE_RELEASE_VERSION',
+                                       description: 'The release version of the app (to use to mark the release notes)',
                                        verify_block: proc do |value|
-                                        UI.user_error!("No relase version for UpdateMetadataSourceAction given, pass using `release_version: 'version'`") unless (value and not value.empty?) 
-                                      end),
+                                         UI.user_error!("No relase version for UpdateMetadataSourceAction given, pass using `release_version: 'version'`") unless value && (!value.empty?)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :source_files,
-                                        env_name: "FL_UPDATE_METADATA_SOURCE_SOURCE_FILES",
-                                        description: "The hash with the path to the source files and the key to use to include their content",
-                                        is_string: false,
-                                        verify_block: proc do |value|
-                                          UI.user_error!("No source file hash for UpdateMetadataSourceAction given, pass using `source_files: 'source file hash'`") unless (value and not value.empty?)
-                                       end)
+                                       env_name: 'FL_UPDATE_METADATA_SOURCE_SOURCE_FILES',
+                                       description: 'The hash with the path to the source files and the key to use to include their content',
+                                       type: Hash,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("No source file hash for UpdateMetadataSourceAction given, pass using `source_files: 'source file hash'`") unless value && (!value.empty?)
+                                       end),
         ]
       end
 
       def self.output
-          
       end
 
       def self.return_value
@@ -165,7 +160,7 @@ module Fastlane
       end
 
       def self.authors
-        ["loremattei"]
+        ['Automattic']
       end
 
       def self.is_supported?(platform)

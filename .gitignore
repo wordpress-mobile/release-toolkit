@@ -1,21 +1,28 @@
 .DS_Store
 /tmp
 
+# JetBrains IDE files
+.idea
+
+# VSCode IDE files
+.vscode
+
 # Ruby / Bundler
-.bundle/
+vendor/bundle
 
 # Fastlane
 fastlane/README.md
 fastlane/report.xml
 
 # Testing
-/test_results
-/coverage
+test_results/
+coverage/
 
-# DrawText
-/lib/drawText
-/lib/drawText.bundle
-/ext/drawText/drawText.xcodeproj/xcuserdata
-/ext/drawText/drawText.xcodeproj/project.xcworkspace/xcuserdata
-/ext/drawText/test-output
-/default.profraw
+# YARD Documentation
+yard-doc/
+
+# L10n Linter
+vendor/swiftgen
+
+# Build Products
+*.gem

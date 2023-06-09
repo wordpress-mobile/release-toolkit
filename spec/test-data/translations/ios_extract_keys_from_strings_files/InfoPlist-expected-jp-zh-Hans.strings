@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--Warning: Auto-generated file, do not edit.-->
+<plist version="1.0">
+  <dict>
+    <key>NSCameraUsageDescription</key>
+    <string>拍摄要在文章内使用的照片或视频。</string>
+    <key>NSLocationUsageDescription</key>
+    <string>对于已启用地理标记的站点，Jetpack 会向其中的文章内添加您的位置。</string>
+  </dict>
+</plist>

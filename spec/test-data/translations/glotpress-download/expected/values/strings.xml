@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="app_name">WooCommerce</string>
+
+    <!-- Android O notification channels, these show in the Android app settings -->
+    <string name="notification_channel_general_title">General</string>
+    <string name="notification_channel_general_id" translatable="false" content_override="true">wooandroid_notification_channel_general_id</string>
+    <string name="notification_channel_order_title">New order alerts</string>
+    <string name="notification_channel_order_id" translatable="false" content_override="true">wooandroid_notification_channel_order_id</string>
+    <string name="notification_channel_review_title">Product review alerts</string>
+    <string name="notification_channel_review_id" translatable="false" content_override="true">wooandroid_notification_channel_review_id</string>
+    <string name="notification_order_ringtone_title" translatable="false">WooCommerce Cha-ching</string>
+
+    <!-- Required by the login library - overwrites the placeholder value with a real channel -->
+    <string name="login_notification_channel_id" translatable="false" content_override="true">@string/notification_channel_general_id</string>
+    <!--
+        General Strings
+    -->
+    <string name="all">All</string>
+
+    <string name="shipping_label_woo_discount_bottomsheet_title">What is WooCommerce  Services discount?</string>
+    <string name="shipping_label_woo_discount_bottomsheet_message" formatted="false">When purchasing shipping labels with WooCommerce, you get 5% to 40% off compared to post office rates.</string>
+
+    <string name="shipping_label_payments_selected_payment_method">Payment method selected</string>
+    <string name="shipping_label_payments_add_credit_card">Add another credit card</string>
+    <string name="shipping_label_payments_type_digits">%1$s****%2$s</string>
+    <string name="shipping_label_payments_account_info"><![CDATA[Credit cards are retrieved from the following WordPress.com account: %1$s <%2$s>]]></string>
+    <string name="shipping_label_payments_email_receipts_checkbox">Email the label purchase receipts to %1$s (%2$s) at %3$s</string>
+    <string name="shipping_label_payments_expiration_date">Expire %1$s</string>
+    <string name="shipping_label_payments_saving_dialog_title">Saving your settings</string>
+    <string name="shipping_label_payments_saving_dialog_message">Please wait…</string>
+    <string name="shipping_label_payments_saving_error">Error while saving your settings</string>
+    <string name="shipping_label_shipping_carriers_title">Carriers and rates</string>
+    <string name="shipping_label_shipping_carrier_rates_unavailable">There are no shipping options for the selected address and packages</string>
+    <plurals name="shipping_label_shipping_carrier_rates_delivery_estimate">
+        <item quantity="one">%d business day</item>
+        <item quantity="other">%d business days</item>
+    </plurals>
+
+    <!--
+    Order List Tab Labels
+    -->
+    <string-array name="order_list_tabs">
+        <item>Processing</item>
+        <item>All Orders</item>
+    </string-array>
+
+
+    <string name="shipping_label_payments_cant_edit_warning">Only the site owner can manage the shipping label payment methods. Please contact Store Owner %1$s (%2$s) to manage payment methods.</string>
+    <string name="threat_fix_description">Pricing ranges from $70–120/hour</string>
+    <string-array name="settings_jetpackdescription">
+        <item>You may mark an IP address (or series of addresses) as \"Always allowed\"</item>
+        <item>preventing them from ever being blocked by Jetpack. IPv4 and IPv6 are acceptable.</item>
+        <item>To specify a range, enter the low value and high value separated by a dash. Example: 12.12.12.1–12.12.12.100</item>
+    </string-array>
+    <string name="threat_fix_description_large">Pricing ranges from $70 – 120/hour</string>
+    <string-array name="settings_jetpackdescription_large">
+        <item>You may mark an IP address (or series of addresses) as \"Always allowed\"</item>
+        <item>preventing them from ever being blocked by Jetpack. IPv4 and IPv6 are acceptable.</item>
+        <item>To specify a range, enter the low value and high value separated by a dash. Example: 12.12.12.1 – 12.12.12.100</item>
+    </string-array>
+    <string name="field_allowed_values">The field can assume these values: 4 3 2 1 -1 -2</string>
+    <string-array name="settings_number_series">
+        <item>The field can assume these values: 4 3 2 1 -1 -2</item>
+        <item>Please select your choice</item>
+    </string-array>
+    <string name="checklist_one"> - 1. First point</string>
+    <string name="checklist_two"> - o Two. Second point</string>
+    <string-array name="checklist_array">
+        <item> - 1. First point</item>
+        <item> - o Two. Second point</item>
+    </string-array>
+    <string name="multi_range_statement">First range is 2–100 and second is 123–456.</string>
+</resources>

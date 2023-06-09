@@ -4,17 +4,16 @@ require 'fileutils'
 require_relative '../models/configuration'
 
 module Fastlane
-  UI = FastlaneCore::UI unless Fastlane.const_defined?("UI")
+  UI = FastlaneCore::UI unless Fastlane.const_defined?('UI')
 
   module Helper
     class ConfigureHelper
-
       ### Returns the contents of the project's `.configure` file.
       ### If the file doesn't exist, it'll return an empty Configuration
       ### that can later be saved to `.configure`.
       def self.configuration
         if self.configuration_path_exists
-          Configuration.from_file(FilesystemHelper::configure_file)
+          Configuration.from_file(FilesystemHelper.configure_file)
         else
           Configuration.new
         end
@@ -22,12 +21,12 @@ module Fastlane
 
       ### Returns whether or not the `.configure` file exists in the project.
       def self.configuration_path_exists
-        File.file?(FilesystemHelper::configure_file)
+        File.file?(FilesystemHelper.configure_file)
       end
 
       ### A global helper to save the current configuration to `.configure`.
       def self.update_configuration(config)
-        config.save_to_file(FilesystemHelper::configure_file)
+        config.save_to_file(FilesystemHelper.configure_file)
       end
 
       ###
@@ -73,7 +72,7 @@ module Fastlane
       ### NB: Returns nil if the repo is in a detached HEAD state.
       def self.repo_branch_name
         result = `cd #{repository_path} && git rev-parse --abbrev-ref HEAD`.strip
-        (result == "HEAD") ? nil : result
+        (result == 'HEAD') ? nil : result
       end
 
       ### Returns the most recent commit hash in the `~/.mobile-secrets` repository.
@@ -96,28 +95,26 @@ module Fastlane
       ### Returns whether or not the `.configure` file has a pinned hash that's older than the most recent
       ### ~/.mobile-secrets` commit hash.
       def self.configure_file_is_behind_local
-      	configure_file_commits_behind_repo > 0
+        configure_file_commits_behind_repo > 0
       end
 
       def self.configure_file_commits_behind_repo
-     	# Get a sily number of revisions to ensure we don't miss any
-      	result = `cd #{repository_path} && git --no-pager log -10000 --pretty=format:"%H" && echo`
-      	hashes = result.each_line.map{ |s| s.strip }.reverse
+        # Get a sily number of revisions to ensure we don't miss any
+        result = `cd #{repository_path} && git --no-pager log -10000 --pretty=format:"%H" && echo`
+        hashes = result.each_line.map { |s| s.strip }.reverse
 
-      	index_of_configure_hash = hashes.find_index(configure_file_commit_hash)
-      	index_of_repo_commit_hash = hashes.find_index(repo_commit_hash)
+        index_of_configure_hash = hashes.find_index(configure_file_commit_hash)
+        index_of_repo_commit_hash = hashes.find_index(repo_commit_hash)
 
-      	if index_of_configure_hash >= index_of_repo_commit_hash
-      		return 0
-      	end
+        return 0 if index_of_configure_hash >= index_of_repo_commit_hash
 
-      	index_of_repo_commit_hash - index_of_configure_hash
+        index_of_repo_commit_hash - index_of_configure_hash
       end
 
       ### Get a list of files changed in the secrets repo between to commits
       def self.files_changed_between(commit_hash_1, commit_hash_2)
         result = `cd #{repository_path} && git diff --name-only #{commit_hash_1}...#{commit_hash_2}`
-        result.each_line.map{ |s| s.strip }
+        result.each_line.map { |s| s.strip }
       end
 
       ### Determine whether ~/.mobile-secrets` repository is behind its remote counterpart.
@@ -130,9 +127,7 @@ module Fastlane
       def self.repo_commits_behind_remote
         matches = repo_status.match(/behind \d+/)
 
-        if matches == nil
-            return 0
-        end
+        return 0 if matches.nil?
 
         parse_distance(matches[0])
       end
@@ -147,9 +142,7 @@ module Fastlane
       def self.repo_commits_ahead_of_remote
         matches = repo_status.match(/ahead \d+/)
 
-        if matches == nil
-            return 0
-        end
+        return 0 if matches.nil?
 
         parse_distance(matches[0])
       end
@@ -159,9 +152,7 @@ module Fastlane
       def self.parse_distance(match)
         distance = match.to_s.scan(/\d+/).first
 
-        if distance == nil
-            return 0
-        end
+        return 0 if distance.nil?
 
         distance.to_i
       end
@@ -191,18 +182,17 @@ module Fastlane
         file_dependencies ||= []
 
         # Allows support for specifying directories – they'll be expanded recursively
-        expanded_file_dependencies = file_dependencies.map { |path|
+        expanded_file_dependencies = file_dependencies.map do |path|
+          abs_path = self.mobile_secrets_path(path)
 
-            abs_path = self.mobile_secrets_path(path)
-
-            if File.directory?(abs_path)
-                Dir.glob("#{abs_path}**/*").map{ |path|
-                    path.gsub(repository_path + "/", "")
-                }
-            else
-                return path
+          if File.directory?(abs_path)
+            Dir.glob("#{abs_path}**/*").map do |sub_path|
+              sub_path.gsub("#{repository_path}/", '')
             end
-        }
+          else
+            return path
+          end
+        end
 
         self.files_to_copy.map { |o| o.file } + expanded_file_dependencies
       end
@@ -213,18 +203,16 @@ module Fastlane
         file_dependencies = self.configuration.file_dependencies
         file_dependencies ||= []
 
-        directory_dependencies = file_dependencies.select { |path|
-            File.directory?(self.mobile_secrets_path(path))
-        }
+        directory_dependencies = file_dependencies.select do |path|
+          File.directory?(self.mobile_secrets_path(path))
+        end
 
         new_files = []
 
         files.each do |path|
-            directory_dependencies.each do |directory_name|
-                if path.start_with?(directory_name)
-                    new_files << path
-                end
-            end
+          directory_dependencies.each do |directory_name|
+            new_files << path if path.start_with?(directory_name)
+          end
         end
 
         new_files
@@ -233,17 +221,16 @@ module Fastlane
       # Adds a file to the `.configure` file's `files_to_copy` hash.
       # The hash for this method must contain the `source` and `destination` keys
       def self.add_file(params)
+        UI.user_error!('You must pass a `source` to `add_file`') unless params[:source]
 
-        unless(params[:source])
-            UI.user_error!("You must pass a `source` to `add_file`")
-        end
+        UI.user_error!('You must pass a `destination` to `add_file`') unless params[:destination]
 
-        unless(params[:destination])
-            UI.user_error!("You must pass a `destination` to `add_file`")
+        unless Fastlane::Helper::GitHelper.is_ignored?(path: params[:destination])
+          UI.user_error! "Attempted to add a file to a location which is not ignored under Git (#{params[:destination]}). Please either edit your `.configure` file to use an already-ignored destination, or add that destination to the `.gitignore` manually to fix this."
         end
 
         new_config = self.configuration
-        new_config.add_file_to_copy(params[:source], params[:destination], params[:encrypt])
+        new_config.add_file_to_copy(params[:source], params[:destination], encrypt: params[:encrypt])
         update_configuration(new_config)
       end
 
@@ -255,6 +242,7 @@ module Fastlane
       ## Contents of ~/.mobile-secrets/keys.json as a hash
       def self.mobile_secrets_keys_json
         return {} unless File.file?(Fastlane::Helper::FilesystemHelper.secret_store_keys_path)
+
         JSON.parse(File.read(Fastlane::Helper::FilesystemHelper.secret_store_keys_path))
       end
 
@@ -262,6 +250,7 @@ module Fastlane
       ## Uses the project encryption key or the CONFIGURE_ENCRYPTION_KEY env variable, if present
       def self.encryption_key
         return Base64.decode64(ENV['CONFIGURE_ENCRYPTION_KEY']) if ENV.key?('CONFIGURE_ENCRYPTION_KEY')
+
         project_encryption_key
       end
 
@@ -269,6 +258,7 @@ module Fastlane
       def self.project_encryption_key
         keys_json = mobile_secrets_keys_json
         return nil unless keys_json.key?(configuration.project_name)
+
         base64_key = keys_json[configuration.project_name]
         Base64.decode64(base64_key)
       end

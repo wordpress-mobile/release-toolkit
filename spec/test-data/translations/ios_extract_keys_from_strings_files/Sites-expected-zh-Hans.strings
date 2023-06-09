@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--Warning: Auto-generated file, do not edit.-->
+<plist version="1.0">
+  <dict>
+    <key>BOl9KQ</key>
+    <string>有 ${count} 个选项匹配“${site}”。</string>
+    <key>ILcGmf</key>
+    <string>网站</string>
+    <key>gpCwrM</key>
+    <string>选择一个网站</string>
+    <key>s4dJhx</key>
+    <string>只是为了确认一下，你想要'${site}'？</string>
+  </dict>
+</plist>

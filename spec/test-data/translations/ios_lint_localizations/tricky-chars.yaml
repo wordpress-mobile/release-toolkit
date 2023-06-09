@@ -1,0 +1,31 @@
+test_data:
+  en: |
+    "string_no_pos" = "String %@ here.";
+    "string_pos" = "Pos String %1$@ here.";
+    "string_int_pos" = "String %1$@ and Int %2$d";
+    "string_int_pos_inv" = "Int %2$d before String %1$@";
+    "many_placeholders_mix_pos" = "String %2$@, Float %4$f, Int %1$d, Long %5$ld, Precise %3$.3f";
+    "repeated_placeholder" = "String %1$@, yes, I repeat, that's %1$@ indeed, told you %2$d times.";
+  fr: |
+    "string_no_pos" = "String ％@ here."; // WRONG: use of 'FULLWIDTH PERCENT SIGN' character
+    "string_pos" = "Pos String \u{200F}%1$@\u{200E} here."; // OK. 200E and 200F are LRM/RLM markers
+    "string_int_pos" = "String %1＄@ and Int %2$d"; // WRONG: use of 'FULLWIDTH DOLLAR SIGN' character
+    "string_int_pos_inv" = "Int %2$d before String %1$@";
+    "many_placeholders_mix_pos" = "String %2$@, Float %4$f, Int %1#d, Long %5$li, Precise %3$.3f"; // WRONG: %1#d instead of %1$d so not a placeholder, which shifts all other args
+    "repeated_placeholder" = "String %1$@, yes, I repeat, that's %1$@ indeed, told you %2$d times.";
+  ar: |
+    // Those strings are carefully crafted to be using the right order of characters at byte level, despite bidi making it strange-looking in your IDE
+    "many_placeholders_mix_pos" = "السلسلة %2$@ ، عدد %4$.3f ، عدد صحيح %1$d طويل %5$li دقيق %3$f"; // OK
+    "string_no_pos" = "سلسلة% @ هنا."; // OK
+    "string_pos" = "سلسلة موضعية٪1$@ هنا."; // WRONG: Use of 'ARABIC PERCENT SIGN' character
+    "string_int_pos" = "خيط \u{200F}%1$@\u{200E} عدد صحيح \u{200F}%2$d\u{200E}."; // OK. 200E and 200F are LRM/RLM markers
+    "string_int_pos_inv" = "-عدد صحيح%2$d قبل السلسلة%1$@"; // OK
+    "repeated_placeholder" = "السلسلة   %1$@ ، نعم ، أكرر ، هذه   %1$@ بالفعل ، وليست   %2$d."; // OK
+
+result:
+  fr:
+    - "`many_placeholders_mix_pos` expected placeholders for [Int,String,Float,Float,Int] but found [String,Float,Float,Int] instead."
+    - "`string_int_pos` expected placeholders for [String,Int] but found [Int] instead."
+    - "`string_no_pos` expected placeholders for [String] but found [] instead."
+  ar:
+    - "`string_pos` expected placeholders for [String] but found [] instead."

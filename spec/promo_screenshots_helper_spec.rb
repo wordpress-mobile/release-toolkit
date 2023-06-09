@@ -1,7 +1,7 @@
-#require 'shellwords'
-#require_relative './spec_helper'
+# require 'shellwords'
+# require_relative './spec_helper'
 #
-#describe Fastlane::Helper::PromoScreenshots do
+# describe Fastlane::Helper::PromoScreenshots do
 #
 #  context "initialization" do
 #
@@ -231,34 +231,34 @@
 #       expect(images_are_identical(output, "text-test-2.png")).to eq(true)
 #     end
 #   end
-#end
+# end
 #
-#def helper()
+# def helper()
 #  Fastlane::Helper::PromoScreenshots.new
-#end
+# end
 #
-#def source_image(filename)
+# def source_image(filename)
 #  helper.open_image(test_data_path_for("images/source/#{filename}"))
-#end
+# end
 #
-#def sample_image(filename)
+# def sample_image(filename)
 #  helper.open_image(test_data_path_for("images/output/#{filename}"))
-#end
+# end
 #
-#def sample_script(filename)
+# def sample_script(filename)
 #  filename = test_data_path_for("scripts/#{filename}")
 #  return JSON.parse(open(filename).read)
-#end
+# end
 #
-#def sample_stylesheet(filename)
+# def sample_stylesheet(filename)
 #  test_data_path_for("scripts/#{filename}")
-#end
+# end
 #
-#def test_data_path_for(filename)
+# def test_data_path_for(filename)
 #  File.expand_path(File.join(File.dirname(__FILE__), 'test-data', filename))
-#end
+# end
 #
-#def write_test_data(output, filename = "")
+# def write_test_data(output, filename = "")
 #
 #  if filename.empty?
 #    filename = Tempfile.new(output.signature).path
@@ -269,26 +269,26 @@
 #  output.write(filename)
 #
 #  output
-#end
+# end
 #
-#def images_are_identical(image1, sample_image)
+# def images_are_identical(image1, sample_image)
 #
 #  if sample_image.is_a? String
 #    sample_image = sample_image(sample_image)
 #  end
 #
 #  image1.compare_channel(sample_image, Magick::MeanAbsoluteErrorMetric)[1] == 0
-#end
+# end
 #
-#$original_stderr = $stderr
-#$original_stdout = $stdout
+# $original_stderr = $stderr
+# $original_stdout = $stdout
 #
-#def silence_output
+# def silence_output
 #  $stderr = File.open(File::NULL, "w")
 #  $stdout = File.open(File::NULL, "w")
-#end
+# end
 #
-#def unsilence_output
+# def unsilence_output
 #  $stderr = $original_stderr
 #  $stdout = $original_stdout
-#end
+# end

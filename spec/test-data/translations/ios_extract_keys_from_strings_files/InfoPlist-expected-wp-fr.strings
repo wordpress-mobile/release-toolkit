@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--Warning: Auto-generated file, do not edit.-->
+<plist version="1.0">
+  <dict>
+    <key>NSCameraUsageDescription</key>
+    <string>Pour prendre des photos ou réaliser des vidéos à utiliser dans vos articles.</string>
+    <key>NSLocationUsageDescription</key>
+    <string>WordPress voudrait ajouter votre position aux articles des sites pour lesquels vous avez activé la géolocalisation.</string>
+  </dict>
+</plist>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Translation-Revision-Date: 2021-03-16 18:54:04+0000
+Plural-Forms: nplurals=1; plural=0;
+Generator: GlotPress/2.4.0-alpha
+Language: zh_CN
+-->
+<resources>
+    <string name="shipping_label_payments_cant_edit_warning">只有站点所有者可以管理配送标签付款方式。 请联系商店所有者 %1$s (%2$s) 以管理付款方式。</string>
+    <string name="product_term_name_already_exists">已存在具有此名称的选项</string>
+    <string name="product_attribute_name_already_exists">已存在具有此名称的属性</string>
+    <string name="product_enter_attribute_term">添加每个选项的名称并按 Enter 键</string>
+    <string name="product_select_attribute_term">或轻按以选择现有选项</string>
+    <string name="product_new_attribute_term_name">选项名称</string>
+    <string name="shipping_label_payments_saving_error">保存您的设置时出错</string>
+    <string name="shipping_label_payments_saving_dialog_message">请稍候…</string>
+    <string name="shipping_label_payments_saving_dialog_title">正在保存您的设置</string>
+    <string name="shipping_label_payments_expiration_date">%1$s 到期</string>
+    <string name="shipping_label_payments_email_receipts_checkbox">将标签购买收据通过电子邮件发送到 %3$s 的 %1$s (%2$s)</string>
+    <string name="shipping_label_payments_account_info">从以下 WordPress.com 帐户检索信用卡：%1$s &lt;%2$s&gt;</string>
+    <string name="shipping_label_payments_type_digits">%1$s****%2$s</string>
+    <string name="shipping_label_payments_add_credit_card">添加其他信用卡</string>
+    <string name="shipping_label_payments_selected_payment_method">所选付款方式</string>
+    <string name="shipping_label_loading_data_progress_message">请稍候…</string>
+    <string name="shipping_label_loading_data_progress_title">正在获取您的设置</string>
+    <string name="shipping_label_selected_payment_description">尾号为 %1$s 的信用卡</string>
+    <string name="payment_method_paypal">Paypal</string>
+    <string name="payment_method_visa">VISA</string>
+    <string name="payment_method_mastercard">万事达卡</string>
+    <string-array name="order_list_tabs">
+        <item>正在处理…</item>
+        <item>所有订单…</item>
+    </string-array>
+    <string name="threat_fix_description">价格从 70–120 美元/小时不等</string>
+    <string-array name="settings_jetpackdescription">
+        <item>您可以将一个或多个 IP 地址加入白名单，以避免 Jetpack 将其屏蔽</item>
+        <item>IPv4 和 IPv6 都支持。如要按范围指定地址</item>
+        <item>请输入最小值和最大值，并用破折号隔开。示例：12.12.12.0–12.12.12.100</item>
+    </string-array>
+    <string name="threat_fix_description_large">价格从 70 – 120 美元/小时不等</string>
+    <string-array name="settings_jetpackdescription_large">
+        <item>您可以将一个或多个 IP 地址加入白名单，以避免 Jetpack 将其屏蔽</item>
+        <item>IPv4 和 IPv6 都支持。如要按范围指定地址</item>
+        <item>请输入最小值和最大值，并用破折号隔开。示例：12.12.12.0 – 12.12.12.100</item>
+    </string-array>
+    <string name="field_allowed_values">该字段可以采用以下值: 4 3 2 1 -1 -2</string>
+    <string-array name="settings_number_series">
+        <item>该字段可以采用以下值: 4 3 2 1 -1 -2</item>
+        <item>请选择您的选择</item>
+    </string-array>
+    <string name="checklist_one"> - 1. 第一点</string>
+    <string name="checklist_two"> - o 二：第二点</string>
+    <string-array name="checklist_array">
+        <item> - 1. 第一点</item>
+        <item> - o 二：第二点</item>
+    </string-array>
+    <string name="multi_range_statement">第一范围是2–100，第二范围是123–456</string>
+</resources>

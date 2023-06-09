@@ -1,10 +1,10 @@
-require 'spec_helper.rb'
+require 'spec_helper'
 
 describe Fastlane::Helper::EncryptionHelper do
   let(:cipher) { double('cipher') }
 
   before(:each) do
-    allow(OpenSSL::Cipher::AES256).to receive(:new).with(:CBC).and_return(cipher)
+    allow(OpenSSL::Cipher).to receive(:new).with('aes-256-cbc').and_return(cipher)
   end
 
   it 'encrypts the input' do

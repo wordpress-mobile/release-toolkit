@@ -1,0 +1,3 @@
+Contrary to what the extension of this file suggests, this is not a `.strings` file.
+Instead, this is just a regular, plain text file, which should be detected as invalid
+if provided as an input to `Ios::L10nHelper` methods.

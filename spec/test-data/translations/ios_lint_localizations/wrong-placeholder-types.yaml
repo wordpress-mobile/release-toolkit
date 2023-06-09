@@ -1,0 +1,30 @@
+test_data:
+  en: |
+    "string_no_pos" = "String %@ here.";
+    "string_pos" = "Pos String %1$@ here.";
+    "string_int_pos" = "String %1$@ and Int %2$d";
+    "string_int_pos_inv" = "Int %2$d before String %1$@";
+    "many_placeholders_mix_pos" = "String %2$@, Float %4$f, Int %1$d, Long %5$li, Precise %3$.3lf";
+    "repeated_placeholder" = "String %1$@, yes, I repeat, that's %@ indeed, I said %1$@.";
+  fr: |
+    "string_no_pos" = "String %d here.";
+    "string_pos" = "Pos String %1$@ here.";
+    "string_int_pos" = "String %2$@ and Int %1$d";
+    "string_int_pos_inv" = "Int %2$d before String %1$@";
+    "many_placeholders_mix_pos" = "String %@, Float %f, Int %d, Long %li, Precise %.3lf";
+    "repeated_placeholder" = "String %1$@, yes, I repeat, that's %1$@ indeed, I said %@.";
+  it: |
+    "string_no_pos" = "String %@ here.";
+    "string_pos" = "Pos String %1$@ here.";
+    "string_int_pos" = "String %1$@ and Int %2$d";
+    "string_int_pos_inv" = "Int %2$d before String %1$@";
+    "many_placeholders_mix_pos" = "String %2$@, Float %4$f, Int %1$d, Long %5$li, Precise %3$.3lf";
+    "repeated_placeholder" = "String %1$d, yes, I repeat, that's %1$d indeed, I said %d.";
+
+result:
+  fr:
+    - "`many_placeholders_mix_pos` expected placeholders for [Int,String,Float,Int] but found [String,Float,Int,Int] instead."
+    - "`string_int_pos` expected placeholders for [String,Int] but found [Int,String] instead."
+    - "`string_no_pos` expected placeholders for [String] but found [Int] instead."
+  it:
+    - "`repeated_placeholder` expected placeholders for [String] but found [Int] instead."

@@ -1,8 +1,12 @@
 source('https://rubygems.org')
 
 gemspec
-gem 'codecov', :require => false, :group => :test
-gem "danger", "~> 8.0"
 
-plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')
-eval_gemfile(plugins_path) if File.exist?(plugins_path)
+gem 'danger', '~> 9.3'
+gem 'danger-rubocop', '~> 0.6'
+
+gem 'codecov', require: false
+gem 'webmock', require: false
+gem 'yard'
+
+gem 'buildkite-test_collector', '~> 2.3'
