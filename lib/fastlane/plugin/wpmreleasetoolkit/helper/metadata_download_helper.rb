@@ -111,7 +111,7 @@ module Fastlane
           @alternates.clear
           loc_data = JSON.parse(response.body) rescue loc_data = nil
           parse_data(locale, loc_data, is_source)
-          reparse_alternates(target_locale, loc_data, is_source) unless @alternates.length == 0
+          reparse_alternates(target_locale, loc_data, is_source) unless @alternates.empty?
         when '301'
           # Follow the redirect
           UI.message("Received 301 for `#{locale}`. Following redirect...")

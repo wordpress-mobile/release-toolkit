@@ -15,7 +15,7 @@ module Fastlane
             profile.is_a? Spaceship::Portal::ProvisioningProfile::Development
           end
                    .tap do |profiles|
-            UI.important "Warning: Unable to find any profiles associated with #{identifier}" unless profiles.length > 0
+            UI.important "Warning: Unable to find any profiles associated with #{identifier}" if profiles.empty?
           end
                    .each do |profile|
             profile.devices = devices
