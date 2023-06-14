@@ -16,7 +16,7 @@ module Fastlane
 
         milestone_duedate = last_stone[:due_on]
         milestone_duration = params[:milestone_duration]
-        newmilestone_duedate = (milestone_duedate.to_datetime.next_day(milestone_duration).to_time).utc
+        newmilestone_duedate = milestone_duedate.to_datetime.next_day(milestone_duration).to_time.utc
         newmilestone_number = Fastlane::Helper::Ios::VersionHelper.calc_next_release_version(last_stone[:title])
         number_of_days_from_code_freeze_to_release = params[:number_of_days_from_code_freeze_to_release]
         # Because of the app stores review process, we submit the binary 3 days before the intended release date.
