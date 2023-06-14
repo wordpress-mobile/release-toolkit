@@ -284,15 +284,6 @@ Style/SafeNavigation:
   Exclude:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
 
-# Offense count: 9
-# This cop supports safe autocorrection (--autocorrect).
-Style/SelfAssignment:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/an_metadata_update_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_version_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/metadata_update_helper.rb'
-
 # Offense count: 1
 # This cop supports safe autocorrection (--autocorrect).
 # Configuration parameters: EnforcedStyle.

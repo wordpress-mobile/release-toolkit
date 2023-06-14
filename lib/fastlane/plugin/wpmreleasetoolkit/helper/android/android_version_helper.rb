@@ -489,13 +489,13 @@ module Fastlane
                   if line.include?('versionName') && !line.include?('"versionName"') && !line.include?('PversionName')
                     version_name = line.split[1].tr('\"', '')
                     line.sub!(version_name, version[VERSION_NAME].to_s)
-                    version_updated = version_updated + 1
+                    version_updated += 1
                   end
 
                   if line.include? 'versionCode'
                     version_code = line.split[1]
                     line.sub!(version_code, version[VERSION_CODE].to_s)
-                    version_updated = version_updated + 1
+                    version_updated += 1
                   end
                 end
                 temp_file.puts line

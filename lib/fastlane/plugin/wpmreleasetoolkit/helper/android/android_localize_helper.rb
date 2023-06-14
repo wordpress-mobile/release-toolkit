@@ -133,14 +133,14 @@ module Fastlane
             case res
             when :updated
               UI.verbose "#{string_node.attr('name')} updated."
-              updated_count = updated_count + 1
+              updated_count += 1
             when :found
-              untouched_count = untouched_count + 1
+              untouched_count += 1
             when :added
               UI.verbose "#{string_node.attr('name')} added."
-              added_count = added_count + 1
+              added_count += 1
             when :skipped
-              skipped_count = skipped_count + 1
+              skipped_count += 1
             else
               UI.user_error!("Internal Error! #{res}")
             end
