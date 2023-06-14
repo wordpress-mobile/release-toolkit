@@ -38,11 +38,11 @@ module Fastlane
           source = d[0].split(/\u0004/).last
 
           target_files.each do |file|
-            if file[0].to_s == key
-              data = file[1]
-              msg = is_source ? source : d[1].first || '' # In the JSON, each Hash value is an array, with zero or one entry
-              update_key(target_locale, key, file, data, msg)
-            end
+            next unless file[0].to_s == key
+
+            data = file[1]
+            msg = is_source ? source : d[1].first || '' # In the JSON, each Hash value is an array, with zero or one entry
+            update_key(target_locale, key, file, data, msg)
           end
         end
       end
@@ -55,12 +55,12 @@ module Fastlane
 
           @alternates.each do |file|
             puts "Data: #{file[0]} - key: #{key}"
-            if file[0].to_s == key
-              puts "Alternate: #{key}"
-              data = file[1]
-              msg = is_source ? source : d[1].first || '' # In the JSON, each Hash value is an array, with zero or one entry
-              update_key(target_locale, key, file, data, msg)
-            end
+            next unless file[0].to_s == key
+
+            puts "Alternate: #{key}"
+            data = file[1]
+            msg = is_source ? source : d[1].first || '' # In the JSON, each Hash value is an array, with zero or one entry
+            update_key(target_locale, key, file, data, msg)
           end
         end
       end

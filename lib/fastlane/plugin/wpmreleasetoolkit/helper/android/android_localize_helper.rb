@@ -54,25 +54,24 @@ module Fastlane
           # Search for the string in the main file
           result = :added
           main_strings_xml.xpath('//string').each do |main_string_node|
-            if main_string_node.attr('name') == string_name
-              # Skip if the string has the content_override tag
-              return :skipped if skip_string_by_tag?(main_string_node)
+            next unless main_string_node.attr('name') == string_name
+            # Skip if the string has the content_override tag
+            return :skipped if skip_string_by_tag?(main_string_node)
 
-              # If nodes are equivalent, skip
-              return :found if lib_string_node =~ main_string_node
+            # If nodes are equivalent, skip
+            return :found if lib_string_node =~ main_string_node
 
-              # The string needs an update
-              if main_string_node.attr('tools:ignore').nil?
-                # No `tools:ignore` attribute; completely replace existing main string node with lib's one
-                add_xml_attributes!(lib_string_node, library)
-                main_string_node.replace lib_string_node
-              else
-                # Has the `tools:ignore` flag; update the content without touching the other existing attributes
-                add_xml_attributes!(main_string_node, library)
-                main_string_node.content = string_content
-              end
-              return :updated
+            # The string needs an update
+            if main_string_node.attr('tools:ignore').nil?
+              # No `tools:ignore` attribute; completely replace existing main string node with lib's one
+              add_xml_attributes!(lib_string_node, library)
+              main_string_node.replace lib_string_node
+            else
+              # Has the `tools:ignore` flag; update the content without touching the other existing attributes
+              add_xml_attributes!(main_string_node, library)
+              main_string_node.content = string_content
             end
+            return :updated
           end
 
           # String not found, or removed because needing update and not in the exclusion list: add to the main file
@@ -91,14 +90,13 @@ module Fastlane
 
           # Search for the string in the main file
           main_strings_xml.xpath('//string').each do |main_string_node|
-            if main_string_node.attr('name') == string_name
-              # Skip if the string has the content_override tag
-              return if skip_string_by_tag?(main_string_node)
+            next unless main_string_node.attr('name') == string_name
+            # Skip if the string has the content_override tag
+            return if skip_string_by_tag?(main_string_node)
 
-              # Check if up-to-date
-              UI.user_error!("String #{string_name} [#{string_content}] has been updated in the main file but not in the library #{library[:library]}.") if main_string_node.content != string_content
-              return
-            end
+            # Check if up-to-date
+            UI.user_error!("String #{string_name} [#{string_content}] has been updated in the main file but not in the library #{library[:library]}.") if main_string_node.content != string_content
+            return
           end
 
           # String not found and not in the exclusion list
@@ -180,22 +178,22 @@ module Fastlane
 
         def self.verify_local_diff(main, library, main_strings, lib_strings)
           `git diff #{main}`.each_line do |line|
-            if line.start_with?('+ ') || line.start_with?('- ')
-              diffs = line.gsub(/\s+/m, ' ').strip.split
-              diffs.each do |diff|
-                verify_diff(diff, main_strings, lib_strings, library)
-              end
+            next unless line.start_with?('+ ') || line.start_with?('- ')
+
+            diffs = line.gsub(/\s+/m, ' ').strip.split
+            diffs.each do |diff|
+              verify_diff(diff, main_strings, lib_strings, library)
             end
           end
         end
 
         def self.verify_pr_diff(main, library, main_strings, lib_strings, source_diff)
           source_diff.each_line do |line|
-            if line.start_with?('+ ') || line.start_with?('- ')
-              diffs = line.gsub(/\s+/m, ' ').strip.split
-              diffs.each do |diff|
-                verify_diff(diff, main_strings, lib_strings, library)
-              end
+            next unless line.start_with?('+ ') || line.start_with?('- ')
+
+            diffs = line.gsub(/\s+/m, ' ').strip.split
+            diffs.each do |diff|
+              verify_diff(diff, main_strings, lib_strings, library)
             end
           end
         end
