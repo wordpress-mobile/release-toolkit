@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Prevent using non-integer `version_code` values for Android hotfixes [#167]
 
 ### Internal Changes
 
