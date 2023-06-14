@@ -91,10 +91,10 @@ module Fastlane
           source = absolute_secret_store_path(x.file)
           destination = absolute_project_path(x.destination)
 
-          sourceHash = file_hash(source)
-          destinationHash = file_hash(destination)
+          source_hash = file_hash(source)
+          destination_hash = file_hash(destination)
 
-          UI.user_error!("`#{x.destination} doesn't match the file in the secrets repository (#{x.file}) – unable to continue") unless sourceHash == destinationHash
+          UI.user_error!("`#{x.destination} doesn't match the file in the secrets repository (#{x.file}) – unable to continue") unless source_hash == destination_hash
         end
       end
 

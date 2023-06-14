@@ -32,14 +32,14 @@ module Fastlane
         UI.user_error!('`drawText` not found – install it using `brew install automattic/build-tools/drawText`.') unless system('command -v drawText')
       end
 
-      def read_config(configFilePath)
-        configFilePath = resolve_path(configFilePath)
+      def read_config(config_file_path)
+        config_file_path = resolve_path(config_file_path)
 
         begin
           # NOTE: While JSON is a subset of YAML and thus YAML.load_file would technically cover both cases at once, in practice
           # `JSON.parse` is more lenient with JSON files than `YAML.load_file` is — especially, it accepts `// comments` in the
           # JSON file, despite this not being allowed in the spec — hence why we still try with `JSON.parse` for `.json` files.
-          return File.extname(configFilePath) == '.json' ? JSON.parse(File.read(configFilePath)) : YAML.load_file(configFilePath)
+          return File.extname(config_file_path) == '.json' ? JSON.parse(File.read(config_file_path)) : YAML.load_file(config_file_path)
         rescue StandardError => e
           UI.error(e)
           UI.user_error!('Invalid JSON/YAML configuration. Please lint your config file to check for syntax errors.')
@@ -280,7 +280,7 @@ module Fastlane
 
       def draw_text_to_canvas(canvas, text, width, height, x_position, y_position, font_size, stylesheet_path, position = 'center')
         begin
-          tempTextFile = Tempfile.new
+          temp_text_file = Tempfile.new
 
           Action.sh('drawText', "html=#{text}", "maxWidth=#{width}", "maxHeight=#{height}", "output=#{tempTextFile.path}", "fontSize=#{font_size}", "stylesheet=#{stylesheet_path}", "alignment=#{position}")
 
@@ -292,8 +292,8 @@ module Fastlane
                        when 'top' then composite_image_top(text_frame, text_content, 0, 0)
                        end
         ensure
-          tempTextFile.close
-          tempTextFile.unlink
+          temp_text_file.close
+          temp_text_file.unlink
         end
 
         composite_image(canvas, text_frame, x_position, y_position)
@@ -431,12 +431,12 @@ module Fastlane
       end
 
       def resolve_text_into_path(text, locale)
-        localizedFile = format(text, locale)
+        localized_file = format(text, locale)
 
-        text = if File.exist?(localizedFile)
-                 localizedFile
-               elsif can_resolve_path(localizedFile)
-                 resolve_path(localizedFile).realpath.to_s
+        text = if File.exist?(localized_file)
+                 localized_file
+               elsif can_resolve_path(localized_file)
+                 resolve_path(localized_file).realpath.to_s
                else
                  format(text, 'source')
                end
