@@ -183,20 +183,6 @@ Style/MultilineBlockChain:
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_development_certificates_to_provisioning_profiles.rb'
     - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/add_devices_to_provisioning_profiles.rb'
 
-# Offense count: 15
-# This cop supports unsafe autocorrection (--autocorrect-all).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: literals, strict
-Style/MutableConstant:
-  Exclude:
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/android/android_codefreeze_prechecks.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/actions/ios/ios_lint_localizations.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_version_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_adc_app_sizes_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ios/ios_l10n_linter_helper.rb'
-    - 'lib/fastlane/plugin/wpmreleasetoolkit/version.rb'
-    - 'spec/release_notes_helper_spec.rb'
-
 # Offense count: 23
 # This cop supports unsafe autocorrection (--autocorrect-all).
 # Configuration parameters: EnforcedStyle, AllowedMethods, AllowedPatterns.

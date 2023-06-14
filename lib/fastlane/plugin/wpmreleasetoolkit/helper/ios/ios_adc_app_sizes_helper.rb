@@ -4,7 +4,7 @@ module Fastlane
   module Helper
     module Ios
       module ADCAppSizesHelper
-        DEFAULT_DEVICES = ['Universal', 'iPhone 8', 'iPhone X']
+        DEFAULT_DEVICES = ['Universal', 'iPhone 8', 'iPhone X'].freeze
 
         # Fetch the App Sizes stats from ADC
         #

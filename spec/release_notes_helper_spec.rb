@@ -59,7 +59,7 @@ describe Fastlane::Helper::ReleaseNotesHelper do
   end
 end
 
-FAKE_CONTENT = <<~CONTENT
+FAKE_CONTENT = <<~CONTENT.freeze
   1.2.3
   -----
   - Item 1 for v1.2.3
@@ -73,7 +73,7 @@ FAKE_CONTENT = <<~CONTENT
   - Item 2 for v1.2.2
 CONTENT
 
-NEW_SECTION = <<~CONTENT
+NEW_SECTION = <<~CONTENT.freeze
   New Section
   -----
 

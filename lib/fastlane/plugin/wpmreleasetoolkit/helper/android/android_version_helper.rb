@@ -5,9 +5,9 @@ module Fastlane
       #
       module VersionHelper
         # The key used in internal version Hash objects to hold the versionName value
-        VERSION_NAME = 'name'
+        VERSION_NAME = 'name'.freeze
         # The key used in internal version Hash objects to hold the versionCode value
-        VERSION_CODE = 'code'
+        VERSION_CODE = 'code'.freeze
         # The index for the major version number part
         MAJOR_NUMBER = 0
         # The index for the minor version number part
@@ -15,9 +15,9 @@ module Fastlane
         # The index for the hotfix version number part
         HOTFIX_NUMBER = 2
         # The prefix used in front of the versionName for alpha versions
-        ALPHA_PREFIX = 'alpha-'
+        ALPHA_PREFIX = 'alpha-'.freeze
         # The suffix used in the versionName for RC (beta) versions
-        RC_SUFFIX = '-rc'
+        RC_SUFFIX = '-rc'.freeze
 
         # Returns the public-facing version string.
         #

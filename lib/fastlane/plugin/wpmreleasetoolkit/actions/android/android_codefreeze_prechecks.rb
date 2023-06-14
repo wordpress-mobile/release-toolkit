@@ -1,8 +1,8 @@
 module Fastlane
   module Actions
     class AndroidCodefreezePrechecksAction < Action
-      VERSION_RELEASE = 'release'
-      VERSION_ALPHA = 'alpha'
+      VERSION_RELEASE = 'release'.freeze
+      VERSION_ALPHA = 'alpha'.freeze
 
       def self.run(params)
         # fastlane will take care of reading in the parameter and fetching the environment variable:

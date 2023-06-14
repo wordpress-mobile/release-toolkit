@@ -68,7 +68,7 @@ module Fastlane
         duplicate_keys
       end
 
-      RETRY_MESSAGE = <<~MSG
+      RETRY_MESSAGE = <<~MSG.freeze
         Inconsistencies found during Localization linting.
         You need to fix them before continuing. From this point on, you should either:
 
@@ -91,7 +91,7 @@ module Fastlane
         Did you fix the `.strings` files locally and want to lint them again?
       MSG
 
-      ABORT_MESSAGE = <<~MSG
+      ABORT_MESSAGE = <<~MSG.freeze
         Inconsistencies found during Localization linting. Aborting.
       MSG
 
