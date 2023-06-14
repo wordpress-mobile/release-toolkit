@@ -18,11 +18,11 @@ module Fastlane
         translationDirectories = subdirectories_for_path(params[:metadata_folder])
         imageDirectories = subdirectories_for_path(params[:orig_folder])
 
-        unless helper.can_resolve_path(params[:output_folder])
+        if helper.can_resolve_path(params[:output_folder])
+          UI.message "#{self.check_path(params[:output_folder])} Output Folder: #{params[:output_folder]}"
+        else
           UI.message "✅ Created Output Folder: #{params[:output_folder]}"
           FileUtils.mkdir_p(params[:output_folder])
-        else
-          UI.message "#{self.check_path(params[:output_folder])} Output Folder: #{params[:output_folder]}"
         end
 
         outputDirectory = helper.resolve_path(params[:output_folder])
