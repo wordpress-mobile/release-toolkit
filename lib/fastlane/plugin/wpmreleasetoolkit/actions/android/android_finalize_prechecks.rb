@@ -10,8 +10,10 @@ module Fastlane
 
         require_relative '../../helper/android/android_version_helper'
         require_relative '../../helper/android/android_git_helper'
+        require_relative '../../helper/git_helper'
 
-        UI.user_error!('This is not a release branch. Abort.') unless other_action.git_branch.start_with?('release/')
+        current_branch = Fastlane::Helper::GitHelper.current_git_branch
+        UI.user_error!("Current branch - '#{current_branch}' - is not a release branch. Abort.") unless current_branch.start_with?('release/')
 
         version = Fastlane::Helper::Android::VersionHelper.get_public_version
         message = "Finalizing release: #{version}\n"
@@ -47,7 +49,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
                                        env_name: 'FL_ANDROID_FINALIZE_PRECHECKS_SKIPCONFIRM',
                                        description: 'Skips confirmation',
-                                       is_string: false, # true: verifies the input is a string, false: every kind of value
+                                       type: Boolean,
                                        default_value: false), # the default value if the user didn't provide one
         ]
       end

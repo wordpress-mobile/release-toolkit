@@ -10,12 +10,52 @@ _None_
 
 ### New Features
 
-- Add `ios_get_build_number` action to get the current build number from an `xcconfig` file. [#458]
-
+_None_
 
 ### Bug Fixes
 
 _None_
+
+### Internal Changes
+
+- Updates `octokit` to `6.1.1`, `danger` to `9.3.1` and `buildkite-test_collector` to `2.3.1`. [#491]
+
+## 8.1.0
+
+### New Features
+
+- Adds auto_retry option to `gp_downloadmetadata_action`. [#474]
+
+## 8.0.1
+
+### Bug Fixes
+
+- Revert the `gp_downloadmetadata_action` `locales` item type from `type: Hash` to `is_string: false`. [#478]
+
+## 8.0.0
+
+### Breaking Changes
+
+- Remove git push commands after creating a new commit or branch. [#472] See `MIGRATION.md` for instructions.
+
+## 7.1.2
+
+### Bug Fixes
+
+- Revert the `gp_downloadmetadata_action` `locales` item type from `type: Hash` to `is_string: false`. [#480]
+
+## 7.1.1
+
+### Internal Changes
+
+- Remove `rubygems_mfa_required` from the `gemspec`. [#475]
+
+## 7.1.0
+
+### New Features
+
+- Add `ios_get_build_number` action to get the current build number from an `xcconfig` file. [#458]
+
 
 ### Internal Changes
 
@@ -26,6 +66,9 @@ _None_
 - Update `danger` to `9.3.0`. This is an internal-only change and is not a breaking change for clients. [#464]
 - Replace `rspec-buildkite-analytics` with `buildkite-test_collector` (Buildkite renamed the gem) and update it to `2.2.0`. This is another internal-only change and is not a breaking change for clients. [#465]
 - Adds `ignore_pipeline_branch_filters=true` parameter to the API call triggering a Buildkite build [#468]
+- Replace all instances of `is_string` with `type` [#469]
+- Use `git_branch_name_using_HEAD` instead of `git_branch` so that the return value is not modified by environment variables. This has no impact to our current release flow, that's why it's not in "Breaking changes" section. [#463]
+- Deprecate `ios_clear_intermediate_tags` & `ios_final_tag` actions. [#471]
 
 ## 7.0.0
 

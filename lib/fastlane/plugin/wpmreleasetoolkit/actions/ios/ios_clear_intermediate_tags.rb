@@ -2,6 +2,8 @@ module Fastlane
   module Actions
     class IosClearIntermediateTagsAction < Action
       def self.run(params)
+        return unless UI.confirm("#{deprecated_notes} Would you like to continue with the action?")
+
         UI.message("Deleting tags for version: #{params[:version]}")
 
         require_relative '../../helper/git_helper'
@@ -26,11 +28,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Cleans all the intermediate tags for the given version'
+        '(DEPRECATED) Cleans all the intermediate tags for the given version'
       end
 
       def self.details
-        'Cleans all the intermediate tags for the given version'
+        '(DEPRECATED) Cleans all the intermediate tags for the given version'
       end
 
       def self.available_options
@@ -38,7 +40,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: 'FL_IOS_CLEAN_INTERMEDIATE_TAGS_VERSION',
                                        description: 'The version of the tags to clear',
-                                       is_string: true),
+                                       type: String),
         ]
       end
 
@@ -46,6 +48,16 @@ module Fastlane
       end
 
       def self.return_value
+      end
+
+      def self.category
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "This action is deprecated as we don't believe it's currently in use in our projects.
+        However, just to be sure that it's not in use, we decided to deprecate it first. If you
+        believe that this is a mistake, please let us know on Slack."
       end
 
       def self.authors

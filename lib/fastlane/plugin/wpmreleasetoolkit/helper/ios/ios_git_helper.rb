@@ -4,9 +4,9 @@ module Fastlane
       # Helper methods to execute git-related operations that are specific to iOS projects
       #
       module GitHelper
-        # Commit and push the files that are modified when we bump version numbers on an iOS project
+        # Commit the files that are modified when we bump version numbers on an iOS project
         #
-        # This typically commits and pushes:
+        # This typically commits:
         #  - The files in `./config/*` – especially `Version.*.xcconfig` files
         #  - The `fastlane/Deliverfile` file (which contains the `app_version` line)
         #  - The `<ProjectRoot>/<ProjectName>/Resources/AppStoreStrings.pot` file, containing a key for that version's release notes
@@ -25,10 +25,10 @@ module Fastlane
             files_list.append File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'Resources', ENV['APP_STORE_STRINGS_FILE_NAME'])
           end
 
-          Fastlane::Helper::GitHelper.commit(message: 'Bump version number', files: files_list, push: true)
+          Fastlane::Helper::GitHelper.commit(message: 'Bump version number', files: files_list)
         end
 
-        # Calls the `Scripts/localize.py` script in the project root folder and push the `*.strings` files
+        # Calls the `Scripts/localize.py` script in the project root folder and commit the `*.strings` files
         #
         # That script updates the `.strings` files with translations from GlotPress.
         #
@@ -42,7 +42,7 @@ module Fastlane
         def self.localize_project
           Action.sh("cd #{get_from_env!(key: 'PROJECT_ROOT_FOLDER')} && ./Scripts/localize.py")
 
-          Fastlane::Helper::GitHelper.commit(message: 'Update strings for localization', files: strings_files, push: true) || UI.message('No new strings, skipping commit')
+          Fastlane::Helper::GitHelper.commit(message: 'Update strings for localization', files: strings_files) || UI.message('No new strings, skipping commit')
         end
 
         # Call the `Scripts/update-translations.rb` then the `fastlane/download_metadata` Scripts from the host project folder
@@ -56,11 +56,11 @@ module Fastlane
         def self.update_metadata
           Action.sh("cd #{get_from_env!(key: 'PROJECT_ROOT_FOLDER')} && ./Scripts/update-translations.rb")
 
-          Fastlane::Helper::GitHelper.commit(message: 'Update translations', files: strings_files, push: false)
+          Fastlane::Helper::GitHelper.commit(message: 'Update translations', files: strings_files)
 
           Action.sh('cd fastlane && ./download_metadata.swift')
 
-          Fastlane::Helper::GitHelper.commit(message: 'Update metadata translations', files: './fastlane/metadata/', push: true)
+          Fastlane::Helper::GitHelper.commit(message: 'Update metadata translations', files: './fastlane/metadata/')
         end
 
         def self.strings_files
