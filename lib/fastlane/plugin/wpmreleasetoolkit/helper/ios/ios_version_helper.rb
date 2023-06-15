@@ -43,7 +43,7 @@ module Fastlane
         # @deprecated This method is going to be removed soon due to it's dependency on `ENV['PUBLIC_CONFIG_FILE']` via `get_build_version`.
         #
         def self.get_public_version
-          version = get_build_version()
+          version = get_build_version
           vp = get_version_parts(version)
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
 

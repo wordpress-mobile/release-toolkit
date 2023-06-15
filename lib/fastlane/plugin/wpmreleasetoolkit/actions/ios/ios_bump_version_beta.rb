@@ -15,7 +15,7 @@ module Fastlane
         Fastlane::Helper::Ios::VersionHelper.update_xc_configs(@new_beta_version, @short_version, @new_internal_version)
         UI.message 'Done!'
 
-        Fastlane::Helper::Ios::GitHelper.commit_version_bump()
+        Fastlane::Helper::Ios::GitHelper.commit_version_bump
       end
 
       #####################################################
