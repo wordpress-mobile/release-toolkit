@@ -87,7 +87,7 @@ module Fastlane
         version_minor = Integer(values[1])
         @new_key = "#{@rel_note_key}_#{version_major}#{version_minor}"
 
-        version_major = version_major - 1 if version_minor == 0
+        version_major -= 1 if version_minor == 0
         version_minor = version_minor == 0 ? 9 : version_minor - 1
 
         @keep_key = "#{@rel_note_key}_#{version_major}#{version_minor}"
@@ -147,7 +147,7 @@ module Fastlane
         version_minor = Integer(values[1])
         @new_key = "v#{release_version}-whats-new"
 
-        version_major = version_major - 1 if version_minor == 0
+        version_major -= 1 if version_minor == 0
         version_minor = version_minor == 0 ? 9 : version_minor - 1
 
         @old_key = "v#{version_major}.#{version_minor}-whats-new"

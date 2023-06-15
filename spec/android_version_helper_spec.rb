@@ -15,7 +15,7 @@ describe Fastlane::Helper::Android::VersionHelper do
 
       allow(File).to receive(:exist?).and_return(true)
       allow(File).to receive(:read).with('./version.properties').and_return(test_file_content)
-      expect(subject.get_version_from_properties()).to eq('name' => '17.0', 'code' => 123)
+      expect(subject.get_version_from_properties).to eq('name' => '17.0', 'code' => 123)
     end
 
     it 'returns alpha version name and code when present' do

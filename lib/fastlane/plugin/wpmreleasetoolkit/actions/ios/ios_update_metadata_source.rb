@@ -3,7 +3,7 @@ module Fastlane
     class IosUpdateMetadataSourceAction < Action
       def self.run(params)
         # Check local repo status
-        other_action.ensure_git_status_clean()
+        other_action.ensure_git_status_clean
 
         other_action.gp_update_metadata_source(po_file_path: params[:po_file_path],
                                                source_files: params[:source_files],
@@ -43,21 +43,21 @@ module Fastlane
                                        description: 'The path of the .po file to update',
                                        type: String,
                                        verify_block: proc do |value|
-                                                       UI.user_error!("No .po file path for UpdateMetadataSourceAction given, pass using `po_file_path: 'file path'`") unless value && (!value.empty?)
+                                                       UI.user_error!("No .po file path for UpdateMetadataSourceAction given, pass using `po_file_path: 'file path'`") unless value && !value.empty?
                                                        UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
                                                      end),
           FastlaneCore::ConfigItem.new(key: :release_version,
                                        env_name: 'FL_IOS_UPDATE_METADATA_SOURCE_RELEASE_VERSION',
                                        description: 'The release version of the app (to use to mark the release notes)',
                                        verify_block: proc do |value|
-                                                       UI.user_error!("No relase version for UpdateMetadataSourceAction given, pass using `release_version: 'version'`") unless value && (!value.empty?)
+                                                       UI.user_error!("No relase version for UpdateMetadataSourceAction given, pass using `release_version: 'version'`") unless value && !value.empty?
                                                      end),
           FastlaneCore::ConfigItem.new(key: :source_files,
                                        env_name: 'FL_IOS_UPDATE_METADATA_SOURCE_SOURCE_FILES',
                                        description: 'The hash with the path to the source files and the key to use to include their content',
                                        type: Hash,
                                        verify_block: proc do |value|
-                                                       UI.user_error!("No source file hash for UpdateMetadataSourceAction given, pass using `source_files: 'source file hash'`") unless value && (!value.empty?)
+                                                       UI.user_error!("No source file hash for UpdateMetadataSourceAction given, pass using `source_files: 'source file hash'`") unless value && !value.empty?
                                                      end),
         ]
       end

@@ -4,7 +4,7 @@ module Fastlane
   module Helper
     module Ios
       module ADCAppSizesHelper
-        DEFAULT_DEVICES = ['Universal', 'iPhone 8', 'iPhone X']
+        DEFAULT_DEVICES = ['Universal', 'iPhone 8', 'iPhone X'].freeze
 
         # Fetch the App Sizes stats from ADC
         #
@@ -13,7 +13,7 @@ module Fastlane
         #         Value for key `sizeInBytes` is itself a Hash with one entry per device name (including special name "Universal")
         #         whose value is a Hash with keys `compressed` and `uncompressed`
         #
-        def self.get_adc_sizes(adc_user:, adc_team: 'Automattic, Inc.', bundle_id:, only_version: nil, limit: 10)
+        def self.get_adc_sizes(adc_user:, bundle_id:, adc_team: 'Automattic, Inc.', only_version: nil, limit: 10)
           UI.message 'Connecting to ADC...'
           Spaceship::ConnectAPI.login(adc_user, team_name: adc_team)
           app = Spaceship::ConnectAPI::App.find(bundle_id)

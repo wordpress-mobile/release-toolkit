@@ -72,7 +72,7 @@ module Fastlane
       ### NB: Returns nil if the repo is in a detached HEAD state.
       def self.repo_branch_name
         result = `cd #{repository_path} && git rev-parse --abbrev-ref HEAD`.strip
-        (result == 'HEAD') ? nil : result
+        result == 'HEAD' ? nil : result
       end
 
       ### Returns the most recent commit hash in the `~/.mobile-secrets` repository.

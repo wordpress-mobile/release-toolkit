@@ -21,7 +21,7 @@ module Fastlane
         Fastlane::Helper::Android::VersionHelper.update_versions(new_version, nil)
         UI.message 'Done!'
 
-        Fastlane::Helper::Android::GitHelper.commit_version_bump()
+        Fastlane::Helper::Android::GitHelper.commit_version_bump
 
         UI.message 'Done.'
       end
@@ -46,7 +46,8 @@ module Fastlane
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :version_code,
                                        env_name: 'FL_ANDROID_BUMP_VERSION_HOTFIX_CODE',
-                                       description: 'The version code for the hotfix'),
+                                       description: 'The version code for the hotfix',
+                                       type: Integer),
           FastlaneCore::ConfigItem.new(key: :previous_version_name,
                                        env_name: 'FL_ANDROID_BUMP_VERSION_HOTFIX_PREVIOUS_VERSION',
                                        description: 'The version to branch from',

@@ -33,7 +33,7 @@ module Fastlane
         UI.message("Uploading #{file_path} to: #{key}")
 
         File.open(file_path, 'rb') do |file|
-          Aws::S3::Client.new().put_object(
+          Aws::S3::Client.new.put_object(
             body: file,
             bucket: bucket,
             key: key
@@ -50,7 +50,7 @@ module Fastlane
       end
 
       def self.file_is_already_uploaded?(bucket, key)
-        response = Aws::S3::Client.new().head_object(
+        response = Aws::S3::Client.new.head_object(
           bucket: bucket,
           key: key
         )

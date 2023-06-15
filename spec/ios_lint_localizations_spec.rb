@@ -6,7 +6,7 @@ require 'yaml'
 describe Fastlane::Actions::IosLintLocalizationsAction do
   before do
     # Ensure `Action.sh` is not skipped during test – so that SwiftGen will be installed by our action as normal – See spec_helper.rb
-    allow_fastlane_action_sh()
+    allow_fastlane_action_sh
   end
 
   context 'SwiftGen Installation Logic' do
@@ -93,6 +93,10 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     before(:each) do
       @test_data_dir = Dir.mktmpdir('a8c-lint-l10n-tests-data-')
       allow(FastlaneCore::UI).to receive(:abort_with_message!)
+    end
+
+    after(:each) do
+      FileUtils.remove_entry @test_data_dir
     end
 
     it 'succeeds when there are no violations' do
@@ -198,10 +202,6 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       )
 
       expect(result).to eq({ 'fr' => ['`key3` expected placeholders for [Int] but found [] instead.'] })
-    end
-
-    after(:each) do
-      FileUtils.remove_entry @test_data_dir
     end
   end
 end

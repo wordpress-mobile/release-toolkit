@@ -5,9 +5,9 @@ module Fastlane
   module Helper
     module Ios
       class L10nLinterHelper
-        SWIFTGEN_VERSION = '6.4.0'
-        DEFAULT_BASE_LANG = 'en'
-        CONFIG_FILE_NAME = 'swiftgen-stringtypes.yml'
+        SWIFTGEN_VERSION = '6.4.0'.freeze
+        DEFAULT_BASE_LANG = 'en'.freeze
+        CONFIG_FILE_NAME = 'swiftgen-stringtypes.yml'.freeze
 
         attr_reader :install_path, :version
 

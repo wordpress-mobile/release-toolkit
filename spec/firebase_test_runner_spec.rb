@@ -39,8 +39,8 @@ describe Fastlane::FirebaseTestRunner do
     end
 
     it 'properly escapes the app path' do
-      temp_file_path = File.join(Dir.tmpdir(), 'path with spaces.txt')
-      expected_temp_file_path = File.join(Dir.tmpdir(), 'path\ with\ spaces.txt')
+      temp_file_path = File.join(Dir.tmpdir, 'path with spaces.txt')
+      expected_temp_file_path = File.join(Dir.tmpdir, 'path\ with\ spaces.txt')
       File.write(temp_file_path, '')
 
       allow(Fastlane::Action).to receive('sh').with("gcloud firebase test android run --project foo-bar-baz --type instrumentation --app #{expected_temp_file_path} --test #{default_file} --device device --verbosity info 2>&1 | tee #{runner_temp_file}")
@@ -48,8 +48,8 @@ describe Fastlane::FirebaseTestRunner do
     end
 
     it 'properly escapes the test path' do
-      temp_file_path = File.join(Dir.tmpdir(), 'path with spaces.txt')
-      expected_temp_file_path = File.join(Dir.tmpdir(), 'path\ with\ spaces.txt')
+      temp_file_path = File.join(Dir.tmpdir, 'path with spaces.txt')
+      expected_temp_file_path = File.join(Dir.tmpdir, 'path\ with\ spaces.txt')
       File.write(temp_file_path, '')
 
       allow(Fastlane::Action).to receive('sh').with("gcloud firebase test android run --project foo-bar-baz --type instrumentation --app #{default_file} --test #{expected_temp_file_path} --device device --verbosity info 2>&1 | tee #{runner_temp_file}")

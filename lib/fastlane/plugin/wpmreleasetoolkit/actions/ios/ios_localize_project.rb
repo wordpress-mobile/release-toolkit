@@ -5,8 +5,8 @@ module Fastlane
         UI.message 'Updating project localisation...'
 
         require_relative '../../helper/ios/ios_git_helper'
-        other_action.cocoapods()
-        Fastlane::Helper::Ios::GitHelper.localize_project()
+        other_action.cocoapods
+        Fastlane::Helper::Ios::GitHelper.localize_project
 
         UI.message 'Done.'
       end

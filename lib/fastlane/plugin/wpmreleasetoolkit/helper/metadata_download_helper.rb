@@ -38,11 +38,11 @@ module Fastlane
           source = d[0].split(/\u0004/).last
 
           target_files.each do |file|
-            if file[0].to_s == key
-              data = file[1]
-              msg = is_source ? source : d[1].first || '' # In the JSON, each Hash value is an array, with zero or one entry
-              update_key(target_locale, key, file, data, msg)
-            end
+            next unless file[0].to_s == key
+
+            data = file[1]
+            msg = is_source ? source : d[1].first || '' # In the JSON, each Hash value is an array, with zero or one entry
+            update_key(target_locale, key, file, data, msg)
           end
         end
       end
@@ -55,19 +55,19 @@ module Fastlane
 
           @alternates.each do |file|
             puts "Data: #{file[0]} - key: #{key}"
-            if file[0].to_s == key
-              puts "Alternate: #{key}"
-              data = file[1]
-              msg = is_source ? source : d[1].first || '' # In the JSON, each Hash value is an array, with zero or one entry
-              update_key(target_locale, key, file, data, msg)
-            end
+            next unless file[0].to_s == key
+
+            puts "Alternate: #{key}"
+            data = file[1]
+            msg = is_source ? source : d[1].first || '' # In the JSON, each Hash value is an array, with zero or one entry
+            update_key(target_locale, key, file, data, msg)
           end
         end
       end
 
       def update_key(target_locale, key, file, data, msg)
         message_len = msg.length
-        if (data.key?(:max_size)) && (data[:max_size] != 0) && ((message_len) > data[:max_size])
+        if data.key?(:max_size) && (data[:max_size] != 0) && (message_len > data[:max_size])
           if data.key?(:alternate_key)
             UI.message("#{target_locale} translation for #{key} exceeds maximum length (#{message_len}). Switching to the alternate translation.")
             @alternates[data[:alternate_key]] = { desc: data[:desc], max_size: 0 }
@@ -111,7 +111,7 @@ module Fastlane
           @alternates.clear
           loc_data = JSON.parse(response.body) rescue loc_data = nil
           parse_data(locale, loc_data, is_source)
-          reparse_alternates(target_locale, loc_data, is_source) unless @alternates.length == 0
+          reparse_alternates(target_locale, loc_data, is_source) unless @alternates.empty?
         when '301'
           # Follow the redirect
           UI.message("Received 301 for `#{locale}`. Following redirect...")

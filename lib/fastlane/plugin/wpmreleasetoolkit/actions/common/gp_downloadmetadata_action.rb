@@ -25,11 +25,11 @@ module Fastlane
             downloader.download(loc[1], complete_url, loc[1] == params[:source_locale])
           end
 
-          if loc.is_a?(String)
-            UI.message "Downloading language: #{loc}"
-            complete_url = "#{params[:project_url]}#{loc}/default/export-translations/?filters[status]=current&format=json"
-            downloader.download(loc, complete_url, loc == params[:source_locale])
-          end
+          next unless loc.is_a?(String)
+
+          UI.message "Downloading language: #{loc}"
+          complete_url = "#{params[:project_url]}#{loc}/default/export-translations/?filters[status]=current&format=json"
+          downloader.download(loc, complete_url, loc == params[:source_locale])
         end
       end
 
