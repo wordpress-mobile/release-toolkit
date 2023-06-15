@@ -145,37 +145,154 @@ describe Fastlane::Actions::UploadToS3Action do
     end
 
     context 'when the file already exists on S3' do
-      it 'fails if skip_if_exists:false' do
-        expected_key = 'a62f2225bf70bfaccbc7f1ef2a397836717377de/key'
+      it 'fails if skip_if_exists and if_exists are unspecified' do
+        expected_key = '29d5f92e9ee44d4854d6dfaeefc3dc27d779fdf3/existing-key'
         stub_s3_response_for_file(expected_key)
 
-        with_tmp_file(named: 'key') do |file_path|
+        with_tmp_file(named: 'existing-key') do |file_path|
           expect do
             run_described_fastlane_action(
               bucket: test_bucket,
-              key: 'key',
+              key: 'existing-key',
               file: file_path
             )
           end.to raise_error(FastlaneCore::Interface::FastlaneError, "File already exists in S3 bucket #{test_bucket} at #{expected_key}")
         end
       end
 
-      it 'logs a message without failing if skip_if_exists:true' do
-        expected_key = 'a62f2225bf70bfaccbc7f1ef2a397836717377de/key'
+      it 'fails if skip_if_exists:false and if_exists is unspecified' do
+        expected_key = 'faf2b3798ee00168b43fc303d160e0a068e72a7c/existing-key-2'
+        stub_s3_response_for_file(expected_key)
+
+        with_tmp_file(named: 'existing-key-2') do |file_path|
+          expect do
+            run_described_fastlane_action(
+              bucket: test_bucket,
+              key: 'existing-key-2',
+              file: file_path
+            )
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, "File already exists in S3 bucket #{test_bucket} at #{expected_key}")
+        end
+      end
+
+      it 'logs a message without failing if skip_if_exists:true and if_exists is unspecified' do
+        expected_key = '29d5f92e9ee44d4854d6dfaeefc3dc27d779fdf3/existing-key'
         stub_s3_response_for_file(expected_key)
 
         warnings = []
         allow(FastlaneCore::UI).to receive(:important) { |message| warnings << message }
 
-        with_tmp_file(named: 'key') do |file_path|
+        with_tmp_file(named: 'existing-key') do |file_path|
           key = run_described_fastlane_action(
             bucket: test_bucket,
-            key: 'key',
+            key: 'existing-key',
             file: file_path,
             skip_if_exists: true
           )
           expect(warnings).to eq(["File already exists in S3 bucket #{test_bucket} at #{expected_key}. Skipping upload."])
           expect(key).to eq(expected_key)
+        end
+      end
+
+      it 'fails when if_exist is :fail, ignoring skip_if_exists' do
+        expected_key = '29d5f92e9ee44d4854d6dfaeefc3dc27d779fdf3/existing-key'
+        stub_s3_response_for_file(expected_key)
+
+        with_tmp_file(named: 'existing-key') do |file_path|
+          expect do
+            run_described_fastlane_action(
+              bucket: test_bucket,
+              key: 'existing-key',
+              file: file_path,
+              if_exists: :fail,
+              skip_if_exists: true
+            )
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, "File already exists in S3 bucket #{test_bucket} at #{expected_key}")
+        end
+      end
+
+      it 'logs a message without failing when if_exists is :skip, ignoring skip_if_exists' do
+        expected_key = '29d5f92e9ee44d4854d6dfaeefc3dc27d779fdf3/existing-key'
+        stub_s3_response_for_file(expected_key)
+
+        warnings = []
+        allow(FastlaneCore::UI).to receive(:important) { |message| warnings << message }
+
+        with_tmp_file(named: 'existing-key') do |file_path|
+          key = run_described_fastlane_action(
+            bucket: test_bucket,
+            key: 'existing-key',
+            file: file_path,
+            if_exists: :skip,
+            skip_if_exists: false # using false which would make the action fails if if_exists did not take precedence
+          )
+          expect(warnings).to eq(["File already exists in S3 bucket #{test_bucket} at #{expected_key}. Skipping upload."])
+          expect(key).to eq(expected_key)
+        end
+      end
+
+      it 'upload the file overriding the existing one when if_exists is :replace, ignoring skip_if_exists' do
+        expected_key = '29d5f92e9ee44d4854d6dfaeefc3dc27d779fdf3/existing-key'
+        stub_s3_response_for_file(expected_key)
+
+        warnings = []
+        allow(FastlaneCore::UI).to receive(:important) { |message| warnings << message }
+
+        with_tmp_file(named: 'existing-key') do |file_path|
+          expect(client).to receive(:put_object).with(body: file_instance_of(file_path), bucket: test_bucket, key: expected_key)
+
+          return_value = run_described_fastlane_action(
+            bucket: test_bucket,
+            key: 'existing-key',
+            file: file_path,
+            if_exists: :replace,
+            skip_if_exists: false # using false which would make the action fails if if_exists did not take precedence
+          )
+
+          expect(return_value).to eq(expected_key)
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::S3_UPLOADED_FILE_PATH]).to eq(expected_key)
+        end
+      end
+
+      it 'accepts if_exists as a String argument' do
+        expected_key = 'a90dff8ba6472d733cb0a37734fe28a8078f8444/key-2'
+        stub_s3_response_for_file(expected_key)
+
+        with_tmp_file(named: 'key-2') do |file_path|
+          expect do
+            run_described_fastlane_action(
+              bucket: test_bucket,
+              key: 'key-2',
+              file: file_path,
+              if_exists: 'fail'
+            )
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, "File already exists in S3 bucket #{test_bucket} at #{expected_key}")
+        end
+      end
+
+      it 'throws when if_exists is not one of the expected values' do
+        with_tmp_file(named: 'key') do |file_path|
+          expect do
+            run_described_fastlane_action(
+              bucket: test_bucket,
+              key: 'a8c-key1',
+              file: file_path,
+              if_exists: :invalid
+            )
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, '`if_exist` must be one of :skip, :replace, :fail')
+        end
+      end
+
+      it 'throws when if_exists is neither a Symbol nor a String' do
+        with_tmp_file(named: 'key') do |file_path|
+          expect do
+            run_described_fastlane_action(
+              bucket: test_bucket,
+              key: 'a8c-key1',
+              file: file_path,
+              if_exists: 123
+            )
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, '`if_exist` must be a symbol or convertible to a symbol, got 123')
         end
       end
     end

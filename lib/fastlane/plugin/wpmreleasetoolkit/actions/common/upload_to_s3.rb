@@ -22,11 +22,25 @@ module Fastlane
 
         if file_is_already_uploaded?(bucket, key)
           message = "File already exists in S3 bucket #{bucket} at #{key}"
-          if params[:skip_if_exists]
+
+          # skip_if_exists is deprecated but to keep backward compatibility we still support it by reading it only if if_exists is not set.
+          if params[:if_exists].nil?
+            if params[:skip_if_exists]
+              UI.important("#{message}. Skipping upload.")
+              return key
+            else
+              UI.user_error!(message)
+            end
+          end
+
+          case params[:if_exists].to_sym
+          when :fail
+            UI.user_error!(message)
+          when :replace
+            UI.important("#{message}. Will replace with the given one.")
+          when :skip
             UI.important("#{message}. Skipping upload.")
             return key
-          else
-            UI.user_error!(message)
           end
         end
 
@@ -111,10 +125,23 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :skip_if_exists,
-            description: 'If the file already exists in the S3 bucket, skip the upload (and report it in the logs), instead of failing with `user_error!`',
+            description: '[DEPRECATED: Use if_exists instead]. If the file already exists in the S3 bucket, skip the upload (and report it in the logs), instead of failing with `user_error!`. When if_exists is set, this option is ignored',
             optional: true,
             default_value: false,
             type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :if_exists,
+            description: 'What do to if the file file already exists in the S3 bucket. Possible values :skip, :replace, :fail. When set, overrides the deprecated skip_if_exists option',
+            optional: true,
+            is_string: false,
+            default_value: nil, # Using nil under the hood until we remove skip_if_exists
+            verify_block: proc do |value|
+              next if value.nil?
+
+              UI.user_error!("`if_exist` must be a symbol or convertible to a symbol, got #{value}") unless value.respond_to?(:to_sym)
+              UI.user_error!('`if_exist` must be one of :skip, :replace, :fail') unless %i[skip replace fail].include?(value.to_sym)
+            end
           ),
         ]
       end
