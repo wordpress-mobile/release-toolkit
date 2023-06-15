@@ -15,7 +15,7 @@ module Fastlane
             profile.is_a? Spaceship::Portal::ProvisioningProfile::Development
           end
                    .tap do |profiles|
-            UI.important "Warning: Unable to find any profiles associated with #{identifier}" unless profiles.length > 0
+            UI.important "Warning: Unable to find any profiles associated with #{identifier}" if profiles.empty?
           end
                    .each do |profile|
             profile.devices = devices
@@ -52,7 +52,7 @@ module Fastlane
             description: 'The team_id for the provisioning profiles',
             type: String,
             verify_block: proc do |value|
-              UI.user_error!('You must provide a team ID in `team_id`') unless value && (!value.empty?)
+              UI.user_error!('You must provide a team ID in `team_id`') unless value && !value.empty?
             end
           ),
         ]

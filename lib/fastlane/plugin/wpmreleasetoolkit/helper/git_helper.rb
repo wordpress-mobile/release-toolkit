@@ -47,7 +47,7 @@ module Fastlane
       def self.has_git_lfs?
         return false unless is_git_repo?
 
-        `git config --get-regex lfs`.length > 0
+        !`git config --get-regex lfs`.empty?
       end
 
       # Switch to the given branch and pull its latest commits.

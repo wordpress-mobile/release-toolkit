@@ -50,8 +50,8 @@ module Fastlane
           new_branch = UI.select("Select the branch you'd like to switch to: ", get_branches)
           checkout_branch(new_branch)
           update_configure_file
-        else
-          UI.user_error!('The local secrets store is in a deatched HEAD state.  Please check out a branch and try again.') if current_branch.nil?
+        elsif current_branch.nil?
+          UI.user_error!('The local secrets store is in a deatched HEAD state.  Please check out a branch and try again.')
         end
       end
 

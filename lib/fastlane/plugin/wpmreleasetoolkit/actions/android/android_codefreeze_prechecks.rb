@@ -1,8 +1,8 @@
 module Fastlane
   module Actions
     class AndroidCodefreezePrechecksAction < Action
-      VERSION_RELEASE = 'release'
-      VERSION_ALPHA = 'alpha'
+      VERSION_RELEASE = 'release'.freeze
+      VERSION_ALPHA = 'alpha'.freeze
 
       def self.run(params)
         # fastlane will take care of reading in the parameter and fetching the environment variable:
@@ -33,7 +33,7 @@ module Fastlane
         end
 
         # Check local repo status
-        other_action.ensure_git_status_clean()
+        other_action.ensure_git_status_clean
 
         # Return the current version
         Fastlane::Helper::Android::VersionHelper.get_public_version

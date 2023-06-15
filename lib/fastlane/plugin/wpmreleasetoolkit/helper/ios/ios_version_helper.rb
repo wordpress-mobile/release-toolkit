@@ -139,8 +139,8 @@ module Fastlane
         def self.create_internal_version(version)
           vp = get_version_parts(version)
           d = DateTime.now
-          todayDate = d.strftime('%Y%m%d')
-          "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}.#{todayDate}"
+          today_date = d.strftime('%Y%m%d')
+          "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}.#{today_date}"
         end
 
         # Return the build number value incremented by one.
@@ -169,7 +169,7 @@ module Fastlane
         # @return [String] The current version according to the public xcconfig file.
         #
         def self.get_build_version
-          versions = get_version_strings()[0]
+          versions = get_version_strings[0]
         end
 
         # Returns the current value of the `VERSION_LONG` key from the internal xcconfig file
@@ -177,7 +177,7 @@ module Fastlane
         # @return [String] The current version according to the internal xcconfig file.
         #
         def self.get_internal_version
-          get_version_strings()[1]
+          get_version_strings[1]
         end
 
         # Prints the current and next release version numbers to stdout, then return the next release version
@@ -186,7 +186,7 @@ module Fastlane
         #
         def self.bump_version_release
           # Bump release
-          current_version = get_public_version()
+          current_version = get_public_version
           UI.message("Current version: #{current_version}")
           new_version = calc_next_release_version(current_version)
           UI.message("New version: #{new_version}")
@@ -248,7 +248,6 @@ module Fastlane
         end
 
         #----------------------------------------
-        private
 
         # Split a version string into its 4 parts, ensuring its parts count is valid
         #
@@ -267,33 +266,33 @@ module Fastlane
 
         # Extract the VERSION_LONG entry from an `xcconfig` file
         #
-        # @param [String] filePath The path to the `.xcconfig` file to read the value from
+        # @param [String] file_path The path to the `.xcconfig` file to read the value from
         # @return [String] The long version found in said xcconfig file, or nil if not found
         #
-        def self.read_long_version_from_config_file(filePath)
-          read_from_config_file('VERSION_LONG', filePath)
+        def self.read_long_version_from_config_file(file_path)
+          read_from_config_file('VERSION_LONG', file_path)
         end
 
         # Extract the BUILD_NUMBER entry from an `xcconfig` file
         #
-        # @param [String] filePath The path to the `.xcconfig` file to read the value from
+        # @param [String] file_path The path to the `.xcconfig` file to read the value from
         # @return [String] The build number found in said xcconfig file, or nil if not found
         #
-        def self.read_build_number_from_config_file(filePath)
-          read_from_config_file('BUILD_NUMBER', filePath)
+        def self.read_build_number_from_config_file(file_path)
+          read_from_config_file('BUILD_NUMBER', file_path)
         end
 
         # Read the value of a given key from an `.xcconfig` file.
         #
         # @param [String] key The xcconfig key to get the value for
-        # @param [String] filePath The path to the `.xcconfig` file to read the value from
+        # @param [String] file_path The path to the `.xcconfig` file to read the value from
         #
         # @return [String] The value for the given key, or `nil` if the key was not found.
         #
-        def self.read_from_config_file(key, filePath)
-          File.open(filePath, 'r') do |f|
+        def self.read_from_config_file(key, file_path)
+          File.open(file_path, 'r') do |f|
             f.each_line do |line|
-              line = line.strip()
+              line = line.strip
               return line.split('=')[1] if line.start_with?("#{key}=")
             end
           end
@@ -339,7 +338,7 @@ module Fastlane
         #
         # @return [Bool] true if the string is representing an integer value, false if not
         #
-        def self.is_int? string
+        def self.is_int?(string)
           true if Integer(string) rescue false
         end
       end

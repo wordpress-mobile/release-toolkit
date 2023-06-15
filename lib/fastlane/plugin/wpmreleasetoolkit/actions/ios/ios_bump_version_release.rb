@@ -12,9 +12,9 @@ module Fastlane
         other_action.ensure_git_branch(branch: default_branch)
 
         # Create new configuration
-        @new_version = Fastlane::Helper::Ios::VersionHelper.bump_version_release()
-        create_config()
-        show_config()
+        @new_version = Fastlane::Helper::Ios::VersionHelper.bump_version_release
+        create_config
+        show_config
 
         # Update local default branch and create branch from it
         Fastlane::Helper::GitHelper.checkout_and_pull(default_branch)
@@ -78,11 +78,9 @@ module Fastlane
         [:ios, :mac].include?(platform)
       end
 
-      private
-
       def self.create_config
-        @current_version = Fastlane::Helper::Ios::VersionHelper.get_build_version()
-        @current_version_internal = Fastlane::Helper::Ios::VersionHelper.get_internal_version() unless ENV['INTERNAL_CONFIG_FILE'].nil?
+        @current_version = Fastlane::Helper::Ios::VersionHelper.get_build_version
+        @current_version_internal = Fastlane::Helper::Ios::VersionHelper.get_internal_version unless ENV['INTERNAL_CONFIG_FILE'].nil?
         @new_version_internal = Fastlane::Helper::Ios::VersionHelper.create_internal_version(@new_version) unless ENV['INTERNAL_CONFIG_FILE'].nil?
         @new_short_version = Fastlane::Helper::Ios::VersionHelper.get_short_version_string(@new_version)
         @new_release_branch = "release/#{@new_short_version}"

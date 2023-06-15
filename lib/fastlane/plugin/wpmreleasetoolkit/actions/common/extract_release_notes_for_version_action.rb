@@ -15,7 +15,7 @@ module Fastlane
         end
 
         unless extracted_notes_file.nil?
-          extracted_notes_file.close()
+          extracted_notes_file.close
           check_and_commit_extracted_notes_file(extracted_notes_file_path, version)
         end
       end
@@ -25,9 +25,9 @@ module Fastlane
         File.open(release_notes_file_path).each do |line|
           case state
           when :discarding
-            state = :evaluating if (line.match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/)) && (line.strip() == version)
+            state = :evaluating if line.match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/) && (line.strip == version)
           when :evaluating
-            state = (line.match(/-/)) ? :extracting : :discarding
+            state = line.match(/-/) ? :extracting : :discarding
           when :extracting
             if line.match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/)
               state = :discarding

@@ -21,7 +21,7 @@ module Fastlane
         Fastlane::Helper::Android::VersionHelper.update_versions(new_version, nil)
         UI.message 'Done!'
 
-        Fastlane::Helper::Android::GitHelper.commit_version_bump()
+        Fastlane::Helper::Android::GitHelper.commit_version_bump
 
         UI.message 'Done.'
       end

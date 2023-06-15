@@ -7,7 +7,7 @@ module Fastlane
         require_relative '../../helper/ios/ios_git_helper'
         Fastlane::Helper::GitHelper.create_branch("release/#{params[:version]}", from: params[:previous_version])
         create_config(params[:previous_version], params[:version])
-        show_config()
+        show_config
 
         update_deliverfile = params[:skip_deliver] == false
         if update_deliverfile
@@ -78,11 +78,9 @@ module Fastlane
         [:ios, :mac].include?(platform)
       end
 
-      private
-
       def self.create_config(previous_version, new_short_version)
         @current_version = previous_version
-        @current_version_internal = Fastlane::Helper::Ios::VersionHelper.get_internal_version() unless ENV['INTERNAL_CONFIG_FILE'].nil?
+        @current_version_internal = Fastlane::Helper::Ios::VersionHelper.get_internal_version unless ENV['INTERNAL_CONFIG_FILE'].nil?
         @new_version = "#{new_short_version}.0"
         @new_version_internal = Fastlane::Helper::Ios::VersionHelper.create_internal_version(@new_version) unless ENV['INTERNAL_CONFIG_FILE'].nil?
         @new_short_version = new_short_version

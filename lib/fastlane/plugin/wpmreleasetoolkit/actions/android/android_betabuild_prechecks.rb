@@ -42,7 +42,7 @@ module Fastlane
         end
 
         # Check local repo status
-        other_action.ensure_git_status_clean()
+        other_action.ensure_git_status_clean
 
         # Return the current version
         [next_beta_version, next_alpha_version]

@@ -33,7 +33,7 @@ module Fastlane
           raise
         end
 
-        other_action.cocoapods()
+        other_action.cocoapods
       end
 
       #####################################################

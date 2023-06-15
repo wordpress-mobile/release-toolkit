@@ -5,9 +5,9 @@ module Fastlane
         require_relative '../../helper/ios/ios_version_helper'
 
         message = ''
-        message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_internal_version()} and uploading to App Center\n" if params[:internal]
-        message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_build_version()} and uploading to App Center\n" if params[:internal_on_single_version]
-        message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_build_version()} and uploading to TestFlight\n" if params[:external]
+        message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_internal_version} and uploading to App Center\n" if params[:internal]
+        message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_build_version} and uploading to App Center\n" if params[:internal_on_single_version]
+        message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_build_version} and uploading to TestFlight\n" if params[:external]
 
         if params[:skip_confirm]
           UI.message(message)
@@ -16,7 +16,7 @@ module Fastlane
         end
 
         # Check local repo status
-        other_action.ensure_git_status_clean() unless other_action.is_ci()
+        other_action.ensure_git_status_clean unless other_action.is_ci
       end
 
       #####################################################

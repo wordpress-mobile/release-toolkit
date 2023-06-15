@@ -44,7 +44,7 @@ class ChangelogParser
     comps.join('.')
   end
 
-  def update_for_new_release(new_file: 'CHANGELOG.md', new_version:)
+  def update_for_new_release(new_version:, new_file: 'CHANGELOG.md')
     raise 'You need to call #parse_pending_section first' if @pending_section.nil?
 
     File.open(new_file, 'w') do |f|

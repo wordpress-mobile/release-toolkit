@@ -5,9 +5,9 @@ module Fastlane
       #
       module VersionHelper
         # The key used in internal version Hash objects to hold the versionName value
-        VERSION_NAME = 'name'
+        VERSION_NAME = 'name'.freeze
         # The key used in internal version Hash objects to hold the versionCode value
-        VERSION_CODE = 'code'
+        VERSION_CODE = 'code'.freeze
         # The index for the major version number part
         MAJOR_NUMBER = 0
         # The index for the minor version number part
@@ -15,9 +15,9 @@ module Fastlane
         # The index for the hotfix version number part
         HOTFIX_NUMBER = 2
         # The prefix used in front of the versionName for alpha versions
-        ALPHA_PREFIX = 'alpha-'
+        ALPHA_PREFIX = 'alpha-'.freeze
         # The suffix used in the versionName for RC (beta) versions
-        RC_SUFFIX = '-rc'
+        RC_SUFFIX = '-rc'.freeze
 
         # Returns the public-facing version string.
         #
@@ -43,7 +43,7 @@ module Fastlane
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_release_version
-          return get_version_from_properties() if File.exist?(version_properties_file)
+          return get_version_from_properties if File.exist?(version_properties_file)
 
           section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
           gradle_path = self.gradle_path
@@ -145,7 +145,7 @@ module Fastlane
         def self.calc_next_alpha_version(version, alpha_version)
           # Bump alpha name
           alpha_number = alpha_version[VERSION_NAME].sub(ALPHA_PREFIX, '')
-          alpha_name = "#{ALPHA_PREFIX}#{alpha_number.to_i() + 1}"
+          alpha_name = "#{ALPHA_PREFIX}#{alpha_number.to_i + 1}"
 
           # Bump alpha code
           alpha_code = version[VERSION_CODE] + 1
@@ -349,7 +349,6 @@ module Fastlane
         end
 
         #----------------------------------------
-        private
 
         # Remove the beta suffix (part after the `-`) from a version string
         #
@@ -449,8 +448,8 @@ module Fastlane
             file.each_line do |line|
               if found_section
                 return line.split[1] if line.include?(keyword) && !line.include?("\"#{keyword}\"") && !line.include?("P#{keyword}")
-              else
-                found_section = true if line.include?(section)
+              elsif line.include?(section)
+                found_section = true
               end
             end
           end
@@ -490,13 +489,13 @@ module Fastlane
                   if line.include?('versionName') && !line.include?('"versionName"') && !line.include?('PversionName')
                     version_name = line.split[1].tr('\"', '')
                     line.sub!(version_name, version[VERSION_NAME].to_s)
-                    version_updated = version_updated + 1
+                    version_updated += 1
                   end
 
                   if line.include? 'versionCode'
                     version_code = line.split[1]
                     line.sub!(version_code, version[VERSION_CODE].to_s)
-                    version_updated = version_updated + 1
+                    version_updated += 1
                   end
                 end
                 temp_file.puts line
