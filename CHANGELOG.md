@@ -6,11 +6,11 @@
 
 ### Breaking Changes
 
-_None_
+- Replace `skip_if_exists` parameter in `upload_to_s3` action with `if_exists`. Possible values `:skip`, `:fail`, and `:replace`. [#495, #496]
 
 ### New Features
 
-- Adds `if_exists` parameter to `upload_to_s3` action, with possible values `:skip`, `:fail`, and `:replace`. [#495]
+_None_
 
 ### Bug Fixes
 
