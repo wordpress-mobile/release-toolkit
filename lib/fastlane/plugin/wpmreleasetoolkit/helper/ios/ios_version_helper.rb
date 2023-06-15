@@ -1,3 +1,5 @@
+require 'xcodeproj'
+
 module Fastlane
   module Helper
     module Ios
@@ -15,9 +17,30 @@ module Fastlane
 
         # Returns the public-facing version string.
         #
+        # @param [String] xcconfig_file The path for the .xcconfig file containing the public-facing version
+        #
         # @return [String] The public-facing version number, extracted from the VERSION_LONG entry of the xcconfig file.
         #         - If this version is a hotfix (more than 2 parts and 3rd part is non-zero), returns the "X.Y.Z" formatted string
         #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
+        #
+        def self.get_xcconfig_public_version(xcconfig_file:)
+          version = read_long_version_from_config_file(xcconfig_file)
+
+          UI.user_error!(".xcconfig file doesn't have a version configured") if version.nil?
+
+          vp = get_version_parts(version)
+          return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
+
+          "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}"
+        end
+
+        # Returns the public-facing version string.
+        #
+        # @return [String] The public-facing version number, extracted from the VERSION_LONG entry of the xcconfig file.
+        #         - If this version is a hotfix (more than 2 parts and 3rd part is non-zero), returns the "X.Y.Z" formatted string
+        #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
+        #
+        # @deprecated This method is going to be removed soon due to it's dependency on `ENV['PUBLIC_CONFIG_FILE']` via `get_build_version`.
         #
         def self.get_public_version
           version = get_build_version
@@ -169,7 +192,8 @@ module Fastlane
         # @return [String] The current version according to the public xcconfig file.
         #
         def self.get_build_version
-          versions = get_version_strings[0]
+          xcconfig_file = ENV['PUBLIC_CONFIG_FILE']
+          read_long_version_from_config_file(xcconfig_file)
         end
 
         # Returns the current value of the `VERSION_LONG` key from the internal xcconfig file
@@ -177,7 +201,8 @@ module Fastlane
         # @return [String] The current version according to the internal xcconfig file.
         #
         def self.get_internal_version
-          get_version_strings[1]
+          xcconfig_file = ENV['INTERNAL_CONFIG_FILE']
+          read_long_version_from_config_file(xcconfig_file)
         end
 
         # Prints the current and next release version numbers to stdout, then return the next release version
@@ -193,20 +218,6 @@ module Fastlane
           verified_version = verify_version(new_version)
 
           return verified_version
-        end
-
-        # Updates the `app_version` entry in the `Deliverfile`
-        #
-        # @param [String] new_version The new value to set the `app_version` entry to.
-        # @raise [UserError] If the Deliverfile was not found.
-        #
-        def self.update_fastlane_deliver(new_version)
-          fd_file = './fastlane/Deliverfile'
-          if File.exist?(fd_file)
-            Action.sh("sed -i '' \"s/app_version.*/app_version \\\"#{new_version}\\\"/\" #{fd_file}")
-          else
-            UI.user_error!("Can't find #{fd_file}.")
-          end
         end
 
         # Update the `.xcconfig` files (the public one, and the internal one if it exists) with the new version strings.
@@ -290,30 +301,10 @@ module Fastlane
         # @return [String] The value for the given key, or `nil` if the key was not found.
         #
         def self.read_from_config_file(key, file_path)
-          File.open(file_path, 'r') do |f|
-            f.each_line do |line|
-              line = line.strip
-              return line.split('=')[1] if line.start_with?("#{key}=")
-            end
-          end
+          UI.user_error!(".xcconfig file #{file_path} not found") unless File.exist?(file_path)
 
-          return nil
-        end
-
-        # Read the version numbers from the xcconfig file
-        #
-        # @env PUBLIC_CONFIG_FILE The path to the xcconfig file containing the public version numbers.
-        # @env INTERNAL_CONFIG_FILE The path to the xcconfig file containing the internal version numbers. Can be nil.
-        #
-        # @return [String] Array of long version strings found.
-        #         The first element is always present and contains the version extracted from the public config file
-        #         The second element is the version extracted from the internal config file, only present if one was provided.
-        def self.get_version_strings
-          version_strings = []
-          version_strings << read_long_version_from_config_file(ENV['PUBLIC_CONFIG_FILE'])
-          version_strings << read_long_version_from_config_file(ENV['INTERNAL_CONFIG_FILE']) unless ENV['INTERNAL_CONFIG_FILE'].nil?
-
-          return version_strings
+          config = Xcodeproj::Config.new(file_path)
+          config.attributes[key]
         end
 
         # Ensure that the version provided is only composed of number parts and return the validated string

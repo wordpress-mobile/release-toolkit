@@ -13,14 +13,14 @@ describe Fastlane::Actions::IosGetBuildNumberAction do
       expect_build_number(xcconfig_mock_content: xcconfig_mock_content, expected_build_number: '1940')
     end
 
-    it 'parses an xcconfig file with keys with spaces and returns a nil build number' do
+    it 'parses an xcconfig file with keys with spaces and returns the correct build number' do
       xcconfig_mock_content = <<~CONTENT
         VERSION_SHORT = 6
         VERSION_LONG = 6.30.1
         BUILD_NUMBER = 1940
       CONTENT
 
-      expect_build_number(xcconfig_mock_content: xcconfig_mock_content, expected_build_number: nil)
+      expect_build_number(xcconfig_mock_content: xcconfig_mock_content, expected_build_number: '1940')
     end
 
     it 'parses an xcconfig file with an invalid format and returns a nil build number' do
@@ -47,8 +47,7 @@ describe Fastlane::Actions::IosGetBuildNumberAction do
         run_described_fastlane_action(
           xcconfig_file_path: 'file/not/found'
         )
-        # Ruby error for 'No such file or directory': https://ruby-doc.org/core-2.7.4/SystemCallError.html
-      end.to raise_error(Errno::ENOENT)
+      end.to raise_error(FastlaneCore::Interface::FastlaneError)
     end
 
     def expect_build_number(xcconfig_mock_content:, expected_build_number:)

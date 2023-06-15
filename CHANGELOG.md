@@ -6,7 +6,9 @@
 
 ### Breaking Changes
 
-_None_
+- Add the `public_version_xcconfig_file` parameter to the `ios_get_app_version` action to replace the need for an environment variable [#445]
+- Remove the `ios_localize_project` and `ios_update_metadata` actions [#447]
+- Remove the `skip_deliver` parameter from `ios_bump_version_hotfix` and `ios_bump_version_release` actions [#450]
 
 ### New Features
 
@@ -85,6 +87,7 @@ _None_
 ### Internal Changes
 
 - Updates `activesupport` to `6.1.7.1`, addressing [a security issue](https://github.com/advisories/GHSA-j6gc-792m-qgm2). This is a major version change, but as the dependency is internal-only, it shouldn't be a breaking change for clients. [#441]
+- Add the explicit dependency to `xcodeproj (~> 1.22)`, used in this case to replace the previous manual parsing of `.xcconfig` files. [#451]
 
 ## 6.3.0
 
