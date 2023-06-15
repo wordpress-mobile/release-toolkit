@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Adds `if_exists` parameter to `upload_to_s3` action, with possible values `:skip`, `:fail`, and `:replace`. [#495]
 
 ### Bug Fixes
 

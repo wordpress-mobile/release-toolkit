@@ -169,7 +169,8 @@ describe Fastlane::Actions::UploadToS3Action do
             run_described_fastlane_action(
               bucket: test_bucket,
               key: 'existing-key-2',
-              file: file_path
+              file: file_path,
+              skip_if_exists: false
             )
           end.to raise_error(FastlaneCore::Interface::FastlaneError, "File already exists in S3 bucket #{test_bucket} at #{expected_key}")
         end
