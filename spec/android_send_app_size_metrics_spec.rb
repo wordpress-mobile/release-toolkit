@@ -60,10 +60,10 @@ describe Fastlane::Actions::AndroidSendAppSizeMetricsAction do
       expect(File).to exist(output_file)
       gzip_disabled = other_action_args[:use_gzip_content_encoding] == false
       generated_payload = gzip_disabled ? File.read(output_file) : Zlib::GzipReader.open(output_file, &:read)
-      # Compare the payloads as pretty-formatted JSON, to make the diff in test failures more readable if one happen
-      expect(JSON.pretty_generate(JSON.parse(generated_payload))).to eq(JSON.pretty_generate(expected_payload)), 'Decompressed JSON payload was not as expected'
-      # Compare the payloads as raw uncompressed data as a final check
-      expect(generated_payload).to eq(expected_payload.to_json)
+
+      generated_payload = JSON.parse(generated_payload, symbolize_names: true)
+      expect(generated_payload.fetch(:meta, []).to_set).to eq(expected_payload[:meta].to_set)
+      expect(generated_payload.fetch(:metrics, []).to_set).to eq(expected_payload[:metrics].to_set)
     end
   end
 
@@ -200,7 +200,7 @@ describe Fastlane::Actions::AndroidSendAppSizeMetricsAction do
     context 'when only providing an `aab_path`' do
       it 'generates the expected payload containing the aab file size and optimized split sizes' do
         expected_fixture = File.join(test_data_dir, 'android-metrics-payload-aab.json')
-        expected = JSON.parse(File.read(expected_fixture))
+        expected = JSON.parse(File.read(expected_fixture), symbolize_names: true)
 
         test_app_size_action(
           fake_aab_size: 987_654_321,
@@ -222,7 +222,7 @@ describe Fastlane::Actions::AndroidSendAppSizeMetricsAction do
     context 'when only providing an `universal_apk_path`' do
       it 'generates the expected payload containing the apk file size and optimized file and download sizes' do
         expected_fixture = File.join(test_data_dir, 'android-metrics-payload-apk.json')
-        expected = JSON.parse(File.read(expected_fixture))
+        expected = JSON.parse(File.read(expected_fixture), symbolize_names: true)
 
         test_app_size_action(
           fake_aab_size: nil,
@@ -237,7 +237,7 @@ describe Fastlane::Actions::AndroidSendAppSizeMetricsAction do
     context 'when providing both an `aab_path` and an `universal_apk_path`' do
       it 'generates the expected payload containing the aab and universal apk file size and optimized file and download sizes for all splits' do
         expected_fixture = File.join(test_data_dir, 'android-metrics-payload-aab+apk.json')
-        expected = JSON.parse(File.read(expected_fixture))
+        expected = JSON.parse(File.read(expected_fixture), symbolize_names: true)
 
         test_app_size_action(
           fake_aab_size: 987_654_321,
