@@ -23,14 +23,13 @@ module Fastlane
         if file_is_already_uploaded?(bucket, key)
           message = "File already exists in S3 bucket #{bucket} at #{key}"
 
-          # skip_if_exists is deprecated but to keep backward compatibility we still support it by reading it only if if_exists is not set.
+          # skip_if_exists is deprecated but we want to keep backward compatibility.
           if params[:if_exists].nil?
-            if params[:skip_if_exists]
-              UI.important("#{message}. Skipping upload.")
-              return key
-            else
-              UI.user_error!(message)
-            end
+            params[:if_exists] = if params[:skip_if_exists].nil? || params[:skip_if_exists] == false
+                                   :fail
+                                 else
+                                   :skip
+                                 end
           end
 
           case params[:if_exists].to_sym
