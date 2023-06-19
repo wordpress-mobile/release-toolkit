@@ -125,6 +125,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :skip_if_exists,
             description: '[DEPRECATED: Use if_exists instead]. If the file already exists in the S3 bucket, skip the upload (and report it in the logs), instead of failing with `user_error!`. When if_exists is set, this option is ignored',
+            deprecated: 'Use if_exists instead',
             optional: true,
             default_value: false,
             type: Boolean
