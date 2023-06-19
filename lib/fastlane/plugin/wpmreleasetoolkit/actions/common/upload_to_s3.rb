@@ -89,6 +89,14 @@ module Fastlane
       end
 
       def self.available_options
+        file_exists_conflicting_options_handler = proc do |other|
+          # Fail if the conflicting options are not the ones we expect.
+          # This can only happen if the config items are updated without updating the conflicting options.
+          UI.user_error!("Unexpected conflict with option #{other.key}") unless [:skip_if_exists, :if_exists].include?(other.key)
+
+          UI.important('When both :skip_if_exists and :if_exists are set, :skip_if_exists is ignored in favor of :if_exists')
+        end
+
         [
           FastlaneCore::ConfigItem.new(
             key: :bucket,
@@ -126,6 +134,8 @@ module Fastlane
             key: :skip_if_exists,
             description: '[DEPRECATED: Use if_exists instead]. If the file already exists in the S3 bucket, skip the upload (and report it in the logs), instead of failing with `user_error!`. When if_exists is set, this option is ignored',
             deprecated: 'Use if_exists instead',
+            conflicting_options: [:if_exists],
+            conflict_block: file_exists_conflicting_options_handler,
             optional: true,
             default_value: false,
             type: Boolean
@@ -133,6 +143,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :if_exists,
             description: 'What do to if the file file already exists in the S3 bucket. Possible values :skip, :replace, :fail. When set, overrides the deprecated skip_if_exists option',
+            conflicting_options: [:skip_if_exists],
+            conflict_block: file_exists_conflicting_options_handler,
             optional: true,
             type: Symbol,
             default_value: nil, # Using nil under the hood until we remove skip_if_exists

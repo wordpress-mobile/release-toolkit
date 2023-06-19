@@ -227,7 +227,9 @@ describe Fastlane::Actions::UploadToS3Action do
             if_exists: :skip,
             skip_if_exists: false # using false which would make the action fails if if_exists did not take precedence
           )
-          expect(warnings).to eq(["File already exists in S3 bucket #{test_bucket} at #{expected_key}. Skipping upload."])
+
+          # There will also be warnings regarding the conflicting if_exists and skip_if_exists options, but we are not interested in them here.
+          expect(warnings).to include("File already exists in S3 bucket #{test_bucket} at #{expected_key}. Skipping upload.")
           expect(key).to eq(expected_key)
         end
       end
