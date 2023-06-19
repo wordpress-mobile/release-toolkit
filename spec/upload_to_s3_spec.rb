@@ -190,7 +190,12 @@ describe Fastlane::Actions::UploadToS3Action do
             file: file_path,
             skip_if_exists: true
           )
-          expect(warnings).to eq(["File already exists in S3 bucket #{test_bucket} at #{expected_key}. Skipping upload."])
+          expect(warnings).to eq(
+            [
+              'The :skip_if_exists option is deprecated. Please use :if_exists instead.',
+              "File already exists in S3 bucket #{test_bucket} at #{expected_key}. Skipping upload.",
+            ]
+          )
           expect(key).to eq(expected_key)
         end
       end
