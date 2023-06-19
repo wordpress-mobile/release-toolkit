@@ -255,22 +255,6 @@ describe Fastlane::Actions::UploadToS3Action do
         end
       end
 
-      it 'accepts if_exists as a String argument' do
-        expected_key = 'a90dff8ba6472d733cb0a37734fe28a8078f8444/key-2'
-        stub_s3_response_for_file(expected_key)
-
-        with_tmp_file(named: 'key-2') do |file_path|
-          expect do
-            run_described_fastlane_action(
-              bucket: test_bucket,
-              key: 'key-2',
-              file: file_path,
-              if_exists: 'fail'
-            )
-          end.to raise_error(FastlaneCore::Interface::FastlaneError, "File already exists in S3 bucket #{test_bucket} at #{expected_key}")
-        end
-      end
-
       it 'throws when if_exists is not one of the expected values' do
         with_tmp_file(named: 'key') do |file_path|
           expect do
@@ -281,19 +265,6 @@ describe Fastlane::Actions::UploadToS3Action do
               if_exists: :invalid
             )
           end.to raise_error(FastlaneCore::Interface::FastlaneError, '`if_exist` must be one of :skip, :replace, :fail')
-        end
-      end
-
-      it 'throws when if_exists is neither a Symbol nor a String' do
-        with_tmp_file(named: 'key') do |file_path|
-          expect do
-            run_described_fastlane_action(
-              bucket: test_bucket,
-              key: 'a8c-key1',
-              file: file_path,
-              if_exists: 123
-            )
-          end.to raise_error(FastlaneCore::Interface::FastlaneError, '`if_exist` must be a symbol or convertible to a symbol, got 123')
         end
       end
     end

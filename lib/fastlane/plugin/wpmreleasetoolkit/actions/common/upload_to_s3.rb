@@ -32,7 +32,7 @@ module Fastlane
                                  end
           end
 
-          case params[:if_exists].to_sym
+          case params[:if_exists]
           when :fail
             UI.user_error!(message)
           when :replace
@@ -133,13 +133,12 @@ module Fastlane
             key: :if_exists,
             description: 'What do to if the file file already exists in the S3 bucket. Possible values :skip, :replace, :fail. When set, overrides the deprecated skip_if_exists option',
             optional: true,
-            is_string: false,
+            type: Symbol,
             default_value: nil, # Using nil under the hood until we remove skip_if_exists
             verify_block: proc do |value|
               next if value.nil?
 
-              UI.user_error!("`if_exist` must be a symbol or convertible to a symbol, got #{value}") unless value.respond_to?(:to_sym)
-              UI.user_error!('`if_exist` must be one of :skip, :replace, :fail') unless %i[skip replace fail].include?(value.to_sym)
+              UI.user_error!('`if_exist` must be one of :skip, :replace, :fail') unless %i[skip replace fail].include?(value)
             end
           ),
         ]
