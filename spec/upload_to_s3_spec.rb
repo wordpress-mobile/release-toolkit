@@ -271,17 +271,20 @@ describe Fastlane::Actions::UploadToS3Action do
         end
       end
 
-      it 'does not allow to have both skip_if_exists and if_exists set at the same time' do
-        with_tmp_file(named: 'existing-key') do |file_path|
-          expect do
-            run_described_fastlane_action(
-              bucket: test_bucket,
-              key: 'existing-key',
-              file: file_path,
-              if_exists: :skip,
-              skip_if_exists: true
-            )
-          end.to raise_error(FastlaneCore::Interface::FastlaneError, 'You cannot set both :skip_if_exists and :if_exists. Please only use :if_exists.')
+      # test all combinations of skip_if_exists and if_exists
+      [true, false].product(%i[skip fail replace]).each do |skip_if_exists, if_exists|
+        it "does not allow to have both skip_if_exists and if_exists set at the same time (#{skip_if_exists}, #{if_exists})" do
+          with_tmp_file(named: 'existing-key') do |file_path|
+            expect do
+              run_described_fastlane_action(
+                bucket: test_bucket,
+                key: 'existing-key',
+                file: file_path,
+                if_exists: if_exists,
+                skip_if_exists: skip_if_exists
+              )
+            end.to raise_error(FastlaneCore::Interface::FastlaneError, 'You cannot set both :skip_if_exists and :if_exists. Please only use :if_exists.')
+          end
         end
       end
     end
