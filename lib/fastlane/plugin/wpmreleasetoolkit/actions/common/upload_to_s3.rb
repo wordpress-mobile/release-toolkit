@@ -25,11 +25,7 @@ module Fastlane
 
           # skip_if_exists is deprecated but we want to keep backward compatibility.
           if params[:if_exists].nil?
-            params[:if_exists] = if params[:skip_if_exists].nil? || params[:skip_if_exists] == false
-                                   :fail
-                                 else
-                                   :skip
-                                 end
+            params[:if_exists] = params[:skip_if_exists] ? :skip : :fail
           end
 
           case params[:if_exists]
@@ -131,7 +127,6 @@ module Fastlane
               UI.user_error!("You cannot set both :#{option.key} and :skip_if_exists. Please only use :if_exists.")
             end,
             optional: true,
-            default_value: false,
             type: Boolean
           ),
           FastlaneCore::ConfigItem.new(
