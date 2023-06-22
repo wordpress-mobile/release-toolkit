@@ -32,6 +32,7 @@ module Fastlane
         #
         def self.get_public_version
           version = get_release_version
+          return nil if version.nil?
           vp = get_version_parts(version[VERSION_NAME])
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
 

@@ -357,8 +357,8 @@ describe Fastlane::Actions::VersionAction do
     end
   end
 
-  describe 'getting the alpha version from the provided file' do
-    context 'with an Android app' do
+  describe 'when app_platform is :android' do
+    context 'when getting the alpha version from ./version.properties' do
       it 'returns alpha version name and code when present' do
         mock_version_content = <<~CONTENT
           # Some header
@@ -369,22 +369,147 @@ describe Fastlane::Actions::VersionAction do
           alpha.versionCode=1234
         CONTENT
 
-        # expect_version(
-        #   mock_version_content: mock_version_content,
-        #   expected_version: { 'name' => 'alpha-222', 'code' => 1234 },
-        #   app_platform: ':android',
-        #   version_type: 'alpha'
-        # )
+        allow(File).to receive(:exist?).and_return(true)
+        allow(File).to receive(:read).with('./version.properties').and_return(mock_version_content)
 
-        with_tmp_file(named: 'mock_xcconfig.tmp', content: mock_version_content) do |tmp_file_path|
-          version_result = run_described_fastlane_action(
-            app_platform: ':android',
-            version_type: 'alpha',
-            version_file_path: tmp_file_path
-          )
+        version_result = run_described_fastlane_action(
+          app_platform: ':android',
+          version_type: 'alpha',
+          version_file_path: './version.properties'
+        )
 
-          expect(version_result).to eq({ 'name' => 'alpha-222', 'code' => 1234 })
-        end
+        expect(version_result).to eq({ 'name' => 'alpha-222', 'code' => 1234 })
+      end
+
+      it 'returns nil when alpha version name and code are not present' do
+        mock_version_content = <<~CONTENT
+          versionName=17.0
+          versionCode=123
+        CONTENT
+
+        allow(File).to receive(:exist?).and_return(true)
+        allow(File).to receive(:read).with('./version.properties').and_return(mock_version_content)
+
+        version_result = run_described_fastlane_action(
+          app_platform: ':android',
+          version_type: 'alpha',
+          version_file_path: './version.properties'
+        )
+
+        expect(version_result).to be_nil
+      end
+    end
+  end
+
+  describe 'Android - returns the release version' do
+    context 'when getting the release version from ./version.properties' do
+      it 'returns release version name and code when present in ./version.properties' do
+        mock_version_content = <<~CONTENT
+          # Some header
+
+          versionName=17.0
+          versionCode=123
+
+          alpha.versionName=alpha-222
+          alpha.versionCode=1234
+        CONTENT
+
+        allow(File).to receive(:exist?).and_return(true)
+        allow(File).to receive(:read).with('./version.properties').and_return(mock_version_content)
+
+        version_result = run_described_fastlane_action(
+          app_platform: ':android',
+          version_type: 'release',
+          version_file_path: './version.properties'
+        )
+
+        expect(version_result).to eq('name' => '17.0', 'code' => 123)
+      end
+
+      it 'returns nil when release version name and code are not present' do
+        mock_version_content = <<~CONTENT
+          # This is a header
+          # But no versions!
+        CONTENT
+
+        allow(File).to receive(:exist?).and_return(true)
+        allow(File).to receive(:read).with('./version.properties').and_return(mock_version_content)
+
+        version_result = run_described_fastlane_action(
+          app_platform: ':android',
+          version_type: 'release',
+          version_file_path: './version.properties'
+        )
+
+        expect(version_result).to be_nil
+      end
+    end
+  end
+
+  describe 'Android - returns the public version' do
+    context 'when getting the public version from ./version.properties' do
+      it 'returns public version when present in ./version.properties' do
+        mock_version_content = <<~CONTENT
+          # Some header
+
+          versionName=17.0
+          versionCode=123
+
+          alpha.versionName=alpha-222
+          alpha.versionCode=1234
+        CONTENT
+
+        allow(File).to receive(:exist?).and_return(true)
+        allow(File).to receive(:read).with('./version.properties').and_return(mock_version_content)
+
+        version_result = run_described_fastlane_action(
+          app_platform: ':android',
+          version_type: 'public',
+          version_file_path: './version.properties'
+        )
+
+        expect(version_result).to eq('17.0')
+      end
+
+      it 'returns public hotfix version when present in ./version.properties' do
+        mock_version_content = <<~CONTENT
+          # Some header
+
+          versionName=17.0.2
+          versionCode=123
+
+          alpha.versionName=alpha-222
+          alpha.versionCode=1234
+        CONTENT
+
+        allow(File).to receive(:exist?).and_return(true)
+        allow(File).to receive(:read).with('./version.properties').and_return(mock_version_content)
+
+        version_result = run_described_fastlane_action(
+          app_platform: ':android',
+          version_type: 'public',
+          version_file_path: './version.properties'
+        )
+
+        expect(version_result).to eq('17.0.2')
+      end
+
+      it 'returns nil when public version name is not present' do
+        mock_version_content = <<~CONTENT
+          # This is a header
+          # But no versions!
+        CONTENT
+
+        allow(File).to receive(:exist?).and_return(true)
+        allow(File).to receive(:read).with('./version.properties').and_return(mock_version_content)
+
+        version_result = run_described_fastlane_action(
+          app_platform: ':android',
+          version_type: 'public',
+          version_file_path: './version.properties'
+        )
+
+        expect(version_result).to be_nil
       end
     end
   end
