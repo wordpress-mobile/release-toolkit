@@ -253,6 +253,7 @@ describe Fastlane::Actions::UploadToS3Action do
             )
 
             expect(return_value).to eq(expected_key)
+            expect(warnings).to include("File already exists in S3 bucket #{test_bucket} at #{expected_key}. Will replace with the given one.")
             expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::S3_UPLOADED_FILE_PATH]).to eq(expected_key)
           end
         end
