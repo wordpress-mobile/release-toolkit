@@ -138,10 +138,12 @@ module Fastlane
             end,
             optional: true,
             type: Symbol,
-            default_value: nil, # Using nil under the hood until we remove skip_if_exists
+            # We cannot set a default value and have backward compatibility with skip_if_exists at the same time.
+            # (Short of duplicating the default value knowledge in the action implementation)
+            #
+            # We have a test for the default behavior which should hopefully remind us to uncomment this line once well remove skip_if_exists.
+            # default_value: :fail,
             verify_block: proc do |value|
-              next if value.nil?
-
               UI.user_error!('`if_exist` must be one of :skip, :replace, :fail') unless %i[skip replace fail].include?(value)
             end
           ),
