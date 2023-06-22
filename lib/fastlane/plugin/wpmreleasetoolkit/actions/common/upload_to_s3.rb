@@ -22,11 +22,24 @@ module Fastlane
 
         if file_is_already_uploaded?(bucket, key)
           message = "File already exists in S3 bucket #{bucket} at #{key}"
-          if params[:skip_if_exists]
+
+          # skip_if_exists is deprecated but we want to keep backward compatibility.
+          if params[:if_exists].nil?
+            params[:if_exists] = if params[:skip_if_exists].nil? || params[:skip_if_exists] == false
+                                   :fail
+                                 else
+                                   :skip
+                                 end
+          end
+
+          case params[:if_exists]
+          when :fail
+            UI.user_error!(message)
+          when :replace
+            UI.important("#{message}. Will replace with the given one.")
+          when :skip
             UI.important("#{message}. Skipping upload.")
             return key
-          else
-            UI.user_error!(message)
           end
         end
 
@@ -112,9 +125,30 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :skip_if_exists,
             description: 'If the file already exists in the S3 bucket, skip the upload (and report it in the logs), instead of failing with `user_error!`',
+            deprecated: 'Use if_exists instead',
+            conflicting_options: [:if_exists],
+            conflict_block: proc do |option|
+              UI.user_error!("You cannot set both :#{option.key} and :skip_if_exists. Please only use :if_exists.")
+            end,
             optional: true,
             default_value: false,
             type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :if_exists,
+            description: 'What do to if the file file already exists in the S3 bucket. Possible values :skip, :replace, :fail. When set, overrides the deprecated skip_if_exists option',
+            conflicting_options: [:skip_if_exists],
+            conflict_block: proc do |option|
+              UI.user_error!("You cannot set both :#{option.key} and :if_exists. Please only use :if_exists.")
+            end,
+            optional: true,
+            type: Symbol,
+            default_value: nil, # Using nil under the hood until we remove skip_if_exists
+            verify_block: proc do |value|
+              next if value.nil?
+
+              UI.user_error!('`if_exist` must be one of :skip, :replace, :fail') unless %i[skip replace fail].include?(value)
+            end
           ),
         ]
       end
