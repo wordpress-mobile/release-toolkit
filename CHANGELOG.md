@@ -13,7 +13,7 @@
 ### New Features
 
 - Adds `if_exists` parameter to `upload_to_s3` action, with possible values `:skip`, `:fail`, and `:replace`. [#495]
-- Release note files can now include Markdown headers (`#`, `##`, etc.) and list items (Starting with `-`) at the top of the file. [#508]
+- Adds additional formatting options for release note files. They can now include Markdown headers (`#`, `##`, etc.) and list items (Starting with `-`) at the top of the file. [#508]
 
 ### Bug Fixes
 
