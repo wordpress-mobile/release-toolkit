@@ -21,6 +21,23 @@ describe Fastlane::Helper::ReleaseNotesHelper do
 
     HEADER
   end
+  
+  it 'adds a new section after any `#` comments on top' do
+    run_release_notes_test <<~HEADER
+      # This is a Markdown header
+      ## This is another kind of Markdown header
+      ### This is an H3 Markdown header
+
+    HEADER
+  end
+  
+  it 'adds a new section after any `- ` comments on top' do
+    run_release_notes_test <<~HEADER
+      - This is a line item
+      - And this is another line item that we want to include
+
+    HEADER
+  end
 
   it 'does consider empty lines as header' do
     run_release_notes_test("\n\n\n")
@@ -34,19 +51,19 @@ describe Fastlane::Helper::ReleaseNotesHelper do
       *** It contains some mixed style of comments
       *** with both double-slash style comment lines
       *** and triple-star style ones.
-
+      
+      - List item
+      - Another list item
+      
+      # Markdown Header
+      ## H2 Markdown Header
+      
+      
 
 
       // It also contains some empty lines we want to count as part of the pinned lines.
 
     HEADER
-  end
-
-  it 'does not consider # as comments' do
-    prefix = <<~NOT_HEADER
-      # This is not a comment
-    NOT_HEADER
-    run_release_notes_test('', prefix + FAKE_CONTENT)
   end
 
   it 'does not consider ** as comments' do
