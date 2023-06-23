@@ -21,7 +21,7 @@ describe Fastlane::Helper::ReleaseNotesHelper do
 
     HEADER
   end
-  
+
   it 'adds a new section after any `#` comments on top' do
     run_release_notes_test <<~HEADER
       # This is a Markdown header
@@ -30,7 +30,7 @@ describe Fastlane::Helper::ReleaseNotesHelper do
 
     HEADER
   end
-  
+
   it 'adds a new section after any `- ` comments on top' do
     run_release_notes_test <<~HEADER
       - This is a line item
@@ -51,14 +51,14 @@ describe Fastlane::Helper::ReleaseNotesHelper do
       *** It contains some mixed style of comments
       *** with both double-slash style comment lines
       *** and triple-star style ones.
-      
+
       - List item
       - Another list item
-      
+
       # Markdown Header
       ## H2 Markdown Header
-      
-      
+
+
 
 
       // It also contains some empty lines we want to count as part of the pinned lines.
