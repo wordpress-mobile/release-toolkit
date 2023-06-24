@@ -125,6 +125,9 @@ module Fastlane
               UI.user_error!("You cannot set both :#{option.key} and :skip_if_exists. Please only use :if_exists.")
             end,
             optional: true,
+            # This option is deprecated but we stil set a default value to inform that the default behavior is for the action to fail when printing the action docs.
+            # See also https://github.com/wordpress-mobile/release-toolkit/pull/500#discussion_r1239642179
+            default_value: false,
             type: Boolean
           ),
           FastlaneCore::ConfigItem.new(
