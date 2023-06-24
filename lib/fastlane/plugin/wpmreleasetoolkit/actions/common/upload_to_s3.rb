@@ -24,9 +24,7 @@ module Fastlane
           message = "File already exists in S3 bucket #{bucket} at #{key}"
 
           # skip_if_exists is deprecated but we want to keep backward compatibility.
-          if params[:if_exists].nil?
-            params[:if_exists] = params[:skip_if_exists] ? :skip : :fail
-          end
+          params[:if_exists] ||= params[:skip_if_exists] ? :skip : :fail
 
           case params[:if_exists]
           when :fail
