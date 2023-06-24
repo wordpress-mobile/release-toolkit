@@ -270,6 +270,32 @@ describe Fastlane::Actions::UploadToS3Action do
             end.to raise_error(FastlaneCore::Interface::FastlaneError, '`if_exist` must be one of :skip, :replace, :fail')
           end
         end
+
+        # Untill we remove the deprecated skip_if_exists option, if_exists needs to be optional.
+        # if_exists also has a verify_block that will throw if the given value doesn't match the allowed ones.
+        # This test makes sure that if the user omits or set if_exists as nil, Fastlane bypasses the verify_block.
+        # This is models a possible usage for the action—we want to be extra careful.
+        #
+        # See also https://github.com/wordpress-mobile/release-toolkit/pull/500#discussion_r1239644683
+        it 'does not fail the verify_block if if_exists is explicitly nil' do
+          expected_key = '29d5f92e9ee44d4854d6dfaeefc3dc27d779fdf3/existing-key'
+          stub_s3_response_for_file(expected_key, exists: true)
+
+          with_tmp_file(named: 'existing-key') do |file_path|
+            expect do
+              run_described_fastlane_action(
+                bucket: test_bucket,
+                key: 'existing-key',
+                file: file_path,
+                if_exists: nil
+              )
+            end.to raise_error(
+              # If the verify_block doesn't fail, then we should expect the action to behave as per its default.
+              # In the context of the file already existing, the default behavior is to fail.
+              FastlaneCore::Interface::FastlaneError, "File already exists in S3 bucket #{test_bucket} at #{expected_key}"
+            )
+          end
+        end
       end
     end
 
