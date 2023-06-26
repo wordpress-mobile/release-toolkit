@@ -24,13 +24,7 @@ module Fastlane
           message = "File already exists in S3 bucket #{bucket} at #{key}"
 
           # skip_if_exists is deprecated but we want to keep backward compatibility.
-          if params[:if_exists].nil?
-            params[:if_exists] = if params[:skip_if_exists].nil? || params[:skip_if_exists] == false
-                                   :fail
-                                 else
-                                   :skip
-                                 end
-          end
+          params[:if_exists] ||= params[:skip_if_exists] ? :skip : :fail
 
           case params[:if_exists]
           when :fail
@@ -131,6 +125,8 @@ module Fastlane
               UI.user_error!("You cannot set both :#{option.key} and :skip_if_exists. Please only use :if_exists.")
             end,
             optional: true,
+            # This option is deprecated but we stil set a default value to inform that the default behavior is for the action to fail when printing the action docs.
+            # See also https://github.com/wordpress-mobile/release-toolkit/pull/500#discussion_r1239642179
             default_value: false,
             type: Boolean
           ),
@@ -143,10 +139,12 @@ module Fastlane
             end,
             optional: true,
             type: Symbol,
-            default_value: nil, # Using nil under the hood until we remove skip_if_exists
+            # We cannot set a default value and have backward compatibility with skip_if_exists at the same time.
+            # (Short of duplicating the default value knowledge in the action implementation)
+            #
+            # We have a test for the default behavior which should hopefully remind us to uncomment this line once well remove skip_if_exists.
+            # default_value: :fail,
             verify_block: proc do |value|
-              next if value.nil?
-
               UI.user_error!('`if_exist` must be one of :skip, :replace, :fail') unless %i[skip replace fail].include?(value)
             end
           ),
