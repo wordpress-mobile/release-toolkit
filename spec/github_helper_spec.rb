@@ -399,7 +399,7 @@ describe Fastlane::Helper::GithubHelper do
     it 'has the correct options' do
       options = { body: test_description, draft: true, name: test_tag, prerelease: false, target_commitish: test_target }
       expect(client).to receive(:create_release).with(test_repo, test_tag, options)
-      allow(client).to receive(:create_release).and_return(url: release_url)
+      allow(client).to receive(:create_release).and_return(html_url: release_url)
       create_release(is_draft: true)
     end
 
@@ -415,7 +415,7 @@ describe Fastlane::Helper::GithubHelper do
     it 'creates a draft release if is_draft is set to true' do
       options_draft_release = { body: test_description, draft: true, name: test_tag, prerelease: false, target_commitish: test_target }
       expect(client).to receive(:create_release).with(test_repo, test_tag, options_draft_release)
-      allow(client).to receive(:create_release).and_return(url: release_url)
+      allow(client).to receive(:create_release).and_return(html_url: release_url)
       url = create_release(is_draft: true)
       expect(url).to eq(release_url)
     end
@@ -423,7 +423,7 @@ describe Fastlane::Helper::GithubHelper do
     it 'creates a final (non-draft) release if is_draft is set to false' do
       options_final_release = { body: test_description, draft: false, name: test_tag, prerelease: false, target_commitish: test_target }
       expect(client).to receive(:create_release).with(test_repo, test_tag, options_final_release)
-      allow(client).to receive(:create_release).and_return(url: release_url)
+      allow(client).to receive(:create_release).and_return(html_url: release_url)
       url = create_release(is_draft: false)
       expect(url).to eq(release_url)
     end
