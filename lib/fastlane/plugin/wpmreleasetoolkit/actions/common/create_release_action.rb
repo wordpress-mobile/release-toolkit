@@ -23,7 +23,7 @@ module Fastlane
         end
 
         github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
-        github_helper.create_release(
+        url = github_helper.create_release(
           repository: repository,
           version: version,
           target: params[:target],
@@ -32,7 +32,8 @@ module Fastlane
           prerelease: prerelease,
           is_draft: is_draft
         )
-        UI.message('Done')
+        UI.success("Successfully created GitHub Release. You can see it at '#{url}'")
+        url
       end
 
       def self.description
@@ -44,7 +45,7 @@ module Fastlane
       end
 
       def self.return_value
-        # If your method provides a return value, you can describe here what it does
+        'The URL of the created GitHub Release'
       end
 
       def self.details

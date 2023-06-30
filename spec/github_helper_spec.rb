@@ -381,6 +381,7 @@ describe Fastlane::Helper::GithubHelper do
     let(:test_repo) { 'repo-test/project-test' }
     let(:test_tag) { '1.0' }
     let(:test_target) { 'dummysha123456' }
+    let(:release_url) { 'https://github.com/org/repo/releases/tag/1.2.3' }
     let(:test_description) { 'Hey Im a Test Description' }
     let(:client) do
       instance_double(
@@ -398,6 +399,7 @@ describe Fastlane::Helper::GithubHelper do
     it 'has the correct options' do
       options = { body: test_description, draft: true, name: test_tag, prerelease: false, target_commitish: test_target }
       expect(client).to receive(:create_release).with(test_repo, test_tag, options)
+      allow(client).to receive(:create_release).and_return(html_url: release_url)
       create_release(is_draft: true)
     end
 
@@ -413,13 +415,17 @@ describe Fastlane::Helper::GithubHelper do
     it 'creates a draft release if is_draft is set to true' do
       options_draft_release = { body: test_description, draft: true, name: test_tag, prerelease: false, target_commitish: test_target }
       expect(client).to receive(:create_release).with(test_repo, test_tag, options_draft_release)
-      create_release(is_draft: true)
+      allow(client).to receive(:create_release).and_return(html_url: release_url)
+      url = create_release(is_draft: true)
+      expect(url).to eq(release_url)
     end
 
     it 'creates a final (non-draft) release if is_draft is set to false' do
       options_final_release = { body: test_description, draft: false, name: test_tag, prerelease: false, target_commitish: test_target }
       expect(client).to receive(:create_release).with(test_repo, test_tag, options_final_release)
-      create_release(is_draft: false)
+      allow(client).to receive(:create_release).and_return(html_url: release_url)
+      url = create_release(is_draft: false)
+      expect(url).to eq(release_url)
     end
 
     def create_release(is_draft:, assets: [])
