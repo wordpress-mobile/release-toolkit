@@ -134,6 +134,7 @@ module Fastlane
         assets.each do |file_path|
           client.upload_asset(release[:url], file_path, content_type: 'application/octet-stream')
         end
+        release[:url]
       end
 
       # Downloads a file from the given GitHub tag
