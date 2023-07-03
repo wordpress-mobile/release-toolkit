@@ -71,17 +71,17 @@ module Fastlane
         @blocks = []
 
         # Inits default handler
-        @blocks.push Fastlane::Helper::UnknownMetadataBlock.new
+        @blocks.push Fastlane::Helper::AnUnknownMetadataBlock.new
 
         # Init special handlers
         block_files.each do |key, file_path|
           case key
           when :release_note
-            @blocks.push Fastlane::Helper::ReleaseNoteMetadataBlock.new(key, file_path, release_version)
+            @blocks.push Fastlane::Helper::AnReleaseNoteMetadataBlock.new(key, file_path, release_version)
           when :release_note_short
-            @blocks.push Fastlane::Helper::ReleaseNoteShortMetadataBlock.new(key, file_path, release_version)
+            @blocks.push Fastlane::Helper::AnReleaseNoteShortMetadataBlock.new(key, file_path, release_version)
           else
-            @blocks.push Fastlane::Helper::StandardMetadataBlock.new(key, file_path)
+            @blocks.push Fastlane::Helper::AnStandardMetadataBlock.new(key, file_path)
           end
         end
 
