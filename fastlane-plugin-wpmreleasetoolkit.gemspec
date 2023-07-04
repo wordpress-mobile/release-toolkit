@@ -24,10 +24,10 @@ Gem::Specification.new do |spec|
   # since this would cause a circular dependency
 
   # spec.add_dependency 'your-dependency', '~> 1.0.0'
-  spec.add_dependency 'activesupport', '>= 6.1.7.1'
   spec.add_dependency 'buildkit', '~> 1.5'
   spec.add_dependency 'chroma', '0.2.0'
   spec.add_dependency 'diffy', '~> 3.3'
+  spec.add_dependency 'fastlane', '~> 2.213'
   spec.add_dependency 'git', '~> 1.3'
   spec.add_dependency 'nokogiri', '~> 1.11' # Needed for AndroidLocalizeHelper
   spec.add_dependency 'octokit', '~> 6.1'
@@ -40,13 +40,6 @@ Gem::Specification.new do |spec|
 
   # `google-cloud-storage` is required by fastlane, but we pin it in case it's not in the future
   spec.add_dependency 'google-cloud-storage', '~> 1.31'
-
-  # Some of the upstream code uses `BigDecimal.new` which version 2.0 of the
-  # `bigdecimal` gem removed. Until we'll find the time to identify the
-  # dependencies and see if we can move them to something compatible with
-  # modern `bigdecimal`, let's constrain the gem to a version still supporting
-  # `.new` but which warns about it deprecation.
-  spec.add_dependency 'bigdecimal', '~> 1.4'
 
   spec.add_development_dependency 'bundler', '~> 2.0'
   spec.add_development_dependency 'cocoapods', '~> 1.10'

@@ -1,7 +1,7 @@
 module Fastlane
   module Helper
     # Basic line handler
-    class MetadataBlock
+    class AnMetadataBlock
       attr_reader :block_key
 
       def initialize(block_key)
@@ -17,7 +17,7 @@ module Fastlane
       end
     end
 
-    class UnknownMetadataBlock < MetadataBlock
+    class AnUnknownMetadataBlock < AnMetadataBlock
       attr_reader :content_file_path
 
       def initialize
@@ -25,7 +25,7 @@ module Fastlane
       end
     end
 
-    class StandardMetadataBlock < MetadataBlock
+    class AnStandardMetadataBlock < AnMetadataBlock
       attr_reader :content_file_path
 
       def initialize(block_key, content_file_path)
@@ -67,7 +67,7 @@ module Fastlane
       end
     end
 
-    class ReleaseNoteMetadataBlock < StandardMetadataBlock
+    class AnReleaseNoteMetadataBlock < AnStandardMetadataBlock
       attr_reader :new_key, :keep_key, :rel_note_key, :release_version
 
       def initialize(block_key, content_file_path, release_version)
@@ -131,7 +131,7 @@ module Fastlane
       end
     end
 
-    class ReleaseNoteShortMetadataBlock < ReleaseNoteMetadataBlock
+    class AnReleaseNoteShortMetadataBlock < AnReleaseNoteMetadataBlock
       def initialize(block_key, content_file_path, release_version)
         super(block_key, content_file_path, release_version)
         @rel_note_key = 'release_note_short'

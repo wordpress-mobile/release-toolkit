@@ -1,7 +1,7 @@
 require 'tmpdir'
 require_relative './spec_helper'
 
-describe Fastlane::Helper::StandardMetadataBlock do
+describe Fastlane::Helper::AnStandardMetadataBlock do
   it 'strips any trailing newline when generating the block for a single-line input' do
     Dir.mktmpdir do |dir|
       input = "Single line message with new line\n"

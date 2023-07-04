@@ -1,7 +1,7 @@
 # Nodes with values to reuse in the pipeline.
 common_params:
   env: &xcode_image
-    IMAGE_ID: xcode-14.1
+    IMAGE_ID: xcode-14.3.1
   plugins:
   - &docker_plugin
     docker#v3.8.0:
@@ -21,27 +21,39 @@ steps:
   #################
   # Build and Test
   #################
-  - label: "🧪 Build and Test"
+  - group: 🧪 Build and Test"
     key: test
-    command: |
-      # We only need this for tasks running on a Mac
-      brew install pkg-config git-lfs libxml2 imagemagick@6
+    steps:
+      - label: "🧪 Build and Test using Ruby {{ matrix.ruby }}"
+        command: |
+          echo "--- :ruby: Using ruby {{ matrix.ruby }}"
+          export RBENV_VERSION={{ matrix.ruby }}
+          ruby --version
 
-      echo "--- :git: Setting up git-lfs"
-      git-lfs install
+          echo "--- :package: Installing homebrew packages"
+          # We only need this for tasks running on a Mac
+          brew install pkg-config git-lfs libxml2 imagemagick@6
 
-      echo "--- :rubygems: Setting up Gems"
-      # https://github.com/Automattic/bash-cache-buildkite-plugin/issues/16
-      gem install bundler
-      install_gems
+          echo "--- :git: Setting up git-lfs"
+          git-lfs install
 
-      echo "--- :rspec: Run Rspec"
-      bundle exec rspec --profile 10 --format progress
-    env: *xcode_image
-    plugins:
-      - automattic/a8c-ci-toolkit#2.15.0
-    agents:
-      queue: "mac"
+          echo "--- :rubygems: Setting up Gems"
+          # https://github.com/Automattic/bash-cache-buildkite-plugin/issues/16
+          gem install bundler
+          install_gems
+
+          echo "--- :rspec: Run Rspec"
+          bundle exec rspec --profile 10 --format progress
+        env: *xcode_image
+        plugins:
+          - automattic/a8c-ci-toolkit#2.15.0
+        agents:
+          queue: "mac"
+        matrix:
+          setup:
+            ruby:
+              - 2.7.4
+              - 3.2.2
 
   #################
   # Lint
@@ -79,7 +91,7 @@ steps:
      - test
      - rubocop
      - danger
-    # Note: We intentionally call a separate `.sh` script here (as opposed to having all the 
+    # Note: We intentionally call a separate `.sh` script here (as opposed to having all the
     # commands written inline) to avoid leaking a key used in the process in clear in the
     # BUILDKITE_COMMAND environment variable.
     command: .buildkite/gem-push.sh
