@@ -6,6 +6,7 @@ require:
 # Enable new cops when we update rubocop to a newer version
 AllCops:
   NewCops: enable
+  TargetRubyVersion: 2.7
 
 ########## Lint / CodeStyle
 
