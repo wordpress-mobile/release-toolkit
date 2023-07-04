@@ -14,6 +14,7 @@
 
 - Adds `if_exists` parameter to `upload_to_s3` action, with possible values `:skip`, `:fail`, and `:replace`. [#495]
 - The `create_release` action now prints and returns the URL of the created GitHub Release. [#503]
+- Removes two dependencies bigdecimal and activesupport. [#504]
 
 ### Bug Fixes
 
