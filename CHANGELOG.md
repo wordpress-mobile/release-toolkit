@@ -9,6 +9,8 @@
 - Add the `public_version_xcconfig_file` parameter to the `ios_get_app_version` action to replace the need for an environment variable. [#445]
 - Remove the `ios_localize_project` and `ios_update_metadata` actions. [#447]
 - Remove the `skip_deliver` parameter from `ios_bump_version_hotfix` and `ios_bump_version_release` actions. [#450]
+- Remove the `get_prs_list` action, as its was obsolete (and presumably not used by any client project anymore)
+  and will be replaced by the approach of relying on `get_prs_between_tags` instead.
 
 ### New Features
 
