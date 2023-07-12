@@ -10,6 +10,7 @@
 ### Clean-ups
 
 - You can now delete the `ENV['APP_STORE_STRINGS_FILE_NAME']` from your Fastfile, as it isn't being used anymore.
+- When using the `upload_to_s3` action, replace any use of its `skip_if_exists: true` parameter (resp. `false`) with `if_exists: :skip` (resp. `:fail`).
 
 ## From `7.0.0` to `8.0.0`
 
