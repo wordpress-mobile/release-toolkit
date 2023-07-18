@@ -141,9 +141,9 @@ module Fastlane
       # @note This API uses the `.github/release.yml` config file to classify the PRs by category in the generated list according to PR labels.
       #
       # @param [String] repository The repository to create the GitHub release on. Typically a repo slug (<org>/<repo>).
-      # @param [String] tag_name The name of the git tag to generate the changelog for
-      # @param [String] previous_tag The name of the git tag to compare to
-      # @param [String] target_commitish The commit sha1 or branch name to use as the head for the comparison if the `tag_name` tag does not exist yet. Unused if `tag_name` exists
+      # @param [String] tag_name The name of the git tag to generate the changelog for.
+      # @param [String] previous_tag The name of the git tag to compare to.
+      # @param [String] target_commitish The commit sha1 or branch name to use as the head for the comparison if the `tag_name` tag does not exist yet. Unused if `tag_name` exists.
       # @param [String] config_file_path The path to the GitHub configuration file to use for generating release notes. Will use `.github/release.yml` by default if it exists.
       #
       # @return [String] The string returned by GitHub API listing PRs between `previous_tag` and current `tag_name`
@@ -152,7 +152,6 @@ module Fastlane
       def generate_release_notes(repository:, tag_name:, previous_tag:, target_commitish: nil, config_file_path: nil)
         repo_path = Octokit::Repository.path(repository)
         api_url = "#{repo_path}/releases/generate-notes"
-        target_commitish ||= `git rev-parse HEAD`.chomp
         res = client.post(
           api_url,
           tag_name: tag_name,

@@ -80,6 +80,7 @@ module Fastlane
                                                     'Required if the supplied `tag_name` does not reference an existing tag. Ignored if the tag_name already exists. ' \
                                                     'Defaults to the commit sha of the current HEAD',
                                        optional: true,
+                                       default_value: `git rev-parse HEAD`.chomp,
                                        default_value_dynamic: true,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :previous_tag,
