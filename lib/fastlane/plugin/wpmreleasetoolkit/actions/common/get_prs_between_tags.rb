@@ -66,9 +66,9 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :repository,
-                                       env_name: 'GIT_REPO_SLUG',
-                                       description: 'The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`). ' \
-                                                    'Extracted from the `BUILDKITE_REPO` or the git remote URL if not provided explicitly',
+                                       env_names: %w[GIT_REPO_SLUG BUILDKITE_REPO],
+                                       description: 'The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`)',
+                                       optional: false,
                                        default_value_dynamic: true,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :tag_name,
