@@ -1,20 +1,24 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+---
 # Nodes with values to reuse in the pipeline.
 common_params:
   env: &xcode_image
     IMAGE_ID: xcode-14.3.1
   plugins:
-  - &docker_plugin
-    docker#v3.8.0:
-      image: &ruby_version "ruby:2.7.4"
-      propagate-environment: true
-      environment:
-        - "RUBYGEMS_API_KEY"
-  - &docker_plugin_with_danger_token
-    docker#v3.8.0:
-      image: *ruby_version
-      propagate-environment: true
-      environment:
-        - "DANGER_GITHUB_API_TOKEN"
+    - &ci_toolkit
+      automattic/a8c-ci-toolkit#2.18.2: ~
+    - &docker_plugin
+      docker#v3.8.0:
+        image: &ruby_version "ruby:2.7.4"
+        propagate-environment: true
+        environment:
+          - "RUBYGEMS_API_KEY"
+    - &docker_plugin_with_danger_token
+      docker#v3.8.0:
+        image: *ruby_version
+        propagate-environment: true
+        environment:
+          - "DANGER_GITHUB_API_TOKEN"
 
 
 steps:
@@ -38,15 +42,12 @@ steps:
           git-lfs install
 
           echo "--- :rubygems: Setting up Gems"
-          # https://github.com/Automattic/bash-cache-buildkite-plugin/issues/16
-          gem install bundler
           install_gems
 
           echo "--- :rspec: Run Rspec"
           bundle exec rspec --profile 10 --format progress
         env: *xcode_image
-        plugins:
-          - automattic/a8c-ci-toolkit#2.15.0
+        plugins: [*ci_toolkit]
         agents:
           queue: "mac"
         matrix:
