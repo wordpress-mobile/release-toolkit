@@ -18,6 +18,7 @@
 - The `create_release` action now prints and returns the URL of the created GitHub Release. [#503]
 - Removes `bigdecimal` dependency. [#504] [#507]
 - Supports Ruby 3. [#492, #493, #497, and #504]
+- Add `find_previous_tag` and `get_prs_between_tags` actions. [#505]
 
 ### Bug Fixes
 
