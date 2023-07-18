@@ -23,14 +23,19 @@ module Fastlane
             config_file_path: config_file_path
           )
         rescue StandardError => e
-          error_msg = "❌ Error computing the list of PRs since #{previous_tag}: `#{e.message}`"
+          error_msg = "❌ Error computing the list of PRs since #{previous_tag || 'last release'}: `#{e.message}`"
           UI.important(error_msg)
           error_msg # Use error message as GitHub Release body to help us be aware of what went wrong.
         end
 
-        previous_release_link = github_helper.get_release_url(repository: repository, tag_name: previous_tag)
+        previous_release_link = if previous_tag.nil?
+                                  'last release'
+                                else
+                                  link = github_helper.get_release_url(repository: repository, tag_name: previous_tag)
+                                  "[#{previous_tag}](#{link})"
+                                end
         changelog
-          .gsub("## What's Changed", "## New PRs since [#{previous_tag}](#{previous_release_link})\n")
+          .gsub("## What's Changed", "## New PRs since #{previous_release_link}\n")
       end
 
       def self.description
