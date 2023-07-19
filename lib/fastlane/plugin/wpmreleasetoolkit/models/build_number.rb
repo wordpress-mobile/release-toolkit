@@ -7,9 +7,10 @@ module Fastlane
 
       def initialize(file_path)
         @file_path = file_path
-        @build_number = read_build_number_from_xcconfig
+      end
 
-        puts 'Hello'
+      def get_build_number
+        read_build_number_from_xcconfig
       end
 
       def read_build_number_from_xcconfig
