@@ -24,6 +24,7 @@
 ### Internal Changes
 
 - Updates `octokit` to `6.1.1`, `danger` to `9.3.1` and `buildkite-test_collector` to `2.3.1`. [#491]
+- Fix issue with gems cache on CI when testing against Ruby `3.2.2`. [#506]
 
 ## 8.1.0
 
