@@ -6,6 +6,24 @@
 
 ### Breaking Changes
 
+_None_
+
+### New Features
+
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 9.0.0
+
+### Breaking Changes
+
 _See the [`MIGRATION.md`](MIGRATION.md) file for more detailed instructions and options to handle those breaking changes._
 
 - Add the `public_version_xcconfig_file` parameter to the `ios_get_app_version` action to replace the need for an environment variable. [#445]
