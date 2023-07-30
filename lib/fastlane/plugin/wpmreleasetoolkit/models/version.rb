@@ -5,6 +5,6 @@ class Version
     @major = major
     @minor = minor
     @patch = patch
-    @build_count = build_count
+    @build_number = build_number
   end
 end
