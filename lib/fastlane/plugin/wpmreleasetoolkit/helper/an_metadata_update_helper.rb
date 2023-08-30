@@ -1,7 +1,7 @@
 module Fastlane
   module Helper
     # Basic line handler
-    class MetadataBlock
+    class AnMetadataBlock
       attr_reader :block_key
 
       def initialize(block_key)
@@ -17,7 +17,7 @@ module Fastlane
       end
     end
 
-    class UnknownMetadataBlock < MetadataBlock
+    class AnUnknownMetadataBlock < AnMetadataBlock
       attr_reader :content_file_path
 
       def initialize
@@ -25,7 +25,7 @@ module Fastlane
       end
     end
 
-    class StandardMetadataBlock < MetadataBlock
+    class AnStandardMetadataBlock < AnMetadataBlock
       attr_reader :content_file_path
 
       def initialize(block_key, content_file_path)
@@ -50,7 +50,7 @@ module Fastlane
 
         if line_count <= 1
           # Single line output
-          fw.puts("msgid \"#{File.open(@content_file_path, 'r').read.rstrip}\"")
+          fw.puts("msgid \"#{File.read(@content_file_path).rstrip}\"")
         else
           # Multiple line output
           fw.puts('msgid ""')
@@ -67,7 +67,7 @@ module Fastlane
       end
     end
 
-    class ReleaseNoteMetadataBlock < StandardMetadataBlock
+    class AnReleaseNoteMetadataBlock < AnStandardMetadataBlock
       attr_reader :new_key, :keep_key, :rel_note_key, :release_version
 
       def initialize(block_key, content_file_path, release_version)
@@ -83,7 +83,7 @@ module Fastlane
         version_minor = Integer(values[1])
         @new_key = "#{@rel_note_key}_#{version_major.to_s.rjust(2, '0')}#{version_minor}"
 
-        version_major = version_major - 1 if version_minor == 0
+        version_major -= 1 if version_minor == 0
         version_minor = version_minor == 0 ? 9 : version_minor - 1
 
         @keep_key = "#{@rel_note_key}_#{version_major.to_s.rjust(2, '0')}#{version_minor}"
@@ -131,7 +131,7 @@ module Fastlane
       end
     end
 
-    class ReleaseNoteShortMetadataBlock < ReleaseNoteMetadataBlock
+    class AnReleaseNoteShortMetadataBlock < AnReleaseNoteMetadataBlock
       def initialize(block_key, content_file_path, release_version)
         super(block_key, content_file_path, release_version)
         @rel_note_key = 'release_note_short'
@@ -145,7 +145,7 @@ module Fastlane
       end
 
       def generate_block(fw)
-        super(fw) unless File.zero?(@content_file_path)
+        super(fw) unless File.empty?(@content_file_path)
       end
     end
   end

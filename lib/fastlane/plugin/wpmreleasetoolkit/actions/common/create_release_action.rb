@@ -14,22 +14,26 @@ module Fastlane
         # Replace full URLS to PRs/Issues with shorthand, because GitHub does not render them properly otherwise.
         release_notes.gsub!(%r{https://github.com/([^/]*/[^/]*)/(pulls?|issues?)/([0-9]*)}, '\1#\3')
         prerelease = params[:prerelease]
+        is_draft = params[:is_draft]
 
-        UI.message("Creating draft release #{version} in #{repository}.")
+        UI.message("Creating #{is_draft ? 'draft ' : ''}release #{version} in #{repository}.")
         # Verify assets
         assets.each do |file_path|
           UI.user_error!("Can't find file #{file_path}!") unless File.exist?(file_path)
         end
 
-        Fastlane::Helper::GithubHelper.create_release(
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
+        url = github_helper.create_release(
           repository: repository,
           version: version,
           target: params[:target],
           description: release_notes,
           assets: assets,
-          prerelease: prerelease
+          prerelease: prerelease,
+          is_draft: is_draft
         )
-        UI.message('Done')
+        UI.success("Successfully created GitHub Release. You can see it at '#{url}'")
+        url
       end
 
       def self.description
@@ -37,11 +41,11 @@ module Fastlane
       end
 
       def self.authors
-        ['Lorenzo Mattei']
+        ['Automattic']
       end
 
       def self.return_value
-        # If your method provides a return value, you can describe here what it does
+        'The URL of the created GitHub Release'
       end
 
       def self.details
@@ -81,7 +85,14 @@ module Fastlane
                                        description: 'True if this is a pre-release',
                                        optional: true,
                                        default_value: false,
-                                       is_string: false),
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :is_draft,
+                                       env_name: 'GHHELPER_CREATE_RELEASE_IS_DRAFT',
+                                       description: 'True to create the GitHub release as a draft (instead of publishing it immediately)',
+                                       optional: true,
+                                       default_value: true,
+                                       type: Boolean),
+          Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
 

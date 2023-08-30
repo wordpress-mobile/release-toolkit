@@ -113,7 +113,7 @@ module Fastlane
                                        type: Array,
                                        optional: true,
                                        # Default to Mag16.
-                                       default_value: 'ar de es fr he id it ja ko nl pt-br ru sv tr zh-cn zh-tw'.split()),
+                                       default_value: 'ar de es fr he id it ja ko nl pt-br ru sv tr zh-cn zh-tw'.split),
           FastlaneCore::ConfigItem.new(key: :min_acceptable_translation_percentage,
                                        env_name: 'FL_CHECK_TRANSLATION_PROGRESS_MIN_ACCEPTABLE_TRANSLATION_PERCENTAGE',
                                        description: 'The threshold under which an error is raised',
@@ -125,18 +125,18 @@ module Fastlane
                                        description: 'Should we abort with a global error if any violations are found?',
                                        optional: true,
                                        default_value: true,
-                                       is_string: false),
+                                       type: Boolean),
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
                                        env_name: 'FL_CHECK_TRANSLATION_SKIP_CONFIRM',
                                        description: 'Move ahead without requesting confirmation if violations are found. Only works if "abort_on_violations" is disabled',
                                        optional: true,
                                        default_value: false,
-                                       is_string: false),
+                                       type: Boolean),
         ]
       end
 
       def self.authors
-        ['loremattei']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)

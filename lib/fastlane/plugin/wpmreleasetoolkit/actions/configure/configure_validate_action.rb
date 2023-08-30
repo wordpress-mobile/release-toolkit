@@ -15,8 +15,8 @@ module Fastlane
         # otherwise, the error messaging isn't as helpful.
         validate_that_secrets_repo_is_clean
 
-        # Update the repository to get the latest version of the configuration secrets – that's
-        # how we'll know if we're behind in subsequent validations
+        # Update the repository to get the latest version of the configuration secrets
+        # – that's how we'll know if we're behind in subsequent validations
         ConfigureDownloadAction.run
 
         validate_that_branches_match
@@ -91,10 +91,10 @@ module Fastlane
           source = absolute_secret_store_path(x.file)
           destination = absolute_project_path(x.destination)
 
-          sourceHash = file_hash(source)
-          destinationHash = file_hash(destination)
+          source_hash = file_hash(source)
+          destination_hash = file_hash(destination)
 
-          UI.user_error!("`#{x.destination} doesn't match the file in the secrets repository (#{x.file}) – unable to continue") unless sourceHash == destinationHash
+          UI.user_error!("`#{x.destination} doesn't match the file in the secrets repository (#{x.file}) – unable to continue") unless source_hash == destination_hash
         end
       end
 
@@ -119,7 +119,7 @@ module Fastlane
       end
 
       def self.authors
-        ['Jeremy Massel']
+        ['Automattic']
       end
 
       def self.details

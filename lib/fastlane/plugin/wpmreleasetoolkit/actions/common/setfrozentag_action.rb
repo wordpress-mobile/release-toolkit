@@ -9,7 +9,9 @@ module Fastlane
         milestone_title = params[:milestone]
         freeze = params[:freeze]
 
-        milestone = Fastlane::Helper::GithubHelper.get_milestone(repository, milestone_title)
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
+        milestone = github_helper.get_milestone(repository, milestone_title)
+
         UI.user_error!("Milestone #{milestone_title} not found.") if milestone.nil?
 
         mile_title = milestone[:title]
@@ -27,7 +29,7 @@ module Fastlane
         end
 
         UI.message("New milestone: #{mile_title}")
-        Fastlane::Helper::GithubHelper.github_client().update_milestone(repository, milestone[:number], title: mile_title)
+        github_helper.update_milestone(repository: repository, number: milestone[:number], title: mile_title)
       end
 
       def self.is_frozen(milestone)
@@ -41,7 +43,7 @@ module Fastlane
       end
 
       def self.authors
-        ['Lorenzo Mattei']
+        ['Automattic']
       end
 
       def self.return_value
@@ -66,10 +68,11 @@ module Fastlane
                                        optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :freeze,
-                                       description: 'The GitHub milestone',
+                                       description: 'If true, the action will add the ❄️ emoji to the milestone title',
                                        optional: false,
                                        default_value: true,
-                                       is_string: false),
+                                       type: Boolean),
+          Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
 

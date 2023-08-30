@@ -1,0 +1,148 @@
+[
+  {
+    "apiLevel": 18,
+    "codeName": "Jelly Bean",
+    "id": "18",
+    "releaseDate": {
+      "day": 3,
+      "month": 10,
+      "year": 2013
+    },
+    "versionString": "4.3.x"
+  },
+  {
+    "apiLevel": 19,
+    "codeName": "KitKat",
+    "id": "19",
+    "releaseDate": {
+      "day": 2,
+      "month": 6,
+      "year": 2014
+    },
+    "versionString": "4.4.x"
+  },
+  {
+    "apiLevel": 21,
+    "codeName": "Lollipop",
+    "id": "21",
+    "releaseDate": {
+      "day": 19,
+      "month": 12,
+      "year": 2014
+    },
+    "versionString": "5.0.x"
+  },
+  {
+    "apiLevel": 22,
+    "codeName": "Lollipop",
+    "id": "22",
+    "releaseDate": {
+      "day": 21,
+      "month": 4,
+      "year": 2015
+    },
+    "versionString": "5.1.x"
+  },
+  {
+    "apiLevel": 23,
+    "codeName": "Marshmallow",
+    "id": "23",
+    "releaseDate": {
+      "day": 5,
+      "month": 10,
+      "year": 2015
+    },
+    "versionString": "6.0.x"
+  },
+  {
+    "apiLevel": 24,
+    "codeName": "Nougat",
+    "id": "24",
+    "releaseDate": {
+      "day": 22,
+      "month": 8,
+      "year": 2016
+    },
+    "versionString": "7.0.x"
+  },
+  {
+    "apiLevel": 25,
+    "codeName": "Nougat",
+    "id": "25",
+    "releaseDate": {
+      "day": 19,
+      "month": 10,
+      "year": 2016
+    },
+    "versionString": "7.1.x"
+  },
+  {
+    "apiLevel": 26,
+    "codeName": "Oreo",
+    "id": "26",
+    "releaseDate": {
+      "day": 21,
+      "month": 8,
+      "year": 2017
+    },
+    "versionString": "8.0.x"
+  },
+  {
+    "apiLevel": 27,
+    "codeName": "Oreo MR1",
+    "id": "27",
+    "releaseDate": {
+      "day": 4,
+      "month": 12,
+      "year": 2017
+    },
+    "versionString": "8.1.x"
+  },
+  {
+    "apiLevel": 28,
+    "codeName": "Pie",
+    "id": "28",
+    "releaseDate": {
+      "day": 6,
+      "month": 8,
+      "year": 2018
+    },
+    "tags": [
+      "default"
+    ],
+    "versionString": "9.x"
+  },
+  {
+    "apiLevel": 29,
+    "codeName": "Q",
+    "id": "29",
+    "releaseDate": {
+      "day": 3,
+      "month": 9,
+      "year": 2019
+    },
+    "versionString": "10.x"
+  },
+  {
+    "apiLevel": 30,
+    "codeName": "R",
+    "id": "30",
+    "releaseDate": {
+      "day": 3,
+      "month": 9,
+      "year": 2020
+    },
+    "versionString": "11"
+  },
+  {
+    "apiLevel": 31,
+    "codeName": "S",
+    "id": "31",
+    "releaseDate": {
+      "day": 3,
+      "month": 9,
+      "year": 2021
+    },
+    "versionString": "12"
+  }
+]

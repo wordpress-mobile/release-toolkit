@@ -39,7 +39,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :podfile,
                                        env_name: 'FL_IOS_CHECKBETADEPS_PODFILE',
                                        description: 'Path to the Podfile to analyse',
-                                       is_string: true),
+                                       type: String),
         ]
       end
 
@@ -51,11 +51,11 @@ module Fastlane
       end
 
       def self.authors
-        ['loremattei']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?(platform)
       end
     end
   end

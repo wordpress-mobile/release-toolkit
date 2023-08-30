@@ -7,13 +7,19 @@ module Fastlane
       def self.run(params)
         repository = params[:repository]
         branch_name = params[:branch]
-        branch_prot = {}
 
         branch_url = "https://api.github.com/repos/#{repository}/branches/#{branch_name}"
-        branch_prot[:restrictions] = { url: "#{branch_url}/protection/restrictions", users_url: "#{branch_url}/protection/restrictions/users", teams_url: "#{branch_url}/protection/restrictions/teams", users: [], teams: [] }
-        branch_prot[:enforce_admins] = nil
-        branch_prot[:required_pull_request_reviews] = { url: "#{branch_url}/protection/required_pull_request_reviews", dismiss_stale_reviews: false, require_code_owner_reviews: false }
-        Fastlane::Helper::GithubHelper.github_client().protect_branch(repository, branch_name, branch_prot)
+        restrictions = { url: "#{branch_url}/protection/restrictions", users_url: "#{branch_url}/protection/restrictions/users", teams_url: "#{branch_url}/protection/restrictions/teams", users: [], teams: [] }
+        required_pull_request_reviews = { url: "#{branch_url}/protection/required_pull_request_reviews", dismiss_stale_reviews: false, require_code_owner_reviews: false }
+
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
+        github_helper.set_branch_protection(
+          repository: repository,
+          branch: branch_name,
+          restrictions: restrictions,
+          enforce_admins: nil,
+          required_pull_request_reviews: required_pull_request_reviews
+        )
       end
 
       def self.description
@@ -21,7 +27,7 @@ module Fastlane
       end
 
       def self.authors
-        ['Lorenzo Mattei']
+        ['Automattic']
       end
 
       def self.return_value
@@ -45,6 +51,7 @@ module Fastlane
                                        description: 'The branch to protect',
                                        optional: false,
                                        type: String),
+          Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
 

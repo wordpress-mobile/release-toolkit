@@ -1,0 +1,17 @@
+/*
+   This file (`Jetpack-Resources/en.lproj/InfoPlist.strings`) contains the *originals* for the `Info.plist` keys of the Jetpack target,
+   and is supposed to be manually-maintained by the developers when they need a new `Info.plist` key translated.
+
+   ---
+
+   Notice how the keys are not quoted in this file.
+   This is totally valid to not quote keys in the OpenStep `.strings` format, as long as the keys don't contain any special character.
+   Given that for `InfoPlist.strings` the strings keys are the keys you expect to use in the `Info.plist`, they never contain such
+   special character, which is why it's quite common to not quote those keys in this file.
+
+   Having those unquoted is a nice touch in our Unit Tests as well as it allows us to test on the side that we also support such cases
+   (while most third-party libraries that we could have used to try and manipulate `.strings` files in Ruby... might not have)
+ */
+
+NSLocationUsageDescription = "WordPress would like to add your location to posts on sites where you have enabled geotagging.";
+NSCameraUsageDescription = "To take photos or videos to use in your posts.";

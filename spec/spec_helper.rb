@@ -4,6 +4,7 @@ require 'simplecov'
 require 'codecov'
 require 'webmock/rspec'
 require 'ostruct'
+require 'buildkite/test_collector'
 
 # SimpleCov.minimum_coverage 95
 SimpleCov.start
@@ -12,6 +13,10 @@ code_coverage_token = ENV['CODECOV_TOKEN'] || false
 
 # If the environment variable is present, format for Codecov
 SimpleCov.formatter = SimpleCov::Formatter::Codecov if code_coverage_token
+
+# Buildkite Test Analytics
+WebMock.disable_net_connect!(allow: 'analytics-api.buildkite.com')
+Buildkite::TestCollector.configure(hook: :rspec)
 
 # This module is only used to check the environment is currently a testing env
 module SpecHelper
@@ -56,8 +61,7 @@ def expect_shell_command(*command, exitstatus: 0, output: '')
   expect(Open3).to receive(:popen2e).with(*command).and_yield(mock_input, mock_output, mock_thread)
 end
 
-# If the `described_class` of a spec is a `Fastlane::Action` subclass, it runs
-# it with the given parameters.
+# If the `described_class` of a spec is a `Fastlane::Action` subclass, it runs it with the given parameters.
 #
 def run_described_fastlane_action(parameters)
   raise "Only call `#{__callee__}` from a spec describing a `Fastlane::Action` subclass." unless Fastlane::Actions.is_class_action?(described_class)
@@ -111,3 +115,8 @@ def mock_commit(sha: 'abcdef123456', date: DateTime.now)
     date: date,
   )
 end
+
+# File Path Helpers
+EMPTY_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'empty.json')
+PASSED_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-test-lab-run-passed.log')
+FAILED_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-test-lab-run-failure.log')

@@ -28,7 +28,7 @@ module Fastlane
         UI.crash!("Version #{prev_ver} is not tagged! Can't branch. Abort!") unless other_action.git_tag_exists(tag: prev_ver)
 
         # Check local repo status
-        other_action.ensure_git_status_clean()
+        other_action.ensure_git_status_clean
 
         # Return the current version
         prev_ver
@@ -51,11 +51,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: 'FL_IOS_HOTFIX_PRECHECKS_VERSION',
                                        description: 'The version to work on', # a short description of this parameter
-                                       is_string: true),
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
                                        env_name: 'FL_IOS_HOTFIX_PRECHECKS_SKIPCONFIRM',
                                        description: 'Skips confirmation',
-                                       is_string: false, # true: verifies the input is a string, false: every kind of value
+                                       type: Boolean,
                                        default_value: false), # the default value if the user didn't provide one
         ]
       end
@@ -67,11 +67,11 @@ module Fastlane
       end
 
       def self.authors
-        ['loremattei']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?(platform)
       end
     end
   end

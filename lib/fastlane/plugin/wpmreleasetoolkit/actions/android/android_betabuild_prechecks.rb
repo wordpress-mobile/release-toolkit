@@ -42,7 +42,7 @@ module Fastlane
         end
 
         # Check local repo status
-        other_action.ensure_git_status_clean()
+        other_action.ensure_git_status_clean
 
         # Return the current version
         [next_beta_version, next_alpha_version]
@@ -74,12 +74,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :base_version,
                                        env_name: 'FL_ANDROID_BETABUILD_PRECHECKS_BASE_VERSION',
                                        description: 'The version to work on', # a short description of this parameter
-                                       is_string: true,
+                                       type: String,
                                        optional: true), # true: verifies the input is a string, false: every kind of value),
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
                                        env_name: 'FL_ANDROID_BETABUILD_PRECHECKS_SKIPCONFIRM',
                                        description: 'Skips confirmation',
-                                       is_string: false, # true: verifies the input is a string, false: every kind of value
+                                       type: Boolean,
                                        default_value: false), # the default value if the user didn't provide one
           FastlaneCore::ConfigItem.new(key: :default_branch,
                                        env_name: 'FL_RELEASE_TOOLKIT_DEFAULT_BRANCH',
@@ -98,7 +98,7 @@ module Fastlane
 
       def self.authors
         # So no one will ever forget your contribution to fastlane :) You are awesome btw!
-        ['loremattei']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)

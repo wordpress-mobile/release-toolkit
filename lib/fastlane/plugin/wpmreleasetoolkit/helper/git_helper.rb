@@ -8,14 +8,11 @@ module Fastlane
       # Fallback default branch of the client repository.
       DEFAULT_GIT_BRANCH = 'trunk'.freeze
 
-      # Checks if the given path, or current directory if no path is given, is
-      # inside a Git repository
+      # Checks if the given path, or current directory if no path is given, is inside a Git repository
       #
-      # @param [String] path An optional path where to check if a Git repo
-      #        exists.
+      # @param [String] path An optional path where to check if a Git repo exists.
       #
-      # @return [Bool] True if the current directory is the root of a git repo
-      #         (i.e. a local working copy) or a subdirectory of one.
+      # @return [Bool] True if the current directory is the root of a git repo (i.e. a local working copy) or a subdirectory of one.
       #
       def self.is_git_repo?(path: Dir.pwd)
         # If the path doesn't exist, find its first ancestor.
@@ -23,23 +20,19 @@ module Fastlane
         # Get the path's directory, so we can look in it for the Git folder
         dir = path.directory? ? path : path.dirname
 
-        # Recursively look for the Git folder until it's found or we read the
-        # the file system root
+        # Recursively look for the Git folder until it's found or we read the the file system root
         dir = dir.parent until Dir.entries(dir).include?('.git') || dir.root?
 
-        # If we reached the root, we haven't found a repo. (Technically, there
-        # could be a repo in the root of the system, but that's a usecase that
-        # we don't need to support at this time)
+        # If we reached the root, we haven't found a repo.
+        # (Technically, there could be a repo in the root of the system, but that's a usecase that we don't need to support at this time)
         return dir.root? == false
       end
 
-      # Travels back the hierarchy of the given path until it finds an existing
-      # ancestor, or it reaches the root of the file system.
+      # Travels back the hierarchy of the given path until it finds an existing ancestor, or it reaches the root of the file system.
       #
       # @param [String] path The path to inspect
       #
-      # @return [Pathname] The first existing ancestor, or `path` itself if it
-      #         exists
+      # @return [Pathname] The first existing ancestor, or `path` itself if it exists
       #
       def self.first_existing_ancestor_of(path:)
         p = Pathname(path).expand_path
@@ -54,7 +47,7 @@ module Fastlane
       def self.has_git_lfs?
         return false unless is_git_repo?
 
-        `git config --get-regex lfs`.length > 0
+        !`git config --get-regex lfs`.empty?
       end
 
       # Switch to the given branch and pull its latest commits.
@@ -80,16 +73,15 @@ module Fastlane
         Action.sh('git', 'submodule', 'update', '--init', '--recursive')
       end
 
-      # Create a new branch named `branch_name`, cutting it from branch/commit/tag `from`, and push it
+      # Create a new branch named `branch_name`, cutting it from branch/commit/tag `from`
       #
       # If the branch with that name already exists, it will instead switch to it and pull new commits.
       #
       # @param [String] branch_name The full name of the new branch to create, e.g "release/1.2"
       # @param [String?] from The branch or tag from which to cut the branch from.
       #        If `nil`, will cut the new branch from the current commit. Otherwise, will checkout that commit/branch/tag before cutting the branch.
-      # @param [Bool] push If true, will also push the branch to `origin`, tracking the upstream branch with the local one.
       #
-      def self.create_branch(branch_name, from: nil, push: true)
+      def self.create_branch(branch_name, from: nil)
         if branch_exists?(branch_name)
           UI.message("Branch #{branch_name} already exists. Skipping creation.")
           Action.sh('git', 'checkout', branch_name)
@@ -97,22 +89,19 @@ module Fastlane
         else
           Action.sh('git', 'checkout', from) unless from.nil?
           Action.sh('git', 'checkout', '-b', branch_name)
-          Action.sh('git', 'push', '-u', 'origin', branch_name) if push
         end
       end
 
       # `git add` the specified files (if any provided) then commit them using the provided message.
-      # Optionally, push the commit to the remote too.
       #
       # @param [String] message The commit message to use
       # @param [String|Array<String>] files A file or array of files to git-add before creating the commit.
-      #        use `nil` or `[]` if you already added the files in a separate step and don't wan't this method to add any new file before commit.
+      #        Use `nil` or `[]` if you already added the files in a separate step and don't wan't this method to add any new file before commit.
       #        Also accepts the special symbol `:all` to add all the files (`git commit -a -m …`).
-      # @param [Bool] push If true, will `git push` to `origin` after the commit has been created. Defaults to `false`.
       #
-      # @return [Bool] True if commit and push were successful, false if there was an issue during commit & push (most likely being "nothing to commit").
+      # @return [Bool] True if commit was successful, false if there was an issue (most likely being "nothing to commit").
       #
-      def self.commit(message:, files: nil, push: false)
+      def self.commit(message:, files: nil)
         files = [files] if files.is_a?(String)
         args = []
         if files == :all
@@ -122,7 +111,6 @@ module Fastlane
         end
         begin
           Action.sh('git', 'commit', *args, '-m', message)
-          Action.sh('git', 'push', 'origin', 'HEAD') if push
           return true
         rescue
           return false
@@ -188,6 +176,23 @@ module Fastlane
         Action.sh('git', 'fetch', '--tags')
       end
 
+      # Returns the current git branch, or "HEAD" if it's not checked out to any branch
+      # Can NOT be replaced using the environment variables such as `GIT_BRANCH` or `BUILDKITE_BRANCH`
+      #
+      # `fastlane` already has a helper action for this called `git_branch`, however it's modified
+      # by CI environment variables. We need to check which branch we are actually on and not the
+      # initial branch a CI build is started from, so we are using the `git_branch_name_using_HEAD`
+      # helper instead.
+      #
+      # See https://docs.fastlane.tools/actions/git_branch/#git_branch
+      #
+      # @return [String] The current git branch, or "HEAD" if it's not checked out to any branch
+      #
+      def self.current_git_branch
+        # We can't use `other_action.git_branch`, because it is modified by environment variables in Buildkite.
+        Fastlane::Actions.git_branch_name_using_HEAD
+      end
+
       # Checks if a branch exists locally.
       #
       # @param [String] branch_name The name of the branch to check for
@@ -209,8 +214,7 @@ module Fastlane
         UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)
       end
 
-      # Checks whether a given path is ignored by Git, relying on Git's
-      # `check-ignore` under the hood.
+      # Checks whether a given path is ignored by Git, relying on Git's `check-ignore` under the hood.
       #
       # @param [String] path The path to check against `.gitignore`
       #

@@ -6,8 +6,10 @@ module Fastlane
 
         require_relative '../../helper/ios/ios_version_helper'
         require_relative '../../helper/ios/ios_git_helper'
+        require_relative '../../helper/git_helper'
 
-        UI.user_error!('This is not a release branch. Abort.') unless other_action.git_branch.start_with?('release/')
+        current_branch = Fastlane::Helper::GitHelper.current_git_branch
+        UI.user_error!("Current branch - '#{current_branch}' - is not a release branch. Abort.") unless current_branch.start_with?('release/')
 
         version = Fastlane::Helper::Ios::VersionHelper.get_public_version
         message = "Finalizing release: #{version}\n"
@@ -18,7 +20,7 @@ module Fastlane
         end
 
         # Check local repo status
-        other_action.ensure_git_status_clean()
+        other_action.ensure_git_status_clean
 
         version
       end
@@ -40,7 +42,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
                                        env_name: 'FL_IOS_FINALIZE_PRECHECKS_SKIPCONFIRM',
                                        description: 'Skips confirmation',
-                                       is_string: false, # true: verifies the input is a string, false: every kind of value
+                                       type: Boolean,
                                        default_value: false), # the default value if the user didn't provide one
         ]
       end
@@ -53,11 +55,11 @@ module Fastlane
       end
 
       def self.authors
-        ['loremattei']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?(platform)
       end
     end
   end

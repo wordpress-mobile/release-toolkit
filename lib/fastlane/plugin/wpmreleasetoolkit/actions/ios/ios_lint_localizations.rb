@@ -2,10 +2,19 @@ module Fastlane
   module Actions
     class IosLintLocalizationsAction < Action
       def self.run(params)
-        violations = {}
+        violations = nil
 
         loop do
           violations = self.run_linter(params)
+          violations.default = [] # Set the default value for when querying a missing key
+
+          if params[:check_duplicate_keys]
+            find_duplicated_keys(params).each do |language, duplicates|
+              violations[language] += duplicates
+            end
+          end
+
+          report(violations: violations, base_lang: params[:base_lang])
           break unless !violations.empty? && params[:allow_retry] && UI.confirm(RETRY_MESSAGE)
         end
 
@@ -22,20 +31,44 @@ module Fastlane
           install_path: resolve_path(params[:install_path]),
           version: params[:version]
         )
-        violations = helper.run(
+
+        helper.run(
           input_dir: resolve_path(params[:input_dir]),
           base_lang: params[:base_lang],
           only_langs: params[:only_langs]
         )
-
-        violations.each do |lang, diff|
-          UI.error "Inconsistencies found between '#{params[:base_lang]}' and '#{lang}':\n\n#{diff}\n"
-        end
-
-        violations
       end
 
-      RETRY_MESSAGE = <<~MSG
+      def self.report(violations:, base_lang:)
+        violations.each do |lang, lang_violations|
+          UI.error "Inconsistencies found between '#{base_lang}' and '#{lang}':\n\n#{lang_violations.join("\n")}\n"
+        end
+      end
+
+      def self.find_duplicated_keys(params)
+        duplicate_keys = {}
+
+        files_to_lint = Dir.glob('*.lproj/Localizable.strings', base: params[:input_dir])
+        files_to_lint.each do |file|
+          language = File.basename(File.dirname(file), '.lproj')
+          path = File.join(params[:input_dir], file)
+
+          file_type = Fastlane::Helper::Ios::L10nHelper.strings_file_type(path: path)
+          if file_type == :text
+            duplicates = Fastlane::Helper::Ios::StringsFileValidationHelper.find_duplicated_keys(file: path)
+            duplicate_keys[language] = duplicates.map { |key, value| "`#{key}` was found at multiple lines: #{value.join(', ')}" } unless duplicates.empty?
+          else
+            UI.important <<~WRONG_FORMAT
+              File `#{path}` is in #{file_type} format, while finding duplicate keys only make sense on files that are in ASCII-plist format.
+              Since your files are in #{file_type} format, you should probably disable the `check_duplicate_keys` option from this `#{self.action_name}` call.
+            WRONG_FORMAT
+          end
+        end
+
+        duplicate_keys
+      end
+
+      RETRY_MESSAGE = <<~MSG.freeze
         Inconsistencies found during Localization linting.
         You need to fix them before continuing. From this point on, you should either:
 
@@ -58,7 +91,7 @@ module Fastlane
         Did you fix the `.strings` files locally and want to lint them again?
       MSG
 
-      ABORT_MESSAGE = <<~MSG
+      ABORT_MESSAGE = <<~MSG.freeze
         Inconsistencies found during Localization linting. Aborting.
       MSG
 
@@ -130,7 +163,7 @@ module Fastlane
             description: 'Should we abort the rest of the lane with a global error if any violations are found?',
             optional: true,
             default_value: true,
-            is_string: false # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
+            type: Boolean
           ),
           FastlaneCore::ConfigItem.new(
             key: :allow_retry,
@@ -138,7 +171,15 @@ module Fastlane
             description: 'If any violations are found, show an interactive prompt allowing the user to manually fix the issues locally and retry the linting',
             optional: true,
             default_value: false,
-            is_string: false # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
+            type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :check_duplicate_keys,
+            env_name: 'FL_IOS_LINT_TRANSLATIONS_CHECK_DUPLICATE_KEYS',
+            description: 'Checks the input files for duplicate keys',
+            optional: true,
+            default_value: true,
+            type: Boolean
           ),
         ]
       end
@@ -148,15 +189,15 @@ module Fastlane
       end
 
       def self.return_type
-        :hash_of_strings
+        :hash
       end
 
       def self.return_value
-        'A hash, keyed by language code, whose values are the diff found for said language'
+        'A hash, keyed by language code, whose values are arrays of violations found for that language'
       end
 
       def self.authors
-        ['AliSoftware']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)

@@ -9,16 +9,15 @@ module Fastlane
         UI.message 'Running Configure Download'
 
         # If the `~/.mobile-secrets` repository doesn't exist
-        unless File.directory?(secrets_dir)
-          UI.user_error!("The local secrets store does not exist. Please clone it to #{secrets_dir} before continuing.")
-        else
+        if File.directory?(secrets_dir)
           update_repository # If the repo already exists, just update it
+        else
+          UI.user_error!("The local secrets store does not exist. Please clone it to #{secrets_dir} before continuing.")
         end
       end
 
       # Ensure the git repository at `~/.mobile-secrets` is up to date.
-      # If the secrets repo is in a detached HEAD state, skip the pull,
-      # since it will fail.
+      # If the secrets repo is in a detached HEAD state, skip the pull, since it will fail.
       def self.update_repository
         secrets_repo_branch = Fastlane::Helper::ConfigureHelper.repo_branch_name
 
@@ -34,7 +33,7 @@ module Fastlane
       end
 
       def self.authors
-        ['Jeremy Massel']
+        ['Automattic']
       end
 
       def self.return_value

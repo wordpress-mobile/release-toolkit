@@ -37,17 +37,17 @@ By default, this tool will prompt the developer before overwriting any existing 
 
 **`config_file`** (optional)
 
-The tool uses a `.json` file for configuration. By default, the tool will attempt to use a file called `screenshots.json` in the same directory as the `Fastfile`. If your file has a different name, you'll need to use this argument.
+The tool uses a `.json` or `.yaml` file for configuration. By default, the tool will attempt to use a file called `screenshots.json` in the same directory as the `Fastfile`. If your file has a different name, you'll need to use this argument.
 
 ## Sample Implementations
 
 The following sample implementations provide a good example of how to create a configuration file:
 
-- [WordPress Android](https://github.com/wordpress-mobile/WordPress-Android/blob/trunk/fastlane/screenshots.json)
+- [WordPress Android](https://github.com/wordpress-mobile/WordPress-Android/blob/trunk/fastlane/screenshots/wordpress-config.json)
 
 ## Creating a configuration file
 
-The `.json` configuration file contains all the information needed for the compositor to do its work. It has three main sections:
+The `.json` (or `.yaml`) configuration file contains all the information needed for the compositor to do its work. It has three main sections:
 
 - Preamble
 - Devices
@@ -69,7 +69,7 @@ This key defines the default background color of each screenshot. This must be a
 
 **`stylesheet`**
 
-This key defines the default stylesheet used for text formatting. It should be a path to the stylesheet, either absolute, or relative to the configuration file.
+This key defines the default stylesheet used for text formatting. It should be a path to the stylesheet, either absolute, or relative to the `fastlane` folder.
 
 A sample stylesheet looks like this:
 
@@ -105,7 +105,7 @@ The device list specifies a set of reusable device frames for the compositor. Th
     "font_size": "70px",
     "screenshot_size": [740, 1480],
     "screenshot_offset": [170, 440],
-    "device_frame": "playstoreres/assets/pixel-2-xl.svg",
+    "device_frame": "screenshots/assets/pixel-2-xl.svg",
     "device_frame_size": [833, 1708],
     "device_frame_offset": [124, 317]
 },
@@ -143,7 +143,7 @@ Sets the origin of the original screenshot image. This must be provided as an ar
 
 **`device_frame`**
 
-A path to the device frame image (if applicable). This path can be absolute or relative to the configuration file.
+A path to the device frame image (if applicable). This path can be absolute or relative to the `fastlane` folder.
 
 **`device_frame_size`**
 
@@ -165,17 +165,17 @@ Each entry looks something like this:
 ```json
 {
     "device": "Pixel 2 XL",
-    "text": "playstoreres/metadata/%s/play_store_screenshot_7.html",
+    "text": "metadata/%s/play_store_screenshot_7.html",
     "screenshot": "images/phoneScreenshots/1-build-and-manage-your-website.png",
-    "background": "playstoreres/assets/backgrounds/01-background-phone.png",
+    "background": "screenshots/assets/backgrounds/01-background-phone.png",
     "attachments": [
         {
-            "file": "playstoreres/assets/attachments/01-phone-website.png",
+            "file": "screenshots/assets/attachments/01-phone-website.png",
             "size": [740, 1480],
             "position": [170, 441]
         },
         {
-            "file": "playstoreres/assets/attachments/01-phone-photos.png",
+            "file": "screenshots/assets/attachments/01-phone-photos.png",
             "size": [918, 975],
             "position": [78, 832]
         }
@@ -194,7 +194,7 @@ Allows you to customize the exported filename for this entry.
 
 **`background`** (optional)
 
-Specifies the path to a background image for this entry. This path can be absolute or relative to the configuration file. The background image **will not** be automatically resized, and it will be placed at `(0,0)`.  If not provided, the image will use the background color defined in the preamble.
+Specifies the path to a background image for this entry. This path can be absolute, or relative to the `fastlane` folder. The background image **will not** be automatically resized, and it will be placed at `(0,0)`.  If not provided, the image will use the background color defined in the preamble.
 
 **`screenshot`** (optional)
 
@@ -253,7 +253,7 @@ Text attachments use the following keys:
 
 **`text`**
 
-Specifies the path to the text file for this attachment. The path should be specified relative to the configuration file, and can contain the `{locale}` placeholder to allow for localization.
+Specifies the path to the text file for this attachment. The path should be specified relative to the `fastlane` folder, and can contain the `{locale}` placeholder to allow for localization.
 
 **`size`**
 
@@ -269,12 +269,12 @@ Specifies the font size for the text of this attachment. If this number is too l
 
 **`stylesheet`**
 
-Specifies a stylesheet used for this attachment. It should contain a path to the stylesheet, either absolute, or relative to the configuration file.
+Specifies a stylesheet used for this attachment. It should contain a path to the stylesheet, either absolute, or relative to the `fastlane` folder.
 
 **Image Attachment**
 ```json
 {
-  "file": "playstoreres/assets/attachments/01-image-name.png",
+  "file": "screenshots/assets/attachments/01-image-name.png",
   "size": [2107, 1414],
   "position": [446, 586]
 }
@@ -284,7 +284,7 @@ Image attachments use the following keys:
 
 **`file`**
 
-Specifies the path to the attachment image. The path should be specified relative to the configuration file, and can contain the `{locale}` placeholder to allow for localization.
+Specifies the path to the attachment image. The path should be specified relative to the `fastlane` folder, and can contain the `{locale}` placeholder to allow for localization.
 
 **`size`**
 

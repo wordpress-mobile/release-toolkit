@@ -113,7 +113,7 @@ module Fastlane
       end
 
       def self.authors
-        ['Jeremy Massel']
+        ['Automattic']
       end
 
       def self.details
@@ -127,7 +127,7 @@ module Fastlane
                                        description: 'Overwrite copied files without confirmation',
                                        optional: true,
                                        default_value: false,
-                                       is_string: false),
+                                       type: Boolean),
         ]
       end
 

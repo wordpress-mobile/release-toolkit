@@ -15,7 +15,7 @@ module Fastlane
         end
 
         unless extracted_notes_file.nil?
-          extracted_notes_file.close()
+          extracted_notes_file.close
           check_and_commit_extracted_notes_file(extracted_notes_file_path, version)
         end
       end
@@ -25,9 +25,9 @@ module Fastlane
         File.open(release_notes_file_path).each do |line|
           case state
           when :discarding
-            state = :evaluating if (line.match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/)) && (line.strip() == version)
+            state = :evaluating if line.match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/) && (line.strip == version)
           when :evaluating
-            state = (line.match(/-/)) ? :extracting : :discarding
+            state = line.match(/-/) ? :extracting : :discarding
           when :extracting
             if line.match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/)
               state = :discarding
@@ -49,7 +49,7 @@ module Fastlane
       end
 
       def self.authors
-        ['Lorenzo Mattei']
+        ['Automattic']
       end
 
       def self.return_value
@@ -58,7 +58,7 @@ module Fastlane
 
       def self.details
         # Optional:
-        'Creates a release and uploads the provided assets'
+        'Given a file containing release notes and a version, extracts the notes for that version into a dedicated file.'
       end
 
       def self.available_options
@@ -67,17 +67,17 @@ module Fastlane
                                        env_name: 'GHHELPER_EXTRACT_NOTES_VERSION',
                                        description: 'The version of the release',
                                        optional: false,
-                                       is_string: true),
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :release_notes_file_path,
                                        env_name: 'GHHELPER_EXTRACT_NOTES_FILE_PATH',
                                        description: 'The path to the file that contains the release notes',
                                        optional: false,
-                                       is_string: true),
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :extracted_notes_file_path,
                                        env_name: 'GHHELPER_EXTRACT_NOTES_EXTRACTED_FILE_PATH',
                                        description: 'The path to the file that will contain the extracted release notes',
                                        optional: true,
-                                       is_string: true),
+                                       type: String),
         ]
       end
 

@@ -40,13 +40,13 @@ module Fastlane
           UI.message 'Example: google-services.json'
 
           source = UI.input('Source File Path:')
-          sourcePath = absolute_secret_store_path(source) # Transform the relative path into an absolute path.
+          source_path = absolute_secret_store_path(source) # Transform the relative path into an absolute path.
 
           # Don't allow the developer to accidentally specify an invalid file, otherwise validation will never succeed.
-          if File.file?(sourcePath)
+          if File.file?(source_path)
             invalid_file = false
           else
-            UI.error "There is no file at #{sourcePath}."
+            UI.error "There is no file at #{source_path}."
           end
         end
 
@@ -73,7 +73,7 @@ module Fastlane
       end
 
       def self.authors
-        ['Jeremy Massel']
+        ['Automattic']
       end
 
       def self.return_value

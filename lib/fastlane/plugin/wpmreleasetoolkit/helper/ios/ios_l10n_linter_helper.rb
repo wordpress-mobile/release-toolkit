@@ -5,9 +5,9 @@ module Fastlane
   module Helper
     module Ios
       class L10nLinterHelper
-        SWIFTGEN_VERSION = '6.4.0'
-        DEFAULT_BASE_LANG = 'en'
-        CONFIG_FILE_NAME = 'swiftgen-stringtypes.yml'
+        SWIFTGEN_VERSION = '6.4.0'.freeze
+        DEFAULT_BASE_LANG = 'en'.freeze
+        CONFIG_FILE_NAME = 'swiftgen-stringtypes.yml'.freeze
 
         attr_reader :install_path, :version
 
@@ -48,7 +48,7 @@ module Fastlane
             extracted_dir = File.join(tmpdir, "swiftgen-#{version}")
             Action.sh('unzip', zipfile, '-d', extracted_dir)
 
-            FileUtils.rm_rf(install_path) if File.exist?(install_path)
+            FileUtils.rm_rf(install_path)
             FileUtils.mkdir_p(install_path)
             FileUtils.cp_r("#{extracted_dir}/.", install_path)
           end
@@ -58,8 +58,7 @@ module Fastlane
         #
         # @param [String] input_dir The path (ideally absolute) to the directory containing the `.lproj` folders to parse
         # @param [String] base_lang The code name (i.e the basename of one of the `.lproj` folders) of the locale to use as the baseline
-        # @return [Hash<String, String>] A hash whose keys are the language codes (basename of `.lproj` folders) for which violations were found,
-        #         and the values are the output of the `diff` showing these violations.
+        # @return [Hash<String, Array<String>>] A hash of violations, keyed by language code, whose values are the list of violation messages for that language
         #
         def run(input_dir:, base_lang: DEFAULT_BASE_LANG, only_langs: nil)
           check_swiftgen_installed || install_swiftgen!
@@ -87,7 +86,7 @@ module Fastlane
           <<~TEMPLATE
             {% macro recursiveBlock table item %}
               {% for string in item.strings %}
-            "{{string.key}}" => [{{string.types|join:","}}]
+            {{string.key}} ==> [{{string.types|join:","}}]
               {% endfor %}
               {% for child in item.children %}
               {% call recursiveBlock table child %}
@@ -139,20 +138,19 @@ module Fastlane
           return [config_file, langs]
         end
 
-        # Because we use English copy verbatim as key names, some keys are the same except for the upper/lowercase.
-        # We need to sort the output again because SwiftGen only sort case-insensitively so that means keys that are
-        # the same except case might be in swapped order for different outputs
+        # Returns a Hash mapping the list of expected parameter types for each of the keys based in the %… placeholders found in their `.strings` files
         #
         # @param [String] dir The temporary directory in which the file to sort lines for is located
         # @param [String] lang The code for the locale we need to sort the output lines for
+        # @return [Hash<String, String>] A hash whose keys are the strings keys, and corresponding value is a String describing the types expected as parameters.
         #
-        def sort_file_lines!(dir, lang)
+        def placeholder_types_for_keys(dir, lang)
           file = File.join(dir, output_filename(lang))
           return nil unless File.exist?(file)
 
-          sorted_lines = File.readlines(file).sort
-          File.write(file, sorted_lines.join)
-          return file
+          File.readlines(file).map do |line|
+            line.match(/^(.*) ==> (\[[A-Za-z,]*\])$/)&.captures
+          end.compact.to_h
         end
 
         # Prepares the template and config files, then run SwiftGen, run `diff` on each generated output against the baseline, and returns a Hash of the violations found.
@@ -160,7 +158,7 @@ module Fastlane
         # @param [String] input_dir The directory where the `.lproj` folders to scan are located
         # @param [String] base_lang The base language used as source of truth that all other languages will be compared against
         # @param [Array<String>] only_langs The list of languages to limit the generation for. Useful to focus only on a couple of issues or just one language
-        # @return [Hash<String, String>] A hash of violations, keyed by language code, whose values are the diff output.
+        # @return [Hash<String, Array<String>>] A hash of violations, keyed by language code, whose values are the list of violation messages for that language
         #
         # @note The returned Hash contains keys only for locales with violations. Locales parsed but without any violations found will not appear in the resulting hash.
         #
@@ -172,34 +170,22 @@ module Fastlane
             Action.sh(swiftgen_bin, 'config', 'run', '--config', config_file)
 
             # Run diffs
-            base_file = sort_file_lines!(tmpdir, base_lang)
+            params_for_base_lang = placeholder_types_for_keys(tmpdir, base_lang)
             langs.delete(base_lang)
             return langs.map do |lang|
-              file = sort_file_lines!(tmpdir, lang)
-              # If the lang ends up not having any translation at all (e.g. a `.lproj` without any `.strings` file in it but maybe just a storyboard or assets catalog), ignore it
-              next nil if file.nil? || only_empty_lines?(file)
+              params_for_lang = placeholder_types_for_keys(tmpdir, lang)
 
-              # Compute the diff
-              diff = `diff -U0 "#{base_file}" "#{file}"`
-              # Remove the lines starting with `---`/`+++` which contains the file names (which are temp files we don't want to expose in the final diff to users)
-              # Note: We still keep the `@@ from-file-line-numbers to-file-line-numbers @@` lines to help the user know the index of the key to find it faster,
-              #       and also to serve as a clear visual separator between diff entries in the output.
-              #       Those numbers won't be matching the original `.strings` file line numbers because they are line numbers in the SwiftGen-generated intermediate
-              #       file instead, but they can still give an indication at the index in the list of keys at which this difference is located.
-              diff.gsub!(/^(---|\+\+\+).*\n/, '')
-              diff.empty? ? nil : [lang, diff]
+              # If the lang ends up not having any translation at all (e.g. a `.lproj` without any `.strings` file in it but maybe just a storyboard or assets catalog), ignore it
+              next nil if params_for_lang.nil? || params_for_lang.empty?
+
+              violations = params_for_lang.map do |key, param_types|
+                next "`#{key}` was unexpected, as it is not present in the base locale." if params_for_base_lang[key].nil?
+                next "`#{key}` expected placeholders for #{params_for_base_lang[key]} but found #{param_types} instead." if params_for_base_lang[key] != param_types
+              end.compact
+
+              [lang, violations] unless violations.empty?
             end.compact.to_h
           end
-        end
-
-        # Returns true if the file only contains empty lines, i.e. lines that only contains whitespace (space, tab, CR, LF)
-        def only_empty_lines?(file)
-          File.open(file) do |f|
-            while (line = f.gets)
-              return false unless line.strip.empty?
-            end
-          end
-          return true
         end
       end
     end

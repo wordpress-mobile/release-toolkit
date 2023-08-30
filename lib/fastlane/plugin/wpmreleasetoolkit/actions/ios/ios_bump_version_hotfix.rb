@@ -7,20 +7,13 @@ module Fastlane
         require_relative '../../helper/ios/ios_git_helper'
         Fastlane::Helper::GitHelper.create_branch("release/#{params[:version]}", from: params[:previous_version])
         create_config(params[:previous_version], params[:version])
-        show_config()
-
-        update_deliverfile = params[:skip_deliver] == false
-        if update_deliverfile
-          UI.message 'Updating Fastlane deliver file...'
-          Fastlane::Helper::Ios::VersionHelper.update_fastlane_deliver(@new_short_version)
-          UI.message 'Done!'
-        end
+        show_config
 
         UI.message 'Updating XcConfig...'
         Fastlane::Helper::Ios::VersionHelper.update_xc_configs(@new_version, @new_short_version, @new_version_internal)
         UI.message 'Done!'
 
-        Fastlane::Helper::Ios::GitHelper.commit_version_bump(include_deliverfile: update_deliverfile, include_metadata: false)
+        Fastlane::Helper::Ios::GitHelper.commit_version_bump
 
         UI.message 'Done.'
       end
@@ -43,23 +36,13 @@ module Fastlane
             key: :version,
             env_name: 'FL_IOS_BUMP_VERSION_HOTFIX_VERSION',
             description: 'The version of the hotfix',
-            is_string: true
+            type: String
           ),
           FastlaneCore::ConfigItem.new(
             key: :previous_version,
             env_name: 'FL_IOS_BUMP_VERSION_HOTFIX_PREVIOUS_VERSION',
             description: 'The version to branch from',
-            is_string: true
-          ),
-          FastlaneCore::ConfigItem.new(
-            key: :skip_deliver,
-            env_name: 'FL_IOS_BUMP_VERSION_HOTFIX_SKIP_DELIVER',
-            description: 'Skips Deliverfile key update',
-            is_string: false, # Boolean parameter
-            optional: true,
-            # Don't skip the Deliverfile by default. At the time of writing, 2 out of 3 consumers
-            # still have a Deliverfile.
-            default_value: false
+            type: String
           ),
         ]
       end
@@ -71,18 +54,16 @@ module Fastlane
       end
 
       def self.authors
-        ['loremattei']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?(platform)
       end
-
-      private
 
       def self.create_config(previous_version, new_short_version)
         @current_version = previous_version
-        @current_version_internal = Fastlane::Helper::Ios::VersionHelper.get_internal_version() unless ENV['INTERNAL_CONFIG_FILE'].nil?
+        @current_version_internal = Fastlane::Helper::Ios::VersionHelper.get_internal_version unless ENV['INTERNAL_CONFIG_FILE'].nil?
         @new_version = "#{new_short_version}.0"
         @new_version_internal = Fastlane::Helper::Ios::VersionHelper.create_internal_version(@new_version) unless ENV['INTERNAL_CONFIG_FILE'].nil?
         @new_short_version = new_short_version

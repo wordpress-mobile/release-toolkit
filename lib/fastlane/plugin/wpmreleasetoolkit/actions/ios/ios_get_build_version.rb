@@ -32,7 +32,7 @@ module Fastlane
             key: :internal,
             env_name: 'FL_IOS_BUILD_VERSION_INTERNAL',
             description: 'If true, returns the internal build version, otherwise returns the public one',
-            is_string: false, # Boolean
+            type: Boolean,
             default_value: false
           ),
         ]
@@ -49,11 +49,11 @@ module Fastlane
 
       def self.authors
         # So no one will ever forget your contribution to fastlane :) You are awesome btw!
-        ['AliSoftware']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?(platform)
       end
     end
   end

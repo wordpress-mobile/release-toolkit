@@ -8,14 +8,14 @@ module Fastlane
         require_relative '../../helper/ios/ios_version_helper'
 
         Fastlane::Helper::GitHelper.ensure_on_branch!('release')
-        create_config()
-        show_config()
+        create_config
+        show_config
 
         UI.message 'Updating XcConfig...'
         Fastlane::Helper::Ios::VersionHelper.update_xc_configs(@new_beta_version, @short_version, @new_internal_version)
         UI.message 'Done!'
 
-        Fastlane::Helper::Ios::GitHelper.commit_version_bump(include_deliverfile: false, include_metadata: false)
+        Fastlane::Helper::Ios::GitHelper.commit_version_bump
       end
 
       #####################################################
@@ -40,18 +40,16 @@ module Fastlane
       end
 
       def self.authors
-        ['loremattei']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?(platform)
       end
 
-      private
-
       def self.create_config
-        @current_version = Fastlane::Helper::Ios::VersionHelper.get_build_version()
-        @current_version_internal = Fastlane::Helper::Ios::VersionHelper.get_internal_version() unless ENV['INTERNAL_CONFIG_FILE'].nil?
+        @current_version = Fastlane::Helper::Ios::VersionHelper.get_build_version
+        @current_version_internal = Fastlane::Helper::Ios::VersionHelper.get_internal_version unless ENV['INTERNAL_CONFIG_FILE'].nil?
         @new_internal_version = Fastlane::Helper::Ios::VersionHelper.create_internal_version(@current_version) unless ENV['INTERNAL_CONFIG_FILE'].nil?
         @new_beta_version = Fastlane::Helper::Ios::VersionHelper.calc_next_build_version(@current_version)
         @short_version = Fastlane::Helper::Ios::VersionHelper.get_short_version_string(@new_beta_version)

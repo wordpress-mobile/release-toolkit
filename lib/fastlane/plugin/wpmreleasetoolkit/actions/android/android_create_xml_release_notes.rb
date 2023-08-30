@@ -11,7 +11,7 @@ module Fastlane
             complete_path = "#{params[:download_path]}/#{loc[1]}/changelogs/#{params[:build_number]}.txt"
             if File.exist?(complete_path)
               f.puts("<#{loc[1]}>")
-              f.puts(File.open(complete_path).read)
+              f.puts(File.read(complete_path))
               f.puts("</#{loc[1]}>\n")
             else
               UI.message("File #{complete_path} not found. Skipping language #{loc[1]}")
@@ -38,21 +38,21 @@ module Fastlane
                                        env_name: 'ANDROID_XML_NOTES_DOWNLOAD_PATH',
                                        description: 'The path to the folder with the release notes',
                                        optional: false,
-                                       is_string: true),
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :build_number,
                                        env_name: 'ANDROID_XML_NOTES_BUILD_NUMBER',
                                        description: 'The build number of the release notes',
                                        optional: false,
-                                       is_string: true),
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :locales,
                                        env_name: 'FL_DOWNLOAD_METADATA_LOCALES',
                                        description: 'The hash with the GLotPress locale and the project locale association',
-                                       is_string: false),
+                                       type: Hash),
         ]
       end
 
       def self.authors
-        ['loremattei']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)

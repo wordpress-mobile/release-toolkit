@@ -10,13 +10,16 @@
 /* comment on key 2 */
 "key2" = "string 2️⃣";
 
-/* multiline comment
-   on key 3 */
-"key3" = "string 3";
+/* multiline comment on key 3.
+   %d = number of lines
+   and = a red herring for when merge_strings tries to add prefixes to lines it identifies as pairs using unquoted keys */
+"key3" = "string 3
+on %d lines";
 
 /* MARK: - InfoPlist-utf8.strings */
 
-"InfoKey1" = "Info String 1";
-"InfoKey2" = "Info String 2️⃣";
-"InfoKey3" = "Info String 3";
+InfoKey1 = "Info String 1";
+InfoKey2 = "Info String 2️⃣.
+Please accept.";
+InfoKey3 = "Info String 3";
 

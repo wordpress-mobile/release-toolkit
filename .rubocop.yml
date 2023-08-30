@@ -6,14 +6,9 @@ require:
 # Enable new cops when we update rubocop to a newer version
 AllCops:
   NewCops: enable
+  TargetRubyVersion: 2.7
 
 ########## Lint / CodeStyle
-
-# This gem is included as part of the `Pluginfile`, which is `required` separately,
-# so makes it hard to keep it ordered with the rest of the gems
-Gemspec/OrderedDependencies:
-  Exclude:
-    - 'fastlane-plugin-wpmreleasetoolkit.gemspec'
 
 # Especially for actions and methods like `self.run(params)` it's common to have the argument unused; but that
 # comes with the parent class API / contract, so we feel it more readable to avoid the _ unused prefix for those.
@@ -54,6 +49,21 @@ Style/AsciiComments:
 # which would be incorrect and not what we want
 Style/StringConcatenation:
   Enabled: false
+  
+# This rule was enforced after upgrading Rubocop from `1.22.1` to `1.50.2`. We are disabling this rule for the
+# time being so that we don't see any unexpected behavior when running Release Toolkit actions that could be
+# changed by this rule. See https://github.com/wordpress-mobile/release-toolkit/pull/464#pullrequestreview-1396569629
+# for more discussion
+Style/FetchEnvVar:
+  Enabled: false
+  
+########## Gemspec Rules
+
+# This was turned on by default after updating Rubocop to `1.50.2`. We want to disable this for now because
+# all the gem publishing is done within CI and doesn't allow for user input such as an MFA code. See
+# https://github.com/wordpress-mobile/release-toolkit/pull/464#pullrequestreview-1396569313 for more discussion
+Gemspec/RequireMFA:
+  Enabled: false
 
 ########## Metrics / Max Lengths Rules
 
@@ -73,7 +83,7 @@ Metrics/ClassLength:
   Max: 300
 
 Metrics/MethodLength:
-  Max: 100
+  Max: 150
 
 Metrics/ModuleLength:
   Max: 300

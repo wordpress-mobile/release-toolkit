@@ -33,8 +33,7 @@ module Fastlane
           raise
         end
 
-        Action.sh('rake dependencies:pod:clean')
-        other_action.cocoapods()
+        other_action.cocoapods
       end
 
       #####################################################
@@ -54,7 +53,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :derived_data_path,
             description: "The path to the DerivedData directory for the project. Should match what's used in the `gym` action",
-            is_string: true,
+            type: String,
             default_value: '~/Library/Developer/Xcode/DerivedData'
           ),
         ]
@@ -67,11 +66,11 @@ module Fastlane
       end
 
       def self.authors
-        ['loremattei']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?(platform)
       end
     end
   end

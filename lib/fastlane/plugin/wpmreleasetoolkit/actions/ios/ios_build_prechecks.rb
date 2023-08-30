@@ -5,9 +5,9 @@ module Fastlane
         require_relative '../../helper/ios/ios_version_helper'
 
         message = ''
-        message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_internal_version()} and uploading to App Center\n" if params[:internal]
-        message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_build_version()} and uploading to App Center\n" if params[:internal_on_single_version]
-        message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_build_version()} and uploading to TestFlight\n" if params[:external]
+        message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_internal_version} and uploading to App Center\n" if params[:internal]
+        message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_build_version} and uploading to App Center\n" if params[:internal_on_single_version]
+        message << "Building version #{Fastlane::Helper::Ios::VersionHelper.get_build_version} and uploading to TestFlight\n" if params[:external]
 
         if params[:skip_confirm]
           UI.message(message)
@@ -16,7 +16,7 @@ module Fastlane
         end
 
         # Check local repo status
-        other_action.ensure_git_status_clean() unless other_action.is_ci()
+        other_action.ensure_git_status_clean unless other_action.is_ci
       end
 
       #####################################################
@@ -36,22 +36,22 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
                                        env_name: 'FL_IOS_BUILD_PRECHECKS_SKIP_CONFIRM',
                                        description: 'True to avoid the system ask for confirmation',
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :internal,
                                        env_name: 'FL_IOS_BUILD_PRECHECKS_INTERNAL_BUILD',
                                        description: 'True if this is for an internal build',
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :external,
                                        env_name: 'FL_IOS_BUILD_PRECHECKS_EXTERNAL_BUILD',
                                        description: 'True if this is for a public build',
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :internal_on_single_version,
                                        env_name: 'FL_IOS_BUILD_PRECHECKS_INTERNAL_SV_BUILD',
                                        description: 'True if this is for an internal build that follows the same versioning of the external',
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
         ]
       end
@@ -63,11 +63,11 @@ module Fastlane
       end
 
       def self.authors
-        ['loremattei']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?(platform)
       end
     end
   end

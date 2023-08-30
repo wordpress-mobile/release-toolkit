@@ -10,10 +10,12 @@ module Fastlane
         repository = params[:repository]
         milestone_title = params[:milestone]
 
-        milestone = Fastlane::Helper::GithubHelper.get_milestone(repository, milestone_title)
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
+        milestone = github_helper.get_milestone(repository, milestone_title)
+
         UI.user_error!("Milestone #{milestone_title} not found.") if milestone.nil?
 
-        Fastlane::Helper::GithubHelper.github_client().update_milestone(repository, milestone[:number], state: 'closed')
+        github_helper.update_milestone(repository: repository, number: milestone[:number], state: 'closed')
       end
 
       def self.description
@@ -21,7 +23,7 @@ module Fastlane
       end
 
       def self.authors
-        ['Lorenzo Mattei']
+        ['Automattic']
       end
 
       def self.return_value
@@ -45,6 +47,7 @@ module Fastlane
                                        description: 'The GitHub milestone',
                                        optional: false,
                                        type: String),
+          Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
 

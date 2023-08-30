@@ -10,25 +10,26 @@ module Fastlane
         UI.message "Locales: #{params[:locales].inspect}"
         UI.message "Source locale: #{params[:source_locale].nil? ? '-' : params[:source_locale]}"
         UI.message "Path: #{params[:download_path]}"
+        UI.message "Auto-retry: #{params[:auto_retry]}"
 
         # Check download path
-        Dir.mkdir(params[:download_path]) unless File.exist?(params[:download_path])
+        FileUtils.mkdir_p(params[:download_path])
 
         # Download
-        downloader = Fastlane::Helper::MetadataDownloader.new(params[:download_path], params[:target_files])
+        downloader = Fastlane::Helper::MetadataDownloader.new(params[:download_path], params[:target_files], params[:auto_retry])
 
         params[:locales].each do |loc|
           if loc.is_a?(Array)
-            puts "Downloading language: #{loc[1]}"
-            complete_url = "#{params[:project_url]}#{loc[0]}/default/export-translations?filters[status]=current&format=json"
+            UI.message "Downloading language: #{loc[1]}"
+            complete_url = "#{params[:project_url]}#{loc[0]}/default/export-translations/?filters[status]=current&format=json"
             downloader.download(loc[1], complete_url, loc[1] == params[:source_locale])
           end
 
-          if loc.is_a?(String)
-            puts "Downloading language: #{loc}"
-            complete_url = "#{params[:project_url]}#{loc}/default/export-translations?filters[status]=current&format=json"
-            downloader.download(loc, complete_url, loc == params[:source_locale])
-          end
+          next unless loc.is_a?(String)
+
+          UI.message "Downloading language: #{loc}"
+          complete_url = "#{params[:project_url]}#{loc}/default/export-translations/?filters[status]=current&format=json"
+          downloader.download(loc, complete_url, loc == params[:source_locale])
         end
       end
 
@@ -55,7 +56,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :target_files,
                                        env_name: 'FL_DOWNLOAD_METADATA_TARGET_FILES',
                                        description: 'The hash with the path to the target files and the key to use to extract their content',
-                                       is_string: false),
+                                       type: Hash),
           FastlaneCore::ConfigItem.new(key: :locales,
                                        env_name: 'FL_DOWNLOAD_METADATA_LOCALES',
                                        description: 'The hash with the GlotPress locale and the project locale association',
@@ -67,7 +68,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :download_path,
                                        env_name: 'FL_DOWNLOAD_METADATA_DOWNLOAD_PATH',
                                        description: 'The path of the target files',
-                                       is_string: true),
+                                       type: String),
+          FastlaneCore::ConfigItem.new(key: :auto_retry,
+                                       env_name: 'FL_DOWNLOAD_METADATA_AUTO_RETRY',
+                                       description: 'Whether to auto retry downloads after Too Many Requests error',
+                                       type: FastlaneCore::Boolean,
+                                       optional: true,
+                                       default_value: true),
         ]
       end
 
@@ -79,11 +86,11 @@ module Fastlane
       end
 
       def self.authors
-        ['loremattei']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)
-        [:ios, :android].include?(platform)
+        true
       end
     end
   end

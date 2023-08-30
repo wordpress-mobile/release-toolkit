@@ -1,0 +1,27 @@
+/* Generated File. Do not edit. */
+
+/* MARK: - Localizable-utf16.strings */
+
+/* Some file header comment here */
+
+/* comment on key 1 */
+"key1" = "string 1";
+
+/* comment on key 2 */
+"key2" = "string 2️⃣";
+
+/* multiline comment on key 3.
+   %d = number of lines
+   and = a red herring for when merge_strings tries to add prefixes to lines it identifies as pairs using unquoted keys */
+"key3" = "string 3
+on %d lines";
+
+/* MARK: - non-latin-utf16.strings */
+
+"diacritics" = "Ça c'est un bon café! ☕️";
+"emojis" = "😎🥳👨‍👩‍👧‍👦🍊";
+"to-exclude" = "❌🙅🏽";
+"key2" = "another dup";
+"japanese" = "お体を大切に。";
+"key1" = "duplicate";
+

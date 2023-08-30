@@ -7,7 +7,7 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
   let(:locales_subset) { { 'fr-FR': 'fr', 'zh-cn': 'zh-Hans' } }
 
   def gp_stub(locale:, query:)
-    stub_request(:get, "#{gp_fake_url}/#{locale}/default/export-translations").with(query: query)
+    stub_request(:get, "#{gp_fake_url}/#{locale}/default/export-translations/").with(query: query)
   end
 
   describe 'downloading export files from GlotPress' do
@@ -70,6 +70,7 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
         stub = gp_stub(locale: 'unknown-locale', query: { 'filters[status]': 'current', format: 'strings' }).to_return(status: [404, 'Not Found'])
         error_messages = []
         allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+        allow(FastlaneCore::UI).to receive(:confirm).and_return(false) # as we will be asked if we want to retry when getting a network error
 
         # Act
         run_described_fastlane_action(
@@ -81,7 +82,7 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
         # Assert
         expect(stub).to have_been_made.once
         expect(File).not_to exist(File.join(tmp_dir, 'Base.lproj', 'Localizable.strings'))
-        expect(error_messages).to eq(['Error downloading locale `unknown-locale` — 404 Not Found'])
+        expect(error_messages).to eq(["Error downloading locale `unknown-locale` — 404 Not Found (#{gp_fake_url}/unknown-locale/default/export-translations/?filters%5Bstatus%5D=current&format=strings)"])
       end
     end
 

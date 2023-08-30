@@ -6,19 +6,21 @@ module Fastlane
 
         require_relative '../../helper/android/android_version_helper'
         require_relative '../../helper/android/android_git_helper'
+        require_relative '../../helper/git_helper'
 
-        UI.user_error!('This is not a release branch. Abort.') unless other_action.git_branch.start_with?('release/')
+        current_branch = Fastlane::Helper::GitHelper.current_git_branch
+        UI.user_error!("Current branch - '#{current_branch}' - is not a release branch. Abort.") unless current_branch.start_with?('release/')
 
         version = Fastlane::Helper::Android::VersionHelper.get_public_version
         message = "Completing code freeze for: #{version}\n"
-        unless params[:skip_confirm]
-          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
-        else
+        if params[:skip_confirm]
           UI.message(message)
+        else
+          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
         end
 
         # Check local repo status
-        other_action.ensure_git_status_clean()
+        other_action.ensure_git_status_clean
 
         version
       end
@@ -40,7 +42,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
                                        env_name: 'FL_ANDROID_COMPLETECODEFREEZE_PRECHECKS_SKIPCONFIRM',
                                        description: 'Skips confirmation',
-                                       is_string: false, # true: verifies the input is a string, false: every kind of value
+                                       type: Boolean,
                                        default_value: false), # the default value if the user didn't provide one
         ]
       end
@@ -57,7 +59,7 @@ module Fastlane
       end
 
       def self.authors
-        ['loremattei']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)

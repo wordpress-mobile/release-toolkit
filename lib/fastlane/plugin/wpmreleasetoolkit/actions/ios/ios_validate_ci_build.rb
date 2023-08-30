@@ -5,8 +5,8 @@ module Fastlane
         require_relative '../../helper/ios/ios_git_helper'
         require_relative '../../helper/ios/ios_version_helper'
 
-        version = Fastlane::Helper::Ios::VersionHelper.get_public_version()
-        head_tags = Fastlane::Helper::GitHelper.list_tags_on_current_commit()
+        version = Fastlane::Helper::Ios::VersionHelper.get_public_version
+        head_tags = Fastlane::Helper::GitHelper.list_tags_on_current_commit
         UI.user_error!('HEAD is not on tag. Aborting!') if head_tags.empty?
 
         return head_tags.include?(version) # Current commit is tagged with "version" tag
@@ -35,11 +35,11 @@ module Fastlane
       end
 
       def self.authors
-        ['loremattei']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?(platform)
       end
     end
   end

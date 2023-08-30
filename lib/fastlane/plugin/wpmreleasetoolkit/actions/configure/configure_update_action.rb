@@ -46,12 +46,12 @@ module Fastlane
 
       def self.prompt_to_switch_branches
         branch_name_to_display = current_branch.nil? ? current_hash : current_branch
-        if UI.confirm("The current branch is `#{branch_name_to_display}`. Would you like to switch branches?")
+        if UI.confirm("The current Mobile Secrets branch is `#{branch_name_to_display}`. Would you like to switch branches?")
           new_branch = UI.select("Select the branch you'd like to switch to: ", get_branches)
           checkout_branch(new_branch)
           update_configure_file
-        else
-          UI.user_error!('The local secrets store is in a deatched HEAD state.  Please check out a branch and try again.') if current_branch.nil?
+        elsif current_branch.nil?
+          UI.user_error!('The local secrets store is in a deatched HEAD state.  Please check out a branch and try again.')
         end
       end
 
@@ -124,7 +124,7 @@ module Fastlane
       end
 
       def self.authors
-        ['Jeremy Massel']
+        ['Automattic']
       end
 
       def self.details

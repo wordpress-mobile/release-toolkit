@@ -9,19 +9,29 @@ module Fastlane
         pipeline_name = {
           PIPELINE: params[:pipeline_file]
         }
+        options = {
+          branch: params[:branch],
+          commit: params[:commit],
+          env: params[:environment].merge(pipeline_name),
+          message: params[:message],
+          # Buildkite will not trigger a build if the GitHub activity for that branch is turned off
+          # We want API triggers to work regardless of the GitHub activity settings, so this option is necessary
+          # https://forum.buildkite.community/t/request-build-error-branches-have-been-disabled-for-this-pipeline/1463/2
+          ignore_pipeline_branch_filters: true
+        }.compact # remove entries with `nil` values from the Hash, if any
 
         client = Buildkit.new(token: params[:buildkite_token])
         response = client.create_build(
           params[:buildkite_organization],
           params[:buildkite_pipeline],
-          {
-            branch: params[:branch],
-            commit: params[:commit],
-            env: params[:environment].merge(pipeline_name)
-          }
+          options
         )
 
-        response.state == 'scheduled' ? UI.message('Done!') : UI.crash!("Failed to start job\nError: [#{response}]")
+        if response.state == 'scheduled'
+          UI.success("Successfully scheduled new build. You can see it at '#{response.web_url}'")
+        else
+          UI.crash!("Failed to start job\nError: [#{response}]")
+        end
       end
 
       #####################################################
@@ -36,7 +46,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(
             key: :buildkite_token,
-            env_name: 'BUILDKITE_TOKEN',
+            env_names: %w[BUILDKITE_TOKEN BUILDKITE_API_TOKEN],
             description: 'Buildkite Personal Access Token',
             type: String,
             sensitive: true
@@ -63,6 +73,13 @@ module Fastlane
             description: 'The commit hash you want to build',
             type: String,
             default_value: 'HEAD'
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :message,
+            description: 'A custom message to show for the build in Buildkite\'s UI',
+            type: String,
+            optional: true,
+            default_value: nil
           ),
           FastlaneCore::ConfigItem.new(
             key: :pipeline_file,

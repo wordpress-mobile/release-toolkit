@@ -22,11 +22,11 @@ module Fastlane
 
         # Update submodules then lint translations
         unless params[:lint_task].nil? || params[:lint_task].empty?
-          Fastlane::Helper::GitHelper.update_submodules()
+          Fastlane::Helper::GitHelper.update_submodules
           Action.sh('./gradlew', params[:lint_task])
         end
 
-        Fastlane::Helper::GitHelper.commit(message: 'Update translations', files: res_dir, push: true) unless params[:skip_commit]
+        Fastlane::Helper::GitHelper.commit(message: 'Update translations', files: res_dir) unless params[:skip_commit]
       end
 
       #####################################################
@@ -38,7 +38,7 @@ module Fastlane
       end
 
       def self.details
-        'Download translations from GlotPress, update local strings.xml files accordingly, lint, commit the changes, and push to the remote'
+        'Download translations from GlotPress, update local strings.xml files accordingly, lint, commit the changes'
       end
 
       def self.available_options
@@ -90,8 +90,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :skip_commit,
             env_name: 'FL_DOWNLOAD_TRANSLATIONS_SKIP_COMMIT',
-            description: 'If set to true, will skip the commit/push step. Otherwise, it will commit the changes and push them (the default)',
-            is_string: false, # Boolean
+            description: 'If set to true, will skip the commit step',
+            type: Boolean,
             default_value: false
           ),
         ]
@@ -104,7 +104,7 @@ module Fastlane
       end
 
       def self.authors
-        ['AliSoftware']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)

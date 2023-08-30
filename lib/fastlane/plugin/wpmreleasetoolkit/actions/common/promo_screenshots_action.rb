@@ -11,30 +11,32 @@ module Fastlane
         UI.message "#{self.check_path(params[:orig_folder])} Original Screenshot Source: #{params[:orig_folder]}"
         UI.message "#{self.check_path(params[:metadata_folder])} Translation source: #{params[:metadata_folder]}"
 
-        config = helper.read_json(params[:config_file])
+        config = helper.read_config(params[:config_file])
 
-        translationDirectories = subdirectories_for_path(params[:metadata_folder])
-        imageDirectories = subdirectories_for_path(params[:orig_folder])
+        helper.check_fonts_installed!(config: config) unless params[:skip_font_check]
 
-        unless helper.can_resolve_path(params[:output_folder])
+        translation_directories = subdirectories_for_path(params[:metadata_folder])
+        image_directories = subdirectories_for_path(params[:orig_folder])
+
+        if helper.can_resolve_path(params[:output_folder])
+          UI.message "#{self.check_path(params[:output_folder])} Output Folder: #{params[:output_folder]}"
+        else
           UI.message "✅ Created Output Folder: #{params[:output_folder]}"
           FileUtils.mkdir_p(params[:output_folder])
-        else
-          UI.message "#{self.check_path(params[:output_folder])} Output Folder: #{params[:output_folder]}"
         end
 
-        outputDirectory = helper.resolve_path(params[:output_folder])
+        output_directory = helper.resolve_path(params[:output_folder])
 
         ## If there are no translated screenshot images (whether it's because they haven't been generated yet,
         ##   or because we aren't using them), just use the translated directories.
-        languages = if imageDirectories == []
-                      translationDirectories
+        languages = if image_directories == []
+                      translation_directories
                     ## And vice-versa.
-                    elsif translationDirectories == []
-                      imageDirectories
+                    elsif translation_directories == []
+                      image_directories
                     ## If there are original screenshots and translations available, use only locales that exist in both.
                     else
-                      imageDirectories & translationDirectories
+                      image_directories & translation_directories
                     end
 
         UI.message("💙 Creating Promo Screenshots for: #{languages.join(', ')}")
@@ -47,7 +49,7 @@ module Fastlane
 
         stylesheet_path = config['stylesheet']
 
-        entries = build_entries(config['entries'], languages, outputDirectory, params)
+        entries = build_entries(config['entries'], languages, output_directory, params)
 
         bar = ProgressBar.new(entries.count, :bar, :counter, :eta, :rate)
 
@@ -123,7 +125,7 @@ module Fastlane
       end
 
       def self.authors
-        ['Lorenzo Mattei']
+        ['Automattic']
       end
 
       def self.return_value
@@ -141,31 +143,34 @@ module Fastlane
                                        env_name: 'PROMOSS_ORIG',
                                        description: 'The directory containing the original screenshots',
                                        optional: false,
-                                       is_string: true),
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :output_folder,
                                        env_name: 'PROMOSS_OUTPUT',
                                        description: 'The path of the folder to save the promo screenshots',
                                        optional: false,
-                                       is_string: true),
-
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :metadata_folder,
                                        env_name: 'PROMOSS_METADATA_FOLDER',
                                        description: 'The directory containing the translation data',
                                        optional: false,
-                                       is_string: true),
-
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :config_file,
                                        env_name: 'PROMOSS_CONFIG_FILE',
                                        description: 'The path to the file containing the promo screenshot configuration',
                                        optional: true,
-                                       is_string: true,
+                                       type: String,
                                        default_value: 'screenshots.json'),
-
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: 'PROMOSS_FORCE_CREATION',
                                        description: 'Overwrite existing promo screenshots without asking first?',
                                        optional: true,
-                                       is_string: false,
+                                       type: Boolean,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :skip_font_check,
+                                       env_name: 'PROMOSS_SKIP_FONT_CHECK',
+                                       description: 'Skip the check verifying that needed fonts are installed and active',
+                                       optional: true,
+                                       type: Boolean,
                                        default_value: false),
         ]
       end
@@ -178,32 +183,32 @@ module Fastlane
         config_entries
           .flat_map do |entry|
           languages.map do |language|
-            newEntry = entry.deep_dup
+            new_entry = entry.deep_dup
 
             # Not every output file will have a screenshot, so handle cases where no
             # screenshot file is defined
             if !entry['screenshot'].nil? && !entry['filename'].nil?
-              newEntry['screenshot'] = helper.resolve_path(params[:orig_folder]) + language + entry['screenshot']
-              newEntry['filename'] = output_directory + language + entry['filename']
+              new_entry['screenshot'] = helper.resolve_path(params[:orig_folder]) + language + entry['screenshot']
+              new_entry['filename'] = output_directory + language + entry['filename']
             elsif !entry['screenshot'].nil? && entry['filename'].nil?
-              newEntry['screenshot'] = helper.resolve_path(params[:orig_folder]) + language + entry['screenshot']
-              newEntry['filename'] = output_directory + language + entry['screenshot']
+              new_entry['screenshot'] = helper.resolve_path(params[:orig_folder]) + language + entry['screenshot']
+              new_entry['filename'] = output_directory + language + entry['screenshot']
             elsif entry['screenshot'].nil? && !entry['filename'].nil?
-              newEntry['filename'] = output_directory + language + entry['filename']
+              new_entry['filename'] = output_directory + language + entry['filename']
             else
-              puts newEntry
+              puts new_entry
               abort 'Unable to find output file names'
             end
 
-            newEntry['locale'] = language
+            new_entry['locale'] = language
 
             # Localize file paths for text
-            newEntry['text'].sub!('{locale}', language.dup) unless entry['text'].nil?
+            new_entry['text'].sub!('{locale}', language.dup) unless entry['text'].nil?
 
             # Map attachments paths to their localized versions
-            newEntry['attachments'] = [] if newEntry['attachments'].nil?
+            new_entry['attachments'] = [] if new_entry['attachments'].nil?
 
-            newEntry['attachments'].each do |attachment|
+            new_entry['attachments'].each do |attachment|
               ## If there are no translated screenshot images (whether it's because they haven't been generated yet,
               ##   or because we aren't using them), just use the translated directories.
               ## And vice-versa.
@@ -235,7 +240,7 @@ module Fastlane
               attachment['text']&.sub!('{locale}', language.dup)
             end
 
-            newEntry
+            new_entry
           end
         end
           .sort do |x, y|

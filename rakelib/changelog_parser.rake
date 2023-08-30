@@ -1,5 +1,5 @@
 class ChangelogParser
-  PENDING_SECTION_TITLE = 'Develop'.freeze
+  PENDING_SECTION_TITLE = 'Trunk'.freeze
   EMPTY_PLACEHOLDER = '_None_'.freeze
   SUBSECTIONS_SEMVER_MAP = { 'Breaking Changes': 3, 'New Features': 2, 'Bug Fixes': 1, 'Internal Changes': 1 }.freeze
 
@@ -30,7 +30,7 @@ class ChangelogParser
   def cleaned_pending_changelog_lines
     lines = []
     @pending_section[:subsections].map do |s|
-      lines.append "\#\#\# #{s[:title]}\n" unless s[:title].nil? # subsection title is nil for lines between h2 and first h3
+      lines.append "### #{s[:title]}\n" unless s[:title].nil? # subsection title is nil for lines between h2 and first h3
       lines += s[:lines]
     end
     lines
@@ -44,7 +44,7 @@ class ChangelogParser
     comps.join('.')
   end
 
-  def update_for_new_release(new_file: 'CHANGELOG.md', new_version:)
+  def update_for_new_release(new_version:, new_file: 'CHANGELOG.md')
     raise 'You need to call #parse_pending_section first' if @pending_section.nil?
 
     File.open(new_file, 'w') do |f|
@@ -52,9 +52,9 @@ class ChangelogParser
       # Empty placeholder section for next version after this one
       f.puts placeholder_section
       # Section for new version, with the non-empty subsections found while parsing first section
-      f.puts "\#\# #{new_version}\n\n"
+      f.puts "## #{new_version}\n\n"
       f.puts cleaned_pending_changelog_lines
-      f.puts "\#\# #{@pending_section[:next_title]}"
+      f.puts "## #{@pending_section[:next_title]}"
       f.puts read_up_to_end
     end
   end
@@ -81,8 +81,8 @@ class ChangelogParser
   end
 
   def placeholder_section
-    lines = ["\#\# #{PENDING_SECTION_TITLE}\n\n"]
-    lines += SUBSECTIONS_SEMVER_MAP.keys.map { |s| "\#\#\# #{s}\n\n#{EMPTY_PLACEHOLDER}\n\n" }
+    lines = ["## #{PENDING_SECTION_TITLE}\n\n"]
+    lines += SUBSECTIONS_SEMVER_MAP.keys.map { |s| "### #{s}\n\n#{EMPTY_PLACEHOLDER}\n\n" }
     lines.join
   end
 

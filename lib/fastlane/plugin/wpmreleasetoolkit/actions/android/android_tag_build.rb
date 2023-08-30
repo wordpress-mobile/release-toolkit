@@ -28,7 +28,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :tag_alpha,
                                        env_name: 'FL_ANDROID_TAG_BUILD_ALPHA',
                                        description: 'True to skip tagging the alpha version',
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: true),
         ]
       end
@@ -40,7 +40,7 @@ module Fastlane
       end
 
       def self.authors
-        ['loremattei']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)

@@ -7,11 +7,11 @@ rescue LoadError
 end
 require 'json'
 require 'tempfile'
+require 'open3'
 require 'optparse'
 require 'pathname'
 require 'progress_bar'
 require 'parallel'
-require 'jsonlint'
 require 'chroma'
 require 'securerandom'
 
@@ -24,7 +24,7 @@ module Fastlane
         if $skip_magick
           message = "PromoScreenshots feature is currently disabled.\n"
           message << "Please, install RMagick if you aim to generate the PromoScreenshots.\n"
-          message << "\'bundle install --with screenshots\' should do it if your project is configured for PromoScreenshots.\n"
+          message << "'bundle install --with screenshots' should do it if your project is configured for PromoScreenshots.\n"
           message << 'Aborting.'
           UI.user_error!(message)
         end
@@ -32,17 +32,65 @@ module Fastlane
         UI.user_error!('`drawText` not found – install it using `brew install automattic/build-tools/drawText`.') unless system('command -v drawText')
       end
 
-      def read_json(configFilePath)
-        configFilePath = resolve_path(configFilePath)
+      def read_config(config_file_path)
+        config_file_path = resolve_path(config_file_path)
 
         begin
-          return JSON.parse(open(configFilePath).read)
-        rescue
-          linter = JsonLint::Linter.new
-          linter.check(configFilePath)
-          linter.display_errors
+          # NOTE: While JSON is a subset of YAML and thus YAML.load_file would technically cover both cases at once, in practice
+          # `JSON.parse` is more lenient with JSON files than `YAML.load_file` is — especially, it accepts `// comments` in the
+          # JSON file, despite this not being allowed in the spec — hence why we still try with `JSON.parse` for `.json` files.
+          return File.extname(config_file_path) == '.json' ? JSON.parse(File.read(config_file_path)) : YAML.load_file(config_file_path)
+        rescue StandardError => e
+          UI.error(e)
+          UI.user_error!('Invalid JSON/YAML configuration. Please lint your config file to check for syntax errors.')
+        end
+      end
 
-          UI.user_error!('Invalid JSON configuration. See errors in log.')
+      # Checks that all required fonts are installed
+      #  - Visits the JSON config to find all the stylesheets referenced in it
+      #  - For each stylesheet, extract the first font of each `font-family` attribute found
+      #  - Finally, for each of those fonts, check that they exist and are activated.
+      #
+      # @param [Hash] config The promo screenshots configuration, as returned by #read_config
+      # @raise [UserError] Raises if at least one font is missing.
+      #
+      def check_fonts_installed!(config:)
+        # Find all stylesheets in the config
+        all_stylesheets = ([config['stylesheet']] + config['entries'].flat_map do |entry|
+          entry['attachments']&.map { |att| att['stylesheet'] }
+        end).compact.uniq
+
+        # Parse the first font in each `font-family` attribute found in all found CSS files.
+        # Only the first in each `font-family` font list matters, as others are fallbacks we don't want to use anyway.
+        font_families = all_stylesheets.flat_map do |s|
+          File.readlines(s).flat_map do |line|
+            attr = line.match(/font-family: (.*);/)&.captures&.first
+            attr.split(',').first.strip.gsub(/'(.*)'/, '\1').gsub(/"(.*)"/, '\1') unless attr.nil?
+          end
+        end.compact.uniq
+
+        # Verify that all fonts exists and are active—using a small swift script as there's no nice CLI for that
+        swift_script = <<~SWIFT
+          import AppKit
+
+          var exitCode: Int32 = 0
+          for fontName in CommandLine.arguments.dropFirst() {
+              if NSFont(name: fontName, size: NSFont.systemFontSize) != nil {
+                  print(" ✅ Font \\"\\(fontName)\\" found and active")
+              } else {
+                  print(" ❌ Font \\"\\(fontName)\\" not found, it is either not installed or disabled. Please install it using FontBook first.")
+                  exitCode = 1
+              }
+          }
+          exit(exitCode)
+        SWIFT
+
+        Tempfile.create(['fonts-check-', '.swift']) do |f|
+          f.write(swift_script)
+          f.close
+          oe, s = Open3.capture2e('/usr/bin/env', 'xcrun', 'swift', f.path, *font_families)
+          UI.command_output(oe)
+          UI.user_error!('Some fonts required by your stylesheets are missing. Please install them and try again.') unless s.success?
         end
       end
 
@@ -117,8 +165,7 @@ module Fastlane
       end
 
       def draw_screenshot_to_canvas(entry, canvas, device)
-        # Don't require a screenshot to be present – we can just skip
-        # this function if one doesn't exist.
+        # Don't require a screenshot to be present – we can just skip this function if one doesn't exist.
         return canvas if entry['screenshot'].nil?
 
         device_mask = device['screenshot_mask']
@@ -233,9 +280,9 @@ module Fastlane
 
       def draw_text_to_canvas(canvas, text, width, height, x_position, y_position, font_size, stylesheet_path, position = 'center')
         begin
-          tempTextFile = Tempfile.new()
+          temp_text_file = Tempfile.new
 
-          sh('drawText', "html=\"#{text}\"", "maxWidth=#{width}", "maxHeight=#{height}", "output=\"#{tempTextFile.path}\"", "fontSize=#{font_size}", "stylesheet=\"#{stylesheet_path}\"", "alignment=\"#{position}\"")
+          Action.sh('drawText', "html=#{text}", "maxWidth=#{width}", "maxHeight=#{height}", "output=#{tempTextFile.path}", "fontSize=#{font_size}", "stylesheet=#{stylesheet_path}", "alignment=#{position}")
 
           text_content = open_image(tempTextFile.path).trim
           text_frame = create_image(width, height)
@@ -245,8 +292,8 @@ module Fastlane
                        when 'top' then composite_image_top(text_frame, text_content, 0, 0)
                        end
         ensure
-          tempTextFile.close
-          tempTextFile.unlink
+          temp_text_file.close
+          temp_text_file.unlink
         end
 
         composite_image(canvas, text_frame, x_position, y_position)
@@ -344,8 +391,8 @@ module Fastlane
       def open_image(path)
         path = resolve_path(path)
 
-        Magick::Image.read(path)  do
-          self.background_color = 'transparent'
+        Magick::Image.read(path) do |image|
+          image.background_color = 'transparent'
         end.first
       end
 
@@ -384,12 +431,12 @@ module Fastlane
       end
 
       def resolve_text_into_path(text, locale)
-        localizedFile = format(text, locale)
+        localized_file = format(text, locale)
 
-        text = if File.exist?(localizedFile)
-                 localizedFile
-               elsif can_resolve_path(localizedFile)
-                 resolve_path(localizedFile).realpath.to_s
+        text = if File.exist?(localized_file)
+                 localized_file
+               elsif can_resolve_path(localized_file)
+                 resolve_path(localized_file).realpath.to_s
                else
                  format(text, 'source')
                end

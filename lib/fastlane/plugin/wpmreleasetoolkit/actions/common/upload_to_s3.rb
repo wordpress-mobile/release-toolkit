@@ -20,12 +20,27 @@ module Fastlane
           key = [file_name_hash, key].join('/')
         end
 
-        UI.user_error!("File already exists in S3 bucket #{bucket} at #{key}") if file_is_already_uploaded?(bucket, key)
+        if file_is_already_uploaded?(bucket, key)
+          message = "File already exists in S3 bucket #{bucket} at #{key}"
+
+          # skip_if_exists is deprecated but we want to keep backward compatibility.
+          params[:if_exists] ||= params[:skip_if_exists] ? :skip : :fail
+
+          case params[:if_exists]
+          when :fail
+            UI.user_error!(message)
+          when :replace
+            UI.important("#{message}. Will replace with the given one.")
+          when :skip
+            UI.important("#{message}. Skipping upload.")
+            return key
+          end
+        end
 
         UI.message("Uploading #{file_path} to: #{key}")
 
         File.open(file_path, 'rb') do |file|
-          Aws::S3::Client.new().put_object(
+          Aws::S3::Client.new.put_object(
             body: file,
             bucket: bucket,
             key: key
@@ -42,7 +57,7 @@ module Fastlane
       end
 
       def self.file_is_already_uploaded?(bucket, key)
-        response = Aws::S3::Client.new().head_object(
+        response = Aws::S3::Client.new.head_object(
           bucket: bucket,
           key: key
         )
@@ -100,6 +115,38 @@ module Fastlane
             optional: true,
             default_value: true,
             type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :skip_if_exists,
+            description: 'If the file already exists in the S3 bucket, skip the upload (and report it in the logs), instead of failing with `user_error!`',
+            deprecated: 'Use if_exists instead',
+            conflicting_options: [:if_exists],
+            conflict_block: proc do |option|
+              UI.user_error!("You cannot set both :#{option.key} and :skip_if_exists. Please only use :if_exists.")
+            end,
+            optional: true,
+            # This option is deprecated but we stil set a default value to inform that the default behavior is for the action to fail when printing the action docs.
+            # See also https://github.com/wordpress-mobile/release-toolkit/pull/500#discussion_r1239642179
+            default_value: false,
+            type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :if_exists,
+            description: 'What do to if the file file already exists in the S3 bucket. Possible values :skip, :replace, :fail. When set, overrides the deprecated skip_if_exists option',
+            conflicting_options: [:skip_if_exists],
+            conflict_block: proc do |option|
+              UI.user_error!("You cannot set both :#{option.key} and :if_exists. Please only use :if_exists.")
+            end,
+            optional: true,
+            type: Symbol,
+            # We cannot set a default value and have backward compatibility with skip_if_exists at the same time.
+            # (Short of duplicating the default value knowledge in the action implementation)
+            #
+            # We have a test for the default behavior which should hopefully remind us to uncomment this line once well remove skip_if_exists.
+            # default_value: :fail,
+            verify_block: proc do |value|
+              UI.user_error!('`if_exist` must be one of :skip, :replace, :fail') unless %i[skip replace fail].include?(value)
+            end
           ),
         ]
       end

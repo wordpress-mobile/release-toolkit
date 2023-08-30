@@ -5,8 +5,8 @@ module Fastlane
         require_relative '../../helper/ios/ios_version_helper'
         require_relative '../../helper/ios/ios_git_helper'
 
-        itc_ver = Fastlane::Helper::Ios::VersionHelper.get_build_version()
-        int_ver = Fastlane::Helper::Ios::VersionHelper.get_internal_version() unless ENV['INTERNAL_CONFIG_FILE'].nil?
+        itc_ver = Fastlane::Helper::Ios::VersionHelper.get_build_version
+        int_ver = Fastlane::Helper::Ios::VersionHelper.get_internal_version unless ENV['INTERNAL_CONFIG_FILE'].nil?
         Fastlane::Helper::GitHelper.create_tag(itc_ver)
         Fastlane::Helper::GitHelper.create_tag(int_ver) unless int_ver.nil?
       end
@@ -33,11 +33,11 @@ module Fastlane
       end
 
       def self.authors
-        ['loremattei']
+        ['Automattic']
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?(platform)
       end
     end
   end
