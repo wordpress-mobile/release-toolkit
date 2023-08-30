@@ -15,8 +15,8 @@ module Fastlane
         key.start_with?(@rel_note_key) && values.length == 4 && is_int?(values[3].sub(/^0*/, ''))
       end
 
-      def generate_block(fw)
-        super(fw) unless File.empty?(@content_file_path)
+      def generate_block(file)
+        super(file) unless File.empty?(@content_file_path)
       end
     end
   end
