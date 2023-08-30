@@ -112,7 +112,7 @@ end
 def mock_commit(sha: 'abcdef123456', date: DateTime.now)
   OpenStruct.new(
     sha: sha,
-    date: date,
+    date: date
   )
 end
 

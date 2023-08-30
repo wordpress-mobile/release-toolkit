@@ -56,6 +56,9 @@ Style/StringConcatenation:
 # for more discussion
 Style/FetchEnvVar:
   Enabled: false
+
+Style/OpenStructUse:
+  Enabled: false
   
 ########## Gemspec Rules
 
