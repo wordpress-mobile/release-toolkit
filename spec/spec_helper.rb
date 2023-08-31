@@ -3,7 +3,6 @@ $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 require 'simplecov'
 require 'codecov'
 require 'webmock/rspec'
-require 'ostruct'
 require 'buildkite/test_collector'
 
 # SimpleCov.minimum_coverage 95
@@ -109,8 +108,10 @@ def version(major:, minor:, patch: 0, rc_number: nil)
   )
 end
 
+Commit = Struct.new(:sha, :date, keyword_init: true)
+
 def mock_commit(sha: 'abcdef123456', date: DateTime.now)
-  OpenStruct.new(
+  Commit.new(
     sha: sha,
     date: date
   )
