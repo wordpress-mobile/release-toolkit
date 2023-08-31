@@ -1,7 +1,7 @@
 require 'fastlane/action'
-require_relative '../../helper/release_note_metadata_block'
-require_relative '../../helper/release_note_short_metadata_block'
-require_relative '../../helper/whats_new_metadata_block'
+require_relative '../../helper/metadata/release_note_metadata_block'
+require_relative '../../helper/metadata/release_note_short_metadata_block'
+require_relative '../../helper/metadata/whats_new_metadata_block'
 
 module Fastlane
   module Actions
