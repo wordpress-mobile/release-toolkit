@@ -5,8 +5,7 @@ module Fastlane
         require_relative '../../helper/ios/ios_version_helper'
 
         xcconfig_file_path = params[:xcconfig_file_path]
-        build_number = Fastlane::Model::BuildNumber.new(xcconfig_file_path)
-        build_number.get_build_number
+        Fastlane::Helper::Ios::VersionHelper.read_build_number_from_config_file(xcconfig_file_path)
       end
 
       #####################################################
