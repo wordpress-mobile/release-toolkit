@@ -137,6 +137,43 @@ module Fastlane
         release[:html_url]
       end
 
+      # Use the GitHub API to generate release notes based on the list of PRs between current tag and previous tag.
+      # @note This API uses the `.github/release.yml` config file to classify the PRs by category in the generated list according to PR labels.
+      #
+      # @param [String] repository The repository to create the GitHub release on. Typically a repo slug (<org>/<repo>).
+      # @param [String] tag_name The name of the git tag to generate the changelog for.
+      # @param [String] previous_tag The name of the git tag to compare to.
+      # @param [String] target_commitish The commit sha1 or branch name to use as the head for the comparison if the `tag_name` tag does not exist yet. Unused if `tag_name` exists.
+      # @param [String] config_file_path The path to the GitHub configuration file to use for generating release notes. Will use `.github/release.yml` by default if it exists.
+      #
+      # @return [String] The string returned by GitHub API listing PRs between `previous_tag` and current `tag_name`
+      # @raise [StandardError] Might raise if there was an error during the API call
+      #
+      def generate_release_notes(repository:, tag_name:, previous_tag:, target_commitish: nil, config_file_path: nil)
+        repo_path = Octokit::Repository.path(repository)
+        api_url = "#{repo_path}/releases/generate-notes"
+        res = client.post(
+          api_url,
+          tag_name: tag_name,
+          target_commitish: target_commitish, # Only used if no git tag named `tag_name` exists yet
+          previous_tag_name: previous_tag,
+          config_file_path: config_file_path
+        )
+        res.body
+      end
+
+      # Returns the URL of the GitHub release pointing at a given tag
+      # @param [String] repository The repository to create the GitHub release on. Typically a repo slug (<org>/<repo>).
+      # @param [String] tag_name The name of the git tag to get the associated release of
+      #
+      # @return [String] URL of the corresponding GitHub Release, or nil if none was found.
+      #
+      def get_release_url(repository:, tag_name:)
+        client.release_for_tag(repository, tag_name).html_url
+      rescue Octokit::NotFound
+        nil
+      end
+
       # Downloads a file from the given GitHub tag
       #
       # @param [String] repository The repository name (including the organization)

@@ -6,16 +6,38 @@
 
 ### Breaking Changes
 
-- Add the `public_version_xcconfig_file` parameter to the `ios_get_app_version` action to replace the need for an environment variable [#445]
-- Remove the `ios_localize_project` and `ios_update_metadata` actions [#447]
-- Remove the `skip_deliver` parameter from `ios_bump_version_hotfix` and `ios_bump_version_release` actions [#450]
+_None_
+
+### New Features
+
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 9.0.0
+
+### Breaking Changes
+
+_See the [`MIGRATION.md`](MIGRATION.md) file for more detailed instructions and options to handle those breaking changes._
+
+- Add the `public_version_xcconfig_file` parameter to the `ios_get_app_version` action to replace the need for an environment variable. [#445]
+- Remove the `ios_localize_project` and `ios_update_metadata` actions. [#447]
+- Remove the `skip_deliver` parameter from `ios_bump_version_hotfix` and `ios_bump_version_release` actions. [#450]
+- Remove the `get_prs_list` action, as its was obsolete (and not used by any client project anymore). [#505]
 
 ### New Features
 
 - Adds `if_exists` parameter to `upload_to_s3` action, with possible values `:skip`, `:fail`, and `:replace`. [#495]
 - The `create_release` action now prints and returns the URL of the created GitHub Release. [#503]
-- Removes two dependencies bigdecimal and activesupport. [#504]
+- Removes `bigdecimal` dependency. [#504] [#507]
 - Supports Ruby 3. [#492, #493, #497, and #504]
+- Add `find_previous_tag` and `get_prs_between_tags` actions. [#505]
 
 ### Bug Fixes
 
@@ -24,6 +46,7 @@
 ### Internal Changes
 
 - Updates `octokit` to `6.1.1`, `danger` to `9.3.1` and `buildkite-test_collector` to `2.3.1`. [#491]
+- Fix issue with gems cache on CI when testing against Ruby `3.2.2`. [#506]
 
 ## 8.1.0
 
