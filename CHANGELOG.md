@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Fix metadata `po` generation for iOS projects removing the final `\n` [#498]
 
 ### Internal Changes
 
