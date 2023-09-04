@@ -168,7 +168,7 @@ module Fastlane
             key: :app_display_name,
             env_name: 'FL_PROTOTYPE_BUILD_DETAILS_COMMENT_APP_DISPLAY_NAME',
             description: 'The display name to use for the app in the comment message',
-            optional: false,
+            optional: true,
             type: String
           ),
           FastlaneCore::ConfigItem.new(
@@ -176,7 +176,7 @@ module Fastlane
             env_name: 'APPCENTER_OWNER_NAME', # Intentionally the same as the one used by the `appcenter_upload` action
             description: 'The name of the organization in App Center (if you used `appcenter_upload` to distribute your Prototype build)',
             type: String,
-            optional: true
+            optional: false
           ),
           FastlaneCore::ConfigItem.new(
             key: :app_center_app_name,
