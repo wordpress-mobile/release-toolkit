@@ -250,6 +250,16 @@ module Fastlane
         client.unprotect_branch(repository, branch)
       end
 
+      # Get the list of branch protection settings for a given branch of a repository
+      #
+      # @param [String] repository The repository name (including the organization)
+      # @param [String] branch The branch name
+      # @see https://docs.github.com/en/rest/branches/branch-protection#get-branch-protection
+      #
+      def get_branch_protection(repository:, branch:, **options)
+        client.branch_protection(repository, branch)
+      end
+
       # Protects a single branch from a repository
       #
       # @param [String] repository The repository name (including the organization)
@@ -270,6 +280,8 @@ module Fastlane
       # @see https://docs.github.com/en/rest/branches/branch-protection
       #
       def self.branch_protection_api_response_to_normalized_hash(response)
+        return {} if response.nil?
+
         normalize_values = lambda do |hash|
           hash.each do |k, v|
             # Boolean values appear as { "enabled" => true/false } in the Response, while they must appear as true/false in Request
@@ -285,7 +297,8 @@ module Fastlane
             v.each { |item| normalize_values.call(item) if item.is_a?(Hash) } if v.is_a?(Array)
           end
         end
-        hash = response&.to_hash || {}
+
+        hash = response.to_hash
         normalize_values.call(hash)
 
         # Response contains both (legacy) `:contexts` key and new `:checks` key, but only one of the two should be passed in Request
