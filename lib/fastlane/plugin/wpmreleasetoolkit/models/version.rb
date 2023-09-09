@@ -7,4 +7,16 @@ class Version
     @patch = patch
     @build_number = build_number
   end
+
+  def to_s
+    "#{@major}.#{@minor}.#{@patch}.#{@build_number}"
+  end
+
+  def release_version
+    "#{@major}.#{@minor}"
+  end
+
+  def patch_version
+    "#{@major}.#{@minor}.#{@patch}"
+  end
 end
