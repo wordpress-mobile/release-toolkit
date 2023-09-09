@@ -307,6 +307,19 @@ module Fastlane
           config.attributes[key]
         end
 
+        # Write the value of a given key to an `.xcconfig` file.
+        #
+        # @param [String] key The xcconfig key to write the value for
+        # @param [String] value The value to write for the given key
+        # @param [String] file_path The path to the `.xcconfig` file to write the value to
+        def self.write_to_config_file(key, value, file_path)
+          UI.user_error!(".xcconfig file #{file_path} not found") unless File.exist?(file_path)
+
+          config = Xcodeproj::Config.new(file_path)
+          config.attributes[key] = value
+          config.save_as(file_path)
+        end
+
         # Ensure that the version provided is only composed of number parts and return the validated string
         #
         # @param [String] version The version string to validate
