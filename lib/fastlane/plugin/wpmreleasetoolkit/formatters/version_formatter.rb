@@ -1,18 +1,14 @@
 require_relative '../models/app_version'
 
 module Fastlane
-  module Formatter
+  module Formatters
     class VersionFormatter
       def initialize(version)
         @version = version
       end
 
       def release_version
-        [version.major, version.minor].join('.') if version.patch.zero? && version.rc.nil?
-      end
-
-      def hotfix_version
-        [version.major, version.minor, version.patch].join('.') if !version.patch.zero? && version.rc.nil?
+        @version.patch.zero? ? "#{@version.major}.#{@version.minor}" : "#{@version.major}.#{@version.minor}.#{@version.patch}"
       end
     end
   end
