@@ -1,4 +1,4 @@
-require_relative '../models/version'
+require_relative '../models/app_version'
 
 module Fastlane
   module Helper

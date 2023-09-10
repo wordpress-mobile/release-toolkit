@@ -1,4 +1,5 @@
-require_relative '../models/version'
+require_relative '../models/app_version'
+require_relative 'version_bumper'
 
 module Fastlane
   module Bumper
