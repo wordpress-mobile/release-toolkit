@@ -212,6 +212,7 @@ GEM
       xcodeproj (>= 1.13.0, < 2.0.0)
       xcpretty (~> 0.3.0)
       xcpretty-travis-formatter (>= 0.0.3)
+    fastlane-plugin-xcconfig (2.0.0)
     ffi (1.15.5)
     fourflusher (2.3.1)
     fuzzy_match (2.0.4)
@@ -421,6 +422,7 @@ DEPENDENCIES
   danger-rubocop (~> 0.6)
   fastlane (~> 2.210)
   fastlane-plugin-wpmreleasetoolkit!
+  fastlane-plugin-xcconfig (~> 2.0)
   pry (~> 0.12.2)
   rmagick (~> 4.1)
   rspec (~> 3.8)
