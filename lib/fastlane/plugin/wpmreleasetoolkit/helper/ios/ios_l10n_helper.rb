@@ -161,7 +161,16 @@ module Fastlane
         #                               Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
         # @param [String, IO] destination The path or `IO`-like instance, where to write the downloaded file on disk.
         #
-        def self.download_glotpress_export_file(project_url:, locale:, filters:, destination:)
+        def self.download_glotpress_export_file(
+          project_url:,
+          locale:,
+          filters:,
+          destination:,
+          autoretry: true,
+          autoretry_count: 0,
+          autoretry_max: Fastlane::Helper::MetadataDownloader::MAX_AUTO_RETRY_ATTEMPTS,
+          autoretry_sleep: Fastlane::Helper::MetadataDownloader::AUTO_RETRY_SLEEP_TIME
+        )
           query_params = (filters || {}).transform_keys { |k| "filters[#{k}]" }.merge(format: 'strings')
           uri = URI.parse("#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}")
 
@@ -172,7 +181,27 @@ module Fastlane
             IO.copy_stream(uri.open(options), destination)
           rescue StandardError => e
             UI.error "Error downloading locale `#{locale}` — #{e.message} (#{uri})"
-            retry if e.is_a?(OpenURI::HTTPError) && UI.confirm("Retry downloading `#{locale}`?")
+            if e.is_a?(OpenURI::HTTPError)
+              if e.io.status[0] == '429' && autoretry
+                if autoretry_count < autoretry_max
+                  UI.message("Received 429 for `#{locale}`. Auto retrying in #{autoretry_sleep} seconds...")
+                  sleep(autoretry_sleep)
+                  return download_glotpress_export_file(
+                    project_url: project_url,
+                    locale: locale,
+                    filters: filters,
+                    destination: destination,
+                    autoretry: autoretry,
+                    autoretry_count: autoretry_count + 1,
+                    autoretry_max: autoretry_max
+                  )
+                else
+                  UI.user_error!("Abandoning `#{locale}` download after #{autoretry_max} attempts.")
+                end
+              elsif UI.confirm("Retry downloading `#{locale}`?")
+                retry
+              end
+            end
             return nil
           end
         end
