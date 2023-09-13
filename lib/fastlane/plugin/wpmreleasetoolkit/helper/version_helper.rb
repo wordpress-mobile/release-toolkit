@@ -7,6 +7,10 @@ module Fastlane
         @version = version
       end
 
+      def today_date
+        DateTime.now.strftime('%Y%m%d')
+      end
+
       # Is this version number a patch version?
       def patch?
         !version.patch.zero?
