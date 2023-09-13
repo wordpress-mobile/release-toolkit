@@ -1,9 +1,9 @@
 require_relative '../models/app_version'
-require_relative 'version_bumper'
+require_relative 'version_calculator'
 
 module Fastlane
-  module Bumpers
-    class MarketingVersionBumper < VersionBumper
+  module Calculators
+    class MarketingVersionCalculator < VersionCalculator
       def bump_minor_version
         @version.minor == 9 ? bump_major_version : super
 

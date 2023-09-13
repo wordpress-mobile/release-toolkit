@@ -1,9 +1,9 @@
 require_relative '../models/app_version'
-require_relative 'version_bumper'
+require_relative 'version_calculator'
 
 module Fastlane
-  module Bumpers
-    class DateVersionBumper < VersionBumper
+  module Calculators
+    class DateVersionCalculator < VersionCalculator
       def bump_minor_version
         first_release_of_year = UI.confirm('Is this release the first release of next year?') if Time.now.month == 12
         if first_release_of_year

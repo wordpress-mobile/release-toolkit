@@ -1,8 +1,8 @@
 require_relative '../models/app_version'
 
 module Fastlane
-  module Bumpers
-    class VersionBumper
+  module Calculators
+    class VersionCalculator
       def initialize(version)
         @version = version
       end

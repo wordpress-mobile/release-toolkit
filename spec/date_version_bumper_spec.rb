@@ -1,16 +1,16 @@
 require 'spec_helper'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/bumpers/date_version_bumper'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/bumpers/version_bumper'
+require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/calculators/date_version_calculator'
+require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/calculators/version_calculator'
 require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
 
-describe Fastlane::Bumpers::DateVersionBumper do
+describe Fastlane::Calculators::DateVersionCalculator do
   describe 'bumps the version number when using date versioning' do
     context 'when the current month is not December' do
       it 'increments the minor version number without prompting the user' do
         allow(Time).to receive(:now).and_return(Time.new(2024, 4, 15))
         version = Fastlane::Models::AppVersion.new(2005, 13, 1, 1)
-        bumper = described_class.new(version)
-        bumped_version = bumper.bump_minor_version.to_s
+        calculator = described_class.new(version)
+        bumped_version = calculator.bump_minor_version.to_s
         expect(bumped_version).to eq('2005.14.0.0')
       end
     end
@@ -21,8 +21,8 @@ describe Fastlane::Bumpers::DateVersionBumper do
           allow(Time).to receive(:now).and_return(Time.new(2023, 12, 3))
           allow(FastlaneCore::UI).to receive(:confirm).and_return(true)
           version = Fastlane::Models::AppVersion.new(1999, 30, 1, 2)
-          bumper = described_class.new(version)
-          bumped_version = bumper.bump_minor_version.to_s
+          calculator = described_class.new(version)
+          bumped_version = calculator.bump_minor_version.to_s
           expect(bumped_version).to eq('2000.1.0.0')
         end
       end
@@ -32,8 +32,8 @@ describe Fastlane::Bumpers::DateVersionBumper do
           allow(Time).to receive(:now).and_return(Time.new(2023, 12, 1))
           allow(FastlaneCore::UI).to receive(:confirm).and_return(false)
           version = Fastlane::Models::AppVersion.new(1999, 30, 1, 2)
-          bumper = described_class.new(version)
-          bumped_version = bumper.bump_minor_version.to_s
+          calculator = described_class.new(version)
+          bumped_version = calculator.bump_minor_version.to_s
           expect(bumped_version).to eq('1999.31.0.0')
         end
       end

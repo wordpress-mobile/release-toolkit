@@ -1,8 +1,8 @@
 require_relative '../models/build_code'
 
 module Fastlane
-  module Bumpers
-    class BuildCodeBumper
+  module Calculators
+    class BuildCodeCalculator
       def initialize(build_code)
         @build_code = build_code
       end
