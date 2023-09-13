@@ -40,6 +40,30 @@ module Fastlane
 
         @version
       end
+
+      def previous_major_version
+        @version.minor -= 1
+
+        @version
+      end
+
+      def previous_minor_version
+        @version.minor -= 1
+
+        @version
+      end
+
+      def previous_patch_version
+        @version.patch -= 1
+
+        @version
+      end
+
+      def previous_build_number
+        @version.build_number -= 1
+
+        @version
+      end
     end
   end
 end
