@@ -1,5 +1,6 @@
 require 'xcodeproj'
 require_relative '../../models/app_version'
+require_relative '../../models/build_code'
 
 
 module Fastlane
@@ -307,6 +308,29 @@ module Fastlane
 
           config = Xcodeproj::Config.new(file_path)
           config.attributes[key]
+        end
+
+        def self.read_version_number_from_xcconfig_file(file_path)
+          UI.user_error!(".xcconfig file path not provided") if file_path.nil?
+
+          # Read the value of the VERSION_LONG key from the xcconfig file
+          version_number = read_from_config_file('VERSION_LONG', file_path)
+
+          # Split the version number into its components
+          major, minor, patch, build_number = version_number.split('.').map(&:to_i)
+
+          # Create an AppVersion object
+          Fastlane::Models::AppVersion.new(major, minor, patch, build_number)
+        end
+
+        def self.read_build_code_from_xcconfig_file(file_path)
+          UI.user_error!(".xcconfig file path not provided") if file_path.nil?
+
+          # Read the value of the BUILD_NUMBER key from the xcconfig file
+          build_code = read_from_config_file('BUILD_NUMBER', file_path)
+
+          # Create a BuildCode object
+          Fastlane::Models::BuildCode.new(build_code)
         end
 
         # Write the value of a given key to an `.xcconfig` file.
