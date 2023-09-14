@@ -244,11 +244,10 @@ module Fastlane
       #
       # @param [String] repository The repository name (including the organization)
       # @param [String] branch The branch name
-      # @param [Hash] options A customizable set of options.
-      # @see https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
+      # @see https://docs.github.com/en/rest/branches/branch-protection#delete-branch-protection
       #
-      def remove_branch_protection(repository:, branch:, **options)
-        client.unprotect_branch(repository, branch, options)
+      def remove_branch_protection(repository:, branch:)
+        client.unprotect_branch(repository, branch)
       end
 
       # Protects a single branch from a repository

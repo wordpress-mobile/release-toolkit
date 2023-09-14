@@ -8,18 +8,15 @@ module Fastlane
         repository = params[:repository]
         branch_name = params[:branch]
 
-        branch_url = "https://api.github.com/repos/#{repository}/branches/#{branch_name}"
-        restrictions = { url: "#{branch_url}/protection/restrictions", users_url: "#{branch_url}/protection/restrictions/users", teams_url: "#{branch_url}/protection/restrictions/teams", users: [], teams: [] }
-        required_pull_request_reviews = { url: "#{branch_url}/protection/required_pull_request_reviews", dismiss_stale_reviews: false, require_code_owner_reviews: false }
-
         github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
         github_helper.remove_branch_protection(
           repository: repository,
-          branch: branch_name,
-          restrictions: restrictions,
-          enforce_admins: nil,
-          required_pull_request_reviews: required_pull_request_reviews
+          branch: branch_name
         )
+      rescue Octokit::NotFound
+        UI.user_error!("Branch `#{branch_name}` of repository `#{repository}` was not found.")
+      rescue Octokit::BranchNotProtected
+        UI.message("Note: Branch `#{branch_name}` was not protected in the first place.")
       end
 
       def self.description
