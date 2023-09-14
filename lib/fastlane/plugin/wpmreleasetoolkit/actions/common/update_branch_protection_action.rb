@@ -3,7 +3,7 @@ require_relative '../../helper/github_helper'
 
 module Fastlane
   module Actions
-    class SetbranchprotectionAction < Action
+    class UpdateBranchProtectionAction < Action
       def self.run(params)
         repository = params[:repository]
         branch_name = params[:branch]
@@ -23,20 +23,15 @@ module Fastlane
       end
 
       def self.description
-        "Sets the 'release branch' protection state for the specified branch"
+        'Sets the protection state for the specified branch'
       end
 
-      def self.authors
-        ['Automattic']
+      def self.details
+        description
       end
 
       def self.return_value
         # If your method provides a return value, you can describe here what it does
-      end
-
-      def self.details
-        # Optional:
-        "Sets the 'release branch' protection state for the specified branch"
       end
 
       def self.available_options
@@ -55,8 +50,23 @@ module Fastlane
         ]
       end
 
+      def self.authors
+        ['Automattic']
+      end
+
       def self.is_supported?(platform)
         true
+      end
+    end
+
+    # For backwards compatibility
+    class SetbranchprotectionAction < UpdateBranchProtectionAction
+      def self.category
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "This action has been renamed `#{superclass.action_name}`"
       end
     end
   end
