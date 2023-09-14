@@ -10,4 +10,3 @@ gem 'webmock', require: false
 gem 'yard'
 
 gem 'buildkite-test_collector', '~> 2.3'
-gem 'fastlane-plugin-xcconfig', '~> 2.0'
