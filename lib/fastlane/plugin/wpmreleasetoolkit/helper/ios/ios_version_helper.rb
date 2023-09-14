@@ -2,7 +2,6 @@ require 'xcodeproj'
 require_relative '../../models/app_version'
 require_relative '../../models/build_code'
 
-
 module Fastlane
   module Helper
     module Ios
@@ -311,7 +310,7 @@ module Fastlane
         end
 
         def self.read_version_number_from_xcconfig_file(file_path)
-          UI.user_error!(".xcconfig file path not provided") if file_path.nil?
+          UI.user_error!('.xcconfig file path not provided') if file_path.nil?
 
           # Read the value of the VERSION_LONG key from the xcconfig file
           version_number = read_from_config_file('VERSION_LONG', file_path)
@@ -324,7 +323,7 @@ module Fastlane
         end
 
         def self.read_build_code_from_xcconfig_file(file_path)
-          UI.user_error!(".xcconfig file path not provided") if file_path.nil?
+          UI.user_error!('.xcconfig file path not provided') if file_path.nil?
 
           # Read the value of the BUILD_NUMBER key from the xcconfig file
           build_code = read_from_config_file('BUILD_NUMBER', file_path)

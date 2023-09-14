@@ -22,7 +22,7 @@ module Fastlane
         # Date-based apps start with a minor version of 1 for the first release of the year. We can't assume what the
         # the previous minor number was, so the user needs to input it
         if @version.minor == 1
-          minor_number = prompt(text: "Please enter the minor number of the previous release: ")
+          minor_number = prompt(text: 'Please enter the minor number of the previous release: ')
           @version.major = previous_major_version
           @version.minor = minor_number
           @version.patch = 0

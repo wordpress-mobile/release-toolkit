@@ -11,16 +11,15 @@ module Fastlane
       end
 
       def calculate_previous_release_version
-        if @version.minor == 0
+        if @version.minor.zero?
           @version.major = calculate_previous_major_version
           @version.minor = 9
-          @version.patch = 0
-          @version.build_number = 0
         else
           calculate_previous_minor_version
-          @version.patch = 0
-          @version.build_number = 0
         end
+
+        @version.patch = 0
+        @version.build_number = 0
 
         @version
       end
