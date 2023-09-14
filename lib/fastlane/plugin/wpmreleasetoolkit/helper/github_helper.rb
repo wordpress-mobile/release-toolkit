@@ -262,6 +262,35 @@ module Fastlane
         client.protect_branch(repository, branch, options)
       end
 
+      # Convert a response from the `/branch-protection` API endpoint into a Hash
+      # suitable to be returned and/or reused to pass to a subsequent `/branch-protection` API request
+      # @param [Sawyer::Resource] response The API response returned by `#get_branch_protection` or `#set_branch_protection`
+      # @return [Hash] A hash representation of the API response—or an empty Hash if `response` was `nil`—
+      #                with Boolean values normalized to true/false, and any extra values that would be refused
+      #                if used in a subsequent API request (like legacy vs new key) removed.
+      # @see https://docs.github.com/en/rest/branches/branch-protection
+      #
+      def self.branch_protection_api_response_to_normalized_hash(response)
+        hash = response&.to_hash || {}
+        hash.each do |k, v|
+          # Boolean values appear as { "enabled" => true/false } in the Response, while they must appear as true/false in Request
+          hash[k] = v[:enabled] if v.is_a?(Hash) && v.key?(:enabled)
+        end
+        # Response contains lots of `*url` keys that are useless in practice and makes the returned hash harder to parse visually
+        remove_url_fields = lambda do |polluted_hash|
+          polluted_hash.each do |k, v|
+            polluted_hash.delete(k) if k.to_s == 'url' || k.to_s.end_with?('_url')
+            remove_url_fields.call(v) if v.is_a?(Hash)
+          end
+        end
+        remove_url_fields.call(hash)
+
+        # Response contains both (legacy) `:contexts` key and new `:checks` key, but only one of the two should be passed in Request
+        hash[:required_status_checks].delete(:contexts) unless hash.dig(:required_status_checks, :checks).nil?
+
+        hash
+      end
+
       # Creates a GithubToken Fastlane ConfigItem
       #
       # @return [FastlaneCore::ConfigItem] The Fastlane ConfigItem for GitHub OAuth access token
