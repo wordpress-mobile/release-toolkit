@@ -31,5 +31,14 @@ describe Fastlane::Calculators::VersionCalculator do
       bumped_version = calculator.calculate_next_build_number.to_s
       expect(bumped_version).to eq('19.3.1.2')
     end
+
+    describe 'calculates today\'s date in the correct format' do
+      it 'returns a date string in the correct format' do
+        allow(DateTime).to receive(:now).and_return(DateTime.new(2024, 4, 15))
+        version = Fastlane::Models::AppVersion.new(19, 3, 1, 1)
+        version_calculator = described_class.new(version)
+        expect(version_calculator.today_date).to eq('20240415')
+      end
+    end
   end
 end
