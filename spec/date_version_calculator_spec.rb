@@ -10,7 +10,7 @@ describe Fastlane::Calculators::DateVersionCalculator do
         allow(Time).to receive(:now).and_return(Time.new(2024, 4, 15))
         version = Fastlane::Models::AppVersion.new(2005, 13, 1, 1)
         calculator = described_class.new(version)
-        bumped_version = calculator.bump_minor_version.to_s
+        bumped_version = calculator.calculate_next_release_version.to_s
         expect(bumped_version).to eq('2005.14.0.0')
       end
     end
@@ -22,7 +22,7 @@ describe Fastlane::Calculators::DateVersionCalculator do
           allow(FastlaneCore::UI).to receive(:confirm).and_return(true)
           version = Fastlane::Models::AppVersion.new(1999, 30, 1, 2)
           calculator = described_class.new(version)
-          bumped_version = calculator.bump_minor_version.to_s
+          bumped_version = calculator.calculate_next_release_version.to_s
           expect(bumped_version).to eq('2000.1.0.0')
         end
       end
@@ -33,7 +33,7 @@ describe Fastlane::Calculators::DateVersionCalculator do
           allow(FastlaneCore::UI).to receive(:confirm).and_return(false)
           version = Fastlane::Models::AppVersion.new(1999, 30, 1, 2)
           calculator = described_class.new(version)
-          bumped_version = calculator.bump_minor_version.to_s
+          bumped_version = calculator.calculate_next_release_version.to_s
           expect(bumped_version).to eq('1999.31.0.0')
         end
       end
