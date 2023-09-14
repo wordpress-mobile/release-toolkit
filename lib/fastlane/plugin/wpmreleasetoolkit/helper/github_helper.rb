@@ -271,19 +271,23 @@ module Fastlane
       # @see https://docs.github.com/en/rest/branches/branch-protection
       #
       def self.branch_protection_api_response_to_normalized_hash(response)
-        hash = response&.to_hash || {}
-        hash.each do |k, v|
-          # Boolean values appear as { "enabled" => true/false } in the Response, while they must appear as true/false in Request
-          hash[k] = v[:enabled] if v.is_a?(Hash) && v.key?(:enabled)
-        end
-        # Response contains lots of `*url` keys that are useless in practice and makes the returned hash harder to parse visually
-        remove_url_fields = lambda do |polluted_hash|
-          polluted_hash.each do |k, v|
-            polluted_hash.delete(k) if k.to_s == 'url' || k.to_s.end_with?('_url')
-            remove_url_fields.call(v) if v.is_a?(Hash)
+        normalize_values = lambda do |hash|
+          hash.each do |k, v|
+            # Boolean values appear as { "enabled" => true/false } in the Response, while they must appear as true/false in Request
+            hash[k] = v[:enabled] if v.is_a?(Hash) && v.key?(:enabled)
+            # References to :users, :teams and :apps are expanded as Objects in the Response, while they must just be the login or slug in Request
+            hash[k] = v.map { |item| item[:login] } if k == :users && v.is_a?(Array)
+            hash[k] = v.map { |item| item[:slug] } if %i[teams apps].include?(k) && v.is_a?(Array)
+            # Response contains lots of `*url` keys that are useless in practice and makes the returned hash harder to parse visually
+            hash.delete(k) if k.to_s == 'url' || k.to_s.end_with?('_url')
+
+            # Recurse into Hashes and Array of Hashes
+            normalize_values.call(v) if v.is_a?(Hash)
+            v.each { |item| normalize_values.call(item) if item.is_a?(Hash) } if v.is_a?(Array)
           end
         end
-        remove_url_fields.call(hash)
+        hash = response&.to_hash || {}
+        normalize_values.call(hash)
 
         # Response contains both (legacy) `:contexts` key and new `:checks` key, but only one of the two should be passed in Request
         hash[:required_status_checks].delete(:contexts) unless hash.dig(:required_status_checks, :checks).nil?

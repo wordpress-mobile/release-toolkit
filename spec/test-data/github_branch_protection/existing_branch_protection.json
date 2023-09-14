@@ -24,8 +24,45 @@
     "users_url": "https://api.github.com/repos/automattic/demorepo/branches/main/protection/restrictions/users",
     "teams_url": "https://api.github.com/repos/automattic/demorepo/branches/main/protection/restrictions/teams",
     "apps_url": "https://api.github.com/repos/automattic/demorepo/branches/main/protection/restrictions/apps",
-    "users": [],
-    "teams": ["apps-infrastructure"],
+    "users": [
+      {
+        "login": "release-toolkit-user",
+        "id": 12345,
+        "node_id": "AABB12cd34EfXjQ47Q==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/12345?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/ReleaseToolkitUser",
+        "html_url": "https://github.com/ReleaseToolkitUser",
+        "followers_url": "https://api.github.com/users/ReleaseToolkitUser/followers",
+        "following_url": "https://api.github.com/users/ReleaseToolkitUser/following{/other_user}",
+        "gists_url": "https://api.github.com/users/ReleaseToolkitUser/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/ReleaseToolkitUser/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/ReleaseToolkitUser/subscriptions",
+        "organizations_url": "https://api.github.com/users/ReleaseToolkitUser/orgs",
+        "repos_url": "https://api.github.com/users/ReleaseToolkitUser/repos",
+        "events_url": "https://api.github.com/users/ReleaseToolkitUser/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/ReleaseToolkitUser/received_events",
+        "type": "User",
+        "site_admin": false
+      }
+    ],
+    "teams": [
+      {
+        "name": "The Power Team",
+        "id": 654321,
+        "node_id": "MDQ7WPCjcKFyUfPyNF==",
+        "slug": "the-power-team",
+        "description": "Some dummy team for tests",
+        "privacy": "secret",
+        "notification_setting": "notifications_enabled",
+        "url": "https://api.github.com/organizations/1337042/team/654321",
+        "html_url": "https://github.com/orgs/my-org/teams/the-power-team",
+        "members_url": "https://api.github.com/organizations/1337042/team/654321/members{/member}",
+        "repositories_url": "https://api.github.com/organizations/1337042/team/654321/repos",
+        "permission": "pull",
+        "parent": null
+      }
+    ],
     "apps": []
   },
   "required_pull_request_reviews": {

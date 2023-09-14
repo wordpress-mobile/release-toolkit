@@ -224,7 +224,7 @@ describe Fastlane::Actions::UpdateBranchProtectionAction do
             { context: 'buildkite/check2', app_id: nil },
           ]
         },
-        restrictions: { apps: [], teams: ['apps-infrastructure'], users: [] }
+        restrictions: { apps: [], teams: ['the-power-team'], users: ['release-toolkit-user'] }
       }
     end
 
