@@ -10,7 +10,9 @@ _None_
 
 ### New Features
 
-_None_
+- Adds AppVersion and BuildCode models that can be used by version actions [#512]
+- Adds version calculator and formatter classes that can be used with the AppVersion and BuildCode models by version actions [#512]
+- Adds methods for writing values to `xcconfig` files using the `Xcodeproj` gem [#512]
 
 ### Bug Fixes
 
@@ -18,7 +20,7 @@ _None_
 
 ### Internal Changes
 
-- Added AppVersion and BuildCode models for working with version actions [#512]
+_None_
 
 ## 9.0.1
 
