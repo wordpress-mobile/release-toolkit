@@ -87,6 +87,32 @@ module Fastlane
           Fastlane::Models::BuildCode.new(version_code.to_i)
         end
 
+        def self.write_version_name_to_version_properties(file_path, version_name)
+          write_value_to_version_properties(
+            file_path,
+            'versionName',
+            version_name
+          )
+        end
+
+        def self.write_version_code_to_version_properties(file_path, version_code)
+          write_value_to_version_properties(
+            file_path,
+            'versionCode',
+            version_code
+          )
+        end
+
+        def self.write_value_to_version_properties(file_path, key, value)
+          UI.user_error!("version.properties #{file_path} not found") unless File.exist?(file_path)
+
+          # Read the contents of the version.properties file
+          content = File.read(file_path)
+          # Replace the value in the version.properties file
+          content.gsub!(/#{key}=(\S*)/, "#{key}=#{value}")
+          File.write(file_path, content)
+        end
+
         # Extract the version name and code from the release version of the app from `version.properties file`
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
