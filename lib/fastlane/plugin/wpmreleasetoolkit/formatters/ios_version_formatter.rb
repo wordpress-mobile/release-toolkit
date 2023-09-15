@@ -7,7 +7,6 @@ require_relative '../calculators/version_calculator'
 module Fastlane
   module Formatters
     class IosVersionFormatter < VersionFormatter
-
       # Get the beta version of the iOS app
       #
       # @return [AppVersion] The beta-formatted version of the iOS app
