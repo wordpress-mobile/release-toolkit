@@ -1,3 +1,6 @@
+require_relative '../../models/app_version'
+require_relative '../../models/build_code'
+
 module Fastlane
   module Helper
     module Android
@@ -36,6 +39,52 @@ module Fastlane
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
 
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}"
+        end
+
+        def self.read_version_name_from_version_properties(file_path)
+          UI.user_error!("version.properties #{file_path} not found") unless File.exist?(file_path)
+
+          # Read the version name from the version.properties file
+          file_content = File.read(file_path)
+          version_name = file_content.match(/versionName=(\S*)/m)&.captures&.first
+
+          UI.user_error!('Version name not found in version.properties') if version_name.nil?
+
+          # Set the build number to 0 by default so that it will be set correctly for non-beta version numbers
+          build_number = 0
+
+          if version_name.include?(RC_SUFFIX)
+            # Extract the build number from the version name
+            build_number = version_name.split('-')[2]
+            # Extract the version name without the build number and drop the RC suffix
+            version_name = version_name.split(RC_SUFFIX)[0]
+          end
+
+          # Split the version name into its components
+          version_number_parts = version_name.split('.').map(&:to_i)
+          # Fill the array with 0 if needed to ensure array has at least 3 components
+          version_number_parts.fill(0, version_number_parts.length...3)
+
+          # Map version_number_parts to AppVersion model
+          major = version_number_parts[0]
+          minor = version_number_parts[1]
+          patch = version_number_parts[2]
+
+          # Create an AppVersion object
+          Fastlane::Models::AppVersion.new(major, minor, patch, build_number)
+        end
+
+        def self.read_version_code_from_version_properties(file_path)
+          UI.user_error!("version.properties #{file_path} not found") unless File.exist?(file_path)
+
+          # Read the version code from the version.properties file
+          text = File.read(file_path)
+          version_code = text.match(/versionCode=(\S*)/m)&.captures&.first
+
+          UI.user_error!('Version code not found in version.properties') if version_code.nil?
+
+          # Create a BuildCode object
+          Fastlane::Models::BuildCode.new(version_code.to_i)
         end
 
         # Extract the version name and code from the release version of the app from `version.properties file`

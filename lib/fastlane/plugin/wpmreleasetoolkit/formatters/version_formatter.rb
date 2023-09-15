@@ -4,7 +4,6 @@ require_relative '../calculators/version_calculator'
 module Fastlane
   module Formatters
     class VersionFormatter
-      ALPHA_IDENTIFIER = 'alpha'.freeze
       BETA_IDENTIFIER = 'RC'.freeze
 
       def initialize(version)

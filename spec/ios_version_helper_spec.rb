@@ -40,9 +40,9 @@ describe Fastlane::Helper::Ios::VersionHelper do
     end
 
     context 'when the .xcconfig file does not exist' do
-      file_path = 'fake_path/test.xcconfig'
-
       it 'raises an error' do
+        file_path = 'fake_path/test.xcconfig'
+
         expect { described_class.read_build_code_from_xcconfig_file(file_path) }
           .to raise_error(FastlaneCore::Interface::FastlaneError, /\.xcconfig file .* not found/)
       end
@@ -60,9 +60,9 @@ describe Fastlane::Helper::Ios::VersionHelper do
     end
 
     context 'when the .xcconfig file does not exist' do
-      file_path = 'fake_path/test.xcconfig'
-
       it 'raises an error' do
+        file_path = 'fake_path/test.xcconfig'
+
         expect { described_class.read_version_number_from_xcconfig_file(file_path) }
           .to raise_error(FastlaneCore::Interface::FastlaneError, /\.xcconfig file .* not found/)
       end
