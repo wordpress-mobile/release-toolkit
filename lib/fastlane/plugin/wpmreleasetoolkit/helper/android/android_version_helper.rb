@@ -41,6 +41,14 @@ module Fastlane
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}"
         end
 
+        # Reads the version name from a version.properties file.
+        #
+        # @param file_path [String] The path to the version.properties file.
+        #
+        # @return [AppVersion] An instance of `AppVersion` representing the version name read from the file.
+        #
+        # @raise [UI::Error] If the file_path is nil or the version name is not found.
+        #
         def self.read_version_name_from_version_properties(file_path)
           UI.user_error!("version.properties #{file_path} not found") unless File.exist?(file_path)
 
@@ -74,6 +82,14 @@ module Fastlane
           Fastlane::Models::AppVersion.new(major, minor, patch, build_number)
         end
 
+        # Reads the version code from a version.properties file.
+        #
+        # @param file_path [String] The path to the version.properties file.
+        #
+        # @return [BuildCode] An instance of `BuildCode` representing the version code read from the file.
+        #
+        # @raise [UI::Error] If the file_path is nil or the version code is not found.
+        #
         def self.read_version_code_from_version_properties(file_path)
           UI.user_error!("version.properties #{file_path} not found") unless File.exist?(file_path)
 
@@ -87,6 +103,12 @@ module Fastlane
           Fastlane::Models::BuildCode.new(version_code.to_i)
         end
 
+        # Writes the version name to a version.properties file.
+        #
+        # @param file_path [String] The path to the version.properties file.
+        #
+        # @param version_name [String] The version name to write to the file.
+        #
         def self.write_version_name_to_version_properties(file_path, version_name)
           write_value_to_version_properties(
             file_path,
@@ -95,6 +117,12 @@ module Fastlane
           )
         end
 
+        # Writes the version code to a version.properties file.
+        #
+        # @param file_path [String] The path to the version.properties file.
+        #
+        # @param version_code [String] The version code to write to the file.
+        #
         def self.write_version_code_to_version_properties(file_path, version_code)
           write_value_to_version_properties(
             file_path,
@@ -103,6 +131,16 @@ module Fastlane
           )
         end
 
+        # Writes a key-value pair to a version.properties file.
+        #
+        # @param file_path [String] The path to the version.properties file.
+        #
+        # @param key [String] The key for the key-value pair.
+        #
+        # @param value [String] The value to write to the file.
+        #
+        # @raise [UI::Error] If the file_path doesn't exist.
+        #
         def self.write_value_to_version_properties(file_path, key, value)
           UI.user_error!("version.properties #{file_path} not found") unless File.exist?(file_path)
 

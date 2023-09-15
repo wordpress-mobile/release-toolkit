@@ -309,6 +309,14 @@ module Fastlane
           config.attributes[key]
         end
 
+        # Reads the version number from an .xcconfig file.
+        #
+        # @param file_path [String] The path to the .xcconfig file.
+        #
+        # @return [AppVersion] An instance of `AppVersion` representing the version number read from the file.
+        #
+        # @raise [UI::Error] If the file_path is nil.
+        #
         def self.read_version_number_from_xcconfig_file(file_path)
           UI.user_error!('.xcconfig file path not provided') if file_path.nil?
 
@@ -322,6 +330,14 @@ module Fastlane
           Fastlane::Models::AppVersion.new(major, minor, patch, build_number)
         end
 
+        # Reads the build code from an .xcconfig file.
+        #
+        # @param file_path [String] The path to the .xcconfig file.
+        #
+        # @return [BuildCode] An instance of `BuildCode` representing the build code read from the file.
+        #
+        # @raise [UI::Error] If the file_path is nil.
+        #
         def self.read_build_code_from_xcconfig_file(file_path)
           UI.user_error!('.xcconfig file path not provided') if file_path.nil?
 
