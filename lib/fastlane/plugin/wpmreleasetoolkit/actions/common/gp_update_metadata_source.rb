@@ -1,4 +1,6 @@
-require_relative '../../helper/metadata_update_helper'
+require_relative '../../helper/metadata/release_note_metadata_block'
+require_relative '../../helper/metadata/release_note_short_metadata_block'
+require_relative '../../helper/metadata/whats_new_metadata_block'
 
 module Fastlane
   module Actions
