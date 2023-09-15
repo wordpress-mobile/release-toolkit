@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Added AppVersion and BuildCode models for working with version actions [#512]
 
 ## 9.0.1
 
