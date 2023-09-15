@@ -4,8 +4,6 @@ require_relative '../calculators/version_calculator'
 module Fastlane
   module Formatters
     class VersionFormatter
-      BETA_IDENTIFIER = 'RC'.freeze
-
       def initialize(version)
         @version = version
       end
