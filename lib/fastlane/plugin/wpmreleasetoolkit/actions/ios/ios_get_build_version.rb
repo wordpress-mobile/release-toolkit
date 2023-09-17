@@ -2,6 +2,8 @@ module Fastlane
   module Actions
     class IosGetBuildVersionAction < Action
       def self.run(params)
+        return unless UI.confirm("#{deprecated_notes} Would you like to continue with the action?")
+
         require_relative '../../helper/ios/ios_version_helper'
 
         UI.user_error!('You need to set at least the PUBLIC_CONFIG_FILE env var to the path to the public xcconfig file') unless ENV['PUBLIC_CONFIG_FILE']
@@ -19,11 +21,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Gets the build version of the app'
+        '(DEPRECATED) Gets the build version of the app'
       end
 
       def self.details
-        'Gets the build version (`VERSION_LONG`) of the app from the xcconfig file'
+        '(DEPRECATED) Gets the build version (`VERSION_LONG`) of the app from the xcconfig file'
       end
 
       def self.available_options
@@ -45,6 +47,14 @@ module Fastlane
       def self.return_value
         # If you method provides a return value, you can describe here what it does
         'Return the public or internal build version of the app'
+      end
+
+      def self.category
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        'This action is deprecated. Please use the `version` action to retrieve version numbers.'
       end
 
       def self.authors
