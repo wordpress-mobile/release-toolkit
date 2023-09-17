@@ -3,6 +3,8 @@ require 'spec_helper'
 describe Fastlane::Actions::IosGetAppVersionAction do
   describe 'getting the public app version from the provided .xcconfig file' do
     it 'parses the xcconfig file format correctly and gets the public version' do
+      allow(FastlaneCore::UI).to receive(:confirm).and_return(true)
+
       xcconfig_mock_content = <<~CONTENT
         // a comment
         VERSION_SHORT = 6
@@ -13,6 +15,8 @@ describe Fastlane::Actions::IosGetAppVersionAction do
     end
 
     it 'parses the xcconfig file format correctly and gets the public hotfix version' do
+      allow(FastlaneCore::UI).to receive(:confirm).and_return(true)
+
       xcconfig_mock_content = <<~CONTENT
         VERSION_SHORT = 6
         // a comment
@@ -23,6 +27,8 @@ describe Fastlane::Actions::IosGetAppVersionAction do
     end
 
     it 'parses the xcconfig with keys without spacing and gets the public version' do
+      allow(FastlaneCore::UI).to receive(:confirm).and_return(true)
+
       xcconfig_mock_content = <<~CONTENT
         // a comment
         VERSION_SHORT=6
@@ -33,6 +39,8 @@ describe Fastlane::Actions::IosGetAppVersionAction do
     end
 
     it 'parses the xcconfig with keys without spacing and gets the public hotfix version' do
+      allow(FastlaneCore::UI).to receive(:confirm).and_return(true)
+
       xcconfig_mock_content = <<~CONTENT
         VERSION_SHORT=6
         // a comment
@@ -43,6 +51,8 @@ describe Fastlane::Actions::IosGetAppVersionAction do
     end
 
     it 'fails to extract the version from an xcconfig file with an invalid format' do
+      allow(FastlaneCore::UI).to receive(:confirm).and_return(true)
+
       xcconfig_mock_content = <<~CONTENT
         VERSION_SHORT = 6
         VERSION_LONG 6.30.1
@@ -54,6 +64,8 @@ describe Fastlane::Actions::IosGetAppVersionAction do
     end
 
     it 'throws an error when the file is not found' do
+      allow(FastlaneCore::UI).to receive(:confirm).and_return(true)
+
       file_path = 'file/not/found'
 
       expect do
@@ -64,6 +76,8 @@ describe Fastlane::Actions::IosGetAppVersionAction do
     end
 
     it "throws an error when there isn't a version configured in the .xcconfig file" do
+      allow(FastlaneCore::UI).to receive(:confirm).and_return(true)
+
       xcconfig_mock_content = <<~CONTENT
         VERSION_SHORT = 6
         // a comment
