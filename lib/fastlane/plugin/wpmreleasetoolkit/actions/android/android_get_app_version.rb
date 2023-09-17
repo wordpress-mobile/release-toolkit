@@ -2,6 +2,8 @@ module Fastlane
   module Actions
     class AndroidGetAppVersionAction < Action
       def self.run(params)
+        return unless UI.confirm("#{deprecated_notes} Would you like to continue with the action?")
+
         require_relative '../../helper/android/android_version_helper'
         Fastlane::Helper::Android::VersionHelper.get_public_version
       end
@@ -11,11 +13,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Gets the public version of the app'
+        '(DEPRECATED) Gets the public version of the app'
       end
 
       def self.details
-        'Gets the public version of the app'
+        '(DEPRECATED) Gets the public version of the app'
       end
 
       def self.available_options
@@ -29,6 +31,14 @@ module Fastlane
       def self.return_value
         # If you method provides a return value, you can describe here what it does
         'Return the public version of the app'
+      end
+
+      def self.category
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        'This action is deprecated. Please use the `version` action to retrieve version numbers.'
       end
 
       def self.authors
