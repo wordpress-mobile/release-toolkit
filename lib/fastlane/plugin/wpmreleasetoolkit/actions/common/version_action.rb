@@ -66,7 +66,7 @@ module Fastlane
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :version_object,
                                        env_name: 'FL_VERSION_OBJECT',
-                                       description: 'The version object passed in from `read_version_from_file_action`',
+                                       description: 'The version object passed in from `read_value_from_file_action`',
                                        optional: true,
                                        is_string: false),
         ]
