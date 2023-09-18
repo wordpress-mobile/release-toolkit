@@ -37,7 +37,7 @@ describe Fastlane::Actions::CopyBranchProtectionAction do
     allow(client).to receive(:branch_protection).with(repo, from_branch).and_return(stub_response(existing_settings))
 
     new_settings = Fastlane::Helper::GithubHelper.branch_protection_api_response_to_normalized_hash(existing_settings)
-    expect(client).to receive(:protect_branch).with(repo, to_branch, **new_settings)
+    expect(client).to receive(:protect_branch).with(repo, to_branch, new_settings)
 
     run_described_fastlane_action(
       repository: repo,
@@ -77,7 +77,7 @@ describe Fastlane::Actions::CopyBranchProtectionAction do
     existing_settings = fixture('existing_branch_protection.json')
     allow(client).to receive(:branch_protection).with(repo, from_branch).and_return(stub_response(existing_settings))
     new_settings = Fastlane::Helper::GithubHelper.branch_protection_api_response_to_normalized_hash(existing_settings)
-    allow(client).to receive(:protect_branch).with(repo, to_branch, **new_settings).and_raise(Octokit::NotFound)
+    allow(client).to receive(:protect_branch).with(repo, to_branch, new_settings).and_raise(Octokit::NotFound)
 
     expect do
       run_described_fastlane_action(
