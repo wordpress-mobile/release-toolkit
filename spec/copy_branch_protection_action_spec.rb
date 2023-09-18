@@ -5,6 +5,7 @@ describe Fastlane::Actions::CopyBranchProtectionAction do
   let(:repo) { 'automattic/demorepo' }
   let(:from_branch) { 'trunk' }
   let(:to_branch) { 'release/12.3' }
+  let(:github_token) { 'stubbed-gh-token' }
   let(:client) do
     instance_double(
       Octokit::Client,
@@ -41,7 +42,8 @@ describe Fastlane::Actions::CopyBranchProtectionAction do
     run_described_fastlane_action(
       repository: repo,
       from_branch: from_branch,
-      to_branch: to_branch
+      to_branch: to_branch,
+      github_token: github_token
     )
   end
 
@@ -52,7 +54,8 @@ describe Fastlane::Actions::CopyBranchProtectionAction do
       run_described_fastlane_action(
         repository: repo,
         from_branch: from_branch,
-        to_branch: to_branch
+        to_branch: to_branch,
+        github_token: github_token
       )
     end.to raise_error(FastlaneCore::Interface::FastlaneError, "Branch `#{from_branch}` of repository `#{repo}` was not found.")
   end
@@ -64,7 +67,8 @@ describe Fastlane::Actions::CopyBranchProtectionAction do
       run_described_fastlane_action(
         repository: repo,
         from_branch: from_branch,
-        to_branch: to_branch
+        to_branch: to_branch,
+        github_token: github_token
       )
     end.to raise_error(FastlaneCore::Interface::FastlaneError, "Branch `#{from_branch}` does not have any branch protection set up.")
   end
@@ -79,7 +83,8 @@ describe Fastlane::Actions::CopyBranchProtectionAction do
       run_described_fastlane_action(
         repository: repo,
         from_branch: from_branch,
-        to_branch: to_branch
+        to_branch: to_branch,
+        github_token: github_token
       )
     end.to raise_error(FastlaneCore::Interface::FastlaneError, "Branch `#{to_branch}` of repository `#{repo}` was not found.")
   end

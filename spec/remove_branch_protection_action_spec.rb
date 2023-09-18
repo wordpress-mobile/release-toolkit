@@ -4,6 +4,7 @@ require 'tmpdir'
 describe Fastlane::Actions::RemoveBranchProtectionAction do
   let(:repo) { 'automattic/demorepo' }
   let(:branch) { 'release/12.3' }
+  let(:github_token) { 'stubbed-gh-token' }
   let(:client) do
     instance_double(
       Octokit::Client,
@@ -21,7 +22,8 @@ describe Fastlane::Actions::RemoveBranchProtectionAction do
 
     run_described_fastlane_action(
       repository: repo,
-      branch: branch
+      branch: branch,
+      github_token: github_token
     )
   end
 
@@ -34,7 +36,8 @@ describe Fastlane::Actions::RemoveBranchProtectionAction do
 
     run_described_fastlane_action(
       repository: repo,
-      branch: branch
+      branch: branch,
+      github_token: github_token
     )
   end
 
@@ -45,7 +48,8 @@ describe Fastlane::Actions::RemoveBranchProtectionAction do
     expect do
       run_described_fastlane_action(
         repository: repo,
-        branch: branch
+        branch: branch,
+        github_token: github_token
       )
     end.to raise_error FastlaneCore::Interface::FastlaneError, "Branch `#{branch}` of repository `#{repo}` was not found."
   end
