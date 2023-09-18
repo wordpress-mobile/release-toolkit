@@ -264,6 +264,7 @@ GEM
     httpclient (2.8.3)
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
+    java-properties (0.3.0)
     jmespath (1.6.2)
     json (2.6.3)
     jwt (2.7.0)
@@ -421,6 +422,7 @@ DEPENDENCIES
   danger-rubocop (~> 0.6)
   fastlane (~> 2.210)
   fastlane-plugin-wpmreleasetoolkit!
+  java-properties (~> 0.3.0)
   pry (~> 0.12.2)
   rmagick (~> 4.1)
   rspec (~> 3.8)
