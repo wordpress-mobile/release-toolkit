@@ -1,5 +1,10 @@
 # Migration Instructions for Major Releases
 
+## From `9.0.0` to `10.0.0`
+
+ - Action `addbranchprotection` has been renamed `update_branch_protection`. Besides, you might want to use the new `copy_branch_protection(from_branch: to_branch:)` instead (especially for protecting the `release/*` branch after code-freeze).
+ - Action `removebranchprotection` has been renamed `remove_branch_protection`.
+
 ## From `8.0.0` to `9.0.0`
 
 - The deprecated actions `ios_localize_project` and `ios_update_metadata` were now completely removed. If your project is still using them, please use the new tooling instead.
