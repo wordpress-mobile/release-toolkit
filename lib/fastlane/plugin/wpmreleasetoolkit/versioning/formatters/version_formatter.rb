@@ -1,11 +1,11 @@
 # The `VersionFormatter` class is a generic version formatter that can be used as a base class
 # for formatting version objects used by for different platforms. It contains formatting methods that
 # are shared by all platforms.
-require_relative '../models/app_version'
+require_relative '../../models/app_version'
 require_relative '../calculators/version_calculator'
 
-module Fastlane
-  module Formatters
+module WPMReleaseToolkit
+  module Versioning
     class VersionFormatter
       # Initializes a new VersionFormatter instance with a given version.
       #

@@ -1,10 +1,11 @@
 # The `DateVersionCalculator` class is a specialized version calculator for date-based versions
 # of an app, extending the `VersionCalculator` class.
-require_relative '../models/app_version'
+require 'fastlane'
+require_relative '../../models/app_version'
 require_relative 'version_calculator'
 
-module Fastlane
-  module Calculators
+module WPMReleaseToolkit
+  module Versioning
     class DateVersionCalculator < VersionCalculator
       # Calculate the next date-based release version.
       #
@@ -16,7 +17,7 @@ module Fastlane
       # @return [AppVersion] The next date-based release version.
       #
       def calculate_next_release_version
-        first_release_of_year = UI.confirm('Is this release the first release of next year?') if Time.now.month == 12
+        first_release_of_year = FastlaneCore::UI.confirm('Is this release the first release of next year?') if Time.now.month == 12
         if first_release_of_year
           @version.major += 1
           @version.minor = 1

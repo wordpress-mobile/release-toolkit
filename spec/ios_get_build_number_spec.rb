@@ -15,7 +15,7 @@ describe Fastlane::Actions::IosGetBuildNumberAction do
 
     it 'parses an xcconfig file with keys with spaces and returns the correct build number' do
       xcconfig_mock_content = <<~CONTENT
-        VERSION_SHORT = 6
+        VERSION_SHORT = 6w
         VERSION_LONG = 6.30.1
         BUILD_NUMBER = 1940
       CONTENT

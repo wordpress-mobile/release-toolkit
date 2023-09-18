@@ -1,10 +1,11 @@
 # The `AndroidVersionFormatter` class is a specialized version formatter for Android apps,
 # extending the `VersionFormatter` class.
-require_relative '../models/app_version'
+require 'fastlane'
+require_relative '../../models/app_version'
 require_relative 'version_formatter'
 
-module Fastlane
-  module Formatters
+module WPMReleaseToolkit
+  module Versioning
     class AndroidVersionFormatter < VersionFormatter
       # The string identifier used for beta versions in Android.
       BETA_IDENTIFIER = 'rc'.freeze
@@ -20,7 +21,7 @@ module Fastlane
       #
       def beta_version
         # Ensure that the build number is 1 or higher for a beta version
-        UI.user_error!('The build number of a beta version must be 1 or higher') unless @version.build_number.positive?
+        FastlaneCore::UI.user_error!('The build number of a beta version must be 1 or higher') unless @version.build_number.positive?
 
         # Construct and return the formatted beta version string.
         "#{release_version}-#{BETA_IDENTIFIER}-#{@version.build_number}"

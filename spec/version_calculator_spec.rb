@@ -1,8 +1,8 @@
 require 'spec_helper'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/calculators/version_calculator'
+require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/calculators/version_calculator'
 require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
 
-describe Fastlane::Calculators::VersionCalculator do
+describe WPMReleaseToolkit::Versioning::VersionCalculator do
   describe 'bumps the version number' do
     it 'increments the major version by 1 and sets the minor, patch, and build number to 0' do
       version = Fastlane::Models::AppVersion.new(19, 3, 1, 1)

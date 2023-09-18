@@ -1,9 +1,9 @@
 require 'spec_helper'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/calculators/date_version_calculator'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/calculators/version_calculator'
+require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/calculators/date_version_calculator'
+require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/calculators/version_calculator'
 require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
 
-describe Fastlane::Calculators::DateVersionCalculator do
+describe WPMReleaseToolkit::Versioning::DateVersionCalculator do
   describe 'bumps the version number when using date versioning' do
     context 'when the current month is not December' do
       it 'increments the minor version number without prompting the user' do

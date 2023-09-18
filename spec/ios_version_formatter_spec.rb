@@ -1,9 +1,9 @@
 require 'spec_helper'
 require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/formatters/ios_version_formatter'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/formatters/version_formatter'
+require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/formatters/ios_version_formatter'
+require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/formatters/version_formatter'
 
-describe Fastlane::Formatters::IosVersionFormatter do
+describe WPMReleaseToolkit::Versioning::IosVersionFormatter do
   describe 'formats a beta version number with the correct format' do
     it 'returns a beta version number when provided with a version object' do
       version = Fastlane::Models::AppVersion.new(19, 3, 1, 1)

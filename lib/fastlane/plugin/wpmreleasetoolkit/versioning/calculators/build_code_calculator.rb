@@ -1,8 +1,8 @@
 # The `BuildCodeCalculator` class is responsible for performing calculations on build codes.
-require_relative '../models/build_code'
+require_relative '../../models/build_code'
 
-module Fastlane
-  module Calculators
+module WPMReleaseToolkit
+  module Versioning
     class BuildCodeCalculator
       # Initializes a new BuildCodeCalculator instance with a given build code.
       #

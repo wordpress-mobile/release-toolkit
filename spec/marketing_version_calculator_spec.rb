@@ -1,9 +1,9 @@
 require 'spec_helper'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/calculators/marketing_version_calculator'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/calculators/version_calculator'
+require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/calculators/marketing_version_calculator'
+require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/calculators/version_calculator'
 require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
 
-describe Fastlane::Calculators::MarketingVersionCalculator do
+describe WPMReleaseToolkit::Versioning::MarketingVersionCalculator do
   describe 'bumps the version number when using marketing versioning' do
     context 'when the minor version is not 9' do
       it 'increments the minor version when the minor version is less than 9' do

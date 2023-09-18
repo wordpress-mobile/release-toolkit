@@ -1,11 +1,11 @@
 # The `MarketingVersionCalculator` class is a specialized version calculator for marketing versions
 # of an app, extending the `VersionCalculator` class. It provides methods to calculate the next and previous
 # marketing release versions.
-require_relative '../models/app_version'
+require_relative '../../models/app_version'
 require_relative 'version_calculator'
 
-module Fastlane
-  module Calculators
+module WPMReleaseToolkit
+  module Versioning
     class MarketingVersionCalculator < VersionCalculator
       # Calculate the next marketing release version.
       #

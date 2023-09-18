@@ -1,9 +1,9 @@
 require 'spec_helper'
 require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/formatters/android_version_formatter'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/formatters/version_formatter'
+require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/formatters/android_version_formatter'
+require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/formatters/version_formatter'
 
-describe Fastlane::Formatters::AndroidVersionFormatter do
+describe WPMReleaseToolkit::Versioning::AndroidVersionFormatter do
   describe 'formats a beta version number with the correct format' do
     it 'raises an error when the build number is 0' do
       version = Fastlane::Models::AppVersion.new(1, 2, 3, 0)
