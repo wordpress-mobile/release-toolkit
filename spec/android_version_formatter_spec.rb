@@ -3,7 +3,7 @@ require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
 require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/formatters/android_version_formatter'
 require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/formatters/version_formatter'
 
-describe WPMReleaseToolkit::Versioning::AndroidVersionFormatter do
+describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFormatter do
   describe 'formats a beta version number with the correct format' do
     it 'raises an error when the build number is 0' do
       version = Fastlane::Models::AppVersion.new(1, 2, 3, 0)

@@ -2,7 +2,7 @@ require 'spec_helper'
 require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/build_code'
 require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/calculators/build_code_calculator'
 
-describe WPMReleaseToolkit::Versioning::BuildCodeCalculator do
+describe Fastlane::Wpmreleasetoolkit::Versioning::BuildCodeCalculator do
   describe 'bumps the build code' do
     it 'increments the build code by 1' do
       build_code = Fastlane::Models::BuildCode.new(735)

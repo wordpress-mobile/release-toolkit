@@ -2,7 +2,7 @@ require 'spec_helper'
 require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/formatters/version_formatter'
 require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
 
-describe WPMReleaseToolkit::Versioning::VersionFormatter do
+describe Fastlane::Wpmreleasetoolkit::Versioning::VersionFormatter do
   describe 'formats the version number' do
     context 'when the patch version is 0' do
       it 'returns a version string with the major and minor versions' do
