@@ -1,6 +1,4 @@
 require 'xcodeproj'
-require_relative '../../models/app_version'
-require_relative '../../models/build_code'
 
 module Fastlane
   module Helper
@@ -307,58 +305,6 @@ module Fastlane
 
           config = Xcodeproj::Config.new(file_path)
           config.attributes[key]
-        end
-
-        # Reads the version number from an .xcconfig file.
-        #
-        # @param file_path [String] The path to the .xcconfig file.
-        #
-        # @return [AppVersion] An instance of `AppVersion` representing the version number read from the file.
-        #
-        # @raise [UI::Error] If the file_path is nil.
-        #
-        def self.read_version_number_from_xcconfig_file(file_path)
-          UI.user_error!('.xcconfig file path not provided') if file_path.nil?
-
-          # Read the value of the VERSION_LONG key from the xcconfig file
-          version_number = read_from_config_file('VERSION_LONG', file_path)
-
-          # Split the version number into its components
-          major, minor, patch, build_number = version_number.split('.').map(&:to_i)
-
-          # Create an AppVersion object
-          Fastlane::Models::AppVersion.new(major, minor, patch, build_number)
-        end
-
-        # Reads the build code from an .xcconfig file.
-        #
-        # @param file_path [String] The path to the .xcconfig file.
-        #
-        # @return [BuildCode] An instance of `BuildCode` representing the build code read from the file.
-        #
-        # @raise [UI::Error] If the file_path is nil.
-        #
-        def self.read_build_code_from_xcconfig_file(file_path)
-          UI.user_error!('.xcconfig file path not provided') if file_path.nil?
-
-          # Read the value of the BUILD_NUMBER key from the xcconfig file
-          build_code = read_from_config_file('BUILD_NUMBER', file_path)
-
-          # Create a BuildCode object
-          Fastlane::Models::BuildCode.new(build_code)
-        end
-
-        # Write the value of a given key to an `.xcconfig` file.
-        #
-        # @param [String] key The xcconfig key to write the value for
-        # @param [String] value The value to write for the given key
-        # @param [String] file_path The path to the `.xcconfig` file to write the value to
-        def self.write_to_xcconfig_file(key, value, file_path)
-          UI.user_error!(".xcconfig file #{file_path} not found") unless File.exist?(file_path)
-
-          config = Xcodeproj::Config.new(file_path)
-          config.attributes[key] = value
-          config.save_as(file_path)
         end
 
         # Ensure that the version provided is only composed of number parts and return the validated string

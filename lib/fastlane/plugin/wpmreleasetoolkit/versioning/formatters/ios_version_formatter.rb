@@ -1,4 +1,4 @@
-# The `IosVersionFormatter` class is a specialized version formatter for iOS and Mac apps,
+# The `IOSVersionFormatter` class is a specialized version formatter for iOS and Mac apps,
 # extending the `VersionFormatter` class.
 require_relative '../../models/app_version'
 require_relative 'version_formatter'
@@ -7,7 +7,7 @@ require_relative '../calculators/version_calculator'
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
-      class IosVersionFormatter < VersionFormatter
+      class IOSVersionFormatter < VersionFormatter
         # Get the beta version of the iOS app
         #
         # @return [AppVersion] The beta-formatted version of the iOS app
