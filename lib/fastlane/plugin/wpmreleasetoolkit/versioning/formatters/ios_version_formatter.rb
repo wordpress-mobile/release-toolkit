@@ -12,8 +12,8 @@ module Fastlane
         #
         # @return [AppVersion] The beta-formatted version of the iOS app
         #
-        def beta_version
-          @version
+        def beta_version(version)
+          "#{version.major}.#{version.minor}.#{version.patch}.#{version.build_number}"
         end
 
         # Calculate and retrieve the internal version of the iOS app
@@ -24,13 +24,13 @@ module Fastlane
         #
         # @return [AppVersion] The internal version of the iOS app
         #
-        def internal_version
+        def internal_version(version)
           # Create a VersionCalculator instance and calculate the next internal version
           # based on the current `@version`.
-          Fastlane::Wpmreleasetoolkit::Versioning::VersionCalculator.new(@version).calculate_next_internal_version
+          Fastlane::Wpmreleasetoolkit::Versioning::VersionCalculator.new.calculate_next_internal_version(version)
 
           # Return the calculated version
-          @version
+          "#{version.major}.#{version.minor}.#{version.patch}.#{version.build_number}"
         end
       end
     end

@@ -8,14 +8,6 @@ module Fastlane
   module Wpmreleasetoolkit
     module Versioning
       class VersionFormatter
-        # Initializes a new VersionFormatter instance with a given version.
-        #
-        # @param version [AppVersion] The version to be formatted.
-        #
-        def initialize(version)
-          @version = version
-        end
-
         # Get the release version string for the app.
         #
         # This method constructs the release version string based on the major, minor, and
@@ -25,8 +17,8 @@ module Fastlane
         #
         # @return [String] The formatted release version string.
         #
-        def release_version
-          @version.patch.zero? ? "#{@version.major}.#{@version.minor}" : "#{@version.major}.#{@version.minor}.#{@version.patch}"
+        def release_version(version)
+          version.patch.zero? ? "#{version.major}.#{version.minor}" : "#{version.major}.#{version.minor}.#{version.patch}"
         end
       end
     end

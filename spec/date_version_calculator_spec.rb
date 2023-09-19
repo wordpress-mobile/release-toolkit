@@ -9,9 +9,8 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DateVersionCalculator do
       it 'increments the minor version number without prompting the user' do
         allow(Time).to receive(:now).and_return(Time.new(2024, 4, 15))
         version = Fastlane::Models::AppVersion.new(2005, 13, 1, 1)
-        calculator = described_class.new(version)
-        bumped_version = calculator.calculate_next_release_version.to_s
-        expect(bumped_version).to eq('2005.14.0.0')
+        bumped_version = described_class.new.calculate_next_release_version(version)
+        expect(bumped_version.to_s).to eq('2005.14.0.0')
       end
     end
 
@@ -21,9 +20,8 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DateVersionCalculator do
           allow(Time).to receive(:now).and_return(Time.new(2023, 12, 3))
           allow(FastlaneCore::UI).to receive(:confirm).and_return(true)
           version = Fastlane::Models::AppVersion.new(1999, 30, 1, 2)
-          calculator = described_class.new(version)
-          bumped_version = calculator.calculate_next_release_version.to_s
-          expect(bumped_version).to eq('2000.1.0.0')
+          bumped_version = described_class.new.calculate_next_release_version(version)
+          expect(bumped_version.to_s).to eq('2000.1.0.0')
         end
       end
 
@@ -32,9 +30,8 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DateVersionCalculator do
           allow(Time).to receive(:now).and_return(Time.new(2023, 12, 1))
           allow(FastlaneCore::UI).to receive(:confirm).and_return(false)
           version = Fastlane::Models::AppVersion.new(1999, 30, 1, 2)
-          calculator = described_class.new(version)
-          bumped_version = calculator.calculate_next_release_version.to_s
-          expect(bumped_version).to eq('1999.31.0.0')
+          bumped_version = described_class.new.calculate_next_release_version(version)
+          expect(bumped_version.to_s).to eq('1999.31.0.0')
         end
       end
     end
