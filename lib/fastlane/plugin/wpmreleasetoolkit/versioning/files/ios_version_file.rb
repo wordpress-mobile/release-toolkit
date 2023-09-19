@@ -59,8 +59,7 @@ module Fastlane
           config.attributes['VERSION_SHORT'] = version_short.to_s unless version_short.nil?
           config.attributes['VERSION_LONG'] = version_long.to_s unless version_long.nil?
           config.attributes['BUILD_NUMBER'] = build_number.to_s unless build_number.nil?
-
-          File.write(xcconfig_path, config.to_s)
+          config.save_as(Pathname.new(xcconfig_path))
         end
 
         # Verifies the existence of the .xcconfig file.
