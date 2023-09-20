@@ -3,7 +3,7 @@ require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/calculator
 require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
 
 describe Fastlane::Wpmreleasetoolkit::Versioning::VersionCalculator do
-  describe 'bumps the version number' do
+  describe 'calculates the next version number' do
     it 'increments the major version by 1 and sets the minor, patch, and build number to 0' do
       version = Fastlane::Models::AppVersion.new('19.3.1.1')
       bumped_version = described_class.new.calculate_next_major_version(version)
@@ -34,6 +34,32 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::VersionCalculator do
         today_date = described_class.new.today_date
         expect(today_date).to eq('20240415')
       end
+    end
+  end
+
+  describe 'calculates the previous version number' do
+    it 'decrements the major version by 1 and sets the minor, patch, and build number to 0' do
+      version = Fastlane::Models::AppVersion.new('13.2.1.3')
+      previous_version = described_class.new.calculate_previous_major_version(version)
+      expect(previous_version.to_s).to eq('12.0.0.0')
+    end
+
+    it 'decrements the minor version by 1 and sets the patch and build number to 0' do
+      version = Fastlane::Models::AppVersion.new('13.2.1.3')
+      previous_version = described_class.new.calculate_previous_minor_version(version)
+      expect(previous_version.to_s).to eq('13.1.0.0')
+    end
+
+    it 'decrements the patch version by 1 and sets the build number to 0' do
+      version = Fastlane::Models::AppVersion.new('13.2.1.3')
+      previous_version = described_class.new.calculate_previous_patch_version(version)
+      expect(previous_version.to_s).to eq('13.2.0.0')
+    end
+
+    it 'decrements the build number by 1' do
+      version = Fastlane::Models::AppVersion.new('13.2.1.3')
+      previous_version = described_class.new.calculate_previous_build_number(version)
+      expect(previous_version.to_s).to eq('13.2.1.2')
     end
   end
 end

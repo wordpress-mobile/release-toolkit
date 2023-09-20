@@ -81,6 +81,19 @@ module Fastlane
           !version.patch.zero?
         end
 
+        # Calculate the previous major version by decrementing the minor version.
+        #
+        # @return [AppVersion] The previous major version.
+        #
+        def calculate_previous_major_version(version)
+          version.major -= 1
+          version.minor = 0
+          version.patch = 0
+          version.build_number = 0
+
+          version
+        end
+
         # Calculate the previous minor version by decrementing the minor version.
         #
         # @return [AppVersion] The previous minor version.

@@ -32,16 +32,16 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::MarketingVersionCalculator do
     context 'when the minor version is not 0' do
       it 'decrements the minor version' do
         version = Fastlane::Models::AppVersion.new('13.9.0.1')
-        bumped_version = described_class.new.calculate_previous_release_version(version)
-        expect(bumped_version.to_s).to eq('13.8.0.0')
+        previous_version = described_class.new.calculate_previous_release_version(version)
+        expect(previous_version.to_s).to eq('13.8.0.0')
       end
     end
 
     context 'when the minor version is 0' do
       it 'decrements the major version and sets the minor version to 9' do
         version = Fastlane::Models::AppVersion.new('13.0.0.1')
-        bumped_version = described_class.new.calculate_previous_release_version(version)
-        expect(bumped_version.to_s).to eq('12.9.0.0')
+        previous_version = described_class.new.calculate_previous_release_version(version)
+        expect(previous_version.to_s).to eq('12.9.0.0')
       end
     end
   end
