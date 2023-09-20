@@ -11,7 +11,7 @@ module Fastlane
         #
         # @return [AppVersion] The next major version.
         #
-        def calculate_next_major_version(version)
+        def next_major_version(version)
           version.major += 1
           version.minor = 0
           version.patch = 0
@@ -25,7 +25,7 @@ module Fastlane
         #
         # @return [AppVersion] The next minor version.
         #
-        def calculate_next_minor_version(version)
+        def next_minor_version(version)
           version.minor += 1
           version.patch = 0
           version.build_number = 0
@@ -37,7 +37,7 @@ module Fastlane
         #
         # @return [AppVersion] The next patch version.
         #
-        def calculate_next_patch_version(version)
+        def next_patch_version(version)
           version.patch += 1
           version.build_number = 0
 
@@ -48,7 +48,7 @@ module Fastlane
         #
         # @return [AppVersion] The next version with an incremented build number.
         #
-        def calculate_next_build_number(version)
+        def next_build_number(version)
           version.build_number += 1
 
           version
@@ -66,7 +66,7 @@ module Fastlane
         #
         # @return [AppVersion] The next version with the build number set to the current date.
         #
-        def calculate_next_internal_version(version)
+        def next_internal_version(version)
           version.build_number = today_date
 
           version
@@ -84,7 +84,7 @@ module Fastlane
         #
         # @return [AppVersion] The previous major version.
         #
-        def calculate_previous_major_version(version)
+        def previous_major_version(version)
           version.major -= 1
           version.minor = 0
           version.patch = 0
@@ -97,7 +97,7 @@ module Fastlane
         #
         # @return [AppVersion] The previous minor version.
         #
-        def calculate_previous_minor_version(version)
+        def previous_minor_version(version)
           version.minor -= 1
           version.patch = 0
           version.build_number = 0
@@ -109,7 +109,7 @@ module Fastlane
         #
         # @return [AppVersion] The previous patch version.
         #
-        def calculate_previous_patch_version(version)
+        def previous_patch_version(version)
           version.patch -= 1 unless version.patch.zero?
           version.build_number = 0
 
@@ -120,7 +120,7 @@ module Fastlane
         #
         # @return [AppVersion] The previous version with a decremented build number.
         #
-        def calculate_previous_build_number(version)
+        def previous_build_number(version)
           version.build_number -= 1
 
           version

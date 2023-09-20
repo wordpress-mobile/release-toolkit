@@ -14,8 +14,8 @@ module Fastlane
         #
         # @return [AppVersion] The next marketing release version.
         #
-        def calculate_next_release_version(version)
-          version.minor == 9 ? calculate_next_major_version(version) : calculate_next_minor_version(version)
+        def next_release_version(version)
+          version.minor == 9 ? next_major_version(version) : next_minor_version(version)
 
           version
         end
@@ -28,12 +28,12 @@ module Fastlane
         #
         # @return [AppVersion] The previous marketing release version.
         #
-        def calculate_previous_release_version(version)
+        def previous_release_version(version)
           if version.minor.zero?
             version.major -= 1
             version.minor = 9
           else
-            calculate_previous_minor_version(version)
+            previous_minor_version(version)
           end
 
           version.patch = 0
