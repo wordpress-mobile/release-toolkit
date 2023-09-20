@@ -5,25 +5,25 @@ require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
 describe Fastlane::Wpmreleasetoolkit::Versioning::VersionCalculator do
   describe 'bumps the version number' do
     it 'increments the major version by 1 and sets the minor, patch, and build number to 0' do
-      version = Fastlane::Models::AppVersion.new(19, 3, 1, 1)
+      version = Fastlane::Models::AppVersion.new('19.3.1.1')
       bumped_version = described_class.new.calculate_next_major_version(version)
       expect(bumped_version.to_s).to eq('20.0.0.0')
     end
 
     it 'increments the minor version by 1 and sets the patch and build number to 0' do
-      version = Fastlane::Models::AppVersion.new(19, 3, 1, 1)
+      version = Fastlane::Models::AppVersion.new('19.3.1.1')
       bumped_version = described_class.new.calculate_next_minor_version(version)
       expect(bumped_version.to_s).to eq('19.4.0.0')
     end
 
     it 'increments the patch version by 1 and sets the build number to 0' do
-      version = Fastlane::Models::AppVersion.new(19, 3, 1, 1)
+      version = Fastlane::Models::AppVersion.new('19.3.1.1')
       bumped_version = described_class.new.calculate_next_patch_version(version)
       expect(bumped_version.to_s).to eq('19.3.2.0')
     end
 
     it 'increments the build number by 1' do
-      version = Fastlane::Models::AppVersion.new(19, 3, 1, 1)
+      version = Fastlane::Models::AppVersion.new('19.3.1.1')
       bumped_version = described_class.new.calculate_next_build_number(version)
       expect(bumped_version.to_s).to eq('19.3.1.2')
     end

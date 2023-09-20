@@ -10,7 +10,7 @@ module Fastlane
       # @param build_code [String] The build code value.
       #
       def initialize(build_code)
-        @build_code = build_code
+        @build_code = build_code.to_i
       end
 
       # Returns the build code as a string.
