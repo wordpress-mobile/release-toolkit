@@ -1,5 +1,6 @@
 # The `AndroidVersionFormatter` class is a specialized version formatter for Android apps,
 # extending the `VersionFormatter` class.
+require_relative 'version_formatter'
 
 module Fastlane
   module Wpmreleasetoolkit

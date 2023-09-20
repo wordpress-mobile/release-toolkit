@@ -1,5 +1,6 @@
 # The `IOSVersionFormatter` class is a specialized version formatter for iOS and Mac apps,
 # extending the `VersionFormatter` class.
+require_relative 'version_formatter'
 
 module Fastlane
   module Wpmreleasetoolkit
