@@ -1,5 +1,6 @@
 # The `DateVersionCalculator` class is a specialized version calculator for date-based versions
 # of an app, extending the `VersionCalculator` class.
+require_relative 'version_calculator'
 
 module Fastlane
   module Wpmreleasetoolkit
