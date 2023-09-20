@@ -1,9 +1,5 @@
 # A class for reading and writing Android version information to a version.properties file.
-#
 require 'java-properties'
-require_relative '../../models/app_version'
-require_relative '../../models/build_code'
-require_relative '../formatters/android_version_formatter'
 
 module Fastlane
   module Wpmreleasetoolkit
@@ -30,7 +26,7 @@ module Fastlane
         def read_version_name
           verify_version_properties_exists
 
-          beta_identifier = Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFormatter::BETA_IDENTIFIER
+          beta_identifier = AndroidVersionFormatter::BETA_IDENTIFIER
 
           # Read the version name from the version.properties file
           file_content = JavaProperties.load(version_properties_path)

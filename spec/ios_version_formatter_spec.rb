@@ -1,7 +1,4 @@
 require 'spec_helper'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/formatters/ios_version_formatter'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/formatters/version_formatter'
 
 describe Fastlane::Wpmreleasetoolkit::Versioning::IOSVersionFormatter do
   describe 'formats a beta version number with the correct format' do

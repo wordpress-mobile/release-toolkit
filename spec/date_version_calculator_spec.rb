@@ -1,7 +1,4 @@
 require 'spec_helper'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/calculators/date_version_calculator'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/calculators/version_calculator'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
 
 describe Fastlane::Wpmreleasetoolkit::Versioning::DateVersionCalculator do
   describe 'calculates the next release version when using date versioning' do

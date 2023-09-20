@@ -1,5 +1,6 @@
 # The `BuildCode` class represents a build code for an app. This could be the Version Code for an Android app or
 # the BUILD_NUMBER xcconfig value used by certain iOS or Mac apps.
+
 module Fastlane
   module Models
     class BuildCode

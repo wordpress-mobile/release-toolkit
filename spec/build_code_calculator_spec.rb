@@ -1,6 +1,4 @@
 require 'spec_helper'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/build_code'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/calculators/build_code_calculator'
 
 describe Fastlane::Wpmreleasetoolkit::Versioning::BuildCodeCalculator do
   describe 'bumps the build code' do

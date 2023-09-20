@@ -1,7 +1,4 @@
 require 'spec_helper'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/calculators/marketing_version_calculator'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/calculators/version_calculator'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
 
 describe Fastlane::Wpmreleasetoolkit::Versioning::MarketingVersionCalculator do
   describe 'calculates the next release version when using marketing versioning' do

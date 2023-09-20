@@ -1,6 +1,4 @@
 require 'spec_helper'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/formatters/version_formatter'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
 
 describe Fastlane::Wpmreleasetoolkit::Versioning::VersionFormatter do
   describe 'formats the version number' do

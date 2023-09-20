@@ -1,5 +1,4 @@
 require 'spec_helper'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/build_code'
 
 describe Fastlane::Models::BuildCode do
   describe '#initialize' do

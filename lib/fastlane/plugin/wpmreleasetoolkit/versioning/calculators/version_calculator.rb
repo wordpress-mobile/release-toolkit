@@ -1,7 +1,6 @@
 # The `VersionCalculator` class is responsible for performing version calculations and transformations. It can be used
 # as a base class for version calculations that use different versioning schemes. It contains calculation and
 # transformation methods that are shared by all platforms.
-require_relative '../../models/app_version'
 
 module Fastlane
   module Wpmreleasetoolkit

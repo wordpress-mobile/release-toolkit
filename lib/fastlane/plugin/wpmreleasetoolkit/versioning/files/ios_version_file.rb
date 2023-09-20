@@ -1,8 +1,5 @@
 # A class for reading and writing version information to an Xcode .xcconfig file.
-#
 require 'xcodeproj'
-require_relative '../../models/app_version'
-require_relative '../../models/build_code'
 
 module Fastlane
   module Wpmreleasetoolkit

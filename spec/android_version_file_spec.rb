@@ -1,9 +1,5 @@
 require 'spec_helper'
 require 'java-properties'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/files/android_version_file'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/formatters/android_version_formatter'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/build_code'
 
 describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
   describe 'read version name from version.properties' do

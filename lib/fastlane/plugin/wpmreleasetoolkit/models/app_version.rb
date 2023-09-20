@@ -1,4 +1,5 @@
 # Fastlane::Models::AppVersion represents a version of an app with major, minor, patch, and build number components.
+
 module Fastlane
   module Models
     class AppVersion

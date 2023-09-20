@@ -1,7 +1,4 @@
 require 'spec_helper'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/files/ios_version_file'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/build_code'
 
 describe Fastlane::Wpmreleasetoolkit::Versioning::IOSVersionFile do
   describe 'write the provided version numbers to an xcconfig file' do

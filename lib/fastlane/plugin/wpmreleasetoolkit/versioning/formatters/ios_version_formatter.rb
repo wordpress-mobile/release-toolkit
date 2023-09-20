@@ -1,8 +1,5 @@
 # The `IOSVersionFormatter` class is a specialized version formatter for iOS and Mac apps,
 # extending the `VersionFormatter` class.
-require_relative '../../models/app_version'
-require_relative 'version_formatter'
-require_relative '../calculators/version_calculator'
 
 module Fastlane
   module Wpmreleasetoolkit
@@ -27,7 +24,7 @@ module Fastlane
         def internal_version(version)
           # Create a VersionCalculator instance and calculate the next internal version
           # based on the current `@version`.
-          Fastlane::Wpmreleasetoolkit::Versioning::VersionCalculator.new.calculate_next_internal_version(version)
+          VersionCalculator.new.calculate_next_internal_version(version)
 
           # Return the calculated version
           "#{version.major}.#{version.minor}.#{version.patch}.#{version.build_number}"
