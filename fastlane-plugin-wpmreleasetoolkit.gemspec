@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'diffy', '~> 3.3'
   spec.add_dependency 'fastlane', '~> 2.213'
   spec.add_dependency 'git', '~> 1.3'
+  spec.add_dependency 'java-properties', '~> 0.3.0'
   spec.add_dependency 'nokogiri', '~> 1.11' # Needed for AndroidLocalizeHelper
   spec.add_dependency 'octokit', '~> 6.1'
   spec.add_dependency 'parallel', '~> 1.14'
@@ -38,7 +39,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rake', '>= 12.3', '< 14.0'
   spec.add_dependency 'rake-compiler', '~> 1.0'
   spec.add_dependency 'xcodeproj', '~> 1.22'
-  spec.add_dependency 'java-properties', '~> 0.3.0'
 
   # `google-cloud-storage` is required by fastlane, but we pin it in case it's not in the future
   spec.add_dependency 'google-cloud-storage', '~> 1.31'
