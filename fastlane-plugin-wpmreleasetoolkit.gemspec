@@ -38,6 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rake', '>= 12.3', '< 14.0'
   spec.add_dependency 'rake-compiler', '~> 1.0'
   spec.add_dependency 'xcodeproj', '~> 1.22'
+  spec.add_dependency 'java-properties', '~> 0.3.0'
 
   # `google-cloud-storage` is required by fastlane, but we pin it in case it's not in the future
   spec.add_dependency 'google-cloud-storage', '~> 1.31'
