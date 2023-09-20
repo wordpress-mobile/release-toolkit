@@ -31,7 +31,7 @@ module Fastlane
         #
         def calculate_previous_release_version(version)
           if version.minor.zero?
-            version.major = calculate_previous_major_version(version)
+            version.major -= 1
             version.minor = 9
           else
             calculate_previous_minor_version(version)

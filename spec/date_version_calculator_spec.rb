@@ -4,7 +4,7 @@ require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/calculator
 require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
 
 describe Fastlane::Wpmreleasetoolkit::Versioning::DateVersionCalculator do
-  describe 'bumps the version number when using date versioning' do
+  describe 'calculates the next release version when using date versioning' do
     context 'when the current month is not December' do
       it 'increments the minor version number without prompting the user' do
         allow(Time).to receive(:now).and_return(Time.new(2024, 4, 15))
@@ -33,6 +33,25 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DateVersionCalculator do
           bumped_version = described_class.new.calculate_next_release_version(version)
           expect(bumped_version.to_s).to eq('1999.31.0.0')
         end
+      end
+    end
+  end
+
+  describe 'calculates the previous release version when using date versioning' do
+    context 'when the minor version is not 1' do
+      it 'decrements the minor version number' do
+        version = Fastlane::Models::AppVersion.new('1999.30.1.2')
+        bumped_version = described_class.new.calculate_previous_release_version(version)
+        expect(bumped_version.to_s).to eq('1999.29.0.0')
+      end
+    end
+
+    context 'when the minor version is 1' do
+      it 'prompts the user to input the minor number of the previous release' do
+        allow(FastlaneCore::UI).to receive(:prompt).and_return('29')
+        version = Fastlane::Models::AppVersion.new('1999.1.1.1')
+        bumped_version = described_class.new.calculate_previous_release_version(version)
+        expect(bumped_version.to_s).to eq('1998.29.0.0')
       end
     end
   end
