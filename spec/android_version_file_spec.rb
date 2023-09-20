@@ -1,5 +1,7 @@
 require 'spec_helper'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_version_helper'
+require 'java-properties'
+require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/files/android_version_file'
+require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/versioning/formatters/android_version_formatter'
 require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/app_version'
 require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/models/build_code'
 
@@ -8,7 +10,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
     it 'raises an error if version.properties is not present' do
       file_path = 'fake_path/test.xcconfig'
 
-      expect { described_class.read_version_name_from_version_properties(file_path) }
+      expect { described_class.new(version_properties_path: file_path).read_version_name }
         .to raise_error(FastlaneCore::Interface::FastlaneError, "version.properties #{file_path} not found")
     end
 
@@ -18,7 +20,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       CONTENT
 
       with_tmp_file(named: 'version.properties', content: expected_content) do |tmp_file_path|
-        expect { described_class.read_version_name_from_version_properties(tmp_file_path) }
+        expect { described_class.new(version_properties_path: tmp_file_path).read_version_name }
           .to raise_error(FastlaneCore::Interface::FastlaneError, 'Version name not found in version.properties')
       end
     end
@@ -30,8 +32,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       CONTENT
 
       with_tmp_file(named: 'version.properties', content: expected_content) do |tmp_file_path|
-        version_name = described_class.read_version_name_from_version_properties(tmp_file_path)
-
+        version_name = described_class.new(version_properties_path: tmp_file_path).read_version_name
         expect(version_name.to_s).to eq('12.3.0.1')
       end
     end
@@ -43,7 +44,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       CONTENT
 
       with_tmp_file(named: 'version.properties', content: expected_content) do |tmp_file_path|
-        version_name = described_class.read_version_name_from_version_properties(tmp_file_path)
+        version_name = described_class.new(version_properties_path: tmp_file_path).read_version_name
 
         expect(version_name.to_s).to eq('12.3.0.0')
       end
@@ -56,7 +57,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       CONTENT
 
       with_tmp_file(named: 'version.properties', content: expected_content) do |tmp_file_path|
-        version_name = described_class.read_version_name_from_version_properties(tmp_file_path)
+        version_name = described_class.new(version_properties_path: tmp_file_path).read_version_name
 
         expect(version_name.to_s).to eq('12.3.1.0')
       end
@@ -69,7 +70,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       CONTENT
 
       with_tmp_file(named: 'version.properties', content: expected_content) do |tmp_file_path|
-        version_name = described_class.read_version_name_from_version_properties(tmp_file_path)
+        version_name = described_class.new(version_properties_path: tmp_file_path).read_version_name
 
         expect(version_name.to_s).to eq('12.3.1.2')
       end
@@ -80,7 +81,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
     it 'raises an error if version.properties is not present' do
       file_path = 'fake_path/test.xcconfig'
 
-      expect { described_class.read_version_code_from_version_properties(file_path) }
+      expect { described_class.new(version_properties_path: file_path).read_version_code }
         .to raise_error(FastlaneCore::Interface::FastlaneError, "version.properties #{file_path} not found")
     end
 
@@ -90,7 +91,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       CONTENT
 
       with_tmp_file(named: 'version.properties', content: expected_content) do |tmp_file_path|
-        expect { described_class.read_version_code_from_version_properties(tmp_file_path) }
+        expect { described_class.new(version_properties_path: tmp_file_path).read_version_code }
           .to raise_error(FastlaneCore::Interface::FastlaneError, 'Version code not found in version.properties')
       end
     end
@@ -102,9 +103,9 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       CONTENT
 
       with_tmp_file(named: 'version.properties', content: expected_content) do |tmp_file_path|
-        version_name = described_class.read_version_code_from_version_properties(tmp_file_path)
+        version_code = described_class.new(version_properties_path: tmp_file_path).read_version_code
 
-        expect(version_name.to_s).to eq('1240')
+        expect(version_code.to_s).to eq('1240')
       end
     end
   end
@@ -113,13 +114,15 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
     it 'raises an error if version.properties is not present' do
       file_path = 'fake_path/test.xcconfig'
       version_name = '1.2.3'
+      version_code = '1234'
 
-      expect { described_class.write_version_name_to_version_properties(file_path, version_name) }
+      expect { described_class.new(version_properties_path: file_path).write_version(version_name, version_code) }
         .to raise_error(FastlaneCore::Interface::FastlaneError, "version.properties #{file_path} not found")
     end
 
-    it 'writes the given release version name to version.properties' do
+    it 'writes the given release version name and version code to version.properties' do
       version_name = '1.2.3'
+      version_code = '1240'
 
       existing_content = <<~CONTENT
         versionName=12.3-rc-1
@@ -127,20 +130,21 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       CONTENT
 
       expected_content = <<~CONTENT
-        versionName=1.2.3
-        versionCode=1240
+        versionName=#{version_name}
+        versionCode=#{version_code}
       CONTENT
 
       with_tmp_file(named: 'version.properties', content: existing_content) do |tmp_file_path|
-        described_class.write_version_name_to_version_properties(tmp_file_path, version_name)
+        described_class.new(version_properties_path: tmp_file_path).write_version(version_name, version_code)
 
         current_content = File.read(tmp_file_path)
-        expect(current_content).to eq(expected_content)
+        expect(current_content).to eq(expected_content.strip)
       end
     end
 
-    it 'writes the given beta version name to version.properties' do
+    it 'writes the given beta version name and version code to version.properties' do
       version_name = '1.2.3-rc-4'
+      version_code = '1240'
 
       existing_content = <<~CONTENT
         versionName=12.3-rc-1
@@ -148,36 +152,15 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       CONTENT
 
       expected_content = <<~CONTENT
-        versionName=1.2.3-rc-4
-        versionCode=1240
+        versionName=#{version_name}
+        versionCode=#{version_code}
       CONTENT
 
       with_tmp_file(named: 'version.properties', content: existing_content) do |tmp_file_path|
-        described_class.write_version_name_to_version_properties(tmp_file_path, version_name)
+        described_class.new(version_properties_path: tmp_file_path).write_version(version_name, version_code)
 
         current_content = File.read(tmp_file_path)
-        expect(current_content).to eq(expected_content)
-      end
-    end
-
-    it 'writes the given version code to version.properties' do
-      version_code = '1234'
-
-      existing_content = <<~CONTENT
-        versionName=12.3-rc-1
-        versionCode=1240
-      CONTENT
-
-      expected_content = <<~CONTENT
-        versionName=12.3-rc-1
-        versionCode=1234
-      CONTENT
-
-      with_tmp_file(named: 'version.properties', content: existing_content) do |tmp_file_path|
-        described_class.write_version_code_to_version_properties(tmp_file_path, version_code)
-
-        current_content = File.read(tmp_file_path)
-        expect(current_content).to eq(expected_content)
+        expect(current_content).to eq(expected_content.strip)
       end
     end
   end

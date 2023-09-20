@@ -1,5 +1,6 @@
 # A class for reading and writing Android version information to a version.properties file.
 #
+require 'java-properties'
 require_relative '../../models/app_version'
 require_relative '../../models/build_code'
 require_relative '../formatters/android_version_formatter'
@@ -26,14 +27,14 @@ module Fastlane
         #
         # @raise [UI::Error] If the file_path is nil or the version name is not found.
         #
-        def self.read_version_name_from_version_properties(version_properties_path)
+        def read_version_name
+          verify_version_properties_exists
+
           beta_identifier = Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFormatter::BETA_IDENTIFIER
 
-          UI.user_error!("version.properties #{version_properties_path} not found") unless File.exist?(version_properties_path)
-
           # Read the version name from the version.properties file
-          file_content = File.read(version_properties_path)
-          version_name = file_content.match(/versionName=(\S*)/m)&.captures&.first
+          file_content = JavaProperties.load(version_properties_path)
+          version_name = file_content[:versionName]
 
           UI.user_error!('Version name not found in version.properties') if version_name.nil?
 
@@ -69,12 +70,14 @@ module Fastlane
         #
         # @raise [UI::Error] If the file_path is nil or the version code is not found.
         #
-        def self.read_version_code_from_version_properties(file_path)
-          UI.user_error!("version.properties #{file_path} not found") unless File.exist?(file_path)
+        def read_version_code
+          verify_version_properties_exists
+
+          UI.user_error!("version.properties #{version_properties_path} not found") unless File.exist?(version_properties_path)
 
           # Read the version code from the version.properties file
-          text = File.read(file_path)
-          version_code = text.match(/versionCode=(\S*)/m)&.captures&.first
+          file_content = JavaProperties.load(version_properties_path)
+          version_code = file_content[:versionCode]
 
           UI.user_error!('Version code not found in version.properties') if version_code.nil?
 
@@ -82,52 +85,35 @@ module Fastlane
           Fastlane::Models::BuildCode.new(version_code.to_i)
         end
 
-        # Writes the version name to a version.properties file.
-        #
-        # @param file_path [String] The path to the version.properties file.
+        # Writes the provided version name and version code to the version.properties file.
         #
         # @param version_name [String] The version name to write to the file.
-        #
-        def self.write_version_name_to_version_properties(file_path, version_name)
-          write_value_to_version_properties(
-            file_path,
-            'versionName',
-            version_name
-          )
-        end
-
-        # Writes the version code to a version.properties file.
-        #
-        # @param file_path [String] The path to the version.properties file.
-        #
         # @param version_code [String] The version code to write to the file.
         #
-        def self.write_version_code_to_version_properties(file_path, version_code)
-          write_value_to_version_properties(
-            file_path,
-            'versionCode',
-            version_code
+        # @raise [UI::Error] If the version name or version code is nil.
+        #
+        def write_version(version_name, version_code)
+          verify_version_properties_exists
+
+          # Create the version name and version code hash
+          version = {
+            versionName: version_name,
+            versionCode: version_code
+          }
+
+          # Write the version name and version code hash to the version.properties file
+          JavaProperties.write(
+            version,
+            version_properties_path
           )
         end
 
-        # Writes a key-value pair to a version.properties file.
+        # Verifies the existence of the version.properties file.
         #
-        # @param file_path [String] The path to the version.properties file.
+        # @raise [UI.user_error] Raised if the version.properties file does not exist.
         #
-        # @param key [String] The key for the key-value pair.
-        #
-        # @param value [String] The value to write to the file.
-        #
-        # @raise [UI::Error] If the file_path doesn't exist.
-        #
-        def self.write_value_to_version_properties(file_path, key, value)
-          UI.user_error!("version.properties #{file_path} not found") unless File.exist?(file_path)
-
-          # Read the contents of the version.properties file
-          content = File.read(file_path)
-          # Replace the value in the version.properties file
-          content.gsub!(/#{key}=(\S*)/, "#{key}=#{value}")
-          File.write(file_path, content)
+        def verify_version_properties_exists
+          UI.user_error!("version.properties #{version_properties_path} not found") unless File.exist?(version_properties_path)
         end
       end
     end
