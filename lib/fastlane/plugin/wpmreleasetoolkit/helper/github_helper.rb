@@ -244,11 +244,20 @@ module Fastlane
       #
       # @param [String] repository The repository name (including the organization)
       # @param [String] branch The branch name
-      # @param [Hash] options A customizable set of options.
-      # @see https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
+      # @see https://docs.github.com/en/rest/branches/branch-protection#delete-branch-protection
       #
-      def remove_branch_protection(repository:, branch:, **options)
-        client.unprotect_branch(repository, branch, options)
+      def remove_branch_protection(repository:, branch:)
+        client.unprotect_branch(repository, branch)
+      end
+
+      # Get the list of branch protection settings for a given branch of a repository
+      #
+      # @param [String] repository The repository name (including the organization)
+      # @param [String] branch The branch name
+      # @see https://docs.github.com/en/rest/branches/branch-protection#get-branch-protection
+      #
+      def get_branch_protection(repository:, branch:, **options)
+        client.branch_protection(repository, branch)
       end
 
       # Protects a single branch from a repository
@@ -260,6 +269,42 @@ module Fastlane
       #
       def set_branch_protection(repository:, branch:, **options)
         client.protect_branch(repository, branch, options)
+      end
+
+      # Convert a response from the `/branch-protection` API endpoint into a Hash
+      # suitable to be returned and/or reused to pass to a subsequent `/branch-protection` API request
+      # @param [Sawyer::Resource] response The API response returned by `#get_branch_protection` or `#set_branch_protection`
+      # @return [Hash] A hash representation of the API response—or an empty Hash if `response` was `nil`—
+      #                with Boolean values normalized to true/false, and any extra values that would be refused
+      #                if used in a subsequent API request (like legacy vs new key) removed.
+      # @see https://docs.github.com/en/rest/branches/branch-protection
+      #
+      def self.branch_protection_api_response_to_normalized_hash(response)
+        return {} if response.nil?
+
+        normalize_values = lambda do |hash|
+          hash.each do |k, v|
+            # Boolean values appear as { "enabled" => true/false } in the Response, while they must appear as true/false in Request
+            hash[k] = v[:enabled] if v.is_a?(Hash) && v.key?(:enabled)
+            # References to :users, :teams and :apps are expanded as Objects in the Response, while they must just be the login or slug in Request
+            hash[k] = v.map { |item| item[:login] } if k == :users && v.is_a?(Array)
+            hash[k] = v.map { |item| item[:slug] } if %i[teams apps].include?(k) && v.is_a?(Array)
+            # Response contains lots of `*url` keys that are useless in practice and makes the returned hash harder to parse visually
+            hash.delete(k) if k.to_s == 'url' || k.to_s.end_with?('_url')
+
+            # Recurse into Hashes and Array of Hashes
+            normalize_values.call(v) if v.is_a?(Hash)
+            v.each { |item| normalize_values.call(item) if item.is_a?(Hash) } if v.is_a?(Array)
+          end
+        end
+
+        hash = response.to_hash
+        normalize_values.call(hash)
+
+        # Response contains both (legacy) `:contexts` key and new `:checks` key, but only one of the two should be passed in Request
+        hash[:required_status_checks].delete(:contexts) unless hash.dig(:required_status_checks, :checks).nil?
+
+        hash
       end
 
       # Creates a GithubToken Fastlane ConfigItem

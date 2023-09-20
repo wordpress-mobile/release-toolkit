@@ -10,7 +10,14 @@ _None_
 
 ### New Features
 
-_None_
+ - Renamed `addbranchprotection` to `set_branch_protection`, and allow it to provide additional optional protection
+   settings to set/update on the target branch (like `lock_branch`, `required_ci_checks`, etc).
+   The `addbranchprotection` action name still exists for backward compatibility for now (with a deprecation notice),
+   but it will be removed in a future major release. [#513]
+ - Renamed `removebranchprotection` to `remove_branch_protection`.
+   The `removebranchprotection` action name still exists for now for backward compatibility (with a deprecation notice),
+   but it will be removed in a future major release. [#513]
+ - Added `copy_branch_protection` action to replicate the branch protection settings of one branch onto another. [#513]
 
 ### Bug Fixes
 
