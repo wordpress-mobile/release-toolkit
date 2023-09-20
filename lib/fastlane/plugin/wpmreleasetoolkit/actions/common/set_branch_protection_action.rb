@@ -3,7 +3,7 @@ require_relative '../../helper/github_helper'
 
 module Fastlane
   module Actions
-    class UpdateBranchProtectionAction < Action
+    class SetBranchProtectionAction < Action
       def self.run(params)
         repository = params[:repository]
         branch_name = params[:branch]
@@ -140,7 +140,7 @@ module Fastlane
     end
 
     # For backwards compatibility
-    class SetbranchprotectionAction < UpdateBranchProtectionAction
+    class SetbranchprotectionAction < SetBranchProtectionAction
       def self.category
         :deprecated
       end

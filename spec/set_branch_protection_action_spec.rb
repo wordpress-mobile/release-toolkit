@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'tmpdir'
 
-describe Fastlane::Actions::UpdateBranchProtectionAction do
+describe Fastlane::Actions::SetBranchProtectionAction do
   let(:repo) { 'automattic/demorepo' }
   let(:branch) { 'release/12.3' }
   let(:restrictions) { { users: [], teams: [] } }

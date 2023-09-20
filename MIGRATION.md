@@ -2,7 +2,7 @@
 
 ## From `9.0.0` to `10.0.0`
 
- - Action `addbranchprotection` has been renamed `update_branch_protection`. Besides, you might want to use the new `copy_branch_protection(from_branch: to_branch:)` instead (especially for protecting the `release/*` branch after code-freeze).
+ - Action `addbranchprotection` has been renamed `set_branch_protection`. Besides, you might want to use the new `copy_branch_protection(from_branch: to_branch:)` instead (especially for protecting the `release/*` branch after code-freeze).
  - Action `removebranchprotection` has been renamed `remove_branch_protection`.
 
 ## From `8.0.0` to `9.0.0`
