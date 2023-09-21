@@ -12,7 +12,7 @@ module Fastlane
 
         Fastlane::Helper::GitHelper.create_tag(version)
 
-        other_action.ios_clear_intermediate_tags(version: version)
+        other_action.ios_clear_intermediate_tags(version:)
       end
 
       #####################################################

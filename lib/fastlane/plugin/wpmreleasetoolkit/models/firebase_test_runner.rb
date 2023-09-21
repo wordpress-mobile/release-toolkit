@@ -27,7 +27,7 @@ module Fastlane
 
       params = {
         project: project_id,
-        type: type,
+        type:,
         app: apk_path,
         test: test_apk_path,
         'test-targets': test_targets,
@@ -42,7 +42,7 @@ module Fastlane
       Action.sh("#{command} 2>&1 | tee #{log_file_path}")
 
       # Make the file object available to other tasks
-      result = FirebaseTestLabResult.new(log_file_path: log_file_path)
+      result = FirebaseTestLabResult.new(log_file_path:)
       Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE] = result
 
       result
@@ -64,7 +64,7 @@ module Fastlane
       FileUtils.mkdir_p(destination) unless File.directory?(destination)
 
       storage = Google::Cloud::Storage.new(
-        project_id: project_id,
+        project_id:,
         credentials: key_file_path
       )
 
@@ -74,7 +74,7 @@ module Fastlane
 
       # Download the files
       UI.header "Downloading Results Files to #{destination}"
-      files_to_download.each { |file| download_file(file: file, destination: destination) }
+      files_to_download.each { |file| download_file(file:, destination:) }
     end
 
     # Download a Google Cloud Storage file to the local machine, creating intermediate directories as needed.

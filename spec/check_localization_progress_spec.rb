@@ -336,11 +336,11 @@ end
 
 def generate_glotpress_response_for_language(lang:, lang_code:, current:, fuzzy:, waiting:, untranslated:, progress:)
   res = "<tr class=\"odd\">\n"
-  res << generate_glotpress_response_header_for_language(lang: lang, lang_code: lang_code, progress: progress)
-  res << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'translated', status: 'current', string_count: current)
-  res << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'fuzzy', status: 'fuzzy', string_count: fuzzy)
-  res << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'untranslated', status: 'untranslated', string_count: waiting)
-  res << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'waiting', status: 'waiting', string_count: untranslated)
+  res << generate_glotpress_response_header_for_language(lang:, lang_code:, progress:)
+  res << generate_glotpress_response_for_language_status(lang_code:, status_main: 'translated', status: 'current', string_count: current)
+  res << generate_glotpress_response_for_language_status(lang_code:, status_main: 'fuzzy', status: 'fuzzy', string_count: fuzzy)
+  res << generate_glotpress_response_for_language_status(lang_code:, status_main: 'untranslated', status: 'untranslated', string_count: waiting)
+  res << generate_glotpress_response_for_language_status(lang_code:, status_main: 'waiting', status: 'waiting', string_count: untranslated)
   res <<	'</tr>'
 end
 

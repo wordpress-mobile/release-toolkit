@@ -76,12 +76,12 @@ describe Fastlane::FirebaseTestRunner do
     def run_tests(project_id: 'foo-bar-baz', apk_path: default_file, test_apk_path: default_file, device: 'device', test_targets: nil, type: 'instrumentation')
       Fastlane::Actions.lane_context[:FIREBASE_TEST_LOG_FILE_PATH] = runner_temp_file
       described_class.run_tests(
-        project_id: project_id,
-        apk_path: apk_path,
-        test_apk_path: test_apk_path,
-        device: device,
-        test_targets: test_targets,
-        type: type
+        project_id:,
+        apk_path:,
+        test_apk_path:,
+        device:,
+        test_targets:,
+        type:
       )
     end
   end
@@ -100,10 +100,10 @@ describe Fastlane::FirebaseTestRunner do
 
     def run_download(result: passed_test_log, destination: '/tmp/test', project_id: 'foo-bar-baz', key_file_path: 'invalid')
       described_class.download_result_files(
-        result: result,
-        destination: destination,
-        project_id: project_id,
-        key_file_path: key_file_path
+        result:,
+        destination:,
+        project_id:,
+        key_file_path:
       )
     end
   end

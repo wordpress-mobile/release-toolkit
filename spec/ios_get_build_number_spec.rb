@@ -10,7 +10,7 @@ describe Fastlane::Actions::IosGetBuildNumberAction do
         BUILD_NUMBER=1940
       CONTENT
 
-      expect_build_number(xcconfig_mock_content: xcconfig_mock_content, expected_build_number: '1940')
+      expect_build_number(xcconfig_mock_content:, expected_build_number: '1940')
     end
 
     it 'parses an xcconfig file with keys with spaces and returns the correct build number' do
@@ -20,7 +20,7 @@ describe Fastlane::Actions::IosGetBuildNumberAction do
         BUILD_NUMBER = 1940
       CONTENT
 
-      expect_build_number(xcconfig_mock_content: xcconfig_mock_content, expected_build_number: '1940')
+      expect_build_number(xcconfig_mock_content:, expected_build_number: '1940')
     end
 
     it 'parses an xcconfig file with an invalid format and returns a nil build number' do
@@ -30,7 +30,7 @@ describe Fastlane::Actions::IosGetBuildNumberAction do
         BUILD_NUMBER 1940
       CONTENT
 
-      expect_build_number(xcconfig_mock_content: xcconfig_mock_content, expected_build_number: nil)
+      expect_build_number(xcconfig_mock_content:, expected_build_number: nil)
     end
 
     it 'parses an xcconfig file with no build number and returns a nil build number' do
@@ -39,7 +39,7 @@ describe Fastlane::Actions::IosGetBuildNumberAction do
         // a comment
       CONTENT
 
-      expect_build_number(xcconfig_mock_content: xcconfig_mock_content, expected_build_number: nil)
+      expect_build_number(xcconfig_mock_content:, expected_build_number: nil)
     end
 
     it 'throws an error when the xcconfig file does not exist' do

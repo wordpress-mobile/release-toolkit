@@ -29,11 +29,11 @@ module Fastlane
 
     def to_hash
       {
-        project_name: project_name,
-        branch: branch,
-        pinned_hash: pinned_hash,
-        files_to_copy: files_to_copy.map(&:to_hash),
-        file_dependencies: file_dependencies
+        project_name: self.project_name,
+        branch: self.branch,
+        pinned_hash: self.pinned_hash,
+        files_to_copy: self.files_to_copy.map { |f| f.to_hash },
+        file_dependencies: self.file_dependencies
       }
     end
   end

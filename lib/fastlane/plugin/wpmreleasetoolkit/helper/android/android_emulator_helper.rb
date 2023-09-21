@@ -21,7 +21,7 @@ module Fastlane
         # @return [String] The `sdkmanager` package specifier that has been installed
         #
         def install_system_image(api:)
-          package = system_image_package(api: api)
+          package = system_image_package(api:)
 
           UI.message("Installing System Image for Android #{api} (#{package})")
           Actions.sh(@tools.sdkmanager, '--install', package)
@@ -39,7 +39,7 @@ module Fastlane
         # @return [String] The device name (i.e. either `name` if provided, or the derived `<device>_API_<api>` if provided `name` was `nil``)
         #
         def create_avd(api:, device:, system_image: nil, name: nil, sdcard: '512M')
-          package = system_image || system_image_package(api: api)
+          package = system_image || system_image_package(api:)
           device_name = name || "#{device.gsub(' ', '_').capitalize}_API_#{api}"
 
           UI.message("Creating AVD `#{device_name}` (#{device}, API #{api})")

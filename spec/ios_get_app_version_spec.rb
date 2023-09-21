@@ -9,7 +9,7 @@ describe Fastlane::Actions::IosGetAppVersionAction do
         VERSION_LONG = 6.30.0
       CONTENT
 
-      expect_version(xcconfig_mock_content: xcconfig_mock_content, expected_version: '6.30')
+      expect_version(xcconfig_mock_content:, expected_version: '6.30')
     end
 
     it 'parses the xcconfig file format correctly and gets the public hotfix version' do
@@ -19,7 +19,7 @@ describe Fastlane::Actions::IosGetAppVersionAction do
         VERSION_LONG = 6.30.1
       CONTENT
 
-      expect_version(xcconfig_mock_content: xcconfig_mock_content, expected_version: '6.30.1')
+      expect_version(xcconfig_mock_content:, expected_version: '6.30.1')
     end
 
     it 'parses the xcconfig with keys without spacing and gets the public version' do
@@ -29,7 +29,7 @@ describe Fastlane::Actions::IosGetAppVersionAction do
         VERSION_LONG=6.30.0
       CONTENT
 
-      expect_version(xcconfig_mock_content: xcconfig_mock_content, expected_version: '6.30')
+      expect_version(xcconfig_mock_content:, expected_version: '6.30')
     end
 
     it 'parses the xcconfig with keys without spacing and gets the public hotfix version' do
@@ -39,7 +39,7 @@ describe Fastlane::Actions::IosGetAppVersionAction do
         VERSION_LONG=6.30.1
       CONTENT
 
-      expect_version(xcconfig_mock_content: xcconfig_mock_content, expected_version: '6.30.1')
+      expect_version(xcconfig_mock_content:, expected_version: '6.30.1')
     end
 
     it 'fails to extract the version from an xcconfig file with an invalid format' do
@@ -49,7 +49,7 @@ describe Fastlane::Actions::IosGetAppVersionAction do
       CONTENT
 
       expect do
-        expect_version(xcconfig_mock_content: xcconfig_mock_content, expected_version: 'n/a')
+        expect_version(xcconfig_mock_content:, expected_version: 'n/a')
       end.to raise_error(FastlaneCore::Interface::FastlaneError)
     end
 
@@ -70,7 +70,7 @@ describe Fastlane::Actions::IosGetAppVersionAction do
       CONTENT
 
       expect do
-        expect_version(xcconfig_mock_content: xcconfig_mock_content, expected_version: 'n/a')
+        expect_version(xcconfig_mock_content:, expected_version: 'n/a')
       end.to raise_error(FastlaneCore::Interface::FastlaneError)
     end
 

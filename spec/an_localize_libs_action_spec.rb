@@ -32,7 +32,7 @@ describe Fastlane::Actions::AnLocalizeLibsAction do
         File.write(lib2_strings_path, android_xml_with_lines(['<string name="a_lib2_string">test from lib 2</string>']))
 
         run_described_fastlane_action(
-          app_strings_path: app_strings_path,
+          app_strings_path:,
           libs_strings_path: [
             { library: 'lib_1', strings_path: lib1_strings_path, exclusions: [] },
             { library: 'lib_2', strings_path: lib2_strings_path, exclusions: [] },
@@ -67,7 +67,7 @@ describe Fastlane::Actions::AnLocalizeLibsAction do
         File.write(lib_strings_path, android_xml_with_lines(lib_xml_lines))
 
         run_described_fastlane_action(
-          app_strings_path: app_strings_path,
+          app_strings_path:,
           libs_strings_path: [
             { library: 'lib', strings_path: lib_strings_path, exclusions: [] },
           ]
@@ -108,7 +108,7 @@ describe Fastlane::Actions::AnLocalizeLibsAction do
         File.write(lib2_strings_path, android_xml_with_lines(lib2_xml_lines))
 
         run_described_fastlane_action(
-          app_strings_path: app_strings_path,
+          app_strings_path:,
           libs_strings_path: [
             { library: 'lib1', strings_path: lib1_strings_path, source_id: 'lib1-id' },
             { library: 'lib2', strings_path: lib2_strings_path, source_id: 'lib2-id' },
@@ -157,7 +157,7 @@ describe Fastlane::Actions::AnLocalizeLibsAction do
         File.write(lib2_strings_path, android_xml_with_lines(lib2_xml_lines))
 
         run_described_fastlane_action(
-          app_strings_path: app_strings_path,
+          app_strings_path:,
           libs_strings_path: [
             { library: 'lib1', strings_path: lib1_strings_path, source_id: 'lib1', add_ignore_attr: true },
             { library: 'lib2', strings_path: lib2_strings_path, source_id: 'lib2' },
@@ -201,7 +201,7 @@ describe Fastlane::Actions::AnLocalizeLibsAction do
         File.write(lib_strings_path, android_xml_with_lines(lib_xml_lines))
 
         run_described_fastlane_action(
-          app_strings_path: app_strings_path,
+          app_strings_path:,
           libs_strings_path: [
             { library: 'lib', strings_path: lib_strings_path, exclusions: ['override-missing'] },
           ]

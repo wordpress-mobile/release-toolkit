@@ -7,7 +7,7 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
   let(:locales_subset) { { 'fr-FR': 'fr', 'zh-cn': 'zh-Hans' } }
 
   def gp_stub(locale:, query:)
-    stub_request(:get, "#{gp_fake_url}/#{locale}/default/export-translations/").with(query: query)
+    stub_request(:get, "#{gp_fake_url}/#{locale}/default/export-translations/").with(query:)
   end
 
   describe 'downloading export files from GlotPress' do
@@ -26,7 +26,7 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
           locales: locales_subset,
           download_dir: tmp_dir,
           table_basename: tablename,
-          filters: filters
+          filters:
         }.compact)
 
         # Assert
@@ -95,7 +95,7 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
         run_described_fastlane_action(
           project_url: gp_fake_url,
           locales: { 'fr-FR': 'fr' },
-          download_dir: download_dir
+          download_dir:
         )
       end
 

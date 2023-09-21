@@ -163,7 +163,7 @@ module Fastlane
           diff_string = diff_string.slice(0..(end_index - 1))
 
           lib_strings.xpath('//string').each do |string_node|
-            verify_string(main_strings, library, string_node) if string_node.attr('name') == diff_string
+            res = verify_string(main_strings, library, string_node) if string_node.attr('name') == diff_string
           end
         end
 
@@ -243,7 +243,7 @@ module Fastlane
           locales_map.each do |lang_codes|
             all_xml_documents = glotpress_filters.map do |filters|
               UI.message "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]}) [#{filters}]..."
-              download_glotpress_export_file(project_url: glotpress_project_url, locale: lang_codes[:glotpress], filters: filters)
+              download_glotpress_export_file(project_url: glotpress_project_url, locale: lang_codes[:glotpress], filters:)
             end.compact
             next if all_xml_documents.empty?
 

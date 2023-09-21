@@ -54,7 +54,7 @@ end
 def expect_shell_command(*, exitstatus: 0, output: '')
   mock_input = double(:input)
   mock_output = StringIO.new(output)
-  mock_status = double(:status, exitstatus: exitstatus)
+  mock_status = double(:status, exitstatus:)
   mock_thread = double(:thread, value: mock_status)
 
   expect(Open3).to receive(:popen2e).with(*).and_yield(mock_input, mock_output, mock_thread)

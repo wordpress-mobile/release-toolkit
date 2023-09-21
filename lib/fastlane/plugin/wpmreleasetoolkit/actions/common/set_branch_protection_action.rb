@@ -11,7 +11,7 @@ module Fastlane
 
         settings = if params[:keep_existing_settings_unchanged]
                      Fastlane::Helper::GithubHelper.branch_protection_api_response_to_normalized_hash(
-                       github_helper.get_branch_protection(repository: repository, branch: branch_name)
+                       github_helper.get_branch_protection(repository:, branch: branch_name)
                      )
                    else
                      {}
@@ -58,7 +58,7 @@ module Fastlane
 
         # API Call - See https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection
         response = github_helper.set_branch_protection(
-          repository: repository,
+          repository:,
           branch: branch_name,
           **settings
         )

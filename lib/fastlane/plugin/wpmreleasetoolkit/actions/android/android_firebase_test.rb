@@ -33,14 +33,14 @@ module Fastlane
           project_id: params[:project_id],
           apk_path: params[:apk_path],
           test_apk_path: params[:test_apk_path],
-          device: device,
+          device:,
           test_targets: params[:test_targets],
           type: params[:type]
         )
 
         # Download all of the outputs from the job to the local machine
         FirebaseTestRunner.download_result_files(
-          result: result,
+          result:,
           destination: test_dir,
           project_id: params[:project_id],
           key_file_path: params[:key_file]

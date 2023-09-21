@@ -74,7 +74,7 @@ module Fastlane
       end
 
       def to_hash
-        { file: file, destination: destination, encrypt: encrypt }
+        { file: self.file, destination: self.destination, encrypt: self.encrypt }
       end
     end
   end
