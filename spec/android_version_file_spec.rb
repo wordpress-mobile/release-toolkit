@@ -29,7 +29,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
 
       with_tmp_file(named: 'version.properties', content: expected_content) do |tmp_file_path|
         version_name = described_class.new(version_properties_path: tmp_file_path).read_version_name
-        expect(version_name.to_s).to eq('12.3.0.1')
+        expect(version_name.to_s).to eq('12.3-rc-1')
       end
     end
 
@@ -42,7 +42,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       with_tmp_file(named: 'version.properties', content: expected_content) do |tmp_file_path|
         version_name = described_class.new(version_properties_path: tmp_file_path).read_version_name
 
-        expect(version_name.to_s).to eq('12.3.0.0')
+        expect(version_name.to_s).to eq('12.3')
       end
     end
 
@@ -55,7 +55,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       with_tmp_file(named: 'version.properties', content: expected_content) do |tmp_file_path|
         version_name = described_class.new(version_properties_path: tmp_file_path).read_version_name
 
-        expect(version_name.to_s).to eq('12.3.1.0')
+        expect(version_name.to_s).to eq('12.3.1')
       end
     end
 
@@ -68,7 +68,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       with_tmp_file(named: 'version.properties', content: expected_content) do |tmp_file_path|
         version_name = described_class.new(version_properties_path: tmp_file_path).read_version_name
 
-        expect(version_name.to_s).to eq('12.3.1.2')
+        expect(version_name.to_s).to eq('12.3.1-rc-2')
       end
     end
   end
