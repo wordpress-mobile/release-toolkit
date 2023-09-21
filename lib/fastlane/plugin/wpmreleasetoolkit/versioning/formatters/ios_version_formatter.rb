@@ -25,7 +25,7 @@ module Fastlane
         def internal_version(version)
           # Create a VersionCalculator instance and calculate the next internal version
           # based on the current `@version`.
-          VersionCalculator.new.next_internal_version(version)
+          VersionCalculator.new.next_internal_version(after: version)
 
           # Return the calculated version
           "#{version.major}.#{version.minor}.#{version.patch}.#{version.build_number}"

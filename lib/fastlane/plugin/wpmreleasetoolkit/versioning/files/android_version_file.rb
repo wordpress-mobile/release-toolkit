@@ -17,8 +17,6 @@ module Fastlane
 
         # Reads the version name from a version.properties file.
         #
-        # @param version_properties_path [String] The path to the version.properties file.
-        #
         # @return [AppVersion] An instance of `AppVersion` representing the version name read from the file.
         #
         # @raise [UI::Error] If the file_path is nil or the version name is not found.
