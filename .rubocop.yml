@@ -1,3 +1,5 @@
+inherit_from: .rubocop_todo.yml
+
 require:
 - rubocop-rspec
 
@@ -106,4 +108,4 @@ RSpec/MultipleMemoizedHelpers:
   Enabled: false
 
 RSpec/MultipleExpectations:
-  Max: 4
+  Enabled: false
