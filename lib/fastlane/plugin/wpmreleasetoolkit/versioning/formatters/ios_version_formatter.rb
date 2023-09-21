@@ -18,7 +18,7 @@ module Fastlane
           UI.user_error!("The version string must have four components. This version string has #{components.count} components") unless components.count == 4
 
           # Create a new AppVersion instance from the version string components
-          AppVersion.new(*components.map(&:to_i))
+          Fastlane::Models::AppVersion.new(*components.map(&:to_i))
         end
 
         # Format the beta version of the iOS app

@@ -1,6 +1,24 @@
 require 'spec_helper'
 
 describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFormatter do
+  describe 'parses a version string' do
+    it 'returns a version object when provided with a release version name string' do
+      version = described_class.new.parse('1.2.3')
+      expect(version.major).to eq(1)
+      expect(version.minor).to eq(2)
+      expect(version.patch).to eq(3)
+      expect(version.build_number).to eq(0)
+    end
+
+    it 'returns a version object when provided with a beta version name string' do
+      version = described_class.new.parse('1.2.3-rc-4')
+      expect(version.major).to eq(1)
+      expect(version.minor).to eq(2)
+      expect(version.patch).to eq(3)
+      expect(version.build_number).to eq(4)
+    end
+  end
+
   describe 'formats a beta version number with the correct format' do
     it 'raises an error when the build number is 0' do
       version = Fastlane::Models::AppVersion.new(1, 2, 3, 0)

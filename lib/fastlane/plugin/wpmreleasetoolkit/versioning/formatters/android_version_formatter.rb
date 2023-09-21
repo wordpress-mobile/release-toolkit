@@ -19,11 +19,11 @@ module Fastlane
           # Set the build number to 0 by default so that it will be set correctly for non-beta version numbers
           build_number = 0
 
-          if version_name.include?(beta_identifier)
+          if version_name.include?(RC_SUFFIX)
             # Extract the build number from the version name
-            build_number = version_name.split('-')[2]
+            build_number = version_name.split('-')[2].to_i
             # Extract the version name without the build number and drop the RC suffix
-            version_name = version_name.split(beta_identifier)[0]
+            version_name = version_name.split(RC_SUFFIX)[0]
           end
 
           # Split the version name into its components
