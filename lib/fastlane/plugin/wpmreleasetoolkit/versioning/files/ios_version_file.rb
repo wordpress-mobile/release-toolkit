@@ -15,29 +15,26 @@ module Fastlane
           @xcconfig_path = xcconfig_path
         end
 
-        # Reads the app version from the .xcconfig file and returns it as an AppVersion object.
+        # Reads the app version from the .xcconfig file and returns it as a String.
         #
-        # @return [Fastlane::Models::AppVersion] The app version.
+        # @return [String] The app version.
         #
         def read_app_version
           verify_xcconfig_exists
 
           config = Xcodeproj::Config.new(xcconfig_path)
-          version = config.attributes['VERSION_LONG']
-          parts = version.split('.').map(&:to_i)
-          Fastlane::Models::AppVersion.new(*parts)
+          config.attributes['VERSION_LONG']
         end
 
-        # Reads the build code from the .xcconfig file and returns it as a BuildCode object.
+        # Reads the build code from the .xcconfig file and returns it String.
         #
-        # @return [Fastlane::Models::BuildCode] The build code.
+        # @return [String] The build code.
         #
         def read_build_code
           verify_xcconfig_exists
 
           config = Xcodeproj::Config.new(xcconfig_path)
-          number = config.attributes['BUILD_NUMBER']
-          Fastlane::Models::BuildCode.new(number)
+          config.attributes['BUILD_NUMBER']
         end
 
         # Writes the provided version numbers to the .xcconfig file.

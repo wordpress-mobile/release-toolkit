@@ -6,6 +6,17 @@ module Fastlane
   module Wpmreleasetoolkit
     module Versioning
       class IOSVersionFormatter < VersionFormatter
+        def parse(version)
+          # Split the version string into its components
+          components = version.split('.')
+
+          # Ensure that the version string has at least four components
+          UI.user_error!('The version string must have four components') unless components.count == 4
+
+          # Create a new AppVersion instance from the version string components
+          AppVersion.new(*components.map(&:to_i))
+        end
+
         # Get the beta version of the iOS app
         #
         # @return [AppVersion] The beta-formatted version of the iOS app

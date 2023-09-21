@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFormatter do
   describe 'formats a beta version number with the correct format' do
     it 'raises an error when the build number is 0' do
-      version = Fastlane::Models::AppVersion.new('1.2.3.0')
+      version = Fastlane::Models::AppVersion.new(1, 2, 3, 0)
 
       expect { described_class.new.beta_version(version) }
         .to raise_error(
@@ -13,14 +13,14 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFormatter do
     end
 
     it 'returns a beta version number when provided with a release version object' do
-      version = Fastlane::Models::AppVersion.new('1.2.0.4')
+      version = Fastlane::Models::AppVersion.new(1, 2, 0, 4)
       formatted_version = described_class.new.beta_version(version)
 
       expect(formatted_version).to eq('1.2-rc-4')
     end
 
     it 'returns a beta version number when provided with a patch/hotfix version object' do
-      version = Fastlane::Models::AppVersion.new('1.2.3.4')
+      version = Fastlane::Models::AppVersion.new(1, 2, 3, 4)
       formatted_version = described_class.new.beta_version(version)
 
       expect(formatted_version).to eq('1.2.3-rc-4')

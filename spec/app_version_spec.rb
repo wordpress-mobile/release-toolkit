@@ -20,7 +20,7 @@ describe Fastlane::Models::AppVersion do
     it 'handles nil values' do
       app_version = described_class.new(nil, nil, nil, nil)
       # The AppVersion class uses `to_i` on the values, so nil values are converted to 0
-      expect(app_version.to_s).to eq('0.0.0.0')
+      expect(app_version.to_s).to eq('...')
     end
   end
 end
