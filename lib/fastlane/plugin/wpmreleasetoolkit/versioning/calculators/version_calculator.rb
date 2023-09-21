@@ -54,14 +54,6 @@ module Fastlane
           after
         end
 
-        # Get the current date in the format 'YYYYMMDD'.
-        #
-        # @return [String] The current date in 'YYYYMMDD' format.
-        #
-        def today_date
-          DateTime.now.strftime('%Y%m%d')
-        end
-
         # Calculate the next internal version by setting the build number to the current date.
         #
         # @return [AppVersion] The next version with the build number set to the current date.
@@ -124,6 +116,16 @@ module Fastlane
           before.build_number -= 1
 
           before
+        end
+
+        private
+
+        # Get the current date in the format 'YYYYMMDD'.
+        #
+        # @return [String] The current date in 'YYYYMMDD' format.
+        #
+        def today_date
+          DateTime.now.strftime('%Y%m%d')
         end
       end
     end

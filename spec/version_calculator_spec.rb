@@ -25,14 +25,6 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::VersionCalculator do
       bumped_version = described_class.new.next_build_number(after: version)
       expect(bumped_version.to_s).to eq('19.3.1.2')
     end
-
-    describe 'calculates today\'s date in the correct format' do
-      it 'returns a date string in the correct format' do
-        allow(DateTime).to receive(:now).and_return(DateTime.new(2024, 4, 15))
-        today_date = described_class.new.today_date
-        expect(today_date).to eq('20240415')
-      end
-    end
   end
 
   describe 'calculates the previous version number' do
