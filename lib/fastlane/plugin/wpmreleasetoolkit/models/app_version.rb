@@ -20,6 +20,8 @@ module Fastlane
       end
 
       # Converts the AppVersion object to a string representation.
+      # This should only be used for internal debugging/testing purposes, not to write versions in version files
+      # In order to format an `AppVersion` into a `String`, you should use the appropriate `VersionFormatter` for your project instead.
       #
       # @return [String] a string in the format "major.minor.patch.build_number".
       #
