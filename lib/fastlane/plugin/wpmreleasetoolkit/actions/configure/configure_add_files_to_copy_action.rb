@@ -24,9 +24,7 @@ module Fastlane
             continue = false
           end
 
-          Fastlane::Helper::ConfigureHelper.files_to_copy.each do |file_reference|
-            file_reference.update
-          end
+          Fastlane::Helper::ConfigureHelper.files_to_copy.each(&:update)
         end
       end
 

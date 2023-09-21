@@ -1,3 +1,4 @@
+require 'English'
 require 'fastlane_core/ui/ui'
 require 'fileutils'
 
@@ -95,13 +96,13 @@ module Fastlane
       ### Returns whether or not the `.configure` file has a pinned hash that's older than the most recent
       ### ~/.mobile-secrets` commit hash.
       def self.configure_file_is_behind_local
-        configure_file_commits_behind_repo > 0
+        configure_file_commits_behind_repo.positive?
       end
 
       def self.configure_file_commits_behind_repo
         # Get a sily number of revisions to ensure we don't miss any
         result = `cd #{repository_path} && git --no-pager log -10000 --pretty=format:"%H" && echo`
-        hashes = result.each_line.map { |s| s.strip }.reverse
+        hashes = result.each_line.map(&:strip).reverse
 
         index_of_configure_hash = hashes.find_index(configure_file_commit_hash)
         index_of_repo_commit_hash = hashes.find_index(repo_commit_hash)
@@ -114,13 +115,13 @@ module Fastlane
       ### Get a list of files changed in the secrets repo between to commits
       def self.files_changed_between(commit_hash_1, commit_hash_2)
         result = `cd #{repository_path} && git diff --name-only #{commit_hash_1}...#{commit_hash_2}`
-        result.each_line.map { |s| s.strip }
+        result.each_line.map(&:strip)
       end
 
       ### Determine whether ~/.mobile-secrets` repository is behind its remote counterpart.
       ### (ie – the remote repo has changes that the local repo doesn't)
       def self.repo_is_behind_remote
-        repo_commits_behind_remote > 0
+        repo_commits_behind_remote.positive?
       end
 
       ### Determine how far behind the remote repo the ~/.mobile-secrets` repository is.
@@ -135,7 +136,7 @@ module Fastlane
       ### Determine whether ~/.mobile-secrets` repository is ahead of its remote counterpart.
       ### (ie – the local repo has changes that the remote repo doesn't)
       def self.repo_is_ahead_of_remote
-        repo_commits_ahead_of_remote > 0
+        repo_commits_ahead_of_remote.positive?
       end
 
       ### Determine how far ahead of the remote repo the ~/.mobile-secrets` repository is.
@@ -192,7 +193,7 @@ module Fastlane
           end
         end
 
-        files_to_copy.map { |o| o.file } + expanded_file_dependencies
+        files_to_copy.map(&:file) + expanded_file_dependencies
       end
 
       ## If we specify a directory in `file_dependencies` instead of listing each file
@@ -273,7 +274,7 @@ module Fastlane
         `cd #{repository_path} && git add keys.json && git commit -m "Update keys.json for #{configuration.project_name}" && git push origin #{repo_branch_name}`
 
         # Check command success
-        UI.user_error!("Failed to update encryption key for #{configuration.project_name}") unless $?.success?
+        UI.user_error!("Failed to update encryption key for #{configuration.project_name}") unless $CHILD_STATUS.success?
       end
     end
   end

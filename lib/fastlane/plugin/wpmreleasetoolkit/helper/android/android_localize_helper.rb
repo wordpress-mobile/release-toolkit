@@ -27,7 +27,7 @@ module Fastlane
           return false if library[:exclusions].nil?
 
           skip = library[:exclusions].include?(string_name)
-          return unless skip
+          return false unless skip
 
           UI.message " - Skipping #{string_name} string"
           true
@@ -163,7 +163,7 @@ module Fastlane
           diff_string = diff_string.slice(0..(end_index - 1))
 
           lib_strings.xpath('//string').each do |string_node|
-            res = verify_string(main_strings, library, string_node) if string_node.attr('name') == diff_string
+            verify_string(main_strings, library, string_node) if string_node.attr('name') == diff_string
           end
         end
 
@@ -377,8 +377,8 @@ module Nokogiri
         oa = other.attributes
         return false unless sa.length == oa.length
 
-        sa = sa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
-        oa = oa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
+        sa = sa.sort.map { |n, a| [n, a.value, a.namespace&.href] }
+        oa = oa.sort.map { |n, a| [n, a.value, a.namespace&.href] }
         return false unless sa == oa
 
         skids = children

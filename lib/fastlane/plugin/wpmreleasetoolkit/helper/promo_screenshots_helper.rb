@@ -397,7 +397,7 @@ module Fastlane
       end
 
       def create_image(width, height, background = 'transparent')
-        background_color = background.paint.to_hex
+        background.paint.to_hex
 
         Image.new(width, height) do
           self.background_color = background
@@ -431,13 +431,13 @@ module Fastlane
       def resolve_text_into_path(text, locale)
         localized_file = format(text, locale)
 
-        text = if File.exist?(localized_file)
-                 localized_file
-               elsif can_resolve_path(localized_file)
-                 resolve_path(localized_file).realpath.to_s
-               else
-                 format(text, 'source')
-               end
+        if File.exist?(localized_file)
+          localized_file
+        elsif can_resolve_path(localized_file)
+          resolve_path(localized_file).realpath.to_s
+        else
+          format(text, 'source')
+        end
       end
     end
   end

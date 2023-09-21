@@ -34,9 +34,7 @@ module Fastlane
           update_configure_file
         end
 
-        Fastlane::Helper::ConfigureHelper.files_to_copy.each do |file_reference|
-          file_reference.update
-        end
+        Fastlane::Helper::ConfigureHelper.files_to_copy.each(&:update)
 
         UI.success "Configuration Secrets are up to date – don't forget to commit your changes to `.configure`."
 

@@ -89,7 +89,7 @@ module Fastlane
         #
         def self.calc_prev_release_version(version)
           vp = get_version_parts(version)
-          if vp[MINOR_NUMBER] == 0
+          if (vp[MINOR_NUMBER]).zero?
             vp[MAJOR_NUMBER] -= 1
             vp[MINOR_NUMBER] = 9
           else
@@ -134,7 +134,7 @@ module Fastlane
         #
         def self.calc_prev_build_version(version)
           vp = get_version_parts(version)
-          vp[BUILD_NUMBER] -= 1 unless vp[BUILD_NUMBER] == 0
+          vp[BUILD_NUMBER] -= 1 unless (vp[BUILD_NUMBER]).zero?
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}.#{vp[BUILD_NUMBER]}"
         end
 
@@ -147,8 +147,8 @@ module Fastlane
         #
         def self.calc_prev_hotfix_version(version)
           vp = get_version_parts(version)
-          vp[HOTFIX_NUMBER] -= 1 unless vp[HOTFIX_NUMBER] == 0
-          return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}" unless vp[HOTFIX_NUMBER] == 0
+          vp[HOTFIX_NUMBER] -= 1 unless (vp[HOTFIX_NUMBER]).zero?
+          return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}" unless (vp[HOTFIX_NUMBER]).zero?
 
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}"
         end
@@ -267,7 +267,7 @@ module Fastlane
         #
         def self.get_version_parts(version)
           parts = version.split('.')
-          parts = parts.fill('0', parts.length...4).map { |chr| chr.to_i }
+          parts = parts.fill('0', parts.length...4).map(&:to_i)
           UI.user_error!("Bad version string: #{version}") if parts.length > 4
 
           parts
