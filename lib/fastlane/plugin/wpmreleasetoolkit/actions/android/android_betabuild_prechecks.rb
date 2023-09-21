@@ -42,7 +42,7 @@ module Fastlane
 
         # Check user overwrite
         unless params[:base_version].nil?
-          overwrite_version = get_user_build_version(version: params[:base_version], message: message)
+          overwrite_version = get_user_build_version(version: params[:base_version], message:)
           release_version = overwrite_version[0]
           alpha_release_version = overwrite_version[1]
         end

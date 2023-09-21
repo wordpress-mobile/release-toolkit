@@ -18,16 +18,16 @@ module Fastlane
 
         case params[:format]
         when 'csv'
-          csv = Helper.format_csv(app_sizes, devices: devices)
+          csv = Helper.format_csv(app_sizes, devices:)
           UI.message "Result (CSV)\n\n#{csv}\n"
         when 'markdown'
-          tables = Helper.format_markdown(app_sizes, devices: devices)
+          tables = Helper.format_markdown(app_sizes, devices:)
           tables.each do |table|
             UI.message "Result (Markdown)\n\n#{table}\n"
           end
         end
 
-        return app_sizes
+        app_sizes
       end
 
       #####################################################
@@ -114,7 +114,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
     end
   end

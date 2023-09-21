@@ -21,7 +21,7 @@ module Fastlane
       def download(target_locale, glotpress_url, is_source)
         uri = URI(glotpress_url)
         response = Net::HTTP.get_response(uri)
-        handle_glotpress_download(response: response, locale: target_locale, is_source: is_source)
+        handle_glotpress_download(response:, locale: target_locale, is_source:)
       end
 
       # Parse JSON data and update the local files
@@ -34,8 +34,8 @@ module Fastlane
         end
 
         loc_data.each do |d|
-          key = d[0].split(/\u0004/).first
-          source = d[0].split(/\u0004/).last
+          key = d[0].split("\u0004").first
+          source = d[0].split("\u0004").last
 
           target_files.each do |file|
             next unless file[0].to_s == key
@@ -50,8 +50,8 @@ module Fastlane
       # Parse JSON data and update the local files
       def reparse_alternates(target_locale, loc_data, is_source)
         loc_data.each do |d|
-          key = d[0].split(/\u0004/).first
-          source = d[0].split(/\u0004/).last
+          key = d[0].split("\u0004").first
+          source = d[0].split("\u0004").last
 
           @alternates.each do |file|
             puts "Data: #{file[0]} - key: #{key}"
@@ -109,7 +109,11 @@ module Fastlane
           # All good, parse the result
           UI.success("Successfully downloaded `#{locale}`.")
           @alternates.clear
-          loc_data = JSON.parse(response.body) rescue loc_data = nil
+          loc_data = begin
+            JSON.parse(response.body)
+          rescue StandardError
+            loc_data = nil
+          end
           parse_data(locale, loc_data, is_source)
           reparse_alternates(target_locale, loc_data, is_source) unless @alternates.empty?
         when '301'

@@ -1,4 +1,4 @@
-require_relative './spec_helper'
+require_relative 'spec_helper'
 
 describe Fastlane::Helper::Ios::L10nHelper do
   let(:test_data_dir) { File.join(File.dirname(__FILE__), 'test-data', 'translations', 'ios_l10n_helper') }
@@ -50,7 +50,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
 
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         output_file = File.join(tmp_dir, 'output.strings')
-        described_class.merge_strings(paths: paths, output_path: output_file)
+        described_class.merge_strings(paths:, output_path: output_file)
         expect(File.read(output_file)).to eq(File.read(fixture('expected-merged.strings')))
         expect(file_encoding(output_file)).to eq(Encoding::UTF_8)
       end
@@ -62,7 +62,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         paths.each { |f| FileUtils.cp(f, tmp_dir) }
         paths = paths.to_h { |f| [File.join(tmp_dir, File.basename(f)), nil] }
-        described_class.merge_strings(paths: paths, output_path: paths.keys.first)
+        described_class.merge_strings(paths:, output_path: paths.keys.first)
         expect(File.read(paths.keys.first)).to eq(File.read(fixture('expected-merged.strings')))
       end
     end
@@ -82,7 +82,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
       }
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         output_file = File.join(tmp_dir, 'output.strings')
-        duplicates = described_class.merge_strings(paths: paths, output_path: output_file)
+        duplicates = described_class.merge_strings(paths:, output_path: output_file)
         expect(File.read(output_file)).to eq(File.read(fixture('expected-merged-prefixed.strings')))
         # We should also not find duplicates anymore, given that `key1` and `key2` (duplicates from `Localizable-utf16.strings`
         # and `non-latin-utf16.strings` files) will now be prefixed differently, and thus made different during merge
@@ -94,7 +94,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
       paths = { fixture('Localizable-utf16.strings') => nil, fixture('non-latin-utf16.strings') => nil }
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         output_file = File.join(tmp_dir, 'output.strings')
-        duplicates = described_class.merge_strings(paths: paths, output_path: output_file)
+        duplicates = described_class.merge_strings(paths:, output_path: output_file)
         expect(duplicates).to eq(%w[key1 key2])
       end
     end
@@ -104,7 +104,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         output_file = File.join(tmp_dir, 'output.strings')
         expect do
-          described_class.merge_strings(paths: paths, output_path: output_file)
+          described_class.merge_strings(paths:, output_path: output_file)
         end.to raise_exception(RuntimeError, "The file `#{paths.keys[1]}` is in xml format but we currently only support merging `.strings` files in text format.")
       end
     end
@@ -114,7 +114,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         output_file = File.join(tmp_dir, 'output.strings')
         expect do
-          described_class.merge_strings(paths: paths, output_path: output_file)
+          described_class.merge_strings(paths:, output_path: output_file)
         end.to raise_exception(RuntimeError, "The file `#{paths.keys[1]}` does not exist or is of unknown format.")
       end
     end
@@ -178,7 +178,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         output_file = File.join(tmp_dir, 'output.strings')
         # 3. Generate XML strings file from the filtered hash
-        described_class.generate_strings_file_from_hash(translations: translations, output_path: output_file)
+        described_class.generate_strings_file_from_hash(translations:, output_path: output_file)
         expect(File.read(output_file)).to eq(File.read(expected_file))
       end
     end
@@ -242,7 +242,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
           # Note: in practice it seems that GlotPress's `.strings` exports are using UTF-8 (but served as `application/octet-stream`)
           #       but it does not hurt to ensure the download to a file can work with UTF-16 (and copy the binary stream verbatim)
           body = File.read(fixture('Localizable-utf16.strings'))
-          stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations/").with(query: { format: 'strings' }).to_return(body: body)
+          stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations/").with(query: { format: 'strings' }).to_return(body:)
           dest = File.join(tmp_dir, 'export.strings')
           # Act
           described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: nil, destination: dest)

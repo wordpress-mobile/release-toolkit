@@ -16,9 +16,9 @@ module Fastlane
 
         repo_status = Actions.sh('git status --porcelain')
         repo_clean = repo_status.empty?
-        unless repo_clean
-          Action.sh('git commit -m "Update metadata strings"')
-        end
+        return if repo_clean
+
+        Action.sh('git commit -m "Update metadata strings"')
       end
 
       #####################################################
@@ -73,7 +73,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
     end
   end

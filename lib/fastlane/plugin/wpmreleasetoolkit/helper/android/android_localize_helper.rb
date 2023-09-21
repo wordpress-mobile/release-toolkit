@@ -19,7 +19,7 @@ module Fastlane
             return true
           end
 
-          return false
+          false
         end
 
         # Checks if `string_name` is in the exclusion list
@@ -27,10 +27,10 @@ module Fastlane
           return false if library[:exclusions].nil?
 
           skip = library[:exclusions].include?(string_name)
-          if skip
-            UI.message " - Skipping #{string_name} string"
-            return true
-          end
+          return unless skip
+
+          UI.message " - Skipping #{string_name} string"
+          true
         end
 
         # Adds the appropriate XML attributes to an XML `<string>` node according to library configuration
@@ -77,7 +77,7 @@ module Fastlane
           # String not found, or removed because needing update and not in the exclusion list: add to the main file
           add_xml_attributes!(lib_string_node, library)
           main_strings_xml.xpath('//string').last.add_next_sibling("\n#{' ' * 4}#{lib_string_node.to_xml.strip}")
-          return result
+          result
         end
 
         # Verify a string node from a library has properly been merged into the main one
@@ -149,21 +149,21 @@ module Fastlane
           end
 
           UI.message("Done (#{added_count} added, #{updated_count} updated, #{untouched_count} untouched, #{skipped_count} skipped).")
-          return (added_count + updated_count) != 0
+          (added_count + updated_count) != 0
         end
 
         def self.verify_diff(diff_string, main_strings, lib_strings, library)
-          if diff_string.start_with?('name=')
-            diff_string.slice!('name="')
+          return unless diff_string.start_with?('name=')
 
-            end_index = diff_string.index('"')
-            end_index ||= diff_string.length # Use the whole string if there's no '"'
+          diff_string.slice!('name="')
 
-            diff_string = diff_string.slice(0..(end_index - 1))
+          end_index = diff_string.index('"')
+          end_index ||= diff_string.length # Use the whole string if there's no '"'
 
-            lib_strings.xpath('//string').each do |string_node|
-              res = verify_string(main_strings, library, string_node) if string_node.attr('name') == diff_string
-            end
+          diff_string = diff_string.slice(0..(end_index - 1))
+
+          lib_strings.xpath('//string').each do |string_node|
+            res = verify_string(main_strings, library, string_node) if string_node.attr('name') == diff_string
           end
         end
 
@@ -243,7 +243,7 @@ module Fastlane
           locales_map.each do |lang_codes|
             all_xml_documents = glotpress_filters.map do |filters|
               UI.message "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]}) [#{filters}]..."
-              download_glotpress_export_file(project_url: glotpress_project_url, locale: lang_codes[:glotpress], filters: filters)
+              download_glotpress_export_file(project_url: glotpress_project_url, locale: lang_codes[:glotpress], filters:)
             end.compact
             next if all_xml_documents.empty?
 
@@ -290,7 +290,7 @@ module Fastlane
           rescue StandardError => e
             UI.error "Error downloading #{locale} - #{e.message}"
             retry if e.is_a?(OpenURI::HTTPError) && UI.confirm("Retry downloading `#{locale}`?")
-            return nil
+            nil
           end
         end
         private_class_method :download_glotpress_export_file
@@ -331,12 +331,12 @@ module Fastlane
           tag.content = tag.content.gsub('...', '…')
 
           # Typography en-dash
-          if tag.content.include?('-')
-            tag.content = tag.content.gsub(/(\d+\s*)-(\s*\d+)/) do |str|
-              match = Regexp.last_match # of type `MatchData`. match[0] == str == whole match, match[1] = 1st capture group (left part of the range), match[2] = second capture group (right part of the range)
-              is_negative_number = match[2][0] != ' ' && match[1][-1] == ' ' # if right part of range does not start with a space (e.g. `-3`), but left part of range does end with space, it's not a range after all but more likely a list containing negative numbers in it (e.g. `2 -3`)
-              is_negative_number ? str : "#{match[1]}\u{2013}#{match[2]}"
-            end
+          return unless tag.content.include?('-')
+
+          tag.content = tag.content.gsub(/(\d+\s*)-(\s*\d+)/) do |str|
+            match = Regexp.last_match # of type `MatchData`. match[0] == str == whole match, match[1] = 1st capture group (left part of the range), match[2] = second capture group (right part of the range)
+            is_negative_number = match[2][0] != ' ' && match[1][-1] == ' ' # if right part of range does not start with a space (e.g. `-3`), but left part of range does end with space, it's not a range after all but more likely a list containing negative numbers in it (e.g. `2 -3`)
+            is_negative_number ? str : "#{match[1]}\u{2013}#{match[2]}"
           end
         end
         private_class_method :apply_substitutions
@@ -347,9 +347,9 @@ module Fastlane
         # @param [String] lang The language we are currently processing. Used for providing context during logging / warning message
         #
         def self.quick_lint(string_tag, lang)
-          if string_tag['formatted'] == 'false' && string_tag.content.include?('%%')
-            UI.important "Warning: [#{lang}] translation for '#{string_tag['name']}' has attribute formatted=false, but still contains escaped '%%' in translation."
-          end
+          return unless string_tag['formatted'] == 'false' && string_tag.content.include?('%%')
+
+          UI.important "Warning: [#{lang}] translation for '#{string_tag['name']}' has attribute formatted=false, but still contains escaped '%%' in translation."
         end
         private_class_method :quick_lint
 

@@ -10,7 +10,7 @@ module Fastlane
       end
 
       def source_contents
-        return File.read(secrets_repository_file_path) unless self.encrypt || FastlaneCore::Helper.is_ci?
+        return File.read(secrets_repository_file_path) unless encrypt || FastlaneCore::Helper.is_ci?
         return nil unless File.file?(encrypted_file_path)
 
         encrypted = File.read(encrypted_file_path)
@@ -29,7 +29,7 @@ module Fastlane
       end
 
       def update
-        return unless self.encrypt
+        return unless encrypt
 
         # Create the destination directory if it doesn't exist
         FileUtils.mkdir_p(Pathname.new(encrypted_file_path).dirname)
@@ -56,17 +56,17 @@ module Fastlane
       end
 
       def secrets_repository_file_path
-        File.join(Fastlane::Helper::FilesystemHelper.secret_store_dir, self.file)
+        File.join(Fastlane::Helper::FilesystemHelper.secret_store_dir, file)
       end
 
       def encrypted_file_path
-        Fastlane::Helper::FilesystemHelper.encrypted_file_path(self.file)
+        Fastlane::Helper::FilesystemHelper.encrypted_file_path(file)
       end
 
       def destination_file_path
-        return File.expand_path(self.destination) if self.destination.start_with?('~')
+        return File.expand_path(destination) if destination.start_with?('~')
 
-        File.join(Fastlane::Helper::FilesystemHelper.project_path, self.destination)
+        File.join(Fastlane::Helper::FilesystemHelper.project_path, destination)
       end
 
       def encryption_key
@@ -74,7 +74,7 @@ module Fastlane
       end
 
       def to_hash
-        { file: self.file, destination: self.destination, encrypt: self.encrypt }
+        { file:, destination:, encrypt: }
       end
     end
   end

@@ -14,8 +14,8 @@ module Fastlane
         else
           # Add new annotation using `buildkite-agent`
           extra_params = {
-            context: context,
-            style: style
+            context:,
+            style:
           }.compact.flat_map { |k, v| ["--#{k}", v] }
           sh('buildkite-agent', 'annotate', *extra_params, params[:message])
         end

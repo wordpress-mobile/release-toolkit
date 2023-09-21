@@ -59,7 +59,7 @@ module Fastlane
       # @param [String] with_lproj The new name of the `.lproj` parent folder to point to
       #
       def self.replace_lproj_in_path(path, with_lproj:)
-        File.join(File.dirname(File.dirname(path)), with_lproj, File.basename(path))
+        File.join(File.dirname(path, 2), with_lproj, File.basename(path))
       end
 
       #####################################################
@@ -129,7 +129,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
     end
   end

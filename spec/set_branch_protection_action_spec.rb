@@ -31,15 +31,15 @@ describe Fastlane::Actions::SetBranchProtectionAction do
           dismiss_stale_reviews: false,
           require_code_owner_reviews: false
         },
-        restrictions: restrictions
+        restrictions:
       }
 
       expect(client).to receive(:protect_branch).with(repo, branch, expected_options)
 
       run_described_fastlane_action(
         repository: repo,
-        branch: branch,
-        github_token: github_token,
+        branch:,
+        github_token:,
         **additional_options
       )
     end
@@ -52,16 +52,16 @@ describe Fastlane::Actions::SetBranchProtectionAction do
           dismiss_stale_reviews: false,
           require_code_owner_reviews: false
         },
-        restrictions: restrictions
+        restrictions:
       }
 
       expect(client).to receive(:protect_branch).with(repo, branch, expected_options)
 
       run_described_fastlane_action(
         repository: repo,
-        branch: branch,
+        branch:,
         required_ci_checks: [],
-        github_token: github_token,
+        github_token:,
         **additional_options
       )
     end
@@ -81,16 +81,16 @@ describe Fastlane::Actions::SetBranchProtectionAction do
           dismiss_stale_reviews: false,
           require_code_owner_reviews: false
         },
-        restrictions: restrictions
+        restrictions:
       }
 
       expect(client).to receive(:protect_branch).with(repo, branch, expected_options)
 
       run_described_fastlane_action(
         repository: repo,
-        branch: branch,
+        branch:,
         required_ci_checks: %w[check1 check2 check3],
-        github_token: github_token,
+        github_token:,
         **additional_options
       )
     end
@@ -103,16 +103,16 @@ describe Fastlane::Actions::SetBranchProtectionAction do
           require_code_owner_reviews: false,
           required_approving_review_count: 3
         },
-        restrictions: restrictions
+        restrictions:
       }
 
       expect(client).to receive(:protect_branch).with(repo, branch, expected_options)
 
       run_described_fastlane_action(
         repository: repo,
-        branch: branch,
+        branch:,
         required_approving_review_count: 3,
-        github_token: github_token,
+        github_token:,
         **additional_options
       )
     end
@@ -124,16 +124,16 @@ describe Fastlane::Actions::SetBranchProtectionAction do
           dismiss_stale_reviews: false,
           require_code_owner_reviews: false
         },
-        restrictions: restrictions
+        restrictions:
       }
 
       expect(client).to receive(:protect_branch).with(repo, branch, expected_options)
 
       run_described_fastlane_action(
         repository: repo,
-        branch: branch,
+        branch:,
         enforce_admins: true,
-        github_token: github_token,
+        github_token:,
         **additional_options
       )
     end
@@ -145,7 +145,7 @@ describe Fastlane::Actions::SetBranchProtectionAction do
           dismiss_stale_reviews: false,
           require_code_owner_reviews: false
         },
-        restrictions: restrictions,
+        restrictions:,
         allow_force_pushes: true
       }
 
@@ -153,9 +153,9 @@ describe Fastlane::Actions::SetBranchProtectionAction do
 
       run_described_fastlane_action(
         repository: repo,
-        branch: branch,
+        branch:,
         allow_force_pushes: true,
-        github_token: github_token,
+        github_token:,
         **additional_options
       )
     end
@@ -167,7 +167,7 @@ describe Fastlane::Actions::SetBranchProtectionAction do
           dismiss_stale_reviews: false,
           require_code_owner_reviews: false
         },
-        restrictions: restrictions,
+        restrictions:,
         lock_branch: true
       }
 
@@ -175,9 +175,9 @@ describe Fastlane::Actions::SetBranchProtectionAction do
 
       run_described_fastlane_action(
         repository: repo,
-        branch: branch,
+        branch:,
         lock_branch: true,
-        github_token: github_token,
+        github_token:,
         **additional_options
       )
     end
@@ -241,8 +241,8 @@ describe Fastlane::Actions::SetBranchProtectionAction do
 
       run_described_fastlane_action(
         repository: repo,
-        branch: branch,
-        github_token: github_token
+        branch:,
+        github_token:
       )
     end
 
@@ -254,9 +254,9 @@ describe Fastlane::Actions::SetBranchProtectionAction do
 
       run_described_fastlane_action(
         repository: repo,
-        branch: branch,
+        branch:,
         required_ci_checks: [],
-        github_token: github_token
+        github_token:
       )
     end
 
@@ -272,9 +272,9 @@ describe Fastlane::Actions::SetBranchProtectionAction do
 
       run_described_fastlane_action(
         repository: repo,
-        branch: branch,
+        branch:,
         required_ci_checks: %w[new/check1 new/check2 new/check3],
-        github_token: github_token
+        github_token:
       )
     end
 
@@ -287,9 +287,9 @@ describe Fastlane::Actions::SetBranchProtectionAction do
 
       run_described_fastlane_action(
         repository: repo,
-        branch: branch,
+        branch:,
         required_approving_review_count: 3,
-        github_token: github_token
+        github_token:
       )
     end
 
@@ -302,9 +302,9 @@ describe Fastlane::Actions::SetBranchProtectionAction do
 
       run_described_fastlane_action(
         repository: repo,
-        branch: branch,
+        branch:,
         enforce_admins: false,
-        github_token: github_token
+        github_token:
       )
     end
 
@@ -317,9 +317,9 @@ describe Fastlane::Actions::SetBranchProtectionAction do
 
       run_described_fastlane_action(
         repository: repo,
-        branch: branch,
+        branch:,
         allow_force_pushes: false,
-        github_token: github_token
+        github_token:
       )
     end
 
@@ -332,9 +332,9 @@ describe Fastlane::Actions::SetBranchProtectionAction do
 
       run_described_fastlane_action(
         repository: repo,
-        branch: branch,
+        branch:,
         lock_branch: false,
-        github_token: github_token
+        github_token:
       )
     end
   end

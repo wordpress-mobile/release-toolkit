@@ -10,7 +10,7 @@ module Fastlane
 
         github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
         github_helper.remove_branch_protection(
-          repository: repository,
+          repository:,
           branch: branch_name
         )
       rescue Octokit::NotFound

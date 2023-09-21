@@ -39,7 +39,7 @@ module Fastlane
           # NOTE: While JSON is a subset of YAML and thus YAML.load_file would technically cover both cases at once, in practice
           # `JSON.parse` is more lenient with JSON files than `YAML.load_file` is — especially, it accepts `// comments` in the
           # JSON file, despite this not being allowed in the spec — hence why we still try with `JSON.parse` for `.json` files.
-          return File.extname(config_file_path) == '.json' ? JSON.parse(File.read(config_file_path)) : YAML.load_file(config_file_path)
+          File.extname(config_file_path) == '.json' ? JSON.parse(File.read(config_file_path)) : YAML.load_file(config_file_path)
         rescue StandardError => e
           UI.error(e)
           UI.user_error!('Invalid JSON/YAML configuration. Please lint your config file to check for syntax errors.')
@@ -191,7 +191,7 @@ module Fastlane
           end
         end
 
-        return canvas
+        canvas
       end
 
       def draw_file_attachment_to_canvas(attachment, canvas, entry)
@@ -405,12 +405,10 @@ module Fastlane
       end
 
       def can_resolve_path(path)
-        begin
-          resolve_path(path)
-          return true
-        rescue
-          return false
-        end
+        resolve_path(path)
+        true
+      rescue StandardError
+        false
       end
 
       def resolve_path(path)

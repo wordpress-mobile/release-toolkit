@@ -9,7 +9,7 @@ module Fastlane
         head_tags = Fastlane::Helper::GitHelper.list_tags_on_current_commit
         UI.user_error!('HEAD is not on tag. Aborting!') if head_tags.empty?
 
-        return head_tags.include?(version) # Current commit is tagged with "version" tag
+        head_tags.include?(version) # Current commit is tagged with "version" tag
       end
 
       #####################################################
@@ -39,7 +39,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
     end
   end

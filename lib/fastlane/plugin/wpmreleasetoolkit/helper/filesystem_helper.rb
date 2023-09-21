@@ -66,7 +66,7 @@ module Fastlane
 
       ### Returns the path to the `~/.mobile-secrets` directory.
       def self.secret_store_dir
-        return "#{Dir.home}/.mobile-secrets"
+        "#{Dir.home}/.mobile-secrets"
       end
 
       ### Transforms a relative path within the secret store to an absolute path on disk.

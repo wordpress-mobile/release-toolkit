@@ -5,7 +5,7 @@ module Fastlane
         violations = nil
 
         loop do
-          violations = self.run_linter(params)
+          violations = run_linter(params)
           violations.default = [] # Set the default value for when querying a missing key
 
           if params[:check_duplicate_keys]
@@ -14,7 +14,7 @@ module Fastlane
             end
           end
 
-          report(violations: violations, base_lang: params[:base_lang])
+          report(violations:, base_lang: params[:base_lang])
           break unless !violations.empty? && params[:allow_retry] && UI.confirm(RETRY_MESSAGE)
         end
 
@@ -53,14 +53,14 @@ module Fastlane
           language = File.basename(File.dirname(file), '.lproj')
           path = File.join(params[:input_dir], file)
 
-          file_type = Fastlane::Helper::Ios::L10nHelper.strings_file_type(path: path)
+          file_type = Fastlane::Helper::Ios::L10nHelper.strings_file_type(path:)
           if file_type == :text
             duplicates = Fastlane::Helper::Ios::StringsFileValidationHelper.find_duplicated_keys(file: path)
             duplicate_keys[language] = duplicates.map { |key, value| "`#{key}` was found at multiple lines: #{value.join(', ')}" } unless duplicates.empty?
           else
             UI.important <<~WRONG_FORMAT
               File `#{path}` is in #{file_type} format, while finding duplicate keys only make sense on files that are in ASCII-plist format.
-              Since your files are in #{file_type} format, you should probably disable the `check_duplicate_keys` option from this `#{self.action_name}` call.
+              Since your files are in #{file_type} format, you should probably disable the `check_duplicate_keys` option from this `#{action_name}` call.
             WRONG_FORMAT
           end
         end
@@ -201,7 +201,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
     end
   end

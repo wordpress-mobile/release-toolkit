@@ -8,14 +8,14 @@ module Fastlane
         # Check gems and pods are up to date. This will exit if it fails
         begin
           Action.sh('bundle check')
-        rescue
+        rescue StandardError
           UI.user_error!("You should run 'bundle install' to make sure gems are up to date")
           raise
         end
 
         begin
           Action.sh('command -v bundletool > /dev/null')
-        rescue
+        rescue StandardError
           UI.user_error!("bundletool is required to build the APKs. Install it with 'brew install bundletool'")
           raise
         end

@@ -39,7 +39,7 @@ module Fastlane
         # @return [String] The absolute path of the tool if found.
         # @raise [FastlaneCore::Interface::FastlaneError] If the tool couldn't be found.
         def find_tool_path!(binary:, search_paths:)
-          bin_path = find_tool_path(binary: binary, search_paths: search_paths)
+          bin_path = find_tool_path(binary:, search_paths:)
           UI.user_error!("Unable to find path for #{binary} in #{search_paths.inspect}. Verify you installed the proper Android tools.") if bin_path.nil?
           bin_path
         end

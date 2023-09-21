@@ -8,18 +8,18 @@ module Fastlane
     class PromoScreenshotsAction < Action
       def self.run(params)
         UI.message 'Creating Promo Screenshots'
-        UI.message "#{self.check_path(params[:orig_folder])} Original Screenshot Source: #{params[:orig_folder]}"
-        UI.message "#{self.check_path(params[:metadata_folder])} Translation source: #{params[:metadata_folder]}"
+        UI.message "#{check_path(params[:orig_folder])} Original Screenshot Source: #{params[:orig_folder]}"
+        UI.message "#{check_path(params[:metadata_folder])} Translation source: #{params[:metadata_folder]}"
 
         config = helper.read_config(params[:config_file])
 
-        helper.check_fonts_installed!(config: config) unless params[:skip_font_check]
+        helper.check_fonts_installed!(config:) unless params[:skip_font_check]
 
         translation_directories = subdirectories_for_path(params[:metadata_folder])
         image_directories = subdirectories_for_path(params[:orig_folder])
 
         if helper.can_resolve_path(params[:output_folder])
-          UI.message "#{self.check_path(params[:output_folder])} Output Folder: #{params[:output_folder]}"
+          UI.message "#{check_path(params[:output_folder])} Output Folder: #{params[:output_folder]}"
         else
           UI.message "✅ Created Output Folder: #{params[:output_folder]}"
           FileUtils.mkdir_p(params[:output_folder])
@@ -113,11 +113,11 @@ module Fastlane
       end
 
       def self.check_path(path)
-        self.helper.can_resolve_path(path) ? '✅' : '🚫'
+        helper.can_resolve_path(path) ? '✅' : '🚫'
       end
 
       def self.helper
-        return Fastlane::Helper::PromoScreenshots.new
+        Fastlane::Helper::PromoScreenshots.new
       end
 
       def self.description

@@ -1,12 +1,9 @@
-inherit_from: .rubocop_todo.yml
-
 require:
 - rubocop-rspec
 
 # Enable new cops when we update rubocop to a newer version
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 2.7
 
 ########## Lint / CodeStyle
 
@@ -107,3 +104,6 @@ RSpec/ExampleLength:
 # Same for number of let/subject
 RSpec/MultipleMemoizedHelpers:
   Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 4

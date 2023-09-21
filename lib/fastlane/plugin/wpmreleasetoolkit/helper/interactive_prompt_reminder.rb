@@ -61,7 +61,7 @@ module FastlaneCore
       # if we replied before the timeout, kill the thread so message won't be triggered
       thread.kill
       # If the block given returned a value, pass it
-      return res
+      res
     end
 
     # Monkey-Patch fastlane's `UI.input`, `UI.confirm`, `UI.select` and `UI.password` interactive methods
@@ -75,7 +75,7 @@ module FastlaneCore
         old_method = instance_method(method_name)
 
         define_method(method_name) do |*args|
-          FastlaneCore::Shell.with_reminder(after: after, message: message) { old_method.bind(self).call(*args) }
+          FastlaneCore::Shell.with_reminder(after:, message:) { old_method.bind(self).call(*args) }
         end
       end
     end
@@ -89,5 +89,5 @@ unless ENV['FASTLANE_PROMPT_REMINDER_DISABLE_AUTO_PATCH']
   delays = ENV['FASTLANE_PROMPT_REMINDER_DELAYS']&.split(',')&.map(&:to_i) || FastlaneCore::Shell::DEFAULT_PROMPT_REMINDER_DELAYS
 
   FastlaneCore::UI.verbose("Monkey-patching the UI interactive methods to add a reminder (#{delays.inspect}, #{message.inspect})")
-  FastlaneCore::Shell.monkey_patch_interactive_prompts_with_reminder(after: delays, message: message)
+  FastlaneCore::Shell.monkey_patch_interactive_prompts_with_reminder(after: delays, message:)
 end

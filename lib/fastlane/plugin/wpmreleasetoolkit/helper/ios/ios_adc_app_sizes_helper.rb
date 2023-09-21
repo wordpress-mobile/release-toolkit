@@ -28,7 +28,11 @@ module Fastlane
 
           builds_details = versions.each_with_index.map do |v, idx|
             print "Fetching info for: #{v.version_string.rjust(8)} (#{v.build.version.rjust(11)}) [#{idx.to_s.rjust(3)}/#{versions.count}]\r"
-            Spaceship::Tunes.client.build_details(app_id: app.id, train: v.version_string, build_number: v.build.version, platform: 'ios') rescue nil
+            begin
+              Spaceship::Tunes.client.build_details(app_id: app.id, train: v.version_string, build_number: v.build.version, platform: 'ios')
+            rescue StandardError
+              nil
+            end
           end.compact.reverse
           print("#{' ' * 55}\n")
 

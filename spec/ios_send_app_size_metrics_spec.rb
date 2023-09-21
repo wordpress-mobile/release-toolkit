@@ -1,4 +1,4 @@
-require_relative './spec_helper'
+require_relative 'spec_helper'
 
 describe Fastlane::Actions::IosSendAppSizeMetricsAction do
   let(:test_data_dir) { File.join(File.dirname(__FILE__), 'test-data', 'app_size_metrics') }
@@ -15,7 +15,7 @@ describe Fastlane::Actions::IosSendAppSizeMetricsAction do
       # Act
       code = run_described_fastlane_action(
         api_url: File.join('file://localhost/', output_file),
-        ipa_path: ipa_path,
+        ipa_path:,
         **other_action_args
       )
 
@@ -89,9 +89,9 @@ describe Fastlane::Actions::IosSendAppSizeMetricsAction do
       expected = JSON.parse(File.read(expected_fixture))
 
       test_app_size_action(
-        fake_ipa_size: fake_ipa_size,
+        fake_ipa_size:,
         expected_payload: expected,
-        app_thinning_plist_path: app_thinning_plist_path,
+        app_thinning_plist_path:,
         app_name: 'wordpress',
         build_type: 'internal',
         app_version: '19.8.0.2',

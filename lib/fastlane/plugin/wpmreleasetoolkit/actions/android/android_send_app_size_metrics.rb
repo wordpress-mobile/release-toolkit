@@ -42,18 +42,18 @@ module Fastlane
           unless params[:aab_path].nil?
             generate_split_apks(aab_path: params[:aab_path]) do |apk|
               split_name = File.basename(apk, '.apk')
-              add_apk_size_metrics(helper: metrics_helper, apkanalyzer_bin: apkanalyzer_bin, apk: apk, split_name: split_name)
+              add_apk_size_metrics(helper: metrics_helper, apkanalyzer_bin:, apk:, split_name:)
             end
           end
           unless params[:universal_apk_path].nil?
-            add_apk_size_metrics(helper: metrics_helper, apkanalyzer_bin: apkanalyzer_bin, apk: params[:universal_apk_path], split_name: UNIVERSAL_APK_SPLIT_NAME)
+            add_apk_size_metrics(helper: metrics_helper, apkanalyzer_bin:, apk: params[:universal_apk_path], split_name: UNIVERSAL_APK_SPLIT_NAME)
           end
         end
 
         # Send the payload
         metrics_helper.send_metrics(
           to: api_url,
-          api_token: api_token,
+          api_token:,
           use_gzip: params[:use_gzip_content_encoding]
         )
       end

@@ -31,9 +31,9 @@ module Fastlane
           # The SwiftGen version string has this format:
           #
           # SwiftGen v6.4.0 (Stencil v0.13.1, StencilSwiftKit v2.7.2, SwiftGenKit v6.4.0)
-          return vers_string.include?("SwiftGen v#{version}")
-        rescue
-          return false
+          vers_string.include?("SwiftGen v#{version}")
+        rescue StandardError
+          false
         end
 
         # Download the ZIP of SwiftGen for the requested `version` and install it in the `install_path`
@@ -62,7 +62,7 @@ module Fastlane
         #
         def run(input_dir:, base_lang: DEFAULT_BASE_LANG, only_langs: nil)
           check_swiftgen_installed || install_swiftgen!
-          find_diffs(input_dir: input_dir, base_lang: base_lang, only_langs: only_langs)
+          find_diffs(input_dir:, base_lang:, only_langs:)
         end
 
         ##################
@@ -135,7 +135,7 @@ module Fastlane
           config_file = File.join(output_dir, CONFIG_FILE_NAME)
           File.write(config_file, config.to_yaml)
 
-          return [config_file, langs]
+          [config_file, langs]
         end
 
         # Returns a Hash mapping the list of expected parameter types for each of the keys based in the %… placeholders found in their `.strings` files

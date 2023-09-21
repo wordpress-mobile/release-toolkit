@@ -12,7 +12,7 @@ module Fastlane
       ### If the file doesn't exist, it'll return an empty Configuration
       ### that can later be saved to `.configure`.
       def self.configuration
-        if self.configuration_path_exists
+        if configuration_path_exists
           Configuration.from_file(FilesystemHelper.configure_file)
         else
           Configuration.new
@@ -173,38 +173,36 @@ module Fastlane
 
       ### Returns the list of files to copy from `.configure`.
       def self.files_to_copy
-        self.configuration.files_to_copy
+        configuration.files_to_copy
       end
 
       ### Returns the list of files that this project uses from `.configure`.
       def self.file_dependencies
-        file_dependencies = self.configuration.file_dependencies
+        file_dependencies = configuration.file_dependencies
         file_dependencies ||= []
 
         # Allows support for specifying directories – they'll be expanded recursively
         expanded_file_dependencies = file_dependencies.map do |path|
-          abs_path = self.mobile_secrets_path(path)
+          abs_path = mobile_secrets_path(path)
 
-          if File.directory?(abs_path)
-            Dir.glob("#{abs_path}**/*").map do |sub_path|
-              sub_path.gsub("#{repository_path}/", '')
-            end
-          else
-            return path
+          return path unless File.directory?(abs_path)
+
+          Dir.glob("#{abs_path}**/*").map do |sub_path|
+            sub_path.gsub("#{repository_path}/", '')
           end
         end
 
-        self.files_to_copy.map { |o| o.file } + expanded_file_dependencies
+        files_to_copy.map { |o| o.file } + expanded_file_dependencies
       end
 
       ## If we specify a directory in `file_dependencies` instead of listing each file
       ## individually, there may be new files that we don't know about. This method finds those.
       def self.new_files_in(files)
-        file_dependencies = self.configuration.file_dependencies
+        file_dependencies = configuration.file_dependencies
         file_dependencies ||= []
 
         directory_dependencies = file_dependencies.select do |path|
-          File.directory?(self.mobile_secrets_path(path))
+          File.directory?(mobile_secrets_path(path))
         end
 
         new_files = []
@@ -229,7 +227,7 @@ module Fastlane
           UI.user_error! "Attempted to add a file to a location which is not ignored under Git (#{params[:destination]}). Please either edit your `.configure` file to use an already-ignored destination, or add that destination to the `.gitignore` manually to fix this."
         end
 
-        new_config = self.configuration
+        new_config = configuration
         new_config.add_file_to_copy(params[:source], params[:destination], encrypt: params[:encrypt])
         update_configuration(new_config)
       end

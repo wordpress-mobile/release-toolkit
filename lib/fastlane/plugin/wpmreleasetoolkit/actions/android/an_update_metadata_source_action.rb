@@ -36,7 +36,7 @@ module Fastlane
       # .po fo the others.
       def self.create_temp_po(params)
         orig = params[:po_file_path]
-        target = self.create_target_file_path(orig)
+        target = create_target_file_path(orig)
 
         # Clear if older exists
         FileUtils.rm_f(target)
@@ -48,7 +48,7 @@ module Fastlane
               write_target_block(fw, fr)
             end
           end
-        rescue
+        rescue StandardError
           FileUtils.rm_f(target)
           raise
         end

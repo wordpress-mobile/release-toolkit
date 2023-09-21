@@ -1,4 +1,4 @@
-require_relative './spec_helper'
+require_relative 'spec_helper'
 
 describe Fastlane::Actions::AndroidSendAppSizeMetricsAction do
   let(:test_data_dir) { File.join(File.dirname(__FILE__), 'test-data', 'app_size_metrics') }
@@ -49,8 +49,8 @@ describe Fastlane::Actions::AndroidSendAppSizeMetricsAction do
       # Act
       action_params = {
         api_url: File.join('file://localhost/', output_file),
-        aab_path: aab_path,
-        universal_apk_path: universal_apk_path,
+        aab_path:,
+        universal_apk_path:,
         **other_action_args
       }.compact
       code = run_described_fastlane_action(action_params)

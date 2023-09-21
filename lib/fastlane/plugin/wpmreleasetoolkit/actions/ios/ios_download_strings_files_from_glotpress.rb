@@ -19,7 +19,7 @@ module Fastlane
             project_url: params[:project_url],
             locale: glotpress_locale,
             filters: params[:filters],
-            destination: destination
+            destination:
           )
           # Do a quick check of the downloaded `.strings` file to ensure it looks valid
           validate_strings_file(destination) unless params[:skip_file_validation]
@@ -107,7 +107,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
     end
   end

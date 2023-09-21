@@ -13,7 +13,7 @@ module Fastlane
         path = params[:release_notes_file_path]
         next_version = Fastlane::Helper::Ios::VersionHelper.calc_next_release_version(params[:new_version])
 
-        Fastlane::Helper::ReleaseNotesHelper.add_new_section(path: path, section_title: next_version)
+        Fastlane::Helper::ReleaseNotesHelper.add_new_section(path:, section_title: next_version)
         Fastlane::Helper::GitHelper.commit(message: "Release Notes: add new section for next version (#{next_version})", files: path)
 
         UI.message 'Done.'
@@ -56,7 +56,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
     end
   end

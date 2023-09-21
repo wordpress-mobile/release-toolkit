@@ -17,7 +17,7 @@ describe Fastlane::Helper::ConfigureHelper do
 
         expect(Fastlane::UI).to receive(:user_error!)
 
-        described_class.add_file(source: 'path/to/source', destination: destination, encrypt: true)
+        described_class.add_file(source: 'path/to/source', destination:, encrypt: true)
       end
     end
   end

@@ -56,10 +56,10 @@ module Fastlane
       end
 
       def self.prompt_to_update_to_most_recent_version
-        if UI.confirm("The current branch is #{repo_commits_behind_remote} commit(s) behind. Would you like to update it?")
-          update_branch
-          update_configure_file
-        end
+        return unless UI.confirm("The current branch is #{repo_commits_behind_remote} commit(s) behind. Would you like to update it?")
+
+        update_branch
+        update_configure_file
       end
 
       def self.prompt_to_update_configure_file_to_most_recent_hash

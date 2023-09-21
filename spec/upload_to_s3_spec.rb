@@ -1,4 +1,4 @@
-require_relative './spec_helper'
+require_relative 'spec_helper'
 
 describe Fastlane::Actions::UploadToS3Action do
   let(:client) { instance_double(Aws::S3::Client) }
@@ -12,8 +12,8 @@ describe Fastlane::Actions::UploadToS3Action do
   def stub_s3_response_for_file(key, exists: true)
     content_length = exists == true ? 1 : 0
     allow(client).to(receive(:head_object))
-                 .with(bucket: test_bucket, key: key)
-                 .and_return(Aws::S3::Types::HeadObjectOutput.new(content_length: content_length))
+                 .with(bucket: test_bucket, key:)
+                 .and_return(Aws::S3::Types::HeadObjectOutput.new(content_length:))
   end
 
   describe 'uploading a file with valid parameters' do
@@ -308,8 +308,8 @@ describe Fastlane::Actions::UploadToS3Action do
               bucket: test_bucket,
               key: 'existing-key',
               file: file_path,
-              if_exists: if_exists,
-              skip_if_exists: skip_if_exists
+              if_exists:,
+              skip_if_exists:
             )
           end.to raise_error(FastlaneCore::Interface::FastlaneError, 'You cannot set both :skip_if_exists and :if_exists. Please only use :if_exists.')
         end

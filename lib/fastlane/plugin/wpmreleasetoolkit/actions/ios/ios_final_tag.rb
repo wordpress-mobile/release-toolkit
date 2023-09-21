@@ -12,7 +12,7 @@ module Fastlane
 
         Fastlane::Helper::GitHelper.create_tag(version)
 
-        other_action.ios_clear_intermediate_tags(version: version)
+        other_action.ios_clear_intermediate_tags(version:)
       end
 
       #####################################################
@@ -57,7 +57,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
     end
   end

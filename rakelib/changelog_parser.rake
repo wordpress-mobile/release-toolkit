@@ -18,12 +18,12 @@ class ChangelogParser
     prev_subtitle = nil
     loop do
       (lines, next_level, next_subtitle) = advance_to_next_header(level: 2..3)
-      subsections.append({ title: prev_subtitle, lines: lines }) unless lines.reject { |l| l.chomp.empty? || l.chomp == EMPTY_PLACEHOLDER }.empty?
+      subsections.append({ title: prev_subtitle, lines: }) unless lines.reject { |l| l.chomp.empty? || l.chomp == EMPTY_PLACEHOLDER }.empty?
       prev_subtitle = next_subtitle
 
       break if next_level < 3
     end
-    @pending_section = { lines_before: lines_before_first_section, subsections: subsections, next_title: prev_subtitle }
+    @pending_section = { lines_before: lines_before_first_section, subsections:, next_title: prev_subtitle }
     prev_subtitle
   end
 
@@ -71,7 +71,7 @@ class ChangelogParser
     @current_index = offset.nil? ? -1 : start_idx + offset
 
     m = regex.match(@lines[@current_index])
-    return [@lines[start_idx...@current_index], m[1].length, m[2]]
+    [@lines[start_idx...@current_index], m[1].length, m[2]]
   end
 
   def read_up_to_end
