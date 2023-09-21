@@ -71,15 +71,16 @@ steps:
   #################
   # Danger
   #################
-  - label: "⛔️ Danger"
+  - label: "☢️ Danger - PR Check"
     key: danger
-    command: |
-      bundle install
-      echo "--- :rubocop: Run Danger"
-      bundle exec danger
+    command: .buildkite/commands/danger-pr-check.sh
     plugins: [*docker_plugin_with_danger_token]
     agents:
       queue: "default"
+    retry:
+      manual:
+        permit_on_passed: true
+    if: "build.pull_request.id != null"
 
   #################
   # Push to RubyGems
@@ -94,7 +95,7 @@ steps:
     # Note: We intentionally call a separate `.sh` script here (as opposed to having all the
     # commands written inline) to avoid leaking a key used in the process in clear in the
     # BUILDKITE_COMMAND environment variable.
-    command: .buildkite/gem-push.sh
+    command: .buildkite/commands/gem-push.sh
     plugins: [*docker_plugin]
     agents:
       queue: "default"
