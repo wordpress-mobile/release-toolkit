@@ -39,7 +39,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::IOSVersionFile do
 
       it 'raises an error' do
         expect { described_class.new(xcconfig_path: file_path).write(version_short: version_short) }
-          .to raise_error(FastlaneCore::Interface::FastlaneError, /\.xcconfig file .* not found/)
+          .to raise_error(FastlaneCore::Interface::FastlaneError, ".xcconfig file not found at this path: #{file_path}")
       end
     end
   end
@@ -66,7 +66,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::IOSVersionFile do
         file_path = 'fake_path/test.xcconfig'
 
         expect { described_class.new(xcconfig_path: file_path).read_build_code }
-          .to raise_error(FastlaneCore::Interface::FastlaneError, /\.xcconfig file .* not found/)
+          .to raise_error(FastlaneCore::Interface::FastlaneError, ".xcconfig file not found at this path: #{file_path}")
       end
     end
   end
@@ -93,7 +93,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::IOSVersionFile do
         file_path = 'fake_path/test.xcconfig'
 
         expect { described_class.new(xcconfig_path: file_path).read_app_version }
-          .to raise_error(FastlaneCore::Interface::FastlaneError, /\.xcconfig file .* not found/)
+          .to raise_error(FastlaneCore::Interface::FastlaneError, ".xcconfig file not found at this path: #{file_path}")
       end
     end
   end

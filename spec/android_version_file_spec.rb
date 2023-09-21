@@ -7,7 +7,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       file_path = 'fake_path/test.xcconfig'
 
       expect { described_class.new(version_properties_path: file_path).read_version_name }
-        .to raise_error(FastlaneCore::Interface::FastlaneError, "version.properties #{file_path} not found")
+        .to raise_error(FastlaneCore::Interface::FastlaneError, "version.properties not found at this path: #{file_path}")
     end
 
     it 'raises an error if a version name is not present in version.properties' do
@@ -78,7 +78,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       file_path = 'fake_path/test.xcconfig'
 
       expect { described_class.new(version_properties_path: file_path).read_version_code }
-        .to raise_error(FastlaneCore::Interface::FastlaneError, "version.properties #{file_path} not found")
+        .to raise_error(FastlaneCore::Interface::FastlaneError, "version.properties not found at this path: #{file_path}")
     end
 
     it 'raises an error if a version code is not present in version.properties' do
@@ -113,7 +113,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       version_code = '1234'
 
       expect { described_class.new(version_properties_path: file_path).write_version(version_name, version_code) }
-        .to raise_error(FastlaneCore::Interface::FastlaneError, "version.properties #{file_path} not found")
+        .to raise_error(FastlaneCore::Interface::FastlaneError, "version.properties not found at this path: #{file_path}")
     end
 
     it 'writes the given release version name and version code to version.properties' do

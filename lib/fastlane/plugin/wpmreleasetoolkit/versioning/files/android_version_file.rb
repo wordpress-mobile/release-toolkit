@@ -12,6 +12,8 @@ module Fastlane
         # @param [String] version_properties_path The path to the version.properties file.
         #
         def initialize(version_properties_path: 'version.properties')
+          UI.user_error!("version.properties not found at this path: #{version_properties_path}") unless File.exist?(version_properties_path)
+
           @version_properties_path = version_properties_path
         end
 
@@ -22,8 +24,6 @@ module Fastlane
         # @raise [UI::Error] If the file_path is nil or the version name is not found.
         #
         def read_version_name
-          verify_version_properties_exists
-
           # Read the version name from the version.properties file
           file_content = JavaProperties.load(version_properties_path)
           version_name = file_content[:versionName]
@@ -41,8 +41,6 @@ module Fastlane
         # @raise [UI::Error] If the file_path is nil or the version code is not found.
         #
         def read_version_code
-          verify_version_properties_exists
-
           # Read the version code from the version.properties file
           file_content = JavaProperties.load(version_properties_path)
           version_code = file_content[:versionCode]
@@ -60,8 +58,6 @@ module Fastlane
         # @raise [UI::Error] If the version name or version code is nil.
         #
         def write_version(version_name, version_code)
-          verify_version_properties_exists
-
           # Create the version name and version code hash
           version = {
             versionName: version_name,
@@ -73,14 +69,6 @@ module Fastlane
             version,
             version_properties_path
           )
-        end
-
-        # Verifies the existence of the version.properties file.
-        #
-        # @raise [UI.user_error] Raised if the version.properties file does not exist.
-        #
-        def verify_version_properties_exists
-          UI.user_error!("version.properties #{version_properties_path} not found") unless File.exist?(version_properties_path)
         end
       end
     end
