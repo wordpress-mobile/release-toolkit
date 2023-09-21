@@ -18,9 +18,9 @@ module Fastlane
 
         # Calculate the next derived build code.
         #
-        # This method derives a new build code from the given AppVersion object. The derived build code
-        # is a concatenation of the digit 1, the major version, the minor version, the patch version, and
-        # the build number. The derived build code is then incremented by 1.
+        # This method derives a new build code from the given AppVersion object. The AppVersion's build number is
+        # incremented by 1. The derived build code is then created by concatenating the digit 1, the major version,
+        # the minor version, the patch version, and the build number.
         #
         # @param after [AppVersion] The version to derive the next build code from.
         #
@@ -29,17 +29,17 @@ module Fastlane
         def next_derived_build_code(after:)
           after.build_number += 1
 
-          derived_build_code = Fastlane::Models::BuildCode.new(
+          Fastlane::Models::BuildCode.new(
             format(
-              '1%02d%02d%02d%02d',
-              after.major,
-              after.minor,
-              after.patch,
-              after.build_number
+              # 1 is appended to the beginning of the string in case there needs to be additional platforms or
+              # extensions that could be have a different digit appended such as 2, etc.
+              '1%<major>.2i%<minor>.2i%<patch>.2i%<build_number>.2i',
+              major: after.major,
+              minor: after.minor,
+              patch: after.patch,
+              build_number: after.build_number
             ).to_i
           )
-
-          derived_build_code
         end
       end
     end
