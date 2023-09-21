@@ -11,7 +11,7 @@ module Fastlane
         #
         # @param [String] version_properties_path The path to the version.properties file.
         #
-        def initialize(version_properties_path:)
+        def initialize(version_properties_path: 'version.properties')
           @version_properties_path = version_properties_path
         end
 
