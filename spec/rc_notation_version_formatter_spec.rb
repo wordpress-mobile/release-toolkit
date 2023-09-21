@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFormatter do
+describe Fastlane::Wpmreleasetoolkit::Versioning::RCNotationVersionFormatter do
   describe 'parses a version string' do
     it 'returns a version object when provided with a release version name string' do
       version = described_class.new.parse('1.2.3')

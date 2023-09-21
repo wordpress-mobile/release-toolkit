@@ -14,6 +14,8 @@ module Fastlane
         # a version string in the format "major.minor" (e.g., '1.2'). Otherwise, it returns a
         # version string in the format "major.minor.patch" (e.g., '1.2.3').
         #
+        # @param version [AppVersion] The version object to format
+        #
         # @return [String] The formatted release version string.
         #
         def release_version(version)

@@ -13,6 +13,8 @@ module Fastlane
         # and sets the minor version to 1, resetting the patch and build number components to zero.
         # Otherwise, it calculates the next minor version.
         #
+        # @param after [AppVersion] The version to calculate the next date-based release version for.
+        #
         # @return [AppVersion] The next date-based release version.
         #
         def next_release_version(after:)
@@ -35,6 +37,8 @@ module Fastlane
         # the user to input the minor number of the previous release. Otherwise, it calculates the
         # previous minor version. The major version is adjusted accordingly, and the patch and
         # build number components are reset to zero.
+        #
+        # @param before [AppVersion] The version to calculate the previous date-based release version for.
         #
         # @return [AppVersion] The previous date-based release version.
         #

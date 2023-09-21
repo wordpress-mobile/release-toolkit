@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Fastlane::Wpmreleasetoolkit::Versioning::IOSVersionFormatter do
+describe Fastlane::Wpmreleasetoolkit::Versioning::FourPartVersionFormatter do
   describe 'parses a version string' do
     it 'returns a version object when provided with a version string' do
       version = described_class.new.parse('1.2.3.4')

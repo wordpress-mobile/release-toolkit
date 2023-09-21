@@ -12,6 +12,8 @@ module Fastlane
         # This method checks if the minor version is 9. If it is, it calculates the next major version.
         # Otherwise, it calculates the next minor version. The patch and build number components are reset to zero.
         #
+        # @param after [AppVersion] The version to calculate the next marketing release version for.
+        #
         # @return [AppVersion] The next marketing release version.
         #
         def next_release_version(after:)
@@ -25,6 +27,8 @@ module Fastlane
         # If the minor version is zero, it calculates the previous major version and sets the minor
         # version to 9. Otherwise, it calculates the previous minor version. The patch and build number
         # components are reset to zero.
+        #
+        # @param before [AppVersion] The version to calculate the previous marketing release version for.
         #
         # @return [AppVersion] The previous marketing release version.
         #
