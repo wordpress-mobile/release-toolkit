@@ -64,20 +64,14 @@ module Fastlane
 
         # Calculate the next internal version by setting the build number to the current date.
         #
+        # @param after [AppVersion] The version to calculate the next internal version for.
+        #
         # @return [AppVersion] The next version with the build number set to the current date.
         #
         def next_internal_version(after:)
           after.build_number = today_date
 
           after
-        end
-
-        # Check if this version number represents a patch version.
-        #
-        # @return [Boolean] `true` if it's a patch version, `false` otherwise.
-        #
-        def patch?(version)
-          !version.patch.zero?
         end
 
         # Calculate the previous major version by decrementing the minor version.
