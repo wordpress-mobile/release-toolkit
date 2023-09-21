@@ -29,7 +29,7 @@ module Fastlane
           Fastlane::Models::BuildCode.new(
             format(
               # 1 is appended to the beginning of the string in case there needs to be additional platforms or
-              # extensions that could be have a different digit appended such as 2, etc.
+              # extensions that could then use a different digit prefix such as 2, etc.
               '1%<major>.2i%<minor>.2i%<patch>.2i%<build_number>.2i',
               major: after.major,
               minor: after.minor,
