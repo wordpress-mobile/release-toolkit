@@ -7,11 +7,6 @@ describe Fastlane::Models::BuildCode do
       expect(build_code.build_code.to_s).to eq('135')
     end
 
-    it 'sets the build code to 0 if a non-numerical string is provided' do
-      build_code = described_class.new('ABC123')
-      expect(build_code.build_code.to_s).to eq('0')
-    end
-
     it 'raises an error if a nil build code is provided' do
       expect { described_class.new(nil) }
         .to raise_error(

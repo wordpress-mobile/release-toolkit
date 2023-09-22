@@ -13,7 +13,7 @@ module Fastlane
       def initialize(build_code)
         UI.user_error!('Build code cannot be nil') if build_code.nil?
 
-        @build_code = build_code.to_i
+        @build_code = build_code
       end
 
       # Returns the build code as a string.

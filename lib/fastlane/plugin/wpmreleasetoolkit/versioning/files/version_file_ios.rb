@@ -28,11 +28,13 @@ module Fastlane
 
         # Reads the build code from the .xcconfig file and returns it String.
         #
-        # @return [String] The build code.
+        # @return [BuildCode] A BuildCode object.
         #
         def read_build_code
           config = Xcodeproj::Config.new(xcconfig_path)
-          config.attributes['BUILD_NUMBER']
+          build_code = config.attributes['BUILD_NUMBER']
+
+          Fastlane::Models::BuildCode.new(build_code)
         end
 
         # Writes the provided version numbers to the .xcconfig file.
