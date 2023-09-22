@@ -3,27 +3,27 @@ require 'spec_helper'
 describe Fastlane::Wpmreleasetoolkit::Versioning::VersionCalculator do
   describe 'calculates the next version number' do
     it 'increments the major version by 1 and sets the minor, patch, and build number to 0' do
-      version = Fastlane::Models::AppVersion.new(19, 3, 1, 1)
+      version = Fastlane::Models::AppVersion.new(19, 20, 21, 22)
       bumped_version = described_class.new.next_major_version(after: version)
       expect(bumped_version.to_s).to eq('20.0.0.0')
     end
 
     it 'increments the minor version by 1 and sets the patch and build number to 0' do
-      version = Fastlane::Models::AppVersion.new(19, 3, 1, 1)
+      version = Fastlane::Models::AppVersion.new(19, 20, 21, 22)
       bumped_version = described_class.new.next_minor_version(after: version)
-      expect(bumped_version.to_s).to eq('19.4.0.0')
+      expect(bumped_version.to_s).to eq('19.21.0.0')
     end
 
     it 'increments the patch version by 1 and sets the build number to 0' do
-      version = Fastlane::Models::AppVersion.new(19, 3, 1, 1)
+      version = Fastlane::Models::AppVersion.new(19, 20, 21, 22)
       bumped_version = described_class.new.next_patch_version(after: version)
-      expect(bumped_version.to_s).to eq('19.3.2.0')
+      expect(bumped_version.to_s).to eq('19.20.22.0')
     end
 
     it 'increments the build number by 1' do
-      version = Fastlane::Models::AppVersion.new(19, 3, 1, 1)
+      version = Fastlane::Models::AppVersion.new(19, 20, 21, 22)
       bumped_version = described_class.new.next_build_number(after: version)
-      expect(bumped_version.to_s).to eq('19.3.1.2')
+      expect(bumped_version.to_s).to eq('19.20.21.23')
     end
   end
 

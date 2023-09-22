@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Fastlane::Wpmreleasetoolkit::Versioning::BuildCodeCalculator do
   describe 'calculates the next build code' do
     it 'increments the simple build code by 1' do
-      build_code = 735
+      build_code = Fastlane::Models::BuildCode.new(735)
       bumped_build_code = described_class.new.next_simple_build_code(after: build_code)
       expect(bumped_build_code.to_s).to eq('736')
     end

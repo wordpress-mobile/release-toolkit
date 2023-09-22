@@ -12,8 +12,10 @@ module Fastlane
         #
         # @return [BuildCode] The next build code.
         #
-        def next_simple_build_code(after:)
-          after + 1
+        def next_build_code(after:)
+          after.build_code + 1
+
+          after
         end
 
         # Calculate the next derived build code.

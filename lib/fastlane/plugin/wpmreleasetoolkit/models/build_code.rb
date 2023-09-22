@@ -11,6 +11,8 @@ module Fastlane
       # @param build_code [String] The build code value.
       #
       def initialize(build_code)
+        UI.user_error!('Build code cannot be nil') if build_code.nil?
+
         @build_code = build_code.to_i
       end
 

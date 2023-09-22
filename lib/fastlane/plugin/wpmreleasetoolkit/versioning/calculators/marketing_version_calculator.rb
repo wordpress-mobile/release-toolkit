@@ -17,6 +17,8 @@ module Fastlane
         # @return [AppVersion] The next marketing release version.
         #
         def next_release_version(after:)
+          UI.user_error!('Marketing Versioning: The minor version cannot be greater than 9') if after.minor > 9
+
           after.minor == 9 ? next_major_version(after: after) : next_minor_version(after: after)
 
           after
