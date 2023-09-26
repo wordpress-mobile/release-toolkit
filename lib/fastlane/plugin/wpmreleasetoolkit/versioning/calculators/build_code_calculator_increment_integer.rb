@@ -1,7 +1,7 @@
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
-      class IncrementIntegerBuildCodeCalculator
+      class SimpleBuildCodeCalculator
         # Calculate the next build code.
         #
         # This method increments the build code value by 1.

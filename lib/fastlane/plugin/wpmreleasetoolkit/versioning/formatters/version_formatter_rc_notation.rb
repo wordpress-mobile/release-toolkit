@@ -1,11 +1,11 @@
 # The `RCNotationVersionFormatter` class extends the `VersionFormatter` class. It is a specialized version
 # formatter for apps that may use versions in the format of `1.2.3-rc-4`.
-require_relative 'version_formatter'
+require_relative 'version_formatter_abstract'
 
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
-      class RCNotationVersionFormatter < VersionFormatter
+      class RCNotationVersionFormatter < VersionFormatterAbstract
         # The string identifier used for beta versions in Android.
         RC_SUFFIX = 'rc'.freeze
 

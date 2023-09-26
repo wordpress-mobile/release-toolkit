@@ -1,3 +1,5 @@
+require_relative '../formatters/version_formatter_four_part'
+
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
@@ -10,7 +12,7 @@ module Fastlane
         # @return [String] The formatted build code string.
         #
         def build_code(build_code = nil, version:)
-          "#{version.major}.#{version.minor}.#{version.patch}.#{version.build_number}"
+          FourPartVersionFormatter.new.to_s(version)
         end
       end
     end

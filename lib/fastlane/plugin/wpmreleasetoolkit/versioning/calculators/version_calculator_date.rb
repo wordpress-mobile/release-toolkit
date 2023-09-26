@@ -1,11 +1,11 @@
 # The `DateVersionCalculator` class is a specialized version calculator for date-based versions
-# of an app, extending the `VersionCalculator` class.
-require_relative 'version_calculator'
+# of an app, extending the `VersionCalculatorAbstract` class.
+require_relative 'version_calculator_abstract'
 
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
-      class DateVersionCalculator < VersionCalculator
+      class DateVersionCalculator < VersionCalculatorAbstract
         # Calculate the next date-based release version.
         #
         # If the current month is December, the method prompts the user to determine if the next
@@ -46,9 +46,8 @@ module Fastlane
           # Date-based apps start with a minor version of 1 for the first release of the year. We can't assume what the
           # the previous minor number was, so the user needs to input it
           if before.minor == 1
-            minor_number = FastlaneCore::UI.prompt(text: 'Please enter the minor number of the previous release: ')
             before.major -= 1
-            before.minor = minor_number
+            before.minor = FastlaneCore::UI.prompt(text: 'Please enter the minor number of the previous release: ')
             before.patch = 0
             before.build_number = 0
           else

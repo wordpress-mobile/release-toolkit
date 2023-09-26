@@ -1,7 +1,7 @@
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
-      class DerivedOptionOneBuildCodeFormatter
+      class DerivedBuildCodeFormatter
         # Calculate the next derived build code.
         #
         # This method derives a new build code from the given AppVersion object by concatenating the digit 1,

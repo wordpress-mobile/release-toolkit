@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Fastlane::Wpmreleasetoolkit::Versioning::VersionCalculator do
+describe Fastlane::Wpmreleasetoolkit::Versioning::VersionCalculatorAbstract do
   describe 'calculates the next version number' do
     it 'increments the major version by 1 and sets the minor, patch, and build number to 0' do
       version = Fastlane::Models::AppVersion.new(19, 20, 21, 22)

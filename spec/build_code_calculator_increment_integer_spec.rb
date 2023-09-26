@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Fastlane::Wpmreleasetoolkit::Versioning::IncrementIntegerBuildCodeCalculator do
+describe Fastlane::Wpmreleasetoolkit::Versioning::SimpleBuildCodeCalculator do
   describe 'calculates the next build code' do
     it 'increments the build code by 1' do
       build_code = Fastlane::Models::BuildCode.new(123)
