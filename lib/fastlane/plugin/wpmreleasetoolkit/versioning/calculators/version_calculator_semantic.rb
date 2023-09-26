@@ -8,18 +8,18 @@ module Fastlane
       class SemanticVersionCalculator < VersionCalculatorAbstract
         # Calculate the next semantic release version.
         #
-        def next_release_version(after:)
-          next_minor_version(after: after)
+        def next_release_version(version:)
+          next_minor_version(version: version)
 
-          after
+          version
         end
 
         # Calculate the previous semantic release version.
         #
-        def previous_release_version(before:)
-          previous_minor_version(before: before)
+        def previous_release_version(version:)
+          previous_minor_version(version: version)
 
-          before
+          version
         end
       end
     end

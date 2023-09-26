@@ -2,16 +2,16 @@ module Fastlane
   module Wpmreleasetoolkit
     module Versioning
       class DateBuildCodeCalculator
-        # Calculate the next internal version by setting the build number to the current date.
+        # Calculate the next internal build code by setting the build number to the current date.
         #
-        # @param after [AppVersion] The version to calculate the next internal version for.
+        # @param version [AppVersion] The version to calculate the next internal version for.
         #
         # @return [AppVersion] The next version with the build number set to the current date.
         #
-        def next_build_code(after:)
-          after.build_number = today_date
+        def next_build_code(version:)
+          version.build_number = today_date
 
-          after
+          version
         end
 
         private

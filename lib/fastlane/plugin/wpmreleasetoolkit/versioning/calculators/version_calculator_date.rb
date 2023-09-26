@@ -13,22 +13,22 @@ module Fastlane
         # and sets the minor version to 1, resetting the patch and build number components to zero.
         # Otherwise, it calculates the next minor version.
         #
-        # @param after [AppVersion] The version to calculate the next date-based release version for.
+        # @param version [AppVersion] The version to calculate the next date-based release version for.
         #
         # @return [AppVersion] The next date-based release version.
         #
-        def next_release_version(after:)
+        def next_release_version(version:)
           first_release_of_year = FastlaneCore::UI.confirm('Is this release the first release of next year?') if Time.now.month == 12
           if first_release_of_year
-            after.major += 1
-            after.minor = 1
-            after.patch = 0
-            after.build_number = 0
+            version.major += 1
+            version.minor = 1
+            version.patch = 0
+            version.build_number = 0
           else
-            next_minor_version(after: after)
+            next_minor_version(version: version)
           end
 
-          after
+          version
         end
 
         # Calculate the previous date-based release version.
@@ -38,23 +38,23 @@ module Fastlane
         # previous minor version. The major version is adjusted accordingly, and the patch and
         # build number components are reset to zero.
         #
-        # @param before [AppVersion] The version to calculate the previous date-based release version for.
+        # @param version [AppVersion] The version to calculate the previous date-based release version for.
         #
         # @return [AppVersion] The previous date-based release version.
         #
-        def previous_release_version(before:)
+        def previous_release_version(version:)
           # Date-based apps start with a minor version of 1 for the first release of the year. We can't assume what the
           # the previous minor number was, so the user needs to input it
-          if before.minor == 1
-            before.major -= 1
-            before.minor = FastlaneCore::UI.prompt(text: 'Please enter the minor number of the previous release: ')
-            before.patch = 0
-            before.build_number = 0
+          if version.minor == 1
+            version.major -= 1
+            version.minor = FastlaneCore::UI.prompt(text: 'Please enter the minor number of the previous release: ')
+            version.patch = 0
+            version.build_number = 0
           else
-            previous_minor_version(before: before)
+            previous_minor_version(version: version)
           end
 
-          before
+          version
         end
       end
     end

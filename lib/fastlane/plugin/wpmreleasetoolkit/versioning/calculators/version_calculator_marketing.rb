@@ -12,16 +12,16 @@ module Fastlane
         # This method checks if the minor version is 9. If it is, it calculates the next major version.
         # Otherwise, it calculates the next minor version. The patch and build number components are reset to zero.
         #
-        # @param after [AppVersion] The version to calculate the next marketing release version for.
+        # @param version [AppVersion] The version to calculate the next marketing release version for.
         #
         # @return [AppVersion] The next marketing release version.
         #
-        def next_release_version(after:)
-          UI.user_error!('Marketing Versioning: The minor version cannot be greater than 9') if after.minor > 9
+        def next_release_version(version:)
+          UI.user_error!('Marketing Versioning: The minor version cannot be greater than 9') if version.minor > 9
 
-          after.minor == 9 ? next_major_version(after: after) : next_minor_version(after: after)
+          version.minor == 9 ? next_major_version(version: version) : next_minor_version(version: version)
 
-          after
+          version
         end
 
         # Calculate the previous marketing release version.
@@ -30,22 +30,22 @@ module Fastlane
         # version to 9. Otherwise, it calculates the previous minor version. The patch and build number
         # components are reset to zero.
         #
-        # @param before [AppVersion] The version to calculate the previous marketing release version for.
+        # @param version [AppVersion] The version to calculate the previous marketing release version for.
         #
         # @return [AppVersion] The previous marketing release version.
         #
-        def previous_release_version(before:)
-          if before.minor.zero?
-            before.major -= 1
-            before.minor = 9
+        def previous_release_version(version:)
+          if version.minor.zero?
+            version.major -= 1
+            version.minor = 9
           else
-            previous_minor_version(before: before)
+            previous_minor_version(version: version)
           end
 
-          before.patch = 0
-          before.build_number = 0
+          version.patch = 0
+          version.build_number = 0
 
-          before
+          version
         end
       end
     end
