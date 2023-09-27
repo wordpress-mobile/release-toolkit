@@ -16,9 +16,6 @@ module Fastlane
           # Split the version string into its components
           components = version.split('.')
 
-          # Ensure that the version string has at least four components
-          UI.user_error!("The version string must have four components. This version string has #{components.count} components") unless components.count == 4
-
           # Create a new AppVersion instance from the version string components
           Fastlane::Models::AppVersion.new(*components.map(&:to_i))
         end
