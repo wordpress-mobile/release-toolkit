@@ -4,7 +4,7 @@ module Fastlane
   module Wpmreleasetoolkit
     # Return all .rb files inside the "actions", "helper" and "models" directories
     def self.all_classes
-      Dir[File.expand_path('**/{actions,helper,models}/**/*.rb', File.dirname(__FILE__))]
+      Dir[File.expand_path('**/{actions,helper,models,versioning}/**/*.rb', File.dirname(__FILE__))]
     end
   end
 end

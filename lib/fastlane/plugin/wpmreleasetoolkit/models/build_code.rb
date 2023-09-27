@@ -1,5 +1,6 @@
 # The `BuildCode` class represents a build code for an app. This could be the Version Code for an Android app or
 # the BUILD_NUMBER xcconfig value used by certain iOS or Mac apps.
+
 module Fastlane
   module Models
     class BuildCode
@@ -10,6 +11,8 @@ module Fastlane
       # @param build_code [String] The build code value.
       #
       def initialize(build_code)
+        UI.user_error!('Build code cannot be nil') if build_code.nil?
+
         @build_code = build_code
       end
 
