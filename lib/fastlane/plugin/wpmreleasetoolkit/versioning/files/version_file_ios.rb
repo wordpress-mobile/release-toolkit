@@ -39,14 +39,15 @@ module Fastlane
 
         # Writes the provided version numbers to the .xcconfig file.
         #
-        # @param [String] version_short The short version string.
+        # @param [String, nil] version_short The short version string (optional).
         # @param [String, nil] version_long The long version string (optional).
         # @param [String, nil] build_number The build number (optional).
         #
+        # version_long is optional because there are times when it won't be updated, such as a new beta build.
         # version_short is optional because some apps (such as Day One iOS/Mac or Simplenote Mac) don't use it.
         # build_number is optional because some apps (such as WP/JP iOS or WCiOS) don't use it.
         #
-        def write(version_short:, version_long: nil, build_number: nil)
+        def write(version_short: nil, version_long: nil, build_number: nil)
           config = Xcodeproj::Config.new(xcconfig_path)
           config.attributes['VERSION_SHORT'] = version_short.to_s unless version_short.nil?
           config.attributes['VERSION_LONG'] = version_long.to_s unless version_long.nil?
