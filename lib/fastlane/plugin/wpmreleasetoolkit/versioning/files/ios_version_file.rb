@@ -17,24 +17,28 @@ module Fastlane
           @xcconfig_path = xcconfig_path
         end
 
-        # Reads the app version from the .xcconfig file and returns it as a String.
+        # Reads the release version from the .xcconfig file and returns it as a String.
         #
-        # @return [String] The app version.
+        # @return [String] The release version.
         #
-        def read_app_version
+        def read_release_version
           config = Xcodeproj::Config.new(xcconfig_path)
-          config.attributes['VERSION_LONG']
+          config.attributes['VERSION_SHORT']
         end
 
         # Reads the build code from the .xcconfig file and returns it String.
         #
-        # @return [BuildCode] A BuildCode object.
+        # Some apps store the build code in the VERSION_LONG attribute, while others store it in the BUILD_NUMBER attribute.
         #
-        def read_build_code
-          config = Xcodeproj::Config.new(xcconfig_path)
-          build_code = config.attributes['BUILD_NUMBER']
+        # @param [String] attribute_name The name of the attribute to read.
+        #
+        # @return [String] The build code.
+        #
+        def read_build_code(attribute_name:)
+          UI.user_error!('attribute_name must be `VERSION_LONG` or `BUILD_NUMBER`') unless attribute_name.eql?('VERSION_LONG') || attribute_name.eql?('BUILD_NUMBER')
 
-          Fastlane::Models::BuildCode.new(build_code)
+          config = Xcodeproj::Config.new(xcconfig_path)
+          config.attributes[attribute_name]
         end
 
         # Writes the provided version numbers to the .xcconfig file.

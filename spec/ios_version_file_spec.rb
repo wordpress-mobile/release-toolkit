@@ -45,22 +45,6 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::IOSVersionFile do
   end
 
   describe 'read the build code from the provided .xcconfig file' do
-    context 'when the .xcconfig file exists' do
-      it 'reads the build code from the .xcconfig file' do
-        file_content = <<~CONTENT
-          VERSION_LONG = 1.2.3.4
-          VERSION_SHORT = 1.2.3
-          BUILD_NUMBER = 5678
-        CONTENT
-
-        with_tmp_file(named: 'test.xcconfig', content: file_content) do |tmp_file_path|
-          build_code = described_class.new(xcconfig_path: tmp_file_path).read_build_code
-
-          expect(build_code.to_s).to eq('5678')
-        end
-      end
-    end
-
     context 'when the .xcconfig file does not exist' do
       it 'raises an error' do
         file_path = 'fake_path/test.xcconfig'
@@ -69,9 +53,58 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::IOSVersionFile do
           .to raise_error(FastlaneCore::Interface::FastlaneError, ".xcconfig file not found at this path: #{file_path}")
       end
     end
+
+    context 'when an incorrect `attribute_name` is passed' do
+      it 'raises an error' do
+        file_content = <<~CONTENT
+          VERSION_LONG = 1.2.3.4
+          VERSION_SHORT = 1.2.3
+          BUILD_NUMBER = 5678
+        CONTENT
+
+        with_tmp_file(named: 'test.xcconfig', content: file_content) do |tmp_file_path|
+          expect { described_class.new(xcconfig_path: tmp_file_path).read_build_code(attribute_name: 'WRONG_ATTRIBUTE_NAME') }
+            .to raise_error(FastlaneCore::Interface::FastlaneError, 'attribute_name must be `VERSION_LONG` or `BUILD_NUMBER`')
+        end
+      end
+    end
+
+    context 'when the .xcconfig file exists' do
+      context 'when the build code is stored in the VERSION_LONG attribute' do
+        it 'reads the build code from the .xcconfig file' do
+          file_content = <<~CONTENT
+            VERSION_LONG = 1.2.3.4
+            VERSION_SHORT = 1.2.3
+            BUILD_NUMBER = 5678
+          CONTENT
+
+          with_tmp_file(named: 'test.xcconfig', content: file_content) do |tmp_file_path|
+            build_code = described_class.new(xcconfig_path: tmp_file_path).read_build_code(attribute_name: 'VERSION_LONG')
+
+            expect(build_code.to_s).to eq('1.2.3.4')
+          end
+        end
+      end
+
+      context 'when the build code is stored in the BUILD_NUMBER attribute' do
+        it 'reads the build code from the .xcconfig file' do
+          file_content = <<~CONTENT
+            VERSION_LONG = 1.2.3.4
+            VERSION_SHORT = 1.2.3
+            BUILD_NUMBER = 5678
+          CONTENT
+
+          with_tmp_file(named: 'test.xcconfig', content: file_content) do |tmp_file_path|
+            build_code = described_class.new(xcconfig_path: tmp_file_path).read_build_code(attribute_name: 'BUILD_NUMBER')
+
+            expect(build_code.to_s).to eq('5678')
+          end
+        end
+      end
+    end
   end
 
-  describe 'read the version number from the provided .xcconfig file' do
+  describe 'read the release version number from the provided .xcconfig file' do
     context 'when the .xcconfig file exists' do
       it 'reads the version number from the .xcconfig file' do
         file_content = <<~CONTENT
@@ -81,9 +114,9 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::IOSVersionFile do
         CONTENT
 
         with_tmp_file(named: 'test.xcconfig', content: file_content) do |tmp_file_path|
-          version = described_class.new(xcconfig_path: tmp_file_path).read_app_version
+          version = described_class.new(xcconfig_path: tmp_file_path).read_release_version
 
-          expect(version.to_s).to eq('1.2.3.4')
+          expect(version.to_s).to eq('1.2.3')
         end
       end
     end
@@ -92,7 +125,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::IOSVersionFile do
       it 'raises an error' do
         file_path = 'fake_path/test.xcconfig'
 
-        expect { described_class.new(xcconfig_path: file_path).read_app_version }
+        expect { described_class.new(xcconfig_path: file_path).read_release_version }
           .to raise_error(FastlaneCore::Interface::FastlaneError, ".xcconfig file not found at this path: #{file_path}")
       end
     end
