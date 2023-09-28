@@ -18,14 +18,15 @@ module Fastlane
         # @return [AppVersion] The next date-based release version.
         #
         def next_release_version(version:)
+          new_version = version.dup
           first_release_of_year = FastlaneCore::UI.confirm('Is this release the first release of next year?') if Time.now.month == 12
           if first_release_of_year
-            new_major = version.major + 1
-            new_minor = 1
-            new_patch = 0
-            new_build_number = 0
+            new_version.major += 1
+            new_version.minor = 1
+            new_version.patch = 0
+            new_version.build_number = 0
 
-            Fastlane::Models::AppVersion.new(new_major, new_minor, new_patch, new_build_number)
+            new_version
           else
             next_minor_version(version: version)
           end
@@ -43,15 +44,16 @@ module Fastlane
         # @return [AppVersion] The previous date-based release version.
         #
         def previous_release_version(version:)
+          new_version = version.dup
           # Date-based apps start with a minor version of 1 for the first release of the year. We can't assume what the
           # the previous minor number was, so the user needs to input it
           if version.minor == 1
-            new_major = version.major - 1
-            new_minor = FastlaneCore::UI.prompt(text: 'Please enter the minor number of the previous release: ')
-            new_patch = 0
-            new_build_number = 0
+            new_version.major -= 1
+            new_version.minor = FastlaneCore::UI.prompt(text: 'Please enter the minor number of the previous release: ')
+            new_version.patch = 0
+            new_version.build_number = 0
 
-            Fastlane::Models::AppVersion.new(new_major, new_minor, new_patch, new_build_number)
+            new_version
           else
             previous_minor_version(version: version)
           end

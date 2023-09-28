@@ -20,6 +20,12 @@ module Fastlane
           Fastlane::Models::AppVersion.new(*components.map(&:to_i))
         end
 
+        # Return the formatted version string
+        #
+        # @param version [AppVersion] The version object to format
+        #
+        # @return [String] The formatted version string
+        #
         def to_s(version)
           "#{version.major}.#{version.minor}.#{version.patch}.#{version.build_number}"
         end

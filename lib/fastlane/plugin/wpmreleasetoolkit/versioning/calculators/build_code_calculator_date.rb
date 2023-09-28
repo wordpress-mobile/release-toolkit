@@ -9,9 +9,10 @@ module Fastlane
         # @return [AppVersion] The next version with the build number set to the current date.
         #
         def next_build_code(version:)
-          version.build_number = today_date
+          new_version = version.dup
+          new_version.build_number = today_date
 
-          version
+          new_version
         end
 
         private

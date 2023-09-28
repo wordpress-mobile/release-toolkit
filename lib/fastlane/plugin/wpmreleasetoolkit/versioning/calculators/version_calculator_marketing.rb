@@ -33,13 +33,14 @@ module Fastlane
         # @return [AppVersion] The previous marketing release version.
         #
         def previous_release_version(version:)
+          new_version = version.dup
           if version.minor.zero?
-            new_major = version.major - 1
-            new_minor = 9
-            new_patch = 0
-            new_build_number = 0
+            new_version.major -= 1
+            new_version.minor = 9
+            new_version.patch = 0
+            new_version.build_number = 0
 
-            Fastlane::Models::AppVersion.new(new_major, new_minor, new_patch, new_build_number)
+            new_version
           else
             previous_minor_version(version: version)
           end

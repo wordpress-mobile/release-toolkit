@@ -11,7 +11,8 @@ module Fastlane
         # @return [BuildCode] The next build code.
         #
         def next_build_code(build_code:)
-          build_code.build_code += 1
+          new_build_code = build_code.dup
+          new_build_code.build_code += 1
         end
       end
     end
