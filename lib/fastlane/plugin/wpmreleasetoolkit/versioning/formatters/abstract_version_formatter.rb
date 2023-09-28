@@ -1,4 +1,4 @@
-require_relative '../calculators/version_calculator_abstract'
+require_relative '../calculators/abstract_version_calculator'
 
 module Fastlane
   module Wpmreleasetoolkit
@@ -6,7 +6,7 @@ module Fastlane
       # The `VersionFormatter` class is a generic version formatter that can be used as a base class
       # for formatting version objects used by for different platforms. It contains formatting methods that
       # are shared by all platforms. It has the abstract suffix because it should not be instantiated directly.
-      class VersionFormatterAbstract
+      class AbstractVersionFormatter
         # Get the release version string for the app.
         #
         # This method constructs the release version string based on the major, minor, and

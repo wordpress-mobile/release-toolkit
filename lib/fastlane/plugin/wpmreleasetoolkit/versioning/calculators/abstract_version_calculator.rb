@@ -1,11 +1,11 @@
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
-      # The `VersionCalculator` class is responsible for performing version calculations and transformations. It can be used
+      # The `AbstractVersionCalculator` class is responsible for performing version calculations and transformations. It can be used
       # as a base class for version calculations that use different versioning schemes. It contains calculation and
       # transformation methods that are shared by all platforms. It has the abstract suffix because it should not be
       # instantiated directly.
-      class VersionCalculatorAbstract
+      class AbstractVersionCalculator
         # This method increments the major version component and resets minor, patch, and build number
         # components to zero.
         #

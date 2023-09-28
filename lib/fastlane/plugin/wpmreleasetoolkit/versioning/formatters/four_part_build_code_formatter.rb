@@ -1,4 +1,4 @@
-require_relative '../formatters/version_formatter_four_part'
+require_relative '../formatters/four_part_version_formatter'
 
 module Fastlane
   module Wpmreleasetoolkit

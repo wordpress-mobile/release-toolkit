@@ -1,11 +1,11 @@
-require_relative 'version_calculator_abstract'
+require_relative 'abstract_version_calculator'
 
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
       # The `DateVersionCalculator` class is a specialized version calculator for date-based versions
-      # of an app, extending the `VersionCalculatorAbstract` class.
-      class DateVersionCalculator < VersionCalculatorAbstract
+      # of an app, extending the `AbstractVersionCalculator` class.
+      class DateVersionCalculator < AbstractVersionCalculator
         # Calculate the next date-based release version.
         #
         # If the current month is December, the method prompts the user to determine if the next

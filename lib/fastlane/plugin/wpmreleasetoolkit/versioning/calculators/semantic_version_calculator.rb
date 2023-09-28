@@ -1,11 +1,11 @@
-require_relative 'version_calculator_abstract'
+require_relative 'abstract_version_calculator'
 
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
       # The `SemanticVersionCalculator` class is a specialized version calculator for semantic versions
-      # of an app, extending the `VersionCalculatorAbstract` class.
-      class SemanticVersionCalculator < VersionCalculatorAbstract
+      # of an app, extending the `AbstractVersionCalculator` class.
+      class SemanticVersionCalculator < AbstractVersionCalculator
         # Calculate the next semantic release version.
         #
         # @param [AppVersion] version The version to calculate the next semantic release version from.
