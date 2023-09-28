@@ -1,9 +1,9 @@
-# A class for reading and writing version information to an Xcode .xcconfig file.
 require 'xcodeproj'
 
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
+      # The `IOSVersionFile` class takes in a .xcconfig file path and reads/writes values to/from the file.
       class IOSVersionFile
         attr_reader :xcconfig_path
 

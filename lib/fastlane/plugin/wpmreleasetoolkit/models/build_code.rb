@@ -1,8 +1,7 @@
-# The `BuildCode` class represents a build code for an app. This could be the Version Code for an Android app or
-# the BUILD_NUMBER xcconfig value used by certain iOS or Mac apps.
-
 module Fastlane
   module Models
+    # The `BuildCode` model represents a build code for an app. This could be the Version Code for an Android app or
+    # the VERSION_LONG/BUILD_NUMBER for an iOS/Mac app.
     class BuildCode
       attr_accessor :build_code
 

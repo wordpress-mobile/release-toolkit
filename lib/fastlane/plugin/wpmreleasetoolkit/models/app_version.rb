@@ -1,16 +1,15 @@
-# Fastlane::Models::AppVersion represents a version of an app with major, minor, patch, and build number components.
-
 module Fastlane
   module Models
+    # The AppVersion model represents a version of an app with major, minor, patch, and build number components.
     class AppVersion
       attr_accessor :major, :minor, :patch, :build_number
 
       # Initializes a new AppVersion instance.
       #
-      # @param major [Integer] the major version number.
-      # @param minor [Integer] the minor version number.
-      # @param patch [Integer] the patch version number.
-      # @param build_number [Integer] the build number.
+      # @param [Integer] major The major version number.
+      # @param [Integer] minor The minor version number.
+      # @param [Integer] patch The patch version number.
+      # @param [Integer] build_number The build number.
       #
       def initialize(major, minor, patch = 0, build_number = 0)
         # Validate that the major and minor version numbers are not nil

@@ -1,10 +1,10 @@
-# The `DateVersionCalculator` class is a specialized version calculator for date-based versions
-# of an app, extending the `VersionCalculatorAbstract` class.
 require_relative 'version_calculator_abstract'
 
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
+      # The `DateVersionCalculator` class is a specialized version calculator for date-based versions
+      # of an app, extending the `VersionCalculatorAbstract` class.
       class DateVersionCalculator < VersionCalculatorAbstract
         # Calculate the next date-based release version.
         #
@@ -13,7 +13,7 @@ module Fastlane
         # and sets the minor version to 1, resetting the patch and build number components to zero.
         # Otherwise, it calculates the next minor version.
         #
-        # @param version [AppVersion] The version to calculate the next date-based release version for.
+        # @param [AppVersion] version The version to calculate the next date-based release version for.
         #
         # @return [AppVersion] The next date-based release version.
         #
@@ -39,7 +39,7 @@ module Fastlane
         # previous minor version. The major version is adjusted accordingly, and the patch and
         # build number components are reset to zero.
         #
-        # @param version [AppVersion] The version to calculate the previous date-based release version for.
+        # @param [AppVersion] version The version to calculate the previous date-based release version for.
         #
         # @return [AppVersion] The previous date-based release version.
         #

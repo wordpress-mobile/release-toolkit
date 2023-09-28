@@ -1,14 +1,14 @@
-# The `FourPartVersionFormatter` class  extends the `VersionFormatter` class. It is a specialized version formatter for
-# apps that use versions in the format of `1.2.3.4`.
 require_relative 'version_formatter_abstract'
 
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
+      # The `FourPartVersionFormatter` class  extends the `VersionFormatter` class. It is a specialized version formatter for
+      # apps that use versions in the format of `1.2.3.4`.
       class FourPartVersionFormatter < VersionFormatterAbstract
         # Parse the version string into an AppVersion instance
         #
-        # @param version [String] The version string to parse
+        # @param [String] version The version string to parse
         #
         # @return [AppVersion] The parsed version
         #
@@ -22,7 +22,7 @@ module Fastlane
 
         # Return the formatted version string
         #
-        # @param version [AppVersion] The version object to format
+        # @param [AppVersion] version The version object to format
         #
         # @return [String] The formatted version string
         #

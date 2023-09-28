@@ -1,17 +1,17 @@
-# The `RCNotationVersionFormatter` class extends the `VersionFormatter` class. It is a specialized version
-# formatter for apps that may use versions in the format of `1.2.3-rc-4`.
 require_relative 'version_formatter_abstract'
 
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
+      # The `RCNotationVersionFormatter` class extends the `VersionFormatter` class. It is a specialized version
+      # formatter for apps that may use versions in the format of `1.2.3-rc-4`.
       class RCNotationVersionFormatter < VersionFormatterAbstract
         # The string identifier used for beta versions in Android.
         RC_SUFFIX = 'rc'.freeze
 
         # Parse the version string into an AppVersion instance
         #
-        # @param version_name [String] The version string to parse
+        # @param [String] version_name The version string to parse
         #
         # @return [AppVersion] The parsed version
         #
@@ -46,7 +46,7 @@ module Fastlane
         # with the beta identifier and the build number. It ensures that the build number is
         # 1 or higher, as beta versions must have a build number greater than or equal to 1.
         #
-        # @param version [AppVersion] The version object to format
+        # @param [AppVersion] version The version object to format
         #
         # @return [String] The formatted beta version of the Android app
         #

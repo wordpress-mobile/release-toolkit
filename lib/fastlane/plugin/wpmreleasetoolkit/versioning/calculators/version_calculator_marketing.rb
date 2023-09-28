@@ -1,18 +1,17 @@
-# The `MarketingVersionCalculator` class is a specialized version calculator for marketing versions
-# of an app, extending the `VersionCalculatorAbstract` class. It provides methods to calculate the next and previous
-# marketing release versions.
 require_relative 'version_calculator_abstract'
 
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
+      # The `MarketingVersionCalculator` class is a specialized version calculator for marketing versions
+      # of an app, extending the `VersionCalculatorAbstract` class.
       class MarketingVersionCalculator < VersionCalculatorAbstract
         # Calculate the next marketing release version.
         #
         # This method checks if the minor version is 9. If it is, it calculates the next major version.
         # Otherwise, it calculates the next minor version. The patch and build number components are reset to zero.
         #
-        # @param version [AppVersion] The version to calculate the next marketing release version for.
+        # @param [AppVersion] version The version to calculate the next marketing release version for.
         #
         # @return [AppVersion] The next marketing release version.
         #
@@ -28,7 +27,7 @@ module Fastlane
         # version to 9. Otherwise, it calculates the previous minor version. The patch and build number
         # components are reset to zero.
         #
-        # @param version [AppVersion] The version to calculate the previous marketing release version for.
+        # @param [AppVersion] version The version to calculate the previous marketing release version for.
         #
         # @return [AppVersion] The previous marketing release version.
         #

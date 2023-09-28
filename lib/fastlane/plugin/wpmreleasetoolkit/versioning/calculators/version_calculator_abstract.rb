@@ -1,11 +1,10 @@
-# The `VersionCalculator` class is responsible for performing version calculations and transformations. It can be used
-# as a base class for version calculations that use different versioning schemes. It contains calculation and
-# transformation methods that are shared by all platforms. It has the abstract suffix because it should not be
-# instantiated directly.
-
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
+      # The `VersionCalculator` class is responsible for performing version calculations and transformations. It can be used
+      # as a base class for version calculations that use different versioning schemes. It contains calculation and
+      # transformation methods that are shared by all platforms. It has the abstract suffix because it should not be
+      # instantiated directly.
       class VersionCalculatorAbstract
         # This method increments the major version component and resets minor, patch, and build number
         # components to zero.
@@ -85,7 +84,7 @@ module Fastlane
 
         # Calculate the previous minor version by decrementing the minor version.
         #
-        # @param version [AppVersion] The version to calculate the previous minor version for.
+        # @param [AppVersion] version The version to calculate the previous minor version for.
         #
         # @return [AppVersion] The previous minor version.
         #
@@ -100,7 +99,7 @@ module Fastlane
 
         # Calculate the previous patch version by decrementing the patch version if it's not zero.
         #
-        # @param version [AppVersion] The version to calculate the previous patch version for.
+        # @param [AppVersion] version The version to calculate the previous patch version for.
         #
         # @return [AppVersion] The previous patch version.
         #
@@ -114,7 +113,7 @@ module Fastlane
 
         # Calculate the previous build number by decrementing the build number.
         #
-        # @param version [AppVersion] The version to calculate the previous build number for.
+        # @param [AppVersion] version The version to calculate the previous build number for.
         #
         # @return [AppVersion] The previous version with a decremented build number.
         #
