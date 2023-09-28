@@ -39,27 +39,4 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DateVersionCalculator do
       end
     end
   end
-
-  describe 'calculates the previous release version when using date versioning' do
-    context 'when the minor version is not 1' do
-      it 'decrements the minor version number' do
-        version = Fastlane::Models::AppVersion.new(2023, 30, 1, 2)
-        previous_version = described_class.new.previous_release_version(version: version)
-        # Test that the original version is not modified
-        expect(version.to_s).to eq('2023.30.1.2')
-        expect(previous_version.to_s).to eq('2023.29.0.0')
-      end
-    end
-
-    context 'when the minor version is 1' do
-      it 'prompts the user to input the minor number of the previous release' do
-        allow(FastlaneCore::UI).to receive(:prompt).and_return('29')
-        version = Fastlane::Models::AppVersion.new(2023, 1, 1, 1)
-        previous_version = described_class.new.previous_release_version(version: version)
-        # Test that the original version is not modified
-        expect(version.to_s).to eq('2023.1.1.1')
-        expect(previous_version.to_s).to eq('2022.29.0.0')
-      end
-    end
-  end
 end

@@ -31,33 +31,6 @@ module Fastlane
             next_minor_version(version: version)
           end
         end
-
-        # Calculate the previous date-based release version.
-        #
-        # If the minor version is 1 (indicating the first release of the year), the method prompts
-        # the user to input the minor number of the previous release. Otherwise, it calculates the
-        # previous minor version. The major version is adjusted accordingly, and the patch and
-        # build number components are reset to zero.
-        #
-        # @param [AppVersion] version The version to calculate the previous date-based release version for.
-        #
-        # @return [AppVersion] The previous date-based release version.
-        #
-        def previous_release_version(version:)
-          new_version = version.dup
-          # Date-based apps start with a minor version of 1 for the first release of the year. We can't assume what the
-          # the previous minor number was, so the user needs to input it
-          if version.minor == 1
-            new_version.major -= 1
-            new_version.minor = FastlaneCore::UI.prompt(text: 'Please enter the minor number of the previous release: ')
-            new_version.patch = 0
-            new_version.build_number = 0
-
-            new_version
-          else
-            previous_minor_version(version: version)
-          end
-        end
       end
     end
   end

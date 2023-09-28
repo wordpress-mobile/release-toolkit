@@ -29,26 +29,4 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::MarketingVersionCalculator do
       end
     end
   end
-
-  describe 'calculates the previous release version when using marketing versioning' do
-    context 'when the minor version is not 0' do
-      it 'decrements the minor version' do
-        version = Fastlane::Models::AppVersion.new(13, 9, 0, 1)
-        previous_version = described_class.new.previous_release_version(version: version)
-        # Test that the original version is not modified
-        expect(version.to_s).to eq('13.9.0.1')
-        expect(previous_version.to_s).to eq('13.8.0.0')
-      end
-    end
-
-    context 'when the minor version is 0' do
-      it 'decrements the major version and sets the minor version to 9' do
-        version = Fastlane::Models::AppVersion.new(13, 0, 0, 1)
-        previous_version = described_class.new.previous_release_version(version: version)
-        # Test that the original version is not modified
-        expect(version.to_s).to eq('13.0.0.1')
-        expect(previous_version.to_s).to eq('12.9.0.0')
-      end
-    end
-  end
 end

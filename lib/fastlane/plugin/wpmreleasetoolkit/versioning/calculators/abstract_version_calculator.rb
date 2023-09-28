@@ -66,37 +66,6 @@ module Fastlane
           new_version
         end
 
-        # Calculate the previous major version by decrementing the minor version.
-        #
-        # @param version [AppVersion] The version to calculate the previous major version for.
-        #
-        # @return [AppVersion] The previous major version.
-        #
-        def previous_major_version(version:)
-          new_version = version.dup
-          new_version.major -= 1
-          new_version.minor = 0
-          new_version.patch = 0
-          new_version.build_number = 0
-
-          new_version
-        end
-
-        # Calculate the previous minor version by decrementing the minor version.
-        #
-        # @param [AppVersion] version The version to calculate the previous minor version for.
-        #
-        # @return [AppVersion] The previous minor version.
-        #
-        def previous_minor_version(version:)
-          new_version = version.dup
-          new_version.minor -= 1
-          new_version.patch = 0
-          new_version.build_number = 0
-
-          new_version
-        end
-
         # Calculate the previous patch version by decrementing the patch version if it's not zero.
         #
         # @param [AppVersion] version The version to calculate the previous patch version for.
@@ -107,19 +76,6 @@ module Fastlane
           new_version = version.dup
           new_version.patch -= 1 unless version.patch.zero?
           new_version.build_number = 0
-
-          new_version
-        end
-
-        # Calculate the previous build number by decrementing the build number.
-        #
-        # @param [AppVersion] version The version to calculate the previous build number for.
-        #
-        # @return [AppVersion] The previous version with a decremented build number.
-        #
-        def previous_build_number(version:)
-          new_version = version.dup
-          new_version.build_number -= 1
 
           new_version
         end

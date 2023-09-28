@@ -15,16 +15,6 @@ module Fastlane
         def next_release_version(version:)
           next_minor_version(version: version)
         end
-
-        # Calculate the previous semantic release version.
-        #
-        # @param [AppVersion] version The version to calculate the previous semantic release version for.
-        #
-        # @return [AppVersion] The previous semantic release version.
-        #
-        def previous_release_version(version:)
-          previous_minor_version(version: version)
-        end
       end
     end
   end
