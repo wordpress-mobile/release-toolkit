@@ -14,10 +14,10 @@ module Fastlane
         #
         def parse(version)
           # Split the version string into its components
-          components = version.split('.')
+          components = version.split('.').map(&:to_i)
 
           # Create a new AppVersion instance from the version string components
-          Fastlane::Models::AppVersion.new(*components.map(&:to_i))
+          Fastlane::Models::AppVersion.new(*components)
         end
 
         # Return the formatted version string
