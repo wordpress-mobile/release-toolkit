@@ -13,6 +13,8 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::MarketingVersionCalculator do
       it 'increments the minor version when the minor version is less than 9' do
         version = Fastlane::Models::AppVersion.new(13, 5, 1, 1)
         bumped_version = described_class.new.next_release_version(version: version)
+        # Test that the original version is not modified
+        expect(version.to_s).to eq('13.5.1.1')
         expect(bumped_version.to_s).to eq('13.6.0.0')
       end
     end
@@ -21,6 +23,8 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::MarketingVersionCalculator do
       it 'increments the major version and sets the minor version to 0 ' do
         version = Fastlane::Models::AppVersion.new(13, 9, 1, 1)
         bumped_version = described_class.new.next_release_version(version: version)
+        # Test that the original version is not modified
+        expect(version.to_s).to eq('13.9.1.1')
         expect(bumped_version.to_s).to eq('14.0.0.0')
       end
     end
@@ -31,6 +35,8 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::MarketingVersionCalculator do
       it 'decrements the minor version' do
         version = Fastlane::Models::AppVersion.new(13, 9, 0, 1)
         previous_version = described_class.new.previous_release_version(version: version)
+        # Test that the original version is not modified
+        expect(version.to_s).to eq('13.9.0.1')
         expect(previous_version.to_s).to eq('13.8.0.0')
       end
     end
@@ -39,6 +45,8 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::MarketingVersionCalculator do
       it 'decrements the major version and sets the minor version to 9' do
         version = Fastlane::Models::AppVersion.new(13, 0, 0, 1)
         previous_version = described_class.new.previous_release_version(version: version)
+        # Test that the original version is not modified
+        expect(version.to_s).to eq('13.0.0.1')
         expect(previous_version.to_s).to eq('12.9.0.0')
       end
     end

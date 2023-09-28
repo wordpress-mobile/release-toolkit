@@ -15,12 +15,12 @@ module Fastlane
         # @return [AppVersion] The next major version.
         #
         def next_major_version(version:)
-          version.major += 1
-          version.minor = 0
-          version.patch = 0
-          version.build_number = 0
+          new_major = version.major + 1
+          new_minor = 0
+          new_patch = 0
+          new_build_number = 0
 
-          version
+          Fastlane::Models::AppVersion.new(new_major, new_minor, new_patch, new_build_number)
         end
 
         # This method increments the minor version component and resets patch and build number components
@@ -31,11 +31,11 @@ module Fastlane
         # @return [AppVersion] The next minor version.
         #
         def next_minor_version(version:)
-          version.minor += 1
-          version.patch = 0
-          version.build_number = 0
+          new_minor = version.minor + 1
+          new_patch = 0
+          new_build_number = 0
 
-          version
+          Fastlane::Models::AppVersion.new(version.major, new_minor, new_patch, new_build_number)
         end
 
         # This method increments the patch version component and resets the build number component to zero.
@@ -45,10 +45,10 @@ module Fastlane
         # @return [AppVersion] The next patch version.
         #
         def next_patch_version(version:)
-          version.patch += 1
-          version.build_number = 0
+          new_patch = version.patch + 1
+          new_build_number = 0
 
-          version
+          Fastlane::Models::AppVersion.new(version.major, version.minor, new_patch, new_build_number)
         end
 
         # This method increments the build number component.
@@ -58,9 +58,9 @@ module Fastlane
         # @return [AppVersion] The next version with an incremented build number.
         #
         def next_build_number(version:)
-          version.build_number += 1
+          new_build_number = version.build_number + 1
 
-          version
+          Fastlane::Models::AppVersion.new(version.major, version.minor, version.patch, new_build_number)
         end
 
         # Calculate the previous major version by decrementing the minor version.
@@ -70,12 +70,12 @@ module Fastlane
         # @return [AppVersion] The previous major version.
         #
         def previous_major_version(version:)
-          version.major -= 1
-          version.minor = 0
-          version.patch = 0
-          version.build_number = 0
+          new_major = version.major - 1
+          new_minor = 0
+          new_patch = 0
+          new_build_number = 0
 
-          version
+          Fastlane::Models::AppVersion.new(new_major, new_minor, new_patch, new_build_number)
         end
 
         # Calculate the previous minor version by decrementing the minor version.
@@ -85,11 +85,11 @@ module Fastlane
         # @return [AppVersion] The previous minor version.
         #
         def previous_minor_version(version:)
-          version.minor -= 1
-          version.patch = 0
-          version.build_number = 0
+          new_minor = version.minor - 1
+          new_patch = 0
+          new_build_number = 0
 
-          version
+          Fastlane::Models::AppVersion.new(version.major, new_minor, new_patch, new_build_number)
         end
 
         # Calculate the previous patch version by decrementing the patch version if it's not zero.
@@ -99,10 +99,10 @@ module Fastlane
         # @return [AppVersion] The previous patch version.
         #
         def previous_patch_version(version:)
-          version.patch -= 1 unless version.patch.zero?
-          version.build_number = 0
+          new_patch = version.patch - 1 unless version.patch.zero?
+          new_build_number = 0
 
-          version
+          Fastlane::Models::AppVersion.new(version.major, version.minor, new_patch, new_build_number)
         end
 
         # Calculate the previous build number by decrementing the build number.
@@ -112,9 +112,9 @@ module Fastlane
         # @return [AppVersion] The previous version with a decremented build number.
         #
         def previous_build_number(version:)
-          version.build_number -= 1
+          new_build_number = version.build_number - 1
 
-          version
+          Fastlane::Models::AppVersion.new(version.major, version.minor, version.patch, new_build_number)
         end
       end
     end

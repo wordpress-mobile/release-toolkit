@@ -10,16 +10,12 @@ module Fastlane
         #
         def next_release_version(version:)
           next_minor_version(version: version)
-
-          version
         end
 
         # Calculate the previous semantic release version.
         #
         def previous_release_version(version:)
           previous_minor_version(version: version)
-
-          version
         end
       end
     end

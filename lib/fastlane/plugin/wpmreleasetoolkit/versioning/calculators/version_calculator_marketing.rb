@@ -20,8 +20,6 @@ module Fastlane
           UI.user_error!('Marketing Versioning: The minor version cannot be greater than 9') if version.minor > 9
 
           version.minor == 9 ? next_major_version(version: version) : next_minor_version(version: version)
-
-          version
         end
 
         # Calculate the previous marketing release version.
@@ -36,16 +34,15 @@ module Fastlane
         #
         def previous_release_version(version:)
           if version.minor.zero?
-            version.major -= 1
-            version.minor = 9
+            new_major = version.major - 1
+            new_minor = 9
+            new_patch = 0
+            new_build_number = 0
+
+            Fastlane::Models::AppVersion.new(new_major, new_minor, new_patch, new_build_number)
           else
             previous_minor_version(version: version)
           end
-
-          version.patch = 0
-          version.build_number = 0
-
-          version
         end
       end
     end
