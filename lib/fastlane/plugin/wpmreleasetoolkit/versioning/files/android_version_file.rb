@@ -47,7 +47,7 @@ module Fastlane
           UI.user_error!('Version code not found in version.properties') if version_code.nil?
 
           # Create a BuildCode object
-          Fastlane::Models::BuildCode.new(version_code)
+          Fastlane::Models::BuildCode.new(version_code.to_i)
         end
 
         # Writes the provided version name and version code to the version.properties file.
