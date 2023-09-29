@@ -57,7 +57,7 @@ module Fastlane
         #
         # @raise [UI::Error] If the version name or version code is nil.
         #
-        def write_version(version_name, version_code)
+        def write_version(version_name:, version_code:)
           # Create the version name and version code hash
           version = {
             versionName: version_name,
