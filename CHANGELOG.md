@@ -10,6 +10,20 @@ _None_
 
 ### New Features
 
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 9.1.0
+
+### New Features
+
 - Adds `AppVersion` and `BuildCode` models that can be used by version actions. [#512]
 - Adds version calculator and formatter classes that can be used with the `AppVersion` and `BuildCode` models. [#512]
 - Adds methods for writing values to `xcconfig` files using the `Xcodeproj` gem. [#512]
@@ -21,14 +35,6 @@ _None_
    The `removebranchprotection` action name still exists for now for backward compatibility (with a deprecation notice),
    but it will be removed in a future major release. [#513]
 - Added `copy_branch_protection` action to replicate the branch protection settings of one branch onto another. [#513]
-
-### Bug Fixes
-
-_None_
-
-### Internal Changes
-
-_None_
 
 ## 9.0.1
 
