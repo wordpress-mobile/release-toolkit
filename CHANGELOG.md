@@ -10,14 +10,17 @@ _None_
 
 ### New Features
 
- - Renamed `addbranchprotection` to `set_branch_protection`, and allow it to provide additional optional protection
+- Adds `AppVersion` and `BuildCode` models that can be used by version actions. [#512]
+- Adds version calculator and formatter classes that can be used with the `AppVersion` and `BuildCode` models. [#512]
+- Adds methods for writing values to `xcconfig` files using the `Xcodeproj` gem. [#512]
+- Renamed `addbranchprotection` to `set_branch_protection`, and allow it to provide additional optional protection
    settings to set/update on the target branch (like `lock_branch`, `required_ci_checks`, etc).
    The `addbranchprotection` action name still exists for backward compatibility for now (with a deprecation notice),
    but it will be removed in a future major release. [#513]
- - Renamed `removebranchprotection` to `remove_branch_protection`.
+- Renamed `removebranchprotection` to `remove_branch_protection`.
    The `removebranchprotection` action name still exists for now for backward compatibility (with a deprecation notice),
    but it will be removed in a future major release. [#513]
- - Added `copy_branch_protection` action to replicate the branch protection settings of one branch onto another. [#513]
+- Added `copy_branch_protection` action to replicate the branch protection settings of one branch onto another. [#513]
 
 ### Bug Fixes
 
