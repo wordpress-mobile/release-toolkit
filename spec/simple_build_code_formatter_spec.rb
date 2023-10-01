@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Fastlane::Wpmreleasetoolkit::Versioning::IntegerBuildCodeFormatter do
+describe Fastlane::Wpmreleasetoolkit::Versioning::SimpleBuildCodeFormatter do
   describe 'formats a BuildCode object as a build code' do
     it 'returns the integer build code as a string' do
       build_code = Fastlane::Models::BuildCode.new(735)

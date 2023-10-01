@@ -1,9 +1,9 @@
-# A class for reading and writing version information to an Xcode .xcconfig file.
 require 'xcodeproj'
 
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
+      # The `IOSVersionFile` class takes in an .xcconfig file path and reads/writes values to/from the file.
       class IOSVersionFile
         attr_reader :xcconfig_path
 
@@ -17,36 +17,41 @@ module Fastlane
           @xcconfig_path = xcconfig_path
         end
 
-        # Reads the app version from the .xcconfig file and returns it as a String.
+        # Reads the release version from the .xcconfig file and returns it as a String.
         #
-        # @return [String] The app version.
+        # @return [String] The release version.
         #
-        def read_app_version
+        def read_release_version
           config = Xcodeproj::Config.new(xcconfig_path)
-          config.attributes['VERSION_LONG']
+          config.attributes['VERSION_SHORT']
         end
 
         # Reads the build code from the .xcconfig file and returns it String.
         #
-        # @return [BuildCode] A BuildCode object.
+        # Some apps store the build code in the VERSION_LONG attribute, while others store it in the BUILD_NUMBER attribute.
         #
-        def read_build_code
-          config = Xcodeproj::Config.new(xcconfig_path)
-          build_code = config.attributes['BUILD_NUMBER']
+        # @param [String] attribute_name The name of the attribute to read.
+        #
+        # @return [String] The build code.
+        #
+        def read_build_code(attribute_name:)
+          UI.user_error!('attribute_name must be `VERSION_LONG` or `BUILD_NUMBER`') unless attribute_name.eql?('VERSION_LONG') || attribute_name.eql?('BUILD_NUMBER')
 
-          Fastlane::Models::BuildCode.new(build_code)
+          config = Xcodeproj::Config.new(xcconfig_path)
+          config.attributes[attribute_name]
         end
 
         # Writes the provided version numbers to the .xcconfig file.
         #
-        # @param [String] version_short The short version string.
+        # @param [String, nil] version_short The short version string (optional).
         # @param [String, nil] version_long The long version string (optional).
         # @param [String, nil] build_number The build number (optional).
         #
+        # version_long is optional because there are times when it won't be updated, such as a new beta build.
         # version_short is optional because some apps (such as Day One iOS/Mac or Simplenote Mac) don't use it.
         # build_number is optional because some apps (such as WP/JP iOS or WCiOS) don't use it.
         #
-        def write(version_short:, version_long: nil, build_number: nil)
+        def write(version_short: nil, version_long: nil, build_number: nil)
           config = Xcodeproj::Config.new(xcconfig_path)
           config.attributes['VERSION_SHORT'] = version_short.to_s unless version_short.nil?
           config.attributes['VERSION_LONG'] = version_long.to_s unless version_long.nil?

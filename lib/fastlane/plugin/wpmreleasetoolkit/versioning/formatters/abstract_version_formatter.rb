@@ -1,12 +1,12 @@
-# The `VersionFormatter` class is a generic version formatter that can be used as a base class
-# for formatting version objects used by for different platforms. It contains formatting methods that
-# are shared by all platforms. It has the abstract suffix because it should not be instantiated directly.
-require_relative '../calculators/version_calculator_abstract'
+require_relative '../calculators/abstract_version_calculator'
 
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
-      class VersionFormatterAbstract
+      # The `VersionFormatter` class is a generic version formatter that can be used as a base class
+      # for formatting version objects used by for different platforms. It contains formatting methods that
+      # are shared by all platforms. It has the abstract suffix because it should not be instantiated directly.
+      class AbstractVersionFormatter
         # Get the release version string for the app.
         #
         # This method constructs the release version string based on the major, minor, and
@@ -14,7 +14,7 @@ module Fastlane
         # a version string in the format "major.minor" (e.g., '1.2'). Otherwise, it returns a
         # version string in the format "major.minor.patch" (e.g., '1.2.3').
         #
-        # @param version [AppVersion] The version object to format
+        # @param [AppVersion] version The version object to format
         #
         # @return [String] The formatted release version string.
         #

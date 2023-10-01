@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Fastlane::Wpmreleasetoolkit::Versioning::VersionFormatterAbstract do
+describe Fastlane::Wpmreleasetoolkit::Versioning::AbstractVersionFormatter do
   describe 'formats the version number' do
     context 'when the patch version is 0' do
       it 'returns a version string with the major and minor versions' do
