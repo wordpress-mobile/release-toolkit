@@ -3,6 +3,50 @@ require 'json'
 
 module Fastlane
   module Helper
+    class GlotPressDownloader
+      AUTO_RETRY_SLEEP_TIME = 20
+      MAX_AUTO_RETRY_ATTEMPTS = 30
+
+      def initialize(auto_retry)
+        @auto_retry = auto_retry
+        @auto_retry_attempt_counter = 0
+      end
+
+      def download(target_locale, glotpress_url, is_source)
+        uri = URI(glotpress_url)
+        response = Net::HTTP.get_response(uri)
+
+        case response.code
+        when '200'
+          # All good pass the result along
+          response
+        when '301'
+          # Follow the redirect
+          UI.message("Received 301 for `#{locale}`. Following redirect...")
+          download(locale, response.header['location'], is_source)
+        when '429'
+          # We got rate-limited, auto_retry or offer to try again with a prompt
+          if @auto_retry && @auto_retry_attempt_counter <= MAX_AUTO_RETRY_ATTEMPTS
+            UI.message("Received 429 for `#{response.uri}`. Auto retrying in #{AUTO_RETRY_SLEEP_TIME} seconds...")
+            sleep(AUTO_RETRY_SLEEP_TIME)
+            @auto_retry_attempt_counter += 1
+            download(target_locale, response.uri, is_source)
+          elsif UI.confirm("Retry downloading `#{response.uri}` after receiving 429 from the API?")
+            download(target_locale, response.uri, is_source)
+          else
+            UI.error("Abandoning `#{response.uri}` download as requested.")
+          end
+        else
+          message = "Received unexpected #{response.code} from request to URI #{response.uri}."
+          UI.abort_with_message!(message) unless UI.confirm("#{message} Continue anyway?")
+        end
+      end
+    end
+  end
+end
+
+module Fastlane
+  module Helper
     class MetadataDownloader
       AUTO_RETRY_SLEEP_TIME = 20
       MAX_AUTO_RETRY_ATTEMPTS = 30
@@ -19,8 +63,8 @@ module Fastlane
 
       # Downloads data from GlotPress, in JSON format
       def download(target_locale, glotpress_url, is_source)
-        uri = URI(glotpress_url)
-        response = Net::HTTP.get_response(uri)
+        downloader = GlotPressDownloader.new(@auto_retry)
+        response = downloader.download(target_locale, glotpress_url, is_source)
         handle_glotpress_download(response: response, locale: target_locale, is_source: is_source)
       end
 

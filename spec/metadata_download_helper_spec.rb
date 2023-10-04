@@ -24,7 +24,7 @@ describe Fastlane::Helper::MetadataDownloader do
           end
 
           expect(Fastlane::UI).to receive(:message)
-            .with(/Received 429 for `en-AU`. Auto retrying in 20 seconds.../)
+            .with(/Received 429 for `#{fake_url}`. Auto retrying in 20 seconds.../)
 
           expect(Fastlane::UI).to receive(:message)
             .with(/No translation available for en-AU/)
