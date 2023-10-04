@@ -29,11 +29,15 @@ module Fastlane
           UI.message("Received 301 for `#{response.uri}`. Following redirect...")
           download(response.header['location'])
         when '429' # We got rate-limited, auto_retry or offer to try again with a prompt
-          if @auto_retry && @auto_retry_attempt_counter <= MAX_AUTO_RETRY_ATTEMPTS
-            UI.message("Received 429 for `#{response.uri}`. Auto retrying in #{@auto_retry_sleep_time} seconds...")
-            sleep(@auto_retry_sleep_time)
-            @auto_retry_attempt_counter += 1
-            download(response.uri)
+          if @auto_retry
+            if @auto_retry_attempt_counter < @auto_retry_max_attempts
+              UI.message("Received 429 for `#{response.uri}`. Auto retrying in #{@auto_retry_sleep_time} seconds...")
+              sleep(@auto_retry_sleep_time)
+              @auto_retry_attempt_counter += 1
+              download(response.uri)
+            else
+              UI.error("Abandoning `#{response.uri}` download after #{@auto_retry_attempt_counter} retries.")
+            end
           elsif UI.confirm("Retry downloading `#{response.uri}` after receiving 429 from the API?")
             download(response.uri)
           else
@@ -51,9 +55,6 @@ end
 module Fastlane
   module Helper
     class MetadataDownloader
-      AUTO_RETRY_SLEEP_TIME = 20
-      MAX_AUTO_RETRY_ATTEMPTS = 30
-
       attr_reader :target_folder, :target_files
 
       def initialize(target_folder, target_files, auto_retry)
@@ -159,22 +160,6 @@ module Fastlane
           loc_data = JSON.parse(response.body) rescue loc_data = nil
           parse_data(locale, loc_data, is_source)
           reparse_alternates(target_locale, loc_data, is_source) unless @alternates.empty?
-        when '301'
-          # Follow the redirect
-          UI.message("Received 301 for `#{locale}`. Following redirect...")
-          download(locale, response.header['location'], is_source)
-        when '429'
-          # We got rate-limited, auto_retry or offer to try again with a prompt
-          if @auto_retry && @auto_retry_attempt_counter <= MAX_AUTO_RETRY_ATTEMPTS
-            UI.message("Received 429 for `#{locale}`. Auto retrying in #{AUTO_RETRY_SLEEP_TIME} seconds...")
-            sleep(AUTO_RETRY_SLEEP_TIME)
-            @auto_retry_attempt_counter += 1
-            download(locale, response.uri, is_source)
-          elsif UI.confirm("Retry downloading `#{locale}` after receiving 429 from the API?")
-            download(locale, response.uri, is_source)
-          else
-            UI.error("Abandoning `#{locale}` download as requested.")
-          end
         else
           message = "Received unexpected #{response.code} from request to URI #{response.uri}."
           UI.abort_with_message!(message) unless UI.confirm("#{message} Continue anyway?")
