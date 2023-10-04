@@ -103,3 +103,14 @@ end
 EMPTY_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'empty.json')
 PASSED_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-test-lab-run-passed.log')
 FAILED_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-test-lab-run-failure.log')
+
+# Monkey-patch WebMock to work around bug where response.uri is not set
+# See https://github.com/bblimke/webmock/issues/469
+WebMock::HttpLibAdapters::NetHttpAdapter.instance_variable_get(:@webMockNetHTTP).class_eval do
+  old_request = instance_method :request
+  define_method :request do |request, &block|
+    old_request.bind(self).call(request, &block).tap do |response|
+      response.uri = request.uri
+    end
+  end
+end
