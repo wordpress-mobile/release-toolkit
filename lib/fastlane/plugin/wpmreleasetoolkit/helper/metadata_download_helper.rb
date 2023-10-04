@@ -7,8 +7,14 @@ module Fastlane
       AUTO_RETRY_SLEEP_TIME = 20
       MAX_AUTO_RETRY_ATTEMPTS = 30
 
-      def initialize(auto_retry: true)
+      def initialize(
+        auto_retry: true,
+        auto_retry_sleep_time: 20,
+        auto_retry_max_attempts: 30
+      )
         @auto_retry = auto_retry
+        @auto_retry_sleep_time = auto_retry_sleep_time
+        @auto_retry_max_attempts = auto_retry_max_attempts
         @auto_retry_attempt_counter = 0
       end
 
@@ -24,8 +30,8 @@ module Fastlane
           download(response.header['location'])
         when '429' # We got rate-limited, auto_retry or offer to try again with a prompt
           if @auto_retry && @auto_retry_attempt_counter <= MAX_AUTO_RETRY_ATTEMPTS
-            UI.message("Received 429 for `#{response.uri}`. Auto retrying in #{AUTO_RETRY_SLEEP_TIME} seconds...")
-            sleep(AUTO_RETRY_SLEEP_TIME)
+            UI.message("Received 429 for `#{response.uri}`. Auto retrying in #{@auto_retry_sleep_time} seconds...")
+            sleep(@auto_retry_sleep_time)
             @auto_retry_attempt_counter += 1
             download(response.uri)
           elsif UI.confirm("Retry downloading `#{response.uri}` after receiving 429 from the API?")
