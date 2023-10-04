@@ -7,7 +7,7 @@ module Fastlane
       AUTO_RETRY_SLEEP_TIME = 20
       MAX_AUTO_RETRY_ATTEMPTS = 30
 
-      def initialize(auto_retry)
+      def initialize(auto_retry: true)
         @auto_retry = auto_retry
         @auto_retry_attempt_counter = 0
       end
@@ -60,7 +60,7 @@ module Fastlane
 
       # Downloads data from GlotPress, in JSON format
       def download(target_locale, glotpress_url, is_source)
-        downloader = GlotPressDownloader.new(@auto_retry)
+        downloader = GlotPressDownloader.new(auto_retry: @auto_retry)
         response = downloader.download(glotpress_url)
         handle_glotpress_download(response: response, locale: target_locale, is_source: is_source)
       end
