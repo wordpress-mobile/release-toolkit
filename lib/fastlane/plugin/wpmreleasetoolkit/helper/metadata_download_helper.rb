@@ -3,7 +3,7 @@ require 'json'
 
 module Fastlane
   module Helper
-    class GlotPressDownloader
+    class GlotpressDownloader
       AUTO_RETRY_SLEEP_TIME = 20
       MAX_AUTO_RETRY_ATTEMPTS = 30
 

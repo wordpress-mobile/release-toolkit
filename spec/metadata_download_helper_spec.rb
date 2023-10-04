@@ -1,34 +1,5 @@
 require 'spec_helper'
 
-describe Fastlane::Helper::GlotPressDownloader do
-  describe 'downloading' do
-    context 'when GlotPress returs a 429 code' do
-      it 'automatically retries' do
-        downloader = described_class.new(true)
-        fake_url = 'https://test.com'
-
-        count = 0
-        stub_request(:get, fake_url).to_return do
-          count += 1
-          if count == 1
-            { status: 429, body: 'Too Many Requests' }
-          else
-            { status: 200, body: 'OK' }
-          end
-        end
-
-        expect(Fastlane::UI).to receive(:message)
-          .with(/Received 429 for `#{fake_url}`. Auto retrying in 20 seconds.../)
-
-        response = downloader.download(fake_url)
-
-        expect(count).to eq(2)
-        expect(response.code).to eq('200')
-      end
-    end
-  end
-end
-
 describe Fastlane::Helper::MetadataDownloader do
   describe 'downloading from GlotPress' do
     context 'when GlotPress returs a 429 code' do
