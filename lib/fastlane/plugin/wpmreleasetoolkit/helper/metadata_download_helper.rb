@@ -57,17 +57,21 @@ module Fastlane
     class MetadataDownloader
       attr_reader :target_folder, :target_files
 
-      def initialize(target_folder, target_files, auto_retry)
+      def initialize(target_folder, target_files, auto_retry, auto_retry_sleep_time = 20, auto_retry_max_attempts = 30)
         @target_folder = target_folder
         @target_files = target_files
         @auto_retry = auto_retry
+        @auto_retry_sleep_time = auto_retry_sleep_time
         @alternates = {}
         @auto_retry_attempt_counter = 0
       end
 
       # Downloads data from GlotPress, in JSON format
       def download(target_locale, glotpress_url, is_source)
-        downloader = GlotPressDownloader.new(auto_retry: @auto_retry)
+        downloader = GlotpressDownloader.new(
+          auto_retry: @auto_retry,
+          auto_retry_sleep_time: @auto_retry_sleep_time
+        )
         response = downloader.download(glotpress_url)
         handle_glotpress_download(response: response, locale: target_locale, is_source: is_source)
       end

@@ -8,7 +8,8 @@ describe Fastlane::Helper::MetadataDownloader do
           metadata_downloader = described_class.new(
             tmp_dir,
             { key: { desc: 'target-file-name.txt' } },
-            true
+            true,
+            0.1
           )
 
           fake_url = 'https://test.com'
@@ -24,7 +25,7 @@ describe Fastlane::Helper::MetadataDownloader do
           end
 
           expect(Fastlane::UI).to receive(:message)
-            .with(/Received 429 for `#{fake_url}`. Auto retrying in 20 seconds.../)
+            .with(/Received 429 for `#{fake_url}`. Auto retrying in 0.1 seconds.../)
 
           expect(Fastlane::UI).to receive(:message)
             .with(/No translation available for en-AU/)
@@ -34,7 +35,7 @@ describe Fastlane::Helper::MetadataDownloader do
 
           metadata_downloader.download('en-AU', fake_url, false)
 
-          expect(count).to eq(2)
+          assert_requested(:get, fake_url, times: 2)
         end
       end
     end
