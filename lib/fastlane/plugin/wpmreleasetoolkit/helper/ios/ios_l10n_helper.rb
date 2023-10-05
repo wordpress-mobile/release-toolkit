@@ -168,8 +168,8 @@ module Fastlane
           destination:,
           autoretry: true,
           autoretry_count: 0,
-          autoretry_max: Fastlane::Helper::MetadataDownloader::MAX_AUTO_RETRY_ATTEMPTS,
-          autoretry_sleep: Fastlane::Helper::MetadataDownloader::AUTO_RETRY_SLEEP_TIME
+          autoretry_max: Fastlane::Helper::GlotpressDownloader::MAX_AUTO_RETRY_ATTEMPTS,
+          autoretry_sleep: Fastlane::Helper::GlotpressDownloader::AUTO_RETRY_SLEEP_TIME
         )
           query_params = (filters || {}).transform_keys { |k| "filters[#{k}]" }.merge(format: 'strings')
           uri = URI.parse("#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}")
