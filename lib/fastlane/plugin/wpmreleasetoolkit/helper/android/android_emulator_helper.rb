@@ -161,7 +161,7 @@ module Fastlane
 
           # Wait until all emulators are killed
           retry_loop(time_between_retries: SHUTDOWN_WAIT, timeout: SHUTDOWN_TIMEOUT, description: 'waiting for devices to shutdown') do
-            (emulators_list & running_emulators.map(&:serial)).empty?
+            !emulators_list.intersect?(running_emulators.map(&:serial))
           end
 
           UI.success('All emulators are now shut down.')

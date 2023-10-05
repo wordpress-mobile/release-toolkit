@@ -28,7 +28,7 @@ module Fastlane
 
             new_version
           else
-            next_minor_version(version: version)
+            next_minor_version(version:)
           end
         end
       end

@@ -13,7 +13,7 @@ module Fastlane
         # @return [AppVersion] The next semantic release version.
         #
         def next_release_version(version:)
-          next_minor_version(version: version)
+          next_minor_version(version:)
         end
       end
     end
