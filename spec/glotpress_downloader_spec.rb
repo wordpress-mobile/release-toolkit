@@ -3,6 +3,22 @@ require 'spec_helper'
 describe Fastlane::Helper::GlotpressDownloader do
   describe 'downloading' do
     context 'when auto retry is enabled' do
+      context 'when GlotPress returs a 200 code' do
+        it 'returns the response, without retrying' do
+          downloader = described_class.new(auto_retry: true)
+          fake_url = 'https://test.com'
+
+          stub_request(:get, fake_url).to_return(status: 200, body: 'OK')
+
+          response = downloader.download(fake_url)
+
+          expect(response.code).to eq('200')
+          expect(response.body).to eq('OK')
+          # Make sure there was no retry
+          assert_requested(:get, fake_url, times: 1)
+        end
+      end
+
       context 'when GlotPress returs a 429 code' do
         it 'retries automatically' do
           sleep_time = 0.1
@@ -24,7 +40,7 @@ describe Fastlane::Helper::GlotpressDownloader do
 
           response = downloader.download(fake_url)
 
-          expect(count).to eq(2)
+          assert_requested(:get, fake_url, times: 2)
           expect(response.code).to eq('200')
         end
 
@@ -50,13 +66,29 @@ describe Fastlane::Helper::GlotpressDownloader do
 
             downloader.download(fake_url)
 
-            expect(count).to eq(max_retries + 1) # the original request plus the retries
+            assert_requested(:get, fake_url, times: max_retries + 1) # the original request plus the retries
           end
         end
       end
     end
 
     context 'when auto retry is disabled' do
+      context 'when GlotPress returs a 200 code' do
+        it 'returns the response, without retrying' do
+          downloader = described_class.new(auto_retry: false)
+          fake_url = 'https://test.com'
+
+          stub_request(:get, fake_url).to_return(status: 200, body: 'OK')
+
+          response = downloader.download(fake_url)
+
+          expect(response.code).to eq('200')
+          expect(response.body).to eq('OK')
+          # Make sure there was no retry
+          assert_requested(:get, fake_url, times: 1)
+        end
+      end
+
       context 'when GlotPress returs a 429 code' do
         it 'prompt the user for confirmation, ignoring the max auto retry parameter' do
           sleep_time = 0.1
