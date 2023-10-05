@@ -17,9 +17,9 @@ module Fastlane
         @auto_retry_attempt_counter = 0
       end
 
-      def download(glotpress_url)
+      def download(glotpress_url, options = {})
         uri = URI(glotpress_url)
-        response = Net::HTTP.get_response(uri)
+        response = Net::HTTP.get_response(uri, options)
 
         case response.code
         when '200' # All good pass the result along

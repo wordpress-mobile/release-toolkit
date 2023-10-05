@@ -174,35 +174,21 @@ module Fastlane
           query_params = (filters || {}).transform_keys { |k| "filters[#{k}]" }.merge(format: 'strings')
           uri = URI.parse("#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}")
 
+          downloader = Fastlane::Helper::GlotpressDownloader.new(
+            auto_retry: autoretry,
+            auto_retry_sleep_time: autoretry_sleep,
+            auto_retry_max_attempts: autoretry_max
+          )
+
           # Set an unambiguous User Agent so GlotPress won't rate-limit us
           options = { 'User-Agent' => Wpmreleasetoolkit::USER_AGENT }
 
+          response = downloader.download(uri.to_s, options)
+
           begin
-            IO.copy_stream(uri.open(options), destination)
+            IO.copy_stream(StringIO.new(response.body), destination)
           rescue StandardError => e
-            UI.error "Error downloading locale `#{locale}` — #{e.message} (#{uri})"
-            if e.is_a?(OpenURI::HTTPError)
-              if e.io.status[0] == '429' && autoretry
-                if autoretry_count < autoretry_max
-                  UI.message("Received 429 for `#{locale}`. Auto retrying in #{autoretry_sleep} seconds...")
-                  sleep(autoretry_sleep)
-                  return download_glotpress_export_file(
-                    project_url: project_url,
-                    locale: locale,
-                    filters: filters,
-                    destination: destination,
-                    autoretry: autoretry,
-                    autoretry_count: autoretry_count + 1,
-                    autoretry_max: autoretry_max
-                  )
-                else
-                  UI.user_error!("Abandoning `#{locale}` download after #{autoretry_max} attempts.")
-                end
-              elsif UI.confirm("Retry downloading `#{locale}`?")
-                retry
-              end
-            end
-            return nil
+            UI.error "Error saving locale `#{locale}` — #{e.message} (#{uri})"
           end
         end
       end
