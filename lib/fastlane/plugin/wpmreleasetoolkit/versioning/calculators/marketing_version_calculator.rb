@@ -18,7 +18,7 @@ module Fastlane
         def next_release_version(version:)
           UI.user_error!('Marketing Versioning: The minor version cannot be greater than 9') if version.minor > 9
 
-          version.minor == 9 ? next_major_version(version: version) : next_minor_version(version: version)
+          version.minor == 9 ? next_major_version(version:) : next_minor_version(version:)
         end
       end
     end
