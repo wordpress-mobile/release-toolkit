@@ -259,14 +259,14 @@ describe Fastlane::Helper::Ios::L10nHelper do
         # Arrange
         stub = stub_request(:get, "#{gp_fake_url}/invalid/default/export-translations/").with(query: { format: 'strings' }).to_return(status: [404, 'Not Found'])
         error_messages = []
-        allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+        allow(FastlaneCore::UI).to receive(:abort_with_message!) { |message| error_messages.append(message) }
         allow(FastlaneCore::UI).to receive(:confirm).and_return(false) # as we will be asked if we want to retry when getting a network error
         dest = StringIO.new
         # Act
         described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'invalid', filters: nil, destination: dest)
         # Assert
         expect(stub).to have_been_made.once
-        expect(error_messages).to eq(["Error downloading locale `invalid` — 404 Not Found (#{gp_fake_url}/invalid/default/export-translations/?format=strings)"])
+        expect(error_messages).to eq(["Error downloading locale `invalid` — Received unexpected 404 from request to URI #{gp_fake_url}/invalid/default/export-translations/?format=strings"])
       end
 
       it 'prints an `UI.error` if the destination cannot be written to' do
@@ -280,7 +280,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
         # Assert
         expect(stub).to have_been_made.once
         expect(File).not_to exist(dest)
-        expect(error_messages).to eq(["Error downloading locale `fr` — No such file or directory @ rb_sysopen - #{dest} (#{gp_fake_url}/fr/default/export-translations/?format=strings)"])
+        expect(error_messages).to eq(["Error saving locale `fr` — No such file or directory @ rb_sysopen - #{dest} (#{gp_fake_url}/fr/default/export-translations/?format=strings)"])
       end
     end
   end

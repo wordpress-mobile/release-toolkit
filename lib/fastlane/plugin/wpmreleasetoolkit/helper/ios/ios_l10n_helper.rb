@@ -161,19 +161,33 @@ module Fastlane
         #                               Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
         # @param [String, IO] destination The path or `IO`-like instance, where to write the downloaded file on disk.
         #
-        def self.download_glotpress_export_file(project_url:, locale:, filters:, destination:)
+        def self.download_glotpress_export_file(
+          project_url:,
+          locale:,
+          filters:,
+          destination:,
+          autoretry: true,
+          autoretry_max: Fastlane::Helper::GlotpressDownloader::MAX_AUTO_RETRY_ATTEMPTS,
+          autoretry_sleep: Fastlane::Helper::GlotpressDownloader::AUTO_RETRY_SLEEP_TIME
+        )
           query_params = (filters || {}).transform_keys { |k| "filters[#{k}]" }.merge(format: 'strings')
           uri = URI.parse("#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}")
+
+          downloader = Fastlane::Helper::GlotpressDownloader.new(
+            auto_retry: autoretry,
+            auto_retry_sleep_time: autoretry_sleep,
+            auto_retry_max_attempts: autoretry_max
+          )
 
           # Set an unambiguous User Agent so GlotPress won't rate-limit us
           options = { 'User-Agent' => Wpmreleasetoolkit::USER_AGENT }
 
+          response = downloader.download(uri.to_s, options)
+
           begin
-            IO.copy_stream(uri.open(options), destination)
+            IO.copy_stream(StringIO.new(response.body), destination)
           rescue StandardError => e
-            UI.error "Error downloading locale `#{locale}` — #{e.message} (#{uri})"
-            retry if e.is_a?(OpenURI::HTTPError) && UI.confirm("Retry downloading `#{locale}`?")
-            return nil
+            UI.error "Error saving locale `#{locale}` — #{e.message} (#{uri})"
           end
         end
       end

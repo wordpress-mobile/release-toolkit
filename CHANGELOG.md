@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- `ios_download_string_files_from_glotpress` supports automatic retry when receiving a 429 response, enabled by default [#516]
 
 ### Bug Fixes
 
