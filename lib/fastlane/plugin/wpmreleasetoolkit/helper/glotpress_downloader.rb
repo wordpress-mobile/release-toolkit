@@ -33,12 +33,12 @@ module Fastlane
               UI.message("Received 429 for `#{response.uri}`. Auto retrying in #{@auto_retry_sleep_time} seconds...")
               sleep(@auto_retry_sleep_time)
               @auto_retry_attempt_counter += 1
-              download(response.uri)
+              download(response.uri, options)
             else
               UI.error("Abandoning `#{response.uri}` download after #{@auto_retry_attempt_counter} retries.")
             end
           elsif UI.confirm("Retry downloading `#{response.uri}` after receiving 429 from the API?")
-            download(response.uri)
+            download(response.uri, options)
           else
             UI.error("Abandoning `#{response.uri}` download as requested.")
           end
