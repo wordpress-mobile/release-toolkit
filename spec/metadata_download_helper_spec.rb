@@ -2,6 +2,27 @@ require 'spec_helper'
 
 describe Fastlane::Helper::MetadataDownloader do
   describe 'downloading from GlotPress' do
+    it 'save the downloaded data to the target folder and file, including locale name' do
+      in_tmp_dir do |tmp_dir|
+        destination_name = 'target-file-name.txt'
+        dummy_url = 'https://test.com'
+        metadata_downloader = described_class.new(tmp_dir, { key: { desc: destination_name } }, true)
+
+        stub_request(:get, dummy_url).to_return(
+          status: 200,
+          # GlotPress responses have a custom format.
+          body: { "key\u0004test metadata" => ['test metadata'] }.to_json
+        )
+
+        metadata_downloader.download('en-AU', dummy_url, false)
+
+        destination_path_with_locale = File.join(tmp_dir, 'en-AU', destination_name)
+        expect(File.exist?(destination_path_with_locale)).to be true
+        # We also expect a trailing new line.
+        expect(File.read(destination_path_with_locale)).to eq("test metadata\n")
+      end
+    end
+
     context 'when GlotPress returs a 429 code' do
       it 'automatically retries' do
         in_tmp_dir do |tmp_dir|
