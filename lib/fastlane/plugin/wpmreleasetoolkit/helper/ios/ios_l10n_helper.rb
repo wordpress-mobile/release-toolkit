@@ -167,7 +167,6 @@ module Fastlane
           filters:,
           destination:,
           autoretry: true,
-          autoretry_count: 0,
           autoretry_max: Fastlane::Helper::GlotpressDownloader::MAX_AUTO_RETRY_ATTEMPTS,
           autoretry_sleep: Fastlane::Helper::GlotpressDownloader::AUTO_RETRY_SLEEP_TIME
         )
