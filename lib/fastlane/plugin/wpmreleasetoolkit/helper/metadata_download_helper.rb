@@ -6,7 +6,7 @@ module Fastlane
     class MetadataDownloader
       attr_reader :target_folder, :target_files
 
-      def initialize(target_folder, target_files, auto_retry, auto_retry_sleep_time = 20, auto_retry_max_attempts = 30)
+      def initialize(target_folder, target_files, auto_retry, auto_retry_sleep_time = 20)
         @target_folder = target_folder
         @target_files = target_files
         @auto_retry = auto_retry
