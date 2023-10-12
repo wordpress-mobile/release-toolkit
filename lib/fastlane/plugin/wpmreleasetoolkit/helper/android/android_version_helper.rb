@@ -45,6 +45,9 @@ module Fastlane
         def self.get_release_version
           return get_version_from_properties if File.exist?(version_properties_file)
 
+          unless ENV['HAS_ALPHA_VERSION'].nil?
+            UI.important('The `HAS_ALPHA_VERSION` environment variable is deprecated and will be removed in a future release. Please use `version.properties` instead.')
+          end
           section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
           gradle_path = self.gradle_path
           name = get_version_name_from_gradle_file(gradle_path, section)
@@ -84,6 +87,8 @@ module Fastlane
           return get_version_from_properties(is_alpha: true) if File.exist?(version_properties_file)
 
           return nil if ENV['HAS_ALPHA_VERSION'].nil?
+
+          UI.important('The `HAS_ALPHA_VERSION` environment variable is deprecated and will be removed in a future release. Please use `version.properties` instead.')
 
           section = 'defaultConfig'
           gradle_path = self.gradle_path
@@ -312,6 +317,9 @@ module Fastlane
             end
             File.write(version_properties_file, content)
           else
+            unless ENV['HAS_ALPHA_VERSION'].nil?
+              UI.important('The `HAS_ALPHA_VERSION` environment variable is deprecated and will be removed in a future release. Please use `version.properties` instead.')
+            end
             self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
             self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
           end
