@@ -45,7 +45,7 @@ module Fastlane
         def self.get_release_version
           return get_version_from_properties if File.exist?(version_properties_file)
 
-          section = 'defaultConfig'
+          section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
           gradle_path = self.gradle_path
           name = get_version_name_from_gradle_file(gradle_path, section)
           code = get_version_build_from_gradle_file(gradle_path, section)
@@ -77,10 +77,19 @@ module Fastlane
 
         # Extract the version name and code from the `version.properties` file in the project root
         #
-        # @return [Hash] A hash with 2 keys `"name"` and `"code"` containing the extracted version name and code, respectively
+        # @return [Hash] A hash with 2 keys `"name"` and `"code"` containing the extracted version name and code, respectively,
+        #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
         def self.get_alpha_version
           return get_version_from_properties(is_alpha: true) if File.exist?(version_properties_file)
+
+          return nil if ENV['HAS_ALPHA_VERSION'].nil?
+
+          section = 'defaultConfig'
+          gradle_path = self.gradle_path
+          name = get_version_name_from_gradle_file(gradle_path, section)
+          code = get_version_build_from_gradle_file(gradle_path, section)
+          return { VERSION_NAME => name, VERSION_CODE => code }
         end
 
         # Determines if a version name corresponds to an alpha version (starts with `"alpha-"`` prefix)
@@ -303,7 +312,7 @@ module Fastlane
             end
             File.write(version_properties_file, content)
           else
-            self.update_version(new_version_beta, 'defaultConfig')
+            self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
             self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
           end
         end
