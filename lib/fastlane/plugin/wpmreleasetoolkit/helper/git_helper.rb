@@ -228,6 +228,8 @@ module Fastlane
         !Action.sh('git', 'branch', '--list', branch_name).empty?
       end
 
+      # DEPRECATED!
+      #
       # Ensure that we are on the expected branch, and abort if not.
       #
       # @param [String] branch_name The name of the branch we expect to be on
@@ -235,6 +237,7 @@ module Fastlane
       # @raise [UserError] Raises a user_error! and interrupts the lane if we are not on the expected branch.
       #
       def self.ensure_on_branch!(branch_name)
+        UI.important 'Warning: This helper is deprecated, please use Fastlane::Helper::GitHelper.ensure_current_branch_using_HEAD instead!'
         current_branch_name = Action.sh('git', 'symbolic-ref', '-q', 'HEAD')
         UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)
       end
