@@ -193,6 +193,31 @@ module Fastlane
         Fastlane::Actions.git_branch_name_using_HEAD
       end
 
+      # Raises an exception and stop the lane execution if the repo is not on a specific branch
+      # It uses the the `current_git_branch` method which doesn't allow for environment variable modifications.
+      #
+      # Modified from fastlane's original `ensure_git_branch` implementation:
+      #
+      # https://github.com/fastlane/fastlane/blob/2.213.0/fastlane/lib/fastlane/actions/ensure_git_branch.rb
+      #
+      # Note that picking a proper name for this method is a bit hard as the following considerations need
+      # to be taken into account:
+      #
+      # 1. fastlane's original action is called `ensure_git_branch`.
+      # 2. We have a deprecated helper called `ensure_on_branch`. We could have used this name, but
+      # the implementation is different, so it'd be a breaking change for all clients.
+      # 3. This method relies on the `current_git_branch` helper which internally
+      # uses the `git_branch_name_using_HEAD` fastlane helper.
+      def self.ensure_current_branch_using_HEAD(branch)
+        current_branch = current_git_branch
+        branch_expr = /#{branch}/
+        if current_branch =~ branch_expr
+          UI.success("Git branch matches `#{branch}`, all good! 💪")
+        else
+          UI.user_error!("Git is not on a branch matching `#{branch}`. Current branch is `#{current_branch}`! Please ensure the repo is checked out to the correct branch.")
+        end
+      end
+
       # Checks if a branch exists locally.
       #
       # @param [String] branch_name The name of the branch to check for
