@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Adds `ensure_current_branch_using_HEAD` git helper. [#520]
 
 ### Bug Fixes
 
@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Deprecates `ensure_on_branch!` in favor of `ensure_current_branch_using_HEAD` [#520]
 
 ## 9.1.0
 
