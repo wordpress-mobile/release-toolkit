@@ -3,7 +3,10 @@ module Fastlane
     class AndroidGetAppVersionAction < Action
       def self.run(params)
         require_relative '../../helper/android/android_version_helper'
-        Fastlane::Helper::Android::VersionHelper.get_public_version
+        Fastlane::Helper::Android::VersionHelper.get_public_version(
+          params[:build_gradle_path],
+          params[:version_properties_path]
+        )
       end
 
       #####################################################
@@ -19,7 +22,16 @@ module Fastlane
       end
 
       def self.available_options
-        # Define all options your action supports.
+        [
+          FastlaneCore::ConfigItem.new(key: :build_gradle_path,
+                                       description: 'Path to the build.gradle file',
+                                       type: String,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :version_properties_path,
+                                       description: 'Path to the version.properties file',
+                                       type: String,
+                                       optional: true),
+        ]
       end
 
       def self.output

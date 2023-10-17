@@ -7,7 +7,10 @@ module Fastlane
     class AndroidCurrentBranchIsHotfixAction < Action
       def self.run(params)
         require_relative '../../helper/android/android_version_helper'
-        version = Fastlane::Helper::Android::VersionHelper.get_release_version
+        version = Fastlane::Helper::Android::VersionHelper.get_release_version(
+          params[:build_gradle_path],
+          params[:version_properties_path]
+        )
         Fastlane::Helper::Android::VersionHelper.is_hotfix?(version)
       end
 
@@ -24,7 +27,16 @@ module Fastlane
       end
 
       def self.available_options
-        # Define all options your action supports.
+        [
+          FastlaneCore::ConfigItem.new(key: :build_gradle_path,
+                                       description: 'Path to the build.gradle file',
+                                       type: String,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :version_properties_path,
+                                       description: 'Path to the version.properties file',
+                                       type: String,
+                                       optional: true),
+        ]
       end
 
       def self.output

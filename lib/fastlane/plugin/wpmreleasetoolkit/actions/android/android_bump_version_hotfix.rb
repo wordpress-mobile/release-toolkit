@@ -5,9 +5,16 @@ module Fastlane
         UI.message 'Bumping app release version for hotfix...'
 
         require_relative '../../helper/android/android_git_helper'
+
+        build_gradle_path = params[:build_gradle_path]
+        version_properties_path = params[:version_properties_path]
+
         Fastlane::Helper::GitHelper.create_branch("release/#{params[:version_name]}", from: params[:previous_version_name])
 
-        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version
+        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(
+          build_gradle_path,
+          version_properties_path
+        )
         new_version = Fastlane::Helper::Android::VersionHelper.calc_next_hotfix_version(params[:version_name], params[:version_code]) # NOTE: this just puts the name/code values in a tuple, unchanged (no actual calc/bumping)
         new_release_branch = "release/#{params[:version_name]}"
 
@@ -18,10 +25,17 @@ module Fastlane
         UI.message("Release branch: #{new_release_branch}")
 
         UI.message 'Updating app version...'
-        Fastlane::Helper::Android::VersionHelper.update_versions(new_version, nil)
+        Fastlane::Helper::Android::VersionHelper.update_versions(
+          new_version,
+          nil,
+          version_properties_path
+        )
         UI.message 'Done!'
 
-        Fastlane::Helper::Android::GitHelper.commit_version_bump
+        Fastlane::Helper::Android::GitHelper.commit_version_bump(
+          build_gradle_path,
+          version_properties_path
+        )
 
         UI.message 'Done.'
       end
@@ -52,6 +66,14 @@ module Fastlane
                                        env_name: 'FL_ANDROID_BUMP_VERSION_HOTFIX_PREVIOUS_VERSION',
                                        description: 'The version to branch from',
                                        type: String),
+          FastlaneCore::ConfigItem.new(key: :build_gradle_path,
+                                       description: 'Path to the build.gradle file',
+                                       type: String,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :version_properties_path,
+                                       description: 'Path to the version.properties file',
+                                       type: String,
+                                       optional: true),
         ]
       end
 

@@ -5,7 +5,10 @@ module Fastlane
         require_relative '../../helper/android/android_localize_helper'
         require_relative '../../helper/github_helper'
 
-        version = Fastlane::Helper::Android::VersionHelper.get_library_version_from_gradle_config(import_key: params[:import_key])
+        version = Fastlane::Helper::Android::VersionHelper.get_library_version_from_gradle_config(
+          params[:build_gradle_path],
+          import_key: params[:import_key]
+        )
         UI.user_error!("Can't find any reference for key #{params[:import_key]}") if version.nil?
         UI.message "Downloading #{params[:file_path]} from #{params[:repository]} at version #{version} to #{params[:download_folder]}"
 
@@ -56,6 +59,10 @@ module Fastlane
                                        default_value: Dir.tmpdir),
           FastlaneCore::ConfigItem.new(key: :github_release_prefix,
                                        description: 'The prefix which is used in the GitHub release title',
+                                       type: String,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :build_gradle_path,
+                                       description: 'Path to the build.gradle file',
                                        type: String,
                                        optional: true),
           Fastlane::Helper::GithubHelper.github_token_config_item,

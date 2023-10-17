@@ -15,7 +15,10 @@ module Fastlane
         current_branch = Fastlane::Helper::GitHelper.current_git_branch
         UI.user_error!("Current branch - '#{current_branch}' - is not a release branch. Abort.") unless current_branch.start_with?('release/')
 
-        version = Fastlane::Helper::Android::VersionHelper.get_public_version
+        version = Fastlane::Helper::Android::VersionHelper.get_public_version(
+          params[:build_gradle_path],
+          params[:version_properties_path]
+        )
         message = "Finalizing release: #{version}\n"
         if params[:skip_confirm]
           UI.message(message)
@@ -51,6 +54,14 @@ module Fastlane
                                        description: 'Skips confirmation',
                                        type: Boolean,
                                        default_value: false), # the default value if the user didn't provide one
+          FastlaneCore::ConfigItem.new(key: :build_gradle_path,
+                                       description: 'Path to the build.gradle file',
+                                       type: String,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :version_properties_path,
+                                       description: 'Path to the version.properties file',
+                                       type: String,
+                                       optional: true),
         ]
       end
 

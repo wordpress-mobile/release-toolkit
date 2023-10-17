@@ -5,8 +5,17 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper'
         require_relative '../../helper/android/android_git_helper'
 
-        release_ver = Fastlane::Helper::Android::VersionHelper.get_release_version
-        alpha_ver = Fastlane::Helper::Android::VersionHelper.get_alpha_version
+        build_gradle_path = params[:build_gradle_path]
+        version_properties_path = params[:version_properties_path]
+
+        release_ver = Fastlane::Helper::Android::VersionHelper.get_release_version(
+          build_gradle_path,
+          version_properties_path
+        )
+        alpha_ver = Fastlane::Helper::Android::VersionHelper.get_alpha_version(
+          build_gradle_path,
+          version_properties_path
+        )
         Fastlane::Helper::GitHelper.create_tag(release_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME])
         Fastlane::Helper::GitHelper.create_tag(alpha_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]) unless alpha_ver.nil? || (params[:tag_alpha] == false)
       end
@@ -30,6 +39,14 @@ module Fastlane
                                        description: 'True to skip tagging the alpha version',
                                        type: Boolean,
                                        default_value: true),
+          FastlaneCore::ConfigItem.new(key: :build_gradle_path,
+                                       description: 'Path to the build.gradle file',
+                                       type: String,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :version_properties_path,
+                                       description: 'Path to the version.properties file',
+                                       type: String,
+                                       optional: true),
         ]
       end
 

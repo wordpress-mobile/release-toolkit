@@ -11,13 +11,22 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper'
         require_relative '../../helper/android/android_git_helper'
 
+        build_gradle_path = params[:build_gradle_path]
+        version_properties_path = params[:version_properties_path]
+
         # Checkout default branch and update
         default_branch = params[:default_branch]
         Fastlane::Helper::GitHelper.checkout_and_pull(default_branch)
 
         # Create versions
-        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version
-        current_alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version
+        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(
+          build_gradle_path,
+          version_properties_path
+        )
+        current_alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(
+          build_gradle_path,
+          version_properties_path
+        )
         next_version = Fastlane::Helper::Android::VersionHelper.calc_next_release_version(current_version, current_alpha_version)
         next_alpha_version = current_alpha_version.nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(next_version, current_alpha_version)
 
@@ -36,7 +45,10 @@ module Fastlane
         other_action.ensure_git_status_clean
 
         # Return the current version
-        Fastlane::Helper::Android::VersionHelper.get_public_version
+        Fastlane::Helper::Android::VersionHelper.get_public_version(
+          build_gradle_path,
+          version_properties_path
+        )
       end
 
       #####################################################
@@ -64,6 +76,14 @@ module Fastlane
                                        description: 'Default branch of the repository',
                                        type: String,
                                        default_value: Fastlane::Helper::GitHelper::DEFAULT_GIT_BRANCH),
+          FastlaneCore::ConfigItem.new(key: :build_gradle_path,
+                                       description: 'Path to the build.gradle file',
+                                       type: String,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :version_properties_path,
+                                       description: 'Path to the version.properties file',
+                                       type: String,
+                                       optional: true),
         ]
       end
 
