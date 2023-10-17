@@ -66,6 +66,19 @@ describe Fastlane::Helper::GitHelper do
     expect(described_class.has_git_lfs?).to be false
   end
 
+  it 'can ensure currently on release branch' do
+    allow(described_class).to receive(:current_git_branch).and_return('release/23.5')
+    expect(described_class.ensure_current_branch_using_HEAD('^release/')).to be true
+  end
+
+  it 'fails for unexpected git branch' do
+    current_branch = 'trunk'
+    branch = '^release/'
+    expected_error = "Git is not on a branch matching `#{branch}`. Current branch is `#{current_branch}`! Please ensure the repo is checked out to the correct branch."
+    allow(described_class).to receive(:current_git_branch).and_return('trunk')
+    expect(described_class.ensure_current_branch_using_HEAD(branch)).to raise_error(FastlaneCore::Interface::FastlaneError, expected_error)
+  end
+
   context('commit(message:, files:)') do
     before(:each) do
       allow_fastlane_action_sh
