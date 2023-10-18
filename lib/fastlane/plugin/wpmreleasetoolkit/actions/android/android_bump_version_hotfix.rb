@@ -8,12 +8,14 @@ module Fastlane
 
         build_gradle_path = params[:build_gradle_path]
         version_properties_path = params[:version_properties_path]
+        has_alpha_version = params[:has_alpha_version]
 
         Fastlane::Helper::GitHelper.create_branch("release/#{params[:version_name]}", from: params[:previous_version_name])
 
         current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(
           build_gradle_path,
-          version_properties_path
+          version_properties_path,
+          has_alpha_version
         )
         new_version = Fastlane::Helper::Android::VersionHelper.calc_next_hotfix_version(params[:version_name], params[:version_code]) # NOTE: this just puts the name/code values in a tuple, unchanged (no actual calc/bumping)
         new_release_branch = "release/#{params[:version_name]}"
@@ -28,7 +30,8 @@ module Fastlane
         Fastlane::Helper::Android::VersionHelper.update_versions(
           new_version,
           nil,
-          version_properties_path
+          version_properties_path,
+          has_alpha_version
         )
         UI.message 'Done!'
 
@@ -73,6 +76,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version_properties_path,
                                        description: 'Path to the version.properties file',
                                        type: String,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :has_alpha_version,
+                                       description: 'Whether the app has an alpha version',
+                                       type: Boolean,
                                        optional: true),
         ]
       end

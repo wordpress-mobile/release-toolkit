@@ -13,7 +13,8 @@ module Fastlane
 
         version = Fastlane::Helper::Android::VersionHelper.get_public_version(
           params[:build_gradle_path],
-          params[:version_properties_path]
+          params[:version_properties_path],
+          params[:has_alpha_version]
         )
         message = "Completing code freeze for: #{version}\n"
         if params[:skip_confirm]
@@ -54,6 +55,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version_properties_path,
                                        description: 'Path to the version.properties file',
                                        type: String,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :has_alpha_version,
+                                       description: 'Whether the app has an alpha version',
+                                       type: Boolean,
                                        optional: true),
         ]
       end

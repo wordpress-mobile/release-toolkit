@@ -30,10 +30,11 @@ module Fastlane
         #         - If this version is a hotfix (more than 2 parts and 3rd part is non-zero), returns the "X.Y.Z" formatted string
         #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
         #
-        def self.get_public_version(build_gradle_path = nil, version_properties_path = nil)
+        def self.get_public_version(build_gradle_path = nil, version_properties_path = nil, has_alpha_version = nil)
           version = get_release_version(
             build_gradle_path,
-            version_properties_path
+            version_properties_path,
+            has_alpha_version
           )
           vp = get_version_parts(version[VERSION_NAME])
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
@@ -45,10 +46,13 @@ module Fastlane
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
-        def self.get_release_version(build_gradle_path = nil, version_properties_path = nil)
+        def self.get_release_version(build_gradle_path = nil, version_properties_path = nil, has_alpha_version = nil)
           return get_version_from_properties if File.exist?(version_properties_file(version_properties_path))
 
-          section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
+          UI.important('The `HAS_ALPHA_VERSION` environment variable is deprecated and will be removed in a future release. Please pass in an argument for `has_alpha_version` instead.') unless ENV['HAS_ALPHA_VERSION'].nil?
+          has_alpha_version_nil = ENV['HAS_ALPHA_VERSION'].nil? && has_alpha_version.nil?
+
+          section = has_alpha_version_nil ? 'defaultConfig' : 'vanilla {'
           gradle_path = self.gradle_path(build_gradle_path)
           name = get_version_name_from_gradle_file(gradle_path, section)
           code = get_version_build_from_gradle_file(gradle_path, section)
@@ -86,10 +90,11 @@ module Fastlane
         # @return [Hash] A hash with 2 keys `"name"` and `"code"` containing the extracted version name and code, respectively,
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
-        def self.get_alpha_version(build_gradle_path = nil, version_properties_path = nil)
+        def self.get_alpha_version(build_gradle_path = nil, version_properties_path = nil, has_alpha_version = nil)
           return get_version_from_properties(is_alpha: true) if File.exist?(version_properties_file(version_properties_path))
 
-          return nil if ENV['HAS_ALPHA_VERSION'].nil?
+          UI.important('The `HAS_ALPHA_VERSION` environment variable is deprecated and will be removed in a future release. Please pass in an argument for `has_alpha_version` instead.') unless ENV['HAS_ALPHA_VERSION'].nil?
+          return nil if ENV['HAS_ALPHA_VERSION'].nil? && has_alpha_version.nil?
 
           section = 'defaultConfig'
           gradle_path = self.gradle_path(build_gradle_path)
@@ -286,11 +291,12 @@ module Fastlane
         #
         # @return [String] The next release version name to use after bumping the currently used release version.
         #
-        def self.bump_version_release(build_gradle_path = nil, version_properties_path = nil)
+        def self.bump_version_release(build_gradle_path = nil, version_properties_path = nil, has_alpha_version = nil)
           # Bump release
           current_version = self.get_release_version(
             build_gradle_path,
-            version_properties_path
+            version_properties_path,
+            has_alpha_version
           )
           UI.message("Current version: #{current_version[VERSION_NAME]}")
           new_version = calc_next_release_base_version(current_version)
@@ -305,7 +311,7 @@ module Fastlane
         # @param [Hash] new_version_beta The version hash for the beta, containing values for keys "name" and "code"
         # @param [Hash] new_version_alpha The version hash for the alpha , containing values for keys "name" and "code"
         #
-        def self.update_versions(new_version_beta, new_version_alpha, version_properties_path = nil)
+        def self.update_versions(new_version_beta, new_version_alpha, version_properties_path = nil, has_alpha_version = nil)
           if File.exist?(version_properties_file(version_properties_path))
             replacements = {
               versionName: (new_version_beta || {})[VERSION_NAME],
@@ -321,7 +327,10 @@ module Fastlane
             end
             File.write(version_properties_file(version_properties_path), content)
           else
-            self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
+            UI.important('The `HAS_ALPHA_VERSION` environment variable is deprecated and will be removed in a future release. Please pass in an argument for `has_alpha_version` instead.') unless ENV['HAS_ALPHA_VERSION'].nil?
+            has_alpha_version_nil = ENV['HAS_ALPHA_VERSION'].nil? && has_alpha_version.nil?
+
+            self.update_version(new_version_beta, has_alpha_version_nil ? 'defaultConfig' : 'vanilla {')
             self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
           end
         end

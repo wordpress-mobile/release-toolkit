@@ -9,7 +9,8 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper'
         version = Fastlane::Helper::Android::VersionHelper.get_release_version(
           params[:build_gradle_path],
-          params[:version_properties_path]
+          params[:version_properties_path],
+          params[:has_alpha_version]
         )
         Fastlane::Helper::Android::VersionHelper.is_hotfix?(version)
       end
@@ -35,6 +36,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version_properties_path,
                                        description: 'Path to the version.properties file',
                                        type: String,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :has_alpha_version,
+                                       description: 'Whether the app has an alpha version',
+                                       type: Boolean,
                                        optional: true),
         ]
       end

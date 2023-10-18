@@ -10,6 +10,7 @@ module Fastlane
 
         build_gradle_path = params[:build_gradle_path]
         version_properties_path = params[:version_properties_path]
+        has_alpha_version = params[:has_alpha_version]
 
         # Checkout default branch and update
         default_branch = params[:default_branch]
@@ -18,19 +19,22 @@ module Fastlane
         # Check versions
         release_version = Fastlane::Helper::Android::VersionHelper.get_release_version(
           build_gradle_path,
-          version_properties_path
+          version_properties_path,
+          has_alpha_version
         )
         message = "The following current version has been detected: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n"
         alpha_release_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(
           build_gradle_path,
-          version_properties_path
+          version_properties_path,
+          has_alpha_version
         )
         message << "The following Alpha version has been detected: #{alpha_release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
 
         # Check branch
         app_version = Fastlane::Helper::Android::VersionHelper.get_public_version(
           build_gradle_path,
-          version_properties_path
+          version_properties_path,
+          has_alpha_version
         )
         UI.user_error!("#{message}Release branch for version #{app_version} doesn't exist. Abort.") unless !params[:base_version].nil? || Fastlane::Helper::GitHelper.checkout_and_pull(release: app_version)
 
@@ -64,12 +68,14 @@ module Fastlane
         UI.user_error!("Release branch for version #{version} doesn't exist. Abort.") unless Fastlane::Helper::GitHelper.checkout_and_pull(release: version)
         release_version = Fastlane::Helper::Android::VersionHelper.get_release_version(
           build_gradle_path,
-          version_properties_path
+          version_properties_path,
+          has_alpha_version
         )
         message << "Looking at branch release/#{version} as requested by user. Detected version: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}.\n"
         alpha_release_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(
           build_gradle_path,
-          version_properties_path
+          version_properties_path,
+          has_alpha_version
         )
         message << "and Alpha Version: #{alpha_release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
         [release_version, alpha_release_version]
@@ -111,6 +117,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version_properties_path,
                                        description: 'Path to the version.properties file',
                                        type: String,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :has_alpha_version,
+                                       description: 'Whether the app has an alpha version',
+                                       type: Boolean,
                                        optional: true),
         ]
       end

@@ -11,10 +11,11 @@ module Fastlane
 
         build_gradle_path = params[:build_gradle_path]
         version_properties_path = params[:version_properties_path]
+        has_alpha_version = params[:has_alpha_version]
 
         message = ''
-        beta_version = Fastlane::Helper::Android::VersionHelper.get_release_version(build_gradle_path, version_properties_path) unless !params[:beta] && !params[:final]
-        alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(build_gradle_path, version_properties_path) if params[:alpha]
+        beta_version = Fastlane::Helper::Android::VersionHelper.get_release_version(build_gradle_path, version_properties_path, has_alpha_version) unless !params[:beta] && !params[:final]
+        alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(build_gradle_path, version_properties_path, has_alpha_version) if params[:alpha]
 
         UI.user_error!("Can't build a final release out of this branch because it's configured as a beta release!") if params[:final] && Fastlane::Helper::Android::VersionHelper.is_beta_version?(beta_version)
 
@@ -73,6 +74,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version_properties_path,
                                        description: 'Path to the version.properties file',
                                        type: String,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :has_alpha_version,
+                                       description: 'Whether the app has an alpha version',
+                                       type: Boolean,
                                        optional: true),
         ]
       end

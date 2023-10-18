@@ -7,14 +7,17 @@ module Fastlane
 
         build_gradle_path = params[:build_gradle_path]
         version_properties_path = params[:version_properties_path]
+        has_alpha_version = params[:has_alpha_version]
 
         release_ver = Fastlane::Helper::Android::VersionHelper.get_release_version(
           build_gradle_path,
-          version_properties_path
+          version_properties_path,
+          has_alpha_version
         )
         alpha_ver = Fastlane::Helper::Android::VersionHelper.get_alpha_version(
           build_gradle_path,
-          version_properties_path
+          version_properties_path,
+          has_alpha_version
         )
         Fastlane::Helper::GitHelper.create_tag(release_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME])
         Fastlane::Helper::GitHelper.create_tag(alpha_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]) unless alpha_ver.nil? || (params[:tag_alpha] == false)
@@ -46,6 +49,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version_properties_path,
                                        description: 'Path to the version.properties file',
                                        type: String,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :has_alpha_version,
+                                       description: 'Whether the app has an alpha version',
+                                       type: Boolean,
                                        optional: true),
         ]
       end

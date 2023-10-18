@@ -13,6 +13,7 @@ module Fastlane
 
         build_gradle_path = params[:build_gradle_path]
         version_properties_path = params[:version_properties_path]
+        has_alpha_version = params[:has_alpha_version]
 
         # Checkout default branch and update
         default_branch = params[:default_branch]
@@ -21,11 +22,13 @@ module Fastlane
         # Create versions
         current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(
           build_gradle_path,
-          version_properties_path
+          version_properties_path,
+          has_alpha_version
         )
         current_alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(
           build_gradle_path,
-          version_properties_path
+          version_properties_path,
+          has_alpha_version
         )
         next_version = Fastlane::Helper::Android::VersionHelper.calc_next_release_version(current_version, current_alpha_version)
         next_alpha_version = current_alpha_version.nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(next_version, current_alpha_version)
@@ -47,7 +50,8 @@ module Fastlane
         # Return the current version
         Fastlane::Helper::Android::VersionHelper.get_public_version(
           build_gradle_path,
-          version_properties_path
+          version_properties_path,
+          has_alpha_version
         )
       end
 
@@ -83,6 +87,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version_properties_path,
                                        description: 'Path to the version.properties file',
                                        type: String,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :has_alpha_version,
+                                       description: 'Whether the app has an alpha version',
+                                       type: Boolean,
                                        optional: true),
         ]
       end
