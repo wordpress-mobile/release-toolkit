@@ -43,6 +43,10 @@ module Fastlane
       def self.available_options
         [
           Fastlane::Helper::GithubHelper.github_token_config_item,
+          FastlaneCore::ConfigItem.new(key: :github_api_token,
+                                       description: 'The GitHub OAuth access token',
+                                       optional: true,
+                                       type: String),
           FastlaneCore::ConfigItem.new(
             key: :reuse_identifier,
             description: 'If provided, the reuse identifier can identify an existing comment to overwrite',

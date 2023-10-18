@@ -65,6 +65,10 @@ module Fastlane
                                        description: 'Path to the build.gradle file',
                                        type: String,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :github_api_token,
+                                       description: 'The GitHub OAuth access token',
+                                       optional: true,
+                                       type: String),
           Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end

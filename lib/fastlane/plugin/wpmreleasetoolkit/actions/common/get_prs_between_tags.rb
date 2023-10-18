@@ -100,6 +100,10 @@ module Fastlane
                                                     'See https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes#configuration-options',
                                        optional: true,
                                        type: String),
+          FastlaneCore::ConfigItem.new(key: :github_api_token,
+                                       description: 'The GitHub OAuth access token',
+                                       optional: true,
+                                       type: String),
           Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end

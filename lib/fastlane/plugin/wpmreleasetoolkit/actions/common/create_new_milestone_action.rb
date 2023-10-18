@@ -76,6 +76,10 @@ module Fastlane
                                        optional: true,
                                        type: Integer,
                                        default_value: 14),
+          FastlaneCore::ConfigItem.new(key: :github_api_token,
+                                       description: 'The GitHub OAuth access token',
+                                       optional: true,
+                                       type: String),
           Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
