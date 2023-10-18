@@ -19,7 +19,10 @@ _None_
 ### Internal Changes
 
 - Added deprecation notices to any actions or methods using the `PROJECT_ROOT_FOLDER` environment variable [#519]
-- Added optional `build_gradle_path` and `version_properties_paths` to actions that previously used the `PROJECT_ROOT_FOLDER` environment variable [#519]
+- Added optional `build_gradle_path` and `version_properties_paths` config items to actions that previously used the `PROJECT_ROOT_FOLDER` environment variable [#519]
+- Added deprecation notices to any actions or methods using the `HAS_ALPHA_VERSION` environment variable [#521]
+- Added optional `has_alpha_version` config items to actions that previously used the `HAS_ALPHA_VERSION` environment variable [#521]
+
 
 ## 9.1.0
 
