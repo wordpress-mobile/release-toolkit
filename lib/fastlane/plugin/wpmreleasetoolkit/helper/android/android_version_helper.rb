@@ -62,7 +62,7 @@ module Fastlane
         def self.version_properties_file(version_properties_path = nil)
           return version_properties_path unless version_properties_path.nil?
 
-          UI.important('DEPRECATED: The `PROJECT_ROOT_FOLDER` environment variable is deprecated and will be removed in a future release. Please pass in the `version_properties_path` instead.') unless ENV['PROJECT_ROOT_FOLDER'].nil?
+          UI.deprecated('The `PROJECT_ROOT_FOLDER` environment variable is deprecated and will be removed in a future release. Please pass in the `version_properties_path` instead.') unless ENV['PROJECT_ROOT_FOLDER'].nil?
           File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'version.properties')
         end
 
@@ -356,7 +356,7 @@ module Fastlane
         # @return [String] The value of the key, or nil if not found
         #
         def self.get_library_version_from_gradle_config(build_gradle_path = nil, import_key:)
-          UI.important('DEPRECATED: The `PROJECT_ROOT_FOLDER` environment variable is deprecated and will be removed in a future release. Please pass in the `build_gradle_path` instead.') unless ENV['PROJECT_ROOT_FOLDER'].nil?
+          UI.deprecated('The `PROJECT_ROOT_FOLDER` environment variable is deprecated and will be removed in a future release. Please pass in the `build_gradle_path` instead.') unless ENV['PROJECT_ROOT_FOLDER'].nil?
           gradle_path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'build.gradle')
 
           build_gradle = build_gradle_path.nil? ? gradle_path : build_gradle_path
@@ -492,7 +492,7 @@ module Fastlane
           UI.user_error!('You need to set the `PROJECT_NAME` environment variable to the relative path to the project subfolder name') if ENV['PROJECT_NAME'].nil?
 
           # Deprecation warning
-          UI.important('DEPRECATED: The `PROJECT_ROOT_FOLDER` environment variable is deprecated and will be removed in a future release. Please pass in the `build_gradle_path` instead.') unless ENV['PROJECT_ROOT_FOLDER'].nil?
+          UI.deprecated('The `PROJECT_ROOT_FOLDER` environment variable is deprecated and will be removed in a future release. Please pass in the `build_gradle_path` instead.') unless ENV['PROJECT_ROOT_FOLDER'].nil?
           File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'build.gradle')
         end
 
