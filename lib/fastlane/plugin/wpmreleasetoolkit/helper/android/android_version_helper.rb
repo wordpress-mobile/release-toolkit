@@ -49,7 +49,7 @@ module Fastlane
         def self.get_release_version(build_gradle_path = nil, version_properties_path = nil, has_alpha_version = nil)
           return get_version_from_properties if File.exist?(version_properties_file(version_properties_path))
 
-          UI.important('The `HAS_ALPHA_VERSION` environment variable is deprecated and will be removed in a future release. Please pass in an argument for `has_alpha_version` instead.') unless ENV['HAS_ALPHA_VERSION'].nil?
+          UI.deprecated('The `HAS_ALPHA_VERSION` environment variable is deprecated and will be removed in a future release. Please pass in an argument for `has_alpha_version` instead.') unless ENV['HAS_ALPHA_VERSION'].nil?
           has_alpha_version_nil = ENV['HAS_ALPHA_VERSION'].nil? && has_alpha_version.nil?
 
           section = has_alpha_version_nil ? 'defaultConfig' : 'vanilla {'
@@ -93,7 +93,7 @@ module Fastlane
         def self.get_alpha_version(build_gradle_path = nil, version_properties_path = nil, has_alpha_version = nil)
           return get_version_from_properties(is_alpha: true) if File.exist?(version_properties_file(version_properties_path))
 
-          UI.important('The `HAS_ALPHA_VERSION` environment variable is deprecated and will be removed in a future release. Please pass in an argument for `has_alpha_version` instead.') unless ENV['HAS_ALPHA_VERSION'].nil?
+          UI.deprecated('The `HAS_ALPHA_VERSION` environment variable is deprecated and will be removed in a future release. Please pass in an argument for `has_alpha_version` instead.') unless ENV['HAS_ALPHA_VERSION'].nil?
           return nil if ENV['HAS_ALPHA_VERSION'].nil? && has_alpha_version.nil?
 
           section = 'defaultConfig'
@@ -327,7 +327,7 @@ module Fastlane
             end
             File.write(version_properties_file(version_properties_path), content)
           else
-            UI.important('The `HAS_ALPHA_VERSION` environment variable is deprecated and will be removed in a future release. Please pass in an argument for `has_alpha_version` instead.') unless ENV['HAS_ALPHA_VERSION'].nil?
+            UI.deprecated('The `HAS_ALPHA_VERSION` environment variable is deprecated and will be removed in a future release. Please pass in an argument for `has_alpha_version` instead.') unless ENV['HAS_ALPHA_VERSION'].nil?
             has_alpha_version_nil = ENV['HAS_ALPHA_VERSION'].nil? && has_alpha_version.nil?
 
             self.update_version(new_version_beta, has_alpha_version_nil ? 'defaultConfig' : 'vanilla {')
