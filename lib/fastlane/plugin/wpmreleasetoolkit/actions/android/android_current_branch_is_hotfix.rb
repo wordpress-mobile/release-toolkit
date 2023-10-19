@@ -31,11 +31,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :build_gradle_path,
                                        description: 'Path to the build.gradle file',
                                        type: String,
-                                       optional: true),
+                                       optional: true,
+                                       conflicting_options: [:version_properties_path]),
           FastlaneCore::ConfigItem.new(key: :version_properties_path,
                                        description: 'Path to the version.properties file',
                                        type: String,
-                                       optional: true),
+                                       optional: true,
+                                       conflicting_options: [:build_gradle_path]),
           Fastlane::Helper::Deprecated.project_root_folder_config_item,
         ]
       end
