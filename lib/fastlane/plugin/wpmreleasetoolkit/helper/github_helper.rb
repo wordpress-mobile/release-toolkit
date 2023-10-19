@@ -312,6 +312,8 @@ module Fastlane
       # @return [FastlaneCore::ConfigItem] The Fastlane ConfigItem for GitHub OAuth access token
       #
       def self.github_token_config_item
+        UI.deprecated('The `github_token` config item is deprecated and will be removed in a future version of the Release Toolkit. Please provide an explicit value for the `github_api_token` config item instead.')
+
         FastlaneCore::ConfigItem.new(
           key: :github_token,
           env_name: 'GITHUB_TOKEN',
