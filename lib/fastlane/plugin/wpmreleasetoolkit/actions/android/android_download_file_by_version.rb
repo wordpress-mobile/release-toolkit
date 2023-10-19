@@ -6,7 +6,7 @@ module Fastlane
         require_relative '../../helper/github_helper'
 
         version = Fastlane::Helper::Android::VersionHelper.get_library_version_from_gradle_config(
-          params[:build_gradle_path],
+          build_gradle_path: params[:build_gradle_path],
           import_key: params[:import_key]
         )
         UI.user_error!("Can't find any reference for key #{params[:import_key]}") if version.nil?

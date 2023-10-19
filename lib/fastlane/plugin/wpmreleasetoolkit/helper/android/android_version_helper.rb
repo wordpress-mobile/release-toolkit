@@ -46,7 +46,7 @@ module Fastlane
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_release_version(build_gradle_path:, version_properties_path:)
-          return get_version_from_properties if File.exist?(version_properties_file(version_properties_path))
+          return get_version_from_properties(version_properties_path: version_properties_path) if File.exist?(version_properties_file(version_properties_path: version_properties_path))
 
           section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
           gradle_path = self.gradle_path(build_gradle_path)
@@ -68,13 +68,13 @@ module Fastlane
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
-        def self.get_version_from_properties(version_properties_path: nil, is_alpha: false)
-          return nil unless File.exist?(version_properties_file(version_properties_path))
+        def self.get_version_from_properties(version_properties_path:, is_alpha: false)
+          return nil unless File.exist?(version_properties_file(version_properties_path: version_properties_path))
 
           version_name_key = is_alpha ? 'alpha.versionName' : 'versionName'
           version_code_key = is_alpha ? 'alpha.versionCode' : 'versionCode'
 
-          text = File.read(version_properties_file(version_properties_path))
+          text = File.read(version_properties_file(version_properties_path: version_properties_path))
           name = text.match(/#{version_name_key}=(\S*)/m)&.captures&.first
           code = text.match(/#{version_code_key}=(\S*)/m)&.captures&.first
 
@@ -86,8 +86,8 @@ module Fastlane
         # @return [Hash] A hash with 2 keys `"name"` and `"code"` containing the extracted version name and code, respectively,
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
-        def self.get_alpha_version(build_gradle_path: nil, version_properties_path: nil)
-          return get_version_from_properties(is_alpha: true) if File.exist?(version_properties_file(version_properties_path))
+        def self.get_alpha_version(build_gradle_path:, version_properties_path:)
+          return get_version_from_properties(version_properties_path: version_properties_path, is_alpha: true) if File.exist?(version_properties_file(version_properties_path))
 
           return nil if ENV['HAS_ALPHA_VERSION'].nil?
 
@@ -286,7 +286,7 @@ module Fastlane
         #
         # @return [String] The next release version name to use after bumping the currently used release version.
         #
-        def self.bump_version_release(build_gradle_path: nil, version_properties_path: nil)
+        def self.bump_version_release(build_gradle_path:, version_properties_path:)
           # Bump release
           current_version = self.get_release_version(
             build_gradle_path: build_gradle_path,
@@ -305,21 +305,21 @@ module Fastlane
         # @param [Hash] new_version_beta The version hash for the beta, containing values for keys "name" and "code"
         # @param [Hash] new_version_alpha The version hash for the alpha , containing values for keys "name" and "code"
         #
-        def self.update_versions(new_version_beta, new_version_alpha, version_properties_path: nil)
-          if File.exist?(version_properties_file(version_properties_path))
+        def self.update_versions(new_version_beta, new_version_alpha, version_properties_path:)
+          if File.exist?(version_properties_file(version_properties_path: version_properties_path))
             replacements = {
               versionName: (new_version_beta || {})[VERSION_NAME],
               versionCode: (new_version_beta || {})[VERSION_CODE],
               'alpha.versionName': (new_version_alpha || {})[VERSION_NAME],
               'alpha.versionCode': (new_version_alpha || {})[VERSION_CODE]
             }
-            content = File.read(version_properties_file(version_properties_path))
+            content = File.read(version_properties_file(version_properties_path: version_properties_path))
             content.gsub!(/^(.*) ?=.*$/) do |line|
               key = Regexp.last_match(1).to_sym
               value = replacements[key]
               value.nil? ? line : "#{key}=#{value}"
             end
-            File.write(version_properties_file(version_properties_path), content)
+            File.write(version_properties_file(version_properties_path: version_properties_path), content)
           else
             self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
             self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
@@ -346,7 +346,7 @@ module Fastlane
         # @param [String] import_key The key to look for
         # @return [String] The value of the key, or nil if not found
         #
-        def self.get_library_version_from_gradle_config(build_gradle_path: nil, import_key:)
+        def self.get_library_version_from_gradle_config(build_gradle_path:, import_key:)
           UI.deprecated('The `PROJECT_ROOT_FOLDER` environment variable is deprecated and will be removed in a future release. Please pass in the `build_gradle_path` instead.') unless ENV['PROJECT_ROOT_FOLDER'].nil?
           gradle_path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'build.gradle')
 
@@ -475,7 +475,7 @@ module Fastlane
         #
         # @return [String] The path of the `build.gradle` file inside the project subfolder in the project's repo
         #
-        def self.gradle_path(build_gradle_path: nil)
+        def self.gradle_path(build_gradle_path:)
           return build_gradle_path unless build_gradle_path.nil?
 
           # Environment variable nil checks
@@ -495,7 +495,7 @@ module Fastlane
         # @todo This implementation is very fragile. This should be done parsing the file in a proper way.
         #       Leveraging gradle itself is probably the easiest way.
         #
-        def self.update_version(version, section, build_gradle_path: nil)
+        def self.update_version(version, section, build_gradle_path:)
           gradle_path = self.gradle_path(build_gradle_path)
           temp_file = Tempfile.new('fastlaneIncrementVersion')
           found_section = false
