@@ -13,8 +13,8 @@ module Fastlane
         version_properties_path = params[:version_properties_path]
 
         message = ''
-        beta_version = Fastlane::Helper::Android::VersionHelper.get_release_version(build_gradle_path, version_properties_path) unless !params[:beta] && !params[:final]
-        alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(build_gradle_path, version_properties_path) if params[:alpha]
+        beta_version = Fastlane::Helper::Android::VersionHelper.get_release_version(build_gradle_path: build_gradle_path, version_properties_path: version_properties_path) unless !params[:beta] && !params[:final]
+        alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(build_gradle_path: build_gradle_path, version_properties_path: version_properties_path) if params[:alpha]
 
         UI.user_error!("Can't build a final release out of this branch because it's configured as a beta release!") if params[:final] && Fastlane::Helper::Android::VersionHelper.is_beta_version?(beta_version)
 

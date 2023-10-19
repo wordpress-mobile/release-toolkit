@@ -30,10 +30,10 @@ module Fastlane
         #         - If this version is a hotfix (more than 2 parts and 3rd part is non-zero), returns the "X.Y.Z" formatted string
         #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
         #
-        def self.get_public_version(build_gradle_path = nil, version_properties_path = nil)
+        def self.get_public_version(build_gradle_path:, version_properties_path:)
           version = get_release_version(
-            build_gradle_path,
-            version_properties_path
+            build_gradle_path: build_gradle_path,
+            version_properties_path: version_properties_path
           )
           vp = get_version_parts(version[VERSION_NAME])
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
@@ -45,7 +45,7 @@ module Fastlane
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
-        def self.get_release_version(build_gradle_path = nil, version_properties_path = nil)
+        def self.get_release_version(build_gradle_path:, version_properties_path:)
           return get_version_from_properties if File.exist?(version_properties_file(version_properties_path))
 
           section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
@@ -55,7 +55,7 @@ module Fastlane
           return { VERSION_NAME => name, VERSION_CODE => code }
         end
 
-        def self.version_properties_file(version_properties_path = nil)
+        def self.version_properties_file(version_properties_path:)
           return version_properties_path unless version_properties_path.nil?
 
           UI.deprecated('The `PROJECT_ROOT_FOLDER` environment variable is deprecated and will be removed in a future release. Please pass in the `version_properties_path` instead.') unless ENV['PROJECT_ROOT_FOLDER'].nil?
@@ -68,7 +68,7 @@ module Fastlane
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
-        def self.get_version_from_properties(version_properties_path = nil, is_alpha: false)
+        def self.get_version_from_properties(version_properties_path: nil, is_alpha: false)
           return nil unless File.exist?(version_properties_file(version_properties_path))
 
           version_name_key = is_alpha ? 'alpha.versionName' : 'versionName'
@@ -86,7 +86,7 @@ module Fastlane
         # @return [Hash] A hash with 2 keys `"name"` and `"code"` containing the extracted version name and code, respectively,
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
-        def self.get_alpha_version(build_gradle_path = nil, version_properties_path = nil)
+        def self.get_alpha_version(build_gradle_path: nil, version_properties_path: nil)
           return get_version_from_properties(is_alpha: true) if File.exist?(version_properties_file(version_properties_path))
 
           return nil if ENV['HAS_ALPHA_VERSION'].nil?
@@ -286,11 +286,11 @@ module Fastlane
         #
         # @return [String] The next release version name to use after bumping the currently used release version.
         #
-        def self.bump_version_release(build_gradle_path = nil, version_properties_path = nil)
+        def self.bump_version_release(build_gradle_path: nil, version_properties_path: nil)
           # Bump release
           current_version = self.get_release_version(
-            build_gradle_path,
-            version_properties_path
+            build_gradle_path: build_gradle_path,
+            version_properties_path: version_properties_path
           )
           UI.message("Current version: #{current_version[VERSION_NAME]}")
           new_version = calc_next_release_base_version(current_version)
@@ -305,7 +305,7 @@ module Fastlane
         # @param [Hash] new_version_beta The version hash for the beta, containing values for keys "name" and "code"
         # @param [Hash] new_version_alpha The version hash for the alpha , containing values for keys "name" and "code"
         #
-        def self.update_versions(new_version_beta, new_version_alpha, version_properties_path = nil)
+        def self.update_versions(new_version_beta, new_version_alpha, version_properties_path: nil)
           if File.exist?(version_properties_file(version_properties_path))
             replacements = {
               versionName: (new_version_beta || {})[VERSION_NAME],
@@ -346,7 +346,7 @@ module Fastlane
         # @param [String] import_key The key to look for
         # @return [String] The value of the key, or nil if not found
         #
-        def self.get_library_version_from_gradle_config(build_gradle_path = nil, import_key:)
+        def self.get_library_version_from_gradle_config(build_gradle_path: nil, import_key:)
           UI.deprecated('The `PROJECT_ROOT_FOLDER` environment variable is deprecated and will be removed in a future release. Please pass in the `build_gradle_path` instead.') unless ENV['PROJECT_ROOT_FOLDER'].nil?
           gradle_path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'build.gradle')
 
@@ -475,7 +475,7 @@ module Fastlane
         #
         # @return [String] The path of the `build.gradle` file inside the project subfolder in the project's repo
         #
-        def self.gradle_path(build_gradle_path = nil)
+        def self.gradle_path(build_gradle_path: nil)
           return build_gradle_path unless build_gradle_path.nil?
 
           # Environment variable nil checks
@@ -495,7 +495,7 @@ module Fastlane
         # @todo This implementation is very fragile. This should be done parsing the file in a proper way.
         #       Leveraging gradle itself is probably the easiest way.
         #
-        def self.update_version(version, section, build_gradle_path = nil)
+        def self.update_version(version, section, build_gradle_path: nil)
           gradle_path = self.gradle_path(build_gradle_path)
           temp_file = Tempfile.new('fastlaneIncrementVersion')
           found_section = false

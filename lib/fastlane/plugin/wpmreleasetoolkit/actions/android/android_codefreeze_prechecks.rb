@@ -20,12 +20,12 @@ module Fastlane
 
         # Create versions
         current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(
-          build_gradle_path,
-          version_properties_path
+          build_gradle_path: build_gradle_path,
+          version_properties_path: version_properties_path
         )
         current_alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(
-          build_gradle_path,
-          version_properties_path
+          build_gradle_path: build_gradle_path,
+          version_properties_path: version_properties_path
         )
         next_version = Fastlane::Helper::Android::VersionHelper.calc_next_release_version(current_version, current_alpha_version)
         next_alpha_version = current_alpha_version.nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(next_version, current_alpha_version)
@@ -46,8 +46,8 @@ module Fastlane
 
         # Return the current version
         Fastlane::Helper::Android::VersionHelper.get_public_version(
-          build_gradle_path,
-          version_properties_path
+          build_gradle_path: build_gradle_path,
+          version_properties_path: version_properties_path
         )
       end
 

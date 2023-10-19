@@ -13,12 +13,12 @@ module Fastlane
         version_properties_path = params[:version_properties_path]
 
         current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(
-          build_gradle_path,
-          version_properties_path
+          build_gradle_path: build_gradle_path,
+          version_properties_path: version_properties_path
         )
         current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version(
-          build_gradle_path,
-          version_properties_path
+          build_gradle_path: build_gradle_path,
+          version_properties_path: version_properties_path
         )
         new_version_beta = Fastlane::Helper::Android::VersionHelper.calc_next_beta_version(current_version, current_version_alpha)
         new_version_alpha = current_version_alpha.nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(new_version_beta, current_version_alpha)
@@ -34,13 +34,13 @@ module Fastlane
         Fastlane::Helper::Android::VersionHelper.update_versions(
           new_version_beta,
           new_version_alpha,
-          version_properties_path
+          version_properties_path: version_properties_path
         )
         UI.message 'Done!'
 
         Fastlane::Helper::Android::GitHelper.commit_version_bump(
-          build_gradle_path,
-          version_properties_path
+          build_gradle_path: build_gradle_path,
+          version_properties_path: version_properties_path
         )
       end
 

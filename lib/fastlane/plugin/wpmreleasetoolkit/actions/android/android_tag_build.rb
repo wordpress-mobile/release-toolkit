@@ -9,12 +9,12 @@ module Fastlane
         version_properties_path = params[:version_properties_path]
 
         release_ver = Fastlane::Helper::Android::VersionHelper.get_release_version(
-          build_gradle_path,
-          version_properties_path
+          build_gradle_path: build_gradle_path,
+          version_properties_path: version_properties_path
         )
         alpha_ver = Fastlane::Helper::Android::VersionHelper.get_alpha_version(
-          build_gradle_path,
-          version_properties_path
+          build_gradle_path: build_gradle_path,
+          version_properties_path: version_properties_path
         )
         Fastlane::Helper::GitHelper.create_tag(release_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME])
         Fastlane::Helper::GitHelper.create_tag(alpha_ver[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]) unless alpha_ver.nil? || (params[:tag_alpha] == false)

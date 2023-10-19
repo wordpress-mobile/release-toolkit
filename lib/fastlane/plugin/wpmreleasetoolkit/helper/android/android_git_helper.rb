@@ -12,7 +12,7 @@ module Fastlane
         # @env PROJECT_ROOT_FOLDER The path to the git root of the project
         # @env PROJECT_NAME The name of the directory containing the project code (especially containing the `build.gradle` file)
         #
-        def self.commit_version_bump(build_gradle_path = nil, version_properties_path = nil)
+        def self.commit_version_bump(build_gradle_path:, version_properties_path:)
           require_relative './android_version_helper'
 
           version_properties = Fastlane::Helper::Android::VersionHelper.version_properties_file(version_properties_path)
