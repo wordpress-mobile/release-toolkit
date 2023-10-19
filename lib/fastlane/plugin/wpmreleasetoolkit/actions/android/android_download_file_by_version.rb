@@ -66,6 +66,7 @@ module Fastlane
                                        type: String,
                                        optional: true),
           Fastlane::Helper::GithubHelper.github_token_config_item,
+          Fastlane::Helper::Deprecated.project_root_folder_config_item,
         ]
       end
 

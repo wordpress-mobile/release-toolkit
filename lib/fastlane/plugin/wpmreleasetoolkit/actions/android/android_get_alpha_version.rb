@@ -31,6 +31,7 @@ module Fastlane
                                        description: 'Path to the version.properties file',
                                        type: String,
                                        optional: true),
+          Fastlane::Helper::Deprecated.project_root_folder_config_item,
         ]
       end
 
