@@ -5,8 +5,11 @@ module Fastlane
         require_relative '../../helper/android/android_localize_helper'
         require_relative '../../helper/github_helper'
 
+        project_root_folder = params[:project_root_folder]
+        build_gradle_path = params[:build_gradle_path] || File.join(project_root_folder || '.', 'build.gradle')
+
         version = Fastlane::Helper::Android::VersionHelper.get_library_version_from_gradle_config(
-          build_gradle_path: params[:build_gradle_path],
+          build_gradle_path: build_gradle_path,
           import_key: params[:import_key]
         )
         UI.user_error!("Can't find any reference for key #{params[:import_key]}") if version.nil?

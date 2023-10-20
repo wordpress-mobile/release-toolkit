@@ -15,9 +15,14 @@ module Fastlane
         current_branch = Fastlane::Helper::GitHelper.current_git_branch
         UI.user_error!("Current branch - '#{current_branch}' - is not a release branch. Abort.") unless current_branch.start_with?('release/')
 
+        project_root_folder = params[:project_root_folder]
+        project_name = params[:project_name]
+        build_gradle_path = params[:build_gradle_path] || File.join(project_root_folder || '.', project_name, 'build.gradle')
+        version_properties_path = params[:version_properties_path] || File.join(project_root_folder || '.', 'version.properties')
+
         version = Fastlane::Helper::Android::VersionHelper.get_public_version(
-          params[:build_gradle_path],
-          params[:version_properties_path]
+          build_gradle_path: build_gradle_path,
+          version_properties_path: version_properties_path
         )
         message = "Finalizing release: #{version}\n"
         if params[:skip_confirm]
@@ -65,6 +70,7 @@ module Fastlane
                                        optional: true,
                                        conflicting_options: [:build_gradle_path]),
           Fastlane::Helper::Deprecated.project_root_folder_config_item,
+          Fastlane::Helper::Deprecated.project_name_config_item,
         ]
       end
 

@@ -7,8 +7,8 @@ module Fastlane
         require_relative '../../helper/android/android_localize_helper'
         require_relative '../../helper/git_helper'
 
-        UI.deprecated('The `PROJECT_ROOT_FOLDER` environment variable is deprecated and will be removed in a future release. Please use the `res_dir` param instead.') unless ENV['PROJECT_ROOT_FOLDER'].nil?
-        res_dir = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', params[:res_dir])
+        project_root_folder = params[:project_root_folder]
+        res_dir = File.join(project_root_folder || '.', params[:res_dir])
 
         Fastlane::Helper::Android::LocalizeHelper.create_available_languages_file(
           res_dir: res_dir,
@@ -95,6 +95,7 @@ module Fastlane
             type: Boolean,
             default_value: false
           ),
+          Fastlane::Helper::Deprecated.project_root_folder_config_item,
         ]
       end
 
