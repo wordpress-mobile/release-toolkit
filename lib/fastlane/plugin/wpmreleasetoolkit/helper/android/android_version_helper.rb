@@ -46,19 +46,12 @@ module Fastlane
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_release_version(build_gradle_path:, version_properties_path:)
-          return get_version_from_properties(version_properties_path: version_properties_path) if File.exist?(version_properties_file(version_properties_path: version_properties_path))
+          return get_version_from_properties(version_properties_path: version_properties_path) if File.exist?(version_properties_path)
 
           section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
-          gradle_path = self.gradle_path(build_gradle_path)
-          name = get_version_name_from_gradle_file(gradle_path, section)
-          code = get_version_build_from_gradle_file(gradle_path, section)
+          name = get_version_name_from_gradle_file(build_gradle_path, section)
+          code = get_version_build_from_gradle_file(build_gradle_path, section)
           return { VERSION_NAME => name, VERSION_CODE => code }
-        end
-
-        def self.version_properties_file(version_properties_path:)
-          return version_properties_path unless version_properties_path.nil?
-
-          File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'version.properties')
         end
 
         # Extract the version name and code from the `version.properties` file in the project root
@@ -68,12 +61,12 @@ module Fastlane
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_version_from_properties(version_properties_path:, is_alpha: false)
-          return nil unless File.exist?(version_properties_file(version_properties_path: version_properties_path))
+          return nil unless File.exist?(version_properties_path)
 
           version_name_key = is_alpha ? 'alpha.versionName' : 'versionName'
           version_code_key = is_alpha ? 'alpha.versionCode' : 'versionCode'
 
-          text = File.read(version_properties_file(version_properties_path: version_properties_path))
+          text = File.read(version_properties_path)
           name = text.match(/#{version_name_key}=(\S*)/m)&.captures&.first
           code = text.match(/#{version_code_key}=(\S*)/m)&.captures&.first
 
@@ -86,7 +79,7 @@ module Fastlane
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
         def self.get_alpha_version(build_gradle_path:, version_properties_path:)
-          return get_version_from_properties(version_properties_path: version_properties_path, is_alpha: true) if File.exist?(version_properties_file(version_properties_path))
+          return get_version_from_properties(version_properties_path: version_properties_path, is_alpha: true) if File.exist?(version_properties_path)
 
           return nil if ENV['HAS_ALPHA_VERSION'].nil?
 
@@ -305,20 +298,20 @@ module Fastlane
         # @param [Hash] new_version_alpha The version hash for the alpha , containing values for keys "name" and "code"
         #
         def self.update_versions(new_version_beta, new_version_alpha, version_properties_path:)
-          if File.exist?(version_properties_file(version_properties_path: version_properties_path))
+          if File.exist?(version_properties_path)
             replacements = {
               versionName: (new_version_beta || {})[VERSION_NAME],
               versionCode: (new_version_beta || {})[VERSION_CODE],
               'alpha.versionName': (new_version_alpha || {})[VERSION_NAME],
               'alpha.versionCode': (new_version_alpha || {})[VERSION_CODE]
             }
-            content = File.read(version_properties_file(version_properties_path: version_properties_path))
+            content = File.read(version_properties_path)
             content.gsub!(/^(.*) ?=.*$/) do |line|
               key = Regexp.last_match(1).to_sym
               value = replacements[key]
               value.nil? ? line : "#{key}=#{value}"
             end
-            File.write(version_properties_file(version_properties_path: version_properties_path), content)
+            File.write(version_properties_path, content)
           else
             self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
             self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
@@ -346,13 +339,9 @@ module Fastlane
         # @return [String] The value of the key, or nil if not found
         #
         def self.get_library_version_from_gradle_config(build_gradle_path:, import_key:)
-          gradle_path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'build.gradle')
+          return nil unless File.exist?(build_gradle_path)
 
-          build_gradle = build_gradle_path.nil? ? gradle_path : build_gradle_path
-
-          return nil unless File.exist?(build_gradle)
-
-          File.open(build_gradle, 'r') do |f|
+          File.open(build_gradle_path, 'r') do |f|
             text = f.read
             text.match(/^\s*(?:\w*\.)?#{Regexp.escape(import_key)}\s*=\s*['"](.*?)["']/m)&.captures&.first
           end
@@ -464,23 +453,6 @@ module Fastlane
             end
           end
           return nil
-        end
-
-        # The path to the build.gradle file for the project.
-        #
-        # @env PROJECT_ROOT_FOLDER The path to the root of the project (the folder containing the `.git` directory).
-        # @env PROJECT_NAME The name of the project, i.e. the name of the subdirectory containing the project's `build.gradle` file.
-        #
-        # @return [String] The path of the `build.gradle` file inside the project subfolder in the project's repo
-        #
-        def self.gradle_path(build_gradle_path:)
-          return build_gradle_path unless build_gradle_path.nil?
-
-          # Environment variable nil checks
-          UI.user_error!("You need to set the `PROJECT_ROOT_FOLDER` environment variable to the path to the project's root") if ENV['PROJECT_ROOT_FOLDER'].nil?
-          UI.user_error!('You need to set the `PROJECT_NAME` environment variable to the relative path to the project subfolder name') if ENV['PROJECT_NAME'].nil?
-
-          File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'build.gradle')
         end
 
         # Update both the versionName and versionCode of the build.gradle file to the specified version.
