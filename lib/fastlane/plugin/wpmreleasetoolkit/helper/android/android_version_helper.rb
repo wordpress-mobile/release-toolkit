@@ -84,9 +84,8 @@ module Fastlane
           return nil if ENV['HAS_ALPHA_VERSION'].nil?
 
           section = 'defaultConfig'
-          gradle_path = self.gradle_path(build_gradle_path)
-          name = get_version_name_from_gradle_file(gradle_path, section)
-          code = get_version_build_from_gradle_file(gradle_path, section)
+          name = get_version_name_from_gradle_file(build_gradle_path, section)
+          code = get_version_build_from_gradle_file(build_gradle_path, section)
           return { VERSION_NAME => name, VERSION_CODE => code }
         end
 
@@ -464,11 +463,10 @@ module Fastlane
         #       Leveraging gradle itself is probably the easiest way.
         #
         def self.update_version(version, section, build_gradle_path:)
-          gradle_path = self.gradle_path(build_gradle_path)
           temp_file = Tempfile.new('fastlaneIncrementVersion')
           found_section = false
           version_updated = 0
-          File.open(gradle_path, 'r') do |file|
+          File.open(build_gradle_path, 'r') do |file|
             file.each_line do |line|
               if found_section
                 if version_updated < 2
@@ -494,7 +492,7 @@ module Fastlane
           end
           temp_file.rewind
           temp_file.close
-          FileUtils.mv(temp_file.path, gradle_path)
+          FileUtils.mv(temp_file.path, build_gradle_path)
           temp_file.unlink
         end
       end
