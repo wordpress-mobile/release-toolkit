@@ -1,6 +1,11 @@
 require 'spec_helper'
 
 describe Fastlane::Helper::Android::VersionHelper do
+  before do
+    stub_const('BUILD_GRADLE_PATH', './build.gradle')
+    stub_const('VERSION_PROPERTIES_PATH', './version.properties')
+  end
+
   describe 'get_version_from_properties' do
     it 'returns version name and code when present' do
       test_file_content = <<~CONTENT
@@ -14,8 +19,8 @@ describe Fastlane::Helper::Android::VersionHelper do
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:read).with('./version.properties').and_return(test_file_content)
-      expect(subject.get_version_from_properties(version_properties_path: nil)).to eq('name' => '17.0', 'code' => 123)
+      allow(File).to receive(:read).with(VERSION_PROPERTIES_PATH).and_return(test_file_content)
+      expect(subject.get_version_from_properties(version_properties_path: VERSION_PROPERTIES_PATH)).to eq('name' => '17.0', 'code' => 123)
     end
 
     it 'returns alpha version name and code when present' do
@@ -29,8 +34,8 @@ describe Fastlane::Helper::Android::VersionHelper do
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:read).with('./version.properties').and_return(test_file_content)
-      expect(subject.get_version_from_properties(version_properties_path: nil, is_alpha: true)).to eq('name' => 'alpha-222', 'code' => 1234)
+      allow(File).to receive(:read).with(VERSION_PROPERTIES_PATH).and_return(test_file_content)
+      expect(subject.get_version_from_properties(version_properties_path: VERSION_PROPERTIES_PATH, is_alpha: true)).to eq('name' => 'alpha-222', 'code' => 1234)
     end
 
     it 'returns nil when alpha version name and code not present' do
@@ -40,8 +45,8 @@ describe Fastlane::Helper::Android::VersionHelper do
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:read).with('./version.properties').and_return(test_file_content)
-      expect(subject.get_version_from_properties(version_properties_path: nil, is_alpha: true)).to be_nil
+      allow(File).to receive(:read).with(VERSION_PROPERTIES_PATH).and_return(test_file_content)
+      expect(subject.get_version_from_properties(version_properties_path: VERSION_PROPERTIES_PATH, is_alpha: true)).to be_nil
     end
   end
 
@@ -75,10 +80,10 @@ describe Fastlane::Helper::Android::VersionHelper do
           alpha.versionName=alpha-456
           alpha.versionCode=4567
         CONTENT
-        allow(File).to receive(:exist?).with('./version.properties').and_return(true)
-        allow(File).to receive(:read).with('./version.properties').and_return(original_content)
-        expect(File).to receive(:write).with('./version.properties', expected_content)
-        subject.update_versions(new_beta_version, nil, version_properties_path: nil)
+        allow(File).to receive(:exist?).with(VERSION_PROPERTIES_PATH).and_return(true)
+        allow(File).to receive(:read).with(VERSION_PROPERTIES_PATH).and_return(original_content)
+        expect(File).to receive(:write).with(VERSION_PROPERTIES_PATH, expected_content)
+        subject.update_versions(new_beta_version, nil, version_properties_path: VERSION_PROPERTIES_PATH)
       end
 
       it 'updates both the main and alpha versions if alpha provided' do
@@ -91,10 +96,10 @@ describe Fastlane::Helper::Android::VersionHelper do
           alpha.versionName=alpha-457
           alpha.versionCode=4570
         CONTENT
-        allow(File).to receive(:exist?).with('./version.properties').and_return(true)
-        allow(File).to receive(:read).with('./version.properties').and_return(original_content)
-        expect(File).to receive(:write).with('./version.properties', expected_content)
-        subject.update_versions(new_beta_version, new_alpha_version, version_properties_path: nil)
+        allow(File).to receive(:exist?).with(VERSION_PROPERTIES_PATH).and_return(true)
+        allow(File).to receive(:read).with(VERSION_PROPERTIES_PATH).and_return(original_content)
+        expect(File).to receive(:write).with(VERSION_PROPERTIES_PATH, expected_content)
+        subject.update_versions(new_beta_version, new_alpha_version, version_properties_path: VERSION_PROPERTIES_PATH)
       end
     end
   end
@@ -102,7 +107,7 @@ describe Fastlane::Helper::Android::VersionHelper do
   describe 'get_library_version_from_gradle_config' do
     it 'returns nil when gradle file is not present' do
       allow(File).to receive(:exist?).and_return(false)
-      expect(subject.get_library_version_from_gradle_config(import_key: 'my-test-key', build_gradle_path: nil)).to be_nil
+      expect(subject.get_library_version_from_gradle_config(import_key: 'my-test-key', build_gradle_path: BUILD_GRADLE_PATH)).to be_nil
     end
 
     it 'returns nil when the key is not present' do
@@ -113,9 +118,9 @@ describe Fastlane::Helper::Android::VersionHelper do
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:open).with('./build.gradle', 'r').and_yield(StringIO.new(test_file_content))
-      expect(subject.get_library_version_from_gradle_config(import_key: 'my-test-key-b', build_gradle_path: nil)).to be_nil
-      expect(subject.get_library_version_from_gradle_config(import_key: 'test-key', build_gradle_path: nil)).to be_nil
+      allow(File).to receive(:open).with(BUILD_GRADLE_PATH, 'r').and_yield(StringIO.new(test_file_content))
+      expect(subject.get_library_version_from_gradle_config(import_key: 'my-test-key-b', build_gradle_path: BUILD_GRADLE_PATH)).to be_nil
+      expect(subject.get_library_version_from_gradle_config(import_key: 'test-key', build_gradle_path: BUILD_GRADLE_PATH)).to be_nil
     end
 
     it 'returns the key content when the key is present' do
@@ -126,8 +131,8 @@ describe Fastlane::Helper::Android::VersionHelper do
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:open).with('./build.gradle', 'r').and_yield(StringIO.new(test_file_content))
-      expect(subject.get_library_version_from_gradle_config(import_key: 'my-test-key', build_gradle_path: nil)).to eq('my_test_value')
+      allow(File).to receive(:open).with(BUILD_GRADLE_PATH, 'r').and_yield(StringIO.new(test_file_content))
+      expect(subject.get_library_version_from_gradle_config(import_key: 'my-test-key', build_gradle_path: BUILD_GRADLE_PATH)).to eq('my_test_value')
 
       # Make sure it handles double quotes
       test_file_content = <<~CONTENT
@@ -137,8 +142,8 @@ describe Fastlane::Helper::Android::VersionHelper do
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:open).with('./build.gradle', 'r').and_yield(StringIO.new(test_file_content))
-      expect(subject.get_library_version_from_gradle_config(import_key: 'my-test-key', build_gradle_path: nil)).to eq('my_test_value')
+      allow(File).to receive(:open).with(BUILD_GRADLE_PATH, 'r').and_yield(StringIO.new(test_file_content))
+      expect(subject.get_library_version_from_gradle_config(import_key: 'my-test-key', build_gradle_path: BUILD_GRADLE_PATH)).to eq('my_test_value')
 
       # Make sure it works with prefixes
       test_file_content = <<~CONTENT
@@ -149,9 +154,9 @@ describe Fastlane::Helper::Android::VersionHelper do
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:open).with('./build.gradle', 'r').and_yield(StringIO.new(test_file_content))
-      expect(subject.get_library_version_from_gradle_config(import_key: 'my-test-key', build_gradle_path: nil)).to eq('my_test_value')
-      expect(subject.get_library_version_from_gradle_config(import_key: 'my_test_key_double', build_gradle_path: nil)).to be_nil
+      allow(File).to receive(:open).with(BUILD_GRADLE_PATH, 'r').and_yield(StringIO.new(test_file_content))
+      expect(subject.get_library_version_from_gradle_config(import_key: 'my-test-key', build_gradle_path: BUILD_GRADLE_PATH)).to eq('my_test_value')
+      expect(subject.get_library_version_from_gradle_config(import_key: 'my_test_key_double', build_gradle_path: BUILD_GRADLE_PATH)).to be_nil
 
       # Make sure it works with spaces starting the line
       test_file_content = <<~CONTENT
@@ -161,8 +166,8 @@ describe Fastlane::Helper::Android::VersionHelper do
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:open).with('./build.gradle', 'r').and_yield(StringIO.new(test_file_content))
-      expect(subject.get_library_version_from_gradle_config(import_key: 'my-test-key', build_gradle_path: nil)).to eq('my_test_value')
+      allow(File).to receive(:open).with(BUILD_GRADLE_PATH, 'r').and_yield(StringIO.new(test_file_content))
+      expect(subject.get_library_version_from_gradle_config(import_key: 'my-test-key', build_gradle_path: BUILD_GRADLE_PATH)).to eq('my_test_value')
     end
   end
 end
