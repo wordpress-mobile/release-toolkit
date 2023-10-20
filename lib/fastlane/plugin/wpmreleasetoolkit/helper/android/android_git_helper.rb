@@ -13,20 +13,15 @@ module Fastlane
         # @env PROJECT_NAME The name of the directory containing the project code (especially containing the `build.gradle` file)
         #
         def self.commit_version_bump(build_gradle_path:, version_properties_path:)
-          require_relative './android_version_helper'
-
-          version_properties = Fastlane::Helper::Android::VersionHelper.version_properties_file(version_properties_path: version_properties_path)
-          build_gradle = Fastlane::Helper::Android::VersionHelper.gradle_path(build_gradle_path: build_gradle_path)
-
-          if File.exist?(version_properties)
-            Fastlane::Helper::GitHelper.commit(
-              message: 'Bump version number',
-              files: version_properties
+          if File.exist?(version_properties_path)
+            git_commit(
+              path: version_properties_path,
+              message: 'Bump version number'
             )
           else
-            Fastlane::Helper::GitHelper.commit(
-              message: 'Bump version number',
-              files: build_gradle
+            git_commit(
+              path: build_gradle_path,
+              message: 'Bump version number'
             )
           end
         end
