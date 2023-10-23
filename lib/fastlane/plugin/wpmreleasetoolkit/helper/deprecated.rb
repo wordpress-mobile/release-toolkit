@@ -20,8 +20,7 @@ module Fastlane
           deprecated: true,
           optional: true,
           verify_block: verify_block,
-          type: String,
-          default_value: ENV['PROJECT_ROOT_FOLDER']
+          type: String
         )
       end
 
@@ -43,8 +42,7 @@ module Fastlane
           deprecated: true,
           optional: true,
           verify_block: verify_block,
-          type: String,
-          default_value: ENV['PROJECT_NAME']
+          type: String
         )
       end
     end
