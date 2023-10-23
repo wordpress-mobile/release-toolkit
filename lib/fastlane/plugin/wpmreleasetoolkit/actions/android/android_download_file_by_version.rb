@@ -67,7 +67,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :build_gradle_path,
                                        description: 'Path to the build.gradle file',
                                        type: String,
-                                       optional: true),
+                                       optional: true,
+                                       conflicting_options: [:project_root_folder]),
           Fastlane::Helper::GithubHelper.github_token_config_item,
           Fastlane::Helper::Deprecated.project_root_folder_config_item,
         ]
