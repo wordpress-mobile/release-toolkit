@@ -8,9 +8,7 @@ module Fastlane
       #
       def self.project_root_folder_config_item
         verify_block = proc do
-          unless ENV['PROJECT_ROOT_FOLDER'].nil?
-            UI.deprecated('DEPRECATED: The PROJECT_ROOT_FOLDER environment variable and config item are deprecated and will be removed in a future version of the Release Toolkit. Please provide an explicit path for instead.')
-          end
+          UI.deprecated('DEPRECATED: The PROJECT_ROOT_FOLDER environment variable and config item are deprecated and will be removed in a future version of the Release Toolkit. Please provide a full path instead.')
         end
 
         FastlaneCore::ConfigItem.new(
@@ -30,9 +28,7 @@ module Fastlane
       #
       def self.project_name_config_item
         verify_block = proc do
-          unless ENV['PROJECT_NAME'].nil?
-            UI.deprecated('DEPRECATED: The PROJECT_NAME environment variable and config item are deprecated and will be removed in a future version of the Release Toolkit. Please provide an explicit path instead.')
-          end
+          UI.deprecated('DEPRECATED: The PROJECT_NAME environment variable and config item are deprecated and will be removed in a future version of the Release Toolkit. Please provide a full path instead.')
         end
 
         FastlaneCore::ConfigItem.new(
