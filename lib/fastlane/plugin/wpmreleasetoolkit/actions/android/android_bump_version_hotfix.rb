@@ -8,7 +8,7 @@ module Fastlane
 
         project_root_folder = params[:project_root_folder]
         project_name = params[:project_name]
-        build_gradle_path = params[:build_gradle_path] || File.join(project_root_folder || '.', project_name, 'build.gradle')
+        build_gradle_path = params[:build_gradle_path] || (File.join(project_root_folder || '.', project_name, 'build.gradle') unless project_name.nil?)
         version_properties_path = params[:version_properties_path] || File.join(project_root_folder || '.', 'version.properties')
 
         Fastlane::Helper::GitHelper.create_branch("release/#{params[:version_name]}", from: params[:previous_version_name])

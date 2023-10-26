@@ -11,7 +11,7 @@ module Fastlane
 
         project_root_folder = params[:project_root_folder]
         project_name = params[:project_name]
-        build_gradle_path = params[:build_gradle_path] || File.join(project_root_folder || '.', project_name, 'build.gradle')
+        build_gradle_path = params[:build_gradle_path] || (File.join(project_root_folder || '.', project_name, 'build.gradle') unless project_name.nil?)
         version_properties_path = params[:version_properties_path] || File.join(project_root_folder || '.', 'version.properties')
 
         message = ''
@@ -34,10 +34,10 @@ module Fastlane
         message << "Building version #{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Beta Channel)\n" if params[:beta]
         message << "Building version #{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Alpha Channel)\n" if params[:alpha]
 
-        if params[:skip_confirm]
-          UI.message(message)
-        else
-          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
+        UI.important(message)
+
+        if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
+          UI.user_error!('Aborted by user request')
         end
 
         # Check local repo status
