@@ -12,6 +12,18 @@ def gemfile_lock_version
   gemfile_lock.scan(/fastlane-plugin-wpmreleasetoolkit \((\d+.\d+.\d+)\)/).last.first
 end
 
+def finished_reviews?
+  repo_name = github.pr_json['base']['repo']['full_name']
+  pr_number = github.pr_json['number']
+
+  !github.api.pull_request_reviews(repo_name, pr_number).empty?
+end
+
+def requested_reviewers?
+  has_requested_reviews = !github.pr_json['requested_teams'].to_a.empty? || !github.pr_json['requested_reviewers'].to_a.empty?
+  has_requested_reviews || finished_reviews?
+end
+
 return if github.pr_labels.include?('Releases')
 
 # Before checking the version, get rid of any change that `bundle install`
@@ -46,4 +58,4 @@ milestone_checker.check_milestone_due_date(days_before_due: 5)
 github.dismiss_out_of_range_messages
 rubocop.lint inline_comment: true, fail_on_inline_comment: true, include_cop_names: true
 
-warn "No reviewers have been set for this PR yet. Please request a review from **@\u2028wordpress-mobile/apps-infrastructure**." unless github.pr_json['assignee']
+warn "No reviewers have been set for this PR yet. Please request a review from **@\u2028wordpress-mobile/apps-infrastructure**." unless requested_reviewers?
