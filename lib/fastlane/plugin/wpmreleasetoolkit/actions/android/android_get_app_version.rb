@@ -4,6 +4,7 @@ module Fastlane
       def self.run(params)
         require_relative '../../helper/android/android_version_helper'
 
+        has_alpha_version = params[:has_alpha_version]
         project_root_folder = params[:project_root_folder]
         project_name = params[:project_name]
         build_gradle_path = params[:build_gradle_path] || (File.join(project_root_folder || '.', project_name, 'build.gradle') unless project_name.nil?)
@@ -11,7 +12,8 @@ module Fastlane
 
         Fastlane::Helper::Android::VersionHelper.get_public_version(
           build_gradle_path: build_gradle_path,
-          version_properties_path: version_properties_path
+          version_properties_path: version_properties_path,
+          has_alpha_version: has_alpha_version
         )
       end
 
@@ -45,6 +47,7 @@ module Fastlane
                                                                project_root_folder]),
           Fastlane::Helper::Deprecated.project_root_folder_config_item,
           Fastlane::Helper::Deprecated.project_name_config_item,
+          Fastlane::Helper::Deprecated.has_alpha_version_config_item,
         ]
       end
 
