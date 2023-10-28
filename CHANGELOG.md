@@ -10,11 +10,21 @@ _None_
 
 ### New Features
 
-- Added optional `build_gradle_path` and `version_properties_path` config items to actions that previously used the `PROJECT_ROOT_FOLDER` environment variable [#519]
+_None_
 
 ### Bug Fixes
 
 _None_
+
+### Internal Changes
+
+_None_
+
+## 9.2.0
+
+### New Features
+
+- Added optional `build_gradle_path` and `version_properties_path` config items to actions that previously used the `PROJECT_ROOT_FOLDER` environment variable [#519]
 
 ### Internal Changes
 
