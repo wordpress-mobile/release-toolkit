@@ -8,6 +8,8 @@ module Fastlane
         require_relative '../../helper/release_notes_helper'
         require_relative '../../helper/git_helper'
 
+        UI.deprecated('The `PROJECT_ROOT_FOLDER` environment variable is deprecated and will be removed in a future release. Please pass a path to the `release_notes_file_path` param instead.') unless ENV['PROJECT_ROOT_FOLDER'].nil?
+
         path = params[:release_notes_file_path]
         next_version = Fastlane::Helper::Ios::VersionHelper.calc_next_release_version(params[:new_version])
 

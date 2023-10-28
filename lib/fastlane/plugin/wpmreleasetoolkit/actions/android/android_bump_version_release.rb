@@ -8,14 +8,28 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper'
         require_relative '../../helper/android/android_git_helper'
 
+        project_root_folder = params[:project_root_folder]
+        project_name = params[:project_name]
+        build_gradle_path = params[:build_gradle_path] || (File.join(project_root_folder || '.', project_name, 'build.gradle') unless project_name.nil?)
+        version_properties_path = params[:version_properties_path] || File.join(project_root_folder || '.', 'version.properties')
+
         default_branch = params[:default_branch]
         other_action.ensure_git_branch(branch: default_branch)
 
         # Create new configuration
-        new_short_version = Fastlane::Helper::Android::VersionHelper.bump_version_release
+        new_short_version = Fastlane::Helper::Android::VersionHelper.bump_version_release(
+          build_gradle_path: build_gradle_path,
+          version_properties_path: version_properties_path
+        )
 
-        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version
-        current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version
+        current_version = Fastlane::Helper::Android::VersionHelper.get_release_version(
+          build_gradle_path: build_gradle_path,
+          version_properties_path: version_properties_path
+        )
+        current_version_alpha = Fastlane::Helper::Android::VersionHelper.get_alpha_version(
+          build_gradle_path: build_gradle_path,
+          version_properties_path: version_properties_path
+        )
         new_version_beta = Fastlane::Helper::Android::VersionHelper.calc_next_release_version(current_version, current_version_alpha)
         new_version_alpha = current_version_alpha.nil? ? nil : Fastlane::Helper::Android::VersionHelper.calc_next_alpha_version(new_version_beta, current_version_alpha)
         new_release_branch = "release/#{new_short_version}"
@@ -35,8 +49,15 @@ module Fastlane
         UI.message 'Done!'
 
         UI.message 'Updating app version...'
-        Fastlane::Helper::Android::VersionHelper.update_versions(new_version_beta, new_version_alpha)
-        Fastlane::Helper::Android::GitHelper.commit_version_bump
+        Fastlane::Helper::Android::VersionHelper.update_versions(
+          new_version_beta,
+          new_version_alpha,
+          version_properties_path: version_properties_path
+        )
+        Fastlane::Helper::Android::GitHelper.commit_version_bump(
+          build_gradle_path: build_gradle_path,
+          version_properties_path: version_properties_path
+        )
         UI.message 'Done.'
       end
 
@@ -59,6 +80,22 @@ module Fastlane
                                        description: 'Default branch of the repository',
                                        type: String,
                                        default_value: Fastlane::Helper::GitHelper::DEFAULT_GIT_BRANCH),
+          FastlaneCore::ConfigItem.new(key: :build_gradle_path,
+                                       description: 'Path to the build.gradle file',
+                                       type: String,
+                                       optional: true,
+                                       conflicting_options: %i[project_name
+                                                               project_root_folder
+                                                               version_properties_path]),
+          FastlaneCore::ConfigItem.new(key: :version_properties_path,
+                                       description: 'Path to the version.properties file',
+                                       type: String,
+                                       optional: true,
+                                       conflicting_options: %i[build_gradle_path
+                                                               project_name
+                                                               project_root_folder]),
+          Fastlane::Helper::Deprecated.project_root_folder_config_item,
+          Fastlane::Helper::Deprecated.project_name_config_item,
         ]
       end
 

@@ -9,9 +9,24 @@ module Fastlane
 
         Fastlane::Helper::GitHelper.ensure_on_branch!('release') unless other_action.is_ci
 
+        project_root_folder = params[:project_root_folder]
+        project_name = params[:project_name]
+        build_gradle_path = params[:build_gradle_path] || (File.join(project_root_folder || '.', project_name, 'build.gradle') unless project_name.nil?)
+        version_properties_path = params[:version_properties_path] || File.join(project_root_folder || '.', 'version.properties')
+
         message = ''
-        beta_version = Fastlane::Helper::Android::VersionHelper.get_release_version unless !params[:beta] && !params[:final]
-        alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version if params[:alpha]
+        unless !params[:beta] && !params[:final]
+          beta_version = Fastlane::Helper::Android::VersionHelper.get_release_version(
+            build_gradle_path: build_gradle_path,
+            version_properties_path: version_properties_path
+          )
+        end
+        if params[:alpha]
+          alpha_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(
+            build_gradle_path: build_gradle_path,
+            version_properties_path: version_properties_path
+          )
+        end
 
         UI.user_error!("Can't build a final release out of this branch because it's configured as a beta release!") if params[:final] && Fastlane::Helper::Android::VersionHelper.is_beta_version?(beta_version)
 
@@ -19,10 +34,10 @@ module Fastlane
         message << "Building version #{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{beta_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Beta Channel)\n" if params[:beta]
         message << "Building version #{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}(#{alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}) (for upload to Alpha Channel)\n" if params[:alpha]
 
-        if params[:skip_confirm]
-          UI.message(message)
-        else
-          UI.user_error!('Aborted by user request') unless UI.confirm("#{message}Do you want to continue?")
+        UI.important(message)
+
+        if !options[:skip_confirm] && !UI.confirm('Do you want to continue?')
+          UI.user_error!('Aborted by user request')
         end
 
         # Check local repo status
@@ -63,6 +78,22 @@ module Fastlane
                                        description: 'True if this is for a final build',
                                        type: Boolean,
                                        default_value: false),
+          FastlaneCore::ConfigItem.new(key: :build_gradle_path,
+                                       description: 'Path to the build.gradle file',
+                                       type: String,
+                                       optional: true,
+                                       conflicting_options: %i[project_name
+                                                               project_root_folder
+                                                               version_properties_path]),
+          FastlaneCore::ConfigItem.new(key: :version_properties_path,
+                                       description: 'Path to the version.properties file',
+                                       type: String,
+                                       optional: true,
+                                       conflicting_options: %i[build_gradle_path
+                                                               project_name
+                                                               project_root_folder]),
+          Fastlane::Helper::Deprecated.project_root_folder_config_item,
+          Fastlane::Helper::Deprecated.project_name_config_item,
         ]
       end
 
