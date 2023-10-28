@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Added optional `build_gradle_path` and `version_properties_path` config items to actions that previously used the `PROJECT_ROOT_FOLDER` environment variable [#519]
 
 ### Bug Fixes
 
@@ -20,7 +20,6 @@ _None_
 
 - Added deprecation notices to any actions or methods using the `PROJECT_ROOT_FOLDER` environment variable [#519]
 - Added deprecation notices to any actions or methods using the `PROJECT_NAME` environment variable [#519]
-- Added optional `build_gradle_path` and `version_properties_path` to actions that previously used the `PROJECT_ROOT_FOLDER` environment variable [#519]
 
 ## 9.1.0
 
