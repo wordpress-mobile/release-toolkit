@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Added optional `has_alpha_version` config item to actions that previously used the `HAS_ALPHA_VERSION` environment variable [#522]
 
 ### Bug Fixes
 
@@ -18,11 +18,18 @@ _None_
 
 ### Internal Changes
 
+- Added deprecation notices to any actions or methods using the `HAS_ALPHA_VERSION` environment variable [#522]
+
+## 9.2.0
+
+### New Features
+
+- Added optional `build_gradle_path` and `version_properties_path` config items to actions that previously used the `PROJECT_ROOT_FOLDER` environment variable [#519]
+
+### Internal Changes
+
 - Added deprecation notices to any actions or methods using the `PROJECT_ROOT_FOLDER` environment variable [#519]
 - Added deprecation notices to any actions or methods using the `PROJECT_NAME` environment variable [#519]
-- Added deprecation notices to any actions or methods using the `HAS_ALPHA_VERSION` environment variable [#522]
-- Added optional `build_gradle_path` and `version_properties_path` config items to actions that previously used the `PROJECT_ROOT_FOLDER` and `PROJECT_NAME` environment variables [#519]
-- Added optional `has_alpha_version` config item to actions that previously used the `HAS_ALPHA_VERSION` environment variable [#522]
 
 ## 9.1.0
 
