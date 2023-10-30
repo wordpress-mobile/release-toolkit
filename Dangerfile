@@ -26,6 +26,8 @@ end
 
 return if github.pr_labels.include?('Releases')
 
+github.dismiss_out_of_range_messages
+
 # Before checking the version, get rid of any change that `bundle install`
 # might have done.
 `git checkout Gemfile.lock &> /dev/null`
@@ -48,14 +50,16 @@ unless git.modified_files.include?('CHANGELOG.md')
 end
 
 manifest_pr_checker.check_gemfile_lock_updated
+
 labels_checker.check(
   required_labels: [//],
-  required_labels_error: 'PR is missing at least one label.'
+  required_labels_error: 'PR requires at least one label.'
 )
+
 pr_size_checker.check_diff_size
+
 milestone_checker.check_milestone_due_date(days_before_due: 5)
 
-github.dismiss_out_of_range_messages
-rubocop.lint inline_comment: true, fail_on_inline_comment: true, include_cop_names: true
+rubocop.lint(inline_comment: true, fail_on_inline_comment: true, include_cop_names: true)
 
-warn "No reviewers have been set for this PR yet. Please request a review from **@\u2028wordpress-mobile/apps-infrastructure**." unless requested_reviewers?
+warn("No reviewers have been set for this PR yet. Please request a review from **@\u2028wordpress-mobile/apps-infrastructure**.") unless requested_reviewers?
