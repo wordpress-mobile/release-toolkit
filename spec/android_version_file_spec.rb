@@ -131,7 +131,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       CONTENT
 
       with_tmp_file(named: 'version.properties', content: existing_content) do |tmp_file_path|
-        described_class.new(version_properties_path: tmp_file_path).write_version(version_name:, version_code:)
+        described_class.new(version_properties_path: tmp_file_path).write_version(version_name: version_name, version_code: version_code)
 
         current_content = File.read(tmp_file_path)
         expect(current_content).to eq(expected_content.strip)
@@ -153,7 +153,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile do
       CONTENT
 
       with_tmp_file(named: 'version.properties', content: existing_content) do |tmp_file_path|
-        described_class.new(version_properties_path: tmp_file_path).write_version(version_name:, version_code:)
+        described_class.new(version_properties_path: tmp_file_path).write_version(version_name: version_name, version_code: version_code)
 
         current_content = File.read(tmp_file_path)
         expect(current_content).to eq(expected_content.strip)
