@@ -21,7 +21,7 @@ module Fastlane
       def download(target_locale, glotpress_url, is_source)
         uri = URI(glotpress_url)
         response = Net::HTTP.get_response(uri)
-        handle_glotpress_download(response:, locale: target_locale, is_source:)
+        handle_glotpress_download(response: response, locale: target_locale, is_source: is_source)
       end
 
       # Parse JSON data and update the local files

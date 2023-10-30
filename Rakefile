@@ -56,7 +56,7 @@ task :new_release do
   Console.header 'Update `VERSION` constant in `version.rb`...'
   update_version_constant(VERSION_FILE, new_version)
   Console.header 'Updating CHANGELOG...'
-  parser.update_for_new_release(new_version:)
+  parser.update_for_new_release(new_version: new_version)
 
   # Commit and push
   Console.header 'Commit and push changes...'

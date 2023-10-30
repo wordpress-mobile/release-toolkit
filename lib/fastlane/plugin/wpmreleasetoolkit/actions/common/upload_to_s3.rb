@@ -42,8 +42,8 @@ module Fastlane
         File.open(file_path, 'rb') do |file|
           Aws::S3::Client.new.put_object(
             body: file,
-            bucket:,
-            key:
+            bucket: bucket,
+            key: key
           )
         rescue Aws::S3::Errors::ServiceError => e
           UI.crash!("Unable to upload file to S3: #{e.message}")
@@ -58,8 +58,8 @@ module Fastlane
 
       def self.file_is_already_uploaded?(bucket, key)
         response = Aws::S3::Client.new.head_object(
-          bucket:,
-          key:
+          bucket: bucket,
+          key: key
         )
         response[:content_length].positive?
       rescue Aws::S3::Errors::NotFound

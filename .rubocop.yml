@@ -55,7 +55,12 @@ Style/StringConcatenation:
 # for more discussion
 Style/FetchEnvVar:
   Enabled: false
-  
+
+# Rule enforced after migrating to Ruby 3, to prevent the new syntax which allows for hash values and keyword arguments
+# omission, such as `myMethod(x:, y:)` and `h = { a:, b: }`.
+Style/HashSyntax:
+  EnforcedShorthandSyntax: never
+
 ########## Gemspec Rules
 
 # This was turned on by default after updating Rubocop to `1.50.2`. We want to disable this for now because

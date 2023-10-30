@@ -49,7 +49,7 @@ describe Fastlane::Helper::GitHelper do
       `git -C #{dir} init --initial-branch main || git -C #{dir} init`
       path = File.join(dir, 'a', 'b')
       `mkdir -p #{path}`
-      expect(described_class.is_git_repo?(path:)).to be true
+      expect(described_class.is_git_repo?(path: path)).to be true
     end
   end
 
@@ -101,7 +101,7 @@ describe Fastlane::Helper::GitHelper do
       files = ['file 1', 'file 2', 'file 3']
       expect_shell_command('git', 'add', files[0], files[1], files[2])
       expect_shell_command('git', 'commit', '-m', @message)
-      described_class.commit(message: @message, files:)
+      described_class.commit(message: @message, files: files)
     end
 
     it 'adds all pending file changes before commit if :all is provided as `files`' do
@@ -118,7 +118,7 @@ describe Fastlane::Helper::GitHelper do
         dummy_file_path: path,
         add_file_to_gitignore: false
       )
-      expect(described_class.is_ignored?(path:)).to be false
+      expect(described_class.is_ignored?(path: path)).to be false
     end
 
     context 'when the path is in the .gitignore' do
@@ -132,7 +132,7 @@ describe Fastlane::Helper::GitHelper do
           add_file_to_gitignore: true,
           commit_gitignore: false
         )
-        expect(described_class.is_ignored?(path:)).to be true
+        expect(described_class.is_ignored?(path: path)).to be true
       end
 
       it 'returns true when the .gitignore has no uncommitted changes' do
@@ -141,7 +141,7 @@ describe Fastlane::Helper::GitHelper do
           add_file_to_gitignore: true,
           commit_gitignore: true
         )
-        expect(described_class.is_ignored?(path:)).to be true
+        expect(described_class.is_ignored?(path: path)).to be true
       end
     end
 
@@ -149,7 +149,7 @@ describe Fastlane::Helper::GitHelper do
     # We need the ability to tell if a path result is ignored, regardless of whether it exists yet.
     it 'returns false for files not yet created but part of the repository' do
       setup_git_repo
-      expect(described_class.is_ignored?(path:)).to be false
+      expect(described_class.is_ignored?(path: path)).to be false
     end
 
     it 'returns true when the path is outside the repository folder' do
@@ -157,14 +157,14 @@ describe Fastlane::Helper::GitHelper do
       path = File.join(@path, '..', 'dummy.txt')
 
       setup_git_repo(dummy_file_path: path, add_file_to_gitignore: false)
-      expect(described_class.is_ignored?(path:)).to be true
+      expect(described_class.is_ignored?(path: path)).to be true
     end
 
     # This is sort of redundant given the previous example already ensures the same logic.
     # But, we'll be using paths starting with `~` as part of our configurations, so it felt appopriate to explicitly ensure this important use case is respected.
     it 'returns true when the path is in the home folder ' do
       path = '~/a/path'
-      expect(described_class.is_ignored?(path:)).to be true
+      expect(described_class.is_ignored?(path: path)).to be true
     end
   end
 end

@@ -40,7 +40,7 @@ describe Fastlane::Helper::GithubHelper do
 
     def download_file_from_tag(download_folder:)
       helper = described_class.new(github_token: 'Fake-GitHubToken-123')
-      helper.download_file_from_tag(repository: test_repo, tag: test_tag, file_path: test_file, download_folder:)
+      helper.download_file_from_tag(repository: test_repo, tag: test_tag, file_path: test_file, download_folder: download_folder)
     end
   end
 
@@ -67,12 +67,12 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     def mock_milestone(title)
-      { title: }
+      { title: title }
     end
 
     def get_last_milestone(repository:)
       helper = described_class.new(github_token: 'Fake-GitHubToken-123')
-      helper.get_last_milestone(repository:)
+      helper.get_last_milestone(repository: repository)
     end
   end
 
@@ -130,7 +130,7 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     def mock_comment(body: '<!-- REUSE_ID: test-id --> Test', user_id: 1234)
-      instance_double('Comment', id: 1234, body:, user: instance_double('User', id: user_id))
+      instance_double('Comment', id: 1234, body: body, user: instance_double('User', id: user_id))
     end
   end
 
@@ -332,7 +332,7 @@ describe Fastlane::Helper::GithubHelper do
       }
 
       expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
-      create_milestone(due_date:, days_until_submission: 4, days_until_release: 7)
+      create_milestone(due_date: due_date, days_until_submission: 4, days_until_release: 7)
     end
 
     it 'computes the correct dates when submission and release dates are in the same day' do
@@ -343,7 +343,7 @@ describe Fastlane::Helper::GithubHelper do
       }
 
       expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
-      create_milestone(due_date:, days_until_submission: 1, days_until_release: 1)
+      create_milestone(due_date: due_date, days_until_submission: 1, days_until_release: 1)
     end
 
     it 'computes the correct dates when the due date is on the verge of a DST day change' do
@@ -359,7 +359,7 @@ describe Fastlane::Helper::GithubHelper do
         }
 
         expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
-        create_milestone(due_date:, days_until_submission: 2, days_until_release: 3)
+        create_milestone(due_date: due_date, days_until_submission: 2, days_until_release: 3)
       end
     end
 
@@ -376,7 +376,7 @@ describe Fastlane::Helper::GithubHelper do
         }
 
         expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
-        create_milestone(due_date:, days_until_submission: 2, days_until_release: 3)
+        create_milestone(due_date: due_date, days_until_submission: 2, days_until_release: 3)
       end
     end
 
@@ -392,7 +392,7 @@ describe Fastlane::Helper::GithubHelper do
         }
 
         expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
-        create_milestone(due_date:, days_until_submission: 2, days_until_release: 3)
+        create_milestone(due_date: due_date, days_until_submission: 2, days_until_release: 3)
       end
     end
 
@@ -406,7 +406,7 @@ describe Fastlane::Helper::GithubHelper do
         }
 
         expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
-        create_milestone(due_date:, days_until_submission: 140, days_until_release: 146)
+        create_milestone(due_date: due_date, days_until_submission: 140, days_until_release: 146)
       end
     end
 
@@ -420,7 +420,7 @@ describe Fastlane::Helper::GithubHelper do
         }
 
         expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
-        create_milestone(due_date:, days_until_submission: 216, days_until_release: 217)
+        create_milestone(due_date: due_date, days_until_submission: 216, days_until_release: 217)
       end
     end
 
@@ -435,7 +435,7 @@ describe Fastlane::Helper::GithubHelper do
         }
 
         expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
-        create_milestone(due_date:, days_until_submission: 60, days_until_release: 61)
+        create_milestone(due_date: due_date, days_until_submission: 60, days_until_release: 61)
       end
     end
 
@@ -450,25 +450,25 @@ describe Fastlane::Helper::GithubHelper do
         }
 
         expect(client).to receive(:create_milestone).with(test_repo, test_milestone_number, options)
-        create_milestone(due_date:, days_until_submission: 60, days_until_release: 61)
+        create_milestone(due_date: due_date, days_until_submission: 60, days_until_release: 61)
       end
     end
 
     it 'raises an error if days_until_submission is less than or equal zero' do
       due_date = '2022-10-20T08:00:00Z'.to_time.utc
-      expect { create_milestone(due_date:, days_until_submission: 0, days_until_release: 5) }
+      expect { create_milestone(due_date: due_date, days_until_submission: 0, days_until_release: 5) }
         .to raise_error(FastlaneCore::Interface::FastlaneError, 'days_until_submission must be greater than zero.')
     end
 
     it 'raises an error if days_until_release is less than or equal zero' do
       due_date = '2022-10-20T08:00:00Z'.to_time.utc
-      expect { create_milestone(due_date:, days_until_submission: 12, days_until_release: -8) }
+      expect { create_milestone(due_date: due_date, days_until_submission: 12, days_until_release: -8) }
         .to raise_error(FastlaneCore::Interface::FastlaneError, 'days_until_release must be greater than zero.')
     end
 
     it 'raises an error if days_until_submission is greater than days_until_release' do
       due_date = '2022-10-20T08:00:00Z'.to_time.utc
-      expect { create_milestone(due_date:, days_until_submission: 14, days_until_release: 3) }
+      expect { create_milestone(due_date: due_date, days_until_submission: 14, days_until_release: 3) }
         .to raise_error(FastlaneCore::Interface::FastlaneError, 'days_until_release must be greater or equal to days_until_submission.')
     end
 
@@ -477,9 +477,9 @@ describe Fastlane::Helper::GithubHelper do
       helper.create_milestone(
         repository: test_repo,
         title: test_milestone_number,
-        due_date:,
-        days_until_submission:,
-        days_until_release:
+        due_date: due_date,
+        days_until_submission: days_until_submission,
+        days_until_release: days_until_release
       )
     end
   end
@@ -542,9 +542,9 @@ describe Fastlane::Helper::GithubHelper do
         version: test_tag,
         target: test_target,
         description: test_description,
-        assets:,
+        assets: assets,
         prerelease: false,
-        is_draft:
+        is_draft: is_draft
       )
     end
   end

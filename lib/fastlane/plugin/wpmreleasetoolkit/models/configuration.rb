@@ -23,17 +23,17 @@ module Fastlane
     end
 
     def add_file_to_copy(source, destination, encrypt: false)
-      file = FileReference.new(file: source, destination:, encrypt:)
+      file = FileReference.new(file: source, destination: destination, encrypt: encrypt)
       files_to_copy << file
     end
 
     def to_hash
       {
-        project_name:,
-        branch:,
-        pinned_hash:,
+        project_name: project_name,
+        branch: branch,
+        pinned_hash: pinned_hash,
         files_to_copy: files_to_copy.map(&:to_hash),
-        file_dependencies:
+        file_dependencies: file_dependencies
       }
     end
   end

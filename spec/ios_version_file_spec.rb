@@ -22,9 +22,9 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::IOSVersionFile do
 
         with_tmp_file(named: 'test.xcconfig', content: existing_content) do |tmp_file_path|
           described_class.new(xcconfig_path: tmp_file_path).write(
-            version_short:,
-            version_long:,
-            build_number:
+            version_short: version_short,
+            version_long: version_long,
+            build_number: build_number
           )
 
           current_content = File.read(tmp_file_path)
@@ -38,7 +38,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::IOSVersionFile do
       version_short = '1.2.3'
 
       it 'raises an error' do
-        expect { described_class.new(xcconfig_path: file_path).write(version_short:) }
+        expect { described_class.new(xcconfig_path: file_path).write(version_short: version_short) }
           .to raise_error(FastlaneCore::Interface::FastlaneError, ".xcconfig file not found at this path: #{file_path}")
       end
     end

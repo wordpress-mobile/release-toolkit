@@ -16,7 +16,7 @@ module Fastlane
       #
       def self.is_git_repo?(path: Dir.pwd)
         # If the path doesn't exist, find its first ancestor.
-        path = first_existing_ancestor_of(path:)
+        path = first_existing_ancestor_of(path: path)
         # Get the path's directory, so we can look in it for the Git folder
         dir = path.directory? ? path : path.dirname
 
@@ -220,7 +220,7 @@ module Fastlane
       #
       # @return [Bool] True if the given path is ignored or outside a Git repository, false otherwise.
       def self.is_ignored?(path:)
-        return true unless is_git_repo?(path:)
+        return true unless is_git_repo?(path: path)
 
         Actions.sh('git', 'check-ignore', path) do |status, _, _|
           status.success?

@@ -243,7 +243,7 @@ module Fastlane
           locales_map.each do |lang_codes|
             all_xml_documents = glotpress_filters.map do |filters|
               UI.message "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]}) [#{filters}]..."
-              download_glotpress_export_file(project_url: glotpress_project_url, locale: lang_codes[:glotpress], filters:)
+              download_glotpress_export_file(project_url: glotpress_project_url, locale: lang_codes[:glotpress], filters: filters)
             end.compact
             next if all_xml_documents.empty?
 

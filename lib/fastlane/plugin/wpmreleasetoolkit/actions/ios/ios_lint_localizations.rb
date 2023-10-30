@@ -14,7 +14,7 @@ module Fastlane
             end
           end
 
-          report(violations:, base_lang: params[:base_lang])
+          report(violations: violations, base_lang: params[:base_lang])
           break unless !violations.empty? && params[:allow_retry] && UI.confirm(RETRY_MESSAGE)
         end
 
@@ -53,7 +53,7 @@ module Fastlane
           language = File.basename(File.dirname(file), '.lproj')
           path = File.join(params[:input_dir], file)
 
-          file_type = Fastlane::Helper::Ios::L10nHelper.strings_file_type(path:)
+          file_type = Fastlane::Helper::Ios::L10nHelper.strings_file_type(path: path)
           if file_type == :text
             duplicates = Fastlane::Helper::Ios::StringsFileValidationHelper.find_duplicated_keys(file: path)
             duplicate_keys[language] = duplicates.map { |key, value| "`#{key}` was found at multiple lines: #{value.join(', ')}" } unless duplicates.empty?

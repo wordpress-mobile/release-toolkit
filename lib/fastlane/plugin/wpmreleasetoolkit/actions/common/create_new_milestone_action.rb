@@ -26,10 +26,10 @@ module Fastlane
         UI.message("Next milestone: #{newmilestone_number} due on #{newmilestone_duedate}.")
 
         github_helper.create_milestone(
-          repository:,
+          repository: repository,
           title: newmilestone_number,
           due_date: newmilestone_duedate,
-          days_until_submission:,
+          days_until_submission: days_until_submission,
           days_until_release: number_of_days_from_code_freeze_to_release
         )
       end

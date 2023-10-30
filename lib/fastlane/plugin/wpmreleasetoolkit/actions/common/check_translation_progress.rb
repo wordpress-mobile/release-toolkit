@@ -15,7 +15,7 @@ module Fastlane
 
         unless under_threshold_langs.empty?
           check_results(
-            under_threshold_langs:,
+            under_threshold_langs: under_threshold_langs,
             threshold: params[:min_acceptable_translation_percentage],
             skip_confirm: params[:skip_confirm]
           )
@@ -37,7 +37,7 @@ module Fastlane
         under_threshold_langs = []
 
         data = begin
-          Fastlane::Helper::GlotPressHelper.get_translation_status_data(glotpress_url:)
+          Fastlane::Helper::GlotPressHelper.get_translation_status_data(glotpress_url: glotpress_url)
         rescue StandardError
           nil
         end
@@ -47,8 +47,8 @@ module Fastlane
           UI.message("> Getting translation status for #{language_code}")
           progress = begin
             Fastlane::Helper::GlotPressHelper.get_translation_status(
-              data:,
-              language_code:
+              data: data,
+              language_code: language_code
             )
           rescue StandardError
             -1
@@ -60,7 +60,7 @@ module Fastlane
           end
 
           UI.message("Language #{language_code} is #{progress}% translated.")
-          under_threshold_langs.push({ lang: language_code, progress: }) if progress < threshold
+          under_threshold_langs.push({ lang: language_code, progress: progress }) if progress < threshold
         end
 
         under_threshold_langs

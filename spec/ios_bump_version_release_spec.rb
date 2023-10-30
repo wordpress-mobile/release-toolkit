@@ -22,7 +22,7 @@ describe Fastlane::Actions::IosBumpVersionReleaseAction do
       expect(Fastlane::Helper::Ios::GitHelper).to receive(:commit_version_bump)
 
       run_described_fastlane_action(
-        default_branch:
+        default_branch: default_branch
       )
     end
   end

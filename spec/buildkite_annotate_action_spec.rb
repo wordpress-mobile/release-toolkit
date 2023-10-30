@@ -17,7 +17,7 @@ describe Fastlane::Actions::BuildkiteAnnotateAction do
         expect(FastlaneCore::UI).not_to receive(:user_error!)
         cmd = run_described_fastlane_action(
           context: 'ctx',
-          style:,
+          style: style,
           message: 'message'
         )
         expect(cmd).to eq("buildkite-agent annotate --context ctx --style #{style} message")
