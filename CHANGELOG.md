@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Added optional `has_alpha_version` config item to actions that previously used the `HAS_ALPHA_VERSION` environment variable [#522]
 
 ### Bug Fixes
 
@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Added deprecation notices to any actions or methods using the `HAS_ALPHA_VERSION` environment variable [#522]
 
 ## 9.2.0
 

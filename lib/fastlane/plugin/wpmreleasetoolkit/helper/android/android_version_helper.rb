@@ -30,10 +30,11 @@ module Fastlane
         #         - If this version is a hotfix (more than 2 parts and 3rd part is non-zero), returns the "X.Y.Z" formatted string
         #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
         #
-        def self.get_public_version(build_gradle_path:, version_properties_path:)
+        def self.get_public_version(build_gradle_path:, version_properties_path:, has_alpha_version:)
           version = get_release_version(
             build_gradle_path: build_gradle_path,
-            version_properties_path: version_properties_path
+            version_properties_path: version_properties_path,
+            has_alpha_version: has_alpha_version
           )
           vp = get_version_parts(version[VERSION_NAME])
           return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
@@ -45,10 +46,10 @@ module Fastlane
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
-        def self.get_release_version(build_gradle_path:, version_properties_path:)
+        def self.get_release_version(build_gradle_path:, version_properties_path:, has_alpha_version:)
           return get_version_from_properties(version_properties_path: version_properties_path) if File.exist?(version_properties_path)
 
-          section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
+          section = has_alpha_version.nil? ? 'defaultConfig' : 'vanilla {'
           name = get_version_name_from_gradle_file(build_gradle_path, section)
           code = get_version_build_from_gradle_file(build_gradle_path, section)
           return { VERSION_NAME => name, VERSION_CODE => code }
@@ -78,10 +79,10 @@ module Fastlane
         # @return [Hash] A hash with 2 keys `"name"` and `"code"` containing the extracted version name and code, respectively,
         #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
         #
-        def self.get_alpha_version(build_gradle_path:, version_properties_path:)
+        def self.get_alpha_version(build_gradle_path:, version_properties_path:, has_alpha_version:)
           return get_version_from_properties(version_properties_path: version_properties_path, is_alpha: true) if File.exist?(version_properties_path)
 
-          return nil if ENV['HAS_ALPHA_VERSION'].nil?
+          return nil if has_alpha_version.nil?
 
           section = 'defaultConfig'
           name = get_version_name_from_gradle_file(build_gradle_path, section)
@@ -277,11 +278,12 @@ module Fastlane
         #
         # @return [String] The next release version name to use after bumping the currently used release version.
         #
-        def self.bump_version_release(build_gradle_path:, version_properties_path:)
+        def self.bump_version_release(build_gradle_path:, version_properties_path:, has_alpha_version:)
           # Bump release
           current_version = self.get_release_version(
             build_gradle_path: build_gradle_path,
-            version_properties_path: version_properties_path
+            version_properties_path: version_properties_path,
+            has_alpha_version: has_alpha_version
           )
           UI.message("Current version: #{current_version[VERSION_NAME]}")
           new_version = calc_next_release_base_version(current_version)
@@ -296,7 +298,7 @@ module Fastlane
         # @param [Hash] new_version_beta The version hash for the beta, containing values for keys "name" and "code"
         # @param [Hash] new_version_alpha The version hash for the alpha , containing values for keys "name" and "code"
         #
-        def self.update_versions(new_version_beta, new_version_alpha, version_properties_path:)
+        def self.update_versions(new_version_beta, new_version_alpha, version_properties_path:, has_alpha_version:)
           if File.exist?(version_properties_path)
             replacements = {
               versionName: (new_version_beta || {})[VERSION_NAME],
@@ -312,7 +314,7 @@ module Fastlane
             end
             File.write(version_properties_path, content)
           else
-            self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
+            self.update_version(new_version_beta, has_alpha_version.nil? ? 'defaultConfig' : 'vanilla {')
             self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
           end
         end
