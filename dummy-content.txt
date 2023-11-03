@@ -1,2 +1,3 @@
 Creation of fake release branch
 Some more commit
+Whoops I'm late to the party, trying to commit something while the target branch is already locked
