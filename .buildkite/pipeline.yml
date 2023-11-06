@@ -56,19 +56,6 @@ steps:
               - 3.2.2
 
   #################
-  # Lint
-  #################
-  - label: "🧹 Lint (Rubocop)"
-    key: rubocop
-    command: |
-      bundle install
-      echo "--- :rubocop: Run Rubocop"
-      bundle exec rubocop
-    plugins: [*docker_plugin]
-    agents:
-      queue: "default"
-
-  #################
   # Danger
   #################
   - label: "☢️ Danger - PR Check"
