@@ -13,7 +13,7 @@ module Fastlane
 
         config = helper.read_config(params[:config_file])
 
-        helper.check_fonts_installed!(config:) unless params[:skip_font_check]
+        helper.check_fonts_installed!(config: config) unless params[:skip_font_check]
 
         translation_directories = subdirectories_for_path(params[:metadata_folder])
         image_directories = subdirectories_for_path(params[:orig_folder])

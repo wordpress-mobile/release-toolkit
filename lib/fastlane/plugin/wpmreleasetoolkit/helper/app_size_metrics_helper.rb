@@ -22,7 +22,7 @@ module Fastlane
       # @param [Hash] hash The metadata common to all the metrics of the payload built by that helper instance. Can be any arbitrary set of key/value pairs
       #
       def metadata=(hash)
-        @metadata = (hash.compact || {}).map { |key, value| { name: key.to_s, value: } }
+        @metadata = (hash.compact || {}).map { |key, value| { name: key.to_s, value: value } }
       end
 
       # Adds a single metric to the group of metrics
@@ -32,7 +32,7 @@ module Fastlane
       # @param [Hash] metadata The arbitrary dictionary of metadata to associate to that metric entry
       #
       def add_metric(name:, value:, metadata: nil)
-        metric = { name:, value: }
+        metric = { name: name, value: value }
         metadata = metadata&.compact || {} # Remove nil values if any (and use empty Hash if nil was provided)
         metric[:meta] = metadata.map { |meta_key, meta_value| { name: meta_key.to_s, value: meta_value } } unless metadata.empty?
         @metrics.append(metric)

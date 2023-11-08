@@ -16,9 +16,9 @@ module Fastlane
         helper.create_avd(
           api: api_level,
           device: device_model,
-          system_image:,
+          system_image: system_image,
           name: avd_name,
-          sdcard:
+          sdcard: sdcard
         )
       end
 

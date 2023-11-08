@@ -14,7 +14,7 @@ describe Fastlane::FirebaseDevice do
   end
 
   def create_model(model: 'Nexus5', version: 27, locale: 'en', orientation: 'portrait')
-    described_class.new(model:, version:, locale:, orientation:)
+    described_class.new(model: model, version: version, locale: locale, orientation: orientation)
   end
 
   describe 'initialization' do

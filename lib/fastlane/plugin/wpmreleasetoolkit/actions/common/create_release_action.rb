@@ -24,13 +24,13 @@ module Fastlane
 
         github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
         url = github_helper.create_release(
-          repository:,
-          version:,
+          repository: repository,
+          version: version,
           target: params[:target],
           description: release_notes,
-          assets:,
-          prerelease:,
-          is_draft:
+          assets: assets,
+          prerelease: prerelease,
+          is_draft: is_draft
         )
         UI.success("Successfully created GitHub Release. You can see it at '#{url}'")
         url

@@ -60,9 +60,9 @@ describe Fastlane::Actions::GetPrsBetweenTagsAction do
         github_token: test_token,
         repository: test_repo,
         tag_name: test_tag_name,
-        target_commitish:,
-        previous_tag:,
-        configuration_file_path:
+        target_commitish: target_commitish,
+        previous_tag: previous_tag,
+        configuration_file_path: configuration_file_path
       )
 
       # Assert
@@ -120,9 +120,9 @@ describe Fastlane::Actions::GetPrsBetweenTagsAction do
         github_token: test_token,
         repository: test_repo,
         tag_name: test_tag_name,
-        target_commitish:,
-        previous_tag:,
-        configuration_file_path:
+        target_commitish: target_commitish,
+        previous_tag: previous_tag,
+        configuration_file_path: configuration_file_path
       )
 
       # Assert

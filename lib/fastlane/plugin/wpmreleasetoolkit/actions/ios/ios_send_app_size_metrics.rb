@@ -44,7 +44,7 @@ module Fastlane
         # Send the payload
         metrics_helper.send_metrics(
           to: api_url,
-          api_token:,
+          api_token: api_token,
           use_gzip: params[:use_gzip_content_encoding]
         )
       end

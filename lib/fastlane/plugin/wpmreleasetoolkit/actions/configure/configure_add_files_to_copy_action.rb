@@ -55,7 +55,7 @@ module Fastlane
 
         encrypt = UI.confirm('Encrypt file?:')
 
-        Fastlane::Helper::ConfigureHelper.add_file(source:, destination:, encrypt:)
+        Fastlane::Helper::ConfigureHelper.add_file(source: source, destination: destination, encrypt: encrypt)
       end
 
       def self.secret_store_dir

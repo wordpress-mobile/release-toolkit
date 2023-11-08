@@ -143,7 +143,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
         test_genstrings(
           params: { paths: [app_src_dir, pods_src_dir], quiet: true, swiftui: false },
           expected_dir_name: 'expected-pods-noswiftui',
-          expected_logs:
+          expected_logs: expected_logs
         )
       end
 
@@ -156,7 +156,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
         test_genstrings(
           params: { paths: [app_src_dir, pods_src_dir], quiet: false, swiftui: false },
           expected_dir_name: 'expected-pods-noswiftui',
-          expected_logs:
+          expected_logs: expected_logs
         )
       end
 
@@ -168,7 +168,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
         test_genstrings(
           params: { paths: [app_src_dir, pods_src_dir], quiet: true, swiftui: false, routines: 'PodLocalizedString', fail_on_error: false },
           expected_dir_name: 'expected-custom-routine',
-          expected_logs:,
+          expected_logs: expected_logs,
           expected_failures: []
         )
       end
@@ -181,7 +181,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
         test_genstrings(
           params: { paths: [app_src_dir, pods_src_dir], quiet: true, swiftui: false, routines: 'PodLocalizedString', fail_on_error: true },
           expected_dir_name: 'expected-custom-routine',
-          expected_logs:,
+          expected_logs: expected_logs,
           expected_failures: [expected_logs.last]
         )
       end
@@ -195,7 +195,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
         test_genstrings(
           params: { paths: [app_src_dir, pods_src_dir], quiet: false, swiftui: false, fail_on_error: true },
           expected_dir_name: 'expected-pods-noswiftui',
-          expected_logs:,
+          expected_logs: expected_logs,
           expected_failures: []
         )
       end

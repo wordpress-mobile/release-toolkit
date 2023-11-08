@@ -128,6 +128,6 @@ end
 
 def stub_path_as_ignored(path:, ignored:)
   allow(Fastlane::Helper::GitHelper).to receive(:is_ignored?)
-    .with(path:)
+    .with(path: path)
     .and_return(ignored)
 end

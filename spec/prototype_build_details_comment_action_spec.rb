@@ -132,7 +132,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           app_center_org_name: 'My-Org',
           app_center_app_name: 'My-App',
           app_center_release_id: '1337',
-          metadata:
+          metadata: metadata
         )
         expect(comment).to include '<td><b>App Name</b></td><td> My App</td>'
         expect(comment).to include '<td><b>Version:Short</b></td><td>28.1</td>'
@@ -168,7 +168,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           app_center_org_name: 'BestOrg',
           app_center_app_name: 'BestApp',
           app_center_release_id: '8888',
-          metadata:,
+          metadata: metadata,
           footnote: '<em>Note: Google Sign-In in not available in those builds</em>'
         )
 
@@ -201,7 +201,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           app_center_app_name: 'BestApp',
           app_center_release_id: '8888',
           download_url: 'https://bestfront.cloudfront.net/feed42/bestapp-pr1357-a1b2c3f.apk',
-          metadata:
+          metadata: metadata
         )
 
         expect(comment).to eq <<~EXPECTED_COMMENT
@@ -235,7 +235,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           app_center_app_name: 'BestApp',
           app_center_release_id: '1234',
           fold: true,
-          metadata:,
+          metadata: metadata,
           footnote: '<em>Note: Google Sign-In in not available in those builds</em>'
         )
 
@@ -309,7 +309,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         comment = run_described_fastlane_action(
           app_display_name: 'My App',
           app_center_org_name: 'My-Org',
-          metadata:
+          metadata: metadata
         )
         expect(comment).to include '<td><b>Version</b></td><td>42.3</td>' # explicitly provided, overriding the implicit value
         expect(comment).not_to include '<td><b>Version</b></td><td>28.7</td>' # otherwise implicitly added if it were not overridden
@@ -378,7 +378,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         comment = run_described_fastlane_action(
           app_display_name: 'The Best App',
           app_center_org_name: 'BestOrg',
-          metadata:,
+          metadata: metadata,
           footnote: '<em>Note: Google Sign-In in not available in those builds</em>'
         )
 
@@ -434,7 +434,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           app_display_name: 'The Best App',
           app_center_org_name: 'BestOrg',
           fold: true,
-          metadata:,
+          metadata: metadata,
           footnote: '<em>Note: Google Sign-In in not available in those builds</em>'
         )
 
@@ -514,7 +514,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         comment = run_described_fastlane_action(
           app_display_name: 'The Best App',
           download_url: 'https://bestfront.cloudfront.net/feed42/bestapp-pr1357-a1b2c3f.apk',
-          metadata:,
+          metadata: metadata,
           footnote: '<em>Note: Google Sign-In in not available in those builds</em>'
         )
 
@@ -547,7 +547,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           app_display_name: 'The Best App',
           download_url: 'https://bestfront.cloudfront.net/feed42/bestapp-pr1357-a1b2c3f.apk',
           fold: true,
-          metadata:,
+          metadata: metadata,
           footnote: '<em>Note: Google Sign-In in not available in those builds</em>'
         )
 

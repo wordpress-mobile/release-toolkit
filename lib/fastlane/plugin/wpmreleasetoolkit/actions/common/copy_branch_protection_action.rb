@@ -13,7 +13,7 @@ module Fastlane
 
         response = begin
           github_helper.get_branch_protection(
-            repository:,
+            repository: repository,
             branch: from_branch
           )
         rescue Octokit::NotFound
@@ -24,7 +24,7 @@ module Fastlane
 
         response = begin
           github_helper.set_branch_protection(
-            repository:,
+            repository: repository,
             branch: to_branch,
             **settings
           )

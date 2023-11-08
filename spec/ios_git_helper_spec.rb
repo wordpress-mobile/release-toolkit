@@ -8,14 +8,14 @@ describe Fastlane::Helper::Ios::GitHelper do
       ENV[key] = nil
 
       expect(FastlaneCore::UI).to receive(:user_error!)
-      described_class.get_from_env!(key:)
+      described_class.get_from_env!(key: key)
     end
 
     it 'returns the value when in the environment' do
       ENV[key] = 'abc123'
 
       expect(FastlaneCore::UI).not_to receive(:user_error!)
-      expect(described_class.get_from_env!(key:)).to eq('abc123')
+      expect(described_class.get_from_env!(key: key)).to eq('abc123')
     end
   end
 end

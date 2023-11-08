@@ -62,7 +62,7 @@ module Fastlane
         #
         def run(input_dir:, base_lang: DEFAULT_BASE_LANG, only_langs: nil)
           check_swiftgen_installed || install_swiftgen!
-          find_diffs(input_dir:, base_lang:, only_langs:)
+          find_diffs(input_dir: input_dir, base_lang: base_lang, only_langs: only_langs)
         end
 
         ##################

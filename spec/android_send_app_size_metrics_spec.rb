@@ -49,8 +49,8 @@ describe Fastlane::Actions::AndroidSendAppSizeMetricsAction do
       # Act
       action_params = {
         api_url: File.join('file://localhost/', output_file),
-        aab_path:,
-        universal_apk_path:,
+        aab_path: aab_path,
+        universal_apk_path: universal_apk_path,
         **other_action_args
       }.compact
       code = run_described_fastlane_action(action_params)

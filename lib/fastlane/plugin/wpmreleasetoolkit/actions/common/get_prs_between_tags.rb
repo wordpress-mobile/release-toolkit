@@ -16,11 +16,11 @@ module Fastlane
         github_helper = Fastlane::Helper::GithubHelper.new(github_token: gh_token)
         changelog = begin
           github_helper.generate_release_notes(
-            repository:,
-            tag_name:,
-            previous_tag:,
-            target_commitish:,
-            config_file_path:
+            repository: repository,
+            tag_name: tag_name,
+            previous_tag: previous_tag,
+            target_commitish: target_commitish,
+            config_file_path: config_file_path
           )
         rescue StandardError => e
           error_msg = "❌ Error computing the list of PRs since #{previous_tag || 'last release'}: `#{e.message}`"
@@ -31,7 +31,7 @@ module Fastlane
         previous_release_link = if previous_tag.nil?
                                   'last release'
                                 else
-                                  link = github_helper.get_release_url(repository:, tag_name: previous_tag)
+                                  link = github_helper.get_release_url(repository: repository, tag_name: previous_tag)
                                   "[#{previous_tag}](#{link})"
                                 end
         changelog

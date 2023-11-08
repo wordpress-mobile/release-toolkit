@@ -22,8 +22,8 @@ describe Fastlane::Actions::RemoveBranchProtectionAction do
 
     run_described_fastlane_action(
       repository: repo,
-      branch:,
-      github_token:
+      branch: branch,
+      github_token: github_token
     )
   end
 
@@ -36,8 +36,8 @@ describe Fastlane::Actions::RemoveBranchProtectionAction do
 
     run_described_fastlane_action(
       repository: repo,
-      branch:,
-      github_token:
+      branch: branch,
+      github_token: github_token
     )
   end
 
@@ -48,8 +48,8 @@ describe Fastlane::Actions::RemoveBranchProtectionAction do
     expect do
       run_described_fastlane_action(
         repository: repo,
-        branch:,
-        github_token:
+        branch: branch,
+        github_token: github_token
       )
     end.to raise_error FastlaneCore::Interface::FastlaneError, "Branch `#{branch}` of repository `#{repo}` was not found."
   end

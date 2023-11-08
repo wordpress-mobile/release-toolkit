@@ -11,11 +11,11 @@ module Fastlane
         res_dir = File.join(project_root_folder || '.', params[:res_dir])
 
         Fastlane::Helper::Android::LocalizeHelper.create_available_languages_file(
-          res_dir:,
+          res_dir: res_dir,
           locale_codes: [params[:source_locale]] + params[:locales].map { |h| h[:android] }
         )
         Fastlane::Helper::Android::LocalizeHelper.download_from_glotpress(
-          res_dir:,
+          res_dir: res_dir,
           glotpress_project_url: params[:glotpress_url],
           glotpress_filters: params[:status_filter].map { |s| { status: s } },
           locales_map: params[:locales]
