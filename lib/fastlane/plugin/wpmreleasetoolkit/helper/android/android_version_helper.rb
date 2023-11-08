@@ -52,7 +52,7 @@ module Fastlane
           section = has_alpha_version.nil? ? 'defaultConfig' : 'vanilla {'
           name = get_version_name_from_gradle_file(build_gradle_path, section)
           code = get_version_build_from_gradle_file(build_gradle_path, section)
-          return { VERSION_NAME => name, VERSION_CODE => code }
+          { VERSION_NAME => name, VERSION_CODE => code }
         end
 
         # Extract the version name and code from the `version.properties` file in the project root
@@ -87,7 +87,7 @@ module Fastlane
           section = 'defaultConfig'
           name = get_version_name_from_gradle_file(build_gradle_path, section)
           code = get_version_build_from_gradle_file(build_gradle_path, section)
-          return { VERSION_NAME => name, VERSION_CODE => code }
+          { VERSION_NAME => name, VERSION_CODE => code }
         end
 
         # Determines if a version name corresponds to an alpha version (starts with `"alpha-"`` prefix)
@@ -280,7 +280,7 @@ module Fastlane
         #
         def self.bump_version_release(build_gradle_path:, version_properties_path:, has_alpha_version:)
           # Bump release
-          current_version = self.get_release_version(
+          current_version = get_release_version(
             build_gradle_path: build_gradle_path,
             version_properties_path: version_properties_path,
             has_alpha_version: has_alpha_version
@@ -312,8 +312,8 @@ module Fastlane
             end
             File.write(version_properties_path, content)
           else
-            self.update_version(new_version_beta, has_alpha_version.nil? ? 'defaultConfig' : 'vanilla {')
-            self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
+            update_version(new_version_beta, has_alpha_version.nil? ? 'defaultConfig' : 'vanilla {')
+            update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
           end
         end
 
