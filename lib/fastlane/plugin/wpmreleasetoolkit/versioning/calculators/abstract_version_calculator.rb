@@ -79,6 +79,16 @@ module Fastlane
 
           new_version
         end
+
+        # Calculate whether a release is a hotfix release.
+        #
+        # @param [AppVersion] version The version to check.
+        #
+        # @return [Boolean] Whether the release is a hotfix release.
+        #
+        def release_is_hotfix(version:)
+          version.patch.positive?
+        end
       end
     end
   end
