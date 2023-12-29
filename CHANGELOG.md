@@ -19,6 +19,8 @@ _None_
 ### Internal Changes
 
 - Added deprecation notices to any actions or methods using the `HAS_ALPHA_VERSION` environment variable [#522]
+- Added a deprecation notice to the `GitHelper.ensure_on_branch!` method [#531]
+- Added a deprecation notice to the `GitHelper.update_submodules` method [#531]
 
 ## 9.2.0
 
