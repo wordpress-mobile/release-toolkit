@@ -23,7 +23,10 @@ module Fastlane
 
         # Update submodules then lint translations
         unless params[:lint_task].nil? || params[:lint_task].empty?
-          Fastlane::Helper::GitHelper.update_submodules
+          git_submodule_update(
+            recursive: true,
+            init: true
+          )
           Action.sh('./gradlew', params[:lint_task])
         end
 

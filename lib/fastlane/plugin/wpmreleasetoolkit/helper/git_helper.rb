@@ -69,7 +69,10 @@ module Fastlane
 
       # Update every submodule in the current git repository
       #
+      # @deprecated This method is going to be removed soon because Fastlane has a built-in `git_submodule_update` that can be used instead
+      #
       def self.update_submodules
+        UI.message("DEPRECATED: This method will be removed soon. Please use Fastlane's `git_submodule_update` action instead.")
         Action.sh('git', 'submodule', 'update', '--init', '--recursive')
       end
 
