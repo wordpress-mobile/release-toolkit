@@ -7,7 +7,8 @@ module Fastlane
         require_relative '../../helper/ios/ios_git_helper'
         require_relative '../../helper/ios/ios_version_helper'
 
-        Fastlane::Helper::GitHelper.ensure_on_branch!('release')
+        # Verify that the current branch is a release branch. Notice that `ensure_git_branch` expects a RegEx parameter
+        ensure_git_branch(branch: '^release/')
         create_config
         show_config
 

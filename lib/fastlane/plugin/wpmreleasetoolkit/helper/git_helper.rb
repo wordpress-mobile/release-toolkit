@@ -69,10 +69,10 @@ module Fastlane
 
       # Update every submodule in the current git repository
       #
-      # @deprecated This method is going to be removed soon because Fastlane has a built-in `git_submodule_update` that can be used instead
+      # @deprecated This method is going to be removed soon. Fastlane has a built-in `git_submodule_update` action that can be used instead.
       #
       def self.update_submodules
-        UI.message("DEPRECATED: This method will be removed soon. Please use Fastlane's `git_submodule_update` action instead.")
+        UI.message("DEPRECATED: The `update_submodules` Release Toolkit method will be removed soon. Please use Fastlane's `git_submodule_update` action instead.")
         Action.sh('git', 'submodule', 'update', '--init', '--recursive')
       end
 
@@ -212,7 +212,10 @@ module Fastlane
       #
       # @raise [UserError] Raises a user_error! and interrupts the lane if we are not on the expected branch.
       #
+      # @deprecated This method is going to be removed soon. Fastlane has a built-in `ensure_git_branch` action that can be used instead.
+      #
       def self.ensure_on_branch!(branch_name)
+        UI.message("DEPRECATED: The `ensure_on_branch!` Release Toolkit method will be removed soon. Please use Fastlane's `ensure_git_branch` action instead.")
         current_branch_name = Action.sh('git', 'symbolic-ref', '-q', 'HEAD')
         UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)
       end
