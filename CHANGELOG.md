@@ -10,12 +10,22 @@ _None_
 
 ### New Features
 
-- Added optional `has_alpha_version` config item to actions that previously used the `HAS_ALPHA_VERSION` environment variable [#522]
-- Added a versioning method to check if a release is a hotfix [#530]
+_None_
 
 ### Bug Fixes
 
 _None_
+
+### Internal Changes
+
+_None_
+
+## 9.3.0
+
+### New Features
+
+- Added optional `has_alpha_version` config item to actions that previously used the `HAS_ALPHA_VERSION` environment variable [#522]
+- Added a versioning method to check if a release is a hotfix [#530]
 
 ### Internal Changes
 
