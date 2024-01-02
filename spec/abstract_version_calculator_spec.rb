@@ -53,14 +53,14 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::AbstractVersionCalculator do
   describe 'calculates whether a release is a hotfix' do
     it 'calculates that a hotfix release version is a hotfix' do
       version = Fastlane::Models::AppVersion.new(1, 0, 3, 0)
-      hotfix = described_class.new.release_is_hotfix(version: version)
+      hotfix = described_class.new.release_is_hotfix?(version: version)
 
       expect(hotfix).to be true
     end
 
     it 'calculates that a non-hotfix release version is not a hotfix' do
       version = Fastlane::Models::AppVersion.new(1, 2, 0, 4)
-      hotfix = described_class.new.release_is_hotfix(version: version)
+      hotfix = described_class.new.release_is_hotfix?(version: version)
 
       expect(hotfix).to be false
     end

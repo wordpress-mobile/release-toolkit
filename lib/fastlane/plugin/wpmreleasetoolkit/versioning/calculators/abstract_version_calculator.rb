@@ -86,7 +86,7 @@ module Fastlane
         #
         # @return [Boolean] Whether the release is a hotfix release.
         #
-        def release_is_hotfix(version:)
+        def release_is_hotfix?(version:)
           version.patch.positive?
         end
       end
