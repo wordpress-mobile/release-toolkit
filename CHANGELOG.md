@@ -11,6 +11,7 @@ _None_
 ### New Features
 
 - Added optional `has_alpha_version` config item to actions that previously used the `HAS_ALPHA_VERSION` environment variable [#522]
+- Added a versioning method to check if a release is a hotfix [#530]
 
 ### Bug Fixes
 
