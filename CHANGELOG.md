@@ -19,6 +19,7 @@ _None_
 ### Internal Changes
 
 - Added deprecation notices to any actions or methods using the `HAS_ALPHA_VERSION` environment variable [#522]
+- Use SwiftGen 6.6.2 to address an Apple Silicon CI issue [#534]
 
 ## 9.2.0
 
