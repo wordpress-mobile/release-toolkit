@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Updated QRCode generated images (for Prototype Build) to use https://goqr.me/api as a replacement to the now-discontinued Google service. [#537]
 
 ### Internal Changes
 
