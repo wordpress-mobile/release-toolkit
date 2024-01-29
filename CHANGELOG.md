@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Moves the mac-based parts of CI over to Apple Silicon. [#541]
 
 ## 9.3.1
 
