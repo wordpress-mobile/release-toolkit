@@ -12,6 +12,8 @@ module Fastlane
         pr_number = params[:pr_number]
         from_milestone = params[:from_milestone]
         to_milestone = params[:to_milestone]
+        pr_comment = params[:pr_comment]
+
         target_milestone = nil
         unless to_milestone.nil?
           target_milestone = github_helper.get_milestone(repository, to_milestone)
@@ -38,6 +40,13 @@ module Fastlane
             repository: repository,
             pr_number: pr_num,
             milestone: target_milestone
+          )
+          next if pr_comment.nil? || pr_comment.empty?
+
+          github_helper.comment_on_pr(
+            project_slug: repository,
+            pr_number: pr_num,
+            body: pr_comment
           )
         end
       end
@@ -77,6 +86,10 @@ module Fastlane
                                        conflicting_options: [:pr_number]),
           FastlaneCore::ConfigItem.new(key: :to_milestone,
                                        description: 'The version (milestone title\'s start) for the new milestone to assign to the targeted PRs. Pass nil to unset the milestone',
+                                       optional: true,
+                                       type: String),
+          FastlaneCore::ConfigItem.new(key: :pr_comment,
+                                       description: 'If non-nil, the custom comment to leave on each PR whose milestone has been updated',
                                        optional: true,
                                        type: String),
           Fastlane::Helper::GithubHelper.github_token_config_item,

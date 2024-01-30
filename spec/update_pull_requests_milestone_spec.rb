@@ -71,6 +71,49 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
 
       expect(result).to eq([101, 103])
     end
+
+    it 'adds a PR comment if one is provided' do
+      comment = 'Updated milestone from 12.2 to 12.3'
+      allow(client).to receive(:search_issues)
+        .with(%(repo:#{test_repo} type:pr milestone:"#{mock_milestone(12.2)[:title]}" is:open))
+        .and_return({ items: [101, 103].map { |n| mock_pr(n) } })
+      allow(client).to receive(:issue_comments).and_return([])
+
+      expect(client).to receive(:update_issue).with(test_repo, 101, { milestone: 123 })
+      expect(client).to receive(:add_comment).with(test_repo, 101, /<!-- REUSE_ID: .* -->#{comment}/)
+      expect(client).to receive(:update_issue).with(test_repo, 103, { milestone: 123 })
+      expect(client).to receive(:add_comment).with(test_repo, 103, /<!-- REUSE_ID: .* -->#{comment}/)
+
+      result = run_described_fastlane_action(
+        github_token: test_token,
+        repository: test_repo,
+        from_milestone: '12.2',
+        to_milestone: '12.3',
+        pr_comment: comment
+      )
+
+      expect(result).to eq([101, 103])
+    end
+
+    it 'does not add a PR comment if comment is empty' do
+      allow(client).to receive(:search_issues)
+        .with(%(repo:#{test_repo} type:pr milestone:"#{mock_milestone(12.2)[:title]}" is:open))
+        .and_return({ items: [101, 103].map { |n| mock_pr(n) } })
+
+      expect(client).to receive(:update_issue).with(test_repo, 101, { milestone: 123 })
+      expect(client).to receive(:update_issue).with(test_repo, 103, { milestone: 123 })
+      expect(client).not_to receive(:add_comment)
+
+      result = run_described_fastlane_action(
+        github_token: test_token,
+        repository: test_repo,
+        from_milestone: '12.2',
+        to_milestone: '12.3',
+        pr_comment: ''
+      )
+
+      expect(result).to eq([101, 103])
+    end
   end
 
   describe 'error handling' do
