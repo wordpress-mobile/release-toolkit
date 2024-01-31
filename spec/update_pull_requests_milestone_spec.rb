@@ -25,7 +25,7 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
     allow(Octokit::Client).to receive(:new).and_return(client)
   end
 
-  context 'when providing a single PR number' do
+  context 'when providing explicit PR numbers' do
     it 'updates the milestone of a single PR' do
       expect(client).to receive(:update_issue).with(test_repo, 1337, { milestone: 123 })
 
@@ -142,7 +142,7 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
       end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Unable to find target milestone matching version 99.9')
     end
 
-    it 'raises if both a source milestone and a pr_number were provided' do
+    it 'raises if both from_milestone and pr_numbers were provided' do
       expect do
         run_described_fastlane_action(
           github_token: test_token,
@@ -154,7 +154,7 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
       end.to raise_error(FastlaneCore::Interface::FastlaneError, %(Unresolved conflict between options: 'from_milestone' and 'pr_numbers'))
     end
 
-    it 'raises if neither a source milestone nor a pr_number was provided' do
+    it 'raises if neither from_milestone nor pr_numbers were provided' do
       expect do
         run_described_fastlane_action(
           github_token: test_token,
