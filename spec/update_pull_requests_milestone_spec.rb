@@ -32,11 +32,25 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
       result = run_described_fastlane_action(
         github_token: test_token,
         repository: test_repo,
-        pr_number: 1337,
+        pr_numbers: [1337],
         to_milestone: '12.3'
       )
 
       expect(result).to eq([1337])
+    end
+
+    it 'updates the milestone of provided PRs' do
+      expect(client).to receive(:update_issue).with(test_repo, 42, { milestone: 123 })
+      expect(client).to receive(:update_issue).with(test_repo, 1337, { milestone: 123 })
+
+      result = run_described_fastlane_action(
+        github_token: test_token,
+        repository: test_repo,
+        pr_numbers: [42, 1337],
+        to_milestone: '12.3'
+      )
+
+      expect(result).to eq([42, 1337])
     end
 
     it 'removes the milestone if to_milestone is nil' do
@@ -45,7 +59,7 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
       result = run_described_fastlane_action(
         github_token: test_token,
         repository: test_repo,
-        pr_number: 1337,
+        pr_numbers: [1337],
         to_milestone: nil
       )
 
@@ -134,10 +148,10 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
           github_token: test_token,
           repository: test_repo,
           from_milestone: '12.2',
-          pr_number: 1337,
+          pr_numbers: [1337],
           to_milestone: '12.3'
         )
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, %(Unresolved conflict between options: 'from_milestone' and 'pr_number'))
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, %(Unresolved conflict between options: 'from_milestone' and 'pr_numbers'))
     end
 
     it 'raises if neither a source milestone nor a pr_number was provided' do
@@ -147,7 +161,7 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
           repository: test_repo,
           to_milestone: '12.3'
         )
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'One of `pr_number` or `from_milestone` must be provided, to indicate which PR(s) to update')
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'One of `pr_numbers` or `from_milestone` must be provided to indicate which PR(s) to update')
     end
   end
 end

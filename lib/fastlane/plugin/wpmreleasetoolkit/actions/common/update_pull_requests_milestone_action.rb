@@ -9,7 +9,7 @@ module Fastlane
 
         github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
 
-        pr_number = params[:pr_number]
+        pr_numbers = params[:pr_numbers]
         from_milestone = params[:from_milestone]
         to_milestone = params[:to_milestone]
         pr_comment = params[:pr_comment]
@@ -20,8 +20,8 @@ module Fastlane
           UI.user_error!("Unable to find target milestone matching version #{to_milestone}") if target_milestone.nil?
         end
 
-        prs_nums = if pr_number
-                     [pr_number]
+        prs_nums = if pr_numbers
+                     pr_numbers
                    elsif from_milestone
                      # get the milestone object based on title starting text
                      m = github_helper.get_milestone(repository, from_milestone)
@@ -30,7 +30,7 @@ module Fastlane
                      # get all open PRs in that milestone
                      github_helper.get_prs_for_milestone(repository: repository, milestone: m).map(&:number)
                    else
-                     UI.user_error!('One of `pr_number` or `from_milestone` must be provided, to indicate which PR(s) to update')
+                     UI.user_error!('One of `pr_numbers` or `from_milestone` must be provided to indicate which PR(s) to update')
                    end
 
         UI.message("Updating milestone of #{prs_nums.count} PRs to `#{target_milestone&.title}`")
@@ -74,16 +74,16 @@ module Fastlane
                                        description: 'The remote path of the GH repository on which we work',
                                        optional: false,
                                        type: String),
-          FastlaneCore::ConfigItem.new(key: :pr_number,
-                                       description: 'The PR number to update the milestone of, if we only want to update a single PR',
+          FastlaneCore::ConfigItem.new(key: :pr_numbers,
+                                       description: 'The PR numbers to update the milestone of, if we only want to update a single PR',
                                        optional: true,
-                                       type: Integer,
+                                       type: Array,
                                        conflicting_options: [:from_milestone]),
           FastlaneCore::ConfigItem.new(key: :from_milestone,
                                        description: 'The version (milestone title\'s start) for which we want to update all open PRs of to a new milestone',
                                        optional: true,
                                        type: String,
-                                       conflicting_options: [:pr_number]),
+                                       conflicting_options: [:pr_numbers]),
           FastlaneCore::ConfigItem.new(key: :to_milestone,
                                        description: 'The version (milestone title\'s start) for the new milestone to assign to the targeted PRs. Pass nil to unset the milestone',
                                        optional: true,
