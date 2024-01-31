@@ -75,7 +75,7 @@ module Fastlane
                                        optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :pr_numbers,
-                                       description: 'The PR numbers to update the milestone of, if we only want to update a single PR',
+                                       description: 'The PR numbers to update the milestone of',
                                        optional: true,
                                        type: Array,
                                        conflicting_options: [:from_milestone]),
