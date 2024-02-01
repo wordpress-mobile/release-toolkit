@@ -20,7 +20,7 @@ The version in the `Gemfile.lock` (`#{gemfile_lock_version}`) doesn't match the 
 
 Please run `bundle install` to make sure they match.
 }
-  raise(message)
+  failure(message)
 end
 
 # Check that the PR contains changes to the CHANGELOG.md file.
