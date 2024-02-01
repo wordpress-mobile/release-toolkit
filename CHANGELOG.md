@@ -10,11 +10,21 @@ _None_
 
 ### New Features
 
-- Added `update_pull_requests_milestone` action, to move all still-opened PRs of a given milestone to another milestone. [#539]
+_None_
 
 ### Bug Fixes
 
 _None_
+
+### Internal Changes
+
+_None_
+
+## 9.4.0
+
+### New Features
+
+- Added `update_pull_requests_milestone` action, to move all still-opened PRs of a given milestone to another milestone. [#539]
 
 ### Internal Changes
 
