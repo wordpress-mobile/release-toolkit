@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-_None_
+- Upgraded the minimum required Ruby version to `3.2.2`. [#517]
 
 ### New Features
 
