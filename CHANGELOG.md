@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Added `update_pull_requests_milestone` action, to move all still-opened PRs of a given milestone to another milestone. [#539]
 
 ### Bug Fixes
 

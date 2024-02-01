@@ -25,25 +25,49 @@ module Fastlane
         @client.auto_paginate = true
       end
 
+      # @param [String] repository A GitHub repository slug
+      # @param [String] release The release version to find the milestone for.
+      # @note This relies on the `release` version string being at the start of the milestone's `title`
+      # @return [Sawyer::Resource] A milestone object in a repository, or nil if none matches
+      #
       def get_milestone(repository, release)
-        miles = client.list_milestones(repository)
-        mile = nil
-
-        miles&.each do |mm|
-          mile = mm if mm[:title].start_with?(release)
+        milestones = client.list_milestones(repository)
+        milestones&.reverse&.find do |m|
+          m[:title].start_with?(release)
         end
-
-        return mile
       end
 
       # Fetch all the PRs for a given milestone
       #
       # @param [String] repository The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`)
-      # @param [String] milestone The name of the milestone we want to fetch the list of PRs for (e.g.: `16.9`)
-      # @return [<Sawyer::Resource>] A list of the PRs for the given milestone, sorted by number
+      # @param [Sawyer::Resource, String] milestone The milestone object, or title of the milestone, we want to fetch the list of PRs for (e.g.: `16.9`)
+      # @param [Boolean] include_closed If set to true, will include both opened and closed PRs. Otherwise, will only include opened PRs.
+      # @return [Array<Sawyer::Resource>] A list of the PRs for the given milestone, sorted by number
       #
-      def get_prs_for_milestone(repository, milestone)
-        client.search_issues(%(type:pr milestone:"#{milestone}" repo:#{repository}))[:items].sort_by(&:number)
+      def get_prs_for_milestone(repository:, milestone:, include_closed: false)
+        milestone_title = milestone.is_a?(Sawyer::Resource) ? milestone.title : milestone
+        query = %(repo:#{repository} type:pr milestone:"#{milestone_title}")
+        query += ' is:open' unless include_closed
+
+        client.search_issues(query)[:items].sort_by(&:number)
+      end
+
+      # Set/Update the milestone assigned to a given PR or issue
+      #
+      # @param [String] repository The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`)
+      # @param [Integer] pr_number The PR (or issue) number to update the milestone of
+      # @param [Sawyer::Resource?, Integer?] milestone The milestone object or number to set on this PR, or nil to unset the milestone
+      # @note Use `get_milestone` to get a milestone object from a version number
+      # @raise [Fastlane::UI::Error] UI.user_error! if PR does not exist or milestone provided is invalid
+      #
+      def set_pr_milestone(repository:, pr_number:, milestone:)
+        milestone_num = milestone.is_a?(Sawyer::Resource) ? milestone.number : milestone
+
+        client.update_issue(repository, pr_number, { milestone: milestone_num })
+      rescue Octokit::NotFound
+        UI.user_error!("Could not find PR ##{pr_number} in #{repository}")
+      rescue Octokit::UnprocessableEntity
+        UI.user_error!("Invalid milestone #{milestone_num}")
       end
 
       def get_last_milestone(repository)

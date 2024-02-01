@@ -19,22 +19,13 @@ describe Fastlane::Actions::CopyBranchProtectionAction do
     JSON.parse(File.read(path), symbolize_names: true)
   end
 
-  def stub_response(hash)
-    stubs = Faraday::Adapter::Test::Stubs.new
-    agent = Sawyer::Agent.new 'http://release-toolkit.com/specs' do |conn|
-      conn.builder.handlers.delete(Faraday::Adapter::NetHttp)
-      conn.adapter :test, stubs
-    end
-    Sawyer::Resource.new(agent, hash)
-  end
-
   before do
     allow(Octokit::Client).to receive(:new).and_return(client)
   end
 
   it 'copies the branch protection settings when all parameters are valid' do
     existing_settings = fixture('existing_branch_protection.json')
-    allow(client).to receive(:branch_protection).with(repo, from_branch).and_return(stub_response(existing_settings))
+    allow(client).to receive(:branch_protection).with(repo, from_branch).and_return(sawyer_resource_stub(**existing_settings))
 
     new_settings = Fastlane::Helper::GithubHelper.branch_protection_api_response_to_normalized_hash(existing_settings)
     expect(client).to receive(:protect_branch).with(repo, to_branch, new_settings)
@@ -75,7 +66,7 @@ describe Fastlane::Actions::CopyBranchProtectionAction do
 
   it 'reports an error if the `to_branch` does not exist' do
     existing_settings = fixture('existing_branch_protection.json')
-    allow(client).to receive(:branch_protection).with(repo, from_branch).and_return(stub_response(existing_settings))
+    allow(client).to receive(:branch_protection).with(repo, from_branch).and_return(sawyer_resource_stub(**existing_settings))
     new_settings = Fastlane::Helper::GithubHelper.branch_protection_api_response_to_normalized_hash(existing_settings)
     allow(client).to receive(:protect_branch).with(repo, to_branch, new_settings).and_raise(Octokit::NotFound)
 
