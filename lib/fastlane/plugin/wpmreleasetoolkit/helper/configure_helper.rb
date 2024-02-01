@@ -193,7 +193,7 @@ module Fastlane
           end
         end
 
-        files_to_copy.map { |o| o.file } + expanded_file_dependencies
+        files_to_copy.map(&:file) + expanded_file_dependencies
       end
 
       ## If we specify a directory in `file_dependencies` instead of listing each file

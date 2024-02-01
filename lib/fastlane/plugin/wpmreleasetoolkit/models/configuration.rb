@@ -32,7 +32,7 @@ module Fastlane
         project_name: project_name,
         branch: branch,
         pinned_hash: pinned_hash,
-        files_to_copy: files_to_copy.map { |f| f.to_hash },
+        files_to_copy: files_to_copy.map(&:to_hash),
         file_dependencies: file_dependencies
       }
     end
