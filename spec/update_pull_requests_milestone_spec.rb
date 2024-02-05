@@ -87,16 +87,16 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
     end
 
     it 'adds a PR comment if one is provided' do
-      comment = 'Updated milestone from 12.2 to 12.3'
+      comment = 'Updated milestone from `12.2` to `12.3`'
       allow(client).to receive(:search_issues)
         .with(%(repo:#{test_repo} type:pr milestone:"#{mock_milestone(12.2)[:title]}" is:open))
         .and_return({ items: [101, 103].map { |n| mock_pr(n) } })
       allow(client).to receive(:issue_comments).and_return([])
 
       expect(client).to receive(:update_issue).with(test_repo, 101, { milestone: 123 })
-      expect(client).to receive(:add_comment).with(test_repo, 101, /<!-- REUSE_ID: .* -->#{comment}/)
+      expect(client).to receive(:add_comment).with(test_repo, 101, /<!-- REUSE_ID: .* -->\n\n#{Regexp.escape(comment)}/)
       expect(client).to receive(:update_issue).with(test_repo, 103, { milestone: 123 })
-      expect(client).to receive(:add_comment).with(test_repo, 103, /<!-- REUSE_ID: .* -->#{comment}/)
+      expect(client).to receive(:add_comment).with(test_repo, 103, /<!-- REUSE_ID: .* -->\n\n#{Regexp.escape(comment)}/)
 
       result = run_described_fastlane_action(
         github_token: test_token,

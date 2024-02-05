@@ -129,7 +129,7 @@ describe Fastlane::Helper::GithubHelper do
       )
     end
 
-    def mock_comment(body: '<!-- REUSE_ID: test-id --> Test', user_id: 1234)
+    def mock_comment(body: '<!-- REUSE_ID: test-id -->\n\nTest', user_id: 1234)
       instance_double('Comment', id: 1234, body: body, user: instance_double('User', id: user_id))
     end
   end
