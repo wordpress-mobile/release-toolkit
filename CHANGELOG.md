@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Fixed `comment_on_pr` to allow first paragraph of the comment to still be interpreted as Markdown. [#544]
 
 ### Internal Changes
 
