@@ -237,7 +237,7 @@ module Fastlane
           comment.user.id == client.user.id and comment.body.include?(reuse_marker)
         end
 
-        comment_body = reuse_marker + body
+        comment_body = "#{reuse_marker}\n\n#{body}"
 
         if existing_comment.nil?
           client.add_comment(project_slug, pr_number, comment_body)
