@@ -213,6 +213,10 @@ module Fastlane
       # @raise [UserError] Raises a user_error! and interrupts the lane if we are not on the expected branch.
       #
       # @deprecated This method is going to be removed soon. Fastlane has a built-in `ensure_git_branch` action that can be used instead.
+      #             After updating to Fastlane version `2.217.0` or later, the `FL_GIT_BRANCH_DONT_USE_ENV_VARS` environment
+      #             variable can be set to `true` to disable the use of environment variables for the `git_branch` action that
+      #             `ensure_git_branch` relies on. This will make `ensure_git_branch` work as expected in CI environments.
+      #             See https://github.com/fastlane/fastlane/pull/21597 for more details.
       #
       def self.ensure_on_branch!(branch_name)
         UI.message("DEPRECATED: The `ensure_on_branch!` Release Toolkit method will be removed soon. Please use Fastlane's `ensure_git_branch` action instead.")
