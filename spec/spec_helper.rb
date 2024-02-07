@@ -77,6 +77,22 @@ def run_described_fastlane_action(parameters)
   Fastlane::FastFile.new.parse(lane).runner.execute(:test)
 end
 
+# Create a stubbed `Sawyer::Resource` instance. Useful to stub tests expected to return values from the GitHub API.
+#
+# @param [Hash] fields The data / list of fields and values for this API response stub
+# @return [Sawyer::Response] a response object representing the provided hash
+#
+# @note Based on how Sawyer gem itself does testing in their own test suite
+# @see https://github.com/lostisland/sawyer/blob/f5f080d5c5260e094069139ffc7c13d0acba4ab5/test/resource_test.rb#L6-L12
+def sawyer_resource_stub(**fields)
+  stubs = Faraday::Adapter::Test::Stubs.new
+  agent = Sawyer::Agent.new 'http://release-toolkit.com/specs' do |conn|
+    conn.builder.handlers.delete(Faraday::Adapter::NetHttp)
+    conn.adapter :test, stubs
+  end
+  Sawyer::Resource.new(agent, fields)
+end
+
 # Executes the given block within an ad hoc temporary directory.
 def in_tmp_dir
   Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmpdir|

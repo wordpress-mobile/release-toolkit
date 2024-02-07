@@ -104,7 +104,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           app_center_release_id: '1337'
         )
         expect(comment).to include "<a href='https://install.appcenter.ms/orgs/My-Org/apps/My-App/releases/1337'>My-App #1337</a>"
-        expect(comment).to include 'https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FMy-Org%2Fapps%2FMy-App%2Freleases%2F1337&choe=UTF-8'
+        expect(comment).to include 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FMy-Org%2Fapps%2FMy-App%2Freleases%2F1337'
       end
 
       it 'uses the App Center link for the QR code even if a `download_url` is provided' do
@@ -116,7 +116,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           download_url: 'https://foo.cloudfront.net/someuuid/myapp-prototype-build-pr1337-a1b2c3f.apk'
         )
         expect(comment).to include "<td><b>Direct Download</b></td><td><a href='https://foo.cloudfront.net/someuuid/myapp-prototype-build-pr1337-a1b2c3f.apk'><code>myapp-prototype-build-pr1337-a1b2c3f.apk</code></a></td>"
-        expect(comment).to include 'https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FMy-Org%2Fapps%2FMy-App%2Freleases%2F1337&choe=UTF-8'
+        expect(comment).to include 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FMy-Org%2Fapps%2FMy-App%2Freleases%2F1337'
         # Inferred metadata rows: App Name, Commit, Direct Download, App Center Build
         expect(comment).to include "<td rowspan='4'"
       end
@@ -176,7 +176,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           <p>📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</p>
           <table>
           <tr>
-            <td rowspan='6' width='260px'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FBestApp%2Freleases%2F8888&choe=UTF-8' width='250' height='250' /></td>
+            <td rowspan='6' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FBestApp%2Freleases%2F8888' width='250' height='250' /></td>
             <td><b>App Name</b></td><td> The Best App</td>
           </tr>
           <tr><td><b>Version:Short</b></td><td>28.2</td></tr>
@@ -208,7 +208,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           <p>📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</p>
           <table>
           <tr>
-            <td rowspan='6' width='260px'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FBestApp%2Freleases%2F8888&choe=UTF-8' width='250' height='250' /></td>
+            <td rowspan='6' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FBestApp%2Freleases%2F8888' width='250' height='250' /></td>
             <td><b>App Name</b></td><td> The Best App</td>
           </tr>
           <tr><td><b>Version:Short</b></td><td>28.2</td></tr>
@@ -243,7 +243,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           <details><summary>📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</summary>
           <table>
           <tr>
-            <td rowspan='7' width='260px'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FBestApp%2Freleases%2F1234&choe=UTF-8' width='250' height='250' /></td>
+            <td rowspan='7' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FBestApp%2Freleases%2F1234' width='250' height='250' /></td>
             <td><b>App Name</b></td><td> The Best App</td>
           </tr>
           <tr><td><b>Version:Short</b></td><td>28.2</td></tr>
@@ -286,7 +286,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           app_center_org_name: 'My-Org'
         )
         expect(comment).to include "<a href='https://install.appcenter.ms/orgs/My-Org/apps/My-App-Alpha/releases/1337'>My App (Alpha) #1337</a>"
-        expect(comment).to include 'https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FMy-Org%2Fapps%2FMy-App-Alpha%2Freleases%2F1337&choe=UTF-8'
+        expect(comment).to include 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FMy-Org%2Fapps%2FMy-App-Alpha%2Freleases%2F1337'
       end
 
       it 'uses the App Center link for the QR code even if a `download_url` is provided' do
@@ -295,7 +295,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           app_center_org_name: 'My-Org',
           download_url: 'https://foo.cloudfront.net/someuuid/myapp-prototype-build-pr1337-a1b2c3f.apk'
         )
-        expect(comment).to include 'https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FMy-Org%2Fapps%2FMy-App-Alpha%2Freleases%2F1337&choe=UTF-8'
+        expect(comment).to include 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FMy-Org%2Fapps%2FMy-App-Alpha%2Freleases%2F1337'
         # Inferred metadata rows: App Name, Build Number, Version, Application ID, Commit, Direct Download, App Center Build
         expect(comment).to include "<td rowspan='7'"
       end
@@ -386,7 +386,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           <p><img alt='The Best App' align='top' src='https://assets.appcenter.ms/My-App-Alpha/1337/icon.png' width='20px' />📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</p>
           <table>
           <tr>
-            <td rowspan='7' width='260px'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FMy-App-Alpha%2Freleases%2F1337&choe=UTF-8' width='250' height='250' /></td>
+            <td rowspan='7' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FMy-App-Alpha%2Freleases%2F1337' width='250' height='250' /></td>
             <td><b>App Name</b></td><td><img alt='The Best App' align='top' src='https://assets.appcenter.ms/My-App-Alpha/1337/icon.png' width='20px' /> The Best App</td>
           </tr>
           <tr><td><b>Configuration</b></td><td>Debug</td></tr>
@@ -411,7 +411,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           <p><img alt='The Best App' align='top' src='https://assets.appcenter.ms/My-App-Alpha/1337/icon.png' width='20px' />📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</p>
           <table>
           <tr>
-            <td rowspan='7' width='260px'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FMy-App-Alpha%2Freleases%2F1337&choe=UTF-8' width='250' height='250' /></td>
+            <td rowspan='7' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FMy-App-Alpha%2Freleases%2F1337' width='250' height='250' /></td>
             <td><b>App Name</b></td><td><img alt='The Best App' align='top' src='https://assets.appcenter.ms/My-App-Alpha/1337/icon.png' width='20px' /> The Best App</td>
           </tr>
           <tr><td><b>Build Number</b></td><td>1287003</td></tr>
@@ -442,7 +442,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           <details><summary><img alt='The Best App' align='top' src='https://assets.appcenter.ms/My-App-Alpha/1337/icon.png' width='20px' />📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</summary>
           <table>
           <tr>
-            <td rowspan='7' width='260px'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FMy-App-Alpha%2Freleases%2F1337&choe=UTF-8' width='250' height='250' /></td>
+            <td rowspan='7' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Finstall.appcenter.ms%2Forgs%2FBestOrg%2Fapps%2FMy-App-Alpha%2Freleases%2F1337' width='250' height='250' /></td>
             <td><b>App Name</b></td><td><img alt='The Best App' align='top' src='https://assets.appcenter.ms/My-App-Alpha/1337/icon.png' width='20px' /> The Best App</td>
           </tr>
           <tr><td><b>Google Login</b></td><td>Disabled</td></tr>
@@ -474,7 +474,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           app_display_name: 'My App',
           download_url: 'https://foo.cloudfront.net/someuuid/myapp-prototype-build-pr1337-a1b2c3f.apk'
         )
-        expect(comment).to include 'https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Ffoo.cloudfront.net%2Fsomeuuid%2Fmyapp-prototype-build-pr1337-a1b2c3f.apk&choe=UTF-8'
+        expect(comment).to include 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Ffoo.cloudfront.net%2Fsomeuuid%2Fmyapp-prototype-build-pr1337-a1b2c3f.apk'
       end
 
       it 'includes the direct link as metadata' do
@@ -522,7 +522,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           <p>📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</p>
           <table>
           <tr>
-            <td rowspan='6' width='260px'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Fbestfront.cloudfront.net%2Ffeed42%2Fbestapp-pr1357-a1b2c3f.apk&choe=UTF-8' width='250' height='250' /></td>
+            <td rowspan='6' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Fbestfront.cloudfront.net%2Ffeed42%2Fbestapp-pr1357-a1b2c3f.apk' width='250' height='250' /></td>
             <td><b>App Name</b></td><td> The Best App</td>
           </tr>
           <tr><td><b>Version Name</b></td><td>28.2</td></tr>
@@ -555,7 +555,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           <details><summary>📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</summary>
           <table>
           <tr>
-            <td rowspan='7' width='260px'><img src='https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=https%3A%2F%2Fbestfront.cloudfront.net%2Ffeed42%2Fbestapp-pr1357-a1b2c3f.apk&choe=UTF-8' width='250' height='250' /></td>
+            <td rowspan='7' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Fbestfront.cloudfront.net%2Ffeed42%2Fbestapp-pr1357-a1b2c3f.apk' width='250' height='250' /></td>
             <td><b>App Name</b></td><td> The Best App</td>
           </tr>
           <tr><td><b>Version Name</b></td><td>28.2</td></tr>

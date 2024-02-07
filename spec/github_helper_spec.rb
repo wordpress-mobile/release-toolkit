@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'webmock/rspec'
 
 describe Fastlane::Helper::GithubHelper do
-  describe 'download_file_from_tag' do
+  describe '#download_file_from_tag' do
     let(:test_repo) { 'repo-test/project-test' }
     let(:test_tag) { '1.0' }
     let(:test_file) { 'test-folder/test-file.xml' }
@@ -44,7 +44,7 @@ describe Fastlane::Helper::GithubHelper do
     end
   end
 
-  describe 'get_last_milestone' do
+  describe '#get_last_milestone' do
     let(:test_repo) { 'repo-test/project-test' }
     let(:last_stone) { mock_milestone('10.0') }
     let(:client) do
@@ -76,7 +76,7 @@ describe Fastlane::Helper::GithubHelper do
     end
   end
 
-  describe 'comment_on_pr' do
+  describe '#comment_on_pr' do
     let(:client) do
       instance_double(
         Octokit::Client,
@@ -129,7 +129,7 @@ describe Fastlane::Helper::GithubHelper do
       )
     end
 
-    def mock_comment(body: '<!-- REUSE_ID: test-id --> Test', user_id: 1234)
+    def mock_comment(body: '<!-- REUSE_ID: test-id -->\n\nTest', user_id: 1234)
       instance_double('Comment', id: 1234, body: body, user: instance_double('User', id: user_id))
     end
   end
@@ -150,7 +150,7 @@ describe Fastlane::Helper::GithubHelper do
     end
   end
 
-  describe 'get_milestone' do
+  describe '#get_milestone' do
     let(:test_repo) { 'repo-test/project-test' }
     let(:test_milestones) { [{ title: '9.8' }, { title: '10.1' }, { title: '10.1.3 ❄️' }] }
     let(:client) do
@@ -200,7 +200,114 @@ describe Fastlane::Helper::GithubHelper do
     end
   end
 
-  describe 'create_milestone' do
+  describe '#get_prs_for_milestone' do
+    let(:test_repo) { 'repo-test/project-test' }
+    let(:client) do
+      instance_double(
+        Octokit::Client,
+        user: instance_double('User', name: 'test'),
+        'auto_paginate=': nil
+      )
+    end
+    let(:helper) do
+      described_class.new(github_token: 'Fake-GitHubToken-123')
+    end
+
+    before do
+      allow(Octokit::Client).to receive(:new).and_return(client)
+    end
+
+    it 'returns only opened PRs for a given milestone by default' do
+      search_results = [101, 103].map { |num| sawyer_resource_stub(number: num) }
+      allow(client).to receive(:search_issues)
+        .with(%(repo:#{test_repo} type:pr milestone:"12.3 New Version" is:open))
+        .and_return({ items: search_results })
+
+      result = helper.get_prs_for_milestone(repository: test_repo, milestone: '12.3 New Version')
+      expect(result).to eq(search_results)
+    end
+
+    it 'returns only opened PRs for a given milestone if include_closed is false' do
+      search_results = [101, 103].map { |num| sawyer_resource_stub(number: num) }
+      allow(client).to receive(:search_issues)
+        .with(%(repo:#{test_repo} type:pr milestone:"12.3 New Version" is:open))
+        .and_return({ items: search_results })
+
+      result = helper.get_prs_for_milestone(repository: test_repo, milestone: '12.3 New Version', include_closed: false)
+      expect(result).to eq(search_results)
+    end
+
+    it 'returns both opened and closed PRs of a milestone if include_closed is true' do
+      search_results = [101, 102, 103, 104].map { |num| sawyer_resource_stub(number: num) }
+      allow(client).to receive(:search_issues)
+        .with(%(repo:#{test_repo} type:pr milestone:"12.3 New Version"))
+        .and_return({ items: search_results })
+
+      result = helper.get_prs_for_milestone(repository: test_repo, milestone: '12.3 New Version', include_closed: true)
+      expect(result).to eq(search_results)
+    end
+  end
+
+  describe '#set_pr_milestone' do
+    let(:test_repo) { 'repo-test/project-test' }
+    let(:client) do
+      instance_double(
+        Octokit::Client,
+        user: instance_double('User', name: 'test'),
+        'auto_paginate=': nil
+      )
+    end
+    let(:helper) do
+      described_class.new(github_token: 'Fake-GitHubToken-123')
+    end
+
+    before do
+      allow(Octokit::Client).to receive(:new).and_return(client)
+    end
+
+    it 'updates the milestone as expected when everything is OK' do
+      allow(client).to receive(:update_issue)
+        .with(test_repo, 1337, { milestone: 42 })
+        .and_return(sawyer_resource_stub(number: 1337))
+
+      result = helper.set_pr_milestone(
+        repository: test_repo,
+        pr_number: 1337,
+        milestone: 42
+      )
+      expect(result&.number).to eq(1337)
+    end
+
+    it 'raises a user_error! if PR number does not exist' do
+      allow(client).to receive(:update_issue)
+        .with(test_repo, 1337, { milestone: 42 })
+        .and_raise(Octokit::NotFound)
+
+      expect do
+        helper.set_pr_milestone(
+          repository: test_repo,
+          pr_number: 1337,
+          milestone: 42
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not find PR #1337 in #{test_repo}")
+    end
+
+    it 'raises a user_error! if the source milestone could not be found' do
+      allow(client).to receive(:update_issue)
+        .with(test_repo, 1337, { milestone: 42 })
+        .and_raise(Octokit::UnprocessableEntity)
+
+      expect do
+        helper.set_pr_milestone(
+          repository: test_repo,
+          pr_number: 1337,
+          milestone: 42
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Invalid milestone 42')
+    end
+  end
+
+  describe '#create_milestone' do
     let(:test_repo) { 'repo-test/project-test' }
     let(:test_milestone_number) { '10.0' }
     let(:test_milestone_duedate) { '2022-10-22T23:39:01Z' }
@@ -377,7 +484,7 @@ describe Fastlane::Helper::GithubHelper do
     end
   end
 
-  describe 'create_release' do
+  describe '#create_release' do
     let(:test_repo) { 'repo-test/project-test' }
     let(:test_tag) { '1.0' }
     let(:test_target) { 'dummysha123456' }
@@ -442,7 +549,7 @@ describe Fastlane::Helper::GithubHelper do
     end
   end
 
-  describe 'github_token_config_item' do
+  describe '#github_token_config_item' do
     it 'has the correct key' do
       expect(described_class.github_token_config_item.key).to eq(:github_token)
     end

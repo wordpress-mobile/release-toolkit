@@ -90,7 +90,7 @@ module Fastlane
           extra_metadata['App Center Build'] = "<a href='#{install_url}'>#{app_center_info.display_name} ##{app_center_info.release_id}</a>"
         end
         UI.user_error!(NO_INSTALL_URL_ERROR_MESSAGE) if install_url.nil?
-        qr_code_url = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=#{CGI.escape(install_url)}&choe=UTF-8"
+        qr_code_url = "https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=#{CGI.escape(install_url)}"
         [qr_code_url, extra_metadata]
       end
 

@@ -10,17 +10,44 @@ _None_
 
 ### New Features
 
-- Added optional `has_alpha_version` config item to actions that previously used the `HAS_ALPHA_VERSION` environment variable [#522]
+_None_
 
 ### Bug Fixes
 
-_None_
+- Fixed `comment_on_pr` to allow first paragraph of the comment to still be interpreted as Markdown. [#544]
+
+### Internal Changes
+
+- Added a deprecation notice to the `GitHelper.ensure_on_branch!` method [#531]
+- Added a deprecation notice to the `GitHelper.update_submodules` method [#531]
+
+## 9.4.0
+
+### New Features
+
+- Added `update_pull_requests_milestone` action, to move all still-opened PRs of a given milestone to another milestone. [#539]
+
+### Internal Changes
+
+- Moves the mac-based parts of CI over to Apple Silicon. [#541]
+
+## 9.3.1
+
+### Bug Fixes
+
+- Updated QRCode generated images (for Prototype Build) to use https://goqr.me/api as a replacement to the now-discontinued Google service. [#537]
+
+## 9.3.0
+
+### New Features
+
+- Added optional `has_alpha_version` config item to actions that previously used the `HAS_ALPHA_VERSION` environment variable [#522]
+- Added a versioning method to check if a release is a hotfix [#530]
 
 ### Internal Changes
 
 - Added deprecation notices to any actions or methods using the `HAS_ALPHA_VERSION` environment variable [#522]
-- Added a deprecation notice to the `GitHelper.ensure_on_branch!` method [#531]
-- Added a deprecation notice to the `GitHelper.update_submodules` method [#531]
+- Use SwiftGen 6.6.2 to address an Apple Silicon CI issue [#534]
 
 ## 9.2.0
 
