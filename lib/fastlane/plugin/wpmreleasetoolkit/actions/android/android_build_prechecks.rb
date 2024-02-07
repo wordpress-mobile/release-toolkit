@@ -7,7 +7,8 @@ module Fastlane
 
         UI.user_error!("Can't build beta and final at the same time!") if params[:final] && params[:beta]
 
-        Fastlane::Helper::GitHelper.ensure_on_branch!('release') unless other_action.is_ci
+        # Verify that the current branch is a release branch. Notice that `ensure_git_branch` expects a RegEx parameter
+        ensure_git_branch(branch: '^release/') unless other_action.is_ci
 
         has_alpha_version = params[:has_alpha_version]
         project_root_folder = params[:project_root_folder]

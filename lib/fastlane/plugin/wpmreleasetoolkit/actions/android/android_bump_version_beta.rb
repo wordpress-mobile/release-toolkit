@@ -7,7 +7,8 @@ module Fastlane
         require_relative '../../helper/android/android_git_helper'
         require_relative '../../helper/android/android_version_helper'
 
-        Fastlane::Helper::GitHelper.ensure_on_branch!('release')
+        # Verify that the current branch is a release branch. Notice that `ensure_git_branch` expects a RegEx parameter
+        ensure_git_branch(branch: '^release/')
 
         has_alpha_version = params[:has_alpha_version]
         project_root_folder = params[:project_root_folder]

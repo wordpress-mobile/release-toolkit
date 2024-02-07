@@ -18,7 +18,8 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Added a deprecation notice to the `GitHelper.ensure_on_branch!` method [#531]
+- Added a deprecation notice to the `GitHelper.update_submodules` method [#531]
 
 ## 9.4.0
 
