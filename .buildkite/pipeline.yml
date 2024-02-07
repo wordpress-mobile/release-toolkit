@@ -13,13 +13,6 @@ common_params:
         propagate-environment: true
         environment:
           - "RUBYGEMS_API_KEY"
-    - &docker_plugin_with_danger_token
-      docker#v5.8.0:
-        image: *ruby_version
-        propagate-environment: true
-        environment:
-          - "DANGER_GITHUB_API_TOKEN"
-
 
 steps:
   #################
@@ -56,20 +49,6 @@ steps:
               - 3.2.2
 
   #################
-  # Danger
-  #################
-  - label: "☢️ Danger - PR Check"
-    key: danger
-    command: .buildkite/commands/danger-pr-check.sh
-    plugins: [*docker_plugin_with_danger_token]
-    agents:
-      queue: "default"
-    retry:
-      manual:
-        permit_on_passed: true
-    if: "build.pull_request.id != null"
-
-  #################
   # Push to RubyGems
   #################
   - label: ":rubygems: Publish to RubyGems"
@@ -78,7 +57,6 @@ steps:
     depends_on:
      - test
      - rubocop
-     - danger
     # Note: We intentionally call a separate `.sh` script here (as opposed to having all the
     # commands written inline) to avoid leaking a key used in the process in clear in the
     # BUILDKITE_COMMAND environment variable.
