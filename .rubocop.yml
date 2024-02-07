@@ -49,14 +49,14 @@ Style/AsciiComments:
 # which would be incorrect and not what we want
 Style/StringConcatenation:
   Enabled: false
-  
+
 # This rule was enforced after upgrading Rubocop from `1.22.1` to `1.50.2`. We are disabling this rule for the
 # time being so that we don't see any unexpected behavior when running Release Toolkit actions that could be
 # changed by this rule. See https://github.com/wordpress-mobile/release-toolkit/pull/464#pullrequestreview-1396569629
 # for more discussion
 Style/FetchEnvVar:
   Enabled: false
-  
+
 ########## Gemspec Rules
 
 # This was turned on by default after updating Rubocop to `1.50.2`. We want to disable this for now because

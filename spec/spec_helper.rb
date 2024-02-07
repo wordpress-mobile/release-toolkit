@@ -115,6 +115,24 @@ def with_tmp_file(named: nil, content: '')
   end
 end
 
+def version(major:, minor:, patch: 0, rc_number: nil)
+  Fastlane::Helper::Version.new(
+    major: major,
+    minor: minor,
+    patch: patch,
+    rc_number: rc_number
+  )
+end
+
+Commit = Struct.new(:sha, :date, keyword_init: true)
+
+def mock_commit(sha: 'abcdef123456', date: DateTime.now)
+  Commit.new(
+    sha: sha,
+    date: date
+  )
+end
+
 # File Path Helpers
 EMPTY_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'empty.json')
 PASSED_FIREBASE_TEST_LOG_PATH = File.join(__dir__, 'test-data', 'firebase', 'firebase-test-lab-run-passed.log')
