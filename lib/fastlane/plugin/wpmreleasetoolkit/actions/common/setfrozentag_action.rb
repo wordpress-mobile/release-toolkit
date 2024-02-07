@@ -35,7 +35,7 @@ module Fastlane
       def self.is_frozen(milestone)
         return milestone[:title].include?('❄️') unless milestone.nil?
 
-        return false
+        false
       end
 
       def self.description

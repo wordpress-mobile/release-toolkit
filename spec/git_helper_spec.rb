@@ -1,8 +1,8 @@
 require 'tmpdir'
-require_relative './spec_helper'
+require_relative 'spec_helper'
 
 describe Fastlane::Helper::GitHelper do
-  before(:each) do
+  before do
     @path = Dir.mktmpdir
     @tmp = Dir.pwd
     Dir.chdir(@path)
@@ -10,7 +10,7 @@ describe Fastlane::Helper::GitHelper do
     allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true)
   end
 
-  after(:each) do
+  after do
     Dir.chdir(@tmp)
     FileUtils.rm_rf(@path)
   end
@@ -67,7 +67,7 @@ describe Fastlane::Helper::GitHelper do
   end
 
   context('commit(message:, files:)') do
-    before(:each) do
+    before do
       allow_fastlane_action_sh
       @message = 'Some commit message with spaces'
     end

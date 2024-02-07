@@ -40,13 +40,12 @@ module Fastlane
         repo_branch_name = Fastlane::Helper::ConfigureHelper.repo_branch_name
         file_branch_name = Fastlane::Helper::ConfigureHelper.configure_file_branch_name
 
-        unless repo_branch_name == file_branch_name
+        return if repo_branch_name == file_branch_name
 
-          UI.user_error!([
-            'The branch specified in `.configure` is not the currently checked out branch in the secrets repository.',
-            "To fix this issue, switch back to the `#{file_branch_name}` branch in the mobile secrets repository.",
-          ].join("\n"))
-        end
+        UI.user_error!([
+          'The branch specified in `.configure` is not the currently checked out branch in the secrets repository.',
+          "To fix this issue, switch back to the `#{file_branch_name}` branch in the mobile secrets repository.",
+        ].join("\n"))
       end
 
       ### Validate that the pinned hash specified in .configure matches
@@ -55,13 +54,12 @@ module Fastlane
         repo_hash = Fastlane::Helper::ConfigureHelper.repo_commit_hash
         file_hash = Fastlane::Helper::ConfigureHelper.configure_file_commit_hash
 
-        unless repo_hash == file_hash
+        return if repo_hash == file_hash
 
-          UI.user_error!([
-            'The pinned_hash specified in `.configure` is not the currently checked out hash in the secrets repository.',
-            "To fix this issue, check out the `#{file_hash}` hash in the mobile secrets repository.",
-          ].join("\n"))
-        end
+        UI.user_error!([
+          'The pinned_hash specified in `.configure` is not the currently checked out hash in the secrets repository.',
+          "To fix this issue, check out the `#{file_hash}` hash in the mobile secrets repository.",
+        ].join("\n"))
       end
 
       ### Validate that based on the commit hash in the .configure file, no files have changed

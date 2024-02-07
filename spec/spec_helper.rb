@@ -51,13 +51,13 @@ end
 # @param [String] output The output string to expect as a result of running the command. Defaults to "".
 # @return [MessageExpectation] self, to support further chaining.
 #
-def expect_shell_command(*command, exitstatus: 0, output: '')
+def expect_shell_command(*, exitstatus: 0, output: '')
   mock_input = double(:input)
   mock_output = StringIO.new(output)
   mock_status = double(:status, exitstatus: exitstatus)
   mock_thread = double(:thread, value: mock_status)
 
-  expect(Open3).to receive(:popen2e).with(*command).and_yield(mock_input, mock_output, mock_thread)
+  expect(Open3).to receive(:popen2e).with(*).and_yield(mock_input, mock_output, mock_thread)
 end
 
 # If the `described_class` of a spec is a `Fastlane::Action` subclass, it runs it with the given parameters.

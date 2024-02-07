@@ -1,4 +1,4 @@
-require_relative './spec_helper'
+require_relative 'spec_helper'
 
 describe Fastlane::Helper::AppSizeMetricsHelper do
   describe '#to_h' do

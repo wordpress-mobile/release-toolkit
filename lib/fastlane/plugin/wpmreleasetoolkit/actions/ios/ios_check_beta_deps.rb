@@ -10,7 +10,7 @@ module Fastlane
           beta_pods << li if li.match('^\s*\t*pod.*beta')
         end
 
-        if beta_pods.count == 0
+        if beta_pods.count.zero?
           UI.message('No beta pods found. You can continue with the code freeze.')
         else
           message = "The following pods are still in beta:\n"
@@ -55,7 +55,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
     end
   end

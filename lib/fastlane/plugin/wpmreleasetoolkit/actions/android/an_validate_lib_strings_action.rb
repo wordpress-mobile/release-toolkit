@@ -14,8 +14,6 @@ module Fastlane
           data = open(params[:diff_url])
           source_diff = data.read
         end
-
-        any_error = false
         libraries_strings_path.each do |lib|
           Fastlane::Helper::Android::LocalizeHelper.verify_lib(main_strings_path, lib, source_diff)
         end
@@ -68,7 +66,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        return platform == :android
+        platform == :android
       end
     end
   end

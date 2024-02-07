@@ -30,9 +30,9 @@ module Fastlane
           return nil unless status.success?
 
           case format_desc
-          when /Apple binary property list/ then return :binary
-          when /XML/ then return :xml
-          when /text/ then return :text
+          when /Apple binary property list/ then :binary
+          when /XML/ then :xml
+          when /text/ then :text
           end
         end
 
@@ -173,7 +173,7 @@ module Fastlane
           rescue StandardError => e
             UI.error "Error downloading locale `#{locale}` — #{e.message} (#{uri})"
             retry if e.is_a?(OpenURI::HTTPError) && UI.confirm("Retry downloading `#{locale}`?")
-            return nil
+            nil
           end
         end
       end

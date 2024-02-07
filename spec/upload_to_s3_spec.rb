@@ -1,4 +1,4 @@
-require_relative './spec_helper'
+require_relative 'spec_helper'
 
 describe Fastlane::Actions::UploadToS3Action do
   let(:client) { instance_double(Aws::S3::Client) }

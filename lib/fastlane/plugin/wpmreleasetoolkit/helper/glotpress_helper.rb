@@ -72,7 +72,7 @@ module Fastlane
         # 2. Match the info and extract the value in group 1.
         # 3. Values use comma as thousands separator, so remove it.
         # 4. Convert to integer.
-        data.grep(/#{regex}/)[0].match(/#{regex}/)[1].gsub(/,/, '').to_i
+        data.grep(/#{regex}/)[0].match(/#{regex}/)[1].gsub(',', '').to_i
       end
     end
   end

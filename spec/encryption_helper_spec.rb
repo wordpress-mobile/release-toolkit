@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Fastlane::Helper::EncryptionHelper do
   let(:cipher) { double('cipher') }
 
-  before(:each) do
+  before do
     allow(OpenSSL::Cipher).to receive(:new).with('aes-256-cbc').and_return(cipher)
   end
 

@@ -71,7 +71,7 @@ class ChangelogParser
     @current_index = offset.nil? ? -1 : start_idx + offset
 
     m = regex.match(@lines[@current_index])
-    return [@lines[start_idx...@current_index], m[1].length, m[2]]
+    [@lines[start_idx...@current_index], m[1].length, m[2]]
   end
 
   def read_up_to_end

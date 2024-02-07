@@ -1,5 +1,5 @@
 require 'tmpdir'
-require_relative './spec_helper'
+require_relative 'spec_helper'
 
 describe Fastlane::Helper::StandardMetadataBlock do
   it 'strips any trailing newline when generating the block for a single-line input' do

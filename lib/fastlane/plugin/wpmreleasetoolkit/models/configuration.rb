@@ -15,7 +15,7 @@ module Fastlane
 
     def self.from_file(path)
       json = JSON.parse(File.read(path), symbolize_names: true)
-      self.new(json)
+      new(json)
     end
 
     def save_to_file(path)
@@ -24,16 +24,16 @@ module Fastlane
 
     def add_file_to_copy(source, destination, encrypt: false)
       file = FileReference.new(file: source, destination: destination, encrypt: encrypt)
-      self.files_to_copy << file
+      files_to_copy << file
     end
 
     def to_hash
       {
-        project_name: self.project_name,
-        branch: self.branch,
-        pinned_hash: self.pinned_hash,
-        files_to_copy: self.files_to_copy.map { |f| f.to_hash },
-        file_dependencies: self.file_dependencies
+        project_name: project_name,
+        branch: branch,
+        pinned_hash: pinned_hash,
+        files_to_copy: files_to_copy.map(&:to_hash),
+        file_dependencies: file_dependencies
       }
     end
   end

@@ -1,4 +1,4 @@
-require_relative './spec_helper'
+require_relative 'spec_helper'
 
 describe Fastlane::Helper::Ios::GitHelper do
   describe '#get_from_env!' do

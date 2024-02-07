@@ -5,7 +5,7 @@ module Fastlane
         violations = nil
 
         loop do
-          violations = self.run_linter(params)
+          violations = run_linter(params)
           violations.default = [] # Set the default value for when querying a missing key
 
           if params[:check_duplicate_keys]
@@ -60,7 +60,7 @@ module Fastlane
           else
             UI.important <<~WRONG_FORMAT
               File `#{path}` is in #{file_type} format, while finding duplicate keys only make sense on files that are in ASCII-plist format.
-              Since your files are in #{file_type} format, you should probably disable the `check_duplicate_keys` option from this `#{self.action_name}` call.
+              Since your files are in #{file_type} format, you should probably disable the `check_duplicate_keys` option from this `#{action_name}` call.
             WRONG_FORMAT
           end
         end
@@ -201,7 +201,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
     end
   end

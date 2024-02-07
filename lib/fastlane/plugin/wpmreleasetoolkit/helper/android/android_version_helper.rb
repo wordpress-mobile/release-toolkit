@@ -52,7 +52,7 @@ module Fastlane
           section = has_alpha_version.nil? ? 'defaultConfig' : 'vanilla {'
           name = get_version_name_from_gradle_file(build_gradle_path, section)
           code = get_version_build_from_gradle_file(build_gradle_path, section)
-          return { VERSION_NAME => name, VERSION_CODE => code }
+          { VERSION_NAME => name, VERSION_CODE => code }
         end
 
         # Extract the version name and code from the `version.properties` file in the project root
@@ -71,7 +71,7 @@ module Fastlane
           name = text.match(/#{version_name_key}=(\S*)/m)&.captures&.first
           code = text.match(/#{version_code_key}=(\S*)/m)&.captures&.first
 
-          return name.nil? || code.nil? ? nil : { VERSION_NAME => name, VERSION_CODE => code.to_i }
+          name.nil? || code.nil? ? nil : { VERSION_NAME => name, VERSION_CODE => code.to_i }
         end
 
         # Extract the version name and code from the `version.properties` file in the project root
@@ -87,7 +87,7 @@ module Fastlane
           section = 'defaultConfig'
           name = get_version_name_from_gradle_file(build_gradle_path, section)
           code = get_version_build_from_gradle_file(build_gradle_path, section)
-          return { VERSION_NAME => name, VERSION_CODE => code }
+          { VERSION_NAME => name, VERSION_CODE => code }
         end
 
         # Determines if a version name corresponds to an alpha version (starts with `"alpha-"`` prefix)
@@ -185,8 +185,8 @@ module Fastlane
         # @return [String] The version name for the next release
         #
         def self.calc_next_release_short_version(version)
-          v = self.calc_next_release_base_version(VERSION_NAME => version, VERSION_CODE => nil)
-          return v[VERSION_NAME]
+          v = calc_next_release_base_version(VERSION_NAME => version, VERSION_CODE => nil)
+          v[VERSION_NAME]
         end
 
         # Compute the next release version name for the given version, without incrementing the version code
@@ -251,7 +251,7 @@ module Fastlane
         #
         def self.calc_prev_release_version(version)
           vp = get_version_parts(version)
-          if vp[MINOR_NUMBER] == 0
+          if (vp[MINOR_NUMBER]).zero?
             vp[MAJOR_NUMBER] -= 1
             vp[MINOR_NUMBER] = 9
           else
@@ -271,7 +271,7 @@ module Fastlane
           return false if is_alpha_version?(version)
 
           vp = get_version_parts(version[VERSION_NAME])
-          return (vp.length > 2) && (vp[HOTFIX_NUMBER] != 0)
+          (vp.length > 2) && (vp[HOTFIX_NUMBER] != 0)
         end
 
         # Prints the current and next release version names to stdout, then returns the next release version
@@ -280,7 +280,7 @@ module Fastlane
         #
         def self.bump_version_release(build_gradle_path:, version_properties_path:, has_alpha_version:)
           # Bump release
-          current_version = self.get_release_version(
+          current_version = get_release_version(
             build_gradle_path: build_gradle_path,
             version_properties_path: version_properties_path,
             has_alpha_version: has_alpha_version
@@ -288,9 +288,7 @@ module Fastlane
           UI.message("Current version: #{current_version[VERSION_NAME]}")
           new_version = calc_next_release_base_version(current_version)
           UI.message("New version: #{new_version[VERSION_NAME]}")
-          verified_version = verify_version(new_version[VERSION_NAME])
-
-          return verified_version
+          verify_version(new_version[VERSION_NAME])
         end
 
         # Update the `version.properties` file with new `versionName` and `versionCode` values
@@ -314,8 +312,8 @@ module Fastlane
             end
             File.write(version_properties_path, content)
           else
-            self.update_version(new_version_beta, has_alpha_version.nil? ? 'defaultConfig' : 'vanilla {')
-            self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
+            update_version(new_version_beta, has_alpha_version.nil? ? 'defaultConfig' : 'vanilla {')
+            update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
           end
         end
 
@@ -328,8 +326,8 @@ module Fastlane
         #
         def self.calc_prev_hotfix_version_name(version_name)
           vp = get_version_parts(version_name)
-          vp[HOTFIX_NUMBER] -= 1 unless vp[HOTFIX_NUMBER] == 0
-          return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}" unless vp[HOTFIX_NUMBER] == 0
+          vp[HOTFIX_NUMBER] -= 1 unless (vp[HOTFIX_NUMBER]).zero?
+          return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}" unless (vp[HOTFIX_NUMBER]).zero?
 
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}"
         end
@@ -372,7 +370,7 @@ module Fastlane
         def self.get_version_parts(version)
           parts = version.split('.').map(&:to_i)
           parts.fill(0, parts.length...3) # add 0 if needed to ensure array has at least 3 components
-          return parts
+          parts
         end
 
         # Ensure that a version string is correctly formatted (that is, each of its parts is a number) and returns the 2-parts version number
@@ -399,7 +397,9 @@ module Fastlane
         # @return [Bool] true if the string is representing an integer value, false if not
         #
         def self.is_int?(string)
-          true if Integer(string) rescue false
+          true if Integer(string)
+        rescue StandardError
+          false
         end
 
         #########
@@ -416,7 +416,7 @@ module Fastlane
         def self.get_version_name_from_gradle_file(file_path, section)
           res = get_keyword_from_gradle_file(file_path, section, 'versionName')
           res = res.tr('\"', '') unless res.nil?
-          return res
+          res
         end
 
         # Extract the versionCode rom a build.gradle file
@@ -428,7 +428,7 @@ module Fastlane
         #
         def self.get_version_build_from_gradle_file(file_path, section)
           res = get_keyword_from_gradle_file(file_path, section, 'versionCode')
-          return res.to_i
+          res.to_i
         end
 
         # Extract the value for a specific keyword in a specific section of a `.gradle` file
@@ -453,7 +453,7 @@ module Fastlane
               end
             end
           end
-          return nil
+          nil
         end
 
         # Update both the versionName and versionCode of the build.gradle file to the specified version.

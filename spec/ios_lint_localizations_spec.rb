@@ -90,12 +90,12 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       expect(result).to eq(yml['result'])
     end
 
-    before(:each) do
+    before do
       @test_data_dir = Dir.mktmpdir('a8c-lint-l10n-tests-data-')
       allow(FastlaneCore::UI).to receive(:abort_with_message!)
     end
 
-    after(:each) do
+    after do
       FileUtils.remove_entry @test_data_dir
     end
 

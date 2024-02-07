@@ -7,7 +7,7 @@ describe Fastlane::Actions::AnLocalizeLibsAction do
     # The desired indentation is 4 spaces to stay aligned with the production code applies when merging the XMLs.
     indented_content = lines.map { |l| "    #{l.chomp}" }.join("\n")
 
-    return <<~XML
+    <<~XML
       <?xml version="1.0" encoding="UTF-8"?>
       <resources xmlns:tools="http://schemas.android.com/tools">
       #{indented_content}

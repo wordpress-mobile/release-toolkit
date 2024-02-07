@@ -27,7 +27,7 @@ describe Fastlane::Configuration do
     end
     let(:configure_json_string) { JSON.pretty_generate(configure_json) }
 
-    before(:each) do
+    before do
       allow(File).to receive(:read).with(configure_path).and_return(configure_json_string)
       allow(File).to receive(:write).with(configure_path, configure_json_string)
     end

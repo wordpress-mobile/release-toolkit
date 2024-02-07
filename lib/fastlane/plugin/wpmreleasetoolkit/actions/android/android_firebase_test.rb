@@ -50,11 +50,11 @@ module Fastlane
 
         if result.success?
           UI.success 'Firebase Tests Complete'
-          return true
+          true
         else
           ui_method = params[:crash_on_test_failure] ? :test_failure! : :error
           FastlaneCore::UI.send(ui_method, "Firebase Tests failed – more information can be found at #{result.more_details_url}")
-          return false
+          false
         end
       end
 

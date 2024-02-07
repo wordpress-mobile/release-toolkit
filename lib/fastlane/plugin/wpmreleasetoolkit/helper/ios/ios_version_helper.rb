@@ -89,7 +89,7 @@ module Fastlane
         #
         def self.calc_prev_release_version(version)
           vp = get_version_parts(version)
-          if vp[MINOR_NUMBER] == 0
+          if (vp[MINOR_NUMBER]).zero?
             vp[MAJOR_NUMBER] -= 1
             vp[MINOR_NUMBER] = 9
           else
@@ -134,7 +134,7 @@ module Fastlane
         #
         def self.calc_prev_build_version(version)
           vp = get_version_parts(version)
-          vp[BUILD_NUMBER] -= 1 unless vp[BUILD_NUMBER] == 0
+          vp[BUILD_NUMBER] -= 1 unless (vp[BUILD_NUMBER]).zero?
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}.#{vp[BUILD_NUMBER]}"
         end
 
@@ -147,8 +147,8 @@ module Fastlane
         #
         def self.calc_prev_hotfix_version(version)
           vp = get_version_parts(version)
-          vp[HOTFIX_NUMBER] -= 1 unless vp[HOTFIX_NUMBER] == 0
-          return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}" unless vp[HOTFIX_NUMBER] == 0
+          vp[HOTFIX_NUMBER] -= 1 unless (vp[HOTFIX_NUMBER]).zero?
+          return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}" unless (vp[HOTFIX_NUMBER]).zero?
 
           "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}"
         end
@@ -184,7 +184,7 @@ module Fastlane
         #
         def self.is_hotfix?(version)
           vp = get_version_parts(version)
-          return (vp.length > 2) && (vp[HOTFIX_NUMBER] != 0)
+          (vp.length > 2) && (vp[HOTFIX_NUMBER] != 0)
         end
 
         # Returns the current value of the `VERSION_LONG` key from the public xcconfig file
@@ -215,9 +215,7 @@ module Fastlane
           UI.message("Current version: #{current_version}")
           new_version = calc_next_release_version(current_version)
           UI.message("New version: #{new_version}")
-          verified_version = verify_version(new_version)
-
-          return verified_version
+          verify_version(new_version)
         end
 
         # Update the `.xcconfig` files (the public one, and the internal one if it exists) with the new version strings.
@@ -269,10 +267,10 @@ module Fastlane
         #
         def self.get_version_parts(version)
           parts = version.split('.')
-          parts = parts.fill('0', parts.length...4).map { |chr| chr.to_i }
+          parts = parts.fill('0', parts.length...4).map(&:to_i)
           UI.user_error!("Bad version string: #{version}") if parts.length > 4
 
-          return parts
+          parts
         end
 
         # Extract the VERSION_LONG entry from an `xcconfig` file
@@ -330,7 +328,9 @@ module Fastlane
         # @return [Bool] true if the string is representing an integer value, false if not
         #
         def self.is_int?(string)
-          true if Integer(string) rescue false
+          true if Integer(string)
+        rescue StandardError
+          false
         end
       end
     end

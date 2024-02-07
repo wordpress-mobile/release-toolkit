@@ -94,7 +94,7 @@ describe Fastlane::Configuration::FileReference do
   describe 'with encryption' do
     let(:subject) { described_class.new(file: 'path/to/file', destination: 'destination', encrypt: true) }
 
-    before(:each) do
+    before do
       allow(Fastlane::Helper::ConfigureHelper).to receive(:encryption_key).and_return('key')
     end
 

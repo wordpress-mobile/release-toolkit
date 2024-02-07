@@ -53,7 +53,7 @@ module Fastlane
 
         Actions.lane_context[SharedValues::S3_UPLOADED_FILE_PATH] = key
 
-        return key
+        key
       end
 
       def self.file_is_already_uploaded?(bucket, key)
@@ -61,9 +61,9 @@ module Fastlane
           bucket: bucket,
           key: key
         )
-        return response[:content_length].positive?
+        response[:content_length].positive?
       rescue Aws::S3::Errors::NotFound
-        return false
+        false
       end
 
       def self.description

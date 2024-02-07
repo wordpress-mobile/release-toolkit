@@ -21,14 +21,18 @@ module Fastlane
           UI.message 'Fetching the list of versions...'
           versions = app.app_store_versions.select { |v| v.version_string == only_version && !v.build.nil? }
           versions = app.get_app_store_versions.reject { |v| v.build.nil? } if versions.empty?
-          UI.message "Found #{versions.count} versions." + (limit == 0 ? '' : " Limiting to last #{limit}")
-          versions = versions.first(limit) unless limit == 0
+          UI.message "Found #{versions.count} versions." + (limit.zero? ? '' : " Limiting to last #{limit}")
+          versions = versions.first(limit) unless limit.zero?
 
           UI.message 'Fetching App Sizes...'
 
           builds_details = versions.each_with_index.map do |v, idx|
             print "Fetching info for: #{v.version_string.rjust(8)} (#{v.build.version.rjust(11)}) [#{idx.to_s.rjust(3)}/#{versions.count}]\r"
-            Spaceship::Tunes.client.build_details(app_id: app.id, train: v.version_string, build_number: v.build.version, platform: 'ios') rescue nil
+            begin
+              Spaceship::Tunes.client.build_details(app_id: app.id, train: v.version_string, build_number: v.build.version, platform: 'ios')
+            rescue StandardError
+              nil
+            end
           end.compact.reverse
           print("#{' ' * 55}\n")
 

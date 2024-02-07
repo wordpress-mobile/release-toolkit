@@ -61,7 +61,7 @@ module FastlaneCore
       # if we replied before the timeout, kill the thread so message won't be triggered
       thread.kill
       # If the block given returned a value, pass it
-      return res
+      res
     end
 
     # Monkey-Patch fastlane's `UI.input`, `UI.confirm`, `UI.select` and `UI.password` interactive methods

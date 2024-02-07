@@ -25,7 +25,7 @@ module Fastlane
 
         # If we reached the root, we haven't found a repo.
         # (Technically, there could be a repo in the root of the system, but that's a usecase that we don't need to support at this time)
-        return dir.root? == false
+        dir.root? == false
       end
 
       # Travels back the hierarchy of the given path until it finds an existing ancestor, or it reaches the root of the file system.
@@ -37,7 +37,7 @@ module Fastlane
       def self.first_existing_ancestor_of(path:)
         p = Pathname(path).expand_path
         p = p.parent until p.exist? || p.root?
-        return p
+        p
       end
 
       # Check if the current directory has git-lfs enabled
@@ -62,9 +62,9 @@ module Fastlane
         branch = branch.first.join('/') if branch.is_a?(Hash)
         Action.sh('git', 'checkout', branch)
         Action.sh('git', 'pull')
-        return true
-      rescue
-        return false
+        true
+      rescue StandardError
+        false
       end
 
       # Update every submodule in the current git repository
@@ -114,9 +114,9 @@ module Fastlane
         end
         begin
           Action.sh('git', 'commit', *args, '-m', message)
-          return true
-        rescue
-          return false
+          true
+        rescue StandardError
+          false
         end
       end
 
