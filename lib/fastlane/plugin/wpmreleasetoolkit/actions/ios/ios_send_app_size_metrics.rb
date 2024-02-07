@@ -31,7 +31,7 @@ module Fastlane
         app_thinning_plist_path = params[:app_thinning_plist_path] || File.join(File.dirname(params[:ipa_path]), 'app-thinning.plist')
         if File.exist?(app_thinning_plist_path)
           plist = Plist.parse_xml(app_thinning_plist_path)
-          plist['variants'].each do |_key, variant|
+          plist['variants'].each_value do |variant|
             variant_descriptors = variant['variantDescriptors'] || [{ 'device' => 'Universal' }]
             variant_descriptors.each do |desc|
               variant_metadata = { device: desc['device'], 'OS Version': desc['os-version'] }

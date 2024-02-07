@@ -108,7 +108,7 @@ module Fastlane
                                        type: Hash,
                                        verify_block: proc do |values|
                                          UI.user_error!('`target_original_files` must contain at least one path to an original `.strings` file.') if values.empty?
-                                         values.each do |path, _|
+                                         values.each_key do |path|
                                            UI.user_error!("Path `#{path}` (found in `target_original_files`) does not exist.") unless File.exist?(path)
                                            UI.user_error! "Expected `#{path}` (found in `target_original_files`) to be a path ending in a `*.lproj/*.strings`." unless File.extname(path) == '.strings' && File.extname(File.dirname(path)) == '.lproj'
                                          end
