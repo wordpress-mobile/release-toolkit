@@ -56,7 +56,6 @@ steps:
     if: build.tag != null
     depends_on:
      - test
-     - rubocop
     # Note: We intentionally call a separate `.sh` script here (as opposed to having all the
     # commands written inline) to avoid leaking a key used in the process in clear in the
     # BUILDKITE_COMMAND environment variable.
