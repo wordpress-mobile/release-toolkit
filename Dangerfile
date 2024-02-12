@@ -25,10 +25,6 @@ if github.pr_labels.include?('Releases')
   return
 end
 
-# Before checking the version, get rid of any change that `bundle install`
-# might have done.
-`git checkout Gemfile.lock &> /dev/null`
-
 if version.to_s != gemfile_lock_version.to_s
   message = <<~MESSAGE
     The version in the `Gemfile.lock` (`#{gemfile_lock_version}`) doesn't match the one in `version.rb` (`#{version}`).
