@@ -10,7 +10,7 @@ module Fastlane
                                                release_version: params[:release_version])
 
         Action.sh("git add #{params[:po_file_path]}")
-        params[:source_files].each do |_key, file|
+        params[:source_files].each_value do |file|
           Action.sh("git add #{file}")
         end
 

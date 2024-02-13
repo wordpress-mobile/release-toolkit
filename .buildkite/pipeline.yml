@@ -13,13 +13,6 @@ common_params:
         propagate-environment: true
         environment:
           - "RUBYGEMS_API_KEY"
-    - &docker_plugin_with_danger_token
-      docker#v5.8.0:
-        image: *ruby_version
-        propagate-environment: true
-        environment:
-          - "DANGER_GITHUB_API_TOKEN"
-
 
 steps:
   #################
@@ -56,32 +49,6 @@ steps:
               - 3.2.2
 
   #################
-  # Lint
-  #################
-  - label: "🧹 Lint (Rubocop)"
-    key: rubocop
-    command: |
-      bundle install
-      echo "--- :rubocop: Run Rubocop"
-      bundle exec rubocop
-    plugins: [*docker_plugin]
-    agents:
-      queue: "default"
-
-  #################
-  # Danger
-  #################
-  - label: "⛔️ Danger"
-    key: danger
-    command: |
-      bundle install
-      echo "--- :rubocop: Run Danger"
-      bundle exec danger
-    plugins: [*docker_plugin_with_danger_token]
-    agents:
-      queue: "default"
-
-  #################
   # Push to RubyGems
   #################
   - label: ":rubygems: Publish to RubyGems"
@@ -89,12 +56,10 @@ steps:
     if: build.tag != null
     depends_on:
      - test
-     - rubocop
-     - danger
     # Note: We intentionally call a separate `.sh` script here (as opposed to having all the
     # commands written inline) to avoid leaking a key used in the process in clear in the
     # BUILDKITE_COMMAND environment variable.
-    command: .buildkite/gem-push.sh
+    command: .buildkite/commands/gem-push.sh
     plugins: [*docker_plugin]
     agents:
       queue: "default"
