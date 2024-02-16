@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'fastlane', '~> 2.213'
   spec.add_dependency 'git', '~> 1.3'
   spec.add_dependency 'java-properties', '~> 0.3.0'
-  spec.add_dependency 'nokogiri', '~> 1.11', '< 1.16' # Needed for AndroidLocalizeHelper. The upper bound can be removed once the Release Toolkit is migrated from Ruby 2.7 to Ruby 3
+  spec.add_dependency 'nokogiri', '~> 1.11', '< 1.17' # Needed for AndroidLocalizeHelper. The upper bound can be removed once the Release Toolkit is migrated from Ruby 2.7 to Ruby 3
   spec.add_dependency 'octokit', '~> 6.1'
   spec.add_dependency 'parallel', '~> 1.14'
   spec.add_dependency 'plist', '~> 3.1'
@@ -49,7 +49,7 @@ Gem::Specification.new do |spec|
   # See https://github.com/fastlane/fastlane/releases/tag/2.210.0
   spec.add_development_dependency 'fastlane', '~> 2.210'
   spec.add_development_dependency 'pry', '~> 0.12.2'
-  spec.add_development_dependency 'rmagick', '~> 4.1'
+  spec.add_development_dependency 'rmagick', '~> 5.3'
   spec.add_development_dependency 'rspec', '~> 3.8'
   spec.add_development_dependency 'rspec_junit_formatter', '~> 0.4.1'
   spec.add_development_dependency 'rubocop', '~> 1.0'
