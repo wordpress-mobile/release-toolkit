@@ -20,6 +20,7 @@ _None_
 
 - Added a deprecation notice to the `GitHelper.ensure_on_branch!` method [#531]
 - Added a deprecation notice to the `GitHelper.update_submodules` method [#531]
+- Update `nokogiri`, `mini_portile2`, and `rmagick` [#546]
 
 ## 9.4.0
 
