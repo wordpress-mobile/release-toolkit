@@ -3,7 +3,7 @@ require_relative '../../helper/github_helper'
 
 module Fastlane
   module Actions
-    class SetfrozentagAction < Action
+    class SetMilestoneFrozenMarkerAction < Action
       def self.run(params)
         repository = params[:repository]
         milestone_title = params[:milestone]
@@ -12,23 +12,23 @@ module Fastlane
         github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
         milestone = github_helper.get_milestone(repository, milestone_title)
 
-        UI.user_error!("Milestone #{milestone_title} not found.") if milestone.nil?
+        UI.user_error!("Milestone `#{milestone_title}` not found.") if milestone.nil?
 
         mile_title = milestone[:title]
-        puts freeze
+
         if freeze
           # Check if the state needs changes
           if is_frozen(milestone)
-            UI.message("Milestone #{mile_title} is already frozen. Nothing to do")
+            UI.message("Milestone `#{mile_title}` is already frozen. Nothing to do")
             return # Already frozen: nothing to do
           end
 
           mile_title = "#{mile_title} ❄️"
         else
-          mile_title = milestone_title
+          mile_title = milestone.title.gsub(/ ?❄/, '')
         end
 
-        UI.message("New milestone: #{mile_title}")
+        UI.message("New milestone title: `#{mile_title}`")
         github_helper.update_milestone(repository: repository, number: milestone[:number], title: mile_title)
       end
 
@@ -39,7 +39,7 @@ module Fastlane
       end
 
       def self.description
-        'Sets the frozen tag for the specified milestone'
+        'Add the frozen marker (❄️ emoji) on a given milestone'
       end
 
       def self.authors
@@ -52,7 +52,7 @@ module Fastlane
 
       def self.details
         # Optional:
-        'Sets the frozen tag for the specified milestone'
+        'Add the frozen marker (❄️ emoji) on a given milestone'
       end
 
       def self.available_options
@@ -68,7 +68,7 @@ module Fastlane
                                        optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :freeze,
-                                       description: 'If true, the action will add the ❄️ emoji to the milestone title',
+                                       description: 'If true, the action will add the ❄️ emoji to the milestone title; otherwise, will remove it if already present',
                                        optional: false,
                                        default_value: true,
                                        type: Boolean),
