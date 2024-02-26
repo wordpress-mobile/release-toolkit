@@ -27,7 +27,7 @@ module Fastlane
         else
           unless is_frozen(milestone)
             UI.message("Milestone `#{mile_title}` is not frozen. Nothing to do")
-            return # Already frozen: nothing to do
+            return # Not frozen: nothing to do
           end
 
           mile_title = milestone[:title].gsub(/ ?❄️/, '')
