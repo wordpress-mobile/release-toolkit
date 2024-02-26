@@ -37,16 +37,16 @@ module Fastlane
         end
       end
 
-      # Fetch all the PRs for a given milestone
+      # Fetch all the PRs and issues for a given milestone
       #
       # @param [String] repository The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`)
       # @param [Sawyer::Resource, String] milestone The milestone object, or title of the milestone, we want to fetch the list of PRs for (e.g.: `16.9`)
       # @param [Boolean] include_closed If set to true, will include both opened and closed PRs. Otherwise, will only include opened PRs.
       # @return [Array<Sawyer::Resource>] A list of the PRs for the given milestone, sorted by number
       #
-      def get_prs_for_milestone(repository:, milestone:, include_closed: false)
+      def get_prs_and_issues_for_milestone(repository:, milestone:, include_closed: false)
         milestone_title = milestone.is_a?(Sawyer::Resource) ? milestone.title : milestone
-        query = %(repo:#{repository} type:pr milestone:"#{milestone_title}")
+        query = %(repo:#{repository} milestone:"#{milestone_title}")
         query += ' is:open' unless include_closed
 
         client.search_issues(query)[:items].sort_by(&:number)
@@ -55,17 +55,17 @@ module Fastlane
       # Set/Update the milestone assigned to a given PR or issue
       #
       # @param [String] repository The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`)
-      # @param [Integer] pr_number The PR (or issue) number to update the milestone of
+      # @param [Integer] number The PR (or issue) number to update the milestone of
       # @param [Sawyer::Resource?, Integer?] milestone The milestone object or number to set on this PR, or nil to unset the milestone
       # @note Use `get_milestone` to get a milestone object from a version number
       # @raise [Fastlane::UI::Error] UI.user_error! if PR does not exist or milestone provided is invalid
       #
-      def set_pr_milestone(repository:, pr_number:, milestone:)
+      def set_milestone(repository:, number:, milestone:)
         milestone_num = milestone.is_a?(Sawyer::Resource) ? milestone.number : milestone
 
-        client.update_issue(repository, pr_number, { milestone: milestone_num })
+        client.update_issue(repository, number, { milestone: milestone_num })
       rescue Octokit::NotFound
-        UI.user_error!("Could not find PR ##{pr_number} in #{repository}")
+        UI.user_error!("Could not find PR or issue ##{number} in #{repository}")
       rescue Octokit::UnprocessableEntity
         UI.user_error!("Invalid milestone #{milestone_num}")
       end
