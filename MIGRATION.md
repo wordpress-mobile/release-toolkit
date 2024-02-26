@@ -5,6 +5,7 @@
  - The new minimum required Ruby version is `3.2.2`. Please make sure to upgrade your projects before upgrading to this version to avoid compatibility issues.
  - Action `addbranchprotection` has been renamed `set_branch_protection`. Besides, you might want to use the new `copy_branch_protection(from_branch: to_branch:)` instead (especially for protecting the `release/*` branch after code-freeze).
  - Action `removebranchprotection` has been renamed `remove_branch_protection`.
+ - Action `update_pull_requests_milestone` has been renamed `update_assigned_milestone` and its `pr_numbers` and `pr_comment` parameters renamed to just `numbers` and `comment`; the action now acts on Issues and not just PRs anymore.
 
 ## From `8.0.0` to `9.0.0`
 

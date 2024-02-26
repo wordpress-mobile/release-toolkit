@@ -7,6 +7,7 @@
 ### Breaking Changes
 
 - Upgraded the minimum required Ruby version to `3.2.2`. [#517]
+- Renamed `update_pull_requests_milestone` to `update_assigned_milestone` and make it handle GitHub issues as well as PRs. [#547]
 
 ### New Features
 
