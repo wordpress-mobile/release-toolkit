@@ -7,6 +7,7 @@
 ### Breaking Changes
 
 - Upgraded the minimum required Ruby version to `3.2.2`. [#517]
+- Renamed `setfrozentag` action to `set_milestone_frozen_marker`. [#548]
 
 ### New Features
 
