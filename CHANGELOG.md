@@ -8,6 +8,7 @@
 
 - Upgraded the minimum required Ruby version to `3.2.2`. [#517]
 - Removed the old `setbranchprotection` and `removebranchprotection` backwards-compatiblity stubs for the now-renamed `set_branch_protection` and `remove_branch_protection` actions. [#549]
+- Renamed `setfrozentag` action to `set_milestone_frozen_marker`. [#548]
 - Removed the `ios_clear_intermediate_tags` action, which has been deprecated for a while. [#549]
 
 ### New Features
