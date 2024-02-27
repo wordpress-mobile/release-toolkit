@@ -44,20 +44,11 @@ module Fastlane
       end
 
       def self.description
-        'Add the frozen marker (❄️ emoji) on a given milestone'
+        'Add or remove the frozen marker (❄️ emoji) on a given GitHub milestone'
       end
 
       def self.authors
         ['Automattic']
-      end
-
-      def self.return_value
-        # If your method provides a return value, you can describe here what it does
-      end
-
-      def self.details
-        # Optional:
-        'Add the frozen marker (❄️ emoji) on a given milestone'
       end
 
       def self.available_options
