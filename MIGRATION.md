@@ -3,9 +3,10 @@
 ## From `9.0.0` to `10.0.0`
 
  - The new minimum required Ruby version is `3.2.2`. Please make sure to upgrade your projects before upgrading to this version to avoid compatibility issues.
- - Action `addbranchprotection` has been renamed `set_branch_protection`. Besides, you might want to use the new `copy_branch_protection(from_branch: to_branch:)` instead (especially for protecting the `release/*` branch after code-freeze).
+ - Action `setbranchprotection` has been renamed `set_branch_protection`. Besides, you might want to use the new `copy_branch_protection(from_branch: to_branch:)` instead (especially for protecting the `release/*` branch with the same settings as `trunk` after a code-freeze).
  - Action `removebranchprotection` has been renamed `remove_branch_protection`.
  - Action `setfrozentag` has been renamed `set_milestone_frozen_marker`.
+ - Actions `ios_clear_intermediate_tags` and `ios_final_tag` have been removed, as they have been deprecated for a while.
 
 ## From `8.0.0` to `9.0.0`
 

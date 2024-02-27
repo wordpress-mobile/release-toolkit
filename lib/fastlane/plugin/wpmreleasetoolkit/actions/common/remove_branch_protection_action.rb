@@ -55,16 +55,5 @@ module Fastlane
         true
       end
     end
-
-    # For backwards compatibility
-    class RemovebranchprotectionAction < RemoveBranchProtectionAction
-      def self.category
-        :deprecated
-      end
-
-      def self.deprecated_notes
-        "This action has been renamed `#{superclass.action_name}`"
-      end
-    end
   end
 end
