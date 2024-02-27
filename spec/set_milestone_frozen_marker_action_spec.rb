@@ -22,7 +22,7 @@ describe Fastlane::Actions::SetMilestoneFrozenMarkerAction do
     allow(Octokit::Client).to receive(:new).and_return(client)
   end
 
-  context 'when passing `freeze: false` (default)' do
+  context 'when passing `freeze: true` (default)' do
     it 'adds the frozen marker if not present already' do
       allow(client).to receive(:list_milestones).with(repo).and_return(test_milestones)
       expect(client).to receive(:update_milestone).with(repo, 980, { title: '9.8 Some Custom Title ❄️' })
