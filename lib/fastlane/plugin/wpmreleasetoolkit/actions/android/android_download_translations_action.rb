@@ -7,8 +7,7 @@ module Fastlane
         require_relative '../../helper/android/android_localize_helper'
         require_relative '../../helper/git_helper'
 
-        project_root_folder = params[:project_root_folder]
-        res_dir = File.join(project_root_folder || '.', params[:res_dir])
+        res_dir = File.join('.', params[:res_dir])
 
         Fastlane::Helper::Android::LocalizeHelper.create_available_languages_file(
           res_dir: res_dir,
@@ -98,7 +97,6 @@ module Fastlane
             type: Boolean,
             default_value: false
           ),
-          Fastlane::Helper::Deprecated.project_root_folder_config_item,
         ]
       end
 

@@ -11,10 +11,8 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper'
         require_relative '../../helper/android/android_git_helper'
 
-        project_root_folder = params[:project_root_folder]
-        project_name = params[:project_name]
-        build_gradle_path = params[:build_gradle_path] || (File.join(project_root_folder || '.', project_name, 'build.gradle') unless project_name.nil?)
-        version_properties_path = params[:version_properties_path] || File.join(project_root_folder || '.', 'version.properties')
+        build_gradle_path = params[:build_gradle_path]
+        version_properties_path = params[:version_properties_path]
 
         # Checkout default branch and update
         default_branch = params[:default_branch]
@@ -82,18 +80,12 @@ module Fastlane
                                        description: 'Path to the build.gradle file',
                                        type: String,
                                        optional: true,
-                                       conflicting_options: %i[project_name
-                                                               project_root_folder
-                                                               version_properties_path]),
+                                       conflicting_options: [:version_properties_path]),
           FastlaneCore::ConfigItem.new(key: :version_properties_path,
                                        description: 'Path to the version.properties file',
                                        type: String,
                                        optional: true,
-                                       conflicting_options: %i[build_gradle_path
-                                                               project_name
-                                                               project_root_folder]),
-          Fastlane::Helper::Deprecated.project_root_folder_config_item,
-          Fastlane::Helper::Deprecated.project_name_config_item,
+                                       conflicting_options: [:build_gradle_path]),
         ]
       end
 

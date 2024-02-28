@@ -5,8 +5,7 @@ module Fastlane
         require_relative '../../helper/android/android_localize_helper'
         require_relative '../../helper/github_helper'
 
-        project_root_folder = params[:project_root_folder]
-        build_gradle_path = params[:build_gradle_path] || File.join(project_root_folder || '.', 'build.gradle')
+        build_gradle_path = params[:build_gradle_path]
 
         version = Fastlane::Helper::Android::VersionHelper.get_library_version_from_gradle_config(
           build_gradle_path: build_gradle_path,
@@ -67,10 +66,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :build_gradle_path,
                                        description: 'Path to the build.gradle file',
                                        type: String,
-                                       optional: true,
-                                       conflicting_options: [:project_root_folder]),
+                                       optional: true),
           Fastlane::Helper::GithubHelper.github_token_config_item,
-          Fastlane::Helper::Deprecated.project_root_folder_config_item,
         ]
       end
 
