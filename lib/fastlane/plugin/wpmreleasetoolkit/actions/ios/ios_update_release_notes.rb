@@ -39,7 +39,7 @@ module Fastlane
                                        env_name: 'FL_IOS_UPDATE_RELEASE_NOTES_FILE_PATH',
                                        description: 'The path to the release notes file to be updated',
                                        type: String,
-                                       default_value: File.join('.', 'RELEASE-NOTES.txt')),
+                                       default_value: 'RELEASE-NOTES.txt'),
         ]
       end
 

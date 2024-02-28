@@ -9,7 +9,6 @@ module Fastlane
         # This typically commits the `version.properties` inside root folder or `build.gradle` file
         # inside the project subfolder.
         #
-        #
         def self.commit_version_bump(build_gradle_path:, version_properties_path:)
           if File.exist?(version_properties_path)
             git_commit(
