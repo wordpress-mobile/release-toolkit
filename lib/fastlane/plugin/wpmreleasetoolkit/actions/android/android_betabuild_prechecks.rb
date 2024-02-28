@@ -8,11 +8,8 @@ module Fastlane
         require_relative '../../helper/android/android_version_helper'
         require_relative '../../helper/android/android_git_helper'
 
-        has_alpha_version = params[:has_alpha_version]
-        project_root_folder = params[:project_root_folder]
-        project_name = params[:project_name]
-        build_gradle_path = params[:build_gradle_path] || (File.join(project_root_folder || '.', project_name, 'build.gradle') unless project_name.nil?)
-        version_properties_path = params[:version_properties_path] || File.join(project_root_folder || '.', 'version.properties')
+        build_gradle_path = params[:build_gradle_path]
+        version_properties_path = params[:version_properties_path]
 
         # Checkout default branch and update
         default_branch = params[:default_branch]
@@ -21,22 +18,19 @@ module Fastlane
         # Check versions
         release_version = Fastlane::Helper::Android::VersionHelper.get_release_version(
           build_gradle_path: build_gradle_path,
-          version_properties_path: version_properties_path,
-          has_alpha_version: has_alpha_version
+          version_properties_path: version_properties_path
         )
         message = "The following current version has been detected: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n"
         alpha_release_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(
           build_gradle_path: build_gradle_path,
-          version_properties_path: version_properties_path,
-          has_alpha_version: has_alpha_version
+          version_properties_path: version_properties_path
         )
         message << "The following Alpha version has been detected: #{alpha_release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
 
         # Check branch
         app_version = Fastlane::Helper::Android::VersionHelper.get_public_version(
           build_gradle_path: build_gradle_path,
-          version_properties_path: version_properties_path,
-          has_alpha_version: has_alpha_version
+          version_properties_path: version_properties_path
         )
         UI.user_error!("#{message}Release branch for version #{app_version} doesn't exist. Abort.") unless !params[:base_version].nil? || Fastlane::Helper::GitHelper.checkout_and_pull(release: app_version)
 
@@ -70,14 +64,12 @@ module Fastlane
         UI.user_error!("Release branch for version #{version} doesn't exist. Abort.") unless Fastlane::Helper::GitHelper.checkout_and_pull(release: version)
         release_version = Fastlane::Helper::Android::VersionHelper.get_release_version(
           build_gradle_path: build_gradle_path,
-          version_properties_path: version_properties_path,
-          has_alpha_version: has_alpha_version
+          version_properties_path: version_properties_path
         )
         message << "Looking at branch release/#{version} as requested by user. Detected version: #{release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}.\n"
         alpha_release_version = Fastlane::Helper::Android::VersionHelper.get_alpha_version(
           build_gradle_path: build_gradle_path,
-          version_properties_path: version_properties_path,
-          has_alpha_version: has_alpha_version
+          version_properties_path: version_properties_path
         )
         message << "and Alpha Version: #{alpha_release_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]}\n" unless alpha_release_version.nil?
         [release_version, alpha_release_version]
@@ -116,19 +108,12 @@ module Fastlane
                                        description: 'Path to the build.gradle file',
                                        type: String,
                                        optional: true,
-                                       conflicting_options: %i[project_name
-                                                               project_root_folder
-                                                               version_properties_path]),
+                                       conflicting_options: [:version_properties_path]),
           FastlaneCore::ConfigItem.new(key: :version_properties_path,
                                        description: 'Path to the version.properties file',
                                        type: String,
                                        optional: true,
-                                       conflicting_options: %i[build_gradle_path
-                                                               project_name
-                                                               project_root_folder]),
-          Fastlane::Helper::Deprecated.project_root_folder_config_item,
-          Fastlane::Helper::Deprecated.project_name_config_item,
-          Fastlane::Helper::Deprecated.has_alpha_version_config_item,
+                                       conflicting_options: [:build_gradle_path]),
         ]
       end
 

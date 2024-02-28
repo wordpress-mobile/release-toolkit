@@ -10,6 +10,8 @@
 - Removed the old `setbranchprotection` and `removebranchprotection` backwards-compatiblity stubs for the now-renamed `set_branch_protection` and `remove_branch_protection` actions. [#549]
 - Renamed `setfrozentag` action to `set_milestone_frozen_marker`. [#548]
 - Removed the `ios_clear_intermediate_tags` action, which has been deprecated for a while. [#549]
+- Removed the `has_alpha_version` option from several actions and helper methods. It has already been deprecated for many versions. [#550]
+- Removed the `project_name` and `project_root_folder` options from several actions. [#550]
 - Renamed `update_pull_requests_milestone` to `update_assigned_milestone` and make it handle GitHub issues as well as PRs. [#547]
 
 ### New Features

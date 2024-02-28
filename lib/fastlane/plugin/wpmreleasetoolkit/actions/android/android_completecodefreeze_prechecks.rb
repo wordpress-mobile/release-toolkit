@@ -11,16 +11,12 @@ module Fastlane
         current_branch = Fastlane::Helper::GitHelper.current_git_branch
         UI.user_error!("Current branch - '#{current_branch}' - is not a release branch. Abort.") unless current_branch.start_with?('release/')
 
-        has_alpha_version = params[:has_alpha_version]
-        project_root_folder = params[:project_root_folder]
-        project_name = params[:project_name]
-        build_gradle_path = params[:build_gradle_path] || (File.join(project_root_folder || '.', project_name, 'build.gradle') unless project_name.nil?)
-        version_properties_path = params[:version_properties_path] || File.join(project_root_folder || '.', 'version.properties')
+        build_gradle_path = params[:build_gradle_path]
+        version_properties_path = params[:version_properties_path]
 
         version = Fastlane::Helper::Android::VersionHelper.get_public_version(
           build_gradle_path: build_gradle_path,
-          version_properties_path: version_properties_path,
-          has_alpha_version: has_alpha_version
+          version_properties_path: version_properties_path
         )
         message = "Completing code freeze for: #{version}\n"
         if params[:skip_confirm]
@@ -58,19 +54,12 @@ module Fastlane
                                        description: 'Path to the build.gradle file',
                                        type: String,
                                        optional: true,
-                                       conflicting_options: %i[project_name
-                                                               project_root_folder
-                                                               version_properties_path]),
+                                       conflicting_options: [:version_properties_path]),
           FastlaneCore::ConfigItem.new(key: :version_properties_path,
                                        description: 'Path to the version.properties file',
                                        type: String,
                                        optional: true,
-                                       conflicting_options: %i[build_gradle_path
-                                                               project_name
-                                                               project_root_folder]),
-          Fastlane::Helper::Deprecated.project_root_folder_config_item,
-          Fastlane::Helper::Deprecated.project_name_config_item,
-          Fastlane::Helper::Deprecated.has_alpha_version_config_item,
+                                       conflicting_options: [:build_gradle_path]),
         ]
       end
 

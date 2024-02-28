@@ -8,8 +8,6 @@ module Fastlane
         require_relative '../../helper/release_notes_helper'
         require_relative '../../helper/git_helper'
 
-        UI.deprecated('The `PROJECT_ROOT_FOLDER` environment variable is deprecated and will be removed in a future release. Please pass a path to the `release_notes_file_path` param instead.') unless ENV['PROJECT_ROOT_FOLDER'].nil?
-
         path = params[:release_notes_file_path]
         next_version = Fastlane::Helper::Android::VersionHelper.calc_next_release_short_version(params[:new_version])
 
@@ -41,7 +39,7 @@ module Fastlane
                                        env_name: 'FL_ANDROID_UPDATE_RELEASE_NOTES_FILE_PATH',
                                        description: 'The path to the release notes file to be updated',
                                        type: String,
-                                       default_value: File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'RELEASE-NOTES.txt')),
+                                       default_value: 'RELEASE-NOTES.txt'),
         ]
       end
 
