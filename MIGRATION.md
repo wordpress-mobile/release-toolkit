@@ -9,6 +9,7 @@
  - Actions `ios_clear_intermediate_tags` and `ios_final_tag` have been removed, as they have been deprecated for a while.
  - Option `has_alpha_version` has been removed after being deprecated for a while.
  - Options `project_name` and `project_root_folder` have been removed from several actions. Explicit paths should be passed instead.
+ - Action `update_pull_requests_milestone` has been renamed `update_assigned_milestone` and its `pr_numbers` and `pr_comment` parameters renamed to just `numbers` and `comment`; the action now acts on Issues and not just PRs anymore.
 
 ## From `8.0.0` to `9.0.0`
 

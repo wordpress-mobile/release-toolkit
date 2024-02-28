@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
+describe Fastlane::Actions::UpdateAssignedMilestoneAction do
   let(:test_token) { 'ghp_fake_token' }
   let(:test_repo) { 'repo-test/project-test' }
   let(:client) do
@@ -32,7 +32,7 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
       result = run_described_fastlane_action(
         github_token: test_token,
         repository: test_repo,
-        pr_numbers: [1337],
+        numbers: [1337],
         to_milestone: '12.3'
       )
 
@@ -46,7 +46,7 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
       result = run_described_fastlane_action(
         github_token: test_token,
         repository: test_repo,
-        pr_numbers: [42, 1337],
+        numbers: [42, 1337],
         to_milestone: '12.3'
       )
 
@@ -59,7 +59,7 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
       result = run_described_fastlane_action(
         github_token: test_token,
         repository: test_repo,
-        pr_numbers: [1337],
+        numbers: [1337],
         to_milestone: nil
       )
 
@@ -70,7 +70,7 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
   context 'when providing a source milestone' do
     it 'updates the milestone of all matching and still-opened PRs' do
       allow(client).to receive(:search_issues)
-        .with(%(repo:#{test_repo} type:pr milestone:"#{mock_milestone(12.2)[:title]}" is:open))
+        .with(%(repo:#{test_repo} milestone:"#{mock_milestone(12.2)[:title]}" is:open))
         .and_return({ items: [101, 103].map { |n| mock_pr(n) } })
 
       expect(client).to receive(:update_issue).with(test_repo, 101, { milestone: 123 })
@@ -89,7 +89,7 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
     it 'adds a PR comment if one is provided' do
       comment = 'Updated milestone from `12.2` to `12.3`'
       allow(client).to receive(:search_issues)
-        .with(%(repo:#{test_repo} type:pr milestone:"#{mock_milestone(12.2)[:title]}" is:open))
+        .with(%(repo:#{test_repo} milestone:"#{mock_milestone(12.2)[:title]}" is:open))
         .and_return({ items: [101, 103].map { |n| mock_pr(n) } })
       allow(client).to receive(:issue_comments).and_return([])
 
@@ -103,7 +103,7 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
         repository: test_repo,
         from_milestone: '12.2',
         to_milestone: '12.3',
-        pr_comment: comment
+        comment: comment
       )
 
       expect(result).to eq([101, 103])
@@ -111,7 +111,7 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
 
     it 'does not add a PR comment if comment is empty' do
       allow(client).to receive(:search_issues)
-        .with(%(repo:#{test_repo} type:pr milestone:"#{mock_milestone(12.2)[:title]}" is:open))
+        .with(%(repo:#{test_repo} milestone:"#{mock_milestone(12.2)[:title]}" is:open))
         .and_return({ items: [101, 103].map { |n| mock_pr(n) } })
 
       expect(client).to receive(:update_issue).with(test_repo, 101, { milestone: 123 })
@@ -123,7 +123,7 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
         repository: test_repo,
         from_milestone: '12.2',
         to_milestone: '12.3',
-        pr_comment: ''
+        comment: ''
       )
 
       expect(result).to eq([101, 103])
@@ -142,26 +142,26 @@ describe Fastlane::Actions::UpdatePullRequestsMilestoneAction do
       end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Unable to find target milestone matching version 99.9')
     end
 
-    it 'raises if both from_milestone and pr_numbers were provided' do
+    it 'raises if both from_milestone and numbers were provided' do
       expect do
         run_described_fastlane_action(
           github_token: test_token,
           repository: test_repo,
           from_milestone: '12.2',
-          pr_numbers: [1337],
+          numbers: [1337],
           to_milestone: '12.3'
         )
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, %(Unresolved conflict between options: 'from_milestone' and 'pr_numbers'))
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, %(Unresolved conflict between options: 'from_milestone' and 'numbers'))
     end
 
-    it 'raises if neither from_milestone nor pr_numbers were provided' do
+    it 'raises if neither from_milestone nor numbers were provided' do
       expect do
         run_described_fastlane_action(
           github_token: test_token,
           repository: test_repo,
           to_milestone: '12.3'
         )
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'One of `pr_numbers` or `from_milestone` must be provided to indicate which PR(s) to update')
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'One of `numbers` or `from_milestone` must be provided to indicate which PR(s)/issue(s) to update')
     end
   end
 end
