@@ -11,6 +11,7 @@
 - Renamed `setfrozentag` action to `set_milestone_frozen_marker`. [#548]
 - Removed the `ios_clear_intermediate_tags` action, which has been deprecated for a while. [#549]
 - Removed the `has_alpha_version` option from several actions and helper methods. It has already been deprecated for many versions.
+- Removed the `project_name` and `project_root_folder` options from several actions.
 
 ### New Features
 
