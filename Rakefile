@@ -45,7 +45,8 @@ task :new_release do
   Console.warning "Warning: Latest version number does not match latest version title in CHANGELOG (#{latest_version})!" unless latest_version == Fastlane::Wpmreleasetoolkit::VERSION
 
   Console.header 'Pending CHANGELOG:'
-  Console.print_indented_lines(parser.cleaned_pending_changelog_lines)
+  changelog = parser.cleaned_pending_changelog_lines
+  Console.print_indented_lines(changelog)
 
   ## Prompt for next version number
   guess = parser.guessed_next_semantic_version(current: Fastlane::Wpmreleasetoolkit::VERSION)
@@ -63,7 +64,18 @@ task :new_release do
   GitHelper.commit_files("Bumped to version #{new_version}", [VERSION_FILE, 'Gemfile.lock', 'CHANGELOG.md'])
 
   Console.header 'Opening PR draft in your default browser...'
-  GitHelper.prepare_github_pr("release/#{new_version}", 'trunk', "Release #{new_version} into trunk", "New version #{new_version}. Be sure to create a GitHub Release and tag once this PR gets merged.")
+  pr_body = <<~BODY
+    Releasing new version #{new_version}.
+
+    # What's Next
+
+    PR Author: Be sure to create and publish a GitHub Release pointing to `trunk` once this PR gets merged,
+    copy/pasting the following text as the GitHub Release's description:
+    ```
+    #{changelog}
+    ```
+  BODY
+  GitHelper.prepare_github_pr("release/#{new_version}", 'trunk', "Release #{new_version} into trunk", pr_body)
 
   Console.info <<~INSTRUCTIONS
 
@@ -71,12 +83,15 @@ task :new_release do
 
     >>> WHAT'S NEXT
 
-    1. Create a PR against `trunk`.
-    2. Once the PR is merged, publish a GitHub release for `#{new_version}`, targeting `trunk`,
-       creating a new `#{new_version} tag in the process.
+    Once the PR is merged, publish a GitHub release for `#{new_version}`, targeting `trunk`,
+    with the following text as description:
 
-    The creation of the new tag will trigger a CI workflow that will take care of doing the
-    `gem push` of the new version to RubyGems.
+    ```
+    #{changelog}
+    ```
+
+    The publication of the new GitHub release will create a git tag, which in turn will trigger
+    a CI workflow that will take care of doing the `gem push` of the new version to RubyGems.
 
   INSTRUCTIONS
 end
