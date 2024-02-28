@@ -200,7 +200,7 @@ describe Fastlane::Helper::GithubHelper do
     end
   end
 
-  describe '#get_prs_for_milestone' do
+  describe '#get_prs_and_issues_for_milestone' do
     let(:test_repo) { 'repo-test/project-test' }
     let(:client) do
       instance_double(
@@ -220,35 +220,35 @@ describe Fastlane::Helper::GithubHelper do
     it 'returns only opened PRs for a given milestone by default' do
       search_results = [101, 103].map { |num| sawyer_resource_stub(number: num) }
       allow(client).to receive(:search_issues)
-        .with(%(repo:#{test_repo} type:pr milestone:"12.3 New Version" is:open))
+        .with(%(repo:#{test_repo} milestone:"12.3 New Version" is:open))
         .and_return({ items: search_results })
 
-      result = helper.get_prs_for_milestone(repository: test_repo, milestone: '12.3 New Version')
+      result = helper.get_prs_and_issues_for_milestone(repository: test_repo, milestone: '12.3 New Version')
       expect(result).to eq(search_results)
     end
 
     it 'returns only opened PRs for a given milestone if include_closed is false' do
       search_results = [101, 103].map { |num| sawyer_resource_stub(number: num) }
       allow(client).to receive(:search_issues)
-        .with(%(repo:#{test_repo} type:pr milestone:"12.3 New Version" is:open))
+        .with(%(repo:#{test_repo} milestone:"12.3 New Version" is:open))
         .and_return({ items: search_results })
 
-      result = helper.get_prs_for_milestone(repository: test_repo, milestone: '12.3 New Version', include_closed: false)
+      result = helper.get_prs_and_issues_for_milestone(repository: test_repo, milestone: '12.3 New Version', include_closed: false)
       expect(result).to eq(search_results)
     end
 
     it 'returns both opened and closed PRs of a milestone if include_closed is true' do
       search_results = [101, 102, 103, 104].map { |num| sawyer_resource_stub(number: num) }
       allow(client).to receive(:search_issues)
-        .with(%(repo:#{test_repo} type:pr milestone:"12.3 New Version"))
+        .with(%(repo:#{test_repo} milestone:"12.3 New Version"))
         .and_return({ items: search_results })
 
-      result = helper.get_prs_for_milestone(repository: test_repo, milestone: '12.3 New Version', include_closed: true)
+      result = helper.get_prs_and_issues_for_milestone(repository: test_repo, milestone: '12.3 New Version', include_closed: true)
       expect(result).to eq(search_results)
     end
   end
 
-  describe '#set_pr_milestone' do
+  describe '#set_milestone' do
     let(:test_repo) { 'repo-test/project-test' }
     let(:client) do
       instance_double(
@@ -270,9 +270,9 @@ describe Fastlane::Helper::GithubHelper do
         .with(test_repo, 1337, { milestone: 42 })
         .and_return(sawyer_resource_stub(number: 1337))
 
-      result = helper.set_pr_milestone(
+      result = helper.set_milestone(
         repository: test_repo,
-        pr_number: 1337,
+        number: 1337,
         milestone: 42
       )
       expect(result&.number).to eq(1337)
@@ -284,12 +284,12 @@ describe Fastlane::Helper::GithubHelper do
         .and_raise(Octokit::NotFound)
 
       expect do
-        helper.set_pr_milestone(
+        helper.set_milestone(
           repository: test_repo,
-          pr_number: 1337,
+          number: 1337,
           milestone: 42
         )
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not find PR #1337 in #{test_repo}")
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not find PR or issue #1337 in #{test_repo}")
     end
 
     it 'raises a user_error! if the source milestone could not be found' do
@@ -298,9 +298,9 @@ describe Fastlane::Helper::GithubHelper do
         .and_raise(Octokit::UnprocessableEntity)
 
       expect do
-        helper.set_pr_milestone(
+        helper.set_milestone(
           repository: test_repo,
-          pr_number: 1337,
+          number: 1337,
           milestone: 42
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Invalid milestone 42')
