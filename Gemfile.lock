@@ -448,7 +448,7 @@ GEM
     xcpretty-travis-formatter (1.0.1)
       xcpretty (~> 0.2, >= 0.0.7)
     xcresult (0.2.1)
-    yard (0.9.34)
+    yard (0.9.35)
 
 PLATFORMS
   ruby
