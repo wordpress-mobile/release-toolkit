@@ -28,6 +28,6 @@ module GitHelper
   def self.commit_files(message, files, push: true)
     Rake.sh('git', 'add', *files)
     Rake.sh('git', 'commit', '-m', message)
-    Rake.sh('git', 'push', '-q', 'origin', current_branch) if push
+    Rake.sh('git', 'push', '-q', '-u', 'origin', current_branch) if push
   end
 end
