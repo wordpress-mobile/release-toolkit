@@ -68,6 +68,10 @@ describe Fastlane::Helper::Android::VersionHelper do
     include_examples 'robustly accepts version.properties and build.gradle paths', :get_release_version
   end
 
+  describe 'get_alpha_version' do
+    include_examples 'robustly accepts version.properties and build.gradle paths', :get_alpha_version
+  end
+
   describe 'get_version_from_properties' do
     it 'returns version name and code when present' do
       test_file_content = <<~CONTENT

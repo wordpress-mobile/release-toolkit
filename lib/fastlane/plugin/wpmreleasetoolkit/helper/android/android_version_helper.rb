@@ -80,7 +80,9 @@ module Fastlane
         # @return [Hash] A hash with 2 keys `"name"` and `"code"` containing the extracted version name and code, respectively
         #
         def self.get_alpha_version(build_gradle_path:, version_properties_path:)
-          return get_version_from_properties(version_properties_path: version_properties_path, is_alpha: true) if File.exist?(version_properties_path)
+          return get_version_from_properties(version_properties_path: version_properties_path, is_alpha: true) if version_properties_path.nil? == false && File.exist?(version_properties_path)
+
+          UI.user_error!('Both version.properties and build.gradle paths where either nil or invalid.') unless build_gradle_path.nil? == false && File.exist?(build_gradle_path)
 
           section = 'defaultConfig'
           name = get_version_name_from_gradle_file(build_gradle_path, section)
