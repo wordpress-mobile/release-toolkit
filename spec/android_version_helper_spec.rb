@@ -6,6 +6,72 @@ describe Fastlane::Helper::Android::VersionHelper do
     stub_const('VERSION_PROPERTIES_PATH', './version.properties')
   end
 
+  shared_examples 'robustly accepts version.properties and build.gradle paths' do |method|
+    it 'returns the value from version.properties over build.gradle when both are given' do
+      test_build_gradle_content = <<~CONTENT
+        android {
+          defaultConfig {
+            versionName "2.31"
+            versionCode 164
+          }
+        }
+      CONTENT
+
+      allow(File).to receive(:exist?).and_return(true)
+      # The method delegates to get_version_from_properties.
+      # Stubbing it binds the two implemenations, but it's convenient in the context of these shared examples.
+      # Notice that get_version_from_properties is well tested.
+      allow(described_class).to receive(:get_version_from_properties).and_return({ name: '17.0', code: 123 })
+      allow(File).to receive(:read).with(BUILD_GRADLE_PATH).and_return(test_build_gradle_content)
+
+      expect(subject.send(method, version_properties_path: VERSION_PROPERTIES_PATH, build_gradle_path: BUILD_GRADLE_PATH)).to eq(name: '17.0', code: 123)
+    end
+
+    it 'returns the value from version.properties over build.gradle when the latter is nil' do
+      allow(File).to receive(:exist?).and_return(true)
+      # The method delegates to get_version_from_properties.
+      # Stubbing it binds the two implemenations, but it's convenient in the context of these shared examples.
+      # Notice that get_version_from_properties is well tested.
+      allow(described_class).to receive(:get_version_from_properties).and_return({ name: '17.0', code: 123 })
+
+      expect(subject.send(method, version_properties_path: VERSION_PROPERTIES_PATH, build_gradle_path: nil)).to eq(name: '17.0', code: 123)
+    end
+
+    it 'returns the value from build.gradle when version.properties is nil' do
+      in_tmp_dir do |tmp_dir|
+        # The implementation opens the file and iterates on each_lines.
+        # It's therefore easier to create the file rather than stubbing it at runtime.
+        build_gradle_path = File.join(tmp_dir, BUILD_GRADLE_PATH)
+        File.write(
+          build_gradle_path,
+          <<~CONTENT
+            android {
+              defaultConfig {
+                versionName "2.31"
+                versionCode 164
+              }
+            }
+          CONTENT
+        )
+
+        expect(subject.send(method, version_properties_path: nil, build_gradle_path: BUILD_GRADLE_PATH)).to eq('name' => '2.31', 'code' => 164)
+      end
+    end
+
+    it 'fails when both version.properties and build.gradle are nil' do
+      expect { subject.send(method, version_properties_path: nil, build_gradle_path: nil) }
+        .to raise_error(FastlaneCore::Interface::FastlaneError, 'Both version.properties and build.gradle paths where either nil or invalid.')
+    end
+  end
+
+  describe 'get_release_version' do
+    include_examples 'robustly accepts version.properties and build.gradle paths', :get_release_version
+  end
+
+  describe 'get_alpha_version' do
+    include_examples 'robustly accepts version.properties and build.gradle paths', :get_alpha_version
+  end
+
   describe 'get_version_from_properties' do
     it 'returns version name and code when present' do
       test_file_content = <<~CONTENT
@@ -83,7 +149,7 @@ describe Fastlane::Helper::Android::VersionHelper do
         allow(File).to receive(:exist?).with(VERSION_PROPERTIES_PATH).and_return(true)
         allow(File).to receive(:read).with(VERSION_PROPERTIES_PATH).and_return(original_content)
         expect(File).to receive(:write).with(VERSION_PROPERTIES_PATH, expected_content)
-        subject.update_versions(new_beta_version, nil, version_properties_path: VERSION_PROPERTIES_PATH)
+        subject.update_versions(new_beta_version, nil, build_gradle_path: nil, version_properties_path: VERSION_PROPERTIES_PATH)
       end
 
       it 'updates both the main and alpha versions if alpha provided' do
@@ -99,7 +165,7 @@ describe Fastlane::Helper::Android::VersionHelper do
         allow(File).to receive(:exist?).with(VERSION_PROPERTIES_PATH).and_return(true)
         allow(File).to receive(:read).with(VERSION_PROPERTIES_PATH).and_return(original_content)
         expect(File).to receive(:write).with(VERSION_PROPERTIES_PATH, expected_content)
-        subject.update_versions(new_beta_version, new_alpha_version, version_properties_path: VERSION_PROPERTIES_PATH)
+        subject.update_versions(new_beta_version, new_alpha_version, build_gradle_path: nil, version_properties_path: VERSION_PROPERTIES_PATH)
       end
     end
   end

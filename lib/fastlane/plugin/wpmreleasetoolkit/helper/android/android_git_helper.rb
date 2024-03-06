@@ -10,16 +10,18 @@ module Fastlane
         # inside the project subfolder.
         #
         def self.commit_version_bump(build_gradle_path:, version_properties_path:)
-          if File.exist?(version_properties_path)
+          if version_properties_path.nil? == false && File.exist?(version_properties_path)
             git_commit(
               path: version_properties_path,
               message: 'Bump version number'
             )
-          else
+          elsif build_gradle_path.nil? == false && File.exist?(build_gradle_path)
             git_commit(
               path: build_gradle_path,
               message: 'Bump version number'
             )
+          else
+            UI.user_error!('Both version.properties and build.gradle paths where either nil or invalid.')
           end
         end
       end

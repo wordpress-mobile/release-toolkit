@@ -46,7 +46,9 @@ module Fastlane
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
         def self.get_release_version(build_gradle_path:, version_properties_path:)
-          return get_version_from_properties(version_properties_path: version_properties_path) if File.exist?(version_properties_path)
+          return get_version_from_properties(version_properties_path: version_properties_path) if version_properties_path.nil? == false && File.exist?(version_properties_path)
+
+          UI.user_error!('Both version.properties and build.gradle paths where either nil or invalid.') unless build_gradle_path.nil? == false && File.exist?(build_gradle_path)
 
           section = 'defaultConfig'
           name = get_version_name_from_gradle_file(build_gradle_path, section)
@@ -78,7 +80,9 @@ module Fastlane
         # @return [Hash] A hash with 2 keys `"name"` and `"code"` containing the extracted version name and code, respectively
         #
         def self.get_alpha_version(build_gradle_path:, version_properties_path:)
-          return get_version_from_properties(version_properties_path: version_properties_path, is_alpha: true) if File.exist?(version_properties_path)
+          return get_version_from_properties(version_properties_path: version_properties_path, is_alpha: true) if version_properties_path.nil? == false && File.exist?(version_properties_path)
+
+          UI.user_error!('Both version.properties and build.gradle paths where either nil or invalid.') unless build_gradle_path.nil? == false && File.exist?(build_gradle_path)
 
           section = 'defaultConfig'
           name = get_version_name_from_gradle_file(build_gradle_path, section)
@@ -291,8 +295,8 @@ module Fastlane
         # @param [Hash] new_version_beta The version hash for the beta, containing values for keys "name" and "code"
         # @param [Hash] new_version_alpha The version hash for the alpha , containing values for keys "name" and "code"
         #
-        def self.update_versions(new_version_beta, new_version_alpha, version_properties_path:)
-          if File.exist?(version_properties_path)
+        def self.update_versions(new_version_beta, new_version_alpha, build_gradle_path:, version_properties_path:)
+          if version_properties_path.nil? == false && File.exist?(version_properties_path)
             replacements = {
               versionName: (new_version_beta || {})[VERSION_NAME],
               versionCode: (new_version_beta || {})[VERSION_CODE],
@@ -306,9 +310,11 @@ module Fastlane
               value.nil? ? line : "#{key}=#{value}"
             end
             File.write(version_properties_path, content)
+          elsif build_gradle_path.nil? == false && File.exist?(build_gradle_path)
+            update_version(new_version_beta, 'defaultConfig', build_gradle_path: build_gradle_path)
+            update_version(new_version_alpha, 'defaultConfig', build_gradle_path: build_gradle_path) unless new_version_alpha.nil?
           else
-            update_version(new_version_beta, 'defaultConfig')
-            update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
+            UI.user_error!('Both version.properties and build.gradle paths where either nil or invalid.')
           end
         end
 
