@@ -14,6 +14,10 @@ module Fastlane
         build_gradle_path = params[:build_gradle_path]
         version_properties_path = params[:version_properties_path]
 
+        # build_gradle_path and version_properties_path are marked as conflicting options: either you give one or the other.
+        # Fastlane requires conflicting options to be optional, but that leaves the door open for neither being given.
+        UI.user_error!('Either a build_gradle_path or version_properties_path must be specified.') if build_gradle_path.nil? && version_properties_path.nil?
+
         # Checkout default branch and update
         default_branch = params[:default_branch]
         Fastlane::Helper::GitHelper.checkout_and_pull(default_branch)
