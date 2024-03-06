@@ -54,6 +54,7 @@ module Fastlane
         Fastlane::Helper::Android::VersionHelper.update_versions(
           new_version_beta,
           new_version_alpha,
+          build_gradle_path: build_gradle_path,
           version_properties_path: version_properties_path
         )
         Fastlane::Helper::Android::GitHelper.commit_version_bump(

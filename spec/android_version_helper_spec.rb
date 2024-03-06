@@ -149,7 +149,7 @@ describe Fastlane::Helper::Android::VersionHelper do
         allow(File).to receive(:exist?).with(VERSION_PROPERTIES_PATH).and_return(true)
         allow(File).to receive(:read).with(VERSION_PROPERTIES_PATH).and_return(original_content)
         expect(File).to receive(:write).with(VERSION_PROPERTIES_PATH, expected_content)
-        subject.update_versions(new_beta_version, nil, version_properties_path: VERSION_PROPERTIES_PATH)
+        subject.update_versions(new_beta_version, nil, build_gradle_path: nil, version_properties_path: VERSION_PROPERTIES_PATH)
       end
 
       it 'updates both the main and alpha versions if alpha provided' do
@@ -165,7 +165,7 @@ describe Fastlane::Helper::Android::VersionHelper do
         allow(File).to receive(:exist?).with(VERSION_PROPERTIES_PATH).and_return(true)
         allow(File).to receive(:read).with(VERSION_PROPERTIES_PATH).and_return(original_content)
         expect(File).to receive(:write).with(VERSION_PROPERTIES_PATH, expected_content)
-        subject.update_versions(new_beta_version, new_alpha_version, version_properties_path: VERSION_PROPERTIES_PATH)
+        subject.update_versions(new_beta_version, new_alpha_version, build_gradle_path: nil, version_properties_path: VERSION_PROPERTIES_PATH)
       end
     end
   end
