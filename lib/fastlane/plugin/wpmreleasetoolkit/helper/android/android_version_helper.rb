@@ -298,7 +298,7 @@ module Fastlane
         # @param [Hash] new_version_beta The version hash for the beta, containing values for keys "name" and "code"
         # @param [Hash] new_version_alpha The version hash for the alpha , containing values for keys "name" and "code"
         #
-        def self.update_versions(new_version_beta, new_version_alpha, version_properties_path:, has_alpha_version:)
+        def self.update_versions(new_version_beta, new_version_alpha, version_properties_path:, has_alpha_version:, build_gradle_path:)
           if File.exist?(version_properties_path)
             replacements = {
               versionName: (new_version_beta || {})[VERSION_NAME],
@@ -314,8 +314,8 @@ module Fastlane
             end
             File.write(version_properties_path, content)
           else
-            self.update_version(new_version_beta, has_alpha_version.nil? ? 'defaultConfig' : 'vanilla {')
-            self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
+            self.update_version(new_version_beta, has_alpha_version.nil? ? 'defaultConfig' : 'vanilla {', build_gradle_path:)
+            self.update_version(new_version_alpha, 'defaultConfig', build_gradle_path:) unless new_version_alpha.nil?
           end
         end
 
