@@ -6,18 +6,8 @@ describe Fastlane::Helper::Android::VersionHelper do
     stub_const('VERSION_PROPERTIES_PATH', './version.properties')
   end
 
-  describe 'get_release_version' do
+  shared_examples 'robustly accepts version.properties and build.gradle paths' do |method|
     it 'returns the value from version.properties over build.gradle when both are given' do
-      test_properties_content = <<~CONTENT
-        # Some header
-
-        versionName=17.0
-        versionCode=123
-
-        alpha.versionName=alpha-222
-        alpha.versionCode=1234
-      CONTENT
-
       test_build_gradle_content = <<~CONTENT
         android {
           defaultConfig {
@@ -28,27 +18,23 @@ describe Fastlane::Helper::Android::VersionHelper do
       CONTENT
 
       allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:read).with(VERSION_PROPERTIES_PATH).and_return(test_properties_content)
+      # The method delegates to get_version_from_properties.
+      # Stubbing it binds the two implemenations, but it's convenient in the context of these shared examples.
+      # Notice that get_version_from_properties is well tested.
+      allow(described_class).to receive(:get_version_from_properties).and_return({ name: '17.0', code: 123 })
       allow(File).to receive(:read).with(BUILD_GRADLE_PATH).and_return(test_build_gradle_content)
 
-      expect(subject.get_release_version(version_properties_path: VERSION_PROPERTIES_PATH, build_gradle_path: BUILD_GRADLE_PATH)).to eq('name' => '17.0', 'code' => 123)
+      expect(subject.send(method, version_properties_path: VERSION_PROPERTIES_PATH, build_gradle_path: BUILD_GRADLE_PATH)).to eq(name: '17.0', code: 123)
     end
 
     it 'returns the value from version.properties over build.gradle when the latter is nil' do
-      test_properties_content = <<~CONTENT
-        # Some header
-
-        versionName=17.0
-        versionCode=123
-
-        alpha.versionName=alpha-222
-        alpha.versionCode=1234
-      CONTENT
-
       allow(File).to receive(:exist?).and_return(true)
-      allow(File).to receive(:read).with(VERSION_PROPERTIES_PATH).and_return(test_properties_content)
+      # The method delegates to get_version_from_properties.
+      # Stubbing it binds the two implemenations, but it's convenient in the context of these shared examples.
+      # Notice that get_version_from_properties is well tested.
+      allow(described_class).to receive(:get_version_from_properties).and_return({ name: '17.0', code: 123 })
 
-      expect(subject.get_release_version(version_properties_path: VERSION_PROPERTIES_PATH, build_gradle_path: nil)).to eq('name' => '17.0', 'code' => 123)
+      expect(subject.send(method, version_properties_path: VERSION_PROPERTIES_PATH, build_gradle_path: nil)).to eq(name: '17.0', code: 123)
     end
 
     it 'returns the value from build.gradle when version.properties is nil' do
@@ -68,14 +54,18 @@ describe Fastlane::Helper::Android::VersionHelper do
           CONTENT
         )
 
-        expect(subject.get_release_version(version_properties_path: nil, build_gradle_path: BUILD_GRADLE_PATH)).to eq('name' => '2.31', 'code' => 164)
+        expect(subject.send(method, version_properties_path: nil, build_gradle_path: BUILD_GRADLE_PATH)).to eq('name' => '2.31', 'code' => 164)
       end
     end
 
     it 'fails when both version.properties and build.gradle are nil' do
-      expect { subject.get_release_version(version_properties_path: nil, build_gradle_path: nil) }
+      expect { subject.send(method, version_properties_path: nil, build_gradle_path: nil) }
         .to raise_error(FastlaneCore::Interface::FastlaneError, 'Both version.properties and build.gradle paths where either nil or invalid.')
     end
+  end
+
+  describe 'get_release_version' do
+    include_examples 'robustly accepts version.properties and build.gradle paths', :get_release_version
   end
 
   describe 'get_version_from_properties' do
