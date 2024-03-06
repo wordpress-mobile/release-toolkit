@@ -35,8 +35,8 @@ module Fastlane
         unless params[:skip_confirm]
           confirm_message = "Building a new release branch starting from #{default_branch}.\nCurrent version is #{current_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{current_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
           confirm_message += current_alpha_version.nil? ? no_alpha_version_message : "Current Alpha version is #{current_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{current_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
-          confirm_message += "After codefreeze the new version will be: #{next_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{next_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
-          confirm_message += current_alpha_version.nil? ? '' : "After codefreeze the new Alpha will be: #{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
+          confirm_message += "After code freeze the new version will be: #{next_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{next_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
+          confirm_message += current_alpha_version.nil? ? '' : "After code freeze the new Alpha will be: #{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_NAME]} (#{next_alpha_version[Fastlane::Helper::Android::VersionHelper::VERSION_CODE]}).\n"
           confirm_message += 'Do you want to continue?'
           UI.user_error!('Aborted by user request') unless UI.confirm(confirm_message)
         end
@@ -68,7 +68,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
                                        env_name: 'FL_ANDROID_CODEFREEZE_PRECHECKS_SKIPCONFIRM',
-                                       description: 'Skips confirmation before codefreeze',
+                                       description: 'Skips confirmation before code freeze',
                                        type: Boolean,
                                        default_value: false), # the default value if the user didn't provide one
           FastlaneCore::ConfigItem.new(key: :default_branch,

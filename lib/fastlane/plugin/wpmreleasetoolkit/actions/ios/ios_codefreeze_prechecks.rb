@@ -18,7 +18,7 @@ module Fastlane
         next_version = Fastlane::Helper::Ios::VersionHelper.calc_next_release_version(current_version)
 
         # Ask user confirmation
-        unless params[:skip_confirm] || UI.confirm("Building a new release branch starting from #{default_branch}.\nCurrent version is #{current_version} (#{current_build_version}).\nAfter codefreeze the new version will be: #{next_version}.\nDo you want to continue?")
+        unless params[:skip_confirm] || UI.confirm("Building a new release branch starting from #{default_branch}.\nCurrent version is #{current_version} (#{current_build_version}).\nAfter code freeze the new version will be: #{next_version}.\nDo you want to continue?")
           UI.user_error!('Aborted by user request')
         end
 
@@ -46,7 +46,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :skip_confirm,
                                        env_name: 'FL_IOS_CODEFREEZE_PRECHECKS_SKIPCONFIRM',
-                                       description: 'Skips confirmation before codefreeze',
+                                       description: 'Skips confirmation before code freeze',
                                        type: Boolean,
                                        default_value: false), # the default value if the user didn't provide one
           FastlaneCore::ConfigItem.new(key: :default_branch,
