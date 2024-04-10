@@ -19,12 +19,6 @@ rubocop.lint(files: [], force_exclusion: true, inline_comment: true, fail_on_inl
 
 manifest_pr_checker.check_gemfile_lock_updated
 
-# skip remaining checks if we're in a release-process PR
-if github.pr_labels.include?('Releases')
-  message('This PR has the `Releases` label: some checks will be skipped.')
-  return
-end
-
 if version.to_s != gemfile_lock_version.to_s
   message = <<~MESSAGE
     The version in the `Gemfile.lock` (`#{gemfile_lock_version}`) doesn't match the one in `version.rb` (`#{version}`).
@@ -52,8 +46,7 @@ end
 
 labels_checker.check(
   do_not_merge_labels: ['Do Not Merge'],
-  required_labels: [//],
-  required_labels_error: 'PR requires at least one label.'
+  required_labels: []
 )
 
 milestone_checker.check_milestone_due_date(days_before_due: 5)
