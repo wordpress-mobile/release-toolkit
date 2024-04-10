@@ -103,6 +103,21 @@ describe Fastlane::Actions::IosCheckBetaDepsAction do
     expect(result[:message]).to eq(expected_message)
   end
 
+  it 'does not report any error if everything is disabled' do
+    expected_message = Fastlane::Actions::IosCheckBetaDepsAction::ALL_PODS_STABLE_MESSAGE
+    expect(FastlaneCore::UI).to receive(:important).with(expected_message)
+
+    result = run_described_fastlane_action(
+      lockfile: lockfile_fixture_path,
+      report_commits: false,
+      report_branches: false,
+      report_version_pattern: ''
+    )
+
+    expect(result[:pods]).to eq({})
+    expect(result[:message]).to eq(expected_message)
+  end
+
   it 'raises user_error! if regex is invalid' do
     expect do
       run_described_fastlane_action(

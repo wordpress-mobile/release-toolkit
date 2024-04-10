@@ -31,10 +31,11 @@ module Fastlane
           end
         end
 
+        message = ''
         if non_stable_pods.empty?
-          UI.message('All pods are pointing to a stable version. You can continue with the code freeze.')
+          message << ALL_PODS_STABLE_MESSAGE
         else
-          message = NON_STABLE_PODS_MESSAGE.dup
+          message << NON_STABLE_PODS_MESSAGE
           non_stable_pods.sort.each do |pod, reason|
             message << " - #{pod} (currently points to #{reason})\n"
           end
@@ -47,6 +48,7 @@ module Fastlane
       # @!group Documentation
       #####################################################
 
+      ALL_PODS_STABLE_MESSAGE = 'All pods are pointing to a stable version. You can continue with the code freeze.'.freeze
       NON_STABLE_PODS_MESSAGE = "Please create a new stable version of those pods and update the Podfile to the newly released version before continuing with the code freeze:\n".freeze
 
       def self.description
