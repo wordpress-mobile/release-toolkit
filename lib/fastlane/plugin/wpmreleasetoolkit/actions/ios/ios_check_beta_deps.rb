@@ -10,8 +10,8 @@ module Fastlane
         yaml = YAML.load_file(params[:lockfile])
         non_stable_pods = {} # Key will be pod name, value will be reason for flagging
 
-        # Find pods referenced by commit and branch to a repo
-        yaml['EXTERNAL SOURCES'].each do |pod, options|
+        # Find pods referenced by commit and branch to a repo. if any
+        yaml['EXTERNAL SOURCES']&.each do |pod, options|
           non_stable_pods[pod] = 'commit' if params[:report_commits] && options.key?(:commit)
           non_stable_pods[pod] = 'branch' if params[:report_branches] && options.key?(:branch)
         end
