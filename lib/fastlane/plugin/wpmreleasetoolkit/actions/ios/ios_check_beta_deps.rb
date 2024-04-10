@@ -3,6 +3,9 @@ require 'yaml'
 module Fastlane
   module Actions
     class IosCheckBetaDepsAction < Action
+      ALL_PODS_STABLE_MESSAGE = 'All pods are pointing to a stable version. You can continue with the code freeze.'.freeze
+      NON_STABLE_PODS_MESSAGE = "Please create a new stable version of those pods and update the Podfile to the newly released version before continuing with the code freeze:\n".freeze
+
       def self.run(params)
         require_relative '../../helper/ios/ios_version_helper'
         require_relative '../../helper/ios/ios_git_helper'
@@ -47,9 +50,6 @@ module Fastlane
       #####################################################
       # @!group Documentation
       #####################################################
-
-      ALL_PODS_STABLE_MESSAGE = 'All pods are pointing to a stable version. You can continue with the code freeze.'.freeze
-      NON_STABLE_PODS_MESSAGE = "Please create a new stable version of those pods and update the Podfile to the newly released version before continuing with the code freeze:\n".freeze
 
       def self.description
         'Runs some prechecks before finalizing a release'
