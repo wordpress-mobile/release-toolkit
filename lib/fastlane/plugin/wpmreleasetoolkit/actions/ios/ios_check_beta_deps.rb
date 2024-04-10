@@ -84,7 +84,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :report_version_pattern,
-            description: 'Report any pod whose tag name or version constraint matches this Regex pattern. Set to empty string to ignore',
+            description: 'Report any pod whose resolved version matches this Regex pattern. Set to empty string to ignore',
             default_value: '-beta|-rc',
             type: String
           ),
