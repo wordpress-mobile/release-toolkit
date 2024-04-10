@@ -15,7 +15,7 @@ describe Fastlane::Actions::IosCheckBetaDepsAction do
     allow(FastlaneCore::UI).to receive(:important)
   end
 
-  it 'reports Pods referenced by commits, branches and -beta by default' do
+  it 'reports Pods referenced by commits, branches and -beta|-rc by default' do
     expected_violations = {
       'Gridicons' => '-beta|-rc',
       'NSURL+IDN' => '-beta|-rc',
@@ -69,7 +69,7 @@ describe Fastlane::Actions::IosCheckBetaDepsAction do
     expect(result[:message]).to eq(expected_message)
   end
 
-  it 'does not report Pods referenced by *-beta if regex is empty' do
+  it 'does not report Pods referenced by *-beta nor *-rc if regex is empty' do
     expected_violations = {
       'WordPressAuthenticator' => 'commit',
       'WordPressUI' => 'branch'
@@ -104,6 +104,15 @@ describe Fastlane::Actions::IosCheckBetaDepsAction do
     expect(result[:message]).to eq(expected_message)
   end
 
+  it 'raises user_error! if regex is invalid' do
+    expect do
+      run_described_fastlane_action(
+        lockfile: lockfile_with_external_sources,
+        report_version_pattern: '*-rc-\d'
+      )
+    end.to raise_exception(FastlaneCore::Interface::FastlaneError, 'Invalid regex pattern: `*-rc-\d`')
+  end
+
   it 'does not report any error if everything is disabled' do
     expected_message = Fastlane::Actions::IosCheckBetaDepsAction::ALL_PODS_STABLE_MESSAGE
     expect(FastlaneCore::UI).to receive(:important).with(expected_message)
@@ -133,14 +142,5 @@ describe Fastlane::Actions::IosCheckBetaDepsAction do
 
     expect(result[:pods]).to eq({})
     expect(result[:message]).to eq(expected_message)
-  end
-
-  it 'raises user_error! if regex is invalid' do
-    expect do
-      run_described_fastlane_action(
-        lockfile: lockfile_with_external_sources,
-        report_version_pattern: '*-rc-\d'
-      )
-    end.to raise_exception(FastlaneCore::Interface::FastlaneError, 'Invalid regex pattern: `*-rc-\d`')
   end
 end
