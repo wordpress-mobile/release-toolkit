@@ -24,8 +24,8 @@ _None_
 
 ### Breaking Changes
 
-- Make `ios_check_beta_deps` use the `Podfile.lock` instead of `Podfile` for its detection, and also be able to detect Pods referenced by commits and branches.  
-   If your `Fastfile` called this action with an explicit `podfile: …` argument, you'll have to update the call to use `lockfile:` instead (or rely on defaults). [#557]
+- Make `ios_check_beta_deps` use the `Podfile.lock` instead of `Podfile` for its detection, and also be able to detect Pods referenced by commits and branches.
+  If your `Fastfile` called this action with an explicit `podfile: …` argument, you'll have to update the call to use `lockfile:` instead (or rely on defaults). [#557]
 
 ## 10.0.0
 
