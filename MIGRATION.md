@@ -2,7 +2,7 @@
 
 ## From `10.0.0` to `11.0.0`
 
- - The `ios_check_beta_deps` now uses the `Podfile.lock` instead of `Podfile` for its detection. If you called this action with an explicit `podfile: …` argument, you'll have to update the call to use `lockfile:` instead—or remove that argument completely from your call and rely on its default value being `Podfile.lock`.
+- The `ios_check_beta_deps` now uses the `Podfile.lock` instead of `Podfile` for its detection. If you called this action with an explicit `podfile: …` argument, you'll have to update the call to use `lockfile:` instead—or remove that argument completely from your call and rely on its default value being `Podfile.lock`.
 
 ## From `9.0.0` to `10.0.0`
 
