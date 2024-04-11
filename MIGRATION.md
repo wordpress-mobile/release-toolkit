@@ -1,5 +1,9 @@
 # Migration Instructions for Major Releases
 
+## From `10.0.0` to `11.0.0`
+
+- The `ios_check_beta_deps` now uses the `Podfile.lock` instead of `Podfile` for its detection. If you called this action with an explicit `podfile: …` argument, you'll have to update the call to use `lockfile:` instead—or remove that argument completely from your call and rely on its default value being `Podfile.lock`.
+
 ## From `9.0.0` to `10.0.0`
 
  - The new minimum required Ruby version is `3.2.2`. Please make sure to upgrade your projects before upgrading to this version to avoid compatibility issues.
