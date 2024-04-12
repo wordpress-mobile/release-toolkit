@@ -22,7 +22,7 @@ module Fastlane
 
         # Update submodules then lint translations
         unless params[:lint_task].nil? || params[:lint_task].empty?
-          git_submodule_update(
+          other_action.git_submodule_update(
             recursive: true,
             init: true
           )
