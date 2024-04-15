@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Fixed the `android_download_translations` action by correctly calling Fastlane's `git_submodule_update` action [#561]
 
 ### Internal Changes
 
