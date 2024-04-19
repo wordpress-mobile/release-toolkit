@@ -3,7 +3,7 @@ require 'onesky'
 
 module Fastlane
   module Actions
-    class DownloadMetadataFromOnesky < Action
+    class DownloadMetadataFromOneskyAction < Action
       def self.run(params)
         metadata_files = params[:metadata_files]
 
@@ -13,13 +13,17 @@ module Fastlane
         metadata_translations = fetch_translations(
           onesky_project: onesky_project(params),
           source_file_name: params[:source_file_name],
-          locales: params[:locale],
+          locales: params[:locales],
           keys: keys + alts
         )
 
         changed_files = []
         metadata_files.each do |file, config|
           translations = metadata_translations[config[:key]]
+          if translations.nil?
+            UI.error(" - Could not find key #{config[:key]} in translations")
+            next
+          end
           translations.each do |lang, text|
             if lang == 'en-US' && config[:skip_enUS] == true
               UI.message(" - Skipping updating #{lang}/#{file}, because `skip_enUS` was set")
@@ -109,10 +113,11 @@ module Fastlane
         if !config[:max].nil? && (text.nil? || text.empty? || text.length > config[:max])
           UI.error(" ! Translation for #{lang}/#{file} (#{key}) is missing or longer than #{config[:max]} characters, so it was not updated.")
           nil
-        elsif File.read(path).chomp == text.chomp
+        elsif File.exist?(path) && File.read(path).chomp == text.chomp
           UI.message(" ✓ Translation for #{lang}/#{file} was already up-to-date.")
           nil
         else
+          FileUtils.mkdir_p(File.dirname(path))
           File.write(path, "#{text.chomp}\n") # Ensure newline at end of file
           UI.success(" 🆕 Updated translation for #{lang}/#{file}.")
           File.join('fastlane', path)
@@ -147,7 +152,7 @@ module Fastlane
             # Those file names and max limits typically correspond to Android metadata
             metadata_files = {
               'title.txt': { key: 'app_title', max: 30 },
-              'short_description.txt': { key: app_subtitle_10_2021, max: 80 },
+              'short_description.txt': { key: 'app_subtitle_10_2021', max: 80 },
               'full_description.txt': {
                 key: 'app_description_8_2023',
                 max: 4000,
@@ -159,7 +164,7 @@ module Fastlane
             }
             changed_files = download_metadata_from_onesky(
               metadata_files: metadata_files,
-              locales: LocalesMap.default.to_h(:onesky, :google_play)
+              locales: Fastlane::LocalesMap.default.to_h(:onesky, :google_play)
             )
             # Then you can call `git_add`+`git_commit` passing those `changed_files`, for example
           EXAMPLE1
@@ -167,7 +172,7 @@ module Fastlane
             # Those file names and max limits typically correspond to iOS metadata
             metadata_files = {
               'name.txt': { key: 'app_title', max: 30 },
-              'subtitle.txt': { key: app_subtitle_10_2021, max: 30 },
+              'subtitle.txt': { key: 'app_subtitle_10_2021', max: 30 },
               'promotional_text.txt': { key: nil, max: 170 },
               'keywords.txt': { key: 'app_keywords_5_2021', max: 100 },
               'description.txt': {
@@ -175,7 +180,7 @@ module Fastlane
                 max: 4000,
                 alt: 'app_description_8_2023_short',
                 # The copy we actually use for English in ASC is different from the (shorter) English copy we provide translators in OneSky
-                skip_enUS: true # So we don't want to update en-US/description.txt with the OneSky Engish copy.
+                skip_enUS: true # So we don't want to update en-US/description.txt with the OneSky English copy.
               },
               'release_notes.txt': { key: release_notes_id, max: 4000 }
             }
@@ -185,7 +190,7 @@ module Fastlane
               onesky_project_id: 123_456,
               source_file_name: 'store-metadata.xml',
               metadata_files: metadata_files,
-              locales: LocalesMap.default.to_h(:onesky, :app_store)
+              locales: Fastlane::LocalesMap.default.to_h(:onesky, :app_store)
             )
             # Then you can call `git_add`+`git_commit` passing those `changed_files`, for example
           EXAMPLE2
