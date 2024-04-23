@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- `buildkite_trigger_build` now returns the web URL of the Buildkite build it scheduled [#564]
 
 ### Bug Fixes
 
