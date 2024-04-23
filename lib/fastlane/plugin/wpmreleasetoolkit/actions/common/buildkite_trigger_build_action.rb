@@ -27,11 +27,15 @@ module Fastlane
           options
         )
 
+        build_url = response.web_url
+
         if response.state == 'scheduled'
-          UI.success("Successfully scheduled new build. You can see it at '#{response.web_url}'")
+          UI.success("Successfully scheduled new build. You can see it at '#{build_url}'")
         else
           UI.crash!("Failed to start build.\nError: [#{response}]")
         end
+
+        build_url
       end
 
       #####################################################
@@ -98,6 +102,10 @@ module Fastlane
 
       def self.authors
         ['Automattic']
+      end
+
+      def self.return_value
+        'The web URL of the build the action started.'
       end
 
       def self.is_supported?(platform)
