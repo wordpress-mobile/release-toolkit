@@ -21,6 +21,7 @@ describe Fastlane::Actions::BuildkiteTriggerBuildAction do
       # rubocop:enable RSpec/VerifiedDoubles
 
       url = run_described_fastlane_action(
+        buildkite_token: 'fake-token',
         branch: 'branch',
         commit: '1a2b3c',
         pipeline_file: 'pipeline.yml',
@@ -43,6 +44,7 @@ describe Fastlane::Actions::BuildkiteTriggerBuildAction do
       expect(FastlaneCore::UI).to receive(:crash!)
 
       run_described_fastlane_action(
+        buildkite_token: 'fake-token',
         branch: 'branch',
         commit: '1a2b3c',
         pipeline_file: 'pipeline.yml',
