@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- `buildkite_trigger_build` now returns the web URL of the Buildkite build it scheduled [#564]
+_None_
 
 ### Bug Fixes
 
@@ -19,6 +19,18 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 11.0.2
+
+### New Features
+
+- `buildkite_trigger_build` now returns the web URL of the Buildkite build it scheduled [#564]
+
+### Internal Changes
+
+- Bump `yard` from `0.9.34` to `0.9.36` [#554]
+- Bump `nokogiri` from `1.16.2` to `1.16.5` [#566]
+- Bump `rexml` from `3.2.6` to `3.2.8` [#566]
 
 ## 11.0.1
 
