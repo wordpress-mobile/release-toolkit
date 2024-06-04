@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- `buildkite_trigger_build` now returns the web URL of the Buildkite build it scheduled [#564]
+_None_
 
 ### Bug Fixes
 
@@ -19,6 +19,12 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 11.0.2
+
+### New Features
+
+- `buildkite_trigger_build` now returns the web URL of the Buildkite build it scheduled [#564]
 
 ## 11.0.1
 
