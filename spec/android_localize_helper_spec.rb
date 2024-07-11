@@ -182,18 +182,43 @@ describe Fastlane::Helper::Android::LocalizeHelper do
           include_examples 'en-dash substitutions', 'ordered lists', "/resources/string-array[@name='checklist_array']/item[1]", '- 1.', "\u{2013} 1.", '- 1.'
           include_examples 'en-dash substitutions', 'unordered lists', "/resources/string-array[@name='checklist_array']/item[2]", '- o', "\u{2013} o", '- o'
         end
+
+        context 'with //plurals/item tags' do
+          include_examples 'ellipsis substitutions', "/resources/plurals[@name='confirm_entry_trash']/item[@quantity='other']"
+        end
       end
 
-      it 'replicates formatted="false" attribute to generated files' do
-        orig_xml = File.open(generated_file(nil)) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-        pt_xml = File.open(generated_file('pt-rBR')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+      describe 'replicates attributes to generated files' do
+        shared_examples 'replicates attributes' do |xpath, attribute|
+          it "replicates the `#{attribute}` attribute to generated files" do
+            orig_xml = File.open(generated_file(nil)) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+            pt_xml = File.open(generated_file('pt-rBR')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
 
-        orig_node = orig_xml.xpath("/resources/string[@formatted='false']").first
-        expect(orig_node).not_to be_nil
+            orig_node = orig_xml.xpath(xpath).first
+            expect(orig_node).not_to be_nil
 
-        pt_node = pt_xml.xpath("/resources/string[@name='#{orig_node['name']}']").first
-        expect(pt_node).not_to be_nil
-        expect(pt_node['formatted']).to eq(orig_node['formatted'])
+            pt_node = pt_xml.xpath(xpath).first
+            expect(pt_node).not_to be_nil
+            expect(pt_node[attribute]).to eq(orig_node[attribute])
+          end
+        end
+
+        context 'with /resource tags' do
+          include_examples 'replicates attributes', '/resources', 'xmlns:tools'
+        end
+
+        context 'with //string tags' do
+          include_examples 'replicates attributes', "/resources/string[@name='shipping_label_woo_discount_bottomsheet_message']", 'formatted'
+          include_examples 'replicates attributes', "/resources/string[@name='app_name']", 'content_override'
+        end
+
+        context 'with //string-array tags' do
+          include_examples 'replicates attributes', "/resources/string-array[@name='weeks_full']", 'translatable'
+        end
+
+        context 'with //plurals tags' do
+          include_examples 'replicates attributes', "/resources/plurals[@name='confirm_entry_trash']", 'formatted'
+        end
       end
 
       it 'warns about %% usage on tags with formatted="false"' do

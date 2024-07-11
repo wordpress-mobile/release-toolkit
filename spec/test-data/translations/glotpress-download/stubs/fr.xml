@@ -6,6 +6,7 @@ Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+  <string name="app_name">WooCommerce</string>
 	<string name="product_attributes_error_saving">Erreur lors de l’enregistrement de vos attributs</string>
 	<string name="shipping_label_payments_cant_edit_warning">Seul le propriétaire du site peut gérer les moyens de paiement des étiquettes d’expédition. Veuillez contacter le propriétaire de la boutique %1$s (%2$s) pour gérer les moyens de paiement.</string>
 	<string name="shipping_label_shipping_method_free_shipping">Livraison gratuite</string>
@@ -54,4 +55,26 @@ Language: fr
         <item> - o Deux: deuxième point</item>
     </string-array>
     <string name="multi_range_statement">La première plage est 2-100 et la seconde est 123-456.</string>
+    <string name="sunday">Dimanche</string>
+    <string name="monday">Lundi</string>
+    <string name="tuesday">Mardi</string>
+    <string name="wednesday">Mercredi</string>
+    <string name="thursday">Jeudi</string>
+    <string name="friday">Vendredi</string>
+    <string name="saturday">Samedi</string>
+    <string-array name="weeks_full">
+        <item>@string/sunday</item>
+        <item>@string/monday</item>
+        <item>@string/tuesday</item>
+        <item>@string/wednesday</item>
+        <item>@string/thursday</item>
+        <item>@string/friday</item>
+        <item>@string/saturday</item>
+        <item>None</item>
+    </string-array>
+    <string name="confirm_single_entry_trash">Êtes-vous sûr de vouloir déplacer cette entrée vers la corbeille ?</string>
+    <plurals name="confirm_entry_trash">
+        <item quantity="one">@string/confirm_single_entry_trash</item>
+        <item quantity="other">Etes-vous sûr... de vouloir déplacer %d entrées vers la corbeille ?</item>
+    </plurals>
 </resources>

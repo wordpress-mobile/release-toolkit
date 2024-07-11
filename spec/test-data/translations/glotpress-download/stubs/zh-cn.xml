@@ -6,6 +6,7 @@ Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+  <string name="app_name">WooCommerce</string>
 	<string name="shipping_label_payments_cant_edit_warning">只有站点所有者可以管理配送标签付款方式。 请联系商店所有者 %1$s (%2$s) 以管理付款方式。</string>
 	<string name="product_term_name_already_exists">已存在具有此名称的选项</string>
 	<string name="product_attribute_name_already_exists">已存在具有此名称的属性</string>
@@ -55,4 +56,26 @@ Language: zh_CN
         <item> - o 二：第二点</item>
     </string-array>
     <string name="multi_range_statement">第一范围是2-100，第二范围是123-456</string>
+    <string name="sunday">星期日</string>
+    <string name="monday">星期一</string>
+    <string name="tuesday">星期二</string>
+    <string name="wednesday">星期三</string>
+    <string name="thursday">星期四</string>
+    <string name="friday">星期五</string>
+    <string name="saturday">星期六</string>
+    <string-array name="weeks_full">
+        <item>@string/sunday</item>
+        <item>@string/monday</item>
+        <item>@string/tuesday</item>
+        <item>@string/wednesday</item>
+        <item>@string/thursday</item>
+        <item>@string/friday</item>
+        <item>@string/saturday</item>
+        <item>没有任何</item>
+    </string-array>
+    <string name="confirm_single_entry_trash">您确定要将该条目移至垃圾箱吗？</string>
+    <plurals name="confirm_entry_trash">
+        <item quantity="one">@string/confirm_single_entry_trash</item>
+        <item quantity="other">您确定...要将 %d 个条目移至垃圾箱吗？</item>
+    </plurals>
 </resources>
