@@ -152,6 +152,13 @@ module Fastlane
           (added_count + updated_count) != 0
         end
 
+        ########
+        # @!group Verify diff of library vs main strings matches
+        #
+        # @note This set of methods is used by `an_validate_lib_strings_action`
+        #       (which doesn't seem to be used by any of our Android projects nowadays?)
+        ########
+
         def self.verify_diff(diff_string, main_strings, lib_strings, library)
           return unless diff_string.start_with?('name=')
 
@@ -197,6 +204,8 @@ module Fastlane
             end
           end
         end
+
+        # @!endgroup
 
         ########
         # @!group Downloading translations from GlotPress
@@ -266,8 +275,10 @@ module Fastlane
           end
         end
 
+        # @!endgroup
+
         #####################
-        # Private Helpers
+        # @!group Private Helpers
         #####################
 
         # Downloads the export from GlotPress for a given locale and given filters
@@ -296,6 +307,9 @@ module Fastlane
         private_class_method :download_glotpress_export_file
 
         # Merge multiple Nokogiri::XML `strings.xml` documents together
+        #
+        # Used especially when we provided multiple GlotPress filters to `download_from_glotpress`,
+        # as in this case we'd trigger one export per filter, then merge the result in a single XML
         #
         # @param [Array<Nokogiri::XML::Document>] all_xmls Array of the Nokogiri XML documents to merge together
         # @return [Nokogiri::XML::Document] The merged document.
