@@ -354,18 +354,18 @@ module Fastlane
           end
           # 3. Process copies for `string` nodes
           translated_xml.xpath('//string[@name]').each do |string_node|
-            apply_substitutions(string_node)
+            apply_substitutions!(string_node)
             quick_lint(string_node, locale_code)
           end
           # 4. Process copies for `string-array/item` nodes
           translated_xml.xpath('//string-array[@name]/item').each do |item_node|
-            apply_substitutions(item_node)
+            apply_substitutions!(item_node)
             quick_lint(item_node, locale_code)
           end
           # 5. Replicate attributes + Process copies for `plurals/item` nodes
           translated_xml.xpath('//plurals[@name]/item[@quantity]').each do |item_node|
             copy_orig_attributes.call(item_node, "//*[@name = '#{item_node.parent['name']}']/item[@quantity = '#{item_node['quantity']}']")
-            apply_substitutions(item_node)
+            apply_substitutions!(item_node)
             quick_lint(item_node, locale_code)
           end
         end
@@ -375,7 +375,7 @@ module Fastlane
         #
         # @param [Nokogiri::XML::Node] tag The XML tag/node to apply substitutions to
         #
-        def self.apply_substitutions(tag)
+        def self.apply_substitutions!(tag)
           tag.content = tag.content.gsub('...', '…')
 
           # Typography en-dash
@@ -387,7 +387,7 @@ module Fastlane
             is_negative_number ? str : "#{match[1]}\u{2013}#{match[2]}"
           end
         end
-        private_class_method :apply_substitutions
+        private_class_method :apply_substitutions!
 
         # Perform some quick basic checks about an individual `<string>` tag and print warnings accordingly:
         #  - detect the use of `%%` in the string even if `formatted=false` is set
