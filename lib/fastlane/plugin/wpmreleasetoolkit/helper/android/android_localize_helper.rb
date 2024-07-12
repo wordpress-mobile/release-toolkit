@@ -405,7 +405,7 @@ module Fastlane
           # rubocop:disable Style/GuardClause
           if node.content.include?('\\@string/')
             UI.important "Warning: [#{lang}] exported translation for '#{named_node['name']}' contains `\\@string/`. This is a sign that this entry was not marked as `translatable=false` " \
-              + "in the original `values/strings.xml`, and was thus sent to GlotPress, which added the backslash when exporting it back."
+              + 'in the original `values/strings.xml`, and was thus sent to GlotPress, which added the backslash when exporting it back.'
             node.content = node.content.gsub('\\@string/', '@string/')
           end
           # rubocop:enable Style/GuardClause

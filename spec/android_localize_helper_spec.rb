@@ -250,7 +250,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
           expect(processed_node.content).not_to include('\\@string/')
 
           expect(warning_messages).to include("Warning: [fr] exported translation for 'stringref' contains `\\@string/`. This is a sign that this entry was not marked as `translatable=false` " \
-                + "in the original `values/strings.xml`, and was thus sent to GlotPress, which added the backslash when exporting it back.")
+                + 'in the original `values/strings.xml`, and was thus sent to GlotPress, which added the backslash when exporting it back.')
         end
 
         it 'auto-fixes `\\@string/` escaped references in string, string-array/item and plurals/' do
