@@ -196,15 +196,21 @@ describe Fastlane::Helper::Android::LocalizeHelper do
 
             orig_node = orig_xml.xpath(xpath).first
             expect(orig_node).not_to be_nil
+            expect(orig_node[attribute]).not_to be_nil
 
             pt_node = pt_xml.xpath(xpath).first
             expect(pt_node).not_to be_nil
+            expect(pt_node[attribute]).not_to be_nil
             expect(pt_node[attribute]).to eq(orig_node[attribute])
           end
         end
 
-        context 'with /resource tags' do
-          include_examples 'replicates attributes', '/resources', 'xmlns:tools'
+        it 'replicates the xmlns namespaces on generated files' do
+          orig_xml = File.open(generated_file(nil)) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+          pt_xml = File.open(generated_file('pt-rBR')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+
+          expect(orig_xml.namespaces).not_to be_empty
+          expect(pt_xml.namespaces).to eq(orig_xml.namespaces)
         end
 
         context 'with //string tags' do
