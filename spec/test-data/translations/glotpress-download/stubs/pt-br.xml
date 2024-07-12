@@ -54,13 +54,13 @@ Language: pt_BR
     <string name="friday">Sexta-feira</string>
     <string name="saturday">Sábado</string>
     <string-array name="weeks_full">
-        <item>@string/sunday</item>
-        <item>@string/monday</item>
-        <item>@string/tuesday</item>
-        <item>@string/wednesday</item>
-        <item>@string/thursday</item>
-        <item>@string/friday</item>
-        <item>@string/saturday</item>
+        <item>\@string/sunday</item>
+        <item>\@string/monday</item>
+        <item>\@string/tuesday</item>
+        <item>\@string/wednesday</item>
+        <item>\@string/thursday</item>
+        <item>\@string/friday</item>
+        <item>\@string/saturday</item>
         <item>Nenhum</item>
     </string-array>
     <string-array name="progress" formatted="false">
@@ -72,7 +72,7 @@ Language: pt_BR
     </string-array>
     <string name="confirm_single_entry_trash">Tem certeza de que deseja mover esta entrada para a lixeira?</string>
     <plurals name="confirm_entry_trash">
-        <item quantity="one">@string/confirm_single_entry_trash</item>
+        <item quantity="one">\@string/confirm_single_entry_trash</item>
         <item quantity="other">Tem certeza... deseja mover %d entradas para a lixeira?</item>
     </plurals>
 </resources>

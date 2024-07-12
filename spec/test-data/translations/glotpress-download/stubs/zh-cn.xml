@@ -64,13 +64,13 @@ Language: zh_CN
     <string name="friday">星期五</string>
     <string name="saturday">星期六</string>
     <string-array name="weeks_full">
-        <item>@string/sunday</item>
-        <item>@string/monday</item>
-        <item>@string/tuesday</item>
-        <item>@string/wednesday</item>
-        <item>@string/thursday</item>
-        <item>@string/friday</item>
-        <item>@string/saturday</item>
+        <item>\@string/sunday</item>
+        <item>\@string/monday</item>
+        <item>\@string/tuesday</item>
+        <item>\@string/wednesday</item>
+        <item>\@string/thursday</item>
+        <item>\@string/friday</item>
+        <item>\@string/saturday</item>
         <item>没有任何</item>
     </string-array>
     <string-array name="progress" formatted="false">
@@ -82,7 +82,7 @@ Language: zh_CN
     </string-array>
     <string name="confirm_single_entry_trash">您确定要将该条目移至垃圾箱吗？</string>
     <plurals name="confirm_entry_trash">
-        <item quantity="one">@string/confirm_single_entry_trash</item>
+        <item quantity="one">\@string/confirm_single_entry_trash</item>
         <item quantity="other">您确定...要将 %d 个条目移至垃圾箱吗？</item>
     </plurals>
 </resources>
