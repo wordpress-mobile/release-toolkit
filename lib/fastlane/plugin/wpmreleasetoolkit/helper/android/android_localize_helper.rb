@@ -364,7 +364,7 @@ module Fastlane
           end
           # 5. Replicate attributes + Process copies for `plurals/item` nodes
           translated_xml.xpath('//plurals[@name]/item[@quantity]').each do |item_node|
-            copy_orig_attributes.call(item_node, "//*[@name = '#{item_node.parent['name']}']/item[@quantity = '#{item_node['quantity']}']")
+            copy_orig_attributes.call(item_node, "//plurals[@name = '#{item_node.parent['name']}']/item[@quantity = '#{item_node['quantity']}']")
             apply_substitutions!(item_node)
             quick_lint(item_node, locale_code)
           end
