@@ -72,8 +72,15 @@ Language: fr
         <item>@string/saturday</item>
         <item>None</item>
     </string-array>
+    <string-array name="progress" formatted="false">
+        <item>0%%</item>
+        <item>25%</item>
+        <item>50%%</item>
+        <item>75%</item>
+        <item>100%</item>
+    </string-array>
     <string name="confirm_single_entry_trash">Êtes-vous sûr de vouloir déplacer cette entrée vers la corbeille ?</string>
-    <plurals name="confirm_entry_trash" formatted="false">
+    <plurals name="confirm_entry_trash" formatted="true">
         <item quantity="one" tools:ignore="ImpliedQuantity">@string/confirm_single_entry_trash</item>
         <item quantity="other">Etes-vous sûr… de vouloir déplacer %d entrées vers la corbeille ?</item>
     </plurals>

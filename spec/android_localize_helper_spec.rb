@@ -223,12 +223,17 @@ describe Fastlane::Helper::Android::LocalizeHelper do
 
       it 'warns about %% usage on tags with formatted="false"' do
         fr_xml = File.open(generated_file('fr')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-        node = fr_xml.xpath("/resources/string[@formatted='false']").first
+        string_nodes = fr_xml.xpath("/resources/string[@formatted='false'][contains(text(),'%%')]")
+        expect(string_nodes).not_to be_empty
+        item_nodes = fr_xml.xpath("/resources/*[@formatted='false']/item[contains(text(),'%%')]")
+        expect(item_nodes).not_to be_empty
 
-        expect(node).not_to be_nil
-        expect(node.content).to include('%%')
-        expect(node['name']).not_to be_nil
-        expect(warning_messages).to include(%(Warning: [fr] translation for '#{node['name']}' has attribute formatted=false, but still contains escaped '%%' in translation.))
+        [*string_nodes, *item_nodes].each do |node|
+          expect(node.content).to include('%%')
+          rsrc_name = node['name'] || node.parent['name']
+          expect(rsrc_name).not_to be_nil
+          expect(warning_messages).to include(%(Warning: [fr] translation for '#{rsrc_name}' has attribute formatted=false, but still contains escaped '%%' in translation.))
+        end
       end
     end
 

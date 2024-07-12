@@ -63,8 +63,15 @@ Language: pt_BR
         <item>@string/saturday</item>
         <item>Nenhum</item>
     </string-array>
+    <string-array name="progress" formatted="false">
+        <item>0%</item>
+        <item>25%</item>
+        <item>50%</item>
+        <item>75%</item>
+        <item>100%</item>
+    </string-array>
     <string name="confirm_single_entry_trash">Tem certeza de que deseja mover esta entrada para a lixeira?</string>
-    <plurals name="confirm_entry_trash" formatted="false">
+    <plurals name="confirm_entry_trash" formatted="true">
         <item quantity="one" tools:ignore="ImpliedQuantity">@string/confirm_single_entry_trash</item>
         <item quantity="other">Tem certeza… deseja mover %d entradas para a lixeira?</item>
     </plurals>

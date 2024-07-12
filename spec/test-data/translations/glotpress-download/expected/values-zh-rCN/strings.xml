@@ -73,8 +73,15 @@ Language: zh_CN
         <item>@string/saturday</item>
         <item>没有任何</item>
     </string-array>
+    <string-array name="progress" formatted="false">
+        <item>0%</item>
+        <item>25%</item>
+        <item>50%</item>
+        <item>75%</item>
+        <item>100%</item>
+    </string-array>
     <string name="confirm_single_entry_trash">您确定要将该条目移至垃圾箱吗？</string>
-    <plurals name="confirm_entry_trash" formatted="false">
+    <plurals name="confirm_entry_trash" formatted="true">
         <item quantity="one" tools:ignore="ImpliedQuantity">@string/confirm_single_entry_trash</item>
         <item quantity="other">您确定…要将 %d 个条目移至垃圾箱吗？</item>
     </plurals>

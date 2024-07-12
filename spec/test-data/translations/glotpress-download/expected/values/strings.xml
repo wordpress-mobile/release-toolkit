@@ -72,7 +72,7 @@
     <string name="multi_range_statement">First range is 2–100 and second is 123–456.</string>
 
     <!--
-    string-array with references, translatable attributes
+    string-array with references, translatable & formatted attributes
     -->
     <string name="sunday">Sunday</string>
     <string name="monday">Monday</string>
@@ -93,12 +93,20 @@
       <item>None</item>
     </string-array>
 
+    <string-array name="progress" formatted="false">
+      <item>0%</item>
+      <item>25%</item>
+      <item>50%</item>
+      <item>75%</item>
+      <item>100%</item>
+    </string-array>
+
     <!--
     plurals with references, tools:ignore attribute
     -->
 
     <string name="confirm_single_entry_trash">Are you sure you want to move this entry to the trash can?</string>
-    <plurals name="confirm_entry_trash" formatted="false">
+    <plurals name="confirm_entry_trash" formatted="true">
       <item quantity="one" tools:ignore="ImpliedQuantity">@string/confirm_single_entry_trash</item>
       <item quantity="other">Are you sure… you want to move %d entries to the trash can?</item>
     </plurals>
