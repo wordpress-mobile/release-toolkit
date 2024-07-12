@@ -244,10 +244,8 @@ module Fastlane
         def self.download_from_glotpress(res_dir:, glotpress_project_url:, locales_map:, glotpress_filters: { status: 'current' })
           glotpress_filters = [glotpress_filters] unless glotpress_filters.is_a?(Array)
 
-          attributes_to_copy = %w[formatted] # Attributes that we want to replicate into translated `string.xml` files
           orig_file = File.join(res_dir, 'values', 'strings.xml')
           orig_xml = File.open(orig_file) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-          orig_attributes = orig_xml.xpath('//string').to_h { |tag| [tag['name'], tag.attributes.select { |k, _| attributes_to_copy.include?(k) }] }
 
           locales_map.each do |lang_codes|
             all_xml_documents = glotpress_filters.map do |filters|
@@ -259,13 +257,7 @@ module Fastlane
             # Merge all XMLs together
             merged_xml = merge_xml_documents(all_xml_documents)
 
-            # Process XML (text substitutions, replicate attributes, quick-lint string)
-            merged_xml.xpath('//string').each do |string_tag|
-              apply_substitutions(string_tag)
-              orig_attributes[string_tag['name']]&.each { |k, v| string_tag[k] = v }
-              quick_lint(string_tag, lang_codes[:android])
-            end
-            merged_xml.xpath('//string-array/item').each { |item_tag| apply_substitutions(item_tag) }
+            post_process_xml!(merged_xml, locale_code: lang_codes[:android], original_xml: orig_xml)
 
             # Save
             lang_dir = File.join(res_dir, "values-#{lang_codes[:android]}")
@@ -337,7 +329,47 @@ module Fastlane
         end
         private_class_method :merge_xml_documents
 
-        # Apply some common text substitutions to tag contents
+        # Process a downloaded XML (in-place), to apply the following
+        #  - replicate attributes from the nodes of the original XML (`translatable`, `tools:ignore`, …) to the translated XML
+        #  - text substitutions for common special characters
+        #  - quick-lint string by searching for common issue patterns (using `%%` in a `formatted=false` string, etc)
+        #
+        # @param [Nokogiri::XML::Document] translated_xml The downloaded XML to post-process
+        # @param [String] locale_code The android locale code associated with the translated_xml
+        # @param [Nokogiri::XML::Document] original_xml The original `values/strings.xml` to use as reference
+        #
+        def self.post_process_xml!(translated_xml, locale_code:, original_xml:)
+          copy_orig_attributes = lambda do |node, xpath|
+            orig_attributes = original_xml.xpath(xpath)&.first&.attribute_nodes&.to_h do |attr|
+              [[attr.namespace&.prefix, attr.name].compact.join(':'), attr.value]
+            end
+            orig_attributes&.each { |k, v| node[k] = v unless k == 'name' }
+          end
+
+          # 1. Replicate namespaces on the document (especially `xmlns:tools` if present)
+          original_xml.namespaces.each { |k, v| translated_xml.root&.add_namespace(k.delete_prefix('xmlns:'), v) }
+          # 2. Replicate attributes on any node with `@name` attribute (`string`, `string-array`, `plurals`)
+          translated_xml.xpath('//*[@name]').each do |node|
+            copy_orig_attributes.call(node, "//#{node.name}[@name = '#{node['name']}']")
+          end
+          # 3. Process copies for `string` nodes
+          translated_xml.xpath('//string[@name]').each do |string_node|
+            apply_substitutions(string_node)
+            quick_lint(string_node, locale_code)
+          end
+          # 4. Process copies for `string-array/item` nodes
+          translated_xml.xpath('//string-array[@name]/item').each do |item_node|
+            apply_substitutions(item_node)
+          end
+          # 5. Replicate attributes + Process copies for `plurals/item` nodes
+          translated_xml.xpath('//plurals[@name]/item[@quantity]').each do |item_node|
+            copy_orig_attributes.call(item_node, "//*[@name = '#{item_node.parent['name']}']/item[@quantity = '#{item_node['quantity']}']")
+            apply_substitutions(item_node)
+          end
+        end
+        private_class_method :post_process_xml!
+
+        # Apply some common text substitutions to tag contents, like `... => …` or en-dash instead of regular dash for ranges of numbers
         #
         # @param [Nokogiri::XML::Node] tag The XML tag/node to apply substitutions to
         #
