@@ -360,11 +360,13 @@ module Fastlane
           # 4. Process copies for `string-array/item` nodes
           translated_xml.xpath('//string-array[@name]/item').each do |item_node|
             apply_substitutions(item_node)
+            quick_lint(item_node, locale_code)
           end
           # 5. Replicate attributes + Process copies for `plurals/item` nodes
           translated_xml.xpath('//plurals[@name]/item[@quantity]').each do |item_node|
             copy_orig_attributes.call(item_node, "//*[@name = '#{item_node.parent['name']}']/item[@quantity = '#{item_node['quantity']}']")
             apply_substitutions(item_node)
+            quick_lint(item_node, locale_code)
           end
         end
         private_class_method :post_process_xml!
@@ -387,15 +389,24 @@ module Fastlane
         end
         private_class_method :apply_substitutions
 
-        # Perform some quick basic checks about an individual `<string>` tag and print warnings accordingly
+        # Perform some quick basic checks about an individual `<string>` tag and print warnings accordingly:
+        #  - detect the use of `%%` in the string even if `formatted=false` is set
+        #  - detect the presence of `\@string/` in translated XML, which suggests the original key that referenced `@string/…` did not set `translatable=false`
+        #    and thus that `@string/…` copy was sent to GlotPress for translation, then escaped during exporting it back.
         #
-        # @param [Nokogiri::XML::Node] string_tag The XML tag/node to check
+        # @param [Nokogiri::XML::Node] node The XML tag/node to check the content of
         # @param [String] lang The language we are currently processing. Used for providing context during logging / warning message
         #
-        def self.quick_lint(string_tag, lang)
-          return unless string_tag['formatted'] == 'false' && string_tag.content.include?('%%')
-
-          UI.important "Warning: [#{lang}] translation for '#{string_tag['name']}' has attribute formatted=false, but still contains escaped '%%' in translation."
+        def self.quick_lint(node, lang)
+          named_node = node.has_attribute?('name') ? node : node.parent
+          if named_node['formatted'] == 'false' && node.content.include?('%%')
+            UI.important "Warning: [#{lang}] translation for '#{named_node['name']}' has attribute formatted=false, but still contains escaped '%%' in translation."
+          end
+          # rubocop:disable Style/GuardClause
+          if node.content.include?('\\@string/')
+            UI.important "Warning: [#{lang}] translation for '#{named_node['name']}' contains `\\@string/`. This is a sign that this entry was not marked as `translatable=false` in the original `values/strings.xml`, " \
+              + "as it should have when you're referencing another string (and as a result was sent to GlotPress, which added the backslash when exporting it back."
+          end
         end
         private_class_method :quick_lint
 
