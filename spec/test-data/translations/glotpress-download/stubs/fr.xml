@@ -31,6 +31,7 @@ Language: fr
 		<item>En cours…</item>
 		<item>Toutes les commandes...</item>
 	</string-array>
+	<string name="stringref">\@string/shipping_label_woo_discount_bottomsheet_title</string>
 	<string name="threat_fix_description">Les prix vont de 70-120 $ par heure</string>
     <string-array name="settings_jetpackdescription">
         <item>Vous pouvez marquer une adresse IP (ou une série d’adresses IP) comme « Toujours autorisé »</item>
@@ -63,13 +64,13 @@ Language: fr
     <string name="friday">Vendredi</string>
     <string name="saturday">Samedi</string>
     <string-array name="weeks_full">
-        <item>@string/sunday</item>
-        <item>@string/monday</item>
-        <item>@string/tuesday</item>
-        <item>@string/wednesday</item>
-        <item>@string/thursday</item>
-        <item>@string/friday</item>
-        <item>@string/saturday</item>
+        <item>\@string/sunday</item>
+        <item>\@string/monday</item>
+        <item>\@string/tuesday</item>
+        <item>\@string/wednesday</item>
+        <item>\@string/thursday</item>
+        <item>\@string/friday</item>
+        <item>\@string/saturday</item>
         <item>None</item>
     </string-array>
     <string-array name="progress" formatted="false">
@@ -81,7 +82,7 @@ Language: fr
     </string-array>
     <string name="confirm_single_entry_trash">Êtes-vous sûr de vouloir déplacer cette entrée vers la corbeille ?</string>
     <plurals name="confirm_entry_trash">
-        <item quantity="one">@string/confirm_single_entry_trash</item>
+        <item quantity="one">\@string/confirm_single_entry_trash</item>
         <item quantity="other">Etes-vous sûr... de vouloir déplacer %d entrées vers la corbeille ?</item>
     </plurals>
 </resources>

@@ -44,6 +44,8 @@
         <item>All Orders</item>
     </string-array>
 
+    <!-- strings referencing other strings via @string/ should be marked translatable=false -->
+    <string name="stringref">@string/shipping_label_woo_discount_bottomsheet_title</string>
 
     <string name="shipping_label_payments_cant_edit_warning">Only the site owner can manage the shipping label payment methods. Please contact Store Owner %1$s (%2$s) to manage payment methods.</string>
     <string name="threat_fix_description">Pricing ranges from $70–120/hour</string>

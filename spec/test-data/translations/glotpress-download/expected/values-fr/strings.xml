@@ -31,6 +31,7 @@ Language: fr
         <item>En cours…</item>
         <item>Toutes les commandes…</item>
     </string-array>
+    <string name="stringref">@string/shipping_label_woo_discount_bottomsheet_title</string>
     <string name="threat_fix_description">Les prix vont de 70–120 $ par heure</string>
     <string-array name="settings_jetpackdescription">
         <item>Vous pouvez marquer une adresse IP (ou une série d’adresses IP) comme « Toujours autorisé »</item>
