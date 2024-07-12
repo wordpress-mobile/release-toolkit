@@ -232,7 +232,7 @@ module Fastlane
         #
         # @param [String] res_dir The relative path to the `…/src/main/res` directory.
         # @param [String] glotpress_project_url The base URL to the glotpress project to download the strings from.
-        # @param [Hash{String=>String}, Array] glotpress_filters
+        # @param [Hash{Symbol=>String}, Array] glotpress_filters
         #        The filters to apply when exporting strings from GlotPress.
         #        Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
         #        If an array of Hashes is provided instead of a single Hash, this method will perform as many
@@ -279,7 +279,7 @@ module Fastlane
         # @param [String] locale The GlotPress locale code to download strings for.
         # @param [Hash{Symbol=>String}] filters The hash of filters to apply when exporting from GlotPress.
         #                               Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
-        # @return [Nokogiri::XML] the download XML document, parsed as a Nokogiri::XML object
+        # @return [Nokogiri::XML::Document] the download XML document, parsed as a Nokogiri::XML object
         #
         def self.download_glotpress_export_file(project_url:, locale:, filters:)
           query_params = filters.transform_keys { |k| "filters[#{k}]" }.merge(format: 'android')
