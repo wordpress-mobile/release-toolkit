@@ -128,7 +128,22 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
   end
 
   context 'when providing invalid input' do
-    it 'uses the `source_branch` in one of the `target_branches`' do
+    it 'throws an error when the `source_branch` is invalid' do
+      stub_git_release_branches([])
+
+      source_branch = '30.6'
+
+      expect do
+        run_described_fastlane_action(
+          github_token: test_token,
+          repository: test_repo,
+          source_branch: source_branch,
+          default_branch: default_branch
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, '`source_branch` must start with `release/`')
+    end
+
+    it 'throws an error when the `source_branch` in one of the `target_branches`' do
       stub_git_release_branches([])
 
       source_branch = 'release/30.6'

@@ -25,6 +25,10 @@ module Fastlane
         target_milestone = milestone_title.nil? ? nil : github_helper.get_milestone(repository, milestone_title)
 
         final_target_branches = if target_branches.empty?
+                                  unless source_branch.start_with?('release/')
+                                    UI.user_error!('`source_branch` must start with `release/`')
+                                  end
+
                                   determine_target_branches(release_version: source_branch.delete('release/'), default_branch: default_branch)
                                 else
                                   target_branches
