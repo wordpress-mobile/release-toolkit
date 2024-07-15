@@ -27,7 +27,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
 
   def stub_git_release_branches(branches)
     allow(Fastlane::Actions).to receive(:sh)
-      .with('git branch -r -l "origin/release/*"')
+      .with('git', 'branch', '-r', '-l', 'origin/release/*')
       .and_return("\n" + branches.map { |release| "origin/#{release}" }.join("\n") + "\n")
   end
 

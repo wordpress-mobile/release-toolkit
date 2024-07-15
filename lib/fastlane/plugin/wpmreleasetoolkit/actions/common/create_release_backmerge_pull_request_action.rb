@@ -48,7 +48,7 @@ module Fastlane
       end
 
       def self.determine_target_branches(release_version, default_branch)
-        release_branches = Actions.sh('git branch -r -l "origin/release/*"').chomp
+        release_branches = Actions.sh('git', 'branch', '-r', '-l', 'origin/release/*').chomp
 
         all_release_branches_versions = release_branches
                                         .split("\n")
