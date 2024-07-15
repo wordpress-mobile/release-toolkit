@@ -31,7 +31,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
       .and_return("\n" + branches.map { |release| "origin/#{release}" }.join("\n") + "\n")
   end
 
-  def stub_expected_pull_requests(expected_backmerge_branches:, release_branch:, labels: [], milestone_number: nil)
+  def stub_expected_pull_requests(expected_backmerge_branches:, release_branch:, labels: [], milestone_number: nil, reviewers: nil, team_reviewers: nil)
     expected_backmerge_branches.each do |target_branch|
       expected_intermediate_branch = "merge/#{release_branch.gsub('/', '-')}-into-#{target_branch.gsub('/', '-')}"
 
@@ -46,7 +46,9 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
         head: expected_intermediate_branch,
         base: target_branch,
         labels: labels,
-        milestone: milestone_number
+        milestone: milestone_number,
+        reviewers: reviewers,
+        team_reviewers: team_reviewers
       ).and_return(mock_pr_url(target_branch))
     end
   end
@@ -227,6 +229,37 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
           release_branch: release_branch,
           default_branch: default_branch,
           labels: labels
+        )
+
+        expect(result).to eq([mock_pr_url(default_branch)])
+      end
+    end
+  end
+
+  context 'when providing reviewers' do
+    [
+      { team_reviewers: %w[team_awesome team_a], reviewers: %w[coder rubyist] },
+      { team_reviewers: nil, reviewers: nil },
+    ].each do |reviewers|
+      it "creates a backmerge PR setting the team_reviewers `#{reviewers[:team_reviewers]}` and reviewers `#{reviewers[:reviewers]}`" do
+        stub_git_release_branches([])
+
+        release_branch = 'release/30.6'
+
+        stub_expected_pull_requests(
+          expected_backmerge_branches: [default_branch],
+          release_branch: release_branch,
+          reviewers: reviewers[:reviewers],
+          team_reviewers: reviewers[:team_reviewers]
+        )
+
+        result = run_described_fastlane_action(
+          github_token: test_token,
+          repository: test_repo,
+          release_branch: release_branch,
+          default_branch: default_branch,
+          reviewers: reviewers[:reviewers],
+          team_reviewers: reviewers[:team_reviewers]
         )
 
         expect(result).to eq([mock_pr_url(default_branch)])

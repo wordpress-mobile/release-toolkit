@@ -43,8 +43,10 @@ module Fastlane
             title: "Merge #{release_branch} into #{target_branch}",
             head_branch: release_branch,
             base_branch: target_branch,
+            labels: labels,
             milestone: target_milestone&.number,
-            labels: labels
+            reviewers: reviewers,
+            team_reviewers: team_reviewers
           )
         end
       end
@@ -63,7 +65,7 @@ module Fastlane
         target_branches
       end
 
-      def self.create_backmerge_pr(token:, repository:, title:, head_branch:, base_branch:, milestone:, labels:)
+      def self.create_backmerge_pr(token:, repository:, title:, head_branch:, base_branch:, labels:, milestone:, reviewers:, team_reviewers:)
         intermediate_branch = "merge/#{head_branch.gsub('/', '-')}-into-#{base_branch.gsub('/', '-')}"
         Fastlane::Helper::GitHelper.create_branch(intermediate_branch)
 
@@ -90,7 +92,9 @@ module Fastlane
           head: intermediate_branch,
           base: base_branch,
           labels: labels,
-          milestone: milestone
+          milestone: milestone,
+          reviewers: reviewers,
+          team_reviewers: team_reviewers
         )
       end
 
@@ -107,7 +111,7 @@ module Fastlane
       end
 
       def self.return_value
-        'The list of backmerge PRs created'
+        'The list of the created backmerge Pull Request URLs'
       end
 
       def self.details
@@ -148,6 +152,14 @@ module Fastlane
                                        description: 'The title of the milestone to assign to the created PRs',
                                        optional: true,
                                        type: String),
+          FastlaneCore::ConfigItem.new(key: :reviewers,
+                                       description: 'An array of GitHub users that will be assigned to the pull request',
+                                       optional: true,
+                                       type: Array),
+          FastlaneCore::ConfigItem.new(key: :team_reviewers,
+                                       description: 'An array of GitHub team slugs that will be assigned to the pull request',
+                                       optional: true,
+                                       type: Array),
           Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
