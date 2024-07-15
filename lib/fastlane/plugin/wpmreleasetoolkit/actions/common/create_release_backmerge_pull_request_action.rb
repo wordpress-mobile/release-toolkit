@@ -9,7 +9,7 @@ module Fastlane
       def self.run(params)
         token = params[:github_token]
         repository = params[:repository]
-        release_branch = params[:release_branch]
+        source_branch = params[:source_branch]
         default_branch = params[:default_branch]
         target_branches = params[:target_branches]
         labels = params[:labels]
@@ -17,31 +17,27 @@ module Fastlane
         reviewers = params[:reviewers]
         team_reviewers = params[:team_reviewers]
 
-        unless release_branch.start_with?('release/')
-          UI.user_error!('`release_branch` must start with `release/`')
-        end
-
-        if target_branches.include?(release_branch)
-          UI.user_error!('`target_branches` must not contain `release_branch`')
+        if target_branches.include?(source_branch)
+          UI.user_error!('`target_branches` must not contain `source_branch`')
         end
 
         github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
         target_milestone = milestone_title.nil? ? nil : github_helper.get_milestone(repository, milestone_title)
 
         final_target_branches = if target_branches.empty?
-                                  determine_target_branches(release_version: release_branch.delete('release/'), default_branch: default_branch)
+                                  determine_target_branches(release_version: source_branch.delete('release/'), default_branch: default_branch)
                                 else
                                   target_branches
                                 end
 
         final_target_branches.map do |target_branch|
-          Fastlane::Helper::GitHelper.checkout_and_pull(release_branch)
+          Fastlane::Helper::GitHelper.checkout_and_pull(source_branch)
 
           create_backmerge_pr(
             token: token,
             repository: repository,
-            title: "Merge #{release_branch} into #{target_branch}",
-            head_branch: release_branch,
+            title: "Merge #{source_branch} into #{target_branch}",
+            head_branch: source_branch,
             base_branch: target_branch,
             labels: labels,
             milestone: target_milestone&.number,
@@ -129,8 +125,8 @@ module Fastlane
                                        description: 'The remote path of the GH repository on which we work',
                                        optional: false,
                                        type: String),
-          FastlaneCore::ConfigItem.new(key: :release_branch,
-                                       description: 'The release branch, in the format `release/x.y.z`',
+          FastlaneCore::ConfigItem.new(key: :source_branch,
+                                       description: 'The source branch to create a backmerge PR from, in the format `release/x.y.z`',
                                        optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :default_branch,
@@ -139,7 +135,7 @@ module Fastlane
                                        default_value: DEFAULT_BRANCH,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :target_branches,
-                                       description: 'Array of target branches for the backmerge. If empty, the action will determine target branches by finding all `release/x.y.z` branches with a `x.y.z` version greater than the version in source branch's name. If none are found, it will target `default_branch`',
+                                       description: 'Array of target branches for the backmerge. If empty, the action will determine target branches by finding all `release/x.y.z` branches with a `x.y.z` version greater than the version in source branch\'s name. If none are found, it will target `default_branch`', # rubocop:disable Layout/LineLength
                                        optional: true,
                                        default_value: [],
                                        type: Array),
