@@ -11,28 +11,30 @@ module Fastlane
         repository = params[:repository]
         release_branch = params[:release_branch]
         default_branch = params[:default_branch]
-        target_branches_param = params[:target_branches]
+        target_branches = params[:target_branches]
         labels = params[:labels]
         milestone_title = params[:milestone_title]
+        reviewers = params[:reviewers]
+        team_reviewers = params[:team_reviewers]
 
         unless release_branch.start_with?('release/')
           UI.user_error!('`release_branch` must start with `release/`')
         end
 
-        if target_branches_param.include?(release_branch)
+        if target_branches.include?(release_branch)
           UI.user_error!('`target_branches` must not contain `release_branch`')
         end
 
         github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
         target_milestone = milestone_title.nil? ? nil : github_helper.get_milestone(repository, milestone_title)
 
-        target_branches = if target_branches_param.empty?
-                            determine_target_branches(release_branch.delete('release/'), default_branch)
-                          else
-                            target_branches_param
-                          end
+        final_target_branches = if target_branches.empty?
+                                  determine_target_branches(release_version: release_branch.delete('release/'), default_branch: default_branch)
+                                else
+                                  target_branches
+                                end
 
-        target_branches.map do |target_branch|
+        final_target_branches.map do |target_branch|
           Fastlane::Helper::GitHelper.checkout_and_pull(release_branch)
 
           create_backmerge_pr(
@@ -47,11 +49,10 @@ module Fastlane
         end
       end
 
-      def self.determine_target_branches(release_version, default_branch)
-        release_branches = Actions.sh('git', 'branch', '-r', '-l', 'origin/release/*').chomp
+      def self.determine_target_branches(release_version:, default_branch:)
+        release_branches = Actions.sh('git', 'branch', '-r', '-l', 'origin/release/*').chomp.split("\n")
 
         all_release_branches_versions = release_branches
-                                        .split("\n")
                                         .map { |branch| branch.match(%r{origin/release/([0-9.]*)})&.captures&.first }
                                         .compact
 
