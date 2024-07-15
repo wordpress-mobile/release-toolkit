@@ -134,7 +134,7 @@ module Fastlane
                                        default_value: DEFAULT_BRANCH,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :target_branches,
-                                       description: 'Array of target branches for the backmerge. If empty, the action will determine target branches by finding all `release/x.y.z` branches with a version greater than `release_version`. If none are found, it will target `default_branch`',
+                                       description: 'Array of target branches for the backmerge. If empty, the action will determine target branches by finding all `release/x.y.z` branches with a `x.y.z` version greater than the version in source branch's name. If none are found, it will target `default_branch`',
                                        optional: true,
                                        default_value: [],
                                        type: Array),
