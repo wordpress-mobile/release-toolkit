@@ -29,7 +29,7 @@ module Fastlane
                                     UI.user_error!('`source_branch` must start with `release/`')
                                   end
 
-                                  determine_target_branches(release_version: source_branch.delete('release/'), default_branch: default_branch)
+                                  determine_target_branches(source_release_version: source_branch.delete('release/'), default_branch: default_branch)
                                 else
                                   target_branches
                                 end
@@ -51,20 +51,37 @@ module Fastlane
         end
       end
 
-      def self.determine_target_branches(release_version:, default_branch:)
+      # Determines the target branches for a release version.
+      #
+      # @param source_release_version [String] the release version to compare against other release branches.
+      # @param default_branch [String] the default branch to use if no target branches are found.
+      # @return [Array<String>] the list of target branches greater than the release version.
+      def self.determine_target_branches(source_release_version:, default_branch:)
         release_branches = Actions.sh('git', 'branch', '-r', '-l', 'origin/release/*').chomp.split("\n")
 
         all_release_branches_versions = release_branches
                                         .map { |branch| branch.match(%r{origin/release/([0-9.]*)})&.captures&.first }
                                         .compact
 
-        target_branches = all_release_branches_versions.select { |branch| Gem::Version.new(branch) > Gem::Version.new(release_version) }
+        target_branches = all_release_branches_versions.select { |branch| Gem::Version.new(branch) > Gem::Version.new(source_release_version) }
                                                        .map { |v| "release/#{v}" }
         target_branches = [default_branch] if target_branches.empty?
 
         target_branches
       end
 
+      # Creates a backmerge pull request using the `create_pull_request` Fastlane Action.
+      #
+      # @param token [String] the GitHub token for authentication.
+      # @param repository [String] the repository where the pull request will be created.
+      # @param title [String] the title of the pull request.
+      # @param head_branch [String] the source branch for the pull request.
+      # @param base_branch [String] the target branch for the pull request.
+      # @param labels [Array<String>] the labels to add to the pull request.
+      # @param milestone [String] the milestone to associate with the pull request.
+      # @param reviewers [Array<String>] the individual reviewers for the pull request.
+      # @param team_reviewers [Array<String>] the team reviewers for the pull request.
+      # @return [void]
       def self.create_backmerge_pr(token:, repository:, title:, head_branch:, base_branch:, labels:, milestone:, reviewers:, team_reviewers:)
         intermediate_branch = "merge/#{head_branch.gsub('/', '-')}-into-#{base_branch.gsub('/', '-')}"
         Fastlane::Helper::GitHelper.create_branch(intermediate_branch)
