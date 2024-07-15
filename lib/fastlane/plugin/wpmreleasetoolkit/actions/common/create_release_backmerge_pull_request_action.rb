@@ -32,14 +32,12 @@ module Fastlane
                             target_branches_param
                           end
 
-        pr_urls = []
-
-        target_branches.each do |target_branch|
+        target_branches.map do |target_branch|
           Fastlane::Helper::GitHelper.checkout_and_pull(release_branch)
 
-          pr_urls << create_backmerge_pr(
+          create_backmerge_pr(
             token: token,
-            repository: params[:repository],
+            repository: repository,
             title: "Merge #{release_branch} into #{target_branch}",
             head_branch: release_branch,
             base_branch: target_branch,
@@ -47,8 +45,6 @@ module Fastlane
             labels: labels
           )
         end
-
-        pr_urls
       end
 
       def self.determine_target_branches(release_version, default_branch)
