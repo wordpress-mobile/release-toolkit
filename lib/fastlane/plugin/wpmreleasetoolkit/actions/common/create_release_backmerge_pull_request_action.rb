@@ -48,16 +48,16 @@ module Fastlane
             reviewers: reviewers,
             team_reviewers: team_reviewers
           )
-        end
+        end.compact
       end
 
       # Determines the target branches for a release version.
       #
-      # @param source_release_version [String] the release version to compare against other release branches.
+      # @param source_release_version [String] the source release version to compare against other release branches.
       # @param default_branch [String] the default branch to use if no target branches are found.
       # @return [Array<String>] the list of target branches greater than the release version.
       def self.determine_target_branches(source_release_version:, default_branch:)
-        release_branches = Actions.sh('git', 'branch', '-r', '-l', 'origin/release/*').chomp.split("\n")
+        release_branches = Actions.sh('git', 'branch', '-r', '-l', 'origin/release/*').strip.split("\n")
 
         all_release_branches_versions = release_branches
                                         .map { |branch| branch.match(%r{origin/release/([0-9.]*)})&.captures&.first }
@@ -83,6 +83,14 @@ module Fastlane
       # @param team_reviewers [Array<String>] the team reviewers for the pull request.
       # @return [void]
       def self.create_backmerge_pr(token:, repository:, title:, head_branch:, base_branch:, labels:, milestone:, reviewers:, team_reviewers:)
+        # Check for differences between head_branch and base_branch
+        diff_output = Actions.sh('git', 'diff', "#{base_branch}..#{head_branch}").strip
+
+        if diff_output.empty?
+          UI.message("No differences between #{head_branch} and #{base_branch}. Skipping PR creation.")
+          return nil
+        end
+
         intermediate_branch = "merge/#{head_branch.gsub('/', '-')}-into-#{base_branch.gsub('/', '-')}"
         Fastlane::Helper::GitHelper.create_branch(intermediate_branch)
 
