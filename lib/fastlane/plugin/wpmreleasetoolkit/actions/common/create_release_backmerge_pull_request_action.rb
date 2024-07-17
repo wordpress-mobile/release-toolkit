@@ -83,8 +83,13 @@ module Fastlane
       # @param team_reviewers [Array<String>] the team reviewers for the pull request.
       # @return [void]
       def self.create_backmerge_pr(token:, repository:, title:, head_branch:, base_branch:, labels:, milestone:, reviewers:, team_reviewers:)
-        # Check for differences between head_branch and base_branch
-        diff_output = Actions.sh('git', 'diff', "#{base_branch}..#{head_branch}").strip
+        # Check for differences between head_branch and base_branch, using the three-dot diff ('base_branch...head_branch') instead
+        # of the two-dot diff ('base_branch..head_branch').
+        # This ensures that we are checking for differences as if a merge was to happen, providing a more accurate representation of what changes
+        # would be introduced by merging head_branch into base_branch.
+        #
+        # See https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-comparing-branches-in-pull-requests#three-dot-and-two-dot-git-diff-comparisons
+        diff_output = Actions.sh('git', 'diff', "#{base_branch}...#{head_branch}").strip
 
         if diff_output.empty?
           UI.message("No differences between #{head_branch} and #{base_branch}. Skipping PR creation.")

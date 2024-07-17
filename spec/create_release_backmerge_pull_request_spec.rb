@@ -33,7 +33,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
 
   def stub_git_branches_diff(base_branch:, head_branch:, diff:)
     allow(Fastlane::Actions).to receive(:sh)
-      .with('git', 'diff', "#{base_branch}..#{head_branch}")
+      .with('git', 'diff', "#{base_branch}...#{head_branch}")
       .and_return(diff)
   end
 
