@@ -179,6 +179,21 @@ module Fastlane
         Action.sh('git', 'fetch', '--tags')
       end
 
+      # Counts the number of commits between two references in the Git repository.
+      #
+      # @param base_ref [String] The base reference (branch name, tag, or commit hash).
+      # @param head_ref [String] The head reference (branch name, tag, or commit hash).
+      #
+      # @return [Integer] The number of commits between base_ref and head_ref.
+      #
+      def self.count_commits_between(base_ref:, head_ref:)
+        git_repo = Git.open(Dir.pwd)
+
+        new_commits = git_repo.log.between(base_ref, head_ref)
+
+        new_commits.count
+      end
+
       # Returns the current git branch, or "HEAD" if it's not checked out to any branch
       # Can NOT be replaced using the environment variables such as `GIT_BRANCH` or `BUILDKITE_BRANCH`
       #
