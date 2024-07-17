@@ -182,28 +182,103 @@ describe Fastlane::Helper::Android::LocalizeHelper do
           include_examples 'en-dash substitutions', 'ordered lists', "/resources/string-array[@name='checklist_array']/item[1]", '- 1.', "\u{2013} 1.", '- 1.'
           include_examples 'en-dash substitutions', 'unordered lists', "/resources/string-array[@name='checklist_array']/item[2]", '- o', "\u{2013} o", '- o'
         end
+
+        context 'with //plurals/item tags' do
+          include_examples 'ellipsis substitutions', "/resources/plurals[@name='confirm_entry_trash']/item[@quantity='other']"
+        end
       end
 
-      it 'replicates formatted="false" attribute to generated files' do
-        orig_xml = File.open(generated_file(nil)) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-        pt_xml = File.open(generated_file('pt-rBR')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+      describe 'replicates attributes to generated files' do
+        shared_examples 'replicates attributes' do |xpath, attribute|
+          it "replicates the `#{attribute}` attribute to generated files" do
+            orig_xml = File.open(generated_file(nil)) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+            pt_xml = File.open(generated_file('pt-rBR')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
 
-        orig_node = orig_xml.xpath("/resources/string[@formatted='false']").first
-        expect(orig_node).not_to be_nil
+            orig_node = orig_xml.xpath(xpath).first
+            expect(orig_node).not_to be_nil
+            expect(orig_node[attribute]).not_to be_nil
 
-        pt_node = pt_xml.xpath("/resources/string[@name='#{orig_node['name']}']").first
-        expect(pt_node).not_to be_nil
-        expect(pt_node['formatted']).to eq(orig_node['formatted'])
+            pt_node = pt_xml.xpath(xpath).first
+            expect(pt_node).not_to be_nil
+            expect(pt_node[attribute]).not_to be_nil
+            expect(pt_node[attribute]).to eq(orig_node[attribute])
+          end
+        end
+
+        it 'replicates the xmlns namespaces on generated files' do
+          orig_xml = File.open(generated_file(nil)) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+          pt_xml = File.open(generated_file('pt-rBR')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+
+          expect(orig_xml.namespaces).not_to be_empty
+          expect(pt_xml.namespaces).to eq(orig_xml.namespaces)
+        end
+
+        context 'with //string tags' do
+          include_examples 'replicates attributes', "/resources/string[@name='shipping_label_woo_discount_bottomsheet_message']", 'formatted'
+          include_examples 'replicates attributes', "/resources/string[@name='app_name']", 'content_override'
+        end
+
+        context 'with //string-array tags' do
+          include_examples 'replicates attributes', "/resources/string-array[@name='weeks_full']", 'translatable'
+        end
+
+        context 'with //plurals tags' do
+          include_examples 'replicates attributes', "/resources/plurals[@name='confirm_entry_trash']", 'formatted'
+        end
       end
 
-      it 'warns about %% usage on tags with formatted="false"' do
-        fr_xml = File.open(generated_file('fr')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-        node = fr_xml.xpath("/resources/string[@formatted='false']").first
+      describe 'quick_lint' do
+        it 'warns about %% usage on tags with formatted="false"' do
+          fr_xml = File.open(generated_file('fr')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+          string_nodes = fr_xml.xpath("/resources/string[@formatted='false'][contains(text(),'%%')]")
+          expect(string_nodes).not_to be_empty
+          item_nodes = fr_xml.xpath("/resources/*[@formatted='false']/item[contains(text(),'%%')]")
+          expect(item_nodes).not_to be_empty
 
-        expect(node).not_to be_nil
-        expect(node.content).to include('%%')
-        expect(node['name']).not_to be_nil
-        expect(warning_messages).to include(%(Warning: [fr] translation for '#{node['name']}' has attribute formatted=false, but still contains escaped '%%' in translation.))
+          [*string_nodes, *item_nodes].each do |node|
+            expect(node.content).to include('%%')
+            rsrc_name = node['name'] || node.parent['name']
+            expect(rsrc_name).not_to be_nil
+            expect(warning_messages).to include(%(Warning: [fr] translation for '#{rsrc_name}' has attribute formatted=false, but still contains escaped '%%' in translation.))
+          end
+        end
+
+        it 'warns about @string/ references not containing translatable="false"' do
+          fr_exported_xml = File.open(stub_file('fr')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+          exported_node = fr_exported_xml.xpath("/resources/string[@name='stringref']")&.first
+          expect(exported_node).not_to be_nil
+          expect(exported_node.content).to include('\\@string/')
+
+          fr_processed_xml = File.open(generated_file('fr')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+          processed_node = fr_processed_xml.xpath("/resources/string[@name='stringref']")&.first
+          expect(processed_node).not_to be_nil
+          expect(processed_node.content).to include('@string/')
+          expect(processed_node.content).not_to include('\\@string/')
+
+          expect(warning_messages).to include("Warning: [fr] exported translation for 'stringref' contains `\\@string/`. This is a sign that this entry was not marked as `translatable=false` " \
+                + 'in the original `values/strings.xml`, and was thus sent to GlotPress, which added the backslash when exporting it back.')
+        end
+
+        it 'auto-fixes `\\@string/` escaped references in string, string-array/item and plurals/' do
+          fr_exported_xml = File.open(stub_file('fr')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+          fr_processed_xml = File.open(generated_file('fr')) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
+
+          xpaths = %w[
+            /resources/string[@name='stringref']
+            /resources/string-array[@name='weeks_full']
+            /resources/plurals[@name='confirm_entry_trash']/item[@quantity='one']
+          ]
+          xpaths.each do |xpath|
+            exported_node = fr_exported_xml.xpath(xpath)&.first
+            expect(exported_node).not_to be_nil
+            expect(exported_node.content).to include('\\@string/')
+
+            processed_node = fr_processed_xml.xpath(xpath)&.first
+            expect(processed_node).not_to be_nil
+            expect(processed_node.content).to include('@string/')
+            expect(processed_node.content).not_to include('\\@string/')
+          end
+        end
       end
     end
 

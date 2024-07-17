@@ -152,6 +152,13 @@ module Fastlane
           (added_count + updated_count) != 0
         end
 
+        ########
+        # @!group Verify diff of library vs main strings matches
+        #
+        # @note This set of methods is used by `an_validate_lib_strings_action`
+        #       (which doesn't seem to be used by any of our Android projects nowadays?)
+        ########
+
         def self.verify_diff(diff_string, main_strings, lib_strings, library)
           return unless diff_string.start_with?('name=')
 
@@ -198,6 +205,8 @@ module Fastlane
           end
         end
 
+        # @!endgroup
+
         ########
         # @!group Downloading translations from GlotPress
         ########
@@ -223,7 +232,7 @@ module Fastlane
         #
         # @param [String] res_dir The relative path to the `…/src/main/res` directory.
         # @param [String] glotpress_project_url The base URL to the glotpress project to download the strings from.
-        # @param [Hash{String=>String}, Array] glotpress_filters
+        # @param [Hash{Symbol=>String}, Array] glotpress_filters
         #        The filters to apply when exporting strings from GlotPress.
         #        Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
         #        If an array of Hashes is provided instead of a single Hash, this method will perform as many
@@ -235,10 +244,8 @@ module Fastlane
         def self.download_from_glotpress(res_dir:, glotpress_project_url:, locales_map:, glotpress_filters: { status: 'current' })
           glotpress_filters = [glotpress_filters] unless glotpress_filters.is_a?(Array)
 
-          attributes_to_copy = %w[formatted] # Attributes that we want to replicate into translated `string.xml` files
           orig_file = File.join(res_dir, 'values', 'strings.xml')
           orig_xml = File.open(orig_file) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-          orig_attributes = orig_xml.xpath('//string').to_h { |tag| [tag['name'], tag.attributes.select { |k, _| attributes_to_copy.include?(k) }] }
 
           locales_map.each do |lang_codes|
             all_xml_documents = glotpress_filters.map do |filters|
@@ -250,13 +257,7 @@ module Fastlane
             # Merge all XMLs together
             merged_xml = merge_xml_documents(all_xml_documents)
 
-            # Process XML (text substitutions, replicate attributes, quick-lint string)
-            merged_xml.xpath('//string').each do |string_tag|
-              apply_substitutions(string_tag)
-              orig_attributes[string_tag['name']]&.each { |k, v| string_tag[k] = v }
-              quick_lint(string_tag, lang_codes[:android])
-            end
-            merged_xml.xpath('//string-array/item').each { |item_tag| apply_substitutions(item_tag) }
+            post_process_xml!(merged_xml, locale_code: lang_codes[:android], original_xml: orig_xml)
 
             # Save
             lang_dir = File.join(res_dir, "values-#{lang_codes[:android]}")
@@ -266,8 +267,10 @@ module Fastlane
           end
         end
 
+        # @!endgroup
+
         #####################
-        # Private Helpers
+        # @!group Private Helpers
         #####################
 
         # Downloads the export from GlotPress for a given locale and given filters
@@ -276,7 +279,7 @@ module Fastlane
         # @param [String] locale The GlotPress locale code to download strings for.
         # @param [Hash{Symbol=>String}] filters The hash of filters to apply when exporting from GlotPress.
         #                               Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
-        # @return [Nokogiri::XML] the download XML document, parsed as a Nokogiri::XML object
+        # @return [Nokogiri::XML::Document] the download XML document, parsed as a Nokogiri::XML object
         #
         def self.download_glotpress_export_file(project_url:, locale:, filters:)
           query_params = filters.transform_keys { |k| "filters[#{k}]" }.merge(format: 'android')
@@ -296,6 +299,9 @@ module Fastlane
         private_class_method :download_glotpress_export_file
 
         # Merge multiple Nokogiri::XML `strings.xml` documents together
+        #
+        # Used especially when we provided multiple GlotPress filters to `download_from_glotpress`,
+        # as in this case we'd trigger one export per filter, then merge the result in a single XML
         #
         # @param [Array<Nokogiri::XML::Document>] all_xmls Array of the Nokogiri XML documents to merge together
         # @return [Nokogiri::XML::Document] The merged document.
@@ -323,11 +329,53 @@ module Fastlane
         end
         private_class_method :merge_xml_documents
 
-        # Apply some common text substitutions to tag contents
+        # Process a downloaded XML (in-place), to apply the following
+        #  - replicate attributes from the nodes of the original XML (`translatable`, `tools:ignore`, …) to the translated XML
+        #  - text substitutions for common special characters
+        #  - quick-lint string by searching for common issue patterns (using `%%` in a `formatted=false` string, etc)
+        #
+        # @param [Nokogiri::XML::Document] translated_xml The downloaded XML to post-process
+        # @param [String] locale_code The android locale code associated with the translated_xml
+        # @param [Nokogiri::XML::Document] original_xml The original `values/strings.xml` to use as reference
+        #
+        def self.post_process_xml!(translated_xml, locale_code:, original_xml:)
+          copy_orig_attributes = lambda do |node, xpath|
+            orig_attributes = original_xml.xpath(xpath)&.first&.attribute_nodes&.to_h do |attr|
+              [[attr.namespace&.prefix, attr.name].compact.join(':'), attr.value]
+            end
+            orig_attributes&.each { |k, v| node[k] = v unless k == 'name' }
+          end
+
+          # 1. Replicate namespaces on the document (especially `xmlns:tools` if present)
+          original_xml.namespaces.each { |k, v| translated_xml.root&.add_namespace(k.delete_prefix('xmlns:'), v) }
+          # 2. Replicate attributes on any node with `@name` attribute (`string`, `string-array`, `plurals`)
+          translated_xml.xpath('//*[@name]').each do |node|
+            copy_orig_attributes.call(node, "//#{node.name}[@name = '#{node['name']}']")
+          end
+          # 3. Process copies for `string` nodes
+          translated_xml.xpath('//string[@name]').each do |string_node|
+            apply_substitutions!(string_node)
+            quick_lint(string_node, locale_code)
+          end
+          # 4. Process copies for `string-array/item` nodes
+          translated_xml.xpath('//string-array[@name]/item').each do |item_node|
+            apply_substitutions!(item_node)
+            quick_lint(item_node, locale_code)
+          end
+          # 5. Replicate attributes + Process copies for `plurals/item` nodes
+          translated_xml.xpath('//plurals[@name]/item[@quantity]').each do |item_node|
+            copy_orig_attributes.call(item_node, "//plurals[@name = '#{item_node.parent['name']}']/item[@quantity = '#{item_node['quantity']}']")
+            apply_substitutions!(item_node)
+            quick_lint(item_node, locale_code)
+          end
+        end
+        private_class_method :post_process_xml!
+
+        # Apply some common text substitutions to tag contents, like `... => …` or en-dash instead of regular dash for ranges of numbers
         #
         # @param [Nokogiri::XML::Node] tag The XML tag/node to apply substitutions to
         #
-        def self.apply_substitutions(tag)
+        def self.apply_substitutions!(tag)
           tag.content = tag.content.gsub('...', '…')
 
           # Typography en-dash
@@ -339,17 +387,28 @@ module Fastlane
             is_negative_number ? str : "#{match[1]}\u{2013}#{match[2]}"
           end
         end
-        private_class_method :apply_substitutions
+        private_class_method :apply_substitutions!
 
-        # Perform some quick basic checks about an individual `<string>` tag and print warnings accordingly
+        # Perform some quick basic checks about an individual `<string>` tag and print warnings accordingly:
+        #  - detect the use of `%%` in the string even if `formatted=false` is set
+        #  - detect the presence of `\@string/` in translated XML, which suggests the original key that referenced `@string/…` did not set `translatable=false`
+        #    and thus that `@string/…` copy was sent to GlotPress for translation, then escaped during exporting it back.
         #
-        # @param [Nokogiri::XML::Node] string_tag The XML tag/node to check
+        # @param [Nokogiri::XML::Node] node The XML tag/node to check the content of
         # @param [String] lang The language we are currently processing. Used for providing context during logging / warning message
         #
-        def self.quick_lint(string_tag, lang)
-          return unless string_tag['formatted'] == 'false' && string_tag.content.include?('%%')
-
-          UI.important "Warning: [#{lang}] translation for '#{string_tag['name']}' has attribute formatted=false, but still contains escaped '%%' in translation."
+        def self.quick_lint(node, lang)
+          named_node = node.has_attribute?('name') ? node : node.parent
+          if named_node['formatted'] == 'false' && node.content.include?('%%')
+            UI.important "Warning: [#{lang}] translation for '#{named_node['name']}' has attribute formatted=false, but still contains escaped '%%' in translation."
+          end
+          # rubocop:disable Style/GuardClause
+          if node.content.include?('\\@string/')
+            UI.important "Warning: [#{lang}] exported translation for '#{named_node['name']}' contains `\\@string/`. This is a sign that this entry was not marked as `translatable=false` " \
+              + 'in the original `values/strings.xml`, and was thus sent to GlotPress, which added the backslash when exporting it back.'
+            node.content = node.content.gsub('\\@string/', '@string/')
+          end
+          # rubocop:enable Style/GuardClause
         end
         private_class_method :quick_lint
 

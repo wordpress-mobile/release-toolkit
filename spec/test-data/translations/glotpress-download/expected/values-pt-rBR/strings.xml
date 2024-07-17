@@ -5,7 +5,8 @@ Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+  <string name="app_name" content_override="true">WooCommerce</string>
     <string name="shipping_label_payments_saving_error">Ocorreu um erro ao salvar suas configurações</string>
     <string name="shipping_label_payments_saving_dialog_message">Aguarde…</string>
     <string name="shipping_label_payments_saving_dialog_title">Salvando suas configurações</string>
@@ -45,4 +46,33 @@ Language: pt_BR
         <item> - o Dois: segundo ponto</item>
     </string-array>
     <string name="multi_range_statement">O primeiro intervalo é 2–100 e o segundo é 123–456.</string>
+    <string name="sunday">Domingo</string>
+    <string name="monday">Segunda-feira</string>
+    <string name="tuesday">Terça-feira</string>
+    <string name="wednesday">Quarta-feira</string>
+    <string name="thursday">Quinta-feira</string>
+    <string name="friday">Sexta-feira</string>
+    <string name="saturday">Sábado</string>
+    <string-array name="weeks_full" translatable="false">
+        <item>@string/sunday</item>
+        <item>@string/monday</item>
+        <item>@string/tuesday</item>
+        <item>@string/wednesday</item>
+        <item>@string/thursday</item>
+        <item>@string/friday</item>
+        <item>@string/saturday</item>
+        <item>Nenhum</item>
+    </string-array>
+    <string-array name="progress" formatted="false">
+        <item>0%</item>
+        <item>25%</item>
+        <item>50%</item>
+        <item>75%</item>
+        <item>100%</item>
+    </string-array>
+    <string name="confirm_single_entry_trash">Tem certeza de que deseja mover esta entrada para a lixeira?</string>
+    <plurals name="confirm_entry_trash" formatted="true">
+        <item quantity="one" tools:ignore="ImpliedQuantity">@string/confirm_single_entry_trash</item>
+        <item quantity="other">Tem certeza… deseja mover %d entradas para a lixeira?</item>
+    </plurals>
 </resources>
