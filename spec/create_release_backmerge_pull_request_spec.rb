@@ -31,21 +31,17 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
       .and_return("\n" + branches.map { |release| "origin/#{release}" }.join("\n") + "\n")
   end
 
-  def stub_git_branches_diff(base_branch:, head_branch:, diff:)
-    allow(Fastlane::Actions).to receive(:sh)
-      .with('git', 'diff', "#{base_branch}...#{head_branch}")
-      .and_return(diff)
-  end
-
-  def stub_expected_pull_requests(expected_backmerge_branches:, source_branch:, labels: [], milestone_number: nil, reviewers: nil, team_reviewers: nil, diff: 'somediff')
+  def stub_expected_pull_requests(expected_backmerge_branches:, source_branch:, labels: [], milestone_number: nil, reviewers: nil, team_reviewers: nil, commits_between_head_and_base: 42)
     expected_backmerge_branches.each do |target_branch|
       expected_intermediate_branch = "merge/#{source_branch.gsub('/', '-')}-into-#{target_branch.gsub('/', '-')}"
 
-      unless diff.empty?
-        expect(Fastlane::Helper::GitHelper).to receive(:checkout_and_pull).with(source_branch)
-        expect(Fastlane::Helper::GitHelper).to receive(:create_branch).with(expected_intermediate_branch)
-        expect(other_action_mock).to receive(:push_to_git_remote).with(tags: false)
-      end
+      allow(Fastlane::Helper::GitHelper).to receive(:count_commits_between).with(base_ref: target_branch, head_ref: source_branch).and_return(commits_between_head_and_base)
+
+      next if commits_between_head_and_base.zero?
+
+      expect(Fastlane::Helper::GitHelper).to receive(:checkout_and_pull).with(source_branch)
+      expect(Fastlane::Helper::GitHelper).to receive(:create_branch).with(expected_intermediate_branch)
+      expect(other_action_mock).to receive(:push_to_git_remote).with(tags: false)
 
       allow(other_action_mock).to receive(:create_pull_request).with(
         api_token: test_token,
@@ -59,8 +55,6 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
         reviewers: reviewers,
         team_reviewers: team_reviewers
       ).and_return(mock_pr_url(target_branch))
-
-      stub_git_branches_diff(base_branch: target_branch, head_branch: source_branch, diff: diff)
     end
   end
 
@@ -288,7 +282,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
       stub_expected_pull_requests(
         expected_backmerge_branches: expected_backmerge_branches,
         source_branch: source_branch,
-        diff: ''
+        commits_between_head_and_base: 0
       )
 
       result = run_described_fastlane_action(
