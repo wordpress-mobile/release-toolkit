@@ -14,14 +14,20 @@ _None_
 
 ### Bug Fixes
 
-- Fix `android_download_translation` issues reported in #569 [#571]
-   - add post-processing of `plurals` nodes too.
-   - detect and fix `\@string/` references escaped in GlotPress exports.
-   - replicate all XML attributes (and xmlns) present in `values/string.xml` on the corresponding nodes in the translated XML.
+_None_
 
 ### Internal Changes
 
 _None_
+
+## 11.0.3
+
+### Bug Fixes
+
+- Fix `android_download_translation` issues reported in #569 [#571]
+   - add post-processing of `plurals` nodes too.
+   - detect and fix `\@string/` references escaped in GlotPress exports.
+   - replicate all XML attributes (and xmlns) present in `values/string.xml` on the corresponding nodes in the translated XML.
 
 ## 11.0.2
 
