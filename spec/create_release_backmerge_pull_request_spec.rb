@@ -31,13 +31,13 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
       .and_return("\n" + branches.map { |release| "origin/#{release}" }.join("\n") + "\n")
   end
 
-  def stub_expected_pull_requests(expected_backmerge_branches:, source_branch:, labels: [], milestone_number: nil, reviewers: nil, team_reviewers: nil, commits_between_head_and_base: 42)
+  def stub_expected_pull_requests(expected_backmerge_branches:, source_branch:, labels: [], milestone_number: nil, reviewers: nil, team_reviewers: nil, nb_new_commits: 42)
     expected_backmerge_branches.each do |target_branch|
       expected_intermediate_branch = "merge/#{source_branch.gsub('/', '-')}-into-#{target_branch.gsub('/', '-')}"
 
-      allow(Fastlane::Helper::GitHelper).to receive(:count_commits_between).with(base_ref: target_branch, head_ref: source_branch).and_return(commits_between_head_and_base)
+      allow(Fastlane::Helper::GitHelper).to receive(:count_commits_between).with(base_ref: target_branch, head_ref: source_branch).and_return(nb_new_commits)
 
-      next if commits_between_head_and_base.zero?
+      next if nb_new_commits.zero?
 
       expect(Fastlane::Helper::GitHelper).to receive(:checkout_and_pull).with(source_branch)
       expect(Fastlane::Helper::GitHelper).to receive(:create_branch).with(expected_intermediate_branch)
@@ -282,7 +282,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
       stub_expected_pull_requests(
         expected_backmerge_branches: expected_backmerge_branches,
         source_branch: source_branch,
-        commits_between_head_and_base: 0
+        nb_new_commits: 0
       )
 
       result = run_described_fastlane_action(
