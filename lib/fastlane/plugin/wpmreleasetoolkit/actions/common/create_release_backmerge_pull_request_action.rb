@@ -95,7 +95,7 @@ module Fastlane
         intermediate_branch = "merge/#{head_branch.gsub('/', '-')}-into-#{base_branch.gsub('/', '-')}"
         Fastlane::Helper::GitHelper.create_branch(intermediate_branch)
 
-        intermediate_branch_created_callback&.call
+        intermediate_branch_created_callback&.call(base_branch, intermediate_branch)
 
         # if there's a callback, make sure it didn't switch branches
         other_action.ensure_git_branch(branch: "^#{intermediate_branch}/") unless intermediate_branch_created_callback.nil?
@@ -192,7 +192,7 @@ module Fastlane
                                        optional: true,
                                        type: Array),
           FastlaneCore::ConfigItem.new(key: :intermediate_branch_created_callback,
-                                       description: 'Callback to allow for the caller to perform operations on the intermediate branch before pushing',
+                                       description: 'Callback to allow for the caller to perform operations on the intermediate branch before pushing. The call back receives two parameters: the base (target) branch for the PR and the intermediate branch name',
                                        optional: true,
                                        type: Proc),
           Fastlane::Helper::GithubHelper.github_token_config_item,

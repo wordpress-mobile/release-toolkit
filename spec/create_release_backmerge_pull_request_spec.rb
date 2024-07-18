@@ -307,9 +307,10 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
         source_branch: source_branch
       )
 
-      expect(other_action_mock).to receive(:ensure_git_branch).with(branch: "^merge/release-30.6-into-#{default_branch}/")
+      intermediate_branch = "merge/release-30.6-into-#{default_branch}"
+      expect(other_action_mock).to receive(:ensure_git_branch).with(branch: "^#{intermediate_branch}/")
       allow(Fastlane::UI).to receive(:message).with(anything)
-      expect(Fastlane::UI).to receive(:message).with('branch created callback was called!')
+      expect(Fastlane::UI).to receive(:message).with("branch created callback was called! #{default_branch} #{intermediate_branch}")
 
       # Due to the Proc parameter, we cannot use run_described_fastlane_action as it converts everything to strings
       lane = <<~LANE
@@ -319,7 +320,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
             repository: '#{test_repo}',
             source_branch: '#{source_branch}',
             default_branch: '#{default_branch}',
-            intermediate_branch_created_callback: proc { UI.message('branch created callback was called!') }
+            intermediate_branch_created_callback: proc { |target, intermediate_branch| UI.message('branch created callback was called! ' + target + ' ' + intermediate_branch) }
           )
         end
       LANE
