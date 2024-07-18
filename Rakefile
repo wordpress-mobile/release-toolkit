@@ -72,7 +72,7 @@ task :new_release do
     PR Author: Be sure to create and publish a GitHub Release pointing to `trunk` once this PR gets merged,
     copy/pasting the following text as the GitHub Release's description:
     ```
-    #{changelog}
+    #{changelog.join}
     ```
   BODY
   GitHelper.prepare_github_pr("release/#{new_version}", 'trunk', "Release #{new_version} into trunk", pr_body)
@@ -87,7 +87,7 @@ task :new_release do
     with the following text as description:
 
     ```
-    #{changelog}
+    #{changelog.join}
     ```
 
     The publication of the new GitHub release will create a git tag, which in turn will trigger
