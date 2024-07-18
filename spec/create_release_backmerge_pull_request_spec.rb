@@ -295,4 +295,35 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
       expect(result).to be_empty
     end
   end
+
+  context 'when using the `intermediate_branch_created_callback` callback' do
+    it 'correctly calls the callback when there is one' do
+      stub_git_release_branches([])
+
+      source_branch = 'release/30.6'
+
+      stub_expected_pull_requests(
+        expected_backmerge_branches: [default_branch],
+        source_branch: source_branch
+      )
+
+      expect(other_action_mock).to receive(:ensure_git_branch).with(branch: "^merge/release-30.6-into-#{default_branch}/")
+      allow(Fastlane::UI).to receive(:message).with(anything)
+      expect(Fastlane::UI).to receive(:message).with('branch created callback was called!')
+
+      # Due to the Proc parameter, we cannot use run_described_fastlane_action as it converts everything to strings
+      lane = <<~LANE
+        lane :test_branch_created_callback do
+          #{described_class.action_name}(
+            github_token: '#{test_token}',
+            repository: '#{test_repo}',
+            source_branch: '#{source_branch}',
+            default_branch: '#{default_branch}',
+            intermediate_branch_created_callback: proc { UI.message('branch created callback was called!') }
+          )
+        end
+      LANE
+      Fastlane::FastFile.new.parse(lane).runner.execute(:test_branch_created_callback)
+    end
+  end
 end

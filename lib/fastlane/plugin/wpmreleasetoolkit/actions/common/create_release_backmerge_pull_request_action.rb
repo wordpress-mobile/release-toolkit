@@ -16,6 +16,7 @@ module Fastlane
         milestone_title = params[:milestone_title]
         reviewers = params[:reviewers]
         team_reviewers = params[:team_reviewers]
+        intermediate_branch_created_callback = params[:intermediate_branch_created_callback]
 
         if target_branches.include?(source_branch)
           UI.user_error!('`target_branches` must not contain `source_branch`')
@@ -46,7 +47,8 @@ module Fastlane
             labels: labels,
             milestone: target_milestone&.number,
             reviewers: reviewers,
-            team_reviewers: team_reviewers
+            team_reviewers: team_reviewers,
+            intermediate_branch_created_callback: intermediate_branch_created_callback
           )
         end.compact
       end
@@ -82,7 +84,7 @@ module Fastlane
       # @param reviewers [Array<String>] the individual reviewers for the pull request.
       # @param team_reviewers [Array<String>] the team reviewers for the pull request.
       # @return [void]
-      def self.create_backmerge_pr(token:, repository:, title:, head_branch:, base_branch:, labels:, milestone:, reviewers:, team_reviewers:)
+      def self.create_backmerge_pr(token:, repository:, title:, head_branch:, base_branch:, labels:, milestone:, reviewers:, team_reviewers:, intermediate_branch_created_callback:)
         commits_between_head_and_base = Fastlane::Helper::GitHelper.count_commits_between(base_ref: base_branch, head_ref: head_branch)
 
         if commits_between_head_and_base.zero?
@@ -92,6 +94,11 @@ module Fastlane
 
         intermediate_branch = "merge/#{head_branch.gsub('/', '-')}-into-#{base_branch.gsub('/', '-')}"
         Fastlane::Helper::GitHelper.create_branch(intermediate_branch)
+
+        intermediate_branch_created_callback&.call
+
+        # if there's a callback, make sure it didn't switch branches
+        other_action.ensure_git_branch(branch: "^#{intermediate_branch}/") unless intermediate_branch_created_callback.nil?
 
         other_action.push_to_git_remote(tags: false)
 
@@ -184,6 +191,10 @@ module Fastlane
                                        description: 'An array of GitHub team slugs that will be assigned to the pull request',
                                        optional: true,
                                        type: Array),
+          FastlaneCore::ConfigItem.new(key: :intermediate_branch_created_callback,
+                                       description: 'Callback to allow for the caller to perform operations on the intermediate branch before pushing',
+                                       optional: true,
+                                       type: Proc),
           Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
