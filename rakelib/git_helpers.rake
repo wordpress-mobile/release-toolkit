@@ -1,3 +1,5 @@
+require 'cgi'
+
 module GitHelper
   def self.current_branch
     `git --no-pager branch --show-current`.chomp
@@ -19,8 +21,8 @@ module GitHelper
 
   def self.prepare_github_pr(head, base, title, body)
     require 'open-uri'
-    qtitle = title.gsub(' ', '%20')
-    qbody = body.gsub(' ', '%20')
+    qtitle = CGI.escape(title)
+    qbody = CGI.escape(body)
     uri = "https://github.com/wordpress-mobile/release-toolkit/compare/#{base}...#{head}?expand=1&title=#{qtitle}&body=#{qbody}"
     Rake.sh('open', uri)
   end
