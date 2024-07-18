@@ -183,15 +183,28 @@ module Fastlane
       #
       # @param base_ref [String] The base reference (branch name, tag, or commit hash).
       # @param head_ref [String] The head reference (branch name, tag, or commit hash).
+      # @param first_parent [Boolean] Counts only the first parent commit upon seeing a merge commit
       #
       # @return [Integer] The number of commits between base_ref and head_ref.
       #
-      def self.count_commits_between(base_ref:, head_ref:)
+      def self.count_commits_between(base_ref:, head_ref:, first_parent: true)
         git_repo = Git.open(Dir.pwd)
 
-        new_commits = git_repo.log.between(base_ref, head_ref)
+        return git_repo.log.between(base_ref, head_ref).count unless first_parent
 
-        new_commits.count
+        base_commit = git_repo.gcommit(base_ref)
+        head_commit = git_repo.gcommit(head_ref)
+
+        count = 0
+        current_commit = head_commit
+        while current_commit
+          break if current_commit.sha == base_commit.sha
+
+          count += 1
+          current_commit = current_commit.parents.first
+        end
+
+        count
       end
 
       # Returns the current git branch, or "HEAD" if it's not checked out to any branch

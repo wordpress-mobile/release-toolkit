@@ -115,10 +115,11 @@ describe Fastlane::Helper::GitHelper do
       # Spec branching setup:
       #
       #   (1.0)
-      # A---B---C         main
-      #        / \
-      #       |   D---E   feature-branch
-      #       F---G---H   another-branch / new-branch
+      # A---B---C-----------L    main
+      #        / \         /
+      #       |   D---E---F      feature-branch
+      #       |
+      #       G---H---I---J---K  another-branch / new-branch
 
       init_git_repo
 
@@ -132,49 +133,64 @@ describe Fastlane::Helper::GitHelper do
       create_branch('feature-branch')
       add_file_and_commit(file: 'file4.txt', message: 'commit D feature branch')
       add_file_and_commit(file: 'file5.txt', message: 'commit E feature branch')
+      add_file_and_commit(file: 'file6.txt', message: 'commit F feature branch')
 
       checkout_branch('main')
 
       create_branch('another-branch')
-      add_file_and_commit(file: 'file6.txt', message: 'commit F another branch')
       add_file_and_commit(file: 'file7.txt', message: 'commit G another branch')
       add_file_and_commit(file: 'file8.txt', message: 'commit H another branch')
+      add_file_and_commit(file: 'file9.txt', message: 'commit I another branch')
+      add_file_and_commit(file: 'file10.txt', message: 'commit J another branch')
+      add_file_and_commit(file: 'file11.txt', message: 'commit K another branch')
 
       create_branch('new-branch')
+
+      merge_branch(base: 'main', head: 'feature-branch')
     end
 
-    it 'counts commits between different branches' do
-      count = described_class.count_commits_between(base_ref: 'main', head_ref: 'feature-branch')
-      expect(count).to eq(2)
+    shared_examples 'counting commits between refs' do |first_parent|
+      it 'counts commits between a tag and a branch' do
+        count = described_class.count_commits_between(base_ref: '1.0', head_ref: 'another-branch', first_parent: first_parent)
+        expect(count).to eq(6)
+      end
+
+      it 'counts commits between a tag and a branch that had a merge' do
+        count = described_class.count_commits_between(base_ref: '1.0', head_ref: 'main', first_parent: first_parent)
+        expect(count).to eq(first_parent ? 2 : 5)
+      end
+
+      it 'counts commits between a tag and a commit hash' do
+        count = described_class.count_commits_between(base_ref: '1.0', head_ref: commit_hash(commit_message: 'commit D'))
+        expect(count).to eq(2)
+      end
+
+      it 'counts commits between a commit hash and a branch' do
+        count = described_class.count_commits_between(base_ref: commit_hash(commit_message: 'commit B'), head_ref: 'another-branch', first_parent: first_parent)
+        expect(count).to eq(6)
+      end
+
+      it 'counts commits between the same branch' do
+        count = described_class.count_commits_between(base_ref: 'feature-branch', head_ref: 'feature-branch', first_parent: first_parent)
+        expect(count).to eq(0)
+      end
+
+      it 'counts commits between branches that have no difference' do
+        count = described_class.count_commits_between(base_ref: 'another-branch', head_ref: 'new-branch', first_parent: first_parent)
+        expect(count).to eq(0)
+      end
+
+      it 'raises error for a non-existent base_ref' do
+        expect { described_class.count_commits_between(base_ref: 'non-existent', head_ref: 'main', first_parent: first_parent) }.to raise_error(StandardError)
+      end
     end
 
-    it 'counts commits between a tag and a branch' do
-      count = described_class.count_commits_between(base_ref: '1.0', head_ref: 'feature-branch')
-      expect(count).to eq(3)
+    context 'counting commits considering only the merge commit (first parent)' do
+      include_examples 'counting commits between refs', true
     end
 
-    it 'counts commits between a commit hash and a branch' do
-      count = described_class.count_commits_between(base_ref: commit_hash(commit_message: 'commit B'), head_ref: 'another-branch')
-      expect(count).to eq(4)
-    end
-
-    it 'counts commits between different branches with the same parent' do
-      count = described_class.count_commits_between(base_ref: 'feature-branch', head_ref: 'another-branch')
-      expect(count).to eq(3)
-    end
-
-    it 'counts commits between the same branch' do
-      count = described_class.count_commits_between(base_ref: 'feature-branch', head_ref: 'feature-branch')
-      expect(count).to eq(0)
-    end
-
-    it 'counts commits between branches that have no difference' do
-      count = described_class.count_commits_between(base_ref: 'another-branch', head_ref: 'new-branch')
-      expect(count).to eq(0)
-    end
-
-    it 'raises error for a non-existent base_ref' do
-      expect { described_class.count_commits_between(base_ref: 'non-existent', head_ref: 'main') }.to raise_error(StandardError)
+    context 'counting commits considering all commits' do
+      include_examples 'counting commits between refs', false
     end
   end
 
@@ -271,6 +287,12 @@ end
 
 def create_branch(branch_name)
   `git checkout -B #{branch_name}`
+end
+
+def merge_branch(base:, head:)
+  checkout_branch(base)
+
+  `git merge --no-ff #{head}`
 end
 
 def create_tag(tag_name)
