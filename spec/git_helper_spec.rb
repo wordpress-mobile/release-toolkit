@@ -110,7 +110,7 @@ describe Fastlane::Helper::GitHelper do
     end
   end
 
-  context('has_commits_between?(base_ref:, head_ref:, first_parent:)') do
+  context('point_to_same_commit?(ref1, ref2)') do
     before do
       # Spec branching setup:
       #
@@ -144,48 +144,38 @@ describe Fastlane::Helper::GitHelper do
       merge_branch(base: 'main', head: 'feature-branch')
     end
 
-    shared_examples 'counting commits between refs' do |first_parent|
-      it 'counts commits between a tag and a branch' do
-        diff_exists = described_class.has_commits_between?(base_ref: '1.0', head_ref: 'another-branch', first_parent: first_parent)
-        expect(diff_exists).to be true
-      end
-
-      it 'counts commits between a tag and a branch that had a merge' do
-        diff_exists = described_class.has_commits_between?(base_ref: '1.0', head_ref: 'main', first_parent: first_parent)
-        expect(diff_exists).to be true
-      end
-
-      it 'counts commits between a tag and a commit hash' do
-        diff_exists = described_class.has_commits_between?(base_ref: '1.0', head_ref: commit_hash(commit_message: 'commit D'))
-        expect(diff_exists).to be true
-      end
-
-      it 'counts commits between a commit hash and a branch' do
-        diff_exists = described_class.has_commits_between?(base_ref: commit_hash(commit_message: 'commit B'), head_ref: 'another-branch', first_parent: first_parent)
-        expect(diff_exists).to be true
-      end
-
-      it 'counts commits between the same branch' do
-        diff_exists = described_class.has_commits_between?(base_ref: 'feature-branch', head_ref: 'feature-branch', first_parent: first_parent)
-        expect(diff_exists).to be false
-      end
-
-      it 'counts commits between branches that have no difference' do
-        diff_exists = described_class.has_commits_between?(base_ref: 'another-branch', head_ref: 'new-branch', first_parent: first_parent)
-        expect(diff_exists).to be false
-      end
-
-      it 'raises error for a non-existent base_ref' do
-        expect { described_class.has_commits_between?(base_ref: 'non-existent', head_ref: 'main', first_parent: first_parent) }.to raise_error(StandardError)
-      end
+    it 'checks if a tag and a branch point to the same commit' do
+      same_commit = described_class.point_to_same_commit?('1.0', 'another-branch')
+      expect(same_commit).to be false
     end
 
-    context 'counting commits considering only the merge commit (first parent)' do
-      include_examples 'counting commits between refs', true
+    it 'checks if a tag and a branch that had a merge point to the same commit' do
+      same_commit = described_class.point_to_same_commit?('1.0', 'main')
+      expect(same_commit).to be false
     end
 
-    context 'counting commits considering all commits' do
-      include_examples 'counting commits between refs', false
+    it 'checks if a tag and a commit hash point to the same commit' do
+      same_commit = described_class.point_to_same_commit?('1.0', commit_hash(commit_message: 'commit D'))
+      expect(same_commit).to be false
+    end
+
+    it 'checks if a commit hash and a branch point to the same commit' do
+      same_commit = described_class.point_to_same_commit?(commit_hash(commit_message: 'commit B'), 'another-branch')
+      expect(same_commit).to be false
+    end
+
+    it 'checks if commits between the same branch point to the same commit' do
+      same_commit = described_class.point_to_same_commit?('feature-branch', 'feature-branch')
+      expect(same_commit).to be true
+    end
+
+    it 'checks if commits between branches that have no difference point to the same commit' do
+      same_commit = described_class.point_to_same_commit?('another-branch', 'new-branch')
+      expect(same_commit).to be true
+    end
+
+    it 'raises error for a non-existent base_ref' do
+      expect { described_class.point_to_same_commit?('non-existent', 'main') }.to raise_error(StandardError)
     end
   end
 

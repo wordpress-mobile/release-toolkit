@@ -179,32 +179,19 @@ module Fastlane
         Action.sh('git', 'fetch', '--tags')
       end
 
-      # Calculates if there are new commits between two references in the Git repository.
+      # Checks if two git references point to the same commit.
       #
-      # @param base_ref [String] The base reference (branch name, tag, or commit hash).
-      # @param head_ref [String] The head reference (branch name, tag, or commit hash).
-      # @param first_parent [Boolean] Counts only the first parent commit upon seeing a merge commit
+      # @param ref1 [String] the first git reference to check.
+      # @param ref2 [String] the second git reference to check.
       #
-      # @return [Boolean] Whether there are new commits between base_ref and head_ref.
+      # @return [Boolean] true if the two references point to the same commit, false otherwise.
       #
-      def self.has_commits_between?(base_ref:, head_ref:, first_parent: true)
+      def self.point_to_same_commit?(ref1, ref2)
         git_repo = Git.open(Dir.pwd)
+        ref1_commit = git_repo.gcommit(ref1)
+        ref2_commit = git_repo.gcommit(ref2)
 
-        return git_repo.log.between(base_ref, head_ref).count.positive? unless first_parent
-
-        base_commit = git_repo.gcommit(base_ref)
-        head_commit = git_repo.gcommit(head_ref)
-
-        count = 0
-        current_commit = head_commit
-        while current_commit
-          break if current_commit.sha == base_commit.sha
-
-          count += 1
-          current_commit = current_commit.parents.first
-        end
-
-        count.positive?
+        ref1_commit.sha == ref2_commit.sha
       end
 
       # Returns the current git branch, or "HEAD" if it's not checked out to any branch

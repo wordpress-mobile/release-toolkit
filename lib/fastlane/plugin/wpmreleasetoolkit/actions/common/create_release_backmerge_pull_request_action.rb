@@ -103,9 +103,7 @@ module Fastlane
         # if there's a callback, make sure it didn't switch branches
         other_action.ensure_git_branch(branch: "^#{intermediate_branch}/") unless intermediate_branch_created_callback.nil?
 
-        has_commits_between_head_and_base = Fastlane::Helper::GitHelper.has_commits_between?(base_ref: base_branch, head_ref: head_branch)
-
-        unless has_commits_between_head_and_base
+        if Fastlane::Helper::GitHelper.point_to_same_commit?(base_branch, head_branch)
           UI.error("No differences between #{head_branch} and #{base_branch}. Skipping PR creation.")
           return nil
         end

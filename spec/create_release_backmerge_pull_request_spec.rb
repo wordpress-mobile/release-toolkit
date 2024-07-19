@@ -31,7 +31,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
       .and_return("\n" + branches.map { |release| "origin/#{release}" }.join("\n") + "\n")
   end
 
-  def stub_expected_pull_requests(expected_backmerge_branches:, source_branch:, labels: [], milestone_number: nil, reviewers: nil, team_reviewers: nil, branch_exists_on_remote: false, has_commits_between_refs: true)
+  def stub_expected_pull_requests(expected_backmerge_branches:, source_branch:, labels: [], milestone_number: nil, reviewers: nil, team_reviewers: nil, branch_exists_on_remote: false, point_to_same_commit: false)
     expected_backmerge_branches.each do |target_branch|
       expected_intermediate_branch = "merge/#{source_branch.gsub('/', '-')}-into-#{target_branch.gsub('/', '-')}"
 
@@ -39,9 +39,9 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
 
       next if branch_exists_on_remote
 
-      allow(Fastlane::Helper::GitHelper).to receive(:has_commits_between?).with(base_ref: target_branch, head_ref: source_branch).and_return(has_commits_between_refs)
+      allow(Fastlane::Helper::GitHelper).to receive(:point_to_same_commit?).with(target_branch, source_branch).and_return(point_to_same_commit)
 
-      next unless has_commits_between_refs
+      next if point_to_same_commit
 
       expect(Fastlane::Helper::GitHelper).to receive(:checkout_and_pull).with(source_branch)
       expect(Fastlane::Helper::GitHelper).to receive(:create_branch).with(expected_intermediate_branch)
@@ -276,8 +276,8 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
     end
   end
 
-  context 'when checking diff between source & target branches' do
-    it 'does not create a pull request when there are no differences between the `source_branch` a target branch' do
+  context 'when checking if source & target branches point to the same commit' do
+    it 'does not create a pull request when `source_branch` a target branch point to the same commit' do
       stub_git_release_branches(%w[release/30.6])
 
       source_branch = 'release/30.7'
@@ -286,7 +286,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
       stub_expected_pull_requests(
         expected_backmerge_branches: expected_backmerge_branches,
         source_branch: source_branch,
-        has_commits_between_refs: false
+        point_to_same_commit: true
       )
 
       result = run_described_fastlane_action(
