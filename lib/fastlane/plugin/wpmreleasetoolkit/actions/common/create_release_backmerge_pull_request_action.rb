@@ -83,7 +83,11 @@ module Fastlane
       # @param milestone [String] the milestone to associate with the pull request.
       # @param reviewers [Array<String>] the individual reviewers for the pull request.
       # @param team_reviewers [Array<String>] the team reviewers for the pull request.
-      # @return [void]
+      # @param intermediate_branch_created_callback [Proc] A callback to call after having created the intermediate branch
+      #        to allow the caller to e.g. add new commits on it before the PR is created. The callback takes two parameters: the base branch and the intermediate branch
+      #
+      # @return [String] The URL of the created Pull Request, or `nil` if no PR was created.
+      #
       def self.create_backmerge_pr(token:, repository:, title:, head_branch:, base_branch:, labels:, milestone:, reviewers:, team_reviewers:, intermediate_branch_created_callback:)
         intermediate_branch = "merge/#{head_branch.gsub('/', '-')}-into-#{base_branch.gsub('/', '-')}"
 
