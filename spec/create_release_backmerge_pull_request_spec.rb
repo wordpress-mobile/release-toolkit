@@ -31,13 +31,17 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
       .and_return("\n" + branches.map { |release| "origin/#{release}" }.join("\n") + "\n")
   end
 
-  def stub_expected_pull_requests(expected_backmerge_branches:, source_branch:, labels: [], milestone_number: nil, reviewers: nil, team_reviewers: nil, nb_new_commits: 42)
+  def stub_expected_pull_requests(expected_backmerge_branches:, source_branch:, labels: [], milestone_number: nil, reviewers: nil, team_reviewers: nil, branch_exists_on_remote: false, has_commits_between_refs: true)
     expected_backmerge_branches.each do |target_branch|
       expected_intermediate_branch = "merge/#{source_branch.gsub('/', '-')}-into-#{target_branch.gsub('/', '-')}"
 
-      allow(Fastlane::Helper::GitHelper).to receive(:count_commits_between).with(base_ref: target_branch, head_ref: source_branch).and_return(nb_new_commits)
+      allow(Fastlane::Helper::GitHelper).to receive(:branch_exists_on_remote?).with(branch_name: expected_intermediate_branch).and_return(branch_exists_on_remote)
 
-      next if nb_new_commits.zero?
+      next if branch_exists_on_remote
+
+      allow(Fastlane::Helper::GitHelper).to receive(:has_commits_between?).with(base_ref: target_branch, head_ref: source_branch).and_return(has_commits_between_refs)
+
+      next unless has_commits_between_refs
 
       expect(Fastlane::Helper::GitHelper).to receive(:checkout_and_pull).with(source_branch)
       expect(Fastlane::Helper::GitHelper).to receive(:create_branch).with(expected_intermediate_branch)
@@ -282,7 +286,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
       stub_expected_pull_requests(
         expected_backmerge_branches: expected_backmerge_branches,
         source_branch: source_branch,
-        nb_new_commits: 0
+        has_commits_between_refs: false
       )
 
       result = run_described_fastlane_action(
@@ -293,6 +297,30 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
       )
 
       expect(result).to be_empty
+    end
+  end
+
+  context 'when the branch already exists' do
+    it 'does not try to create a new branch' do
+      stub_git_release_branches(%w[release/30.6])
+
+      source_branch = 'release/30.7'
+
+      expected_backmerge_branches = %w[trunk release/30.6]
+      stub_expected_pull_requests(
+        expected_backmerge_branches: expected_backmerge_branches,
+        source_branch: source_branch,
+        branch_exists_on_remote: true
+      )
+
+      expect do
+        run_described_fastlane_action(
+          github_token: test_token,
+          repository: test_repo,
+          source_branch: source_branch,
+          target_branches: expected_backmerge_branches
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'The intermediate branch `merge/release-30.7-into-trunk` already exists. Please check if there is an existing Pull Request that needs to be merged or closed first, or delete the branch.')
     end
   end
 

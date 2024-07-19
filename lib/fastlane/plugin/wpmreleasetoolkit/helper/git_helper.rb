@@ -179,18 +179,18 @@ module Fastlane
         Action.sh('git', 'fetch', '--tags')
       end
 
-      # Counts the number of commits between two references in the Git repository.
+      # Calculates if there are new commits between two references in the Git repository.
       #
       # @param base_ref [String] The base reference (branch name, tag, or commit hash).
       # @param head_ref [String] The head reference (branch name, tag, or commit hash).
       # @param first_parent [Boolean] Counts only the first parent commit upon seeing a merge commit
       #
-      # @return [Integer] The number of commits between base_ref and head_ref.
+      # @return [Boolean] Whether there are new commits between base_ref and head_ref.
       #
-      def self.count_commits_between(base_ref:, head_ref:, first_parent: true)
+      def self.has_commits_between?(base_ref:, head_ref:, first_parent: true)
         git_repo = Git.open(Dir.pwd)
 
-        return git_repo.log.between(base_ref, head_ref).count unless first_parent
+        return git_repo.log.between(base_ref, head_ref).count.positive? unless first_parent
 
         base_commit = git_repo.gcommit(base_ref)
         head_commit = git_repo.gcommit(head_ref)
@@ -204,7 +204,7 @@ module Fastlane
           current_commit = current_commit.parents.first
         end
 
-        count
+        count.positive?
       end
 
       # Returns the current git branch, or "HEAD" if it's not checked out to any branch
@@ -232,6 +232,17 @@ module Fastlane
       #
       def self.branch_exists?(branch_name)
         !Action.sh('git', 'branch', '--list', branch_name).empty?
+      end
+
+      # Checks if a branch exists on the repository's remote.
+      #
+      # @param branch_name [String] the name of the branch to check.
+      # @param remote_name [String] the name of the remote repository (default is 'origin').
+      #
+      # @return [Boolean] true if the branch exists on remote, false otherwise.
+      #
+      def self.branch_exists_on_remote?(branch_name:, remote_name: 'origin')
+        !Action.sh('git', 'ls-remote', '--heads', remote_name, branch_name).empty?
       end
 
       # Ensure that we are on the expected branch, and abort if not.

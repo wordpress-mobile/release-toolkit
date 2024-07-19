@@ -85,20 +85,26 @@ module Fastlane
       # @param team_reviewers [Array<String>] the team reviewers for the pull request.
       # @return [void]
       def self.create_backmerge_pr(token:, repository:, title:, head_branch:, base_branch:, labels:, milestone:, reviewers:, team_reviewers:, intermediate_branch_created_callback:)
-        commits_between_head_and_base = Fastlane::Helper::GitHelper.count_commits_between(base_ref: base_branch, head_ref: head_branch)
+        intermediate_branch = "merge/#{head_branch.gsub('/', '-')}-into-#{base_branch.gsub('/', '-')}"
 
-        if commits_between_head_and_base.zero?
-          UI.message("No differences between #{head_branch} and #{base_branch}. Skipping PR creation.")
+        if Fastlane::Helper::GitHelper.branch_exists_on_remote?(branch_name: intermediate_branch)
+          UI.user_error!("The intermediate branch `#{intermediate_branch}` already exists. Please check if there is an existing Pull Request that needs to be merged or closed first, or delete the branch.")
           return nil
         end
 
-        intermediate_branch = "merge/#{head_branch.gsub('/', '-')}-into-#{base_branch.gsub('/', '-')}"
         Fastlane::Helper::GitHelper.create_branch(intermediate_branch)
 
         intermediate_branch_created_callback&.call(base_branch, intermediate_branch)
 
         # if there's a callback, make sure it didn't switch branches
         other_action.ensure_git_branch(branch: "^#{intermediate_branch}/") unless intermediate_branch_created_callback.nil?
+
+        has_commits_between_head_and_base = Fastlane::Helper::GitHelper.has_commits_between?(base_ref: base_branch, head_ref: head_branch)
+
+        unless has_commits_between_head_and_base
+          UI.error("No differences between #{head_branch} and #{base_branch}. Skipping PR creation.")
+          return nil
+        end
 
         other_action.push_to_git_remote(tags: false)
 
