@@ -26,12 +26,12 @@ describe Fastlane::Helper::GitHelper do
   end
 
   it 'can detect a valid git repository' do
-    `git init --initial-branch main || git init`
+    init_git_repo
     expect(described_class.is_git_repo?).to be true
   end
 
   it 'can detect a valid git repository from a child folder' do
-    `git init --initial-branch main || git init`
+    init_git_repo
     `mkdir -p a/b`
     Dir.chdir('./a/b')
     expect(described_class.is_git_repo?).to be true
@@ -54,13 +54,13 @@ describe Fastlane::Helper::GitHelper do
   end
 
   it 'can detect a repository with Git-lfs enabled' do
-    `git init --initial-branch main || git init`
+    init_git_repo
     `git lfs install`
     expect(described_class.has_git_lfs?).to be true
   end
 
   it 'can detect a repository without Git-lfs enabled' do
-    `git init --initial-branch main || git init`
+    init_git_repo
     `git lfs uninstall &>/dev/null`
     expect(described_class.is_git_repo?).to be true
     expect(described_class.has_git_lfs?).to be false
@@ -107,6 +107,75 @@ describe Fastlane::Helper::GitHelper do
     it 'adds all pending file changes before commit if :all is provided as `files`' do
       expect_shell_command('git', 'commit', '-a', '-m', @message)
       described_class.commit(message: @message, files: :all)
+    end
+  end
+
+  context('point_to_same_commit?(ref1, ref2)') do
+    before do
+      # Spec branching setup:
+      #
+      #   (1.0)
+      # A---B---C----G   main
+      #        / \  /
+      #       |   D      feature-branch
+      #       |
+      #       E---F      another-branch / new-branch
+
+      init_git_repo
+
+      add_file_and_commit(file: 'file1.txt', message: 'commit A')
+      add_file_and_commit(file: 'file2.txt', message: 'commit B')
+
+      create_tag('1.0')
+
+      add_file_and_commit(file: 'file3.txt', message: 'commit C')
+
+      create_branch('feature-branch')
+      add_file_and_commit(file: 'file4.txt', message: 'commit D feature branch')
+
+      checkout_branch('main')
+
+      create_branch('another-branch')
+      add_file_and_commit(file: 'file5.txt', message: 'commit E another branch')
+      add_file_and_commit(file: 'file6.txt', message: 'commit F another branch')
+
+      create_branch('new-branch')
+
+      merge_branch(base: 'main', head: 'feature-branch')
+    end
+
+    it 'checks if a tag and a branch point to the same commit' do
+      same_commit = described_class.point_to_same_commit?('1.0', 'another-branch')
+      expect(same_commit).to be false
+    end
+
+    it 'checks if a tag and a branch that had a merge point to the same commit' do
+      same_commit = described_class.point_to_same_commit?('1.0', 'main')
+      expect(same_commit).to be false
+    end
+
+    it 'checks if a tag and a commit hash point to the same commit' do
+      same_commit = described_class.point_to_same_commit?('1.0', commit_hash(commit_message: 'commit D'))
+      expect(same_commit).to be false
+    end
+
+    it 'checks if a commit hash and a branch point to the same commit' do
+      same_commit = described_class.point_to_same_commit?(commit_hash(commit_message: 'commit B'), 'another-branch')
+      expect(same_commit).to be false
+    end
+
+    it 'checks if commits between the same branch point to the same commit' do
+      same_commit = described_class.point_to_same_commit?('feature-branch', 'feature-branch')
+      expect(same_commit).to be true
+    end
+
+    it 'checks if commits between branches that have no difference point to the same commit' do
+      same_commit = described_class.point_to_same_commit?('another-branch', 'new-branch')
+      expect(same_commit).to be true
+    end
+
+    it 'raises error for a non-existent base_ref' do
+      expect { described_class.point_to_same_commit?('non-existent', 'main') }.to raise_error(StandardError)
     end
   end
 
@@ -170,7 +239,7 @@ describe Fastlane::Helper::GitHelper do
 end
 
 def setup_git_repo(dummy_file_path: nil, add_file_to_gitignore: false, commit_gitignore: false)
-  `git init --initial-branch main || git init`
+  init_git_repo
   `touch .gitignore`
   `git add .gitignore && git commit -m 'Add .gitignore'`
 
@@ -185,4 +254,36 @@ def setup_git_repo(dummy_file_path: nil, add_file_to_gitignore: false, commit_gi
 
   `echo #{dummy_file_path} > .gitignore`
   `git add .gitignore && git commit -m 'Update .gitignore'` if commit_gitignore
+end
+
+def init_git_repo
+  `git init --initial-branch main || git init`
+end
+
+def add_file_and_commit(file:, message:)
+  `touch #{file}`
+  `git add .`
+  `git commit -m '#{message}'`
+end
+
+def checkout_branch(branch_name)
+  `git checkout #{branch_name}`
+end
+
+def create_branch(branch_name)
+  `git checkout -B #{branch_name}`
+end
+
+def merge_branch(base:, head:)
+  checkout_branch(base)
+
+  `git merge --no-ff #{head}`
+end
+
+def create_tag(tag_name)
+  `git tag #{tag_name}`
+end
+
+def commit_hash(commit_message:)
+  `git log --pretty=format:'%H' -1 --grep='#{commit_message}'`.strip
 end

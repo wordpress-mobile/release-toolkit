@@ -179,6 +179,21 @@ module Fastlane
         Action.sh('git', 'fetch', '--tags')
       end
 
+      # Checks if two git references point to the same commit.
+      #
+      # @param ref1 [String] the first git reference to check.
+      # @param ref2 [String] the second git reference to check.
+      #
+      # @return [Boolean] true if the two references point to the same commit, false otherwise.
+      #
+      def self.point_to_same_commit?(ref1, ref2)
+        git_repo = Git.open(Dir.pwd)
+        ref1_commit = git_repo.gcommit(ref1)
+        ref2_commit = git_repo.gcommit(ref2)
+
+        ref1_commit.sha == ref2_commit.sha
+      end
+
       # Returns the current git branch, or "HEAD" if it's not checked out to any branch
       # Can NOT be replaced using the environment variables such as `GIT_BRANCH` or `BUILDKITE_BRANCH`
       #
@@ -204,6 +219,17 @@ module Fastlane
       #
       def self.branch_exists?(branch_name)
         !Action.sh('git', 'branch', '--list', branch_name).empty?
+      end
+
+      # Checks if a branch exists on the repository's remote.
+      #
+      # @param branch_name [String] the name of the branch to check.
+      # @param remote_name [String] the name of the remote repository (default is 'origin').
+      #
+      # @return [Boolean] true if the branch exists on remote, false otherwise.
+      #
+      def self.branch_exists_on_remote?(branch_name:, remote_name: 'origin')
+        !Action.sh('git', 'ls-remote', '--heads', remote_name, branch_name).empty?
       end
 
       # Ensure that we are on the expected branch, and abort if not.
