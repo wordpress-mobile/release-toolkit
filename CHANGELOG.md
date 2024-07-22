@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- Added the action `create_release_backmerge_pull_request` to facilitate the creation of Pull Requests merging a release branch back to the main branch or currently ongoing releases [#570]
+_None_
 
 ### Bug Fixes
 
@@ -19,6 +19,12 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 11.1.0
+
+### New Features
+
+- Added the action `create_release_backmerge_pull_request` to facilitate the creation of Pull Requests merging a release branch back to the main branch or currently ongoing releases [#570]
 
 ## 11.0.3
 
