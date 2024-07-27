@@ -38,12 +38,20 @@ module Fastlane
       # @!group Documentation
       #####################################################
 
+      def self.category
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        'This action is deprecated and will be removed in an upcoming Release Toolkit version. Any necessary steps that are included in this precheck action should be added directly in a repo\'s Fastfile. See https://github.com/wordpress-mobile/release-toolkit/issues/576'
+      end
+
       def self.description
-        'Runs some prechecks before preparing for a new hotfix'
+        '(DEPRECATED) Runs some prechecks before preparing for a new hotfix'
       end
 
       def self.details
-        'Checks out a new branch from a tag and updates tags'
+        '(DEPRECATED) Checks out a new branch from a tag and updates tags'
       end
 
       def self.available_options
