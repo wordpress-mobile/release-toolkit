@@ -18,7 +18,19 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Deprecated the following actions: [#577]
+    - `android_betabuild_prechecks`
+    - `android_build_prechecks`
+    - `android_codefreeze_prechecks`
+    - `android_completecodefreeze_prechecks`
+    - `android_finalize_prechecks`
+    - `android_hotfix_prechecks`
+    - `ios_betabuild_prechecks`
+    - `ios_build_prechecks`
+    - `ios_codefreeze_prechecks`
+    - `ios_completecodefreeze_prechecks`
+    - `ios_finalize_prechecks`
+    - `ios_hotfix_prechecks`
 
 ## 11.1.0
 
