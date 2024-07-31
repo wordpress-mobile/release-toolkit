@@ -32,11 +32,11 @@ module Fastlane
       end
 
       def self.description
-        '(DEPRECATED) Runs some prechecks before the build'
+        'Runs some prechecks before the build'
       end
 
       def self.details
-        '(DEPRECATED) Runs some prechecks before the build'
+        'Runs some prechecks before the build'
       end
 
       def self.available_options

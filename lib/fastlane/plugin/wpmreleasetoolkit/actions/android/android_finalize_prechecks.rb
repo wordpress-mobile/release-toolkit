@@ -48,11 +48,11 @@ module Fastlane
       end
 
       def self.description
-        '(DEPRECATED) Runs some prechecks before finalizing a release'
+        'Runs some prechecks before finalizing a release'
       end
 
       def self.details
-        '(DEPRECATED) Runs some prechecks before finalizing a release'
+        'Runs some prechecks before finalizing a release'
       end
 
       def self.available_options

@@ -42,11 +42,11 @@ module Fastlane
       end
 
       def self.description
-        '(DEPRECATED) Runs some prechecks before code freeze'
+        'Runs some prechecks before code freeze'
       end
 
       def self.details
-        '(DEPRECATED) Updates the default branch, checks the app version and ensure the branch is clean'
+        'Updates the default branch, checks the app version and ensure the branch is clean'
       end
 
       def self.available_options

@@ -47,11 +47,11 @@ module Fastlane
       end
 
       def self.description
-        '(DEPRECATED) Runs some prechecks before preparing for a new hotfix'
+        'Runs some prechecks before preparing for a new hotfix'
       end
 
       def self.details
-        '(DEPRECATED) Checks out a new branch from a tag and updates tags'
+        'Checks out a new branch from a tag and updates tags'
       end
 
       def self.available_options

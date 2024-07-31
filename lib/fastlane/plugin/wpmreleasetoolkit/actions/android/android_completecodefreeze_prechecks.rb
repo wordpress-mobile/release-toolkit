@@ -44,11 +44,11 @@ module Fastlane
       end
 
       def self.description
-        '(DEPRECATED) Runs some prechecks before finalizing a code freeze'
+        'Runs some prechecks before finalizing a code freeze'
       end
 
       def self.details
-        '(DEPRECATED) Runs some prechecks before finalizing a code freeze'
+        'Runs some prechecks before finalizing a code freeze'
       end
 
       def self.available_options

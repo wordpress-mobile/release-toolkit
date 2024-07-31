@@ -88,11 +88,11 @@ module Fastlane
       end
 
       def self.description
-        '(DEPRECATED) Runs some prechecks before preparing for a new test build'
+        'Runs some prechecks before preparing for a new test build'
       end
 
       def self.details
-        '(DEPRECATED) Updates the relevant release branch, checks the app version and ensure the branch is clean'
+        'Updates the relevant release branch, checks the app version and ensure the branch is clean'
       end
 
       def self.available_options
