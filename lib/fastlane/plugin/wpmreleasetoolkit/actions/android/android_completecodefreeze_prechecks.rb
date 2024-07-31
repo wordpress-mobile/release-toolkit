@@ -40,7 +40,7 @@ module Fastlane
       end
 
       def self.deprecated_notes
-        'This action is deprecated and will be removed in an upcoming Release Toolkit version. Any necessary steps that are included in this precheck action should be added directly in a repo\'s Fastfile. See https://github.com/wordpress-mobile/release-toolkit/issues/576'
+        'This action is deprecated and will be removed in the next major version update of the Release Toolkit. Any necessary steps that are included in this precheck action should be added directly in a repo\'s Fastfile. See https://github.com/wordpress-mobile/release-toolkit/issues/576'
       end
 
       def self.description
