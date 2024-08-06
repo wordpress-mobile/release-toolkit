@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-_None_
+- Remove `build_gradle_path` parameter from `android_current_branch_is_hotfix` [#579]
 
 ### New Features
 
@@ -18,15 +18,26 @@ _None_
 
 ### Internal Changes
 
-- Deprecated the following actions: [#577]
+- Deprecated the following actions: [#577, #579]
     - `android_betabuild_prechecks`
     - `android_build_prechecks`
+    - `android_bump_version_beta`
+    - `android_bump_version_final_release`
+    - `android_bump_version_hotfix`
+    - `android_bump_version_release`
     - `android_codefreeze_prechecks`
     - `android_completecodefreeze_prechecks`
     - `android_finalize_prechecks`
+    - `android_get_alpha_version`
+    - `android_get_app_version`
+    - `android_get_release_version`
     - `android_hotfix_prechecks`
+    - `android_tag_build`
     - `ios_betabuild_prechecks`
     - `ios_build_prechecks`
+    - `ios_bump_version_beta`
+    - `ios_bump_version_hotfix`
+    - `ios_bump_version_release`
     - `ios_codefreeze_prechecks`
     - `ios_completecodefreeze_prechecks`
     - `ios_finalize_prechecks`
