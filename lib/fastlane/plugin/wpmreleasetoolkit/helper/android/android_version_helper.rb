@@ -235,22 +235,6 @@ module Fastlane
           (vp.length > 2) && (vp[HOTFIX_NUMBER] != 0)
         end
 
-        # Prints the current and next release version names to stdout, then returns the next release version
-        #
-        # @return [String] The next release version name to use after bumping the currently used release version.
-        #
-        def self.bump_version_release(build_gradle_path:, version_properties_path:)
-          # Bump release
-          current_version = get_release_version(
-            build_gradle_path: build_gradle_path,
-            version_properties_path: version_properties_path
-          )
-          UI.message("Current version: #{current_version[VERSION_NAME]}")
-          new_version = calc_next_release_base_version(current_version)
-          UI.message("New version: #{new_version[VERSION_NAME]}")
-          verify_version(new_version[VERSION_NAME])
-        end
-
         # Update the `version.properties` file with new `versionName` and `versionCode` values
         #
         # @param [Hash] new_version_beta The version hash for the beta, containing values for keys "name" and "code"
