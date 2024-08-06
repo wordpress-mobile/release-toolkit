@@ -19,28 +19,6 @@ module Fastlane
         # The suffix used in the versionName for RC (beta) versions
         RC_SUFFIX = '-rc'.freeze
 
-        # Returns the public-facing version string.
-        #
-        # @example
-        #    "1.2" # Assuming build.gradle contains versionName "1.2"
-        #    "1.2" # Assuming build.gradle contains versionName "1.2.0"
-        #    "1.2.3" # Assuming build.gradle contains versionName "1.2.3"
-        #
-        # @return [String] The public-facing version number, extracted from the `versionName` of the `build.gradle` file.
-        #         - If this version is a hotfix (more than 2 parts and 3rd part is non-zero), returns the "X.Y.Z" formatted string
-        #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
-        #
-        def self.get_public_version(build_gradle_path:, version_properties_path:)
-          version = get_release_version(
-            build_gradle_path: build_gradle_path,
-            version_properties_path: version_properties_path
-          )
-          vp = get_version_parts(version[VERSION_NAME])
-          return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
-
-          "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}"
-        end
-
         # Extract the version name and code from the release version of the app from `version.properties file`
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
