@@ -198,35 +198,6 @@ module Fastlane
           parts.fill(0, parts.length...3) # add 0 if needed to ensure array has at least 3 components
           parts
         end
-
-        # Ensure that a version string is correctly formatted (that is, each of its parts is a number) and returns the 2-parts version number
-        #
-        # @param [String] version The version string to verify
-        #
-        # @return [String] The "major.minor" version string, only with the first 2 components
-        # @raise [UserError] If any of the parts of the version string is not a number
-        #
-        def self.verify_version(version)
-          v_parts = get_version_parts(version)
-
-          v_parts.each do |part|
-            UI.user_error!('Version value can only contains numbers.') unless is_int?(part)
-          end
-
-          "#{v_parts[MAJOR_NUMBER]}.#{v_parts[MINOR_NUMBER]}"
-        end
-
-        # Check if a string is an integer.
-        #
-        # @param [String] string The string to test
-        #
-        # @return [Bool] true if the string is representing an integer value, false if not
-        #
-        def self.is_int?(string)
-          true if Integer(string)
-        rescue StandardError
-          false
-        end
       end
     end
   end
