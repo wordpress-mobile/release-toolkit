@@ -73,19 +73,6 @@ module Fastlane
           name.nil? || code.nil? ? nil : { VERSION_NAME => name, VERSION_CODE => code.to_i }
         end
 
-        # Extract the version name and code from the `version.properties` file in the project root
-        #
-        # @return [Hash] A hash with 2 keys `"name"` and `"code"` containing the extracted version name and code, respectively
-        #
-        def self.get_alpha_version(build_gradle_path:, version_properties_path:)
-          return get_version_from_properties(version_properties_path: version_properties_path, is_alpha: true) if File.exist?(version_properties_path)
-
-          section = 'defaultConfig'
-          name = get_version_name_from_gradle_file(build_gradle_path, section)
-          code = get_version_build_from_gradle_file(build_gradle_path, section)
-          { VERSION_NAME => name, VERSION_CODE => code }
-        end
-
         # Determines if a version name corresponds to an alpha version (starts with `"alpha-"`` prefix)
         #
         # @param [String] version The version name to check
