@@ -73,28 +73,6 @@ module Fastlane
           name.nil? || code.nil? ? nil : { VERSION_NAME => name, VERSION_CODE => code.to_i }
         end
 
-        # Determines if a version name corresponds to an alpha version (starts with `"alpha-"`` prefix)
-        #
-        # @param [String] version The version name to check
-        #
-        # @return [Bool] true if the version name starts with the `ALPHA_PREFIX`, false otherwise.
-        #
-        # @private
-        #
-        def self.is_alpha_version?(version)
-          version[VERSION_NAME].start_with?(ALPHA_PREFIX)
-        end
-
-        # Check if this versionName corresponds to a beta, i.e. contains some `-rc` suffix
-        #
-        # @param [String] version The versionName string to check for
-        #
-        # @return [Bool] True if the version string contains `-rc`, indicating it is a beta version.
-        #
-        def self.is_beta_version?(version)
-          version[VERSION_NAME].include?(RC_SUFFIX)
-        end
-
         # Returns the version name and code to use for the final release.
         #
         # - The final version name corresponds to the beta's versionName, without the `-rc` suffix
