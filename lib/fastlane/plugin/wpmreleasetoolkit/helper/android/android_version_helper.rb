@@ -23,13 +23,8 @@ module Fastlane
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
-        def self.get_release_version(build_gradle_path:, version_properties_path:)
-          return get_version_from_properties(version_properties_path: version_properties_path) if File.exist?(version_properties_path)
-
-          section = 'defaultConfig'
-          name = get_version_name_from_gradle_file(build_gradle_path, section)
-          code = get_version_build_from_gradle_file(build_gradle_path, section)
-          { VERSION_NAME => name, VERSION_CODE => code }
+        def self.get_release_version(version_properties_path:)
+          get_version_from_properties(version_properties_path: version_properties_path)
         end
 
         # Extract the version name and code from the `version.properties` file in the project root
@@ -146,24 +141,21 @@ module Fastlane
         # @param [Hash] new_version_alpha The version hash for the alpha , containing values for keys "name" and "code"
         #
         def self.update_versions(new_version_beta, new_version_alpha, version_properties_path:)
-          if File.exist?(version_properties_path)
-            replacements = {
-              versionName: (new_version_beta || {})[VERSION_NAME],
-              versionCode: (new_version_beta || {})[VERSION_CODE],
-              'alpha.versionName': (new_version_alpha || {})[VERSION_NAME],
-              'alpha.versionCode': (new_version_alpha || {})[VERSION_CODE]
-            }
-            content = File.read(version_properties_path)
-            content.gsub!(/^(.*) ?=.*$/) do |line|
-              key = Regexp.last_match(1).to_sym
-              value = replacements[key]
-              value.nil? ? line : "#{key}=#{value}"
-            end
-            File.write(version_properties_path, content)
-          else
-            update_version(new_version_beta, 'defaultConfig')
-            update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
+          raise "File at #{version_properties_path} does not exist." unless File.exist?(version_properties_path)
+
+          replacements = {
+            versionName: (new_version_beta || {})[VERSION_NAME],
+            versionCode: (new_version_beta || {})[VERSION_CODE],
+            'alpha.versionName': (new_version_alpha || {})[VERSION_NAME],
+            'alpha.versionCode': (new_version_alpha || {})[VERSION_CODE]
+          }
+          content = File.read(version_properties_path)
+          content.gsub!(/^(.*) ?=.*$/) do |line|
+            key = Regexp.last_match(1).to_sym
+            value = replacements[key]
+            value.nil? ? line : "#{key}=#{value}"
           end
+          File.write(version_properties_path, content)
         end
 
         # Extract the value of a import key from build.gradle
@@ -234,102 +226,6 @@ module Fastlane
           true if Integer(string)
         rescue StandardError
           false
-        end
-
-        #########
-        # Functions to support versioning through build.gradle - can be removed once all projects adopt version.properties
-        ########
-
-        # Extract the versionName from a build.gradle file
-        #
-        # @param [String] file_path The path to the `.gradle` file
-        # @param [String] section The name of the section we expect the keyword to be in, e.g. "defaultConfig" or "vanilla"
-        #
-        # @return [String] The value of the versionName attribute as found in the build.gradle file and for this section.
-        #
-        def self.get_version_name_from_gradle_file(file_path, section)
-          res = get_keyword_from_gradle_file(file_path, section, 'versionName')
-          res = res.tr('\"', '') unless res.nil?
-          res
-        end
-
-        # Extract the versionCode rom a build.gradle file
-        #
-        # @param [String] file_path The path to the `.gradle` file
-        # @param [String] section The name of the section we expect the keyword to be in, e.g. "defaultConfig" or "vanilla"
-        #
-        # @return [String] The value of the versionCode attribute as found in the build.gradle file and for this section.
-        #
-        def self.get_version_build_from_gradle_file(file_path, section)
-          res = get_keyword_from_gradle_file(file_path, section, 'versionCode')
-          res.to_i
-        end
-
-        # Extract the value for a specific keyword in a specific section of a `.gradle` file
-        #
-        # @todo: This implementation is very fragile. This should be done parsing the file in a proper way.
-        #        Leveraging gradle itself is probably the easiest way.
-        #
-        # @param [String] file_path The path of the `.gradle` file to extract the value from
-        # @param [String] section The name of the section from which we want to extract this keyword from. For example `defaultConfig` or `myFlavor`
-        # @param [String] keyword The keyword (key name) we want the value for
-        #
-        # @return [String] Returns the value for that keyword in the section of the `.gradle` file, or nil if not found.
-        #
-        def self.get_keyword_from_gradle_file(file_path, section, keyword)
-          found_section = false
-          File.open(file_path, 'r') do |file|
-            file.each_line do |line|
-              if found_section
-                return line.split[1] if line.include?(keyword) && !line.include?("\"#{keyword}\"") && !line.include?("P#{keyword}")
-              elsif line.include?(section)
-                found_section = true
-              end
-            end
-          end
-          nil
-        end
-
-        # Update both the versionName and versionCode of the build.gradle file to the specified version.
-        #
-        # @param [Hash] version The version hash, containing values for keys "name" and "code"
-        # @param [String] section The name of the section to update in the build.gradle file, e.g. "defaultConfig" or "vanilla"
-        #
-        # @todo This implementation is very fragile. This should be done parsing the file in a proper way.
-        #       Leveraging gradle itself is probably the easiest way.
-        #
-        def self.update_version(version, section, build_gradle_path:)
-          temp_file = Tempfile.new('fastlaneIncrementVersion')
-          found_section = false
-          version_updated = 0
-          File.open(build_gradle_path, 'r') do |file|
-            file.each_line do |line|
-              if found_section
-                if version_updated < 2
-                  if line.include?('versionName') && !line.include?('"versionName"') && !line.include?('PversionName')
-                    version_name = line.split[1].tr('\"', '')
-                    line.sub!(version_name, version[VERSION_NAME].to_s)
-                    version_updated += 1
-                  end
-
-                  if line.include? 'versionCode'
-                    version_code = line.split[1]
-                    line.sub!(version_code, version[VERSION_CODE].to_s)
-                    version_updated += 1
-                  end
-                end
-                temp_file.puts line
-              else
-                temp_file.puts line
-                found_section = true if line.include? section
-              end
-            end
-            file.close
-          end
-          temp_file.rewind
-          temp_file.close
-          FileUtils.mv(temp_file.path, build_gradle_path)
-          temp_file.unlink
         end
       end
     end
