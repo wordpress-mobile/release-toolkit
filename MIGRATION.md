@@ -3,6 +3,7 @@
 ## From 11.x to 12.0.0
 
 - `android_current_branch_is_hotfix` no longer supports the `build_gradle_path` parameter. Convert the project to define `versionName` and `versionCode` in `version.properties` and call `android_current_branch_is_hotfix` with `version_properties_path`.
+- `Fastlane::Helper:Android::GitHelper` and `Fastlane::Helper::Ios::GitHelper` have been removed. If you were using their respective `commit_version_bump` methods, you'll need to run the commit directly in your `Fastfile`, for example via Fastlane's `git_commit` action.
 
 ## From `10.0.0` to `11.0.0`
 

@@ -8,7 +8,6 @@ module Fastlane
 
       def self.run(params)
         require_relative '../../helper/ios/ios_version_helper'
-        require_relative '../../helper/ios/ios_git_helper'
 
         yaml = YAML.load_file(params[:lockfile])
         non_stable_pods = {} # Key will be pod name, value will be reason for flagging
