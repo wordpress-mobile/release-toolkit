@@ -66,23 +66,6 @@ module Fastlane
           { VERSION_NAME => "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}", VERSION_CODE => version[VERSION_CODE] }
         end
 
-        # Compute the name of the next version to use after code freeze, by incrementing the current version name and making it a `-rc-1`
-        #
-        # @example
-        #   calc_next_release_version({"name": "1.2", "code": 456}) #=> {"name":"1.3-rc-1", "code": 457}
-        #   calc_next_release_version({"name": "1.2.3", "code": 456}) #=> {"name":"1.3-rc-1", "code": 457}
-        #   calc_next_release_version({"name": "1.2", "code": 456}, {"name":"alpha-1.2", "code": 457}) #=> {"name":"1.3-rc-1", "code": 458}
-        #
-        # @param [Hash] version The current version hash, with keys `"name"` and `"code"`
-        # @param [Hash] alpha_version The current alpha version hash, with keys `"name"` and `"code"`, or nil if no alpha version
-        #
-        # @return [Hash] The hash containing the version name and code to use after release cut
-        #
-        def self.calc_next_release_version(version, alpha_version = nil)
-          nv = calc_next_release_base_version(VERSION_NAME => version[VERSION_NAME], VERSION_CODE => alpha_version.nil? ? version[VERSION_CODE] : [version[VERSION_CODE], alpha_version[VERSION_CODE]].max)
-          calc_next_beta_version(nv)
-        end
-
         # Determines if a version name corresponds to a hotfix
         #
         # @param [String] version The version number to test
