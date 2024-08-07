@@ -43,6 +43,8 @@ _None_
     - `ios_finalize_prechecks`
     - `ios_hotfix_prechecks`
 
+- Updated our internal Ruby dependencies. [#582]
+
 ## 11.1.0
 
 ### New Features
