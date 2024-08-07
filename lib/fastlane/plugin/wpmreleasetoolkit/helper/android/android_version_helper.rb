@@ -79,29 +79,6 @@ module Fastlane
           (vp.length > 2) && (vp[HOTFIX_NUMBER] != 0)
         end
 
-        # Update the `version.properties` file with new `versionName` and `versionCode` values
-        #
-        # @param [Hash] new_version_beta The version hash for the beta, containing values for keys "name" and "code"
-        # @param [Hash] new_version_alpha The version hash for the alpha , containing values for keys "name" and "code"
-        #
-        def self.update_versions(new_version_beta, new_version_alpha, version_properties_path:)
-          raise "File at #{version_properties_path} does not exist." unless File.exist?(version_properties_path)
-
-          replacements = {
-            versionName: (new_version_beta || {})[VERSION_NAME],
-            versionCode: (new_version_beta || {})[VERSION_CODE],
-            'alpha.versionName': (new_version_alpha || {})[VERSION_NAME],
-            'alpha.versionCode': (new_version_alpha || {})[VERSION_CODE]
-          }
-          content = File.read(version_properties_path)
-          content.gsub!(/^(.*) ?=.*$/) do |line|
-            key = Regexp.last_match(1).to_sym
-            value = replacements[key]
-            value.nil? ? line : "#{key}=#{value}"
-          end
-          File.write(version_properties_path, content)
-        end
-
         # Extract the value of a import key from build.gradle
         #
         # @param [String] import_key The key to look for
