@@ -6,19 +6,9 @@
 
 ### Breaking Changes
 
-- Remove `build_gradle_path` parameter from `android_current_branch_is_hotfix` [#579]
-
-### New Features
-
-_None_
-
-### Bug Fixes
-
-_None_
-
-### Internal Changes
-
-- Deprecated the following actions: [#577, #579]
+- Removed `build_gradle_path` parameter from `android_current_branch_is_hotfix` [#579]
+- Deleted `Fastlane::Helper::Android::GitHelper` [#579]
+- Deleted the following deprecated actions: [#577, #579]
     - `android_betabuild_prechecks`
     - `android_build_prechecks`
     - `android_bump_version_beta`
@@ -42,6 +32,18 @@ _None_
     - `ios_completecodefreeze_prechecks`
     - `ios_finalize_prechecks`
     - `ios_hotfix_prechecks`
+
+### New Features
+
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
 
 ## 11.1.0
 
