@@ -58,6 +58,14 @@ module Fastlane
       def self.return_value
       end
 
+      def self.category
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        'This action is deprecated and will be removed in the next major version update of the Release Toolkit. If you need to tag the repo to track the current build version, please do it directly from the Fastfile.'
+      end
+
       def self.authors
         ['Automattic']
       end

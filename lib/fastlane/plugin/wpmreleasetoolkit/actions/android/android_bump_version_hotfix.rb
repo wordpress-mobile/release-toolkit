@@ -79,6 +79,14 @@ module Fastlane
         ]
       end
 
+      def self.category
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        'This action is deprecated and will be removed in the next major version update of the Release Toolkit. Please use the formatters and calculators in the Versioning module to automate version changes.'
+      end
+
       def self.authors
         ['Automattic']
       end

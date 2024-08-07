@@ -1,5 +1,9 @@
 # Migration Instructions for Major Releases
 
+## From 11.x to 12.0.0
+
+- `android_current_branch_is_hotfix` no longer supports the `build_gradle_path` parameter. Convert the project to define `versionName` and `versionCode` in `version.properties` and call `android_current_branch_is_hotfix` with `version_properties_path`.
+
 ## From `10.0.0` to `11.0.0`
 
 - The `ios_check_beta_deps` now uses the `Podfile.lock` instead of `Podfile` for its detection. If you called this action with an explicit `podfile: …` argument, you'll have to update the call to use `lockfile:` instead—or remove that argument completely from your call and rely on its default value being `Podfile.lock`.

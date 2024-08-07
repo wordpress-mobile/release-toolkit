@@ -49,6 +49,14 @@ module Fastlane
         'Return the alpha version of the app'
       end
 
+      def self.category
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        'This action is deprecated and will be removed in the next major version update of the Release Toolkit. Please use the formatters and calculators in the Versioning module to automate version changes.'
+      end
+
       def self.authors
         # So no one will ever forget your contribution to fastlane :) You are awesome btw!
         ['Automattic']

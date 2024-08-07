@@ -8,11 +8,10 @@ module Fastlane
       def self.run(params)
         require_relative '../../helper/android/android_version_helper'
 
-        build_gradle_path = params[:build_gradle_path]
         version_properties_path = params[:version_properties_path]
 
         version = Fastlane::Helper::Android::VersionHelper.get_release_version(
-          build_gradle_path: build_gradle_path,
+          build_gradle_path: nil,
           version_properties_path: version_properties_path
         )
         Fastlane::Helper::Android::VersionHelper.is_hotfix?(version)
@@ -32,16 +31,10 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :build_gradle_path,
-                                       description: 'Path to the build.gradle file',
-                                       type: String,
-                                       optional: true,
-                                       conflicting_options: [:version_properties_path]),
           FastlaneCore::ConfigItem.new(key: :version_properties_path,
                                        description: 'Path to the version.properties file',
                                        type: String,
-                                       optional: true,
-                                       conflicting_options: [:build_gradle_path]),
+                                       optional: false),
         ]
       end
 
