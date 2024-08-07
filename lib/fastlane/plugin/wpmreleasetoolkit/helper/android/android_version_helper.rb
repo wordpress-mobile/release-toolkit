@@ -34,33 +34,6 @@ module Fastlane
           name.nil? || code.nil? ? nil : { VERSION_NAME => name, VERSION_CODE => code.to_i }
         end
 
-        # Compute the version name and code to use for the next beta (`X.Y.Z-rc-N`).
-        #
-        # - The next version name corresponds to the `version`'s name with the value after the `-rc-` suffix incremented by one,
-        #     or with `-rc-1` added if there was no previous rc suffix (if `version` was not a beta but a release)
-        # - The next version code corresponds to the `alpha_version`'s (or `version`'s if `alpha_version` is nil) code, incremented by one.
-        #
-        # @example
-        #   calc_next_beta_version({"name": "1.2.3", "code": 456}) #=> {"name": "1.2.3-rc-1", "code": 457}
-        #   calc_next_beta_version({"name": "1.2.3-rc-2", "code": 456}) #=> {"name": "1.2.3-rc-3", "code": 457}
-        #   calc_next_beta_version({"name": "1.2.3", "code": 456}, {"name": "alpha-1.2.3", "code": 457}) #=> {"name": "1.2.3-rc-1", "code": 458}
-        #
-        # @param [Hash] version The version hash for the current beta or release, containing values for keys "name" and "code"
-        # @param [Hash] alpha_version The version hash for the alpha, containing values for keys "name" and "code",
-        #                             or `nil` if no alpha version to consider.
-        #
-        # @return [Hash] A hash with keys `"name"` and `"code"` containing the next beta version name and code.
-        #
-        def self.calc_next_beta_version(version, alpha_version = nil)
-          # Bump version name
-          beta_number = is_beta_version?(version) ? version[VERSION_NAME].split('-')[2].to_i + 1 : 1
-          version_name = "#{version[VERSION_NAME].split('-')[0]}#{RC_SUFFIX}-#{beta_number}"
-
-          # Bump version code
-          version_code = alpha_version.nil? ? version[VERSION_CODE] + 1 : alpha_version[VERSION_CODE] + 1
-          { VERSION_NAME => version_name, VERSION_CODE => version_code }
-        end
-
         # Compute the version name to use for the next release (`"X.Y"`).
         #
         # @param [String] version The version name (string) to increment
