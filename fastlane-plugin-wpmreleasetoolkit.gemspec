@@ -33,6 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'java-properties', '~> 0.3.0'
   spec.add_dependency 'nokogiri', '~> 1.11', '< 1.17' # Needed for AndroidLocalizeHelper. The upper bound can be removed once the Release Toolkit is migrated from Ruby 2.7 to Ruby 3
   spec.add_dependency 'octokit', '~> 6.1'
+  spec.add_dependency 'onesky-ruby', '~> 1.3'
   spec.add_dependency 'parallel', '~> 1.14'
   spec.add_dependency 'plist', '~> 3.1'
   spec.add_dependency 'progress_bar', '~> 1.3'
