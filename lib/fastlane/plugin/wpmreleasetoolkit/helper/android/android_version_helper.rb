@@ -14,8 +14,6 @@ module Fastlane
         MINOR_NUMBER = 1
         # The index for the hotfix version number part
         HOTFIX_NUMBER = 2
-        # The prefix used in front of the versionName for alpha versions
-        ALPHA_PREFIX = 'alpha-'.freeze
         # The suffix used in the versionName for RC (beta) versions
         RC_SUFFIX = '-rc'.freeze
 
