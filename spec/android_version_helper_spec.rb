@@ -6,7 +6,7 @@ describe Fastlane::Helper::Android::VersionHelper do
     stub_const('VERSION_PROPERTIES_PATH', './version.properties')
   end
 
-  describe 'get_version_from_properties' do
+  describe 'get_release_version' do
     it 'returns version name and code when present' do
       test_file_content = <<~CONTENT
         # Some header
@@ -20,7 +20,7 @@ describe Fastlane::Helper::Android::VersionHelper do
 
       allow(File).to receive(:exist?).and_return(true)
       allow(File).to receive(:read).with(VERSION_PROPERTIES_PATH).and_return(test_file_content)
-      expect(subject.get_version_from_properties(version_properties_path: VERSION_PROPERTIES_PATH)).to eq('name' => '17.0', 'code' => 123)
+      expect(subject.get_release_version(version_properties_path: VERSION_PROPERTIES_PATH)).to eq('name' => '17.0', 'code' => 123)
     end
 
     it 'returns alpha version name and code when present' do
@@ -35,7 +35,7 @@ describe Fastlane::Helper::Android::VersionHelper do
 
       allow(File).to receive(:exist?).and_return(true)
       allow(File).to receive(:read).with(VERSION_PROPERTIES_PATH).and_return(test_file_content)
-      expect(subject.get_version_from_properties(version_properties_path: VERSION_PROPERTIES_PATH, is_alpha: true)).to eq('name' => 'alpha-222', 'code' => 1234)
+      expect(subject.get_release_version(version_properties_path: VERSION_PROPERTIES_PATH, is_alpha: true)).to eq('name' => 'alpha-222', 'code' => 1234)
     end
 
     it 'returns nil when alpha version name and code not present' do
@@ -46,7 +46,7 @@ describe Fastlane::Helper::Android::VersionHelper do
 
       allow(File).to receive(:exist?).and_return(true)
       allow(File).to receive(:read).with(VERSION_PROPERTIES_PATH).and_return(test_file_content)
-      expect(subject.get_version_from_properties(version_properties_path: VERSION_PROPERTIES_PATH, is_alpha: true)).to be_nil
+      expect(subject.get_release_version(version_properties_path: VERSION_PROPERTIES_PATH, is_alpha: true)).to be_nil
     end
   end
 
