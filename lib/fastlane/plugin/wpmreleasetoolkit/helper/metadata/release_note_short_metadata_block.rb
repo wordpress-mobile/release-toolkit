@@ -4,7 +4,7 @@ module Fastlane
   module Helper
     class ReleaseNoteShortMetadataBlock < ReleaseNoteMetadataBlock
       def initialize(block_key, content_file_path, release_version)
-        super(block_key, content_file_path, release_version)
+        super
         @rel_note_key = 'release_note_short'
         @release_version = release_version
         generate_keys(release_version)
@@ -16,7 +16,7 @@ module Fastlane
       end
 
       def generate_block(file)
-        super(file) unless File.empty?(@content_file_path)
+        super unless File.empty?(@content_file_path)
       end
     end
   end

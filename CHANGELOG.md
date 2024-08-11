@@ -43,7 +43,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Updated our internal Ruby dependencies. [#582]
 
 ## 11.1.0
 
