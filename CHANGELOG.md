@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-- Remove `build_gradle_path` parameter from `android_current_branch_is_hotfix` [#579]
+- Remove `build_gradle_path` parameter from `android_current_branch_is_hotfix`. [#579]
 
 ### New Features
 
@@ -17,6 +17,8 @@ _None_
 _None_
 
 ### Internal Changes
+
+- Update gems used internally & remove upper bound on `nokogiri` from the `.gemspec`. [#583]
 
 - Deprecated the following actions: [#577, #579]
     - `android_betabuild_prechecks`
