@@ -3,7 +3,7 @@ module Fastlane
     class IosTagBuildAction < Action
       def self.run(params)
         require_relative '../../helper/ios/ios_version_helper'
-        require_relative '../../helper/ios/ios_git_helper'
+        require_relative '../../helper/git_helper'
 
         itc_ver = Fastlane::Helper::Ios::VersionHelper.get_build_version
         int_ver = Fastlane::Helper::Ios::VersionHelper.get_internal_version unless ENV['INTERNAL_CONFIG_FILE'].nil?
