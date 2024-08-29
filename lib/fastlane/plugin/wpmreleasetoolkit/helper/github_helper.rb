@@ -210,7 +210,7 @@ module Fastlane
         releases = client.releases(repository)
         release = releases.find { |r| r.name == name }
 
-        UI.user_error!("No release found with version #{name}") unless release
+        UI.user_error!("No release found with name #{name}") unless release
 
         client.update_release(
           release.url,
