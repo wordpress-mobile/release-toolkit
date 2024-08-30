@@ -14,6 +14,8 @@ module Fastlane
         MINOR_NUMBER = 1
         # The index for the hotfix version number part
         HOTFIX_NUMBER = 2
+        # The prefix used in front of the versionName for alpha versions
+        ALPHA_PREFIX = 'alpha-'.freeze
         # The suffix used in the versionName for RC (beta) versions
         RC_SUFFIX = '-rc'.freeze
 
@@ -73,7 +75,7 @@ module Fastlane
         # @return [Bool] True if the version number has a non-zero 3rd component, meaning that it is a hotfix version.
         #
         def self.is_hotfix?(version)
-          return false if is_alpha_version?(version)
+          return false if version[VERSION_NAME].start_with?(ALPHA_PREFIX)
 
           vp = get_version_parts(version[VERSION_NAME])
           (vp.length > 2) && (vp[HOTFIX_NUMBER] != 0)
