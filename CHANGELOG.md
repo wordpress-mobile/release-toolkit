@@ -10,7 +10,7 @@
 
 ### New Features
 
-- Added the action `publish_release` to facilitate publishing of GitHub draft releases [#585]
+- Added the `publish_release` action to publish existing GitHub draft releases [#585]
 
 ### Bug Fixes
 

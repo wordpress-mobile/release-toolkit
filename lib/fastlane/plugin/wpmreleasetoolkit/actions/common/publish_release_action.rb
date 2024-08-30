@@ -21,7 +21,7 @@ module Fastlane
       end
 
       def self.description
-        'Publishes an existing GitHub Release still in draft mode'
+        'Publish an existing GitHub Release still in draft mode'
       end
 
       def self.authors
@@ -33,7 +33,7 @@ module Fastlane
       end
 
       def self.details
-        'Publishes an existing GitHub Release still in draft mode'
+        'Publish an existing GitHub Release still in draft mode'
       end
 
       def self.available_options
@@ -43,11 +43,11 @@ module Fastlane
                                        optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :name,
-                                       description: 'The name of the release',
+                                       description: 'The name (aka title) of the draft release to publish',
                                        optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :prerelease,
-                                       description: 'True if this is a pre-release',
+                                       description: 'True if this should be published as a pre-release',
                                        optional: true,
                                        default_value: false,
                                        type: Boolean),
