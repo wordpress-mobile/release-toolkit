@@ -198,7 +198,7 @@ module Fastlane
         nil
       end
 
-      # Publishes an existing GitHub Release still in draft mode. Note that this will search only within the first page of releases, as returned by the GitHub API.
+      # Publishes an existing GitHub Release still in draft mode.
       #
       # @param [String] repository The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`)
       # @param [String] name The name of the release to publish.
