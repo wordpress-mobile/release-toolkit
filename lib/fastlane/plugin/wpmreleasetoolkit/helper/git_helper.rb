@@ -67,15 +67,6 @@ module Fastlane
         false
       end
 
-      # Update every submodule in the current git repository
-      #
-      # @deprecated This method is going to be removed soon. Fastlane has a built-in `git_submodule_update` action that can be used instead.
-      #
-      def self.update_submodules
-        UI.deprecated("The `update_submodules` method will soon be removed from `release-toolkit`. Please use fastlane's `git_submodule_update` action instead.")
-        Action.sh('git', 'submodule', 'update', '--init', '--recursive')
-      end
-
       # Create a new branch named `branch_name`, cutting it from branch/commit/tag `from`
       #
       # If the branch with that name already exists, it will instead switch to it and pull new commits.
@@ -230,24 +221,6 @@ module Fastlane
       #
       def self.branch_exists_on_remote?(branch_name:, remote_name: 'origin')
         !Action.sh('git', 'ls-remote', '--heads', remote_name, branch_name).empty?
-      end
-
-      # Ensure that we are on the expected branch, and abort if not.
-      #
-      # @param [String] branch_name The name of the branch we expect to be on
-      #
-      # @raise [UserError] Raises a user_error! and interrupts the lane if we are not on the expected branch.
-      #
-      # @deprecated This method is going to be removed soon. Fastlane has a built-in `ensure_git_branch` action that can be used instead.
-      #             After updating to Fastlane version `2.217.0` or later, the `FL_GIT_BRANCH_DONT_USE_ENV_VARS` environment
-      #             variable can be set to `true` to disable the use of environment variables for the `git_branch` action that
-      #             `ensure_git_branch` relies on. This will make `ensure_git_branch` work as expected in CI environments.
-      #             See https://github.com/fastlane/fastlane/pull/21597 for more details.
-      #
-      def self.ensure_on_branch!(branch_name)
-        UI.deprecated("The `ensure_on_branch!` method will soon be removed from `release-toolkit`. Please use fastlane's `ensure_git_branch` action (+ potentially set `FL_GIT_BRANCH_DONT_USE_ENV_VARS=true`) instead.")
-        current_branch_name = Action.sh('git', 'symbolic-ref', '-q', 'HEAD')
-        UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)
       end
 
       # Checks whether a given path is ignored by Git, relying on Git's `check-ignore` under the hood.
