@@ -8,7 +8,7 @@
 
 - Removed `build_gradle_path` parameter from `android_current_branch_is_hotfix` [#579]
 - Deleted `Fastlane::Helper::Android::GitHelper` and `Fastlane::Helper::Ios::GitHelper` [#579]
-- Deleted the following deprecated actions: [#577, #579]
+- Deleted the following deprecated actions: [#577, #579, #586]
     - `android_betabuild_prechecks`
     - `android_build_prechecks`
     - `android_bump_version_beta`
@@ -30,8 +30,14 @@
     - `ios_bump_version_release`
     - `ios_codefreeze_prechecks`
     - `ios_completecodefreeze_prechecks`
+    - `ios_current_branch_is_hotfix`
     - `ios_finalize_prechecks`
+    - `ios_get_app_version`
+    - `ios_get_build_number`
+    - `ios_get_build_version`
     - `ios_hotfix_prechecks`
+    - `ios_tag_build`
+    - `ios_validate_ci_build`
 
 ### New Features
 

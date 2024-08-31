@@ -5,7 +5,7 @@
 - `android_current_branch_is_hotfix` no longer supports the `build_gradle_path` parameter. Convert the project to define `versionName` and `versionCode` in `version.properties` and call `android_current_branch_is_hotfix` with `version_properties_path`.
 - Various helper methods and actions to calculate version bumps have been deleted (see `CHANGELOG.md` for the full list). Use the `Versioning` module for any version computation or automation.
 - `Fastlane::Helper:Android::GitHelper` and `Fastlane::Helper::Ios::GitHelper` have been removed. If you were using their respective `commit_version_bump` methods, you'll need to run the commit directly in your `Fastfile`, for example via Fastlane's `git_commit` action.
-- `android_tag_build` has been removed. Our recommended workflow for tagging releases relies on GitHub creating a tag when a GitHub release is published.
+- `android_tag_build` and `ios_tag_build` have been removed. Our recommended workflow for tagging releases relies on GitHub creating a tag when a GitHub release is published.
 
 ## From `10.0.0` to `11.0.0`
 
