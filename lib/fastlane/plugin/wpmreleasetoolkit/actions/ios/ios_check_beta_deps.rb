@@ -7,8 +7,6 @@ module Fastlane
       NON_STABLE_PODS_MESSAGE = "Please create a new stable version of those pods and update the Podfile to the newly released version before continuing with the code freeze:\n".freeze
 
       def self.run(params)
-        require_relative '../../helper/ios/ios_version_helper'
-
         yaml = YAML.load_file(params[:lockfile])
         non_stable_pods = {} # Key will be pod name, value will be reason for flagging
 
