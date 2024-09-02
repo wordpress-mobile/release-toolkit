@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Fastlane::Actions::PublishReleaseAction do
+describe Fastlane::Actions::PublishGithubReleaseAction do
   let(:test_token) { 'ghp_fake_token' }
   let(:test_repo) { 'repo-test/project-test' }
   let(:test_name) { '1.0.0' }
@@ -12,7 +12,7 @@ describe Fastlane::Actions::PublishReleaseAction do
 
   context 'when providing valid parameters' do
     it 'publishes the release and returns the URL' do
-      expect(github_helper).to receive(:publish_release).with(
+      allow(github_helper).to receive(:publish_release).with(
         repository: test_repo,
         name: test_name,
         prerelease: false
@@ -28,7 +28,7 @@ describe Fastlane::Actions::PublishReleaseAction do
     end
 
     it 'publishes a prerelease when specified' do
-      expect(github_helper).to receive(:publish_release).with(
+      allow(github_helper).to receive(:publish_release).with(
         repository: test_repo,
         name: test_name,
         prerelease: true

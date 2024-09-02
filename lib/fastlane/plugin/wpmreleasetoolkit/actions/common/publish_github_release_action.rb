@@ -3,7 +3,7 @@ require_relative '../../helper/github_helper'
 
 module Fastlane
   module Actions
-    class PublishReleaseAction < Action
+    class PublishGithubReleaseAction < Action
       def self.run(params)
         repository = params[:repository]
         name = params[:name]
