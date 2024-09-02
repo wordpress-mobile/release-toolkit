@@ -15,7 +15,7 @@ describe Fastlane::Actions::PublishGithubReleaseAction do
       allow(github_helper).to receive(:publish_release).with(
         repository: test_repo,
         name: test_name,
-        prerelease: false
+        prerelease: nil
       ).and_return('https://github.com/repo-test/project-test/releases/tag/1.0.0')
 
       result = run_described_fastlane_action(

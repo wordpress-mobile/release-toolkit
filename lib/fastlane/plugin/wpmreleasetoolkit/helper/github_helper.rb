@@ -206,7 +206,7 @@ module Fastlane
       #
       # @return [String] URL of the corresponding GitHub Release
       #
-      def publish_release(repository:, name:, prerelease: false)
+      def publish_release(repository:, name:, prerelease: nil)
         releases = client.releases(repository)
         release = releases.find { |r| r.name == name }
 
@@ -217,7 +217,7 @@ module Fastlane
           {
             draft: false,
             prerelease: prerelease
-          }
+          }.compact
         )
 
         release.html_url

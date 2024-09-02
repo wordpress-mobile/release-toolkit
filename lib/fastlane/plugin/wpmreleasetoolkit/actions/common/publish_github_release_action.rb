@@ -14,7 +14,7 @@ module Fastlane
         url = github_helper.publish_release(
           repository: repository,
           name: name,
-          prerelease: prerelease
+          prerelease: prerelease == :unchanged ? nil : prerelease
         )
         UI.success("Successfully published GitHub Release #{name}. You can see it at '#{url}'")
         url
@@ -49,7 +49,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :prerelease,
                                        description: 'True if this should be published as a pre-release',
                                        optional: true,
-                                       default_value: false,
+                                       default_value: :unchanged,
                                        type: Boolean),
           Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
