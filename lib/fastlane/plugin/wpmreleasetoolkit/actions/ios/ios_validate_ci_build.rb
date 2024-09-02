@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class IosValidateCiBuildAction < Action
       def self.run(params)
-        return_value '../../helper/git_helper'
+        require_relative '../../helper/git_helper'
         require_relative '../../helper/ios/ios_version_helper'
 
         version = Fastlane::Helper::Ios::VersionHelper.get_public_version
