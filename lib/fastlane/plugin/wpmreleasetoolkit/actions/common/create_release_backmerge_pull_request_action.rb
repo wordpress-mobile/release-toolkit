@@ -25,8 +25,6 @@ module Fastlane
         github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
         target_milestone = milestone_title.nil? ? nil : github_helper.get_milestone(repository, milestone_title)
 
-        Git.open(Dir.pwd).fetch
-
         final_target_branches = if target_branches.empty?
                                   unless source_branch.start_with?('release/')
                                     UI.user_error!('`source_branch` must start with `release/`')

@@ -5,7 +5,6 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
   let(:test_repo) { 'repo-test/project-test' }
   let(:default_branch) { 'main' }
   let(:other_action_mock) { double }
-  let(:git_mock) { instance_double(Git::Base) }
   let(:client) do
     instance_double(
       Octokit::Client,
@@ -65,8 +64,6 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
 
   before do
     allow(Octokit::Client).to receive(:new).and_return(client)
-    allow(Git).to receive(:open).and_return(git_mock)
-    allow(git_mock).to receive(:fetch)
     allow(Fastlane::Helper::GitHelper).to receive(:checkout_and_pull)
     allow(Fastlane::Helper::GitHelper).to receive(:create_branch)
     allow(Fastlane::Action).to receive(:other_action).and_return(other_action_mock)
