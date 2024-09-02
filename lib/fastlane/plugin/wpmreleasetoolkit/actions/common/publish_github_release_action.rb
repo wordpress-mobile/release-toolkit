@@ -47,7 +47,7 @@ module Fastlane
                                        optional: false,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :prerelease,
-                                       description: 'True if this should be published as a pre-release',
+                                       description: 'True if this should be published as a pre-release. False if this should be published as final. Don\'t provide a value keep the same (non-)prerelease status as the one used in the Draft',
                                        optional: true,
                                        default_value: :unchanged,
                                        type: Boolean),
