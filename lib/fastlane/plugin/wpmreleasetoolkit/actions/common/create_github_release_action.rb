@@ -1,8 +1,6 @@
 require 'fastlane/action'
 require 'date'
 require_relative '../../helper/github_helper'
-require_relative '../../helper/ios/ios_version_helper'
-require_relative '../../helper/android/android_version_helper'
 module Fastlane
   module Actions
     class CreateGithubReleaseAction < Action

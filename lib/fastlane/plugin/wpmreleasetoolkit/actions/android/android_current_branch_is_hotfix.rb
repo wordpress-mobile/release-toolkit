@@ -11,7 +11,6 @@ module Fastlane
         version_properties_path = params[:version_properties_path]
 
         version = Fastlane::Helper::Android::VersionHelper.get_release_version(
-          build_gradle_path: nil,
           version_properties_path: version_properties_path
         )
         Fastlane::Helper::Android::VersionHelper.is_hotfix?(version)

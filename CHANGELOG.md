@@ -6,22 +6,9 @@
 
 ### Breaking Changes
 
-- Remove `build_gradle_path` parameter from `android_current_branch_is_hotfix`. [#579]
-
-### New Features
-
-- Added the `publish_github_release` action to publish existing GitHub draft releases [#585]
-
-### Bug Fixes
-
-- Fix `create_release_backmerge_pull_request_action` error when creating a backmerge to a branch not yet fetched locally. [#587]
-- Deprecated the `create_release` action, now renamed to `create_github_release` for consistency [#585]
-
-### Internal Changes
-
-- Update gems used internally & remove upper bound on `nokogiri` from the `.gemspec`. [#583]
-
-- Deprecated the following actions: [#577, #579]
+- Removed `build_gradle_path` parameter from `android_current_branch_is_hotfix`. [#579]
+- Deleted `Fastlane::Helper::Android::GitHelper` and `Fastlane::Helper::Ios::GitHelper`. [#579]
+- Deleted the following deprecated actions: [#577, #579, #586]
     - `android_betabuild_prechecks`
     - `android_build_prechecks`
     - `android_bump_version_beta`
@@ -43,8 +30,29 @@
     - `ios_bump_version_release`
     - `ios_codefreeze_prechecks`
     - `ios_completecodefreeze_prechecks`
+    - `ios_current_branch_is_hotfix`
     - `ios_finalize_prechecks`
+    - `ios_get_app_version`
+    - `ios_get_build_number`
+    - `ios_get_build_version`
     - `ios_hotfix_prechecks`
+    - `ios_tag_build`
+    - `ios_validate_ci_build`
+
+### New Features
+
+- Added the `publish_github_release` action to publish existing GitHub draft releases. [#585]
+
+### Bug Fixes
+
+- Fix `create_release_backmerge_pull_request_action` error when creating a backmerge to a branch not yet fetched locally. [#587]
+- Deprecated the `create_release` action, now renamed to `create_github_release` for consistency. [#585]
+
+### Internal Changes
+
+- Update gems used internally & remove upper bound on `nokogiri` from the `.gemspec`. [#583]
+
+### Internal Changes
 
 - Updated our internal Ruby dependencies. [#582]
 
