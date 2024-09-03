@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Added the handling of remote to `GitHelper::point_to_same_commit?` [#590]
 
 ## 12.0.0
 
