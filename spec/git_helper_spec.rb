@@ -145,37 +145,37 @@ describe Fastlane::Helper::GitHelper do
     end
 
     it 'checks if a tag and a branch point to the same commit' do
-      same_commit = described_class.point_to_same_commit?('1.0', 'another-branch')
+      same_commit = described_class.point_to_same_commit?('1.0', 'another-branch', remote_name: nil)
       expect(same_commit).to be false
     end
 
     it 'checks if a tag and a branch that had a merge point to the same commit' do
-      same_commit = described_class.point_to_same_commit?('1.0', 'main')
+      same_commit = described_class.point_to_same_commit?('1.0', 'main', remote_name: nil)
       expect(same_commit).to be false
     end
 
     it 'checks if a tag and a commit hash point to the same commit' do
-      same_commit = described_class.point_to_same_commit?('1.0', commit_hash(commit_message: 'commit D'))
+      same_commit = described_class.point_to_same_commit?('1.0', commit_hash(commit_message: 'commit D'), remote_name: nil)
       expect(same_commit).to be false
     end
 
     it 'checks if a commit hash and a branch point to the same commit' do
-      same_commit = described_class.point_to_same_commit?(commit_hash(commit_message: 'commit B'), 'another-branch')
+      same_commit = described_class.point_to_same_commit?(commit_hash(commit_message: 'commit B'), 'another-branch', remote_name: nil)
       expect(same_commit).to be false
     end
 
     it 'checks if commits between the same branch point to the same commit' do
-      same_commit = described_class.point_to_same_commit?('feature-branch', 'feature-branch')
+      same_commit = described_class.point_to_same_commit?('feature-branch', 'feature-branch', remote_name: nil)
       expect(same_commit).to be true
     end
 
     it 'checks if commits between branches that have no difference point to the same commit' do
-      same_commit = described_class.point_to_same_commit?('another-branch', 'new-branch')
+      same_commit = described_class.point_to_same_commit?('another-branch', 'new-branch', remote_name: nil)
       expect(same_commit).to be true
     end
 
     it 'raises error for a non-existent base_ref' do
-      expect { described_class.point_to_same_commit?('non-existent', 'main') }.to raise_error(StandardError)
+      expect { described_class.point_to_same_commit?('non-existent', 'main', remote_name: nil) }.to raise_error(StandardError)
     end
   end
 

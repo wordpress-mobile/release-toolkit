@@ -39,7 +39,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
 
       next if branch_exists_on_remote
 
-      allow(Fastlane::Helper::GitHelper).to receive(:point_to_same_commit?).with("origin/#{target_branch}", "origin/#{source_branch}").and_return(point_to_same_commit)
+      allow(Fastlane::Helper::GitHelper).to receive(:point_to_same_commit?).with(target_branch, source_branch).and_return(point_to_same_commit)
 
       next if point_to_same_commit
 
