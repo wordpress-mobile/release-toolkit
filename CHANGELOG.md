@@ -6,6 +6,24 @@
 
 ### Breaking Changes
 
+_None_
+
+### New Features
+
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 12.0.0
+
+### Breaking Changes
+
 - Removed `build_gradle_path` parameter from `android_current_branch_is_hotfix`. [#579]
 - Deleted `Fastlane::Helper::Android::GitHelper` and `Fastlane::Helper::Ios::GitHelper`. [#579]
 - Renamed `create_release` to `create_github_release` for consistency. [#585, #588]
