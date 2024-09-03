@@ -6,6 +6,7 @@
 - Various helper methods and actions to calculate version bumps have been deleted (see `CHANGELOG.md` for the full list). Use the `Versioning` module for any version computation or automation.
 - `Fastlane::Helper:Android::GitHelper` and `Fastlane::Helper::Ios::GitHelper` have been removed. If you were using their respective `commit_version_bump` methods, you'll need to run the commit directly in your `Fastfile`, for example via Fastlane's `git_commit` action.
 - `android_tag_build` and `ios_tag_build` have been removed. Our recommended workflow for tagging releases relies on GitHub creating a tag when a GitHub release is published.
+- `create_release` has been removed. Use `create_github_release` instead.
 
 ## From `10.0.0` to `11.0.0`
 
