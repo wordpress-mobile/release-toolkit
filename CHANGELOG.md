@@ -14,6 +14,7 @@
 
 ### Bug Fixes
 
+- Fix `create_release_backmerge_pull_request_action` error when creating a backmerge to a branch not yet fetched locally. [#587]
 - Deprecated the `create_release` action, now renamed to `create_github_release` for consistency [#585]
 
 ### Internal Changes
