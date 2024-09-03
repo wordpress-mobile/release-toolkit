@@ -10,11 +10,11 @@
 
 ### New Features
 
-_None_
+- Added the `publish_github_release` action to publish existing GitHub draft releases [#585]
 
 ### Bug Fixes
 
-_None_
+- Deprecated the `create_release` action, now renamed to `create_github_release` for consistency [#585]
 
 ### Internal Changes
 
