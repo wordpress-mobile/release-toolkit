@@ -3,7 +3,7 @@ require 'date'
 require_relative '../../helper/github_helper'
 module Fastlane
   module Actions
-    class CreateReleaseAction < Action
+    class CreateGithubReleaseAction < Action
       def self.run(params)
         repository = params[:repository]
         version = params[:version]
@@ -96,6 +96,17 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+    end
+
+    # For backwards compatibility
+    class CreateReleaseAction < CreateGithubReleaseAction
+      def self.category
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "This action has been renamed `#{superclass.action_name}`"
       end
     end
   end

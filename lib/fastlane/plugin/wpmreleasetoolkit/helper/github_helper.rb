@@ -186,7 +186,7 @@ module Fastlane
         res.body
       end
 
-      # Returns the URL of the GitHub release pointing at a given tag
+      # Returns the URL of the published GitHub release pointing at a given tag
       # @param [String] repository The repository to create the GitHub release on. Typically a repo slug (<org>/<repo>).
       # @param [String] tag_name The name of the git tag to get the associated release of
       #
@@ -196,6 +196,31 @@ module Fastlane
         client.release_for_tag(repository, tag_name).html_url
       rescue Octokit::NotFound
         nil
+      end
+
+      # Publishes an existing GitHub Release still in draft mode.
+      #
+      # @param [String] repository The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`)
+      # @param [String] name The name of the release to publish.
+      # @param [Boolean] prerelease Indicates if this should be created as a pre-release (i.e. for alpha/beta)
+      #
+      # @return [String] URL of the corresponding GitHub Release
+      #
+      def publish_release(repository:, name:, prerelease: nil)
+        releases = client.releases(repository)
+        release = releases.find { |r| r.name == name }
+
+        UI.user_error!("No release found with name #{name}") unless release
+
+        client.update_release(
+          release.url,
+          {
+            draft: false,
+            prerelease: prerelease
+          }.compact
+        )
+
+        release.html_url
       end
 
       # Downloads a file from the given GitHub tag

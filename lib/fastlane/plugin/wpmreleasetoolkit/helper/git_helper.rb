@@ -179,8 +179,14 @@ module Fastlane
       #
       def self.point_to_same_commit?(ref1, ref2)
         git_repo = Git.open(Dir.pwd)
-        ref1_commit = git_repo.gcommit(ref1)
-        ref2_commit = git_repo.gcommit(ref2)
+
+        begin
+          ref1_commit = git_repo.gcommit(ref1)
+          ref2_commit = git_repo.gcommit(ref2)
+        rescue StandardError => e
+          puts "Error: #{e.message}"
+          return false
+        end
 
         ref1_commit.sha == ref2_commit.sha
       end
