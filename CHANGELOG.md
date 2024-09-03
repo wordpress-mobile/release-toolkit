@@ -8,6 +8,7 @@
 
 - Removed `build_gradle_path` parameter from `android_current_branch_is_hotfix`. [#579]
 - Deleted `Fastlane::Helper::Android::GitHelper` and `Fastlane::Helper::Ios::GitHelper`. [#579]
+- Renamed `create_release` to `create_github_release` for consistency. [#585, #588]
 - Deleted the following deprecated actions: [#577, #579, #586]
     - `android_betabuild_prechecks`
     - `android_build_prechecks`
@@ -46,7 +47,6 @@
 ### Bug Fixes
 
 - Fix `create_release_backmerge_pull_request_action` error when creating a backmerge to a branch not yet fetched locally. [#587]
-- Deprecated the `create_release` action, now renamed to `create_github_release` for consistency. [#585]
 
 ### Internal Changes
 
