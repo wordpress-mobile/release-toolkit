@@ -38,14 +38,14 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
       it 'excludes files matching filters starting with *' do
         test_exclude_patterns(
           filter: ['*.m', '*View.swift'],
-          expected: %w[Sources/AppClass1.swift Pods/SomePod/Sources/PodClass1.swift]
+          expected: %w[Sources/AppClass1.swift Pods/SomePod/Sources/PodClass1.swift Pods/SomePod/Sources/PodLocalizedString.swift]
         )
       end
 
       it 'excludes files matching filters containing * mid-pattern' do
         test_exclude_patterns(
           filter: ['*.m', '*/App*View.swift'],
-          expected: %w[Sources/AppClass1.swift Pods/SomePod/Sources/PodClass1.swift Pods/SomePod/Sources/PodSampleView.swift]
+          expected: %w[Sources/AppClass1.swift Pods/SomePod/Sources/PodClass1.swift Pods/SomePod/Sources/PodLocalizedString.swift Pods/SomePod/Sources/PodSampleView.swift]
         )
       end
     end
@@ -59,18 +59,21 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
       cmd_output = []
       allow(FastlaneCore::UI).to receive(:command_output) { |line| cmd_output << line }
       user_errors = []
-      allow(FastlaneCore::UI).to receive(:user_error!) { |line| user_errors << line }
 
       Dir.mktmpdir('a8c-wpmrt-ios_generate_strings_file_from_code-') do |tmp_dir|
         clean_abs_dirs = ->(lines) { lines.map { |l| l.sub(tmp_dir, '<tmpdir>').sub(sample_project_dir, '<testdir>') } }
 
         # Act
         params[:output_dir] = tmp_dir
-        config_items = Fastlane::ConfigurationHelper.parse(described_class, params) # Handles ConfigItem' default values
-        return_value = described_class.run(config_items)
+        return_value = []
+        begin
+          return_value = run_described_fastlane_action(params)
+        rescue FastlaneCore::Interface::FastlaneError => error
+          user_errors << error.message
+        end
 
         output_files = Dir[File.join(tmp_dir, '*.strings')]
-        expected_files = Dir[File.join(test_data_dir, expected_dir_name, '*.strings')]
+        expected_files = expected_dir_name.nil? ? [] : Dir[File.join(test_data_dir, expected_dir_name, '*.strings')]
 
         # Assert: UI.messages, UI.user_error! and return value from the action
         unless expected_logs.nil?
@@ -129,8 +132,38 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
     context 'when allowing custom routines' do
       it 'can parse strings from custom routines' do
         test_genstrings(
-          params: { paths: [app_src_dir, pods_src_dir], quiet: true, swiftui: false, routines: 'PodLocalizedString' },
+          params: {
+            paths: [app_src_dir, pods_src_dir],
+            exclude: ['**/PodLocalizedString.swift'],
+            quiet: true,
+            swiftui: false,
+            routines: 'PodLocalizedString'
+          },
           expected_dir_name: 'expected-custom-routine'
+        )
+      end
+    end
+
+    context 'when requesting custom encoding output' do
+      it 'errors if invalid encoding provided' do
+        test_genstrings(
+          params: { paths: [app_src_dir, pods_src_dir], quiet: true, swiftui: false, output_encoding: 'unicode' },
+          expected_dir_name: nil,
+          expected_failures: ['unknown encoding name - unicode']
+        )
+      end
+
+      it 'copies the files unchanged if output encoding is already the default UTF-16LE' do
+        test_genstrings(
+          params: { paths: [app_src_dir, pods_src_dir], quiet: true, swiftui: false, output_encoding: 'utf-16le' },
+          expected_dir_name: 'expected-pods-noswiftui'
+        )
+      end
+
+      it 'convert the files to requested output encoding if not the default UTF-16LE' do
+        test_genstrings(
+          params: { paths: [app_src_dir, pods_src_dir], quiet: true, swiftui: false, output_encoding: 'utf-8' },
+          expected_dir_name: 'expected-utf8-encoding'
         )
       end
     end
@@ -163,7 +196,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
       it 'does not fail if any error is in the output when `fail_on_error` is off' do
         expected_logs = [
           %(Key "app.key5" used with multiple values. Value "app value 5\\nwith multiple lines." kept. Value "app value 5\\nwith multiple lines, and different value than in Swift" ignored.),
-          %(genstrings: error: bad entry in file <testdir>/Pods/SomePod/Sources/PodClass1.swift (line = 3): Argument is not a literal string.),
+          %(genstrings: error: bad entry in file <testdir>/Pods/SomePod/Sources/PodLocalizedString.swift (line = 3): Argument is not a literal string.),
         ]
         test_genstrings(
           params: { paths: [app_src_dir, pods_src_dir], quiet: true, swiftui: false, routines: 'PodLocalizedString', fail_on_error: false },
@@ -174,15 +207,13 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
       end
 
       it 'fails if there is any error in the output in `fail_on_error` mode, even in quiet mode' do
-        expected_logs = [
-          %(Key "app.key5" used with multiple values. Value "app value 5\\nwith multiple lines." kept. Value "app value 5\\nwith multiple lines, and different value than in Swift" ignored.),
-          %(genstrings: error: bad entry in file <testdir>/Pods/SomePod/Sources/PodClass1.swift (line = 3): Argument is not a literal string.),
+        expected_failures = [
+          %(genstrings: error: bad entry in file <testdir>/Pods/SomePod/Sources/PodLocalizedString.swift (line = 3): Argument is not a literal string.),
         ]
         test_genstrings(
           params: { paths: [app_src_dir, pods_src_dir], quiet: true, swiftui: false, routines: 'PodLocalizedString', fail_on_error: true },
-          expected_dir_name: 'expected-custom-routine',
-          expected_logs: expected_logs,
-          expected_failures: [expected_logs.last]
+          expected_dir_name: nil,
+          expected_failures: expected_failures
         )
       end
 
