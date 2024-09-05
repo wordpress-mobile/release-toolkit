@@ -10,8 +10,8 @@ enum AppClass1 {
                                                 + "and with comment literal spanning multiple lines in code.")
     static let appString4 = NSLocalizedString("app.key4",
                                               bundle: Bundle(for: BundleToken.self),
-                                              value: "appvalue4, %1$@.",
-                                              comment: "App key 4, with value, bundle and placeholder.")
+                                              value: "appvalue4, café à la terrasse, %1$@.",
+                                              comment: "App key 4, with unicode value, bundle and placeholder.")
     static let appString5 = NSLocalizedString("app.key5", tableName: "AppStrings",
                                               value: "app value 5\n"
                                                 + "with multiple lines.",

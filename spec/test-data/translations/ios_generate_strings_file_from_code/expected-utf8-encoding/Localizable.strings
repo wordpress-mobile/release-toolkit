@@ -7,8 +7,8 @@
 /* App key 3, no value, with key containing placeholder, and with comment literal spanning multiple lines in code. */
 "app.key3.%1@d" = "app.key3.%1@d";
 
-/* App key 4, with value, bundle and placeholder. */
-"app.key4" = "appvalue4, %1$@.";
+/* App key 4, with unicode value, bundle and placeholder. */
+"app.key4" = "appvalue4, café à la terrasse, %1$@.";
 
 /* App key 6, no value, with key containing placeholder. */
 "app.key6.%1@d" = "app.key6.%1@d";
