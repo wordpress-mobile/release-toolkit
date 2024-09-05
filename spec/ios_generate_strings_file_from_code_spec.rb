@@ -72,20 +72,19 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
           user_errors << error.message
         end
 
-        output_files = Dir[File.join(tmp_dir, '*.strings')]
-        expected_files = expected_dir_name.nil? ? [] : Dir[File.join(test_data_dir, expected_dir_name, '*.strings')]
-
         # Assert: UI.messages, UI.user_error! and return value from the action
+        unless expected_failures.nil?
+          expect(clean_abs_dirs[user_errors]).to eq(expected_failures)
+        end
+
         unless expected_logs.nil?
           expect(clean_abs_dirs[cmd_output]).to eq(expected_logs)
           expect(clean_abs_dirs[return_value]).to eq(expected_logs)
         end
 
-        unless expected_failures.nil?
-          expect(clean_abs_dirs[user_errors]).to eq(expected_failures)
-        end
-
         # Assert: same list of generated files
+        output_files = Dir[File.join(tmp_dir, '*.strings')]
+        expected_files = expected_dir_name.nil? ? [] : Dir[File.join(test_data_dir, expected_dir_name, '*.strings')]
         expect(output_files.map { |f| File.basename(f) }.sort).to eq(expected_files.map { |f| File.basename(f) }.sort)
 
         # Assert: each generated file has expected content

@@ -2,13 +2,11 @@ module Fastlane
   module Actions
     class IosGenerateStringsFileFromCodeAction < Action
       def self.run(params)
-        enc = begin
-                Encoding.find(params[:output_encoding])
-              rescue ArgumentError => error
-                UI.user_error!(error.message)
-              end
-
-        cmd_output = nil
+        output_encoding = begin
+                            Encoding.find(params[:output_encoding])
+                          rescue ArgumentError => error
+                            UI.user_error!(error.message)
+                          end
 
         Dir.mktmpdir('genstrings-output-') do |tmpdir|
           # Build the command arguments
@@ -26,23 +24,10 @@ module Fastlane
           UI.user_error!(errors.join("\n")) unless !params[:fail_on_error] || errors.empty?
 
           # Convert generated files to requested encoding if necessary, and copy to final destination
-          output_dir = params[:output_dir]
-          Dir.each_child(tmpdir) do |filename|
-            source = File.join(tmpdir, filename)
-            next if filename.start_with?('.') || !File.file?(source)
+          post_process_generated_files(source_dir: tmpdir, dest_dir: params[:output_dir], dest_encoding: output_encoding)
 
-            destination = File.join(output_dir, filename)
-            if enc.name == 'UTF-16LE'
-              # genstrings generates UTF-16 LittleEndian by default, so if that's the requested output encoding, we just copy
-              # the file directly, to avoid the read/write dance, reduce memory footprint, and reduce risk of encoding errors
-              FileUtils.cp(source, destination)
-            else
-              content = File.read(source, binmode: true, encoding: 'BOM|UTF-16LE')
-              File.write(destination, content, binmode: true, encoding: enc.name)
-            end
-          end
+          cmd_output
         end
-        cmd_output
       end
 
       # Adds the proper `**/*.{m,swift}` to the list of paths
@@ -56,10 +41,29 @@ module Fastlane
         end
       end
 
+      # List files matching a list of glob patterns, except the ones matching the list of exclusion patterns
       def self.files_matching(paths:, exclude:)
         globbed_paths = paths.map { |p| glob_pattern(p) }
         Dir.glob(globbed_paths).reject do |file|
           exclude&.any? { |ex| File.fnmatch?(ex, file) }
+        end
+      end
+
+      # Convert the generate files in `source_dir` to the `dest_encoding` if necessary, then copy them to the final `dest_dir`
+      def self.post_process_generated_files(source_dir:, dest_dir:, dest_encoding:)
+        Dir.each_child(source_dir) do |filename|
+          source = File.join(source_dir, filename)
+          next if filename.start_with?('.') || !File.file?(source)
+
+          destination = File.join(dest_dir, filename)
+          if dest_encoding.name == 'UTF-16LE'
+            # genstrings generates UTF-16 LittleEndian by default, so if that's the requested output encoding, we just copy
+            # the file directly, to avoid the read/write dance, reduce memory footprint, and reduce risk of encoding errors
+            FileUtils.cp(source, destination)
+          else
+            content = File.read(source, binmode: true, encoding: 'BOM|UTF-16LE')
+            File.write(destination, content, binmode: true, encoding: dest_encoding.name)
+          end
         end
       end
 
