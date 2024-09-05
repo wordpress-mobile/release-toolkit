@@ -68,8 +68,8 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
         return_value = []
         begin
           return_value = run_described_fastlane_action(params)
-        rescue FastlaneCore::Interface::FastlaneError => error
-          user_errors << error.message
+        rescue FastlaneCore::Interface::FastlaneError => e
+          user_errors << e.message
         end
 
         # Assert: UI.messages, UI.user_error! and return value from the action

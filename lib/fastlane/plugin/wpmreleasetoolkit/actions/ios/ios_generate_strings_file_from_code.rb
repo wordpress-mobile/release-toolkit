@@ -3,10 +3,10 @@ module Fastlane
     class IosGenerateStringsFileFromCodeAction < Action
       def self.run(params)
         output_encoding = begin
-                            Encoding.find(params[:output_encoding])
-                          rescue ArgumentError => error
-                            UI.user_error!(error.message)
-                          end
+          Encoding.find(params[:output_encoding])
+        rescue ArgumentError => e
+          UI.user_error!(e.message)
+        end
 
         Dir.mktmpdir('genstrings-output-') do |tmpdir|
           # Build the command arguments
