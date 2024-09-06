@@ -53,15 +53,21 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
 
   context 'when generating .strings files from code' do
     # Helper method for all the test examples in this context group
-    def test_genstrings(params:, expected_dir_name:, expected_logs: nil, expected_failures: nil)
+    #
+    # @param params [Hash] The list of parameters to pass to the call of ios_generate_strings_file_from_code action
+    # @param expected_dir_name [String] The name of the `expected-*` dir in `test-data/…` where the expected output files are located, to compare them with the actual output
+    # @param expected_logs [Array<String>] The list of output lines we expect from the output of `genstrings` and as return value to the action call
+    # @param expected_failure [String] The error message that we expect to be raised by the action, typically via `UI.user_error!`
+    #
+    def test_genstrings(params:, expected_dir_name:, expected_logs: nil, expected_failure: nil)
       # Arrange
       allow_fastlane_action_sh # see spec_helper
       cmd_output = []
       allow(FastlaneCore::UI).to receive(:command_output) { |line| cmd_output << line }
-      user_errors = []
+      raised_error_message = nil
 
       Dir.mktmpdir('a8c-wpmrt-ios_generate_strings_file_from_code-') do |tmp_dir|
-        clean_abs_dirs = ->(lines) { lines.map { |l| l.sub(tmp_dir, '<tmpdir>').sub(sample_project_dir, '<testdir>') } }
+        clean_abs_dirs = ->(lines) { Array(lines).map { |l| l.sub(tmp_dir, '<tmpdir>').sub(sample_project_dir, '<testdir>') } }
 
         # Act
         params[:output_dir] = tmp_dir
@@ -69,13 +75,11 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
         begin
           return_value = run_described_fastlane_action(params)
         rescue FastlaneCore::Interface::FastlaneError => e
-          user_errors << e.message
+          raised_error_message = e.message
         end
 
         # Assert: UI.messages, UI.user_error! and return value from the action
-        unless expected_failures.nil?
-          expect(clean_abs_dirs[user_errors]).to eq(expected_failures)
-        end
+        expect(clean_abs_dirs[raised_error_message]).to eq(Array(expected_failure))
 
         unless expected_logs.nil?
           expect(clean_abs_dirs[cmd_output]).to eq(expected_logs)
@@ -148,7 +152,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
         test_genstrings(
           params: { paths: [app_src_dir, pods_src_dir], quiet: true, swiftui: false, output_encoding: 'unicode' },
           expected_dir_name: nil,
-          expected_failures: ['unknown encoding name - unicode']
+          expected_failure: 'unknown encoding name - unicode'
         )
       end
 
@@ -201,18 +205,16 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
           params: { paths: [app_src_dir, pods_src_dir], quiet: true, swiftui: false, routines: 'PodLocalizedString', fail_on_error: false },
           expected_dir_name: 'expected-custom-routine',
           expected_logs: expected_logs,
-          expected_failures: []
+          expected_failure: nil
         )
       end
 
       it 'fails if there is any error in the output in `fail_on_error` mode, even in quiet mode' do
-        expected_failures = [
-          %(genstrings: error: bad entry in file <testdir>/Pods/SomePod/Sources/PodLocalizedString.swift (line = 3): Argument is not a literal string.),
-        ]
+        expected_failure = %(genstrings: error: bad entry in file <testdir>/Pods/SomePod/Sources/PodLocalizedString.swift (line = 3): Argument is not a literal string.)
         test_genstrings(
           params: { paths: [app_src_dir, pods_src_dir], quiet: true, swiftui: false, routines: 'PodLocalizedString', fail_on_error: true },
           expected_dir_name: nil,
-          expected_failures: expected_failures
+          expected_failure: expected_failure
         )
       end
 
@@ -226,7 +228,7 @@ describe Fastlane::Actions::IosGenerateStringsFileFromCodeAction do
           params: { paths: [app_src_dir, pods_src_dir], quiet: false, swiftui: false, fail_on_error: true },
           expected_dir_name: 'expected-pods-noswiftui',
           expected_logs: expected_logs,
-          expected_failures: []
+          expected_failure: nil
         )
       end
     end
