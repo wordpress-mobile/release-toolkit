@@ -49,7 +49,7 @@ module Fastlane
         end
       end
 
-      # Convert the generate files in `source_dir` to the `dest_encoding` if necessary, then copy them to the final `dest_dir`
+      # Convert the generated files in `source_dir` to the `dest_encoding` if necessary, then copy them to the final `dest_dir`
       def self.post_process_generated_files(source_dir:, dest_dir:, dest_encoding:)
         Dir.each_child(source_dir) do |filename|
           source = File.join(source_dir, filename)
@@ -58,7 +58,7 @@ module Fastlane
           destination = File.join(dest_dir, filename)
           if dest_encoding.name == 'UTF-16LE'
             # genstrings generates UTF-16 LittleEndian by default, so if that's the requested output encoding, we just copy
-            # the file directly, to avoid the read/write dance, reduce memory footprint, and reduce risk of encoding errors
+            # the file directly, to avoid the read/write dance, reduce memory footprint, and reduce risk of encoding errors on read
             FileUtils.cp(source, destination)
           else
             content = File.read(source, binmode: true, encoding: 'BOM|UTF-16LE')
