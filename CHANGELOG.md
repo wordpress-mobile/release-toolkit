@@ -64,7 +64,7 @@ _None_
 
 ### Bug Fixes
 
-- Fix `create_release_backmerge_pull_request_action` error when creating a backmerge to a branch not yet fetched locally. [#587]
+- Fix `create_release_backmerge_pull_request` error when creating a backmerge to a branch not yet fetched locally. [#587]
 
 ### Internal Changes
 
