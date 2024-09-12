@@ -1,0 +1,10 @@
+/* App key 5, with value, custom table and placeholder.
+   Duplicate declaration of App key 5 between ObjC and Swift,and with a comment even spanning multiple lines! */
+"app.key5" = "app value 5\nwith multiple lines.";
+
+/* App key 7, no value, custom table */
+"app.key7" = "app.key7";
+
+/* App key 9, with custom bundle and table. */
+"app.key9" = "app.key9";
+

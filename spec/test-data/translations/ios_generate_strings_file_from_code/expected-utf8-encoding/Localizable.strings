@@ -1,0 +1,36 @@
+/* App key 1, no value */
+"app.key1" = "app.key1";
+
+/* App key 2, with value containing placeholder. */
+"app.key2" = "appvalue2, %1$@.";
+
+/* App key 3, no value, with key containing placeholder, and with comment literal spanning multiple lines in code. */
+"app.key3.%1@d" = "app.key3.%1@d";
+
+/* App key 4, with unicode value, bundle and placeholder. */
+"app.key4" = "appvalue4, café à la terrasse, %1$@.";
+
+/* App key 6, no value, with key containing placeholder. */
+"app.key6.%1@d" = "app.key6.%1@d";
+
+/* App key 8, with value containing placeholder. */
+"app.key8" = "appvalue8, %1$@.";
+
+/* Pod key 1, no value */
+"pod.key1" = "pod.key1";
+
+/* Pod key 2, with value containing placeholder. */
+"pod.key2" = "podvalue2, %1$@.";
+
+/* Pod key 3, no value, with key containing placeholder,and with multi-line comment */
+"pod.key3.%1@d" = "pod.key3.%1@d";
+
+/* Pod key 4, with value, bundle and placeholder. */
+"pod.key4" = "podvalue4, %1$@.";
+
+/* Pod key 6, no value, with key containing placeholder. */
+"pod.key6.%1@d" = "pod.key6.%1@d";
+
+/* Pod key 8, with value containing placeholder. */
+"pod.key8" = "podvalue8, %1$@.";
+

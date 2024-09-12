@@ -10,7 +10,8 @@ _None_
 
 ### New Features
 
-_None_
+- `ios_generate_strings_file_from_code` now accepts an `output_encoding:` optional parameter. [#591]
+  This is typically useful if you prefer your generated files to be UTF-8 rather than the default UTF-16 that `genstrings` is using.
 
 ### Bug Fixes
 
