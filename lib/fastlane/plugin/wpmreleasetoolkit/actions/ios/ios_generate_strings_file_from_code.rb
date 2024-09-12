@@ -11,7 +11,14 @@ module Fastlane
         Dir.mktmpdir('genstrings-output-') do |tmpdir|
           # Build the command arguments
           files = files_matching(paths: params[:paths], exclude: params[:exclude])
-          flags = [('-q' if params[:quiet]), ('-SwiftUI' if params[:swiftui]), '-littleEndian'].compact
+          flags = [
+            ('-q' if params[:quiet]),
+            ('-SwiftUI' if params[:swiftui]),
+            # If no endianness (-bigEndian vs -littleEndian) is specified, genstrings will use endianness of the current OS.
+            # Currently, genstrings runs only on macOS, which is little-endian, so this parameter is not strictly necessary.
+            # We make it explicit here to raise visibility on the relationship between the endianness of the genstring output and that of the encoding later on.
+            '-littleEndian'
+          ].compact
           flags += Array(params[:routines]).flat_map { |routine| ['-s', routine] }
           cmd = ['genstrings', '-o', tmpdir, *flags, *files]
 
