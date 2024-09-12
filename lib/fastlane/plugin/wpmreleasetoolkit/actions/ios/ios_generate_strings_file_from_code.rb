@@ -17,7 +17,7 @@ module Fastlane
             # If no endianness (-bigEndian vs -littleEndian) is specified, genstrings will use endianness of the current OS.
             # Currently, genstrings runs only on macOS, which is little-endian, so this parameter is not strictly necessary.
             # We make it explicit here to raise visibility on the relationship between the endianness of the genstring output and that of the encoding later on.
-            '-littleEndian'
+            '-littleEndian',
           ].compact
           flags += Array(params[:routines]).flat_map { |routine| ['-s', routine] }
           cmd = ['genstrings', '-o', tmpdir, *flags, *files]
