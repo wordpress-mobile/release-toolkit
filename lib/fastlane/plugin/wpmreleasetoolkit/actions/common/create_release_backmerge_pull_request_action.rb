@@ -139,12 +139,29 @@ module Fastlane
           ```
         GRAPH
 
+        ascii_git_graph = <<~GRAPH
+          ```
+          #{head_branch.rjust(40)}  ----o-- - - -
+          #{' ' * 40}       \\
+          #{intermediate_branch.rjust(40)}        `---.
+          #{' ' * 40}             \\
+          #{base_branch.rjust(40)}  ------------x- - -
+          ```
+        GRAPH
+
         pr_body = <<~BODY
           Merging `#{head_branch}` into `#{base_branch}`.
 
           Via intermediate branch `#{intermediate_branch}`, to help fix conflicts if any:
 
           #{meramid_git_graph}
+
+          <details>
+          <summary>Expand to see an ASCII representation of the Git graph above</summary>
+
+          #{ascii_git_graph}
+
+          </details>
         BODY
 
         other_action.create_pull_request(
