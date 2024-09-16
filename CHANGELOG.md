@@ -180,6 +180,8 @@ _None_
 ### New Features
 
 - Added optional `build_gradle_path` and `version_properties_path` config items to actions that previously used the `PROJECT_ROOT_FOLDER` environment variable [#519]
+- Added a `checkout_and_pull` git action [#532]
+- Added a `create_branch` git action [#532]
 
 ### Internal Changes
 
