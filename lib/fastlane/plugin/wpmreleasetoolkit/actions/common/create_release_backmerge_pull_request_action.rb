@@ -117,7 +117,7 @@ module Fastlane
           %%{
             init: {
               'gitGraph': {
-                'mainBranchName': 'trunk',
+                'mainBranchName': '#{base_branch}',
                 'mainBranchOrder': 1000,
                 'showCommitLabel': false
               }
