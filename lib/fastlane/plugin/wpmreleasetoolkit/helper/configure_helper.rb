@@ -100,11 +100,16 @@ module Fastlane
       end
 
       def self.configure_file_commits_behind_repo
-        # Get a sily number of revisions to ensure we don't miss any
+        # Get a large number of revisions to ensure we don't miss any
         result = `cd #{repository_path} && git --no-pager log -10000 --pretty=format:"%H" && echo`
         hashes = result.each_line.map(&:strip).reverse
 
         index_of_configure_hash = hashes.find_index(configure_file_commit_hash)
+
+        UI.user_error!("Could not find Git commit #{configure_file_commit_hash} from `.configure` file in local secrets repository. Please verify your local copy is up to date with the remote.") if index_of_configure_hash.nil?
+
+        # No need to check for this to be `nil` because it comes by reading the
+        # local `.mobile-secrets` repo itself.
         index_of_repo_commit_hash = hashes.find_index(repo_commit_hash)
 
         return 0 if index_of_configure_hash >= index_of_repo_commit_hash

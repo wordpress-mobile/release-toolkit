@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Improve failure message when pinned commit cannot be found during `configure_update` [#410]
 
 ### Bug Fixes
 
