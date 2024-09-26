@@ -8,8 +8,9 @@ module Fastlane
         commit = params[:commit]
 
         UI.user_error!("Pipeline file not found: #{pipeline_file}") unless File.exist?(pipeline_file)
+        UI.user_error!('You should not provide both `branch` and `commit`') if !branch.nil? && commit != 'HEAD'
 
-        UI.message "Uploading pipeline #{pipeline_file} on branch #{branch}, commit #{commit}"
+        UI.message "Uploading pipeline on #{pipeline_file}, #{"branch #{branch}, " if branch}commit #{commit}"
 
         ENV['BUILDKITE_BRANCH'] = branch
         ENV['BUILDKITE_COMMIT'] = commit
@@ -45,7 +46,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :branch,
             description: 'The branch you want to run the pipeline on',
-            optional: false,
+            optional: true,
             type: String
           ),
           FastlaneCore::ConfigItem.new(
