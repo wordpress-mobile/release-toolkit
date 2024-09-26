@@ -8,6 +8,8 @@ describe Fastlane::Actions::BuildkiteUploadPipelineAction do
 
   before do
     allow(File).to receive(:exist?).with(anything)
+    allow(ENV).to receive(:[]).with(anything)
+    allow(ENV).to receive(:[]).with('BUILDKITE').and_return('true')
   end
 
   describe 'parameter validation' do
@@ -66,6 +68,17 @@ describe Fastlane::Actions::BuildkiteUploadPipelineAction do
       )
     end
 
+    it 'raises an error when not running on Buildkite' do
+      allow(File).to receive(:exist?).with(pipeline_file).and_return(true)
+      allow(ENV).to receive(:[]).with('BUILDKITE').and_return(nil)
+
+      expect do
+        run_described_fastlane_action(
+          pipeline_file: pipeline_file,
+          branch: branch
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /This action can only be called from a Buildkite CI build/)
+    end
   end
 
   describe 'pipeline upload' do

@@ -9,6 +9,7 @@ module Fastlane
 
         UI.user_error!("Pipeline file not found: #{pipeline_file}") unless File.exist?(pipeline_file)
         UI.user_error!('You should not provide both `branch` and `commit`') if !branch.nil? && commit != 'HEAD'
+        UI.user_error!('This action can only be called from a Buildkite CI build') unless ENV['BUILDKITE'] == 'true'
 
         UI.message "Uploading pipeline on #{pipeline_file}, #{"branch #{branch}, " if branch}commit #{commit}"
 
