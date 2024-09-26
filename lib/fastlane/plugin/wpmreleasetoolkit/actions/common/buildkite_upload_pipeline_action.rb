@@ -13,15 +13,17 @@ module Fastlane
 
         UI.message "Uploading pipeline on #{pipeline_file}, #{"branch #{branch}, " if branch}commit #{commit}"
 
-        ENV['BUILDKITE_BRANCH'] = branch
-        ENV['BUILDKITE_COMMIT'] = commit
+        env_vars = {
+          'BUILDKITE_BRANCH' => branch,
+          'BUILDKITE_COMMIT' => commit
+        }.compact
 
         if env_file && File.exist?(env_file)
-          UI.message("Sourcing environment file: #{env_file}")
+          UI.message(" - Sourcing environment file beforehand: #{env_file}")
 
-          sh(". #{env_file} && buildkite-agent pipeline upload #{pipeline_file}")
+          sh(env_vars, ". #{env_file.shellescape} && buildkite-agent pipeline upload #{pipeline_file.shellescape}")
         else
-          sh('buildkite-agent', 'pipeline', 'upload', pipeline_file)
+          sh(env_vars, 'buildkite-agent', 'pipeline', 'upload', pipeline_file)
         end
       end
 
@@ -33,15 +35,15 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(
-            key: :env_file,
-            description: 'The path to the environment variables file to be sourced before uploading the pipeline',
-            optional: true,
+            key: :pipeline_file,
+            description: 'The path to the YAML pipeline file to upload',
+            optional: false,
             type: String
           ),
           FastlaneCore::ConfigItem.new(
-            key: :pipeline_file,
-            description: 'The path to the Buildkite pipeline file',
-            optional: false,
+            key: :env_file,
+            description: 'The path to a bash file to be sourced before uploading the pipeline',
+            optional: true,
             type: String
           ),
           FastlaneCore::ConfigItem.new(
