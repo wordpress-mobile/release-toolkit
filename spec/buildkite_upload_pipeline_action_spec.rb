@@ -165,7 +165,7 @@ describe Fastlane::Actions::BuildkiteUploadPipelineAction do
 
   def expect_upload_pipeline_message(expected_branch: branch, expected_commit: commit_default)
     expect(Fastlane::UI).to receive(:message).with(
-      "Uploading pipeline on #{pipeline_file}#{expected_branch ? ", branch #{expected_branch}" : ''}, commit #{expected_commit}"
+      "Adding steps from `#{pipeline_file}` to the current build (#{expected_branch ? "branch: `#{expected_branch}`, " : ''}commit: `#{expected_commit}`)"
     )
   end
 end
