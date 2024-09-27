@@ -104,7 +104,7 @@ describe Fastlane::Actions::BuildkiteUploadPipelineAction do
       allow(File).to receive(:exist?).with(env_file).and_return(true)
       expect(Fastlane::Action).to receive(:sh).with(
         { 'BUILDKITE_BRANCH' => branch, 'BUILDKITE_COMMIT' => commit_default },
-        ". #{env_file.shellescape} && buildkite-agent pipeline upload #{pipeline_file.shellescape}"
+        "source #{env_file.shellescape} && buildkite-agent pipeline upload #{pipeline_file.shellescape}"
       )
       expect(Fastlane::UI).to receive(:message).with("Uploading pipeline on #{pipeline_file}, branch #{branch}, commit #{commit_default}")
       expect(Fastlane::UI).to receive(:message).with(" - Sourcing environment file beforehand: #{env_file}")
