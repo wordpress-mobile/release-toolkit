@@ -5,6 +5,8 @@ describe Fastlane::Actions::BuildkiteUploadPipelineAction do
   let(:branch) { 'feature-branch' }
   let(:commit) { 'abc123' }
   let(:commit_default) { Fastlane::Actions::BuildkiteUploadPipelineAction::DEFAULT_COMMIT }
+  let(:env_file) { 'path/to/env_file' }
+  let(:env_file_default) { Fastlane::Actions::BuildkiteUploadPipelineAction::DEFAULT_ENV_FILE }
 
   before do
     allow(File).to receive(:exist?).with(anything)
@@ -46,7 +48,7 @@ describe Fastlane::Actions::BuildkiteUploadPipelineAction do
         { 'BUILDKITE_BRANCH' => branch, 'BUILDKITE_COMMIT' => commit_default },
         'buildkite-agent', 'pipeline', 'upload', pipeline_file
       )
-      expect(Fastlane::UI).to receive(:message).with("Uploading pipeline on #{pipeline_file}, branch #{branch}, commit #{commit_default}")
+      expect_upload_pipeline_message
 
       run_described_fastlane_action(
         pipeline_file: pipeline_file,
@@ -60,7 +62,7 @@ describe Fastlane::Actions::BuildkiteUploadPipelineAction do
         { 'BUILDKITE_COMMIT' => commit },
         'buildkite-agent', 'pipeline', 'upload', pipeline_file
       )
-      expect(Fastlane::UI).to receive(:message).with("Uploading pipeline on #{pipeline_file}, commit #{commit}")
+      expect_upload_pipeline_message(expected_branch: nil, expected_commit: commit)
 
       run_described_fastlane_action(
         pipeline_file: pipeline_file,
@@ -91,7 +93,7 @@ describe Fastlane::Actions::BuildkiteUploadPipelineAction do
         { 'BUILDKITE_BRANCH' => branch, 'BUILDKITE_COMMIT' => commit_default },
         'buildkite-agent', 'pipeline', 'upload', pipeline_file
       )
-      expect(Fastlane::UI).to receive(:message).with("Uploading pipeline on #{pipeline_file}, branch #{branch}, commit #{commit_default}")
+      expect_upload_pipeline_message
 
       run_described_fastlane_action(
         pipeline_file: pipeline_file,
@@ -100,14 +102,13 @@ describe Fastlane::Actions::BuildkiteUploadPipelineAction do
     end
 
     it 'calls the right command to upload the pipeline with env_file' do
-      env_file = 'path/to/env_file'
       allow(File).to receive(:exist?).with(env_file).and_return(true)
       expect(Fastlane::Action).to receive(:sh).with(
         { 'BUILDKITE_BRANCH' => branch, 'BUILDKITE_COMMIT' => commit_default },
         "source #{env_file.shellescape} && buildkite-agent pipeline upload #{pipeline_file.shellescape}"
       )
-      expect(Fastlane::UI).to receive(:message).with("Uploading pipeline on #{pipeline_file}, branch #{branch}, commit #{commit_default}")
-      expect(Fastlane::UI).to receive(:message).with(" - Sourcing environment file beforehand: #{env_file}")
+      expect_upload_pipeline_message
+      expect(Fastlane::UI).to receive(:message).with(/Sourcing environment file beforehand: #{env_file}/)
 
       run_described_fastlane_action(
         pipeline_file: pipeline_file,
@@ -117,8 +118,8 @@ describe Fastlane::Actions::BuildkiteUploadPipelineAction do
     end
 
     it 'skips sourcing env_file when it does not exist' do
-      env_file = 'path/to/non_existent_env_file'
-      allow(File).to receive(:exist?).with(env_file).and_return(false)
+      non_existent_env_file = 'path/to/non_existent_env_file'
+      allow(File).to receive(:exist?).with(non_existent_env_file).and_return(false)
       expect(Fastlane::Action).to receive(:sh).with(
         { 'BUILDKITE_BRANCH' => branch, 'BUILDKITE_COMMIT' => commit_default },
         'buildkite-agent', 'pipeline', 'upload', pipeline_file
@@ -127,7 +128,22 @@ describe Fastlane::Actions::BuildkiteUploadPipelineAction do
 
       run_described_fastlane_action(
         pipeline_file: pipeline_file,
-        env_file: env_file,
+        env_file: non_existent_env_file,
+        branch: branch
+      )
+    end
+
+    it 'uses a default env_file when no env_file is provided' do
+      allow(File).to receive(:exist?).with(env_file_default).and_return(true)
+      expect(Fastlane::Action).to receive(:sh).with(
+        { 'BUILDKITE_BRANCH' => branch, 'BUILDKITE_COMMIT' => commit_default },
+        "source #{env_file_default} && buildkite-agent pipeline upload #{pipeline_file.shellescape}"
+      )
+      expect_upload_pipeline_message
+      expect(Fastlane::UI).to receive(:message).with(/Sourcing environment file beforehand: #{env_file_default}/)
+
+      run_described_fastlane_action(
+        pipeline_file: pipeline_file,
         branch: branch
       )
     end
@@ -145,5 +161,11 @@ describe Fastlane::Actions::BuildkiteUploadPipelineAction do
         )
       end.to raise_error(StandardError, 'Upload failed')
     end
+  end
+
+  def expect_upload_pipeline_message(expected_branch: branch, expected_commit: commit_default)
+    expect(Fastlane::UI).to receive(:message).with(
+      "Uploading pipeline on #{pipeline_file}#{expected_branch ? ", branch #{expected_branch}" : ''}, commit #{expected_commit}"
+    )
   end
 end
