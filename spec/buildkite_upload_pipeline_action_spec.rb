@@ -4,7 +4,7 @@ describe Fastlane::Actions::BuildkiteUploadPipelineAction do
   let(:pipeline_file) { 'path/to/pipeline.yml' }
   let(:branch) { 'feature-branch' }
   let(:commit) { 'abc123' }
-  let(:commit_default) { 'HEAD' }
+  let(:commit_default) { Fastlane::Actions::BuildkiteUploadPipelineAction::DEFAULT_COMMIT }
 
   before do
     allow(File).to receive(:exist?).with(anything)

@@ -1,6 +1,9 @@
 module Fastlane
   module Actions
     class BuildkiteUploadPipelineAction < Action
+      DEFAULT_ENV_FILE = File.join('.buildkite', 'shared-pipeline-vars').freeze
+      DEFAULT_COMMIT = 'HEAD'.freeze
+
       def self.run(params)
         env_file = params[:env_file]
         pipeline_file = params[:pipeline_file]
@@ -44,6 +47,7 @@ module Fastlane
             key: :env_file,
             description: 'The path to a bash file to be sourced before uploading the pipeline',
             optional: true,
+            default_value: DEFAULT_ENV_FILE,
             type: String
           ),
           FastlaneCore::ConfigItem.new(
@@ -56,7 +60,7 @@ module Fastlane
             key: :commit,
             description: 'The commit hash you want to run the pipeline on',
             optional: true,
-            default_value: 'HEAD',
+            default_value: DEFAULT_COMMIT,
             type: String
           ),
         ]
