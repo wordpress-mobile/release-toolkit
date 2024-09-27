@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    class BuildkiteUploadPipelineAction < Action
+    class BuildkitePipelineUploadAction < Action
       DEFAULT_ENV_FILE = File.join('.buildkite', 'shared-pipeline-vars').freeze
 
       def self.run(params)

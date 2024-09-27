@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Fastlane::Actions::BuildkiteUploadPipelineAction do
+describe Fastlane::Actions::BuildkitePipelineUploadAction do
   let(:pipeline_file) { 'path/to/pipeline.yml' }
   let(:env_file) { 'path/to/env_file' }
-  let(:env_file_default) { Fastlane::Actions::BuildkiteUploadPipelineAction::DEFAULT_ENV_FILE }
+  let(:env_file_default) { Fastlane::Actions::BuildkitePipelineUploadAction::DEFAULT_ENV_FILE }
   let(:environment) { { 'AKEY' => 'AVALUE' } }
   let(:environment_default) { {} }
 
