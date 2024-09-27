@@ -2,31 +2,23 @@ module Fastlane
   module Actions
     class BuildkiteUploadPipelineAction < Action
       DEFAULT_ENV_FILE = File.join('.buildkite', 'shared-pipeline-vars').freeze
-      DEFAULT_COMMIT = 'HEAD'.freeze
 
       def self.run(params)
-        env_file = params[:env_file]
         pipeline_file = params[:pipeline_file]
-        branch = params[:branch]
-        commit = params[:commit]
+        env_file = params[:env_file]
+        environment = params[:environment]
 
         UI.user_error!("Pipeline file not found: #{pipeline_file}") unless File.exist?(pipeline_file)
-        UI.user_error!('You should not provide both `branch` and `commit`') if !branch.nil? && commit != DEFAULT_COMMIT
         UI.user_error!('This action can only be called from a Buildkite CI build') unless ENV['BUILDKITE'] == 'true'
 
-        UI.message "Adding steps from `#{pipeline_file}` to the current build (#{"branch: `#{branch}`, " if branch}commit: `#{commit}`)"
-
-        env_vars = {
-          'BUILDKITE_BRANCH' => branch,
-          'BUILDKITE_COMMIT' => commit
-        }.compact
+        UI.message "Adding steps from `#{pipeline_file}` to the current build"
 
         if env_file && File.exist?(env_file)
           UI.message(" - Sourcing environment file beforehand: #{env_file}")
 
-          sh(env_vars, "source #{env_file.shellescape} && buildkite-agent pipeline upload #{pipeline_file.shellescape}")
+          sh(environment, "source #{env_file.shellescape} && buildkite-agent pipeline upload #{pipeline_file.shellescape}")
         else
-          sh(env_vars, 'buildkite-agent', 'pipeline', 'upload', pipeline_file)
+          sh(environment, 'buildkite-agent', 'pipeline', 'upload', pipeline_file)
         end
       end
 
@@ -51,17 +43,10 @@ module Fastlane
             type: String
           ),
           FastlaneCore::ConfigItem.new(
-            key: :branch,
-            description: 'The branch you want to run the pipeline on',
-            optional: true,
-            type: String
-          ),
-          FastlaneCore::ConfigItem.new(
-            key: :commit,
-            description: 'The commit hash you want to run the pipeline on',
-            optional: true,
-            default_value: DEFAULT_COMMIT,
-            type: String
+            key: :environment,
+            description: 'Environment variables to load when running `pipeline upload`, to allow for variable substitution in the YAML pipeline',
+            type: Hash,
+            default_value: {}
           ),
         ]
       end
