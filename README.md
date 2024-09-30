@@ -30,7 +30,7 @@ When you need to do a new release of the `release-toolkit`, simply run `rake new
 >  - Deduce which version number to use according to [SemVer](https://semver.org/) rules, and ask you to confirm that version number
 >  - Create a `release/<x.y>` branch, update the version number in all the right places, and create a PR for those changes
 
-Submit the PR, adding the `Releases` label to it and adding the `@wordpress-mobile/apps-infrastructure` as reviewers.
+Submit the PR, adding the `Releases` label to it and adding the `@wordpress-mobile/apps-infrastructure` team as reviewers.
 
 Once that PR is approved and merged, create a new GitHub Release, copy/pasting the CHANGELOG entries for that GH release's description.
 
