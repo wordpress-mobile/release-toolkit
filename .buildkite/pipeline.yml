@@ -1,18 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 ---
-# Nodes with values to reuse in the pipeline.
-common_params:
-  env: &xcode_image
-    IMAGE_ID: xcode-15.2
-  plugins:
-    - &ci_toolkit
-      automattic/a8c-ci-toolkit#2.18.2: ~
-    - &docker_plugin
-      docker#v5.8.0:
-        image: &ruby_version "public.ecr.aws/docker/library/ruby:3.2.2"
-        propagate-environment: true
-        environment:
-          - "RUBYGEMS_API_KEY"
 
 steps:
   #################
@@ -39,14 +26,16 @@ steps:
 
           echo "--- :rspec: Run Rspec"
           bundle exec rspec --profile 10 --format progress
-        env: *xcode_image
-        plugins: [*ci_toolkit]
+        env:
+          IMAGE_ID: $IMAGE_ID
+        plugins:
+          - $CI_TOOLKIT_PLUGIN
         agents:
           queue: "mac"
         matrix:
           setup:
             ruby:
-              - 3.2.2
+              - $RUBY_VERSION
 
   #################
   # Push to RubyGems
@@ -60,6 +49,11 @@ steps:
     # commands written inline) to avoid leaking a key used in the process in clear in the
     # BUILDKITE_COMMAND environment variable.
     command: .buildkite/commands/gem-push.sh
-    plugins: [*docker_plugin]
+    plugins:
+      - docker#v5.8.0:
+          image: "public.ecr.aws/docker/library/ruby:$RUBY_VERSION"
+          propagate-environment: true
+          environment:
+            - "RUBYGEMS_API_KEY"
     agents:
       queue: "default"
