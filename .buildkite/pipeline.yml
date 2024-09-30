@@ -23,6 +23,9 @@ steps:
 
           echo "--- :rspec: Run Rspec"
           bundle exec rspec --profile 10 --format progress
+
+          echo "--- :fastlane: :buildkite: Test pipeline upload action"
+          bundle exec fastlane run buildkite_pipeline_upload pipeline_file:.buildkite/pipeline_for_upload_action_test.yml
         env:
           IMAGE_ID: $IMAGE_ID
         plugins:
