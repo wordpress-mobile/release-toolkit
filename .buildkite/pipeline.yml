@@ -2,13 +2,10 @@
 ---
 
 steps:
-  #################
-  # Build and Test
-  #################
-  - group: 🧪 Build and Test"
+  - group: ":test_tube: Build and Test"
     key: test
     steps:
-      - label: "🧪 Build and Test using Ruby {{ matrix.ruby }}"
+      - label: ":test_tube: Build and Test using Ruby {{ matrix.ruby }}"
         command: |
           echo "--- :ruby: Using ruby {{ matrix.ruby }}"
           export RBENV_VERSION={{ matrix.ruby }}
@@ -31,17 +28,14 @@ steps:
         plugins:
           - $CI_TOOLKIT_PLUGIN
         agents:
-          queue: "mac"
+          queue: mac
         matrix:
           setup:
             ruby:
               - $RUBY_VERSION
 
-  #################
-  # Push to RubyGems
-  #################
   - label: ":rubygems: Publish to RubyGems"
-    key: "gem-push"
+    key: gem-push
     if: build.tag != null
     depends_on:
      - test
@@ -54,6 +48,6 @@ steps:
           image: "public.ecr.aws/docker/library/ruby:$RUBY_VERSION"
           propagate-environment: true
           environment:
-            - "RUBYGEMS_API_KEY"
+            - RUBYGEMS_API_KEY
     agents:
-      queue: "default"
+      queue: default
