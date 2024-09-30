@@ -58,7 +58,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :buildkite_organization,
-            env_name: 'BUILDKITE_ORGANIZTION',
+            env_name: 'BUILDKITE_ORGANIZATION',
             description: 'The Buildkite organization that contains your pipeline',
             type: String
           ),
