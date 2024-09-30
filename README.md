@@ -24,15 +24,17 @@ This guide also includes some tips about configuring your environment and IDE (e
 
 When you need to do a new release of the `release-toolkit`, simply run `rake new_release` and follow the instructions.
 
+> [!NOTE]  
 > This task will:
 >  - Show you the CHANGELOG/release notes it's about to use for that version
 >  - Deduce which version number to use according to [SemVer](https://semver.org/) rules, and ask you to confirm that version number
 >  - Create a `release/<x.y>` branch, update the version number in all the right places, and create a PR for those changes
 
-Submit the PR, adding the `Releases` label to it and adding the `owl-team` as reviewers.
+Submit the PR, adding the `Releases` label to it and adding the `@wordpress-mobile/apps-infrastructure` team as reviewers.
 
 Once that PR is approved and merged, create a new GitHub Release, copy/pasting the CHANGELOG entries for that GH release's description.
 
+> [!IMPORTANT]  
 > Publishing the GitHub Release will create the associated tag as well, which will trigger the CI job that will ultimately `gem push` the gem on RubyGems.
 
 ## Security
