@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- Added the `buildkite_pipeline_upload` action to upload a Buildkite pipeline to a running Buildkite build. [#597]
+_None_
 
 ### Bug Fixes
 
@@ -19,6 +19,12 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 12.2.0
+
+### New Features
+
+- Added the `buildkite_pipeline_upload` action to upload a Buildkite pipeline to a running Buildkite build. [#597]
 
 ## 12.1.0
 
