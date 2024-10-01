@@ -11,7 +11,13 @@ module Fastlane
 
         # Find the index of the first non-empty line that is also NOT a comment.
         # That way we keep commment headers as the very top of the file
-        line_idx = lines.find_index { |l| !l.start_with?('***') && !l.start_with?('//') && !l.chomp.empty? }
+        line_idx = lines.find_index do |l|
+          !l.start_with?('***') &&
+            !l.start_with?('//') &&
+            !l.start_with?('#') &&
+            !l.start_with?('- ') &&
+            !l.chomp.empty?
+        end
         # Put back the header, then the new entry, then the rest
         # (note: '...' excludes the higher bound of the range, unlike '..')
         new_lines = lines[0...line_idx] + ["#{section_title}\n", "-----\n", "\n", "\n"] + lines[line_idx..]

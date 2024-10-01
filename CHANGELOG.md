@@ -227,6 +227,7 @@ _See the [`MIGRATION.md`](MIGRATION.md) file for more detailed instructions and 
 ### New Features
 
 - Adds `if_exists` parameter to `upload_to_s3` action, with possible values `:skip`, `:fail`, and `:replace`. [#495]
+- Adds additional formatting options for release note files. They can now include Markdown headers (`#`, `##`, etc.) and list items (Starting with `-`) at the top of the file. [#508]
 - The `create_release` action now prints and returns the URL of the created GitHub Release. [#503]
 - Removes `bigdecimal` dependency. [#504] [#507]
 - Supports Ruby 3. [#492, #493, #497, and #504]
