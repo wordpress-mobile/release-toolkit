@@ -6,6 +6,9 @@ module Fastlane
     class CreateReleaseBackmergePullRequestAction < Action
       DEFAULT_BRANCH = 'trunk'.freeze
 
+      GIT_GRAPH_TYPES = %i[mermaid ascii both none].freeze
+      GIT_GRAPH_TYPES_STRING = GIT_GRAPH_TYPES.map { |t| ":#{t}" }.join(', ').freeze
+
       def self.run(params)
         token = params[:github_token]
         repository = params[:repository]
@@ -48,7 +51,8 @@ module Fastlane
             milestone: target_milestone&.number,
             reviewers: reviewers,
             team_reviewers: team_reviewers,
-            intermediate_branch_created_callback: intermediate_branch_created_callback
+            intermediate_branch_created_callback: intermediate_branch_created_callback,
+            git_graph_type: params[:git_graph_type]
           )
         end.compact
       end
@@ -88,7 +92,7 @@ module Fastlane
       #
       # @return [String] The URL of the created Pull Request, or `nil` if no PR was created.
       #
-      def self.create_backmerge_pr(token:, repository:, title:, head_branch:, base_branch:, labels:, milestone:, reviewers:, team_reviewers:, intermediate_branch_created_callback:)
+      def self.create_backmerge_pr(token:, repository:, title:, head_branch:, base_branch:, labels:, milestone:, reviewers:, team_reviewers:, intermediate_branch_created_callback:, git_graph_type:) # rubocop:disable Metrics/ParameterLists
         intermediate_branch = "merge/#{head_branch.gsub('/', '-')}-into-#{base_branch.gsub('/', '-')}"
 
         if Fastlane::Helper::GitHelper.branch_exists_on_remote?(branch_name: intermediate_branch)
@@ -149,19 +153,32 @@ module Fastlane
           ```
         GRAPH
 
+        git_graph = case git_graph_type
+                    when :both
+                      <<~GRAPH
+                        #{meramid_git_graph}
+
+                        <details>
+                        <summary>Expand to see an ASCII representation of the Git graph above</summary>
+
+                        #{ascii_git_graph}
+                      GRAPH
+                    when :mermaid
+                      meramid_git_graph
+                    when :ascii
+                      ascii_git_graph
+                    when :none
+                      ''
+                    else
+                      UI.user_error!("Unsupported Git graph type '#{params[:git_graph_type]}'")
+                    end
+
         pr_body = <<~BODY
           Merging `#{head_branch}` into `#{base_branch}`.
 
           Via intermediate branch `#{intermediate_branch}`, to help fix conflicts if any:
 
-          #{meramid_git_graph}
-
-          <details>
-          <summary>Expand to see an ASCII representation of the Git graph above</summary>
-
-          #{ascii_git_graph}
-
-          </details>
+          #{git_graph}
         BODY
 
         other_action.create_pull_request(
@@ -244,6 +261,14 @@ module Fastlane
                                        description: 'Callback to allow for the caller to perform operations on the intermediate branch before pushing. The call back receives two parameters: the base (target) branch for the PR and the intermediate branch name',
                                        optional: true,
                                        type: Proc),
+          FastlaneCore::ConfigItem.new(key: :git_graph_type,
+                                       description: "The type of Git graph to show. Possible values: #{GIT_GRAPH_TYPES_STRING}",
+                                       optional: true,
+                                       type: Symbol,
+                                       default_value: :both,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Unsupported Git graph type '#{value}'. Supported values are: #{GIT_GRAPH_TYPES_STRING}.") unless GIT_GRAPH_TYPES.include?(value)
+                                       end),
           Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
