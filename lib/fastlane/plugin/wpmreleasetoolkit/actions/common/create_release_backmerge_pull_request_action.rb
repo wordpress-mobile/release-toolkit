@@ -92,7 +92,7 @@ module Fastlane
       #
       # @return [String] The URL of the created Pull Request, or `nil` if no PR was created.
       #
-      def self.create_backmerge_pr(token:, repository:, title:, head_branch:, base_branch:, labels:, milestone:, reviewers:, team_reviewers:, intermediate_branch_created_callback:, git_graph_type:)
+      def self.create_backmerge_pr(token:, repository:, title:, head_branch:, base_branch:, labels:, milestone:, reviewers:, team_reviewers:, intermediate_branch_created_callback:, git_graph_type:) # rubocop:disable Metrics/ParameterLists
         intermediate_branch = "merge/#{head_branch.gsub('/', '-')}-into-#{base_branch.gsub('/', '-')}"
 
         if Fastlane::Helper::GitHelper.branch_exists_on_remote?(branch_name: intermediate_branch)
