@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- `create_release_backmerge_pull_request` now deletes existing intermediate branches before creating them anew. [#601]
 
 ### Internal Changes
 
