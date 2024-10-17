@@ -13,6 +13,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
       'auto_paginate=': nil
     )
   end
+  let(:git_client) { instance_double(Git::Base) }
 
   def mock_milestone(release_branch)
     release_version = release_branch.delete('release/')
@@ -29,15 +30,17 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
     allow(Fastlane::Actions).to receive(:sh)
       .with('git', 'branch', '-r', '-l', 'origin/release/*')
       .and_return("\n" + branches.map { |release| "origin/#{release}" }.join("\n") + "\n")
+
+    allow(git_client).to receive(:branches).and_return(
+      branches.map { |b| instance_double(Git::Branch, remote: instance_double(Git::Remote, name: 'origin'), name: b) }
+    )
   end
 
   def stub_expected_pull_requests(expected_backmerge_branches:, source_branch:, labels: [], milestone_number: nil, reviewers: nil, team_reviewers: nil, branch_exists_on_remote: false, point_to_same_commit: false)
-    expected_backmerge_branches.each do |target_branch|
+    expected_backmerge_branches.map do |target_branch|
       expected_intermediate_branch = "merge/#{source_branch.gsub('/', '-')}-into-#{target_branch.gsub('/', '-')}"
 
       allow(Fastlane::Helper::GitHelper).to receive(:branch_exists_on_remote?).with(branch_name: expected_intermediate_branch).and_return(branch_exists_on_remote)
-
-      next if branch_exists_on_remote
 
       allow(Fastlane::Helper::GitHelper).to receive(:point_to_same_commit?).with(target_branch, source_branch).and_return(point_to_same_commit)
 
@@ -59,6 +62,8 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
         reviewers: reviewers,
         team_reviewers: team_reviewers
       ).and_return(mock_pr_url(target_branch))
+
+      expected_intermediate_branch
     end
   end
 
@@ -66,6 +71,9 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
     allow(Octokit::Client).to receive(:new).and_return(client)
     allow(Fastlane::Helper::GitHelper).to receive(:checkout_and_pull)
     allow(Fastlane::Helper::GitHelper).to receive(:create_branch)
+    allow(Fastlane::Helper::GitHelper).to receive(:delete_local_branch_if_exists!)
+    allow(Fastlane::Helper::GitHelper).to receive(:delete_remote_branch_if_exists!)
+    allow(Git).to receive(:open).and_return(git_client)
     allow(Fastlane::Action).to receive(:other_action).and_return(other_action_mock)
   end
 
@@ -301,26 +309,32 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
   end
 
   context 'when the branch already exists' do
-    it 'does not try to create a new branch' do
-      stub_git_release_branches(%w[release/30.6])
+    it 'delete the branch before creating it anew' do
+      stub_git_release_branches(%w[release/30.7])
 
       source_branch = 'release/30.7'
 
-      expected_backmerge_branches = %w[trunk release/30.6]
-      stub_expected_pull_requests(
-        expected_backmerge_branches: expected_backmerge_branches,
+      intermediate_branches = stub_expected_pull_requests(
+        expected_backmerge_branches: [default_branch],
         source_branch: source_branch,
         branch_exists_on_remote: true
       )
 
-      expect do
-        run_described_fastlane_action(
-          github_token: test_token,
-          repository: test_repo,
-          source_branch: source_branch,
-          target_branches: expected_backmerge_branches
-        )
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'The intermediate branch `merge/release-30.7-into-trunk` already exists. Please check if there is an existing Pull Request that needs to be merged or closed first, or delete the branch.')
+      intermediate_branches.each do |branch|
+        expect(FastlaneCore::UI).to receive(:important)
+          .with("An intermediate branch `#{branch}` already existed on the remote. It will be deleted and any associated existing PR will be closed.")
+        expect(Fastlane::Helper::GitHelper).to receive(:delete_remote_branch_if_exists!).with(branch)
+        expect(Fastlane::Helper::GitHelper).to receive(:delete_local_branch_if_exists!).with(branch)
+      end
+
+      result = run_described_fastlane_action(
+        github_token: test_token,
+        repository: test_repo,
+        source_branch: source_branch,
+        default_branch: default_branch
+      )
+
+      expect(result).to eq([mock_pr_url(default_branch)])
     end
   end
 
