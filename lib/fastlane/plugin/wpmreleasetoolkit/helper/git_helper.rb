@@ -232,6 +232,32 @@ module Fastlane
         !Action.sh('git', 'ls-remote', '--heads', remote_name, branch_name).empty?
       end
 
+      # Delete a local branch if it exists.
+      #
+      # @param [String] branch_name The name of the local branch to delete.
+      # @return [Boolean] true if the branch was deleted, false if not (e.g. no such local branch existed in the first place)
+      #
+      def self.delete_local_branch_if_exists!(branch_name)
+        git_repo = Git.open(Dir.pwd)
+        return false unless git_repo.is_local_branch?(branch_name)
+
+        git_repo.branch(branch_name).delete
+        true
+      end
+
+      # Delete a remote branch if it exists.
+      #
+      # @param [String] branch_name The name of the remote branch to delete.
+      # @param [String] remote_name The name of the remote to delete the branch from. Defaults to 'origin'
+      # @return [Boolean] true if the branch was deleted, false if not (e.g. no such local branch existed in the first place)
+      #
+      def self.delete_remote_branch_if_exists!(branch_name, remote_name: 'origin')
+        git_repo = Git.open(Dir.pwd)
+        return false unless git_repo.branches.any? { |b| b.remote&.name == remote_name && b.name == branch_name }
+
+        git_repo.push(remote_name, branch_name, delete: true)
+      end
+
       # Checks whether a given path is ignored by Git, relying on Git's `check-ignore` under the hood.
       #
       # @param [String] path The path to check against `.gitignore`
