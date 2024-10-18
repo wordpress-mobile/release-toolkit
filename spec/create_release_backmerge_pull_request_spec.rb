@@ -322,7 +322,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
 
       intermediate_branches.each do |branch|
         expect(FastlaneCore::UI).to receive(:important)
-          .with("An intermediate branch `#{branch}` already existed on the remote. It will be deleted and any associated existing PR will be closed.")
+          .with("An intermediate branch `#{branch}` already exists on the remote. It will be deleted and GitHub will close any associated existing PR.")
         expect(Fastlane::Helper::GitHelper).to receive(:delete_remote_branch_if_exists!).with(branch)
         expect(Fastlane::Helper::GitHelper).to receive(:delete_local_branch_if_exists!).with(branch)
       end
