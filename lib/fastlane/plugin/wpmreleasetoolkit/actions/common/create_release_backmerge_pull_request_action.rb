@@ -111,10 +111,36 @@ module Fastlane
 
         other_action.push_to_git_remote(tags: false)
 
-        pr_body = <<~BODY
-          Merging `#{head_branch}` into `#{base_branch}`.
+        # Live playground to edit this graph
+        # https://mermaid.live/edit#pako:eNqNkU1PwzAMhv9KZanqpWVFwCVHQOKCxoFrLl7itdGaZEoTTWjqf8eLOo2i8eGTPx77TewjKK8JBJTlUbqCzTgTRTEHJ6s6E18C7vtqkc4li8Y9BnSqX6MlBqoYkttV9Y_cW9AUGLxt2_Y7Nfb-8OStNfEVNzQwtcVhpCU1XUJ2p7KU7vzAXNlkmSLQQDjS6v7m4S7nVU9q51O8UsmSv7jzSEuho9Xc3pzaG-Oib_KXlxr_QL8onbuuVy9unvrXbKiBCV645qvme0mIPVmSINjVtMU0RAm8O0YxRf_-4RQIbqca0l5jpGeDXUALIu9_-gRejKzU
+        meramid_git_graph = <<~GRAPH
+          ```mermaid
+          %%{
+            init: {
+              'gitGraph': {
+                'mainBranchName': '#{base_branch}',
+                'mainBranchOrder': 1000,
+                'showCommitLabel': false
+              }
+            }
+          }%%
+          gitGraph
+             branch #{head_branch}
+             checkout #{head_branch}
+             commit
+             commit
+             commit
+             branch #{intermediate_branch}
+             checkout #{intermediate_branch}
+             commit
+             checkout #{base_branch}
+             commit
+             commit
+             merge #{base_branch}
+          ```
+        GRAPH
 
-          Via intermediate branch `#{intermediate_branch}`, to help fix conflicts if any:
+        ascii_git_graph = <<~GRAPH
           ```
           #{head_branch.rjust(40)}  ----o-- - - -
           #{' ' * 40}       \\
@@ -122,6 +148,21 @@ module Fastlane
           #{' ' * 40}             \\
           #{base_branch.rjust(40)}  ------------x- - -
           ```
+        GRAPH
+
+        pr_body = <<~BODY
+          Merging `#{head_branch}` into `#{base_branch}`.
+
+          Via intermediate branch `#{intermediate_branch}`, to help fix conflicts if any:
+
+          #{meramid_git_graph}
+
+          <details>
+          <summary>Expand to see an ASCII representation of the Git graph above</summary>
+
+          #{ascii_git_graph}
+
+          </details>
         BODY
 
         other_action.create_pull_request(
