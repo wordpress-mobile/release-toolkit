@@ -92,7 +92,7 @@ module Fastlane
         intermediate_branch = "merge/#{head_branch.gsub('/', '-')}-into-#{base_branch.gsub('/', '-')}"
 
         if Fastlane::Helper::GitHelper.branch_exists_on_remote?(branch_name: intermediate_branch)
-          UI.important("An intermediate branch `#{intermediate_branch}` already existed on the remote. It will be deleted and any associated existing PR will be closed.")
+          UI.important("An intermediate branch `#{intermediate_branch}` already exists on the remote. It will be deleted and GitHub will close any associated existing PR.")
           Fastlane::Helper::GitHelper.delete_remote_branch_if_exists!(intermediate_branch)
         end
 
