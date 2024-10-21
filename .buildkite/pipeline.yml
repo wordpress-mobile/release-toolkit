@@ -1,27 +1,11 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 ---
-# Nodes with values to reuse in the pipeline.
-common_params:
-  env: &xcode_image
-    IMAGE_ID: xcode-15.2
-  plugins:
-    - &ci_toolkit
-      automattic/a8c-ci-toolkit#2.18.2: ~
-    - &docker_plugin
-      docker#v5.8.0:
-        image: &ruby_version "public.ecr.aws/docker/library/ruby:3.2.2"
-        propagate-environment: true
-        environment:
-          - "RUBYGEMS_API_KEY"
 
 steps:
-  #################
-  # Build and Test
-  #################
-  - group: 🧪 Build and Test"
+  - group: ":test_tube: Build and Test"
     key: test
     steps:
-      - label: "🧪 Build and Test using Ruby {{ matrix.ruby }}"
+      - label: ":test_tube: Build and Test using Ruby {{ matrix.ruby }}"
         command: |
           echo "--- :ruby: Using ruby {{ matrix.ruby }}"
           export RBENV_VERSION={{ matrix.ruby }}
@@ -39,20 +23,22 @@ steps:
 
           echo "--- :rspec: Run Rspec"
           bundle exec rspec --profile 10 --format progress
-        env: *xcode_image
-        plugins: [*ci_toolkit]
+
+          echo "--- :fastlane: :buildkite: Test pipeline upload action"
+          bundle exec fastlane run buildkite_pipeline_upload pipeline_file:.buildkite/pipeline_for_upload_action_test.yml
+        env:
+          IMAGE_ID: $IMAGE_ID
+        plugins:
+          - $CI_TOOLKIT_PLUGIN
         agents:
-          queue: "mac"
+          queue: mac
         matrix:
           setup:
             ruby:
-              - 3.2.2
+              - $RUBY_VERSION
 
-  #################
-  # Push to RubyGems
-  #################
   - label: ":rubygems: Publish to RubyGems"
-    key: "gem-push"
+    key: gem-push
     if: build.tag != null
     depends_on:
      - test
@@ -60,6 +46,11 @@ steps:
     # commands written inline) to avoid leaking a key used in the process in clear in the
     # BUILDKITE_COMMAND environment variable.
     command: .buildkite/commands/gem-push.sh
-    plugins: [*docker_plugin]
+    plugins:
+      - docker#v5.8.0:
+          image: "public.ecr.aws/docker/library/ruby:$RUBY_VERSION"
+          propagate-environment: true
+          environment:
+            - RUBYGEMS_API_KEY
     agents:
-      queue: "default"
+      queue: default

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# This file is `source`'d before calling `buildkite-agent pipeline upload`, and can be used
+# to set up some variables that will be interpolated in the `.yml` pipeline before uploading it.
+
+CI_TOOLKIT_PLUGIN_VERSION="3.7.1"
+RUBY_VERSION=$(cat .ruby-version)
+XCODE_VERSION=$(sed 's/^~> *//' .xcode-version)
+
+export CI_TOOLKIT_PLUGIN="automattic/a8c-ci-toolkit#$CI_TOOLKIT_PLUGIN_VERSION"
+export IMAGE_ID="xcode-$XCODE_VERSION"
+export RUBY_VERSION
