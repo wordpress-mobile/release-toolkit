@@ -108,7 +108,7 @@ module Fastlane
         unless intermediate_branch_created_callback.nil?
           intermediate_branch_created_callback.call(base_branch, intermediate_branch)
           # Make sure the callback block didn't switch branches
-          other_action.ensure_git_branch(branch: "^#{intermediate_branch}/")
+          other_action.ensure_git_branch(branch: "^#{intermediate_branch}$")
 
           # When a callback was provided, do the pre-check about valid PR _only_ at that point, in case the callback added new commits
           unless can_merge?(intermediate_branch, into: base_branch)

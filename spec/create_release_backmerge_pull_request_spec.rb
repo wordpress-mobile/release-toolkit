@@ -350,7 +350,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
       )
 
       intermediate_branch = "merge/release-30.6-into-#{default_branch}"
-      expect(other_action_mock).to receive(:ensure_git_branch).with(branch: "^#{intermediate_branch}/")
+      expect(other_action_mock).to receive(:ensure_git_branch).with(branch: "^#{intermediate_branch}$")
       allow(Fastlane::UI).to receive(:message).with(anything)
       expect(Fastlane::UI).to receive(:message).with("branch created callback was called! #{default_branch} #{intermediate_branch}")
 
