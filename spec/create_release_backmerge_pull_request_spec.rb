@@ -34,17 +34,25 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
     allow(git_client).to receive(:branches).and_return(
       branches.map { |b| instance_double(Git::Branch, remote: instance_double(Git::Remote, name: 'origin'), name: b) }
     )
+    allow(git_client).to receive(:merge_base) do |ref1, ref2|
+      ['merge-base-of', ref1.gsub('/', '-'), 'and', ref2.gsub('/', '-')].join('-')
+    end
   end
 
-  def stub_expected_pull_requests(expected_backmerge_branches:, source_branch:, labels: [], milestone_number: nil, reviewers: nil, team_reviewers: nil, branch_exists_on_remote: false, point_to_same_commit: false)
+  def stub_expected_pull_requests(expected_backmerge_branches:, source_branch:, labels: [], milestone_number: nil, reviewers: nil, team_reviewers: nil, branch_exists_on_remote: false, nothing_to_merge_between: [])
     expected_backmerge_branches.map do |target_branch|
       expected_intermediate_branch = "merge/#{source_branch.gsub('/', '-')}-into-#{target_branch.gsub('/', '-')}"
 
       allow(Fastlane::Helper::GitHelper).to receive(:branch_exists_on_remote?).with(branch_name: expected_intermediate_branch).and_return(branch_exists_on_remote)
 
-      allow(Fastlane::Helper::GitHelper).to receive(:point_to_same_commit?).with(target_branch, source_branch).and_return(point_to_same_commit)
+      allow(described_class).to receive(:can_merge?).and_return(true)
+      nothing_to_merge_between&.each do |head, base|
+        allow(described_class).to receive(:can_merge?).with(head, into: base).and_return(false)
+      end
 
-      next if point_to_same_commit
+      allow(other_action_mock).to receive(:ensure_git_branch).with({ branch: "^#{expected_intermediate_branch}$" }).and_return(true)
+
+      next unless nothing_to_merge_between.nil? || nothing_to_merge_between.empty?
 
       expect(Fastlane::Helper::GitHelper).to receive(:checkout_and_pull).with(source_branch)
       expect(Fastlane::Helper::GitHelper).to receive(:create_branch).with(expected_intermediate_branch)
@@ -284,27 +292,53 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
     end
   end
 
-  context 'when checking if source & target branches point to the same commit' do
-    it 'does not create a pull request when `source_branch` a target branch point to the same commit' do
-      stub_git_release_branches(%w[release/30.6])
+  context 'when there is nothing to merge' do
+    context 'when no callback is provided' do
+      it 'detects it should not create a pull request before even creating the intermediate branch' do
+        stub_git_release_branches(%w[release/30.8])
 
-      source_branch = 'release/30.7'
+        source_branch = 'release/30.7'
 
-      expected_backmerge_branches = %w[trunk release/30.6]
-      stub_expected_pull_requests(
-        expected_backmerge_branches: expected_backmerge_branches,
-        source_branch: source_branch,
-        point_to_same_commit: true
-      )
+        stub_expected_pull_requests(
+          expected_backmerge_branches: [default_branch],
+          source_branch: source_branch,
+          nothing_to_merge_between: { source_branch => default_branch }
+        )
 
-      result = run_described_fastlane_action(
-        github_token: test_token,
-        repository: test_repo,
-        source_branch: source_branch,
-        target_branches: expected_backmerge_branches
-      )
+        result = run_described_fastlane_action(
+          github_token: test_token,
+          repository: test_repo,
+          source_branch: source_branch,
+          target_branches: [default_branch]
+        )
 
-      expect(result).to be_empty
+        expect(result).to be_empty
+      end
+    end
+
+    context 'when a callback is provided' do
+      it 'checks the merge-ability with the intermediate branch after callback has been called' do
+        stub_git_release_branches(%w[release/30.8])
+
+        source_branch = 'release/30.7'
+
+        stub_expected_pull_requests(
+          expected_backmerge_branches: [default_branch],
+          source_branch: source_branch,
+          nothing_to_merge_between: { 'merge/release-30.7-into-main' => default_branch }
+        )
+
+        inspectable_proc = instance_double(Proc, inspect: 'proc { }')
+        result = run_described_fastlane_action(
+          github_token: test_token,
+          repository: test_repo,
+          source_branch: source_branch,
+          target_branches: [default_branch],
+          intermediate_branch_created_callback: inspectable_proc
+        )
+
+        expect(result).to be_empty
+      end
     end
   end
 
