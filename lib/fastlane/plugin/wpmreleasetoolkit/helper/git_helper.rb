@@ -170,6 +170,17 @@ module Fastlane
         Action.sh('git', 'fetch', '--tags')
       end
 
+      # Use `git merge-base` to find as good common ancestors as possible for a merge
+      #
+      # @param ref1 [String] The first git reference (sha1, ref name…)to find the common ancestor of
+      # @param ref2 [String] The second git reference (sha1, ref name…)to find the common ancestor of
+      # @return [String] The merge-base aka common ancestor for the 2 commits provided
+      #
+      def self.find_merge_base(ref1, ref2)
+        git_repo = Git.open(Dir.pwd)
+        git_repo.merge_base(ref1, ref2)
+      end
+
       # Checks if two git references point to the same commit.
       #
       # @param ref1 [String] the first git reference to check.
