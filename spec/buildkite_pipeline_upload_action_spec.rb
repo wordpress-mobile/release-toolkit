@@ -129,6 +129,43 @@ describe Fastlane::Actions::BuildkitePipelineUploadAction do
         pipeline_file: pipeline_file
       )
     end
+
+    it 'prefixes relative pipeline paths with the `.buildkite/` folder' do
+      relative_path = 'relative/pipeline.yml'
+      expected_path = File.join('.buildkite', relative_path)
+      allow(File).to receive(:exist?).with(expected_path).and_return(true)
+      allow(File).to receive(:absolute_path?).with(relative_path).and_return(false)
+
+      expect(Fastlane::Action).to receive(:sh).with(
+        environment_default,
+        'buildkite-agent', 'pipeline', 'upload', expected_path
+      )
+      expect(Fastlane::UI).to receive(:message).with(
+        "Adding steps from `#{expected_path}` to the current build"
+      )
+
+      run_described_fastlane_action(
+        pipeline_file: relative_path
+      )
+    end
+
+    it 'uses absolute pipeline paths as-is' do
+      absolute_path = '/absolute/path/to/pipeline.yml'
+      allow(File).to receive(:exist?).with(absolute_path).and_return(true)
+      allow(File).to receive(:absolute_path?).with(absolute_path).and_return(true)
+
+      expect(Fastlane::Action).to receive(:sh).with(
+        environment_default,
+        'buildkite-agent', 'pipeline', 'upload', absolute_path
+      )
+      expect(Fastlane::UI).to receive(:message).with(
+        "Adding steps from `#{absolute_path}` to the current build"
+      )
+
+      run_described_fastlane_action(
+        pipeline_file: absolute_path
+      )
+    end
   end
 
   describe 'error handling' do

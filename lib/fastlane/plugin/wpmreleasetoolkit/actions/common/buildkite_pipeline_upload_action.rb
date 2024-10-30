@@ -34,7 +34,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(
             key: :pipeline_file,
-            description: 'The path to the YAML pipeline file to upload',
+            description: 'The path to the YAML pipeline file to upload. If a relative path is provided, it will be prefixed with the `.buildkite/` folder path. Absolute paths are used as-is',
             optional: false,
             type: String
           ),
