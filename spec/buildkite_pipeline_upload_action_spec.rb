@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe Fastlane::Actions::BuildkitePipelineUploadAction do
   let(:pipeline_file) { 'path/to/pipeline.yml' }
+  let(:loaded_pipeline_file) { File.join('.buildkite', pipeline_file) }
   let(:env_file) { 'path/to/env_file' }
   let(:env_file_default) { Fastlane::Actions::BuildkitePipelineUploadAction::DEFAULT_ENV_FILE }
   let(:environment) { { 'AKEY' => 'AVALUE' } }
@@ -23,14 +24,14 @@ describe Fastlane::Actions::BuildkitePipelineUploadAction do
     end
 
     it 'raises an error when pipeline_file does not exist' do
-      allow(File).to receive(:exist?).with(pipeline_file).and_return(false)
+      allow(File).to receive(:exist?).with(loaded_pipeline_file).and_return(false)
       expect do
         run_described_fastlane_action(pipeline_file: pipeline_file)
       end.to raise_error(FastlaneCore::Interface::FastlaneError, /Pipeline file not found/)
     end
 
     it 'raises an error when not running on Buildkite' do
-      allow(File).to receive(:exist?).with(pipeline_file).and_return(true)
+      allow(File).to receive(:exist?).with(loaded_pipeline_file).and_return(true)
       allow(ENV).to receive(:[]).with('BUILDKITE').and_return(nil)
 
       expect do
@@ -39,10 +40,10 @@ describe Fastlane::Actions::BuildkitePipelineUploadAction do
     end
 
     it 'passes the environment hash to the shell command' do
-      allow(File).to receive(:exist?).with(pipeline_file).and_return(true)
+      allow(File).to receive(:exist?).with(loaded_pipeline_file).and_return(true)
       expect(Fastlane::Action).to receive(:sh).with(
         environment,
-        'buildkite-agent', 'pipeline', 'upload', pipeline_file
+        'buildkite-agent', 'pipeline', 'upload', loaded_pipeline_file
       )
       expect_upload_pipeline_message
 
@@ -53,11 +54,11 @@ describe Fastlane::Actions::BuildkitePipelineUploadAction do
     end
 
     it 'passes the environment hash to the shell command also with an env_file' do
-      allow(File).to receive(:exist?).with(pipeline_file).and_return(true)
+      allow(File).to receive(:exist?).with(loaded_pipeline_file).and_return(true)
       allow(File).to receive(:exist?).with(env_file).and_return(true)
       expect(Fastlane::Action).to receive(:sh).with(
         environment,
-        "source #{env_file.shellescape} && buildkite-agent pipeline upload #{pipeline_file.shellescape}"
+        "source #{env_file.shellescape} && buildkite-agent pipeline upload #{loaded_pipeline_file.shellescape}"
       )
       expect_upload_pipeline_message
       expect_sourcing_env_file_message(env_file)
@@ -72,13 +73,13 @@ describe Fastlane::Actions::BuildkitePipelineUploadAction do
 
   describe 'pipeline upload' do
     before do
-      allow(File).to receive(:exist?).with(pipeline_file).and_return(true)
+      allow(File).to receive(:exist?).with(loaded_pipeline_file).and_return(true)
     end
 
     it 'calls the right command to upload the pipeline without env_file' do
       expect(Fastlane::Action).to receive(:sh).with(
         environment_default,
-        'buildkite-agent', 'pipeline', 'upload', pipeline_file
+        'buildkite-agent', 'pipeline', 'upload', loaded_pipeline_file
       )
       expect_upload_pipeline_message
 
@@ -89,7 +90,7 @@ describe Fastlane::Actions::BuildkitePipelineUploadAction do
       allow(File).to receive(:exist?).with(env_file).and_return(true)
       expect(Fastlane::Action).to receive(:sh).with(
         environment_default,
-        "source #{env_file.shellescape} && buildkite-agent pipeline upload #{pipeline_file.shellescape}"
+        "source #{env_file.shellescape} && buildkite-agent pipeline upload #{loaded_pipeline_file.shellescape}"
       )
       expect_upload_pipeline_message
       expect_sourcing_env_file_message(env_file)
@@ -105,7 +106,7 @@ describe Fastlane::Actions::BuildkitePipelineUploadAction do
       allow(File).to receive(:exist?).with(non_existent_env_file).and_return(false)
       expect(Fastlane::Action).to receive(:sh).with(
         environment_default,
-        'buildkite-agent', 'pipeline', 'upload', pipeline_file
+        'buildkite-agent', 'pipeline', 'upload', loaded_pipeline_file
       )
       expect(Fastlane::UI).not_to receive(:message).with(/Sourcing environment file/)
 
@@ -119,7 +120,7 @@ describe Fastlane::Actions::BuildkitePipelineUploadAction do
       allow(File).to receive(:exist?).with(env_file_default).and_return(true)
       expect(Fastlane::Action).to receive(:sh).with(
         environment_default,
-        "source #{env_file_default} && buildkite-agent pipeline upload #{pipeline_file.shellescape}"
+        "source #{env_file_default} && buildkite-agent pipeline upload #{loaded_pipeline_file.shellescape}"
       )
       expect_upload_pipeline_message
       expect_sourcing_env_file_message(env_file_default)
@@ -132,7 +133,7 @@ describe Fastlane::Actions::BuildkitePipelineUploadAction do
 
   describe 'error handling' do
     it 'raises an error when the pipeline upload fails' do
-      allow(File).to receive(:exist?).with(pipeline_file).and_return(true)
+      allow(File).to receive(:exist?).with(loaded_pipeline_file).and_return(true)
       allow(Fastlane::Action).to receive(:sh).and_raise(StandardError.new('Upload failed'))
 
       expect do
@@ -145,7 +146,7 @@ describe Fastlane::Actions::BuildkitePipelineUploadAction do
 
   def expect_upload_pipeline_message
     expect(Fastlane::UI).to receive(:message).with(
-      "Adding steps from `#{pipeline_file}` to the current build"
+      "Adding steps from `#{loaded_pipeline_file}` to the current build"
     )
   end
 
