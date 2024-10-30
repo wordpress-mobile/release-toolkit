@@ -178,28 +178,29 @@ module Fastlane
       #
       def self.find_merge_base(ref1, ref2)
         git_repo = Git.open(Dir.pwd)
-        git_repo.merge_base(ref1, ref2)
+        ref1_full, ref2_full = [ref1, ref2].map do |ref|
+          # If the ref is the name of a branch and that branch exists remotely but not locally,
+          # then prefix `origin/` to the ref name to fallback to use the remote reference
+          git_repo.is_remote_branch?(ref) && !git_repo.is_local_branch?(ref) ? "origin/#{ref}" : ref
+        end
+        git_repo.merge_base(ref1_full, ref2_full)&.first&.sha
       end
 
       # Checks if two git references point to the same commit.
       #
       # @param ref1 [String] the first git reference to check.
       # @param ref2 [String] the second git reference to check.
-      # @param remote_name [String] the name of the remote repository to use (default is 'origin').
-      #                             If nil or empty, no remote prefix will be used.
       #
       # @return [Boolean] true if the two references point to the same commit, false otherwise.
       #
-      def self.point_to_same_commit?(ref1, ref2, remote_name: 'origin')
+      def self.point_to_same_commit?(ref1, ref2)
         git_repo = Git.open(Dir.pwd)
 
-        ref1_full = remote_name.to_s.empty? ? ref1 : "#{remote_name}/#{ref1}"
-        ref2_full = remote_name.to_s.empty? ? ref2 : "#{remote_name}/#{ref2}"
         begin
-          ref1_commit = git_repo.gcommit(ref1_full)
-          ref2_commit = git_repo.gcommit(ref2_full)
+          ref1_commit = git_repo.gcommit(ref1)
+          ref2_commit = git_repo.gcommit(ref2)
         rescue StandardError => e
-          UI.error "Error fetching commits for #{ref1_full} and #{ref2_full}: #{e.message}"
+          UI.error "Error fetching commits for #{ref1} and/or #{ref2}: #{e.message}"
           return false
         end
         ref1_commit.sha == ref2_commit.sha
