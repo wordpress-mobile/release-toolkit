@@ -1,10 +1,11 @@
 module Fastlane
   module Actions
     class BuildkitePipelineUploadAction < Action
-      DEFAULT_ENV_FILE = File.join('.buildkite', 'shared-pipeline-vars').freeze
+      DEFAULT_BUILDKITE_PIPELINE_FOLDER = '.buildkite'.freeze
+      DEFAULT_ENV_FILE = File.join(DEFAULT_BUILDKITE_PIPELINE_FOLDER, 'shared-pipeline-vars').freeze
 
       def self.run(params)
-        pipeline_file = params[:pipeline_file]
+        pipeline_file = File.join(DEFAULT_BUILDKITE_PIPELINE_FOLDER, params[:pipeline_file])
         env_file = params[:env_file]
         # Both keys and values need to be passed as strings
         environment = params[:environment].to_h { |k, v| [k.to_s, v.to_s] }
@@ -12,7 +13,7 @@ module Fastlane
         UI.user_error!("Pipeline file not found: #{pipeline_file}") unless File.exist?(pipeline_file)
         UI.user_error!('This action can only be called from a Buildkite CI build') unless ENV['BUILDKITE'] == 'true'
 
-        UI.message "Adding steps from `#{pipeline_file}` to the current build"
+        UI.message("Adding steps from `#{pipeline_file}` to the current build")
 
         if env_file && File.exist?(env_file)
           UI.message(" - Sourcing environment file beforehand: #{env_file}")
