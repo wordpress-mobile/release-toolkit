@@ -18,7 +18,8 @@ _None_
 
 ### Internal Changes
 
-_None_
+- `buildkite_pipeline_upload`: makes sure all values passed in the environment parameter are strings [#608]
+- `buildkite_pipeline_upload`: prepend .buildkite to the pipeline_file parameter to enforce our conventions [#608]
 
 ## 12.2.1
 
