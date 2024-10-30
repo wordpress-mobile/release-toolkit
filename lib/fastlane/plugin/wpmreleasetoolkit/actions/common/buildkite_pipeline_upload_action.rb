@@ -5,7 +5,8 @@ module Fastlane
       DEFAULT_ENV_FILE = File.join(DEFAULT_BUILDKITE_PIPELINE_FOLDER, 'shared-pipeline-vars').freeze
 
       def self.run(params)
-        pipeline_file = File.join(DEFAULT_BUILDKITE_PIPELINE_FOLDER, params[:pipeline_file])
+        pipeline_file = params[:pipeline_file]
+        pipeline_file = File.join(DEFAULT_BUILDKITE_PIPELINE_FOLDER, pipeline_file) unless File.absolute_path?(pipeline_file)
         env_file = params[:env_file]
         # Both keys and values need to be passed as strings
         environment = params[:environment].to_h { |k, v| [k.to_s, v.to_s] }
