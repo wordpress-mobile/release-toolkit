@@ -6,7 +6,8 @@ module Fastlane
       def self.run(params)
         pipeline_file = params[:pipeline_file]
         env_file = params[:env_file]
-        environment = params[:environment]
+        # Both keys and values need to be passed as strings
+        environment = params[:environment].to_h { |k, v| [k.to_s, v.to_s] }
 
         UI.user_error!("Pipeline file not found: #{pipeline_file}") unless File.exist?(pipeline_file)
         UI.user_error!('This action can only be called from a Buildkite CI build') unless ENV['BUILDKITE'] == 'true'
