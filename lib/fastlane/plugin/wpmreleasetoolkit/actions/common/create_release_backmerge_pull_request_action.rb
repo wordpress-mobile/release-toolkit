@@ -89,24 +89,33 @@ module Fastlane
       # @return [String] The URL of the created Pull Request, or `nil` if no PR was created.
       #
       def self.create_backmerge_pr(token:, repository:, title:, head_branch:, base_branch:, labels:, milestone:, reviewers:, team_reviewers:, intermediate_branch_created_callback:)
-        intermediate_branch = "merge/#{head_branch.gsub('/', '-')}-into-#{base_branch.gsub('/', '-')}"
+        # Do an early pre-check to see if the PR would be valid, but only if no callback (as a callback might add new commits on intermediate branch)
+        if intermediate_branch_created_callback.nil? && !can_merge?(head_branch, into: base_branch)
+          UI.error("Nothing to merge from #{head_branch} into #{base_branch}. Skipping PR creation.")
+          return nil
+        end
 
+        # Create the intermediate branch
+        intermediate_branch = "merge/#{head_branch.gsub('/', '-')}-into-#{base_branch.gsub('/', '-')}"
         if Fastlane::Helper::GitHelper.branch_exists_on_remote?(branch_name: intermediate_branch)
           UI.important("An intermediate branch `#{intermediate_branch}` already exists on the remote. It will be deleted and GitHub will close any associated existing PR.")
           Fastlane::Helper::GitHelper.delete_remote_branch_if_exists!(intermediate_branch)
         end
-
         Fastlane::Helper::GitHelper.delete_local_branch_if_exists!(intermediate_branch)
         Fastlane::Helper::GitHelper.create_branch(intermediate_branch)
 
-        intermediate_branch_created_callback&.call(base_branch, intermediate_branch)
+        # Call the callback if one was provided to allow the use to add commits on the intermediate branch (e.g. solve conflicts)
+        unless intermediate_branch_created_callback.nil?
+          intermediate_branch_created_callback.call(base_branch, intermediate_branch)
+          # Make sure the callback block didn't switch branches
+          other_action.ensure_git_branch(branch: "^#{intermediate_branch}$")
 
-        # if there's a callback, make sure it didn't switch branches
-        other_action.ensure_git_branch(branch: "^#{intermediate_branch}/") unless intermediate_branch_created_callback.nil?
-
-        if Fastlane::Helper::GitHelper.point_to_same_commit?(base_branch, head_branch)
-          UI.error("No differences between #{head_branch} and #{base_branch}. Skipping PR creation.")
-          return nil
+          # When a callback was provided, do the pre-check about valid PR _only_ at that point, in case the callback added new commits
+          unless can_merge?(intermediate_branch, into: base_branch)
+            UI.error("Nothing to merge from #{intermediate_branch} into #{base_branch}. Skipping PR creation.")
+            Fastlane::Helper::GitHelper.delete_local_branch_if_exists!(intermediate_branch)
+            return nil
+          end
         end
 
         other_action.push_to_git_remote(tags: false)
@@ -136,6 +145,23 @@ module Fastlane
           reviewers: reviewers,
           team_reviewers: team_reviewers
         )
+      end
+
+      # Determine if a `head->base` PR would be considered valid by GitHub.
+      #
+      # Note that a PR with an empty diff can still be valid (e.g. if you merge a commit and its revert)
+      #
+      # This method returns false mostly when all commits from `head` has already been merged into `base`
+      # and that there are no new commits to merge (in which case GitHub would refuse creating the PR)
+      #
+      # @param head [String] the head reference (commit sha or branch name) we want to merge
+      # @param into [String] the base reference (commit sha or branch name) we want to merge into
+      # @return [Boolean] true if there are commits in `head` that are not yet in `base` and a merge can happen;
+      #                   false if all commits from `head` are already in `base` and a merge would be rejected
+      #
+      def self.can_merge?(head, into:)
+        merge_base = Fastlane::Helper::GitHelper.find_merge_base(into, head)
+        !Fastlane::Helper::GitHelper.point_to_same_commit?(merge_base, head)
       end
 
       def self.description
@@ -201,7 +227,9 @@ module Fastlane
                                        optional: true,
                                        type: Array),
           FastlaneCore::ConfigItem.new(key: :intermediate_branch_created_callback,
-                                       description: 'Callback to allow for the caller to perform operations on the intermediate branch before pushing. The call back receives two parameters: the base (target) branch for the PR and the intermediate branch name',
+                                       description: 'Callback to allow for the caller to perform operations on the intermediate branch (e.g. pushing new commits to pre-solve conflicts) before creating the PR. ' \
+                                        + 'The callback receives two parameters: the base (target) branch for the PR and the intermediate branch name that has been created.' \
+                                        + 'Note that if you use the callback to add new commits to the intermediate branch, you are responsible for git-pushing them too',
                                        optional: true,
                                        type: Proc),
           Fastlane::Helper::GithubHelper.github_token_config_item,

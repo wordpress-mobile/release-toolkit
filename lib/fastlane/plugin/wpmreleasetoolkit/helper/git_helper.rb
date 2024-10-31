@@ -113,11 +113,19 @@ module Fastlane
 
       # Get the SHA of a given git ref. Typically useful to get the SHA of the current HEAD commit.
       #
-      # @param [String] ref The git ref (commit, branch name, 'HEAD', …) to resolve as a SHA
+      # @param ref [String]
+      #        The git ref (commit, branch name, 'HEAD', …) to resolve as a SHA
+      # @param prepend_origin_if_needed [Boolean]
+      #        If true, will retry the rev-parse by prefixing `origin/` to the ref it it failed without it
       # @return [String] The commit SHA of the ref
       #
-      def self.get_commit_sha(ref: 'HEAD')
-        Git.open(Dir.pwd).revparse(ref)
+      def self.get_commit_sha(ref: 'HEAD', prepend_origin_if_needed: false)
+        repo = Git.open(Dir.pwd)
+        repo.revparse(ref)
+      rescue Git::FailedError
+        raise unless prepend_origin_if_needed
+
+        repo.revparse("origin/#{ref}")
       end
 
       # Creates a tag for the given version, and optionally push it to the remote.
@@ -170,28 +178,36 @@ module Fastlane
         Action.sh('git', 'fetch', '--tags')
       end
 
+      # Use `git merge-base` to find as good a common ancestors as possible for a merge
+      #
+      # @param ref1 [String] The first git reference (sha1, ref name…)to find the common ancestor of
+      # @param ref2 [String] The second git reference (sha1, ref name…)to find the common ancestor of
+      # @return [String] The merge-base aka common ancestor for the 2 commits provided
+      # @note If a reference (e.g. branch name) can't be found locally, it will try with the same ref prefixed with `origin/`
+      #
+      def self.find_merge_base(ref1, ref2)
+        git_repo = Git.open(Dir.pwd)
+        # Resolve to shas, mostly so that we can support cases with and without `origin/` explicit prefix on branch names
+        ref1_sha, ref2_sha = [ref1, ref2].map { |ref| get_commit_sha(ref: ref, prepend_origin_if_needed: true) }
+
+        git_repo.merge_base(ref1_sha, ref2_sha)&.first&.sha
+      end
+
       # Checks if two git references point to the same commit.
       #
       # @param ref1 [String] the first git reference to check.
       # @param ref2 [String] the second git reference to check.
-      # @param remote_name [String] the name of the remote repository to use (default is 'origin').
-      #                             If nil or empty, no remote prefix will be used.
       #
       # @return [Boolean] true if the two references point to the same commit, false otherwise.
       #
-      def self.point_to_same_commit?(ref1, ref2, remote_name: 'origin')
-        git_repo = Git.open(Dir.pwd)
-
-        ref1_full = remote_name.to_s.empty? ? ref1 : "#{remote_name}/#{ref1}"
-        ref2_full = remote_name.to_s.empty? ? ref2 : "#{remote_name}/#{ref2}"
+      def self.point_to_same_commit?(ref1, ref2)
         begin
-          ref1_commit = git_repo.gcommit(ref1_full)
-          ref2_commit = git_repo.gcommit(ref2_full)
+          ref1_sha = get_commit_sha(ref: ref1, prepend_origin_if_needed: true)
+          ref2_sha = get_commit_sha(ref: ref2, prepend_origin_if_needed: true)
         rescue StandardError => e
-          UI.error "Error fetching commits for #{ref1_full} and #{ref2_full}: #{e.message}"
-          return false
+          UI.user_error! "Error fetching commits for #{ref1} and/or #{ref2}: #{e.message}"
         end
-        ref1_commit.sha == ref2_commit.sha
+        ref1_sha == ref2_sha
       end
 
       # Returns the current git branch, or "HEAD" if it's not checked out to any branch
