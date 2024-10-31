@@ -8,7 +8,7 @@ module Fastlane
         pipeline_file = params[:pipeline_file]
         pipeline_file = File.join(DEFAULT_BUILDKITE_PIPELINE_FOLDER, pipeline_file) unless File.absolute_path?(pipeline_file)
         env_file = params[:env_file]
-        # Both keys and values need to be passed as strings
+        # Both keys and values need to be passed as strings otherwise Fastlane.sh will fail to parse the command.
         environment = params[:environment].to_h { |k, v| [k.to_s, v.to_s] }
 
         UI.user_error!("Pipeline file not found: #{pipeline_file}") unless File.exist?(pipeline_file)
