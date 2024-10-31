@@ -14,6 +14,16 @@ _None_
 
 ### Bug Fixes
 
+_None_
+
+### Internal Changes
+
+_None_
+
+## 12.3.0
+
+### Bug Fixes
+
 - `create_release-backmerge_pull_request`: Fix the pre-check logic verifying if a PR is really needed or if there's nothing to backmerge. [#607]
 
 ### Internal Changes
