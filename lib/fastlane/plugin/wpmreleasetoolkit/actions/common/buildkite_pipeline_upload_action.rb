@@ -1,17 +1,20 @@
 module Fastlane
   module Actions
     class BuildkitePipelineUploadAction < Action
-      DEFAULT_ENV_FILE = File.join('.buildkite', 'shared-pipeline-vars').freeze
+      DEFAULT_BUILDKITE_PIPELINE_FOLDER = '.buildkite'.freeze
+      DEFAULT_ENV_FILE = File.join(DEFAULT_BUILDKITE_PIPELINE_FOLDER, 'shared-pipeline-vars').freeze
 
       def self.run(params)
         pipeline_file = params[:pipeline_file]
+        pipeline_file = File.join(DEFAULT_BUILDKITE_PIPELINE_FOLDER, pipeline_file) unless File.absolute_path?(pipeline_file)
         env_file = params[:env_file]
-        environment = params[:environment]
+        # Both keys and values need to be passed as strings otherwise Fastlane.sh will fail to parse the command.
+        environment = params[:environment].to_h { |k, v| [k.to_s, v.to_s] }
 
         UI.user_error!("Pipeline file not found: #{pipeline_file}") unless File.exist?(pipeline_file)
         UI.user_error!('This action can only be called from a Buildkite CI build') unless ENV['BUILDKITE'] == 'true'
 
-        UI.message "Adding steps from `#{pipeline_file}` to the current build"
+        UI.message("Adding steps from `#{pipeline_file}` to the current build")
 
         if env_file && File.exist?(env_file)
           UI.message(" - Sourcing environment file beforehand: #{env_file}")
@@ -31,7 +34,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(
             key: :pipeline_file,
-            description: 'The path to the YAML pipeline file to upload',
+            description: 'The path to the YAML pipeline file to upload. If a relative path is provided, it will be prefixed with the `.buildkite/` folder path. Absolute paths are used as-is',
             optional: false,
             type: String
           ),
