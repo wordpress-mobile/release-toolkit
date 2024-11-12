@@ -9,8 +9,10 @@ module Fastlane
         version = params[:version]
         assets = params[:release_assets]
         release_notes = params[:release_notes_file_path].nil? ? '' : File.read(params[:release_notes_file_path])
-        # Replace full URLS to PRs/Issues with shorthand, because GitHub does not render them properly otherwise.
-        release_notes.gsub!(%r{https://github.com/([^/]*/[^/]*)/(pulls?|issues?)/([0-9]*)}, '\1#\3')
+        # Replace full URLs to PRs/Issues that are in `[https://some-url]` brackets with shorthand, because GitHub does not render them properly otherwise.
+        # That syntax is sometimes used by devs in `RELEASE-NOTES.txt` when pointing to a PR to another repo (e.g. Gutenberg PR from WP repo).
+        # We should NOT transform URLs to PRs/Issues that are in `[text](url)` form (those are valid), only the ones directly in `[]` brackets.
+        release_notes.gsub!(%r{\[https://github.com/([^/]*/[^/]*)/(pulls?|issues?)/([0-9]*)\]}, '[\1#\3]')
         prerelease = params[:prerelease]
         is_draft = params[:is_draft]
 
