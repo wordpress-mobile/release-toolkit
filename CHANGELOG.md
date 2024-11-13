@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Fix issue with post-processing of PR urls in the body of GitHub releases created via `create_github_release` [#610]
 
 ### Internal Changes
 
