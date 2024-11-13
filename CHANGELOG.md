@@ -14,11 +14,17 @@ _None_
 
 ### Bug Fixes
 
-- Fix issue with post-processing of PR urls in the body of GitHub releases created via `create_github_release` [#610]
+_None_
 
 ### Internal Changes
 
 _None_
+
+## 12.3.1
+
+### Bug Fixes
+
+- Fix issue with post-processing of PR urls in the body of GitHub releases created via `create_github_release` [#610]
 
 ## 12.3.0
 
