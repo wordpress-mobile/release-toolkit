@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Fix bug in `configure_apply` that could happen if run on a user machine that hasn't yet `git-pull` the latest commits from `~/.mobile-secrets` to a commit _after_ the new encryption key had been pushed. [#612]
 
 ### Internal Changes
 
@@ -24,13 +24,13 @@ _None_
 
 ### Bug Fixes
 
-- Fix issue with post-processing of PR urls in the body of GitHub releases created via `create_github_release` [#610]
+- Fix issue with post-processing of PR urls in the body of GitHub releases created via `create_github_release`. [#610]
 
 ## 12.3.0
 
 ### New Features
 
-- `buildkite_pipeline_upload`: prepend `.buildkite/` to the `pipeline_file` parameter to enforce our conventions [#608]
+- `buildkite_pipeline_upload`: prepend `.buildkite/` to the `pipeline_file` parameter to enforce our conventions. [#608]
 
 ### Bug Fixes
 
@@ -38,7 +38,7 @@ _None_
 
 ### Internal Changes
 
-- `buildkite_pipeline_upload`: makes sure all values passed in the environment parameter are strings [#608]
+- `buildkite_pipeline_upload`: makes sure all values passed in the environment parameter are strings. [#608]
 
 ## 12.2.1
 
