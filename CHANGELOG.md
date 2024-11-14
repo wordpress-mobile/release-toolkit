@@ -14,11 +14,17 @@ _None_
 
 ### Bug Fixes
 
-- Fix bug in `configure_apply` that could happen if run on a user machine that hasn't yet `git-pull` the latest commits from `~/.mobile-secrets` to a commit _after_ the new encryption key had been pushed. [#612]
+_None_
 
 ### Internal Changes
 
 _None_
+
+## 12.3.2
+
+### Bug Fixes
+
+- Fix bug in `configure_apply` that could happen if run on a user machine that hasn't yet `git-pull` the latest commits from `~/.mobile-secrets` to a commit _after_ the new encryption key had been pushed. [#612]
 
 ## 12.3.1
 
