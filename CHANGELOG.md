@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Fix `check_fonts_installed` step in `create_promo_screenshots` [#615]
 
 ### Internal Changes
 
