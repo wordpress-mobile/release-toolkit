@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Fix broken `draw_text_to_canvas` method for `create_promo_screenshots` [#614]
 
 ### Internal Changes
 
