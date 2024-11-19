@@ -282,9 +282,9 @@ module Fastlane
         begin
           temp_text_file = Tempfile.new
 
-          Action.sh('drawText', "html=#{text}", "maxWidth=#{width}", "maxHeight=#{height}", "output=#{tempTextFile.path}", "fontSize=#{font_size}", "stylesheet=#{stylesheet_path}", "alignment=#{position}")
+          Action.sh('drawText', "html=#{text}", "maxWidth=#{width}", "maxHeight=#{height}", "output=#{temp_text_file.path}", "fontSize=#{font_size}", "stylesheet=#{stylesheet_path}", "alignment=#{position}")
 
-          text_content = open_image(tempTextFile.path).trim
+          text_content = open_image(temp_text_file.path).trim
           text_frame = create_image(width, height)
           text_frame = case position
                        when 'left' then composite_image_left(text_frame, text_content, 0, 0)
