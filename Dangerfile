@@ -49,6 +49,4 @@ labels_checker.check(
   required_labels: []
 )
 
-milestone_checker.check_milestone_due_date(days_before_due: 5)
-
 warn("No reviewers have been set for this PR yet. Please request a review from **@\u2060wordpress-mobile/apps-infrastructure**.") unless github_utils.requested_reviewers?
