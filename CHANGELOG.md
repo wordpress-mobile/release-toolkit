@@ -14,12 +14,18 @@ _None_
 
 ### Bug Fixes
 
-- Fix `check_fonts_installed` step in `create_promo_screenshots` [#615]
-- Fix broken `draw_text_to_canvas` method for `create_promo_screenshots` [#614]
+_None_
 
 ### Internal Changes
 
 _None_
+
+## 12.3.3
+
+### Bug Fixes
+
+- Fix `check_fonts_installed` step in `create_promo_screenshots` [#615]
+- Fix broken `draw_text_to_canvas` method for `create_promo_screenshots` [#614]
 
 ## 12.3.2
 
