@@ -63,7 +63,8 @@ module Fastlane
         # Parse the first font in each `font-family` attribute found in all found CSS files.
         # Only the first in each `font-family` font list matters, as others are fallbacks we don't want to use anyway.
         font_families = all_stylesheets.flat_map do |s|
-          File.readlines(s).flat_map do |line|
+          stylesheet_path = resolve_path(s)
+          File.readlines(stylesheet_path).flat_map do |line|
             attr = line.match(/font-family: (.*);/)&.captures&.first
             attr.split(',').first.strip.gsub(/'(.*)'/, '\1').gsub(/"(.*)"/, '\1') unless attr.nil?
           end
