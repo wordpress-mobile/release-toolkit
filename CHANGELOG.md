@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Remove Danger check for milestones, as we don't really use GitHub milestones in this repo. [#617]
 
 ## 12.3.3
 
