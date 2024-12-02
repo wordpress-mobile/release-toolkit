@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Introduce new `openai_generate` action to get responses to a prompt/question from OpenAI API. [#621]
 
 ### Bug Fixes
 
@@ -24,7 +24,7 @@ _None_
 
 ### Bug Fixes
 
-- `DateVersionCalculator`: move next year calculation decision to the clients [#619]
+- `DateVersionCalculator`: move next year calculation decision to the clients. [#619]
 
 ### Internal Changes
 
@@ -34,8 +34,8 @@ _None_
 
 ### Bug Fixes
 
-- Fix `check_fonts_installed` step in `create_promo_screenshots` [#615]
-- Fix broken `draw_text_to_canvas` method for `create_promo_screenshots` [#614]
+- Fix `check_fonts_installed` step in `create_promo_screenshots`. [#615]
+- Fix broken `draw_text_to_canvas` method for `create_promo_screenshots`. [#614]
 
 ## 12.3.2
 
