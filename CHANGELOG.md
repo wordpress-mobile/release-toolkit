@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- `DateVersionCalculator`: move next year calculation decision to the clients [#619]
 
 ### Internal Changes
 
