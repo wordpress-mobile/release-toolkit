@@ -63,6 +63,10 @@ module Fastlane
         }
       end
 
+      #####################################################
+      # @!group Documentation
+      #####################################################
+
       def self.description
         'Use OpenAI API to generate response to a prompt'
       end
@@ -72,7 +76,7 @@ module Fastlane
       end
 
       def self.return_value
-        'The response from the prompt as returned by OpenAI API'
+        'The response text from the prompt as returned by OpenAI API'
       end
 
       def self.details
@@ -80,6 +84,20 @@ module Fastlane
           Uses the OpenAPI API to generate response to a prompt.
           Can be used to e.g. ask it to generate Release Notes based on a bullet point technical changelog or similar.
         DETAILS
+      end
+
+      def self.examples
+        [
+          <<~EXEMPLE,
+            items = extract_release_notes_for_version(version: app_version, release_notes_file_path: 'RELEASE-NOTES.txt')
+            nice_changelog = openai_generate(
+              prompt: ':release_notes', # Uses the pre-crafted prompt for App Store / Play Store release notes
+              question: "Help me write release notes for the following items:\n#{items}"
+              api_token = get_required_env('OPENAI_API_TOKEN')
+            )
+            File.write(File.join('fastlane', 'metadata', 'android', en-US', 'changelogs', 'default.txt'), nice_changelog)
+          EXEMPLE
+        ]
       end
 
       def self.available_prompt_symbols
@@ -115,7 +133,7 @@ module Fastlane
         ]
       end
 
-      def self.is_supported?(platform)
+      def self.is_supported?(_platform)
         true
       end
     end
