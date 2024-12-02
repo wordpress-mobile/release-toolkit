@@ -36,7 +36,7 @@ module Fastlane
           json = JSON.parse(response.body)
           json['choices']&.first&.dig('message', 'content')
         else
-          UI.user_error!("Error in OpenAPI API response: #{response}. #{response.body}")
+          UI.user_error!("Error in OpenAI API response: #{response}. #{response.body}")
         end
       end
 
@@ -81,7 +81,7 @@ module Fastlane
 
       def self.details
         <<~DETAILS
-          Uses the OpenAPI API to generate response to a prompt.
+          Uses the OpenAI API to generate response to a prompt.
           Can be used to e.g. ask it to generate Release Notes based on a bullet point technical changelog or similar.
         DETAILS
       end
@@ -91,9 +91,9 @@ module Fastlane
           <<~EXEMPLE,
             items = extract_release_notes_for_version(version: app_version, release_notes_file_path: 'RELEASE-NOTES.txt')
             nice_changelog = openai_generate(
-              prompt: ':release_notes', # Uses the pre-crafted prompt for App Store / Play Store release notes
-              question: "Help me write release notes for the following items:\n#{items}"
-              api_token = get_required_env('OPENAI_API_TOKEN')
+              prompt: :release_notes, # Uses the pre-crafted prompt for App Store / Play Store release notes
+              question: "Help me write release notes for the following items:\n#{items}",
+              api_token: get_required_env('OPENAI_API_TOKEN')
             )
             File.write(File.join('fastlane', 'metadata', 'android', en-US', 'changelogs', 'default.txt'), nice_changelog)
           EXEMPLE
@@ -125,8 +125,8 @@ module Fastlane
                                        default_value: nil,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :api_token,
-                                       description: 'The OpenAPI API Token to use for the request',
-                                       env_name: 'OPENAPI_API_TOKEN',
+                                       description: 'The OpenAI API Token to use for the request',
+                                       env_name: 'OPENAI_API_TOKEN',
                                        optional: false,
                                        sensitive: true,
                                        type: String),
