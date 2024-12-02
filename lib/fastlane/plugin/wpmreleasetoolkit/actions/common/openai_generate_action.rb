@@ -34,9 +34,7 @@ module Fastlane
         case response
         when Net::HTTPOK
           json = JSON.parse(response.body)
-          best_choice = json['choices']&.first
-          UI.abort_with_message!("Unable to parse OpenAPI response\n#{json}") if best_choice.nil?
-          best_choice['message']['content']
+          json['choices']&.first&.dig('message', 'content')
         else
           UI.user_error!("Error in OpenAPI API response: #{response}. #{response.body}")
         end
