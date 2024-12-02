@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Fastlane::Actions::OpenaiGenerateAction do
   let(:fake_token) { 'sk-proj-faketok' }
   let(:endpoint) { Fastlane::Actions::OpenaiGenerateAction::OPENAI_API_ENDPOINT }
-  let(:release_notes_prompt) { Fastlane::Actions::OpenaiGenerateAction::RELEASE_NOTES_PROMPT }
+  let(:release_notes_prompt) { Fastlane::Actions::OpenaiGenerateAction::PREDEFINED_PROMPTS[:release_notes] }
 
   def stubbed_response(text)
     <<~JSON
@@ -106,7 +106,7 @@ describe Fastlane::Actions::OpenaiGenerateAction do
     TEXT
 
     result = run_test(
-      prompt_param: ':release_notes',
+      prompt_param: :release_notes,
       question_param: "Help me write release notes for the following items:\n#{changelog}",
       expected_prompt: release_notes_prompt,
       expected_response: expected_response

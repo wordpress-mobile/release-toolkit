@@ -7,18 +7,20 @@ module Fastlane
     class OpenaiGenerateAction < Action
       OPENAI_API_ENDPOINT = URI('https://api.openai.com/v1/chat/completions').freeze
 
-      RELEASE_NOTES_PROMPT = <<~PROMPT.freeze
-        Act like a mobile app marketer who wants to prepare release notes for Google Play and App Store.
-        Do not write it point by point and keep it under 350 characters. It should be a unique paragraph.
+      PREDEFINED_PROMPTS = {
+        release_notes: <<~PROMPT.freeze
+          Act like a mobile app marketer who wants to prepare release notes for Google Play and App Store.
+          Do not write it point by point and keep it under 350 characters. It should be a unique paragraph.
 
-        When provided a list, use the number of any potential "*" in brackets at the start of each item as indicator of importance.
-        Ignore items starting with "[Internal]", and ignore links to GitHub.
-      PROMPT
+          When provided a list, use the number of any potential "*" in brackets at the start of each item as indicator of importance.
+          Ignore items starting with "[Internal]", and ignore links to GitHub.
+        PROMPT
+      }.freeze
 
       def self.run(params)
         api_token = params[:api_token]
         prompt = params[:prompt]
-        prompt = RELEASE_NOTES_PROMPT if prompt == ':release_notes'
+        prompt = PREDEFINED_PROMPTS[prompt] if PREDEFINED_PROMPTS.key?(prompt)
         question = params[:question]
 
         headers = {
@@ -82,13 +84,25 @@ module Fastlane
         DETAILS
       end
 
+      def self.available_prompt_symbols
+        PREDEFINED_PROMPTS.keys.map { |v| "`:#{v}`" }.join(',')
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :prompt,
-                                       description: 'The internal top-level instructions to give to the model to tell it how to behave. Use `:release_notes` to use a predefined prompt to ask to write release notes from a changelog list',
+                                       description: 'The internal top-level instructions to give to the model to tell it how to behave. ' \
+                                        + "Use a Ruby Symbol from one of [#{available_prompt_symbols}] to use a predefined prompt instead of writing your own",
                                        optional: true,
                                        default_value: nil,
-                                       type: String),
+                                       type: String,
+                                       skip_type_validation: true,
+                                       verify_block: proc do |value|
+                                         next if value.is_a?(String)
+                                         next if PREDEFINED_PROMPTS.include?(value)
+
+                                         UI.user_error!("Parameter `prompt` can only be a String or one of the following Symbols: [#{available_prompt_symbols}]")
+                                       end),
           FastlaneCore::ConfigItem.new(key: :question,
                                        description: 'The user message to ask the question to the OpenAI model',
                                        optional: false,
