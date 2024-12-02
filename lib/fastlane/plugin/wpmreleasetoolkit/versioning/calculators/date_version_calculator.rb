@@ -8,19 +8,18 @@ module Fastlane
       class DateVersionCalculator < AbstractVersionCalculator
         # Calculate the next date-based release version.
         #
-        # If the current month is December, the method prompts the user to determine if the next
-        # release will be the first release of the next year. If so, it increments the major version
-        # and sets the minor version to 1, resetting the patch and build number components to zero.
-        # Otherwise, it calculates the next minor version.
+        # When increment_to_next_year is true, increments the major version (representing the year) and resets all other
+        # components (minor to 1, patch and build number to 0). Otherwise, calculates the
+        # next minor version using the parent class implementation.
         #
         # @param [AppVersion] version The version to calculate the next date-based release version for.
+        # @param [Boolean] increment_to_next_year Whether to increment the version to the next year. Defaults to false.
         #
         # @return [AppVersion] The next date-based release version.
         #
-        def next_release_version(version:)
-          new_version = version.dup
-          first_release_of_year = FastlaneCore::UI.confirm('Is this release the first release of next year?') if Time.now.month == 12
-          if first_release_of_year
+        def next_release_version(version:, increment_to_next_year: false)
+          if increment_to_next_year
+            new_version = version.dup
             new_version.major += 1
             new_version.minor = 1
             new_version.patch = 0
