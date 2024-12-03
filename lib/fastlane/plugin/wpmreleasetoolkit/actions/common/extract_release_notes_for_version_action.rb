@@ -41,7 +41,7 @@ module Fastlane
 
       def self.check_and_commit_extracted_notes_file(file_path, version)
         Action.sh("git add #{file_path}")
-        Action.sh("git diff-index --quiet HEAD || git commit -m \"Update draft release notes for #{version}.\"")
+        Action.sh("git diff-index --quiet HEAD || git commit -m \"Update draft release notes for #{version}\"")
       end
 
       def self.description
