@@ -4,7 +4,7 @@ require 'json'
 
 module Fastlane
   module Actions
-    class OpenaiGenerateAction < Action
+    class OpenaiAskAction < Action
       OPENAI_API_ENDPOINT = URI('https://api.openai.com/v1/chat/completions').freeze
 
       PREDEFINED_PROMPTS = {
@@ -90,7 +90,7 @@ module Fastlane
         [
           <<~EXEMPLE,
             items = extract_release_notes_for_version(version: app_version, release_notes_file_path: 'RELEASE-NOTES.txt')
-            nice_changelog = openai_generate(
+            nice_changelog = openai_ask(
               prompt: :release_notes, # Uses the pre-crafted prompt for App Store / Play Store release notes
               question: "Help me write release notes for the following items:\n#{items}",
               api_token: get_required_env('OPENAI_API_TOKEN')

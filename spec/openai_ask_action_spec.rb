@@ -1,9 +1,8 @@
 require 'spec_helper'
 
-describe Fastlane::Actions::OpenaiGenerateAction do
+describe Fastlane::Actions::OpenaiAskAction do
   let(:fake_token) { 'sk-proj-faketok' }
-  let(:endpoint) { Fastlane::Actions::OpenaiGenerateAction::OPENAI_API_ENDPOINT }
-  let(:release_notes_prompt) { Fastlane::Actions::OpenaiGenerateAction::PREDEFINED_PROMPTS[:release_notes] }
+  let(:endpoint) { Fastlane::Actions::OpenaiAskAction::OPENAI_API_ENDPOINT }
 
   def stubbed_response(text)
     <<~JSON
@@ -71,7 +70,7 @@ describe Fastlane::Actions::OpenaiGenerateAction do
       expect(messages[1]['content']).to eq(['type' => 'text', 'text' => question_param])
     end
 
-    # Ensure the request has been made and the response is as expected
+    # Ensure the request has been made and return the action response for it to be validated in calling test
     expect(stub).to have_been_requested
     result
   end
@@ -108,7 +107,7 @@ describe Fastlane::Actions::OpenaiGenerateAction do
     result = run_test(
       prompt_param: :release_notes,
       question_param: "Help me write release notes for the following items:\n#{changelog}",
-      expected_prompt: release_notes_prompt,
+      expected_prompt: Fastlane::Actions::OpenaiAskAction::PREDEFINED_PROMPTS[:release_notes],
       expected_response: expected_response
     )
 
