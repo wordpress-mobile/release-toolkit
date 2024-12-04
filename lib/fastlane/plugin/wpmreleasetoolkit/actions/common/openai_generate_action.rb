@@ -95,7 +95,7 @@ module Fastlane
               question: "Help me write release notes for the following items:\n#{items}",
               api_token: get_required_env('OPENAI_API_TOKEN')
             )
-            File.write(File.join('fastlane', 'metadata', 'android', en-US', 'changelogs', 'default.txt'), nice_changelog)
+            File.write(File.join('fastlane', 'metadata', 'android', 'en-US', 'changelogs', 'default.txt'), nice_changelog)
           EXEMPLE
         ]
       end
