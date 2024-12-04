@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- Introduce new `openai_generate` action to get responses to a prompt/question from OpenAI API. [#621]
+- Introduce new `openai_ask` action to get responses to a prompt/question from OpenAI API. [#621]
 
 ### Bug Fixes
 
