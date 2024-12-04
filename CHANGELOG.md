@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Remove period from "Update draft release notes..." commit message [#622]
 
 ### Internal Changes
 

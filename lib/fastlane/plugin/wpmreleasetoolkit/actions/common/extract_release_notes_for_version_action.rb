@@ -17,7 +17,7 @@ module Fastlane
         return if extracted_notes_file.nil?
 
         extracted_notes_file.close
-        check_and_commit_extracted_notes_file(extracted_notes_file_path, version)
+        commit_extracted_notes_file(extracted_notes_file_path, version)
       end
 
       def self.extract_notes(release_notes_file_path, version)
@@ -39,9 +39,13 @@ module Fastlane
         end
       end
 
-      def self.check_and_commit_extracted_notes_file(file_path, version)
-        Action.sh("git add #{file_path}")
-        Action.sh("git diff-index --quiet HEAD || git commit -m \"Update draft release notes for #{version}.\"")
+      def self.commit_extracted_notes_file(file_path, version)
+        other_action.git_add(path: file_path)
+        other_action.git_commit(
+          path: file_path,
+          message: "Update draft release notes for #{version}",
+          allow_nothing_to_commit: true
+        )
       end
 
       def self.description
