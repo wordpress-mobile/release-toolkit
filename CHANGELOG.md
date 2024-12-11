@@ -11,6 +11,7 @@ _None_
 ### New Features
 
 - Introduce new `openai_ask` action to get responses to a prompt/question from OpenAI API. [#621]
+- Allow `extract_release_notes_for_version` to return the extracted release notes without saving to a file. [#623]
 
 ### Bug Fixes
 

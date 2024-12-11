@@ -8,16 +8,18 @@ module Fastlane
         release_notes_file_path = params[:release_notes_file_path]
         extracted_notes_file_path = params[:extracted_notes_file_path]
 
-        extracted_notes_file = File.open(extracted_notes_file_path, 'w') unless extracted_notes_file_path.blank?
-
+        extracted_notes = ''
         extract_notes(release_notes_file_path, version) do |line|
-          extracted_notes_file.nil? ? puts(line) : extracted_notes_file.write(line)
+          extracted_notes += line
+        end
+        extracted_notes.chomp!('') # Remove any extra empty line(s) at the end
+
+        unless extracted_notes_file_path.nil? || extracted_notes_file_path.empty?
+          File.write(extracted_notes_file_path, extracted_notes)
+          commit_extracted_notes_file(extracted_notes_file_path, version)
         end
 
-        return if extracted_notes_file.nil?
-
-        extracted_notes_file.close
-        commit_extracted_notes_file(extracted_notes_file_path, version)
+        extracted_notes
       end
 
       def self.extract_notes(release_notes_file_path, version)
@@ -57,7 +59,7 @@ module Fastlane
       end
 
       def self.return_value
-        # If your method provides a return value, you can describe here what it does
+        'The content of the extracted release notes (the same text as what was written in the `extracted_notes_file_path` if one was provided)'
       end
 
       def self.details
