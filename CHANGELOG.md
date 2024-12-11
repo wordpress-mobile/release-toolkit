@@ -10,16 +10,26 @@ _None_
 
 ### New Features
 
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 12.4.0
+
+### New Features
+
 - Introduce new `openai_ask` action to get responses to a prompt/question from OpenAI API. [#621]
 - Allow `extract_release_notes_for_version` to return the extracted release notes without saving to a file. [#623]
 
 ### Bug Fixes
 
 - Remove period from "Update draft release notes..." commit message [#622]
-
-### Internal Changes
-
-_None_
 
 ## 12.3.4
 
