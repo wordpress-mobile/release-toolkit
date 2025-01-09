@@ -36,7 +36,7 @@ module Fastlane
           in_quoted_key: {
             '"' => lambda do |state, _|
               state.found_key = state.buffer.string.dup
-              state.buffer.string = ''
+              state.buffer = StringIO.new
               :after_quoted_key_before_eq
             end,
             /./u => lambda do |state, c|
