@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- The library now uses immutable literals, via `# frozen_strings_literal: true`. This may result in runtime issues that we will address ASAP once discovered [#626]
 
 ## 12.4.0
 
