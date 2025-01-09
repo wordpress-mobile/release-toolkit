@@ -33,7 +33,7 @@ module Fastlane
           end
         end
 
-        message = ''
+        message = String.new
         if non_stable_pods.empty?
           message << ALL_PODS_STABLE_MESSAGE
         else
