@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fastlane/action'
 require_relative '../../helper/metadata_download_helper'
 

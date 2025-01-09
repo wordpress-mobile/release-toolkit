@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   module Models
     # The `BuildCode` model represents a build code for an app. This could be the Version Code for an Android app or

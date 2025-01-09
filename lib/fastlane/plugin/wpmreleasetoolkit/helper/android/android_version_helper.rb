@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   module Helper
     module Android
@@ -5,9 +7,9 @@ module Fastlane
       #
       module VersionHelper
         # The key used in internal version Hash objects to hold the versionName value
-        VERSION_NAME = 'name'.freeze
+        VERSION_NAME = 'name'
         # The key used in internal version Hash objects to hold the versionCode value
-        VERSION_CODE = 'code'.freeze
+        VERSION_CODE = 'code'
         # The index for the major version number part
         MAJOR_NUMBER = 0
         # The index for the minor version number part
@@ -15,9 +17,9 @@ module Fastlane
         # The index for the hotfix version number part
         HOTFIX_NUMBER = 2
         # The prefix used in front of the versionName for alpha versions
-        ALPHA_PREFIX = 'alpha-'.freeze
+        ALPHA_PREFIX = 'alpha-'
         # The suffix used in the versionName for RC (beta) versions
-        RC_SUFFIX = '-rc'.freeze
+        RC_SUFFIX = '-rc'
 
         # Extract the version name and code from the release version of the app from `version.properties file`
         #

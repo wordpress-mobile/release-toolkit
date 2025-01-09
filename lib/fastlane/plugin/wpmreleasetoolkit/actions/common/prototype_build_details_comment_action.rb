@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   module Actions
     class PrototypeBuildDetailsCommentAction < Action
@@ -36,13 +38,13 @@ module Fastlane
       # @!group Helpers
       #####################################################
 
-      NO_INSTALL_URL_ERROR_MESSAGE = <<~NO_URL_ERROR.freeze
+      NO_INSTALL_URL_ERROR_MESSAGE = <<~NO_URL_ERROR
         No URL provided to download or install the app.
          - Either use this action right after using `appcenter_upload` and provide an `app_center_org_name` (so that this action can use the link to the App Center build)
          - Or provide an explicit value for the `download_url` parameter
       NO_URL_ERROR
 
-      DEFAULT_APP_CENTER_FOOTNOTE = '<em>Automatticians: You can use our internal self-serve MC tool to give yourself access to App Center if needed.</em>'.freeze
+      DEFAULT_APP_CENTER_FOOTNOTE = '<em>Automatticians: You can use our internal self-serve MC tool to give yourself access to App Center if needed.</em>'
 
       # A small model struct to consolidate and pack all the values related to App Center
       #

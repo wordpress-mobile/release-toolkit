@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fastlane/action'
 require 'date'
 require_relative '../../helper/github_helper'

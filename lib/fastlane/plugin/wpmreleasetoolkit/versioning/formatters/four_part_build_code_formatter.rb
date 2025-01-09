@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../formatters/four_part_version_formatter'
 
 module Fastlane

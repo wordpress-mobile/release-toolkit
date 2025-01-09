@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'fastlane/action'
 require 'rubygems/command_manager'
 
 module Fastlane
   module Actions
     class CheckForToolkitUpdatesAction < Action
-      TOOLKIT_SPEC_NAME = 'fastlane-plugin-wpmreleasetoolkit'.freeze
+      TOOLKIT_SPEC_NAME = 'fastlane-plugin-wpmreleasetoolkit'
 
       def self.run(params)
         updater = Gem::CommandManager.instance[:update]

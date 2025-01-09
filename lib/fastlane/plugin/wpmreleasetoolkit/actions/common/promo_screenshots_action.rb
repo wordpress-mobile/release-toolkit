@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'fastlane/action'
 require 'active_support/all'

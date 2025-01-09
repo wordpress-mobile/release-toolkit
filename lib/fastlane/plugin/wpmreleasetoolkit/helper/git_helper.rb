@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'git'
 
 module Fastlane
@@ -6,7 +8,7 @@ module Fastlane
     #
     module GitHelper
       # Fallback default branch of the client repository.
-      DEFAULT_GIT_BRANCH = 'trunk'.freeze
+      DEFAULT_GIT_BRANCH = 'trunk'
 
       # Checks if the given path, or current directory if no path is given, is inside a Git repository
       #

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fastlane/action'
 require_relative '../../helper/metadata/release_note_metadata_block'
 require_relative '../../helper/metadata/release_note_short_metadata_block'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This action is the new version of android_update_metadata (AndroidUpdateMetadataAction) and should now be used instead of that one
 
 module Fastlane

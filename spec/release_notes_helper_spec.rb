@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tmpdir'
 require_relative 'spec_helper'
 
@@ -59,7 +61,7 @@ describe Fastlane::Helper::ReleaseNotesHelper do
   end
 end
 
-FAKE_CONTENT = <<~CONTENT.freeze
+FAKE_CONTENT = <<~CONTENT
   1.2.3
   -----
   - Item 1 for v1.2.3
@@ -73,7 +75,7 @@ FAKE_CONTENT = <<~CONTENT.freeze
   - Item 2 for v1.2.2
 CONTENT
 
-NEW_SECTION = <<~CONTENT.freeze
+NEW_SECTION = <<~CONTENT
   New Section
   -----
 

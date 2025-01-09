@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.shared_examples 'update_metadata_source_action' do |options|

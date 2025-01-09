@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'webmock/rspec'
 
@@ -297,7 +299,7 @@ describe Fastlane::Actions::CheckTranslationProgressAction do
 end
 
 def generate_glotpress_response_body(languages:)
-  response = ''
+  response = String.new
   response << generate_glotpress_response_header
   languages.each do |language|
     response << generate_glotpress_response_for_language(
@@ -335,7 +337,7 @@ def generate_glotpress_response_header
 end
 
 def generate_glotpress_response_for_language(lang:, lang_code:, current:, fuzzy:, waiting:, untranslated:, progress:)
-  res = "<tr class=\"odd\">\n"
+  res = "<tr class=\"odd\">\n".dup
   res << generate_glotpress_response_header_for_language(lang: lang, lang_code: lang_code, progress: progress)
   res << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'translated', status: 'current', string_count: current)
   res << generate_glotpress_response_for_language_status(lang_code: lang_code, status_main: 'fuzzy', status: 'fuzzy', string_count: fuzzy)
@@ -345,7 +347,7 @@ def generate_glotpress_response_for_language(lang:, lang_code:, current:, fuzzy:
 end
 
 def generate_glotpress_response_header_for_language(lang:, lang_code:, progress:)
-  res = "<td>\n"
+  res = "<td>\n".dup
   res << "<strong><a href=\"/projects/apps/whatever/dev/#{lang_code}/default/\">#{lang}</a></strong>\n"
   res << "<span class=\"bubble morethan90\">#{progress}%</span>\n" if progress.to_i > 90
   res << "</td>\n"

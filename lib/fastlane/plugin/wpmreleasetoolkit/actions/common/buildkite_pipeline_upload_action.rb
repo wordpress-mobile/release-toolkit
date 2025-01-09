@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module Fastlane
   module Actions
     class BuildkitePipelineUploadAction < Action
-      DEFAULT_BUILDKITE_PIPELINE_FOLDER = '.buildkite'.freeze
+      DEFAULT_BUILDKITE_PIPELINE_FOLDER = '.buildkite'
       DEFAULT_ENV_FILE = File.join(DEFAULT_BUILDKITE_PIPELINE_FOLDER, 'shared-pipeline-vars').freeze
 
       def self.run(params)

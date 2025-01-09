@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rake'
 require 'tmpdir'
 
@@ -30,7 +32,7 @@ task :docstats, [:path] do |_, args|
   sh('yard', 'stats', '--list-undoc', path)
 end
 
-GEM_NAME = 'fastlane-plugin-wpmreleasetoolkit'.freeze
+GEM_NAME = 'fastlane-plugin-wpmreleasetoolkit'
 VERSION_FILE = File.join('lib', 'fastlane', 'plugin', 'wpmreleasetoolkit', 'version.rb')
 
 desc 'Create a new version of the release-toolkit gem'

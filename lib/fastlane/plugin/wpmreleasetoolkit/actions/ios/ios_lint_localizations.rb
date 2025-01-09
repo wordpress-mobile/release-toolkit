@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   module Actions
     class IosLintLocalizationsAction < Action
@@ -68,7 +70,7 @@ module Fastlane
         duplicate_keys
       end
 
-      RETRY_MESSAGE = <<~MSG.freeze
+      RETRY_MESSAGE = <<~MSG
         Inconsistencies found during Localization linting.
         You need to fix them before continuing. From this point on, you should either:
 
@@ -91,7 +93,7 @@ module Fastlane
         Did you fix the `.strings` files locally and want to lint them again?
       MSG
 
-      ABORT_MESSAGE = <<~MSG.freeze
+      ABORT_MESSAGE = <<~MSG
         Inconsistencies found during Localization linting. Aborting.
       MSG
 
