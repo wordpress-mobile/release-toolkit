@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'release_note_metadata_block'
 
 module Fastlane

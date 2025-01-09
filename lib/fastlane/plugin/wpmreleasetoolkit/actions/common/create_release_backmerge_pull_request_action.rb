@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'fastlane/action'
 require_relative '../../helper/github_helper'
 
 module Fastlane
   module Actions
     class CreateReleaseBackmergePullRequestAction < Action
-      DEFAULT_BRANCH = 'trunk'.freeze
+      DEFAULT_BRANCH = 'trunk'
 
       def self.run(params)
         token = params[:github_token]

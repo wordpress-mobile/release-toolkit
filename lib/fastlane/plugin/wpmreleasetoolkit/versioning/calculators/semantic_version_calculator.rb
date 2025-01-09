@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'abstract_version_calculator'
 
 module Fastlane

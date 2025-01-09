@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'plist'
 require_relative '../../helper/app_size_metrics_helper'
 
@@ -5,9 +7,9 @@ module Fastlane
   module Actions
     class IosSendAppSizeMetricsAction < Action
       # Keys used by the metrics payload
-      IPA_FILE_SIZE_KEY = 'File Size'.freeze         # value from `File.size` of the Universal `.ipa`
-      IPA_DOWNLOAD_SIZE_KEY = 'Download Size'.freeze # value from `app-thinning.plist`
-      IPA_INSTALL_SIZE_KEY = 'Install Size'.freeze   # value from `app-thinning.plist`
+      IPA_FILE_SIZE_KEY = 'File Size'         # value from `File.size` of the Universal `.ipa`
+      IPA_DOWNLOAD_SIZE_KEY = 'Download Size' # value from `app-thinning.plist`
+      IPA_INSTALL_SIZE_KEY = 'Install Size'   # value from `app-thinning.plist`
 
       def self.run(params)
         # Check input parameters

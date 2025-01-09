@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'abstract_version_formatter'
 
 module Fastlane
@@ -7,7 +9,7 @@ module Fastlane
       # formatter for apps that may use versions in the format of `1.2.3-rc-4`.
       class RCNotationVersionFormatter < AbstractVersionFormatter
         # The string identifier used for beta versions in Android.
-        RC_SUFFIX = 'rc'.freeze
+        RC_SUFFIX = 'rc'
 
         # Parse the version string into an AppVersion instance
         #

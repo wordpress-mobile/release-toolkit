@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   module Models
     # The AppVersion model represents a version of an app with major, minor, patch, and build number components.

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fastlane_core/ui/ui'
 require 'fileutils'
 require 'nokogiri'
@@ -9,7 +11,7 @@ module Fastlane
   module Helper
     module Android
       module LocalizeHelper
-        LIB_SOURCE_XML_ATTR = 'a8c-src-lib'.freeze
+        LIB_SOURCE_XML_ATTR = 'a8c-src-lib'
 
         # Checks if `string_node` has the `content_override` flag set
         def self.skip_string_by_tag?(string_node)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Console
   # ANSI colors
   RED = 1

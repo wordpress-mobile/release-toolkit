@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   class FirebaseTestLabResult
     def initialize(log_file_path:)

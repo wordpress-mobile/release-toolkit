@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 require_relative '../../helper/app_size_metrics_helper'
 
 module Fastlane
   module Actions
     class AndroidSendAppSizeMetricsAction < Action
       # Keys used by the metrics payload
-      AAB_FILE_SIZE_KEY = 'AAB File Size'.freeze                     # value from `File.size` of the `.aab`
-      UNIVERSAL_APK_FILE_SIZE_KEY = 'Universal APK File Size'.freeze # value from `File.size` of the Universal `.apk`
-      UNIVERSAL_APK_SPLIT_NAME = 'Universal'.freeze                  # pseudo-name of the split representing the Universal `.apk`
-      APK_OPTIMIZED_FILE_SIZE_KEY = 'Optimized APK File Size'.freeze # value from `apkanalyzer apk file-size`
-      APK_OPTIMIZED_DOWNLOAD_SIZE_KEY = 'Download Size'.freeze       # value from `apkanalyzer apk download-size`
+      AAB_FILE_SIZE_KEY = 'AAB File Size'                     # value from `File.size` of the `.aab`
+      UNIVERSAL_APK_FILE_SIZE_KEY = 'Universal APK File Size' # value from `File.size` of the Universal `.apk`
+      UNIVERSAL_APK_SPLIT_NAME = 'Universal'                  # pseudo-name of the split representing the Universal `.apk`
+      APK_OPTIMIZED_FILE_SIZE_KEY = 'Optimized APK File Size' # value from `apkanalyzer apk file-size`
+      APK_OPTIMIZED_DOWNLOAD_SIZE_KEY = 'Download Size'       # value from `apkanalyzer apk download-size`
 
       def self.run(params)
         # Check input parameters

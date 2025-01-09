@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   class FirebaseDevice
     attr_reader :model, :version, :locale, :orientation

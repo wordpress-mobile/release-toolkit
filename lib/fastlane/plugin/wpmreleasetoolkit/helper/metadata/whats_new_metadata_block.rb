@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'standard_metadata_block'
 
 module Fastlane

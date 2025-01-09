@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fastlane/action'
 require 'net/http'
 require 'json'
@@ -8,7 +10,7 @@ module Fastlane
       OPENAI_API_ENDPOINT = URI('https://api.openai.com/v1/chat/completions').freeze
 
       PREDEFINED_PROMPTS = {
-        release_notes: <<~PROMPT.freeze
+        release_notes: <<~PROMPT
           Act like a mobile app marketer who wants to prepare release notes for Google Play and App Store.
           Do not write it point by point and keep it under 350 characters. It should be a unique paragraph.
 

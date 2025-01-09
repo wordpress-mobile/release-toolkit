@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'yaml'
 require 'tmpdir'
 
@@ -5,9 +7,9 @@ module Fastlane
   module Helper
     module Ios
       class L10nLinterHelper
-        SWIFTGEN_VERSION = '6.6.2'.freeze
-        DEFAULT_BASE_LANG = 'en'.freeze
-        CONFIG_FILE_NAME = 'swiftgen-stringtypes.yml'.freeze
+        SWIFTGEN_VERSION = '6.6.2'
+        DEFAULT_BASE_LANG = 'en'
+        CONFIG_FILE_NAME = 'swiftgen-stringtypes.yml'
 
         attr_reader :install_path, :version
 
