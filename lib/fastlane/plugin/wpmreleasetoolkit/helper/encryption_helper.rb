@@ -21,23 +21,19 @@ module Fastlane
 
       def self.encrypt(plain_text, key)
         # Ensure consistent encoding
-        plain_text.force_encoding(Encoding::UTF_8)
+        sanitized_plain_text = plain_text.dup.force_encoding(Encoding::UTF_8)
 
         cipher = cipher(OperationType::ENCRYPT)
         cipher.key = key
 
-        encrypted = cipher.update(plain_text)
-        encrypted << cipher.final
-
-        encrypted
+        cipher.update(sanitized_plain_text) + cipher.final
       end
 
       def self.decrypt(encrypted, key)
         cipher = cipher(OperationType::DECRYPT)
         cipher.key = key
 
-        decrypted = cipher.update(encrypted)
-        decrypted << cipher.final
+        decrypted = cipher.update(encrypted) + cipher.final
 
         # Ensure consistent encoding
         decrypted.force_encoding(Encoding::UTF_8)
