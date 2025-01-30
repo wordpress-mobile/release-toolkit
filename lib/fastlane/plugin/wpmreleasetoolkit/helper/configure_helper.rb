@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+require 'English'
 require 'fastlane_core/ui/ui'
 require 'fileutils'
 
@@ -12,7 +15,7 @@ module Fastlane
       ### If the file doesn't exist, it'll return an empty Configuration
       ### that can later be saved to `.configure`.
       def self.configuration
-        if self.configuration_path_exists
+        if configuration_path_exists
           Configuration.from_file(FilesystemHelper.configure_file)
         else
           Configuration.new
@@ -72,7 +75,7 @@ module Fastlane
       ### NB: Returns nil if the repo is in a detached HEAD state.
       def self.repo_branch_name
         result = `cd #{repository_path} && git rev-parse --abbrev-ref HEAD`.strip
-        (result == 'HEAD') ? nil : result
+        result == 'HEAD' ? nil : result
       end
 
       ### Returns the most recent commit hash in the `~/.mobile-secrets` repository.
@@ -95,13 +98,13 @@ module Fastlane
       ### Returns whether or not the `.configure` file has a pinned hash that's older than the most recent
       ### ~/.mobile-secrets` commit hash.
       def self.configure_file_is_behind_local
-        configure_file_commits_behind_repo > 0
+        configure_file_commits_behind_repo.positive?
       end
 
       def self.configure_file_commits_behind_repo
         # Get a large number of revisions to ensure we don't miss any
         result = `cd #{repository_path} && git --no-pager log -10000 --pretty=format:"%H" && echo`
-        hashes = result.each_line.map { |s| s.strip }.reverse
+        hashes = result.each_line.map(&:strip).reverse
 
         index_of_configure_hash = hashes.find_index(configure_file_commit_hash)
 
@@ -119,13 +122,13 @@ module Fastlane
       ### Get a list of files changed in the secrets repo between to commits
       def self.files_changed_between(commit_hash_1, commit_hash_2)
         result = `cd #{repository_path} && git diff --name-only #{commit_hash_1}...#{commit_hash_2}`
-        result.each_line.map { |s| s.strip }
+        result.each_line.map(&:strip)
       end
 
       ### Determine whether ~/.mobile-secrets` repository is behind its remote counterpart.
       ### (ie – the remote repo has changes that the local repo doesn't)
       def self.repo_is_behind_remote
-        repo_commits_behind_remote > 0
+        repo_commits_behind_remote.positive?
       end
 
       ### Determine how far behind the remote repo the ~/.mobile-secrets` repository is.
@@ -140,7 +143,7 @@ module Fastlane
       ### Determine whether ~/.mobile-secrets` repository is ahead of its remote counterpart.
       ### (ie – the local repo has changes that the remote repo doesn't)
       def self.repo_is_ahead_of_remote
-        repo_commits_ahead_of_remote > 0
+        repo_commits_ahead_of_remote.positive?
       end
 
       ### Determine how far ahead of the remote repo the ~/.mobile-secrets` repository is.
@@ -178,38 +181,36 @@ module Fastlane
 
       ### Returns the list of files to copy from `.configure`.
       def self.files_to_copy
-        self.configuration.files_to_copy
+        configuration.files_to_copy
       end
 
       ### Returns the list of files that this project uses from `.configure`.
       def self.file_dependencies
-        file_dependencies = self.configuration.file_dependencies
+        file_dependencies = configuration.file_dependencies
         file_dependencies ||= []
 
         # Allows support for specifying directories – they'll be expanded recursively
         expanded_file_dependencies = file_dependencies.map do |path|
-          abs_path = self.mobile_secrets_path(path)
+          abs_path = mobile_secrets_path(path)
 
-          if File.directory?(abs_path)
-            Dir.glob("#{abs_path}**/*").map do |sub_path|
-              sub_path.gsub("#{repository_path}/", '')
-            end
-          else
-            return path
+          return path unless File.directory?(abs_path)
+
+          Dir.glob("#{abs_path}**/*").map do |sub_path|
+            sub_path.gsub("#{repository_path}/", '')
           end
         end
 
-        self.files_to_copy.map { |o| o.file } + expanded_file_dependencies
+        files_to_copy.map(&:file) + expanded_file_dependencies
       end
 
       ## If we specify a directory in `file_dependencies` instead of listing each file
       ## individually, there may be new files that we don't know about. This method finds those.
       def self.new_files_in(files)
-        file_dependencies = self.configuration.file_dependencies
+        file_dependencies = configuration.file_dependencies
         file_dependencies ||= []
 
         directory_dependencies = file_dependencies.select do |path|
-          File.directory?(self.mobile_secrets_path(path))
+          File.directory?(mobile_secrets_path(path))
         end
 
         new_files = []
@@ -234,7 +235,7 @@ module Fastlane
           UI.user_error! "Attempted to add a file to a location which is not ignored under Git (#{params[:destination]}). Please either edit your `.configure` file to use an already-ignored destination, or add that destination to the `.gitignore` manually to fix this."
         end
 
-        new_config = self.configuration
+        new_config = configuration
         new_config.add_file_to_copy(params[:source], params[:destination], encrypt: params[:encrypt])
         update_configuration(new_config)
       end
@@ -280,7 +281,7 @@ module Fastlane
         `cd #{repository_path} && git add keys.json && git commit -m "Update keys.json for #{configuration.project_name}" && git push origin #{repo_branch_name}`
 
         # Check command success
-        UI.user_error!("Failed to update encryption key for #{configuration.project_name}") unless $?.success?
+        UI.user_error!("Failed to update encryption key for #{configuration.project_name}") unless $CHILD_STATUS.success?
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../../helper/ios/ios_adc_app_sizes_helper'
 
 module Fastlane
@@ -27,7 +29,7 @@ module Fastlane
           end
         end
 
-        return app_sizes
+        app_sizes
       end
 
       #####################################################
@@ -114,7 +116,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'git'
 
 module Fastlane
@@ -6,7 +8,7 @@ module Fastlane
     #
     module GitHelper
       # Fallback default branch of the client repository.
-      DEFAULT_GIT_BRANCH = 'trunk'.freeze
+      DEFAULT_GIT_BRANCH = 'trunk'
 
       # Checks if the given path, or current directory if no path is given, is inside a Git repository
       #
@@ -25,7 +27,7 @@ module Fastlane
 
         # If we reached the root, we haven't found a repo.
         # (Technically, there could be a repo in the root of the system, but that's a usecase that we don't need to support at this time)
-        return dir.root? == false
+        dir.root? == false
       end
 
       # Travels back the hierarchy of the given path until it finds an existing ancestor, or it reaches the root of the file system.
@@ -37,7 +39,7 @@ module Fastlane
       def self.first_existing_ancestor_of(path:)
         p = Pathname(path).expand_path
         p = p.parent until p.exist? || p.root?
-        return p
+        p
       end
 
       # Check if the current directory has git-lfs enabled
@@ -47,7 +49,7 @@ module Fastlane
       def self.has_git_lfs?
         return false unless is_git_repo?
 
-        `git config --get-regex lfs`.length > 0
+        !`git config --get-regex lfs`.empty?
       end
 
       # Switch to the given branch and pull its latest commits.
@@ -62,27 +64,20 @@ module Fastlane
         branch = branch.first.join('/') if branch.is_a?(Hash)
         Action.sh('git', 'checkout', branch)
         Action.sh('git', 'pull')
-        return true
-      rescue
-        return false
+        true
+      rescue StandardError
+        false
       end
 
-      # Update every submodule in the current git repository
-      #
-      def self.update_submodules
-        Action.sh('git', 'submodule', 'update', '--init', '--recursive')
-      end
-
-      # Create a new branch named `branch_name`, cutting it from branch/commit/tag `from`, and push it
+      # Create a new branch named `branch_name`, cutting it from branch/commit/tag `from`
       #
       # If the branch with that name already exists, it will instead switch to it and pull new commits.
       #
       # @param [String] branch_name The full name of the new branch to create, e.g "release/1.2"
       # @param [String?] from The branch or tag from which to cut the branch from.
       #        If `nil`, will cut the new branch from the current commit. Otherwise, will checkout that commit/branch/tag before cutting the branch.
-      # @param [Bool] push If true, will also push the branch to `origin`, tracking the upstream branch with the local one.
       #
-      def self.create_branch(branch_name, from: nil, push: true)
+      def self.create_branch(branch_name, from: nil)
         if branch_exists?(branch_name)
           UI.message("Branch #{branch_name} already exists. Skipping creation.")
           Action.sh('git', 'checkout', branch_name)
@@ -90,22 +85,19 @@ module Fastlane
         else
           Action.sh('git', 'checkout', from) unless from.nil?
           Action.sh('git', 'checkout', '-b', branch_name)
-          Action.sh('git', 'push', '-u', 'origin', branch_name) if push
         end
       end
 
       # `git add` the specified files (if any provided) then commit them using the provided message.
-      # Optionally, push the commit to the remote too.
       #
       # @param [String] message The commit message to use
       # @param [String|Array<String>] files A file or array of files to git-add before creating the commit.
       #        Use `nil` or `[]` if you already added the files in a separate step and don't wan't this method to add any new file before commit.
       #        Also accepts the special symbol `:all` to add all the files (`git commit -a -m …`).
-      # @param [Bool] push If true, will `git push` to `origin` after the commit has been created. Defaults to `false`.
       #
-      # @return [Bool] True if commit and push were successful, false if there was an issue during commit & push (most likely being "nothing to commit").
+      # @return [Bool] True if commit was successful, false if there was an issue (most likely being "nothing to commit").
       #
-      def self.commit(message:, files: nil, push: false)
+      def self.commit(message:, files: nil)
         files = [files] if files.is_a?(String)
         args = []
         if files == :all
@@ -115,20 +107,27 @@ module Fastlane
         end
         begin
           Action.sh('git', 'commit', *args, '-m', message)
-          Action.sh('git', 'push', 'origin', 'HEAD') if push
-          return true
-        rescue
-          return false
+          true
+        rescue StandardError
+          false
         end
       end
 
       # Get the SHA of a given git ref. Typically useful to get the SHA of the current HEAD commit.
       #
-      # @param [String] ref The git ref (commit, branch name, 'HEAD', …) to resolve as a SHA
+      # @param ref [String]
+      #        The git ref (commit, branch name, 'HEAD', …) to resolve as a SHA
+      # @param prepend_origin_if_needed [Boolean]
+      #        If true, will retry the rev-parse by prefixing `origin/` to the ref it it failed without it
       # @return [String] The commit SHA of the ref
       #
-      def self.get_commit_sha(ref: 'HEAD')
-        Git.open(Dir.pwd).revparse(ref)
+      def self.get_commit_sha(ref: 'HEAD', prepend_origin_if_needed: false)
+        repo = Git.open(Dir.pwd)
+        repo.revparse(ref)
+      rescue Git::FailedError
+        raise unless prepend_origin_if_needed
+
+        repo.revparse("origin/#{ref}")
       end
 
       # Creates a tag for the given version, and optionally push it to the remote.
@@ -181,6 +180,55 @@ module Fastlane
         Action.sh('git', 'fetch', '--tags')
       end
 
+      # Use `git merge-base` to find as good a common ancestors as possible for a merge
+      #
+      # @param ref1 [String] The first git reference (sha1, ref name…)to find the common ancestor of
+      # @param ref2 [String] The second git reference (sha1, ref name…)to find the common ancestor of
+      # @return [String] The merge-base aka common ancestor for the 2 commits provided
+      # @note If a reference (e.g. branch name) can't be found locally, it will try with the same ref prefixed with `origin/`
+      #
+      def self.find_merge_base(ref1, ref2)
+        git_repo = Git.open(Dir.pwd)
+        # Resolve to shas, mostly so that we can support cases with and without `origin/` explicit prefix on branch names
+        ref1_sha, ref2_sha = [ref1, ref2].map { |ref| get_commit_sha(ref: ref, prepend_origin_if_needed: true) }
+
+        git_repo.merge_base(ref1_sha, ref2_sha)&.first&.sha
+      end
+
+      # Checks if two git references point to the same commit.
+      #
+      # @param ref1 [String] the first git reference to check.
+      # @param ref2 [String] the second git reference to check.
+      #
+      # @return [Boolean] true if the two references point to the same commit, false otherwise.
+      #
+      def self.point_to_same_commit?(ref1, ref2)
+        begin
+          ref1_sha = get_commit_sha(ref: ref1, prepend_origin_if_needed: true)
+          ref2_sha = get_commit_sha(ref: ref2, prepend_origin_if_needed: true)
+        rescue StandardError => e
+          UI.user_error! "Error fetching commits for #{ref1} and/or #{ref2}: #{e.message}"
+        end
+        ref1_sha == ref2_sha
+      end
+
+      # Returns the current git branch, or "HEAD" if it's not checked out to any branch
+      # Can NOT be replaced using the environment variables such as `GIT_BRANCH` or `BUILDKITE_BRANCH`
+      #
+      # `fastlane` already has a helper action for this called `git_branch`, however it's modified
+      # by CI environment variables. We need to check which branch we are actually on and not the
+      # initial branch a CI build is started from, so we are using the `git_branch_name_using_HEAD`
+      # helper instead.
+      #
+      # See https://docs.fastlane.tools/actions/git_branch/#git_branch
+      #
+      # @return [String] The current git branch, or "HEAD" if it's not checked out to any branch
+      #
+      def self.current_git_branch
+        # We can't use `other_action.git_branch`, because it is modified by environment variables in Buildkite.
+        Fastlane::Actions.git_branch_name_using_HEAD
+      end
+
       # Checks if a branch exists locally.
       #
       # @param [String] branch_name The name of the branch to check for
@@ -191,15 +239,41 @@ module Fastlane
         !Action.sh('git', 'branch', '--list', branch_name).empty?
       end
 
-      # Ensure that we are on the expected branch, and abort if not.
+      # Checks if a branch exists on the repository's remote.
       #
-      # @param [String] branch_name The name of the branch we expect to be on
+      # @param branch_name [String] the name of the branch to check.
+      # @param remote_name [String] the name of the remote repository (default is 'origin').
       #
-      # @raise [UserError] Raises a user_error! and interrupts the lane if we are not on the expected branch.
+      # @return [Boolean] true if the branch exists on remote, false otherwise.
       #
-      def self.ensure_on_branch!(branch_name)
-        current_branch_name = Action.sh('git', 'symbolic-ref', '-q', 'HEAD')
-        UI.user_error!("This command works only on #{branch_name} branch") unless current_branch_name.include?(branch_name)
+      def self.branch_exists_on_remote?(branch_name:, remote_name: 'origin')
+        !Action.sh('git', 'ls-remote', '--heads', remote_name, branch_name).empty?
+      end
+
+      # Delete a local branch if it exists.
+      #
+      # @param [String] branch_name The name of the local branch to delete.
+      # @return [Boolean] true if the branch was deleted, false if not (e.g. no such local branch existed in the first place)
+      #
+      def self.delete_local_branch_if_exists!(branch_name)
+        git_repo = Git.open(Dir.pwd)
+        return false unless git_repo.is_local_branch?(branch_name)
+
+        git_repo.branch(branch_name).delete
+        true
+      end
+
+      # Delete a remote branch if it exists.
+      #
+      # @param [String] branch_name The name of the remote branch to delete.
+      # @param [String] remote_name The name of the remote to delete the branch from. Defaults to 'origin'
+      # @return [Boolean] true if the branch was deleted, false if not (e.g. no such local branch existed in the first place)
+      #
+      def self.delete_remote_branch_if_exists!(branch_name, remote_name: 'origin')
+        git_repo = Git.open(Dir.pwd)
+        return false unless git_repo.branches.any? { |b| b.remote&.name == remote_name && b.name == branch_name }
+
+        git_repo.push(remote_name, branch_name, delete: true)
       end
 
       # Checks whether a given path is ignored by Git, relying on Git's `check-ignore` under the hood.

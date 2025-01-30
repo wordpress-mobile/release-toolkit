@@ -1,9 +1,5 @@
 import Foundation
 
-func PodLocalizedString(_ key: String, value: String? = nil, comment: StaticString) -> String {
-    Bundle(for: BundleToken.self).localizedString(forKey: key, value: value, table: nil)
-}
-
 enum PodClass1 {
     static let podString1 = NSLocalizedString("pod.key1", comment: "Pod key 1, no value")
     static let podString2 = NSLocalizedString("pod.key2",

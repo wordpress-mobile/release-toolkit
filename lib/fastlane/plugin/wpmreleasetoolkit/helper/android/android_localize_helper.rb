@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fastlane_core/ui/ui'
 require 'fileutils'
 require 'nokogiri'
@@ -9,7 +11,7 @@ module Fastlane
   module Helper
     module Android
       module LocalizeHelper
-        LIB_SOURCE_XML_ATTR = 'a8c-src-lib'.freeze
+        LIB_SOURCE_XML_ATTR = 'a8c-src-lib'
 
         # Checks if `string_node` has the `content_override` flag set
         def self.skip_string_by_tag?(string_node)
@@ -19,7 +21,7 @@ module Fastlane
             return true
           end
 
-          return false
+          false
         end
 
         # Checks if `string_name` is in the exclusion list
@@ -27,10 +29,10 @@ module Fastlane
           return false if library[:exclusions].nil?
 
           skip = library[:exclusions].include?(string_name)
-          if skip
-            UI.message " - Skipping #{string_name} string"
-            return true
-          end
+          return false unless skip
+
+          UI.message " - Skipping #{string_name} string"
+          true
         end
 
         # Adds the appropriate XML attributes to an XML `<string>` node according to library configuration
@@ -54,31 +56,30 @@ module Fastlane
           # Search for the string in the main file
           result = :added
           main_strings_xml.xpath('//string').each do |main_string_node|
-            if main_string_node.attr('name') == string_name
-              # Skip if the string has the content_override tag
-              return :skipped if skip_string_by_tag?(main_string_node)
+            next unless main_string_node.attr('name') == string_name
+            # Skip if the string has the content_override tag
+            return :skipped if skip_string_by_tag?(main_string_node)
 
-              # If nodes are equivalent, skip
-              return :found if lib_string_node =~ main_string_node
+            # If nodes are equivalent, skip
+            return :found if lib_string_node =~ main_string_node
 
-              # The string needs an update
-              if main_string_node.attr('tools:ignore').nil?
-                # No `tools:ignore` attribute; completely replace existing main string node with lib's one
-                add_xml_attributes!(lib_string_node, library)
-                main_string_node.replace lib_string_node
-              else
-                # Has the `tools:ignore` flag; update the content without touching the other existing attributes
-                add_xml_attributes!(main_string_node, library)
-                main_string_node.content = string_content
-              end
-              return :updated
+            # The string needs an update
+            if main_string_node.attr('tools:ignore').nil?
+              # No `tools:ignore` attribute; completely replace existing main string node with lib's one
+              add_xml_attributes!(lib_string_node, library)
+              main_string_node.replace lib_string_node
+            else
+              # Has the `tools:ignore` flag; update the content without touching the other existing attributes
+              add_xml_attributes!(main_string_node, library)
+              main_string_node.content = string_content
             end
+            return :updated
           end
 
           # String not found, or removed because needing update and not in the exclusion list: add to the main file
           add_xml_attributes!(lib_string_node, library)
-          main_strings_xml.xpath('//string').last().add_next_sibling("\n#{' ' * 4}#{lib_string_node.to_xml().strip}")
-          return result
+          main_strings_xml.xpath('//string').last.add_next_sibling("\n#{' ' * 4}#{lib_string_node.to_xml.strip}")
+          result
         end
 
         # Verify a string node from a library has properly been merged into the main one
@@ -91,14 +92,13 @@ module Fastlane
 
           # Search for the string in the main file
           main_strings_xml.xpath('//string').each do |main_string_node|
-            if main_string_node.attr('name') == string_name
-              # Skip if the string has the content_override tag
-              return if skip_string_by_tag?(main_string_node)
+            next unless main_string_node.attr('name') == string_name
+            # Skip if the string has the content_override tag
+            return if skip_string_by_tag?(main_string_node)
 
-              # Check if up-to-date
-              UI.user_error!("String #{string_name} [#{string_content}] has been updated in the main file but not in the library #{library[:library]}.") if main_string_node.content != string_content
-              return
-            end
+            # Check if up-to-date
+            UI.user_error!("String #{string_name} [#{string_content}] has been updated in the main file but not in the library #{library[:library]}.") if main_string_node.content != string_content
+            return
           end
 
           # String not found and not in the exclusion list
@@ -133,14 +133,14 @@ module Fastlane
             case res
             when :updated
               UI.verbose "#{string_node.attr('name')} updated."
-              updated_count = updated_count + 1
+              updated_count += 1
             when :found
-              untouched_count = untouched_count + 1
+              untouched_count += 1
             when :added
               UI.verbose "#{string_node.attr('name')} added."
-              added_count = added_count + 1
+              added_count += 1
             when :skipped
-              skipped_count = skipped_count + 1
+              skipped_count += 1
             else
               UI.user_error!("Internal Error! #{res}")
             end
@@ -151,21 +151,28 @@ module Fastlane
           end
 
           UI.message("Done (#{added_count} added, #{updated_count} updated, #{untouched_count} untouched, #{skipped_count} skipped).")
-          return (added_count + updated_count) != 0
+          (added_count + updated_count) != 0
         end
 
+        ########
+        # @!group Verify diff of library vs main strings matches
+        #
+        # @note This set of methods is used by `an_validate_lib_strings_action`
+        #       (which doesn't seem to be used by any of our Android projects nowadays?)
+        ########
+
         def self.verify_diff(diff_string, main_strings, lib_strings, library)
-          if diff_string.start_with?('name=')
-            diff_string.slice!('name="')
+          return unless diff_string.start_with?('name=')
 
-            end_index = diff_string.index('"')
-            end_index ||= diff_string.length # Use the whole string if there's no '"'
+          diff_string.slice!('name="')
 
-            diff_string = diff_string.slice(0..(end_index - 1))
+          end_index = diff_string.index('"')
+          end_index ||= diff_string.length # Use the whole string if there's no '"'
 
-            lib_strings.xpath('//string').each do |string_node|
-              res = verify_string(main_strings, library, string_node) if string_node.attr('name') == diff_string
-            end
+          diff_string = diff_string.slice(0..(end_index - 1))
+
+          lib_strings.xpath('//string').each do |string_node|
+            verify_string(main_strings, library, string_node) if string_node.attr('name') == diff_string
           end
         end
 
@@ -180,25 +187,27 @@ module Fastlane
 
         def self.verify_local_diff(main, library, main_strings, lib_strings)
           `git diff #{main}`.each_line do |line|
-            if line.start_with?('+ ') || line.start_with?('- ')
-              diffs = line.gsub(/\s+/m, ' ').strip.split
-              diffs.each do |diff|
-                verify_diff(diff, main_strings, lib_strings, library)
-              end
+            next unless line.start_with?('+ ') || line.start_with?('- ')
+
+            diffs = line.gsub(/\s+/m, ' ').strip.split
+            diffs.each do |diff|
+              verify_diff(diff, main_strings, lib_strings, library)
             end
           end
         end
 
         def self.verify_pr_diff(main, library, main_strings, lib_strings, source_diff)
           source_diff.each_line do |line|
-            if line.start_with?('+ ') || line.start_with?('- ')
-              diffs = line.gsub(/\s+/m, ' ').strip.split
-              diffs.each do |diff|
-                verify_diff(diff, main_strings, lib_strings, library)
-              end
+            next unless line.start_with?('+ ') || line.start_with?('- ')
+
+            diffs = line.gsub(/\s+/m, ' ').strip.split
+            diffs.each do |diff|
+              verify_diff(diff, main_strings, lib_strings, library)
             end
           end
         end
+
+        # @!endgroup
 
         ########
         # @!group Downloading translations from GlotPress
@@ -225,7 +234,7 @@ module Fastlane
         #
         # @param [String] res_dir The relative path to the `…/src/main/res` directory.
         # @param [String] glotpress_project_url The base URL to the glotpress project to download the strings from.
-        # @param [Hash{String=>String}, Array] glotpress_filters
+        # @param [Hash{Symbol=>String}, Array] glotpress_filters
         #        The filters to apply when exporting strings from GlotPress.
         #        Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
         #        If an array of Hashes is provided instead of a single Hash, this method will perform as many
@@ -234,13 +243,11 @@ module Fastlane
         #        An array of locales to download. Each item in the array must be a Hash
         #        with keys `:glotpress` and `:android` containing the respective locale codes.
         #
-        def self.download_from_glotpress(res_dir:, glotpress_project_url:, glotpress_filters: { status: 'current' }, locales_map:)
+        def self.download_from_glotpress(res_dir:, glotpress_project_url:, locales_map:, glotpress_filters: { status: 'current' })
           glotpress_filters = [glotpress_filters] unless glotpress_filters.is_a?(Array)
 
-          attributes_to_copy = %w[formatted] # Attributes that we want to replicate into translated `string.xml` files
           orig_file = File.join(res_dir, 'values', 'strings.xml')
           orig_xml = File.open(orig_file) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
-          orig_attributes = orig_xml.xpath('//string').map { |tag| [tag['name'], tag.attributes.select { |k, _| attributes_to_copy.include?(k) }] }.to_h
 
           locales_map.each do |lang_codes|
             all_xml_documents = glotpress_filters.map do |filters|
@@ -252,24 +259,20 @@ module Fastlane
             # Merge all XMLs together
             merged_xml = merge_xml_documents(all_xml_documents)
 
-            # Process XML (text substitutions, replicate attributes, quick-lint string)
-            merged_xml.xpath('//string').each do |string_tag|
-              apply_substitutions(string_tag)
-              orig_attributes[string_tag['name']]&.each { |k, v| string_tag[k] = v }
-              quick_lint(string_tag, lang_codes[:android])
-            end
-            merged_xml.xpath('//string-array/item').each { |item_tag| apply_substitutions(item_tag) }
+            post_process_xml!(merged_xml, locale_code: lang_codes[:android], original_xml: orig_xml)
 
             # Save
             lang_dir = File.join(res_dir, "values-#{lang_codes[:android]}")
-            FileUtils.mkdir(lang_dir) unless Dir.exist?(lang_dir)
+            FileUtils.mkdir_p(lang_dir)
             lang_file = File.join(lang_dir, 'strings.xml')
             File.open(lang_file, 'w') { |f| merged_xml.write_to(f, encoding: Encoding::UTF_8.to_s, indent: 4) }
           end
         end
 
+        # @!endgroup
+
         #####################
-        # Private Helpers
+        # @!group Private Helpers
         #####################
 
         # Downloads the export from GlotPress for a given locale and given filters
@@ -278,7 +281,7 @@ module Fastlane
         # @param [String] locale The GlotPress locale code to download strings for.
         # @param [Hash{Symbol=>String}] filters The hash of filters to apply when exporting from GlotPress.
         #                               Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
-        # @return [Nokogiri::XML] the download XML document, parsed as a Nokogiri::XML object
+        # @return [Nokogiri::XML::Document] the download XML document, parsed as a Nokogiri::XML object
         #
         def self.download_glotpress_export_file(project_url:, locale:, filters:)
           query_params = filters.transform_keys { |k| "filters[#{k}]" }.merge(format: 'android')
@@ -292,12 +295,15 @@ module Fastlane
           rescue StandardError => e
             UI.error "Error downloading #{locale} - #{e.message}"
             retry if e.is_a?(OpenURI::HTTPError) && UI.confirm("Retry downloading `#{locale}`?")
-            return nil
+            nil
           end
         end
         private_class_method :download_glotpress_export_file
 
         # Merge multiple Nokogiri::XML `strings.xml` documents together
+        #
+        # Used especially when we provided multiple GlotPress filters to `download_from_glotpress`,
+        # as in this case we'd trigger one export per filter, then merge the result in a single XML
         #
         # @param [Array<Nokogiri::XML::Document>] all_xmls Array of the Nokogiri XML documents to merge together
         # @return [Nokogiri::XML::Document] The merged document.
@@ -325,33 +331,86 @@ module Fastlane
         end
         private_class_method :merge_xml_documents
 
-        # Apply some common text substitutions to tag contents
+        # Process a downloaded XML (in-place), to apply the following
+        #  - replicate attributes from the nodes of the original XML (`translatable`, `tools:ignore`, …) to the translated XML
+        #  - text substitutions for common special characters
+        #  - quick-lint string by searching for common issue patterns (using `%%` in a `formatted=false` string, etc)
+        #
+        # @param [Nokogiri::XML::Document] translated_xml The downloaded XML to post-process
+        # @param [String] locale_code The android locale code associated with the translated_xml
+        # @param [Nokogiri::XML::Document] original_xml The original `values/strings.xml` to use as reference
+        #
+        def self.post_process_xml!(translated_xml, locale_code:, original_xml:)
+          copy_orig_attributes = lambda do |node, xpath|
+            orig_attributes = original_xml.xpath(xpath)&.first&.attribute_nodes&.to_h do |attr|
+              [[attr.namespace&.prefix, attr.name].compact.join(':'), attr.value]
+            end
+            orig_attributes&.each { |k, v| node[k] = v unless k == 'name' }
+          end
+
+          # 1. Replicate namespaces on the document (especially `xmlns:tools` if present)
+          original_xml.namespaces.each { |k, v| translated_xml.root&.add_namespace(k.delete_prefix('xmlns:'), v) }
+          # 2. Replicate attributes on any node with `@name` attribute (`string`, `string-array`, `plurals`)
+          translated_xml.xpath('//*[@name]').each do |node|
+            copy_orig_attributes.call(node, "//#{node.name}[@name = '#{node['name']}']")
+          end
+          # 3. Process copies for `string` nodes
+          translated_xml.xpath('//string[@name]').each do |string_node|
+            apply_substitutions!(string_node)
+            quick_lint(string_node, locale_code)
+          end
+          # 4. Process copies for `string-array/item` nodes
+          translated_xml.xpath('//string-array[@name]/item').each do |item_node|
+            apply_substitutions!(item_node)
+            quick_lint(item_node, locale_code)
+          end
+          # 5. Replicate attributes + Process copies for `plurals/item` nodes
+          translated_xml.xpath('//plurals[@name]/item[@quantity]').each do |item_node|
+            copy_orig_attributes.call(item_node, "//plurals[@name = '#{item_node.parent['name']}']/item[@quantity = '#{item_node['quantity']}']")
+            apply_substitutions!(item_node)
+            quick_lint(item_node, locale_code)
+          end
+        end
+        private_class_method :post_process_xml!
+
+        # Apply some common text substitutions to tag contents, like `... => …` or en-dash instead of regular dash for ranges of numbers
         #
         # @param [Nokogiri::XML::Node] tag The XML tag/node to apply substitutions to
         #
-        def self.apply_substitutions(tag)
+        def self.apply_substitutions!(tag)
           tag.content = tag.content.gsub('...', '…')
 
           # Typography en-dash
-          if tag.content.include?('-')
-            tag.content = tag.content.gsub(/(\d+\s*)-(\s*\d+)/) do |str|
-              match = Regexp.last_match # of type `MatchData`. match[0] == str == whole match, match[1] = 1st capture group (left part of the range), match[2] = second capture group (right part of the range)
-              is_negative_number = match[2][0] != ' ' && match[1][-1] == ' ' # if right part of range does not start with a space (e.g. `-3`), but left part of range does end with space, it's not a range after all but more likely a list containing negative numbers in it (e.g. `2 -3`)
-              is_negative_number ? str : "#{match[1]}\u{2013}#{match[2]}"
-            end
+          return unless tag.content.include?('-')
+
+          tag.content = tag.content.gsub(/(\d+\s*)-(\s*\d+)/) do |str|
+            match = Regexp.last_match # of type `MatchData`. match[0] == str == whole match, match[1] = 1st capture group (left part of the range), match[2] = second capture group (right part of the range)
+            is_negative_number = match[2][0] != ' ' && match[1][-1] == ' ' # if right part of range does not start with a space (e.g. `-3`), but left part of range does end with space, it's not a range after all but more likely a list containing negative numbers in it (e.g. `2 -3`)
+            is_negative_number ? str : "#{match[1]}\u{2013}#{match[2]}"
           end
         end
-        private_class_method :apply_substitutions
+        private_class_method :apply_substitutions!
 
-        # Perform some quick basic checks about an individual `<string>` tag and print warnings accordingly
+        # Perform some quick basic checks about an individual `<string>` tag and print warnings accordingly:
+        #  - detect the use of `%%` in the string even if `formatted=false` is set
+        #  - detect the presence of `\@string/` in translated XML, which suggests the original key that referenced `@string/…` did not set `translatable=false`
+        #    and thus that `@string/…` copy was sent to GlotPress for translation, then escaped during exporting it back.
         #
-        # @param [Nokogiri::XML::Node] string_tag The XML tag/node to check
+        # @param [Nokogiri::XML::Node] node The XML tag/node to check the content of
         # @param [String] lang The language we are currently processing. Used for providing context during logging / warning message
         #
-        def self.quick_lint(string_tag, lang)
-          if string_tag['formatted'] == 'false' && string_tag.content.include?('%%')
-            UI.important "Warning: [#{lang}] translation for '#{string_tag['name']}' has attribute formatted=false, but still contains escaped '%%' in translation."
+        def self.quick_lint(node, lang)
+          named_node = node.has_attribute?('name') ? node : node.parent
+          if named_node['formatted'] == 'false' && node.content.include?('%%')
+            UI.important "Warning: [#{lang}] translation for '#{named_node['name']}' has attribute formatted=false, but still contains escaped '%%' in translation."
           end
+          # rubocop:disable Style/GuardClause
+          if node.content.include?('\\@string/')
+            UI.important "Warning: [#{lang}] exported translation for '#{named_node['name']}' contains `\\@string/`. This is a sign that this entry was not marked as `translatable=false` " \
+              + 'in the original `values/strings.xml`, and was thus sent to GlotPress, which added the backslash when exporting it back.'
+            node.content = node.content.gsub('\\@string/', '@string/')
+          end
+          # rubocop:enable Style/GuardClause
         end
         private_class_method :quick_lint
 
@@ -379,8 +438,8 @@ module Nokogiri
         oa = other.attributes
         return false unless sa.length == oa.length
 
-        sa = sa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
-        oa = oa.sort.map { |n, a| [n, a.value, a.namespace && a.namespace.href] }
+        sa = sa.sort.map { |n, a| [n, a.value, a.namespace&.href] }
+        oa = oa.sort.map { |n, a| [n, a.value, a.namespace&.href] }
         return false unless sa == oa
 
         skids = children

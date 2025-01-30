@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   class FirebaseTestLabResult
     def initialize(log_file_path:)
@@ -27,7 +29,7 @@ module Fastlane
 
       return nil if uri.nil?
 
-      return {
+      {
         bucket: uri.host,
         prefix: uri.path.delete_prefix('/').chomp('/')
       }

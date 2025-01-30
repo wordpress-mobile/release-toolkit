@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'spaceship'
 
 module Fastlane
   module Helper
     module Ios
       module ADCAppSizesHelper
-        DEFAULT_DEVICES = ['Universal', 'iPhone 8', 'iPhone X']
+        DEFAULT_DEVICES = ['Universal', 'iPhone 8', 'iPhone X'].freeze
 
         # Fetch the App Sizes stats from ADC
         #
@@ -13,7 +15,7 @@ module Fastlane
         #         Value for key `sizeInBytes` is itself a Hash with one entry per device name (including special name "Universal")
         #         whose value is a Hash with keys `compressed` and `uncompressed`
         #
-        def self.get_adc_sizes(adc_user:, adc_team: 'Automattic, Inc.', bundle_id:, only_version: nil, limit: 10)
+        def self.get_adc_sizes(adc_user:, bundle_id:, adc_team: 'Automattic, Inc.', only_version: nil, limit: 10)
           UI.message 'Connecting to ADC...'
           Spaceship::ConnectAPI.login(adc_user, team_name: adc_team)
           app = Spaceship::ConnectAPI::App.find(bundle_id)
@@ -21,14 +23,18 @@ module Fastlane
           UI.message 'Fetching the list of versions...'
           versions = app.app_store_versions.select { |v| v.version_string == only_version && !v.build.nil? }
           versions = app.get_app_store_versions.reject { |v| v.build.nil? } if versions.empty?
-          UI.message "Found #{versions.count} versions." + (limit == 0 ? '' : " Limiting to last #{limit}")
-          versions = versions.first(limit) unless limit == 0
+          UI.message "Found #{versions.count} versions." + (limit.zero? ? '' : " Limiting to last #{limit}")
+          versions = versions.first(limit) unless limit.zero?
 
           UI.message 'Fetching App Sizes...'
 
           builds_details = versions.each_with_index.map do |v, idx|
             print "Fetching info for: #{v.version_string.rjust(8)} (#{v.build.version.rjust(11)}) [#{idx.to_s.rjust(3)}/#{versions.count}]\r"
-            Spaceship::Tunes.client.build_details(app_id: app.id, train: v.version_string, build_number: v.build.version, platform: 'ios') rescue nil
+            begin
+              Spaceship::Tunes.client.build_details(app_id: app.id, train: v.version_string, build_number: v.build.version, platform: 'ios')
+            rescue StandardError
+              nil
+            end
           end.compact.reverse
           print("#{' ' * 55}\n")
 

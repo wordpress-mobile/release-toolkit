@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   module Actions
     class BuildkiteTriggerBuildAction < Action
@@ -13,7 +15,11 @@ module Fastlane
           branch: params[:branch],
           commit: params[:commit],
           env: params[:environment].merge(pipeline_name),
-          message: params[:message]
+          message: params[:message],
+          # Buildkite will not trigger a build if the GitHub activity for that branch is turned off.
+          # We want API triggers to work regardless of the GitHub activity settings, so this option is necessary.
+          # See https://forum.buildkite.community/t/request-build-error-branches-have-been-disabled-for-this-pipeline/1463/2
+          ignore_pipeline_branch_filters: true
         }.compact # remove entries with `nil` values from the Hash, if any
 
         client = Buildkit.new(token: params[:buildkite_token])
@@ -23,7 +29,15 @@ module Fastlane
           options
         )
 
-        response.state == 'scheduled' ? UI.message('Done!') : UI.crash!("Failed to start job\nError: [#{response}]")
+        build_url = response.web_url
+
+        if response.state == 'scheduled'
+          UI.success("Successfully scheduled new build. You can see it at '#{build_url}'")
+        else
+          UI.crash!("Failed to start build.\nError: [#{response}]")
+        end
+
+        build_url
       end
 
       #####################################################
@@ -31,7 +45,8 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Triggers a job on Buildkite'
+        # https://buildkite.com/docs/pipelines/glossary#build
+        'Triggers a build on Buildkite'
       end
 
       def self.available_options
@@ -45,7 +60,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :buildkite_organization,
-            env_name: 'BUILDKITE_ORGANIZTION',
+            env_name: 'BUILDKITE_ORGANIZATION',
             description: 'The Buildkite organization that contains your pipeline',
             type: String
           ),
@@ -89,6 +104,10 @@ module Fastlane
 
       def self.authors
         ['Automattic']
+      end
+
+      def self.return_value
+        'The web URL of the build the action started.'
       end
 
       def self.is_supported?(platform)

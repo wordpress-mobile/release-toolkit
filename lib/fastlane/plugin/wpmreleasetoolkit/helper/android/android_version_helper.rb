@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   module Helper
     module Android
@@ -19,165 +21,21 @@ module Fastlane
         # The suffix used in the versionName for RC (beta) versions
         RC_SUFFIX = '-rc'
 
-        # Returns the public-facing version string.
-        #
-        # @example
-        #    "1.2" # Assuming build.gradle contains versionName "1.2"
-        #    "1.2" # Assuming build.gradle contains versionName "1.2.0"
-        #    "1.2.3" # Assuming build.gradle contains versionName "1.2.3"
-        #
-        # @return [String] The public-facing version number, extracted from the `versionName` of the `build.gradle` file.
-        #         - If this version is a hotfix (more than 2 parts and 3rd part is non-zero), returns the "X.Y.Z" formatted string
-        #         - Otherwise (not a hotfix / 3rd part of version is 0), returns "X.Y" formatted version number
-        #
-        def self.get_public_version
-          version = get_release_version
-          vp = get_version_parts(version[VERSION_NAME])
-          return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}" unless is_hotfix?(version)
-
-          "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}"
-        end
-
         # Extract the version name and code from the release version of the app from `version.properties file`
         #
         # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
         #
-        def self.get_release_version
-          return get_version_from_properties() if File.exist?(version_properties_file)
-
-          section = ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {'
-          gradle_path = self.gradle_path
-          name = get_version_name_from_gradle_file(gradle_path, section)
-          code = get_version_build_from_gradle_file(gradle_path, section)
-          return { VERSION_NAME => name, VERSION_CODE => code }
-        end
-
-        def self.version_properties_file
-          File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'version.properties')
-        end
-
-        # Extract the version name and code from the `version.properties` file in the project root
-        #
-        # @param [Boolean] is_alpha true if the alpha version should be returned, false otherwise
-        #
-        # @return [Hash] A hash with 2 keys "name" and "code" containing the extracted version name and code, respectively
-        #
-        def self.get_version_from_properties(is_alpha: false)
-          return nil unless File.exist?(version_properties_file)
+        def self.get_release_version(version_properties_path:, is_alpha: false)
+          return nil unless File.exist?(version_properties_path)
 
           version_name_key = is_alpha ? 'alpha.versionName' : 'versionName'
           version_code_key = is_alpha ? 'alpha.versionCode' : 'versionCode'
 
-          text = File.read(version_properties_file)
+          text = File.read(version_properties_path)
           name = text.match(/#{version_name_key}=(\S*)/m)&.captures&.first
           code = text.match(/#{version_code_key}=(\S*)/m)&.captures&.first
 
-          return name.nil? || code.nil? ? nil : { VERSION_NAME => name, VERSION_CODE => code.to_i }
-        end
-
-        # Extract the version name and code from the `version.properties` file in the project root
-        #
-        # @return [Hash] A hash with 2 keys `"name"` and `"code"` containing the extracted version name and code, respectively,
-        #                or `nil` if `$HAS_ALPHA_VERSION` is not defined.
-        #
-        def self.get_alpha_version
-          return get_version_from_properties(is_alpha: true) if File.exist?(version_properties_file)
-
-          return nil if ENV['HAS_ALPHA_VERSION'].nil?
-
-          section = 'defaultConfig'
-          gradle_path = self.gradle_path
-          name = get_version_name_from_gradle_file(gradle_path, section)
-          code = get_version_build_from_gradle_file(gradle_path, section)
-          return { VERSION_NAME => name, VERSION_CODE => code }
-        end
-
-        # Determines if a version name corresponds to an alpha version (starts with `"alpha-"`` prefix)
-        #
-        # @param [String] version The version name to check
-        #
-        # @return [Bool] true if the version name starts with the `ALPHA_PREFIX`, false otherwise.
-        #
-        # @private
-        #
-        def self.is_alpha_version?(version)
-          version[VERSION_NAME].start_with?(ALPHA_PREFIX)
-        end
-
-        # Check if this versionName corresponds to a beta, i.e. contains some `-rc` suffix
-        #
-        # @param [String] version The versionName string to check for
-        #
-        # @return [Bool] True if the version string contains `-rc`, indicating it is a beta version.
-        #
-        def self.is_beta_version?(version)
-          version[VERSION_NAME].include?(RC_SUFFIX)
-        end
-
-        # Returns the version name and code to use for the final release.
-        #
-        # - The final version name corresponds to the beta's versionName, without the `-rc` suffix
-        # - The final version code corresponds to the versionCode for the alpha (or for the beta if alpha_version is nil) incremented by one.
-        #
-        # @param [Hash] beta_version The version hash for the beta, containing values for keys "name" and "code"
-        # @param [Hash] alpha_version The version hash for the alpha, containing values for keys "name" and "code",
-        #                             or `nil` if no alpha version to consider.
-        #
-        # @return [Hash] A version hash with keys "name" and "code", containing the version name and code to use for final release.
-        #
-        def self.calc_final_release_version(beta_version, alpha_version)
-          version_name = beta_version[VERSION_NAME].split('-')[0]
-          version_code = alpha_version.nil? ? beta_version[VERSION_CODE] + 1 : alpha_version[VERSION_CODE] + 1
-
-          { VERSION_NAME => version_name, VERSION_CODE => version_code }
-        end
-
-        # Returns the version name and code to use for the next alpha.
-        #
-        # - The next version name corresponds to the `alpha_version`'s name incremented by one (alpha-42 => alpha-43)
-        # - The next version code corresponds to the `version`'s code incremented by one.
-        #
-        # @param [Hash] version The version hash for the current beta or release, containing values for keys "name" and "code"
-        # @param [Hash] alpha_version The version hash for the current alpha (defaultConfig), containing values for keys "name" and "code"
-        #
-        # @return [Hash] A version hash with keys "name" and "code", containing the version name and code to use for final release.
-        #
-        def self.calc_next_alpha_version(version, alpha_version)
-          # Bump alpha name
-          alpha_number = alpha_version[VERSION_NAME].sub(ALPHA_PREFIX, '')
-          alpha_name = "#{ALPHA_PREFIX}#{alpha_number.to_i() + 1}"
-
-          # Bump alpha code
-          alpha_code = version[VERSION_CODE] + 1
-
-          { VERSION_NAME => alpha_name, VERSION_CODE => alpha_code }
-        end
-
-        # Compute the version name and code to use for the next beta (`X.Y.Z-rc-N`).
-        #
-        # - The next version name corresponds to the `version`'s name with the value after the `-rc-` suffix incremented by one,
-        #     or with `-rc-1` added if there was no previous rc suffix (if `version` was not a beta but a release)
-        # - The next version code corresponds to the `alpha_version`'s (or `version`'s if `alpha_version` is nil) code, incremented by one.
-        #
-        # @example
-        #   calc_next_beta_version({"name": "1.2.3", "code": 456}) #=> {"name": "1.2.3-rc-1", "code": 457}
-        #   calc_next_beta_version({"name": "1.2.3-rc-2", "code": 456}) #=> {"name": "1.2.3-rc-3", "code": 457}
-        #   calc_next_beta_version({"name": "1.2.3", "code": 456}, {"name": "alpha-1.2.3", "code": 457}) #=> {"name": "1.2.3-rc-1", "code": 458}
-        #
-        # @param [Hash] version The version hash for the current beta or release, containing values for keys "name" and "code"
-        # @param [Hash] alpha_version The version hash for the alpha, containing values for keys "name" and "code",
-        #                             or `nil` if no alpha version to consider.
-        #
-        # @return [Hash] A hash with keys `"name"` and `"code"` containing the next beta version name and code.
-        #
-        def self.calc_next_beta_version(version, alpha_version = nil)
-          # Bump version name
-          beta_number = is_beta_version?(version) ? version[VERSION_NAME].split('-')[2].to_i + 1 : 1
-          version_name = "#{version[VERSION_NAME].split('-')[0]}#{RC_SUFFIX}-#{beta_number}"
-
-          # Bump version code
-          version_code = alpha_version.nil? ? version[VERSION_CODE] + 1 : alpha_version[VERSION_CODE] + 1
-          { VERSION_NAME => version_name, VERSION_CODE => version_code }
+          name.nil? || code.nil? ? nil : { VERSION_NAME => name, VERSION_CODE => code.to_i }
         end
 
         # Compute the version name to use for the next release (`"X.Y"`).
@@ -187,8 +45,8 @@ module Fastlane
         # @return [String] The version name for the next release
         #
         def self.calc_next_release_short_version(version)
-          v = self.calc_next_release_base_version(VERSION_NAME => version, VERSION_CODE => nil)
-          return v[VERSION_NAME]
+          v = calc_next_release_base_version(VERSION_NAME => version, VERSION_CODE => nil)
+          v[VERSION_NAME]
         end
 
         # Compute the next release version name for the given version, without incrementing the version code
@@ -212,57 +70,6 @@ module Fastlane
           { VERSION_NAME => "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}", VERSION_CODE => version[VERSION_CODE] }
         end
 
-        # Compute the name of the next version to use after code freeze, by incrementing the current version name and making it a `-rc-1`
-        #
-        # @example
-        #   calc_next_release_version({"name": "1.2", "code": 456}) #=> {"name":"1.3-rc-1", "code": 457}
-        #   calc_next_release_version({"name": "1.2.3", "code": 456}) #=> {"name":"1.3-rc-1", "code": 457}
-        #   calc_next_release_version({"name": "1.2", "code": 456}, {"name":"alpha-1.2", "code": 457}) #=> {"name":"1.3-rc-1", "code": 458}
-        #
-        # @param [Hash] version The current version hash, with keys `"name"` and `"code"`
-        # @param [Hash] alpha_version The current alpha version hash, with keys `"name"` and `"code"`, or nil if no alpha version
-        #
-        # @return [Hash] The hash containing the version name and code to use after release cut
-        #
-        def self.calc_next_release_version(version, alpha_version = nil)
-          nv = calc_next_release_base_version(VERSION_NAME => version[VERSION_NAME], VERSION_CODE => alpha_version.nil? ? version[VERSION_CODE] : [version[VERSION_CODE], alpha_version[VERSION_CODE]].max)
-          calc_next_beta_version(nv)
-        end
-
-        # Compute the name and code of the next hotfix version.
-        #
-        # @param [String] hotfix_version_name The next version name we want for the hotfix
-        # @param [String] hotfix_version_code The next version code we want for the hotfix
-        #
-        # @return [Hash] The predicted next hotfix version, as a Hash containing the keys `"name"` and `"code"`
-        #
-        def self.calc_next_hotfix_version(hotfix_version_name, hotfix_version_code)
-          { VERSION_NAME => hotfix_version_name, VERSION_CODE => hotfix_version_code }
-        end
-
-        # Compute the name of the previous release version, by decrementing the minor version number
-        #
-        # @example
-        #    calc_prev_release_version("1.2") => "1.1"
-        #    calc_prev_release_version("1.2.3") => "1.1"
-        #    calc_prev_release_version("3.0") => "2.9"
-        #
-        # @param [String] version The version string to decrement
-        #
-        # @return [String] A 2-parts version string "X.Y" corresponding to the guessed previous release version.
-        #
-        def self.calc_prev_release_version(version)
-          vp = get_version_parts(version)
-          if vp[MINOR_NUMBER] == 0
-            vp[MAJOR_NUMBER] -= 1
-            vp[MINOR_NUMBER] = 9
-          else
-            vp[MINOR_NUMBER] -= 1
-          end
-
-          "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}"
-        end
-
         # Determines if a version name corresponds to a hotfix
         #
         # @param [String] version The version number to test
@@ -270,66 +77,10 @@ module Fastlane
         # @return [Bool] True if the version number has a non-zero 3rd component, meaning that it is a hotfix version.
         #
         def self.is_hotfix?(version)
-          return false if is_alpha_version?(version)
+          return false if version[VERSION_NAME].start_with?(ALPHA_PREFIX)
 
           vp = get_version_parts(version[VERSION_NAME])
-          return (vp.length > 2) && (vp[HOTFIX_NUMBER] != 0)
-        end
-
-        # Prints the current and next release version names to stdout, then returns the next release version
-        #
-        # @return [String] The next release version name to use after bumping the currently used release version.
-        #
-        def self.bump_version_release
-          # Bump release
-          current_version = self.get_release_version
-          UI.message("Current version: #{current_version[VERSION_NAME]}")
-          new_version = calc_next_release_base_version(current_version)
-          UI.message("New version: #{new_version[VERSION_NAME]}")
-          verified_version = verify_version(new_version[VERSION_NAME])
-
-          return verified_version
-        end
-
-        # Update the `version.properties` file with new `versionName` and `versionCode` values
-        #
-        # @param [Hash] new_version_beta The version hash for the beta, containing values for keys "name" and "code"
-        # @param [Hash] new_version_alpha The version hash for the alpha , containing values for keys "name" and "code"
-        #
-        def self.update_versions(new_version_beta, new_version_alpha)
-          if File.exist?(version_properties_file)
-            replacements = {
-              versionName: (new_version_beta || {})[VERSION_NAME],
-              versionCode: (new_version_beta || {})[VERSION_CODE],
-              'alpha.versionName': (new_version_alpha || {})[VERSION_NAME],
-              'alpha.versionCode': (new_version_alpha || {})[VERSION_CODE]
-            }
-            content = File.read(version_properties_file)
-            content.gsub!(/^(.*) ?=.*$/) do |line|
-              key = Regexp.last_match(1).to_sym
-              value = replacements[key]
-              value.nil? ? line : "#{key}=#{value}"
-            end
-            File.write(version_properties_file, content)
-          else
-            self.update_version(new_version_beta, ENV['HAS_ALPHA_VERSION'].nil? ? 'defaultConfig' : 'vanilla {')
-            self.update_version(new_version_alpha, 'defaultConfig') unless new_version_alpha.nil?
-          end
-        end
-
-        # Compute the name of the previous hotfix version.
-        #
-        # @param [String] version_name The current version name we want to decrement
-        #
-        # @return [String] The predicted previous hotfix version, in the form of "X.Y.Z", or "X.Y" if Z is 0.
-        #         Corresponds to decrementing the 3rd component Z of the version, stripping it if it ends up being zero.
-        #
-        def self.calc_prev_hotfix_version_name(version_name)
-          vp = get_version_parts(version_name)
-          vp[HOTFIX_NUMBER] -= 1 unless vp[HOTFIX_NUMBER] == 0
-          return "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}.#{vp[HOTFIX_NUMBER]}" unless vp[HOTFIX_NUMBER] == 0
-
-          "#{vp[MAJOR_NUMBER]}.#{vp[MINOR_NUMBER]}"
+          (vp.length > 2) && (vp[HOTFIX_NUMBER] != 0)
         end
 
         # Extract the value of a import key from build.gradle
@@ -337,19 +88,16 @@ module Fastlane
         # @param [String] import_key The key to look for
         # @return [String] The value of the key, or nil if not found
         #
-        def self.get_library_version_from_gradle_config(import_key:)
-          gradle_file_path = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', 'build.gradle')
+        def self.get_library_version_from_gradle_config(build_gradle_path:, import_key:)
+          return nil unless File.exist?(build_gradle_path)
 
-          return nil unless File.exist?(gradle_file_path)
-
-          File.open(gradle_file_path, 'r') do |f|
+          File.open(build_gradle_path, 'r') do |f|
             text = f.read
             text.match(/^\s*(?:\w*\.)?#{Regexp.escape(import_key)}\s*=\s*['"](.*?)["']/m)&.captures&.first
           end
         end
 
         #----------------------------------------
-        private
 
         # Remove the beta suffix (part after the `-`) from a version string
         #
@@ -373,144 +121,7 @@ module Fastlane
         def self.get_version_parts(version)
           parts = version.split('.').map(&:to_i)
           parts.fill(0, parts.length...3) # add 0 if needed to ensure array has at least 3 components
-          return parts
-        end
-
-        # Ensure that a version string is correctly formatted (that is, each of its parts is a number) and returns the 2-parts version number
-        #
-        # @param [String] version The version string to verify
-        #
-        # @return [String] The "major.minor" version string, only with the first 2 components
-        # @raise [UserError] If any of the parts of the version string is not a number
-        #
-        def self.verify_version(version)
-          v_parts = get_version_parts(version)
-
-          v_parts.each do |part|
-            UI.user_error!('Version value can only contains numbers.') unless is_int?(part)
-          end
-
-          "#{v_parts[MAJOR_NUMBER]}.#{v_parts[MINOR_NUMBER]}"
-        end
-
-        # Check if a string is an integer.
-        #
-        # @param [String] string The string to test
-        #
-        # @return [Bool] true if the string is representing an integer value, false if not
-        #
-        def self.is_int?(string)
-          true if Integer(string) rescue false
-        end
-
-        #########
-        # Functions to support versioning through build.gradle - can be removed once all projects adopt version.properties
-        ########
-
-        # Extract the versionName from a build.gradle file
-        #
-        # @param [String] file_path The path to the `.gradle` file
-        # @param [String] section The name of the section we expect the keyword to be in, e.g. "defaultConfig" or "vanilla"
-        #
-        # @return [String] The value of the versionName attribute as found in the build.gradle file and for this section.
-        #
-        def self.get_version_name_from_gradle_file(file_path, section)
-          res = get_keyword_from_gradle_file(file_path, section, 'versionName')
-          res = res.tr('\"', '') unless res.nil?
-          return res
-        end
-
-        # Extract the versionCode rom a build.gradle file
-        #
-        # @param [String] file_path The path to the `.gradle` file
-        # @param [String] section The name of the section we expect the keyword to be in, e.g. "defaultConfig" or "vanilla"
-        #
-        # @return [String] The value of the versionCode attribute as found in the build.gradle file and for this section.
-        #
-        def self.get_version_build_from_gradle_file(file_path, section)
-          res = get_keyword_from_gradle_file(file_path, section, 'versionCode')
-          return res.to_i
-        end
-
-        # Extract the value for a specific keyword in a specific section of a `.gradle` file
-        #
-        # @todo: This implementation is very fragile. This should be done parsing the file in a proper way.
-        #        Leveraging gradle itself is probably the easiest way.
-        #
-        # @param [String] file_path The path of the `.gradle` file to extract the value from
-        # @param [String] section The name of the section from which we want to extract this keyword from. For example `defaultConfig` or `myFlavor`
-        # @param [String] keyword The keyword (key name) we want the value for
-        #
-        # @return [String] Returns the value for that keyword in the section of the `.gradle` file, or nil if not found.
-        #
-        def self.get_keyword_from_gradle_file(file_path, section, keyword)
-          found_section = false
-          File.open(file_path, 'r') do |file|
-            file.each_line do |line|
-              if found_section
-                return line.split[1] if line.include?(keyword) && !line.include?("\"#{keyword}\"") && !line.include?("P#{keyword}")
-              else
-                found_section = true if line.include?(section)
-              end
-            end
-          end
-          return nil
-        end
-
-        # The path to the build.gradle file for the project.
-        #
-        # @env PROJECT_ROOT_FOLDER The path to the root of the project (the folder containing the `.git` directory).
-        # @env PROJECT_NAME The name of the project, i.e. the name of the subdirectory containing the project's `build.gradle` file.
-        #
-        # @return [String] The path of the `build.gradle` file inside the project subfolder in the project's repo
-        #
-        def self.gradle_path
-          UI.user_error!("You need to set the \`PROJECT_ROOT_FOLDER\` environment variable to the path to the project's root") if ENV['PROJECT_ROOT_FOLDER'].nil?
-          UI.user_error!("You need to set the \`PROJECT_NAME\` environment variable to the relative path to the project subfolder name") if ENV['PROJECT_NAME'].nil?
-          File.join(ENV['PROJECT_ROOT_FOLDER'], ENV['PROJECT_NAME'], 'build.gradle')
-        end
-
-        # Update both the versionName and versionCode of the build.gradle file to the specified version.
-        #
-        # @param [Hash] version The version hash, containing values for keys "name" and "code"
-        # @param [String] section The name of the section to update in the build.gradle file, e.g. "defaultConfig" or "vanilla"
-        #
-        # @todo This implementation is very fragile. This should be done parsing the file in a proper way.
-        #       Leveraging gradle itself is probably the easiest way.
-        #
-        def self.update_version(version, section)
-          gradle_path = self.gradle_path
-          temp_file = Tempfile.new('fastlaneIncrementVersion')
-          found_section = false
-          version_updated = 0
-          File.open(gradle_path, 'r') do |file|
-            file.each_line do |line|
-              if found_section
-                if version_updated < 2
-                  if line.include?('versionName') && !line.include?('"versionName"') && !line.include?('PversionName')
-                    version_name = line.split[1].tr('\"', '')
-                    line.sub!(version_name, version[VERSION_NAME].to_s)
-                    version_updated = version_updated + 1
-                  end
-
-                  if line.include? 'versionCode'
-                    version_code = line.split[1]
-                    line.sub!(version_code, version[VERSION_CODE].to_s)
-                    version_updated = version_updated + 1
-                  end
-                end
-                temp_file.puts line
-              else
-                temp_file.puts line
-                found_section = true if line.include? section
-              end
-            end
-            file.close
-          end
-          temp_file.rewind
-          temp_file.close
-          FileUtils.mv(temp_file.path, gradle_path)
-          temp_file.unlink
+          parts
         end
       end
     end

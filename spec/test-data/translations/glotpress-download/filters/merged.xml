@@ -5,7 +5,7 @@ Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="gp_locale">fr</string>
     <string name="only_in_current">This is only in "current" export</string>
     <string name="in_multiple_exports">fuzzy</string>

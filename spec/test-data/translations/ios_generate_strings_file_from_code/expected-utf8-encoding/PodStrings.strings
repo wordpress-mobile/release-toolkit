@@ -1,0 +1,10 @@
+/* Duplicate declaration of Pod key 5 between ObjC and Swift,and with a comment even spanning multiple lines!
+   Pod key 5, with value, custom table and placeholder. */
+"pod.key5" = "pod value 5\nwith multiple lines.";
+
+/* Pod key 7, no value, custom table */
+"pod.key7" = "pod.key7";
+
+/* Pod key 9, with custom bundle and table. */
+"pod.key9" = "pod.key9";
+

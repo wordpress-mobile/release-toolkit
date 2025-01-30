@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 require_relative '../../helper/app_size_metrics_helper'
 
 module Fastlane
   module Actions
     class AndroidSendAppSizeMetricsAction < Action
       # Keys used by the metrics payload
-      AAB_FILE_SIZE_KEY = 'AAB File Size'.freeze                     # value from `File.size` of the `.aab`
-      UNIVERSAL_APK_FILE_SIZE_KEY = 'Universal APK File Size'.freeze # value from `File.size` of the Universal `.apk`
-      UNIVERSAL_APK_SPLIT_NAME = 'Universal'.freeze                  # pseudo-name of the split representing the Universal `.apk`
-      APK_OPTIMIZED_FILE_SIZE_KEY = 'Optimized APK File Size'.freeze # value from `apkanalyzer apk file-size`
-      APK_OPTIMIZED_DOWNLOAD_SIZE_KEY = 'Download Size'.freeze       # value from `apkanalyzer apk download-size`
+      AAB_FILE_SIZE_KEY = 'AAB File Size'                     # value from `File.size` of the `.aab`
+      UNIVERSAL_APK_FILE_SIZE_KEY = 'Universal APK File Size' # value from `File.size` of the Universal `.apk`
+      UNIVERSAL_APK_SPLIT_NAME = 'Universal'                  # pseudo-name of the split representing the Universal `.apk`
+      APK_OPTIMIZED_FILE_SIZE_KEY = 'Optimized APK File Size' # value from `apkanalyzer apk file-size`
+      APK_OPTIMIZED_DOWNLOAD_SIZE_KEY = 'Download Size'       # value from `apkanalyzer apk download-size`
 
       def self.run(params)
         # Check input parameters
@@ -71,31 +73,26 @@ module Fastlane
         end
 
         # The path where the `apkanalyzer` binary was found, after searching it:
-        #  - in priority in `$ANDROID_SDK_ROOT` (or `$ANDROID_HOME` for legacy setups), under `cmdline-tools/latest/bin/` or `cmdline-tools/tools/bin`
+        #  - in priority in `$ANDROID_HOME` (or `$ANDROID_SDK_ROOT` for legacy setups), under `cmdline-tools/latest/bin/` or `cmdline-tools/tools/bin`
         #  - and falling back by trying to find it in `$PATH`
         #
         # @return [String,Nil] The path to `apkanalyzer`, or `nil` if it wasn't found in any of the above tested paths.
         #
         def find_apkanalyzer_binary
-          sdk_root = ENV['ANDROID_SDK_ROOT'] || ENV['ANDROID_HOME']
-          if sdk_root
-            pattern = File.join(sdk_root, 'cmdline-tools', '{latest,tools}', 'bin', 'apkanalyzer')
-            apkanalyzer_bin = Dir.glob(pattern).find { |path| File.executable?(path) }
-          end
-          apkanalyzer_bin || Action.sh('command', '-v', 'apkanalyzer', print_command_output: false) { |_| nil }
+          @tools ||= Fastlane::Helper::Android::ToolsPathHelper.new
+          @tools.find_tool_path(binary: 'apkanalyzer', search_paths: @tools.cmdline_tools_search_paths)
         end
 
         # The path where the `apkanalyzer` binary was found, after searching it:
-        #  - in priority in `$ANDROID_SDK_ROOT` (or `$ANDROID_HOME` for legacy setups), under `cmdline-tools/latest/bin/` or `cmdline-tools/tools/bin`
+        #  - in priority in `$ANDROID_HOME` (or `$ANDROID_SDK_ROOT` for legacy setups), under `cmdline-tools/latest/bin/` or `cmdline-tools/tools/bin`
         #  - and falling back by trying to find it in `$PATH`
         #
         # @return [String] The path to `apkanalyzer`
         # @raise [FastlaneCore::Interface::FastlaneError] if it wasn't found in any of the above tested paths.
         #
         def find_apkanalyzer_binary!
-          apkanalyzer_bin = find_apkanalyzer_binary
-          UI.user_error!('Unable to find `apkanalyzer` executable in either `$PATH` or `$ANDROID_SDK_ROOT`. Make sure you installed the Android SDK Command-line Tools') if apkanalyzer_bin.nil?
-          apkanalyzer_bin
+          @tools ||= Fastlane::Helper::Android::ToolsPathHelper.new
+          @tools.find_tool_path!(binary: 'apkanalyzer', search_paths: @tools.cmdline_tools_search_paths)
         end
 
         # Add the `file-size` and `download-size` values of an APK to the helper, as reported by the corresponding `apkanalyzer apk …` commands

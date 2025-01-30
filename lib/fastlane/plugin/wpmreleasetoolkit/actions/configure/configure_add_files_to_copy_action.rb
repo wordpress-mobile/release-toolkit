@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fastlane/action'
 require 'fastlane_core/ui/ui'
 require 'fileutils'
@@ -24,9 +26,7 @@ module Fastlane
             continue = false
           end
 
-          Fastlane::Helper::ConfigureHelper.files_to_copy.each do |file_reference|
-            file_reference.update
-          end
+          Fastlane::Helper::ConfigureHelper.files_to_copy.each(&:update)
         end
       end
 
@@ -40,13 +40,13 @@ module Fastlane
           UI.message 'Example: google-services.json'
 
           source = UI.input('Source File Path:')
-          sourcePath = absolute_secret_store_path(source) # Transform the relative path into an absolute path.
+          source_path = absolute_secret_store_path(source) # Transform the relative path into an absolute path.
 
           # Don't allow the developer to accidentally specify an invalid file, otherwise validation will never succeed.
-          if File.file?(sourcePath)
+          if File.file?(source_path)
             invalid_file = false
           else
-            UI.error "There is no file at #{sourcePath}."
+            UI.error "There is no file at #{source_path}."
           end
         end
 

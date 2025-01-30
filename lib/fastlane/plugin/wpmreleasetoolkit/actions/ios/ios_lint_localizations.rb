@@ -1,13 +1,14 @@
+# frozen_string_literal: true
+
 module Fastlane
   module Actions
     class IosLintLocalizationsAction < Action
       def self.run(params)
-        violations = Hash.new([])
+        violations = nil
 
         loop do
-          # If we did `violations = self.run...` we'd lose the default value for missing key being `[]` that we set above with `Hash.new`.
-          # We want that default value so that we can use `+=` when adding the duplicate keys violations below.
-          violations = violations.merge(self.run_linter(params))
+          violations = run_linter(params)
+          violations.default = [] # Set the default value for when querying a missing key
 
           if params[:check_duplicate_keys]
             find_duplicated_keys(params).each do |language, duplicates|
@@ -49,18 +50,21 @@ module Fastlane
       def self.find_duplicated_keys(params)
         duplicate_keys = {}
 
-        files_to_lint = Dir.chdir(params[:input_dir]) do
-          Dir.glob('*.lproj/Localizable.strings').map do |file|
-            {
-              language: File.basename(File.dirname(file), '.lproj'),
-              path: File.join(params[:input_dir], file)
-            }
-          end
-        end
-
+        files_to_lint = Dir.glob('*.lproj/Localizable.strings', base: params[:input_dir])
         files_to_lint.each do |file|
-          duplicates = Fastlane::Helper::Ios::StringsFileValidationHelper.find_duplicated_keys(file: file[:path])
-          duplicate_keys[file[:language]] = duplicates.map { |key, value| "`#{key}` was found at multiple lines: #{value.join(', ')}" } unless duplicates.empty?
+          language = File.basename(File.dirname(file), '.lproj')
+          path = File.join(params[:input_dir], file)
+
+          file_type = Fastlane::Helper::Ios::L10nHelper.strings_file_type(path: path)
+          if file_type == :text
+            duplicates = Fastlane::Helper::Ios::StringsFileValidationHelper.find_duplicated_keys(file: path)
+            duplicate_keys[language] = duplicates.map { |key, value| "`#{key}` was found at multiple lines: #{value.join(', ')}" } unless duplicates.empty?
+          else
+            UI.important <<~WRONG_FORMAT
+              File `#{path}` is in #{file_type} format, while finding duplicate keys only make sense on files that are in ASCII-plist format.
+              Since your files are in #{file_type} format, you should probably disable the `check_duplicate_keys` option from this `#{action_name}` call.
+            WRONG_FORMAT
+          end
         end
 
         duplicate_keys
@@ -161,7 +165,7 @@ module Fastlane
             description: 'Should we abort the rest of the lane with a global error if any violations are found?',
             optional: true,
             default_value: true,
-            is_string: false # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
+            type: Boolean
           ),
           FastlaneCore::ConfigItem.new(
             key: :allow_retry,
@@ -169,7 +173,7 @@ module Fastlane
             description: 'If any violations are found, show an interactive prompt allowing the user to manually fix the issues locally and retry the linting',
             optional: true,
             default_value: false,
-            is_string: false # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
+            type: Boolean
           ),
           FastlaneCore::ConfigItem.new(
             key: :check_duplicate_keys,
@@ -177,7 +181,7 @@ module Fastlane
             description: 'Checks the input files for duplicate keys',
             optional: true,
             default_value: true,
-            is_string: false # https://docs.fastlane.tools/advanced/actions/#boolean-parameters
+            type: Boolean
           ),
         ]
       end
@@ -199,7 +203,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
     end
   end

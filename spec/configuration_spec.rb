@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Fastlane::Configuration do
@@ -12,6 +14,8 @@ describe Fastlane::Configuration do
   end
 
   describe 'file reading/writing' do
+    subject { described_class.from_file(configure_path) }
+
     let(:configure_path) { 'path/to/.configure' }
 
     let(:configure_json) do
@@ -25,9 +29,7 @@ describe Fastlane::Configuration do
     end
     let(:configure_json_string) { JSON.pretty_generate(configure_json) }
 
-    subject { Fastlane::Configuration.from_file(configure_path) }
-
-    before(:each) do
+    before do
       allow(File).to receive(:read).with(configure_path).and_return(configure_json_string)
       allow(File).to receive(:write).with(configure_path, configure_json_string)
     end

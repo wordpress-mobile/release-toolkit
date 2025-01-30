@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This action is the new version of android_update_metadata (AndroidUpdateMetadataAction) and should now be used instead of that one
 
 module Fastlane
@@ -7,7 +9,7 @@ module Fastlane
         require_relative '../../helper/android/android_localize_helper'
         require_relative '../../helper/git_helper'
 
-        res_dir = File.join(ENV['PROJECT_ROOT_FOLDER'] || '.', params[:res_dir])
+        res_dir = File.join('.', params[:res_dir])
 
         Fastlane::Helper::Android::LocalizeHelper.create_available_languages_file(
           res_dir: res_dir,
@@ -22,11 +24,14 @@ module Fastlane
 
         # Update submodules then lint translations
         unless params[:lint_task].nil? || params[:lint_task].empty?
-          Fastlane::Helper::GitHelper.update_submodules()
+          other_action.git_submodule_update(
+            recursive: true,
+            init: true
+          )
           Action.sh('./gradlew', params[:lint_task])
         end
 
-        Fastlane::Helper::GitHelper.commit(message: 'Update translations', files: res_dir, push: true) unless params[:skip_commit]
+        Fastlane::Helper::GitHelper.commit(message: 'Update translations', files: res_dir) unless params[:skip_commit]
       end
 
       #####################################################
@@ -38,7 +43,7 @@ module Fastlane
       end
 
       def self.details
-        'Download translations from GlotPress, update local strings.xml files accordingly, lint, commit the changes, and push to the remote'
+        'Download translations from GlotPress, update local strings.xml files accordingly, lint, commit the changes'
       end
 
       def self.available_options
@@ -90,8 +95,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :skip_commit,
             env_name: 'FL_DOWNLOAD_TRANSLATIONS_SKIP_COMMIT',
-            description: 'If set to true, will skip the commit/push step. Otherwise, it will commit the changes and push them (the default)',
-            is_string: false, # Boolean
+            description: 'If set to true, will skip the commit step',
+            type: Boolean,
             default_value: false
           ),
         ]

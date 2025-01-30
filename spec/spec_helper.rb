@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 
 require 'simplecov'
 require 'codecov'
 require 'webmock/rspec'
-require 'rspec/buildkite/analytics'
+require 'buildkite/test_collector'
 
 # SimpleCov.minimum_coverage 95
 SimpleCov.start
@@ -15,7 +17,7 @@ SimpleCov.formatter = SimpleCov::Formatter::Codecov if code_coverage_token
 
 # Buildkite Test Analytics
 WebMock.disable_net_connect!(allow: 'analytics-api.buildkite.com')
-RSpec::Buildkite::Analytics.configure(token: ENV['BUILDKITE_ANALYTICS_TOKEN'])
+Buildkite::TestCollector.configure(hook: :rspec)
 
 # This module is only used to check the environment is currently a testing env
 module SpecHelper
@@ -51,13 +53,13 @@ end
 # @param [String] output The output string to expect as a result of running the command. Defaults to "".
 # @return [MessageExpectation] self, to support further chaining.
 #
-def expect_shell_command(*command, exitstatus: 0, output: '')
+def expect_shell_command(*, exitstatus: 0, output: '')
   mock_input = double(:input)
   mock_output = StringIO.new(output)
   mock_status = double(:status, exitstatus: exitstatus)
   mock_thread = double(:thread, value: mock_status)
 
-  expect(Open3).to receive(:popen2e).with(*command).and_yield(mock_input, mock_output, mock_thread)
+  expect(Open3).to receive(:popen2e).with(*).and_yield(mock_input, mock_output, mock_thread)
 end
 
 # If the `described_class` of a spec is a `Fastlane::Action` subclass, it runs it with the given parameters.
@@ -75,6 +77,22 @@ def run_described_fastlane_action(parameters)
     end
   LANE
   Fastlane::FastFile.new.parse(lane).runner.execute(:test)
+end
+
+# Create a stubbed `Sawyer::Resource` instance. Useful to stub tests expected to return values from the GitHub API.
+#
+# @param [Hash] fields The data / list of fields and values for this API response stub
+# @return [Sawyer::Response] a response object representing the provided hash
+#
+# @note Based on how Sawyer gem itself does testing in their own test suite
+# @see https://github.com/lostisland/sawyer/blob/f5f080d5c5260e094069139ffc7c13d0acba4ab5/test/resource_test.rb#L6-L12
+def sawyer_resource_stub(**fields)
+  stubs = Faraday::Adapter::Test::Stubs.new
+  agent = Sawyer::Agent.new 'http://release-toolkit.com/specs' do |conn|
+    conn.builder.handlers.delete(Faraday::Adapter::NetHttp)
+    conn.adapter :test, stubs
+  end
+  Sawyer::Resource.new(agent, fields)
 end
 
 # Executes the given block within an ad hoc temporary directory.

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   class FirebaseAccount
     def self.activate_service_account_with_key_file(key_file_path)

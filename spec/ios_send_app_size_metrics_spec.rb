@@ -1,4 +1,6 @@
-require_relative './spec_helper'
+# frozen_string_literal: true
+
+require_relative 'spec_helper'
 
 describe Fastlane::Actions::IosSendAppSizeMetricsAction do
   let(:test_data_dir) { File.join(File.dirname(__FILE__), 'test-data', 'app_size_metrics') }

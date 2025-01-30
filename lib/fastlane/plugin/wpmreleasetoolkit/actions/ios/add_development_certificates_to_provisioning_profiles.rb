@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   module Actions
     class AddDevelopmentCertificatesToProvisioningProfilesAction < Action
@@ -17,7 +19,7 @@ module Fastlane
             profile.is_a? Spaceship::Portal::ProvisioningProfile::Development
           end
                    .tap do |profiles|
-            UI.important "Warning: Unable to find any profiles associated with #{identifier}" unless profiles.length > 0
+            UI.important "Warning: Unable to find any profiles associated with #{identifier}" if profiles.empty?
           end
                    .each do |profile|
             profile.certificates = all_certificates
@@ -43,15 +45,15 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        description: 'List of App Identifiers that should contain the new device identifier',
-                                       is_string: false,
+                                       type: Array,
                                        verify_block: proc do |value|
                                                        UI.user_error!('You must provide an array of bundle identifiers in `app_identifier`') if value.empty?
                                                      end),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        description: 'The team_id for the provisioning profiles',
-                                       is_string: true,
+                                       type: String,
                                        verify_block: proc do |value|
-                                                       UI.user_error!('You must provide a team ID in `team_id`') unless value && (!value.empty?)
+                                                       UI.user_error!('You must provide a team ID in `team_id`') unless value && !value.empty?
                                                      end),
         ]
       end

@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 module Fastlane
   module Wpmreleasetoolkit
-    VERSION = '5.5.0'
+    VERSION = '12.4.0'
   end
 end

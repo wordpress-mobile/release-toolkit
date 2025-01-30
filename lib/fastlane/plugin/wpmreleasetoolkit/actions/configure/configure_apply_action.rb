@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fastlane/action'
 require 'fastlane_core/ui/ui'
 require 'fileutils'
@@ -10,11 +12,10 @@ module Fastlane
   module Actions
     class ConfigureApplyAction < Action
       def self.run(params = {})
-        # Preflight
-        UI.user_error!('Decryption key could not be found') if Fastlane::Helper::ConfigureHelper.encryption_key.nil?
-
         # Checkout the right commit hash etc. before applying the configuration
         prepare_repository do
+          UI.user_error!('Decryption key could not be found') if Fastlane::Helper::ConfigureHelper.encryption_key.nil?
+
           # Copy/decrypt the files
           files_to_copy.each do |file_reference|
             apply_file(file_reference, params[:force])
@@ -127,7 +128,7 @@ module Fastlane
                                        description: 'Overwrite copied files without confirmation',
                                        optional: true,
                                        default_value: false,
-                                       is_string: false),
+                                       type: Boolean),
         ]
       end
 

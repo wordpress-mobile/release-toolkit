@@ -18,7 +18,410 @@ _None_
 
 ### Internal Changes
 
-_None_
+- The library now uses immutable literals, via `# frozen_strings_literal: true`. This may result in runtime issues that we will address ASAP once discovered [#626]
+
+## 12.4.0
+
+### New Features
+
+- Introduce new `openai_ask` action to get responses to a prompt/question from OpenAI API. [#621]
+- Allow `extract_release_notes_for_version` to return the extracted release notes without saving to a file. [#623]
+
+### Bug Fixes
+
+- Remove period from "Update draft release notes..." commit message [#622]
+
+## 12.3.4
+
+### Bug Fixes
+
+- `DateVersionCalculator`: move next year calculation decision to the clients. [#619]
+
+### Internal Changes
+
+- Remove Danger check for milestones, as we don't really use GitHub milestones in this repo. [#617]
+
+## 12.3.3
+
+### Bug Fixes
+
+- Fix `check_fonts_installed` step in `create_promo_screenshots`. [#615]
+- Fix broken `draw_text_to_canvas` method for `create_promo_screenshots`. [#614]
+
+## 12.3.2
+
+### Bug Fixes
+
+- Fix bug in `configure_apply` that could happen if run on a user machine that hasn't yet `git-pull` the latest commits from `~/.mobile-secrets` to a commit _after_ the new encryption key had been pushed. [#612]
+
+## 12.3.1
+
+### Bug Fixes
+
+- Fix issue with post-processing of PR urls in the body of GitHub releases created via `create_github_release`. [#610]
+
+## 12.3.0
+
+### New Features
+
+- `buildkite_pipeline_upload`: prepend `.buildkite/` to the `pipeline_file` parameter to enforce our conventions. [#608]
+
+### Bug Fixes
+
+- `create_release-backmerge_pull_request`: Fix the pre-check logic verifying if a PR is really needed or if there's nothing to backmerge. [#607]
+
+### Internal Changes
+
+- `buildkite_pipeline_upload`: makes sure all values passed in the environment parameter are strings. [#608]
+
+## 12.2.1
+
+### Bug Fixes
+
+- `create_release_backmerge_pull_request` now deletes existing intermediate branches before creating them anew. [#601]
+
+## 12.2.0
+
+### New Features
+
+- Added the `buildkite_pipeline_upload` action to upload a Buildkite pipeline to a running Buildkite build. [#597]
+
+## 12.1.0
+
+### New Features
+
+- `ios_generate_strings_file_from_code` now accepts an `output_encoding:` optional parameter. [#591]
+  This is typically useful if you prefer your generated files to be UTF-8 rather than the default UTF-16 that `genstrings` is using.
+
+### Internal Changes
+
+- Added the handling of remote to `GitHelper::point_to_same_commit?` [#590]
+
+## 12.0.0
+
+### Breaking Changes
+
+- Removed `build_gradle_path` parameter from `android_current_branch_is_hotfix`. [#579]
+- Deleted `Fastlane::Helper::Android::GitHelper` and `Fastlane::Helper::Ios::GitHelper`. [#580]
+- Renamed `create_release` to `create_github_release` for consistency. [#585, #588]
+- Deleted the following deprecated actions: [#577, #579, #580, #586]
+    - `android_betabuild_prechecks`
+    - `android_build_prechecks`
+    - `android_bump_version_beta`
+    - `android_bump_version_final_release`
+    - `android_bump_version_hotfix`
+    - `android_bump_version_release`
+    - `android_codefreeze_prechecks`
+    - `android_completecodefreeze_prechecks`
+    - `android_finalize_prechecks`
+    - `android_get_alpha_version`
+    - `android_get_app_version`
+    - `android_get_release_version`
+    - `android_hotfix_prechecks`
+    - `android_tag_build`
+    - `ios_betabuild_prechecks`
+    - `ios_build_prechecks`
+    - `ios_bump_version_beta`
+    - `ios_bump_version_hotfix`
+    - `ios_bump_version_release`
+    - `ios_codefreeze_prechecks`
+    - `ios_completecodefreeze_prechecks`
+    - `ios_current_branch_is_hotfix`
+    - `ios_finalize_prechecks`
+    - `ios_get_app_version`
+    - `ios_get_build_number`
+    - `ios_get_build_version`
+    - `ios_hotfix_prechecks`
+    - `ios_tag_build`
+    - `ios_validate_ci_build`
+
+### New Features
+
+- Added the `publish_github_release` action to publish existing GitHub draft releases. [#585]
+
+### Bug Fixes
+
+- Fix `create_release_backmerge_pull_request` error when creating a backmerge to a branch not yet fetched locally. [#587]
+
+### Internal Changes
+
+- Update gems used internally & remove upper bound on `nokogiri` from the `.gemspec`. [#583]
+
+### Internal Changes
+
+- Updated our internal Ruby dependencies. [#582]
+
+## 11.1.0
+
+### New Features
+
+- Added the action `create_release_backmerge_pull_request` to facilitate the creation of Pull Requests merging a release branch back to the main branch or currently ongoing releases [#570]
+
+## 11.0.3
+
+### Bug Fixes
+
+- Fix `android_download_translation` issues reported in #569 [#571]
+   - add post-processing of `plurals` nodes too.
+   - detect and fix `\@string/` references escaped in GlotPress exports.
+   - replicate all XML attributes (and xmlns) present in `values/string.xml` on the corresponding nodes in the translated XML.
+
+## 11.0.2
+
+### New Features
+
+- `buildkite_trigger_build` now returns the web URL of the Buildkite build it scheduled [#564]
+
+### Internal Changes
+
+- Bump `yard` from `0.9.34` to `0.9.36` [#554]
+- Bump `nokogiri` from `1.16.2` to `1.16.5` [#566]
+- Bump `rexml` from `3.2.6` to `3.2.8` [#566]
+
+## 11.0.1
+
+### Bug Fixes
+
+- Fixed the `android_download_translations` action by correctly calling Fastlane's `git_submodule_update` action [#561]
+
+## 11.0.0
+
+### Breaking Changes
+
+- Make `ios_check_beta_deps` use the `Podfile.lock` instead of `Podfile` for its detection, and also be able to detect Pods referenced by commits and branches.
+  If your `Fastfile` called this action with an explicit `podfile: …` argument, you'll have to update the call to use `lockfile:` instead (or rely on defaults). [#557]
+
+## 10.0.0
+
+### Breaking Changes
+
+- Upgraded the minimum required Ruby version to `3.2.2`. [#517]
+- Removed the old `setbranchprotection` and `removebranchprotection` backwards-compatiblity stubs for the now-renamed `set_branch_protection` and `remove_branch_protection` actions. [#549]
+- Renamed `setfrozentag` action to `set_milestone_frozen_marker`. [#548]
+- Removed the `ios_clear_intermediate_tags` action, which has been deprecated for a while. [#549]
+- Removed the `has_alpha_version` option from several actions and helper methods. It has already been deprecated for many versions. [#550]
+- Removed the `project_name` and `project_root_folder` options from several actions. [#550]
+- Renamed `update_pull_requests_milestone` to `update_assigned_milestone` and make it handle GitHub issues as well as PRs. [#547]
+
+### Bug Fixes
+
+- Fixed `comment_on_pr` to allow first paragraph of the comment to still be interpreted as Markdown. [#544]
+
+### Internal Changes
+
+- Added a deprecation notice to the `GitHelper.ensure_on_branch!` method [#531]
+- Added a deprecation notice to the `GitHelper.update_submodules` method [#531]
+- Update `nokogiri`, `mini_portile2`, and `rmagick` [#546]
+
+## 9.4.0
+
+### New Features
+
+- Added `update_pull_requests_milestone` action, to move all still-opened PRs of a given milestone to another milestone. [#539]
+
+### Internal Changes
+
+- Moves the mac-based parts of CI over to Apple Silicon. [#541]
+
+## 9.3.1
+
+### Bug Fixes
+
+- Updated QRCode generated images (for Prototype Build) to use https://goqr.me/api as a replacement to the now-discontinued Google service. [#537]
+
+## 9.3.0
+
+### New Features
+
+- Added optional `has_alpha_version` config item to actions that previously used the `HAS_ALPHA_VERSION` environment variable [#522]
+- Added a versioning method to check if a release is a hotfix [#530]
+
+### Internal Changes
+
+- Added deprecation notices to any actions or methods using the `HAS_ALPHA_VERSION` environment variable [#522]
+- Use SwiftGen 6.6.2 to address an Apple Silicon CI issue [#534]
+
+## 9.2.0
+
+### New Features
+
+- Added optional `build_gradle_path` and `version_properties_path` config items to actions that previously used the `PROJECT_ROOT_FOLDER` environment variable [#519]
+
+### Internal Changes
+
+- Added deprecation notices to any actions or methods using the `PROJECT_ROOT_FOLDER` environment variable [#519]
+- Added deprecation notices to any actions or methods using the `PROJECT_NAME` environment variable [#519]
+
+## 9.1.0
+
+### New Features
+
+- Adds `AppVersion` and `BuildCode` models that can be used by version actions. [#512]
+- Adds calculator and formatter classes that can be used with the `AppVersion` and `BuildCode` models. [#512]
+- Renamed `addbranchprotection` to `set_branch_protection`, and allow it to provide additional optional protection
+   settings to set/update on the target branch (like `lock_branch`, `required_ci_checks`, etc).
+   The `addbranchprotection` action name still exists for backward compatibility for now (with a deprecation notice),
+   but it will be removed in a future major release. [#513]
+- Renamed `removebranchprotection` to `remove_branch_protection`.
+   The `removebranchprotection` action name still exists for now for backward compatibility (with a deprecation notice),
+   but it will be removed in a future major release. [#513]
+- Added `copy_branch_protection` action to replicate the branch protection settings of one branch onto another. [#513]
+
+## 9.0.1
+
+### Bug Fixes
+
+- Fix metadata `po` generation for iOS projects removing the final `\n`. [#498]
+
+## 9.0.0
+
+### Breaking Changes
+
+_See the [`MIGRATION.md`](MIGRATION.md) file for more detailed instructions and options to handle those breaking changes._
+
+- Add the `public_version_xcconfig_file` parameter to the `ios_get_app_version` action to replace the need for an environment variable. [#445]
+- Remove the `ios_localize_project` and `ios_update_metadata` actions. [#447]
+- Remove the `skip_deliver` parameter from `ios_bump_version_hotfix` and `ios_bump_version_release` actions. [#450]
+- Remove the `get_prs_list` action, as its was obsolete (and not used by any client project anymore). [#505]
+
+### New Features
+
+- Adds `if_exists` parameter to `upload_to_s3` action, with possible values `:skip`, `:fail`, and `:replace`. [#495]
+- The `create_release` action now prints and returns the URL of the created GitHub Release. [#503]
+- Removes `bigdecimal` dependency. [#504] [#507]
+- Supports Ruby 3. [#492, #493, #497, and #504]
+- Add `find_previous_tag` and `get_prs_between_tags` actions. [#505]
+
+### Bug Fixes
+
+- Prevent using non-integer `version_code` values for Android hotfixes [#167]
+
+### Internal Changes
+
+- Updates `octokit` to `6.1.1`, `danger` to `9.3.1` and `buildkite-test_collector` to `2.3.1`. [#491]
+- Fix issue with gems cache on CI when testing against Ruby `3.2.2`. [#506]
+
+## 8.1.0
+
+### New Features
+
+- Adds auto_retry option to `gp_downloadmetadata_action`. [#474]
+
+## 8.0.1
+
+### Bug Fixes
+
+- Revert the `gp_downloadmetadata_action` `locales` item type from `type: Hash` to `is_string: false`. [#478]
+
+## 8.0.0
+
+### Breaking Changes
+
+- Remove git push commands after creating a new commit or branch. [#472] See `MIGRATION.md` for instructions.
+
+## 7.1.2
+
+### Bug Fixes
+
+- Revert the `gp_downloadmetadata_action` `locales` item type from `type: Hash` to `is_string: false`. [#480]
+
+## 7.1.1
+
+### Internal Changes
+
+- Remove `rubygems_mfa_required` from the `gemspec`. [#475]
+
+## 7.1.0
+
+### New Features
+
+- Add `ios_get_build_number` action to get the current build number from an `xcconfig` file. [#458]
+
+
+### Internal Changes
+
+- Add "Mobile Secrets" to `configure_update` current branch message to clarify which repo it's referring to. [#455]
+- `buildkite_trigger_build` now prints the web URL of the newly scheduled build, to allow you to easily open it via cmd-click. [#460]
+- Add the branch information to the 'This is not a release branch' error that's thrown from complete code freeze lane. [#461]
+- Update `octokit` to `5.6.1` This is a major version bump from version `4.18`, but is not a breaking change for the Release Toolkit because it doesn't change any public APIs for clients. [#464]
+- Update `danger` to `9.3.0`. This is an internal-only change and is not a breaking change for clients. [#464]
+- Replace `rspec-buildkite-analytics` with `buildkite-test_collector` (Buildkite renamed the gem) and update it to `2.2.0`. This is another internal-only change and is not a breaking change for clients. [#465]
+- Adds `ignore_pipeline_branch_filters=true` parameter to the API call triggering a Buildkite build [#468]
+- Replace all instances of `is_string` with `type` [#469]
+- Use `git_branch_name_using_HEAD` instead of `git_branch` so that the return value is not modified by environment variables. This has no impact to our current release flow, that's why it's not in "Breaking changes" section. [#463]
+- Deprecate `ios_clear_intermediate_tags` & `ios_final_tag` actions. [#471]
+
+## 7.0.0
+
+### Breaking Changes
+
+- Remove the `skip_glotpress` parameter from the `ios_bump_version_release` action [#443]
+
+### New Features
+
+- Add new `buildkite_annotate` action to add/remove annotations from the current build. [#442]
+- Add new `buildkite_metadata` action to set/get metadata from the current build. [#442]
+- Add new `prototype_build_details_comment` action to make it easier to generate the HTML comment about Prototype Builds in PRs. [#449]
+
+### Internal Changes
+
+- Updates `activesupport` to `6.1.7.1`, addressing [a security issue](https://github.com/advisories/GHSA-j6gc-792m-qgm2). This is a major version change, but as the dependency is internal-only, it shouldn't be a breaking change for clients. [#441]
+- Add the explicit dependency to `xcodeproj (~> 1.22)`, used in this case to replace the previous manual parsing of `.xcconfig` files. [#451]
+
+## 6.3.0
+
+### New Features
+
+- Add Mac support to all `common` actions and any relevant `ios` actions [#439]
+
+## 6.2.0
+
+### New Features
+
+- Add a `is_draft` parameter to the `create_release` action to specify whether the release should be created as a draft. [#433]
+
+### Internal Changes
+
+- Update the CI image used to build this project to use `xcode-14.1`. [#431]
+
+## 6.1.0
+
+### New Features
+
+- Allow `android_firebase_test` to not crash on failure, letting the caller do custom failure handling (e.g. Buildkite Annotations, etc) on their side. [#430]
+- `promo_screenshots` now checks that the fonts—referenced via `font-family` in all the stylesheets referenced in the config file—are installed before starting, and prompt to install them if they are not. This check is enabled by default now but can be disabled/skipped if it causes any issue. [#429]
+- `promo_screenshots` now supports config files to be written in `YAML` in addition to still supporting `JSON`. [#429]
+
+### Bug Fixes
+
+- Fix deprecation warning in `RMagick` call used by `promo_screenshots` action. [#429]
+
+## 6.0.0
+
+### Breaking Changes
+
+- Removed support for the deprecated `GHHELPER_ACCESS` in favor of `GITHUB_TOKEN` as the default environment variable to set the GitHub API token. [#420]
+- The `github_token:` parameter (aka `ConfigItem`)–or using the corresponding `GITHUB_TOKEN` env var to provide it a value–is now mandatory for all Fastlane actions that use the GitHub API. [#420]
+- The Fastlane action `comment_on_pr` has the parameter `access_key:` replaced by `github_token:`. [#420]
+
+### New Features
+
+- Allow `upload_to_s3` action to just log instead of crash (using new `skip_if_exists` parameter) when the file already exists in the S3 bucket. [#427]
+
+### Bug Fixes
+
+ - Improve resilience of the `ios_lint_localizations` action to support UTF16 files, and to warn and skip files in XML format when trying to detect duplicate keys on `.strings` files. [#418]
+ - Work around GitHub API bug when creating a new milestone, where their interpretation of the milestone's due date sent during API call is incorrect when we cross DST change dates — leading to milestones created after Oct 30 having due dates set on Sunday instead of Monday. [#419]
+
+## 5.6.0
+
+### New Features
+
+- Add `android_create_avd`, `android_launch_emulator` and `android_shutdown_emulator` actions. [#409]
+
+### Internal Changes
+
+- Require Fastlane `~> 2.210` to ensure Xcode 14 compatibility
 
 ## 5.5.0
 

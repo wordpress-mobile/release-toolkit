@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   module Actions
     class IosMergeStringsFilesAction < Action
@@ -72,7 +74,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        %i[ios mac].include? platform
       end
     end
   end

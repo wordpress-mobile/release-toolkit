@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.shared_examples 'shared examples' do
@@ -63,7 +65,7 @@ describe Fastlane::Configuration::FileReference do
   end
 
   describe 'without encryption' do
-    let(:subject) { Fastlane::Configuration::FileReference.new(file: 'path/to/file', destination: 'destination', encrypt: false) }
+    let(:subject) { described_class.new(file: 'path/to/file', destination: 'destination', encrypt: false) }
 
     include_examples 'shared examples'
 
@@ -92,9 +94,9 @@ describe Fastlane::Configuration::FileReference do
   end
 
   describe 'with encryption' do
-    let(:subject) { Fastlane::Configuration::FileReference.new(file: 'path/to/file', destination: 'destination', encrypt: true) }
+    let(:subject) { described_class.new(file: 'path/to/file', destination: 'destination', encrypt: true) }
 
-    before(:each) do
+    before do
       allow(Fastlane::Helper::ConfigureHelper).to receive(:encryption_key).and_return('key')
     end
 

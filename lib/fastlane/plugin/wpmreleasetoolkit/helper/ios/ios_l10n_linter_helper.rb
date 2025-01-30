@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'yaml'
 require 'tmpdir'
 
@@ -5,7 +7,7 @@ module Fastlane
   module Helper
     module Ios
       class L10nLinterHelper
-        SWIFTGEN_VERSION = '6.4.0'
+        SWIFTGEN_VERSION = '6.6.2'
         DEFAULT_BASE_LANG = 'en'
         CONFIG_FILE_NAME = 'swiftgen-stringtypes.yml'
 
@@ -31,9 +33,9 @@ module Fastlane
           # The SwiftGen version string has this format:
           #
           # SwiftGen v6.4.0 (Stencil v0.13.1, StencilSwiftKit v2.7.2, SwiftGenKit v6.4.0)
-          return vers_string.include?("SwiftGen v#{version}")
-        rescue
-          return false
+          vers_string.include?("SwiftGen v#{version}")
+        rescue StandardError
+          false
         end
 
         # Download the ZIP of SwiftGen for the requested `version` and install it in the `install_path`
@@ -48,7 +50,7 @@ module Fastlane
             extracted_dir = File.join(tmpdir, "swiftgen-#{version}")
             Action.sh('unzip', zipfile, '-d', extracted_dir)
 
-            FileUtils.rm_rf(install_path) if File.exist?(install_path)
+            FileUtils.rm_rf(install_path)
             FileUtils.mkdir_p(install_path)
             FileUtils.cp_r("#{extracted_dir}/.", install_path)
           end
@@ -135,7 +137,7 @@ module Fastlane
           config_file = File.join(output_dir, CONFIG_FILE_NAME)
           File.write(config_file, config.to_yaml)
 
-          return [config_file, langs]
+          [config_file, langs]
         end
 
         # Returns a Hash mapping the list of expected parameter types for each of the keys based in the %… placeholders found in their `.strings` files

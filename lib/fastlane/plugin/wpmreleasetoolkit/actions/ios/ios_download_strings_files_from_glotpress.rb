@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   module Actions
     class IosDownloadStringsFilesFromGlotpressAction < Action
@@ -13,7 +15,7 @@ module Fastlane
           UI.message "Downloading translations for '#{lproj_name}' from GlotPress (#{glotpress_locale}) [#{params[:filters]}]..."
           lproj_dir = File.join(download_dir, "#{lproj_name}.lproj")
           destination = File.join(lproj_dir, "#{params[:table_basename]}.strings")
-          FileUtils.mkdir(lproj_dir) unless Dir.exist?(lproj_dir)
+          FileUtils.mkdir_p(lproj_dir)
 
           Fastlane::Helper::Ios::L10nHelper.download_glotpress_export_file(
             project_url: params[:project_url],
@@ -107,7 +109,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
     end
   end

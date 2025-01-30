@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   module Actions
     class IosBuildPreflightAction < Action
@@ -11,7 +13,7 @@ module Fastlane
         # Internal Builds use it to generate the App Icon as part of the build process
         begin
           Action.sh('which convert')
-        rescue
+        rescue StandardError
           UI.user_error!("Couldn't find ImageMagick. Please install it by running `brew install imagemagick`")
           raise
         end
@@ -20,7 +22,7 @@ module Fastlane
         # Internal Builds use it to generate the App Icon as part of the build process
         begin
           Action.sh('which gs')
-        rescue
+        rescue StandardError
           UI.user_error!("Couldn't find Ghostscript. Please install it by running `brew install ghostscript`")
           raise
         end
@@ -28,12 +30,12 @@ module Fastlane
         # Check gems and pods are up to date. This will exit if it fails
         begin
           Action.sh('bundle check')
-        rescue
+        rescue StandardError
           UI.user_error!("You should run 'rake dependencies' to make sure gems are up to date")
           raise
         end
 
-        other_action.cocoapods()
+        other_action.cocoapods
       end
 
       #####################################################
@@ -53,7 +55,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :derived_data_path,
             description: "The path to the DerivedData directory for the project. Should match what's used in the `gym` action",
-            is_string: true,
+            type: String,
             default_value: '~/Library/Developer/Xcode/DerivedData'
           ),
         ]
@@ -70,7 +72,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        %i[ios mac].include?(platform)
       end
     end
   end

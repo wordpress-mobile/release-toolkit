@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   module Actions
     module SharedValues
@@ -7,7 +9,12 @@ module Fastlane
     class AndroidCurrentBranchIsHotfixAction < Action
       def self.run(params)
         require_relative '../../helper/android/android_version_helper'
-        version = Fastlane::Helper::Android::VersionHelper.get_release_version
+
+        version_properties_path = params[:version_properties_path]
+
+        version = Fastlane::Helper::Android::VersionHelper.get_release_version(
+          version_properties_path: version_properties_path
+        )
         Fastlane::Helper::Android::VersionHelper.is_hotfix?(version)
       end
 
@@ -24,7 +31,12 @@ module Fastlane
       end
 
       def self.available_options
-        # Define all options your action supports.
+        [
+          FastlaneCore::ConfigItem.new(key: :version_properties_path,
+                                       description: 'Path to the version.properties file',
+                                       type: String,
+                                       optional: false),
+        ]
       end
 
       def self.output

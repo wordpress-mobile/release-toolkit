@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 require 'tmpdir'
-require_relative './spec_helper'
+require_relative 'spec_helper'
 
 describe Fastlane::Helper::ReleaseNotesHelper do
   it 'adds a new section on top if there are no header comments' do

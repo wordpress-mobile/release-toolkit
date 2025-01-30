@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fastlane/action'
 require_relative '../../helper/android/android_localize_helper'
 
@@ -56,7 +58,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        return platform == :android
+        platform == :android
       end
     end
   end

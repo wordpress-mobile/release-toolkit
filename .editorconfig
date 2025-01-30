@@ -3,17 +3,37 @@ root = true
 
 # Apply to all files
 [*]
+charset = utf-8
 end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
-
-# Kotlin specific rules
-[*.{kt,kts}]
-max_line_length=120
-
-# Ruby specific rules
-[{*.rb,Fastfile,Gemfile}]
 indent_style = space
 indent_size = 2
+tab_width = 2
 
-
+# Ruby specific rules
+[{*.rb,*.gemspec,*.rake,Fastfile,Gemfile,Rakefile}]
+ij_ruby_align_group_field_declarations = false
+ij_ruby_align_multiline_parameters = true
+ij_ruby_blank_lines_around_class = 1
+ij_ruby_blank_lines_around_method = 1
+ij_ruby_chain_calls_alignment = 0 # none (i.e. don't align with dot, but with start of line)
+ij_ruby_empty_declarations_style = 1 # single-line
+ij_ruby_force_newlines_around_visibility_mods = true
+ij_ruby_indent_private_methods = false
+ij_ruby_indent_protected_methods = false
+ij_ruby_indent_public_methods = false
+ij_ruby_indent_visibility_modifiers = true
+ij_ruby_indent_when_cases = false
+ij_ruby_keep_blank_lines_in_code = 1
+ij_ruby_keep_blank_lines_in_declarations = 1
+ij_ruby_keep_line_breaks = true
+ij_ruby_parentheses_around_method_arguments = true
+ij_ruby_spaces_around_assignment_operators = true
+ij_ruby_spaces_around_hashrocket = true
+ij_ruby_spaces_around_other_operators = true
+ij_ruby_spaces_around_range_operators = false
+ij_ruby_spaces_around_relational_operators = true
+ij_ruby_spaces_within_array_initializer_braces = true
+ij_ruby_spaces_within_braces = true
+ij_ruby_spaces_within_pipes = false

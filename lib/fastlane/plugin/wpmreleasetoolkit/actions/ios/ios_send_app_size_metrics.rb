@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'plist'
 require_relative '../../helper/app_size_metrics_helper'
 
@@ -5,9 +7,9 @@ module Fastlane
   module Actions
     class IosSendAppSizeMetricsAction < Action
       # Keys used by the metrics payload
-      IPA_FILE_SIZE_KEY = 'File Size'.freeze         # value from `File.size` of the Universal `.ipa`
-      IPA_DOWNLOAD_SIZE_KEY = 'Download Size'.freeze # value from `app-thinning.plist`
-      IPA_INSTALL_SIZE_KEY = 'Install Size'.freeze   # value from `app-thinning.plist`
+      IPA_FILE_SIZE_KEY = 'File Size'         # value from `File.size` of the Universal `.ipa`
+      IPA_DOWNLOAD_SIZE_KEY = 'Download Size' # value from `app-thinning.plist`
+      IPA_INSTALL_SIZE_KEY = 'Install Size'   # value from `app-thinning.plist`
 
       def self.run(params)
         # Check input parameters
@@ -31,7 +33,7 @@ module Fastlane
         app_thinning_plist_path = params[:app_thinning_plist_path] || File.join(File.dirname(params[:ipa_path]), 'app-thinning.plist')
         if File.exist?(app_thinning_plist_path)
           plist = Plist.parse_xml(app_thinning_plist_path)
-          plist['variants'].each do |_key, variant|
+          plist['variants'].each_value do |variant|
             variant_descriptors = variant['variantDescriptors'] || [{ 'device' => 'Universal' }]
             variant_descriptors.each do |desc|
               variant_metadata = { device: desc['device'], 'OS Version': desc['os-version'] }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fastlane/action'
 require 'fastlane_core/ui/ui'
 require 'fileutils'
@@ -9,10 +11,10 @@ module Fastlane
         UI.message 'Running Configure Download'
 
         # If the `~/.mobile-secrets` repository doesn't exist
-        unless File.directory?(secrets_dir)
-          UI.user_error!("The local secrets store does not exist. Please clone it to #{secrets_dir} before continuing.")
-        else
+        if File.directory?(secrets_dir)
           update_repository # If the repo already exists, just update it
+        else
+          UI.user_error!("The local secrets store does not exist. Please clone it to #{secrets_dir} before continuing.")
         end
       end
 

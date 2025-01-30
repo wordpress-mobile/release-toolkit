@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fastlane
   module Actions
     class AndroidDownloadFileByVersionAction < Action
@@ -5,11 +7,17 @@ module Fastlane
         require_relative '../../helper/android/android_localize_helper'
         require_relative '../../helper/github_helper'
 
-        version = Fastlane::Helper::Android::VersionHelper.get_library_version_from_gradle_config(import_key: params[:import_key])
+        build_gradle_path = params[:build_gradle_path]
+
+        version = Fastlane::Helper::Android::VersionHelper.get_library_version_from_gradle_config(
+          build_gradle_path: build_gradle_path,
+          import_key: params[:import_key]
+        )
         UI.user_error!("Can't find any reference for key #{params[:import_key]}") if version.nil?
         UI.message "Downloading #{params[:file_path]} from #{params[:repository]} at version #{version} to #{params[:download_folder]}"
 
-        Fastlane::Helper::GithubHelper.download_file_from_tag(
+        github_helper = Fastlane::Helper::GithubHelper.new(github_token: params[:github_token])
+        github_helper.download_file_from_tag(
           repository: params[:repository],
           tag: "#{params[:github_release_prefix]}#{version}",
           file_path: params[:file_path],
@@ -52,11 +60,16 @@ module Fastlane
                                        description: 'The download folder',
                                        type: String,
                                        optional: true,
-                                       default_value: Dir.tmpdir()),
+                                       default_value: Dir.tmpdir),
           FastlaneCore::ConfigItem.new(key: :github_release_prefix,
                                        description: 'The prefix which is used in the GitHub release title',
                                        type: String,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :build_gradle_path,
+                                       description: 'Path to the build.gradle file',
+                                       type: String,
+                                       optional: true),
+          Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end
 

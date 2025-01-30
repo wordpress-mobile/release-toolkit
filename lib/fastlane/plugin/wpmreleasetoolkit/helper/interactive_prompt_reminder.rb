@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fastlane_core'
 
 # The features in this file are controlled by the following ENV vars:
@@ -24,7 +26,7 @@ require 'fastlane_core'
 module FastlaneCore
   # NOTE: FastlaneCore::UI delegates to the FastlaneCore::Shell implementation when output is the terminal
   class Shell
-    DEFAULT_PROMPT_REMINDER_MESSAGE = 'An interactive prompt is waiting for you in the Terminal!'.freeze
+    DEFAULT_PROMPT_REMINDER_MESSAGE = 'An interactive prompt is waiting for you in the Terminal!'
     DEFAULT_PROMPT_REMINDER_DELAYS = [30, 180, 600].freeze
 
     # Calls the block given and remind the user with a vocal message if the block does not return after specific delays.
@@ -61,7 +63,7 @@ module FastlaneCore
       # if we replied before the timeout, kill the thread so message won't be triggered
       thread.kill
       # If the block given returned a value, pass it
-      return res
+      res
     end
 
     # Monkey-Patch fastlane's `UI.input`, `UI.confirm`, `UI.select` and `UI.password` interactive methods
