@@ -3,6 +3,7 @@
 require 'English'
 require 'fastlane_core/ui/ui'
 require 'fileutils'
+require 'git'
 
 require_relative '../models/configuration'
 
@@ -74,8 +75,10 @@ module Fastlane
       ### Returns the currently checked out branch for the `~/.mobile-secrets` repository.
       ### NB: Returns nil if the repo is in a detached HEAD state.
       def self.repo_branch_name
-        result = `cd #{repository_path} && git rev-parse --abbrev-ref HEAD`.strip
-        result == 'HEAD' ? nil : result
+        git = Git.open(repository_path)
+        return nil if git.branches.select(&:current).empty?
+
+        git.current_branch
       end
 
       ### Returns the most recent commit hash in the `~/.mobile-secrets` repository.
