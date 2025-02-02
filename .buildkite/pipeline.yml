@@ -64,12 +64,21 @@ steps:
     agents:
       queue: "default"
 
-  - label: "☢️ Danger - PR Check"
-    command: danger
-    key: danger
-    if: build.pull_request.id != null
-    retry:
-      manual:
-        permit_on_passed: true
-    agents:
-      queue: linter
+  - group: "Linters"
+    steps:
+      - label: ☢️ Danger - PR Check
+        command: danger
+        key: danger
+        if: build.pull_request.id != null
+        retry:
+          manual:
+            permit_on_passed: true
+        agents:
+          queue: linter
+
+      - label: ":rubocop: Rubocop"
+        command: rubocop
+        key: rubocop
+        if: build.pull_request.id != null
+        agents:
+          queue: linter
