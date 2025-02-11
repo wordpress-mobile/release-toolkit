@@ -19,7 +19,7 @@ module Fastlane
         metadata_rows = metadata.compact.map { |key, value| "<tr><td><b>#{key}</b></td><td>#{value}</td></tr>" }
         footnote = params[:footnote] || (release_info.nil? ? '' : DEFAULT_FOOTNOTE)
 
-        body = <<~COMMENT_BODY.chomp
+        body = <<~COMMENT_BODY.chomp('')
           <table>
           <tr>
             <td rowspan='#{metadata_rows.count + 1}' width='260px'><img src='#{qr_code_url}' width='250' height='250' /></td>
@@ -31,9 +31,9 @@ module Fastlane
         COMMENT_BODY
 
         if params[:fold]
-          "<details><summary>#{intro}</summary>\n#{body}</details>\n"
+          "<details><summary>#{intro}</summary>\n#{body}\n</details>\n"
         else
-          "<p>#{intro}</p>\n#{body}"
+          "<p>#{intro}</p>\n#{body}\n"
         end
       end
 

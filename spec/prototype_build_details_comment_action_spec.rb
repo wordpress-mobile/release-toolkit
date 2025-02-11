@@ -7,6 +7,8 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
     ENV['BUILDKITE_COMMIT'] = 'a1b2c3f'
   end
 
+  let(:custom_footnote) { '<em>Note: Google Sign-In is not available in those builds</em>' }
+
   it 'raises an error if neither Firebase info nor download_url is provided' do
     # Clear the lane context to simulate no Firebase info
     allow(Fastlane::Actions).to receive(:lane_context).and_return({})
@@ -70,7 +72,6 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
     end
 
     it 'includes the provided footnote if one was provided explicitly' do
-      custom_footnote = '<em>Note that Google Sign-In in not available in those builds</em>'
       comment = run_described_fastlane_action(
         app_display_name: 'My App',
         download_url: 'https://localhost/foo.apk',
@@ -201,7 +202,6 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
       end
 
       it 'includes the provided footnote if one was provided explicitly' do
-        custom_footnote = '<em>Note that Google Sign-In in not available in those builds</em>'
         comment = run_described_fastlane_action(
           app_display_name: 'My App',
           footnote: custom_footnote
@@ -238,7 +238,6 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
     end
 
     it 'includes the provided footnote if one was provided explicitly' do
-      custom_footnote = '<em>Note that Google Sign-In in not available in those builds</em>'
       comment = run_described_fastlane_action(
         app_display_name: 'My App',
         download_url: 'https://example.com/myapp.apk',
@@ -288,7 +287,8 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         app_display_name: 'The Best App',
         download_url: 'https://example.com/bestapp.apk',
         fold: true,
-        metadata: metadata
+        metadata: metadata,
+        footnote: custom_footnote
       )
 
       expect(comment).to eq <<~EXPECTED_COMMENT
@@ -303,6 +303,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         <tr><td><b>Commit</b></td><td>a1b2c3f</td></tr>
         <tr><td><b>Direct Download</b></td><td><a href='https://example.com/bestapp.apk'><code>bestapp.apk</code></a></td></tr>
         </table>
+        <em>Note: Google Sign-In is not available in those builds</em>
         </details>
       EXPECTED_COMMENT
     end
