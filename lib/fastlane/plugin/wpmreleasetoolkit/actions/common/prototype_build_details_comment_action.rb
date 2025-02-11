@@ -5,22 +5,25 @@ module Fastlane
     class PrototypeBuildDetailsCommentAction < Action
       def self.run(params)
         app_display_name = params[:app_display_name]
-        app_center_info = AppCenterInfo.from_params(params)
-        metadata = consolidate_metadata(params, app_center_info)
+        release_info = FirebaseReleaseInfo.from_lane_context
 
-        qr_code_url, extra_metadata = build_install_links(app_center_info, params[:download_url])
+        # Merge explicit extra metadata passed from params with ones derived from FirebaseReleaseInfo
+        metadata = generate_metadata_hash(params: params, release_info: release_info)
+        # Build the installation link, QR code URL and extra metadata for download links from the available info
+        qr_code_url, extra_metadata = install_links(release_info: release_info, download_url: params[:download_url])
         metadata.merge!(extra_metadata)
 
-        # Build the comment parts
-        icon_img_tag = img_tag(params[:app_icon] || app_center_info.icon, alt: app_display_name)
-        metadata_rows = metadata.compact.map { |key, value| "<tr><td><b>#{key}</b></td><td>#{value}</td></tr>" }
+        # Build the comment parts and body
+        icon_img_tag = img_tag(params[:app_icon])
         intro = "#{icon_img_tag}📲 You can test the changes from this Pull Request in <b>#{app_display_name}</b> by scanning the QR code below to install the corresponding build."
-        footnote = params[:footnote] || (app_center_info.org_name.nil? ? '' : DEFAULT_APP_CENTER_FOOTNOTE)
-        body = <<~COMMENT_BODY
+        metadata_rows = metadata.compact.map { |key, value| "<tr><td><b>#{key}</b></td><td>#{value}</td></tr>" }
+        footnote = params[:footnote] || (release_info.nil? ? '' : DEFAULT_FOOTNOTE)
+
+        body = <<~COMMENT_BODY.chomp
           <table>
           <tr>
             <td rowspan='#{metadata_rows.count + 1}' width='260px'><img src='#{qr_code_url}' width='250' height='250' /></td>
-            <td><b>App Name</b></td><td>#{icon_img_tag} #{app_display_name}</td>
+            <td><b>App Name</b></td><td>#{app_display_name}</td>
           </tr>
           #{metadata_rows.join("\n")}
           </table>
@@ -38,78 +41,89 @@ module Fastlane
       # @!group Helpers
       #####################################################
 
+      FIREBASE_APP_DISTRIBUTION_URL_REGEX = %r{^https?://firebaseappdistribution\.googleapis\.com/}
+
       NO_INSTALL_URL_ERROR_MESSAGE = <<~NO_URL_ERROR
         No URL provided to download or install the app.
-         - Either use this action right after using `appcenter_upload` and provide an `app_center_org_name` (so that this action can use the link to the App Center build)
+         - Either use this action right after using `firebase_app_distribution` so this action can extract the download URL from the `lane_context`
          - Or provide an explicit value for the `download_url` parameter
-      NO_URL_ERROR
+        NO_URL_ERROR
 
-      DEFAULT_APP_CENTER_FOOTNOTE = '<em>Automatticians: You can use our internal self-serve MC tool to give yourself access to App Center if needed.</em>'
+      DEFAULT_FOOTNOTE = '<em>Automatticians: You can use our internal self-serve MC tool to give yourself access to those builds if needed.</em>'
 
-      # A small model struct to consolidate and pack all the values related to App Center
+      # A small model/struct representing values exposed by Firebase App Distribution for a given release
       #
-      AppCenterInfo = Struct.new(:org_name, :app_name, :display_name, :release_id, :icon, :version, :short_version, :os, :bundle_id) do
-        # A method to construct an AppCenterInfo instance from the action params, and infer the rest from the `lane_context` if available
-        def self.from_params(params)
-          org_name = params[:app_center_org_name]
-          ctx = if org_name && defined?(SharedValues::APPCENTER_BUILD_INFORMATION)
-                  Fastlane::Actions.lane_context[SharedValues::APPCENTER_BUILD_INFORMATION] || {}
-                else
-                  {}
-                end
-          app_name = params[:app_center_app_name] || ctx['app_name']
+      FirebaseReleaseInfo = Struct.new(:display_version, :build_version, :testing_url, :os, :bundle_id, :release_id, keyword_init: true) do
+        def self.from_lane_context
+          # Example of the `lane_context` value for `SharedValues::FIREBASE_APP_DISTRO_RELEASE`:
+          # release hash = {
+          #   name: "projects/430684962662/apps/1:430684962662:ios:641a719f9580b971a7d2a7/releases/00tgr1bfh8ipo",
+          #   createTime: "2025-02-03T17:34:26.961658Z",
+          #   # Note: the following URL includes an temporary access token that expires after 1h
+          #   binaryDownloadUri: "https://firebaseappdistribution.googleapis.com/app-binary-downloads/projects/430684962662/apps/1:430684962662:ios:641a719f9580b971a7d2a7/releases/00tgr1bfh8ipo/binaries/9cb6d32a0148a8e1562df50d61aebfd223ad6190df0bbc9c90acebd2c4687653/app.ipa?utm_source=fastlane&token=AFb1MRwAAAAAZ6EMN1h5Bbh036Y9NtcqZ-K8MBK5ervMh8_mGg8ubL8blLblEHpR0eL9_PjDhbwGvFfRHjkzIyWlVkXbMk_FZ6nVoVTrqAIc5aXKmD9Ahm0U0to77RjuWacmaj3UL00fjN-cHWyMuhIZdvor1cWFeIUG7_v6ghKeTFrHA0VNhE5I4aEJN0_UxDrjqXPDt6x-i3nVSffTVBT3ZnpZnb1mezqJFZNJIU2VnIAmvtWRjx-d7hRFArl32Os9nLhz2T71S5OIEGQj8WyLTL4LZWSduv-ehw4TW29Nz4f99HQvWdpWU8tZ3PQifpSRxwKkz0fqgco0W2FXfUut-vd9T0hXeGF4TlY",
+          #   buildVersion: "2579",
+          #   displayVersion: "2025.3",
+          #   testingUri: "https://appdistribution.firebase.google.com/testerapps/1:430684962662:ios:641a719f9580b971a7d2a7/releases/00tgr1bfh8ipo?utm_source=fastlane"
+          #   releaseNotes: {text: "- Build Number: `2580`\n- Branch: `dvdchr/firebase-prototype-poc`\n- Commit: [55906f5](https://github.com/bloom/DayOne-Apple/commit/55906f5bf87a598686aee50bf522f9cfb0a2815f)\n- Pull Request: [#25739](https://github.com/bloom/DayOne-Apple/pull/25739)\n"},
+          #   firebaseConsoleUri: "https://console.firebase.google.com/project/apps-infra-test/appdistribution/app/ios:com.bloombuilt.dayone-ios-prototype/releases/00tgr1bfh8ipo?utm_source=fastlane",
+          # }
+
+          return nil if !defined?(SharedValues::FIREBASE_APP_DISTRO_RELEASE)
+
+          ctx = Fastlane::Actions.lane_context[SharedValues::FIREBASE_APP_DISTRO_RELEASE]
+          return nil if ctx.nil?
+
+          os, bundle_id, release_id = URI(ctx[:firebaseConsoleUri]).path.match(%r{project/.*/appdistribution/app/([^:]*):([^/]*)/releases/(.*)})&.captures unless ctx[:firebaseConsoleUri].nil?
+
           new(
-            org_name,
-            app_name,
-            ctx['app_display_name'] || app_name,
-            params[:app_center_release_id] || ctx['id'],
-            ctx['app_icon_url'],
-            ctx['version'],
-            ctx['short_version'],
-            ctx['app_os'],
-            ctx['bundle_identifier']
+            display_version: ctx[:displayVersion],
+            build_version: ctx[:buildVersion],
+            testing_url: ctx[:testingUri],
+            os: os,
+            bundle_id: bundle_id,
+            release_id: release_id
           )
         end
       end
 
-      # Builds the installation link, QR code URL and extra metadata for download links from the available info
+      # Constructs the Hash of metadata, based on the explicit ones passed by the user as parameter + the implicit ones from `FirebaseReleaseInfo`
       #
-      # @param [AppCenterInfo] app_center_info The struct containing all the values related to App Center info
-      # @param [String] download_url The `download_url` parameter passed to the action, if one exists
+      # @param [Hash<Symbol, Any>] params The action's parameters, as received by `self.run`
+      # @param [FirebaseReleaseInfo?] release_info The information about the Firebase Release extracted from the `lane_context`
+      # @return [Hash<String, String>] A hash of all the metadata, consolidated from both the explicit and the implicit ones
+      #
+      def self.generate_metadata_hash(params:, release_info:)
+        metadata = params[:metadata]&.transform_keys(&:to_s) || {}
+        metadata['Build Number'] ||= release_info&.build_version
+        metadata['Version'] ||= release_info&.display_version
+        metadata[release_info&.os == 'ios' ? 'Bundle ID' : 'Application ID'] ||= release_info&.bundle_id
+        metadata['Commit'] ||= ENV.fetch('BUILDKITE_COMMIT', nil) || other_action.last_git_commit[:abbreviated_commit_hash]
+        metadata
+      end
+
+      # Constructs the installation link, QR code URL and extra metadata for download links from the available info
+      #
+      # @param [FirebaseReleaseInfo?] release_info The information about the Firebase Release extracted from the `lane_context`
+      # @param [String] download_url The `download_url` parameter passed to the action, if one was provided
       # @return [(String, Hash<String,String>)] A tuple containing:
       #   - The URL for the QR Code
       #   - A Hash of the extra metadata key/value pairs to add to the existing metadata, to enrich them with download/install links
       #
-      def self.build_install_links(app_center_info, download_url)
+      def self.install_links(release_info:, download_url:)
         install_url = nil
         extra_metadata = {}
-        if download_url
+        if download_url && !download_url.match?(FIREBASE_APP_DISTRIBUTION_URL_REGEX)
           install_url = download_url
           extra_metadata['Direct Download'] = "<a href='#{install_url}'><code>#{File.basename(install_url)}</code></a>"
         end
-        if app_center_info.org_name && app_center_info.app_name
-          install_url = "https://install.appcenter.ms/orgs/#{app_center_info.org_name}/apps/#{app_center_info.app_name}/releases/#{app_center_info.release_id}"
-          extra_metadata['App Center Build'] = "<a href='#{install_url}'>#{app_center_info.display_name} ##{app_center_info.release_id}</a>"
+        if release_info&.testing_url || download_url&.match?(FIREBASE_APP_DISTRIBUTION_URL_REGEX)
+          install_url = release_info&.testing_url || download_url
+          extra_metadata['Installation URL'] = "<a href='#{install_url}'>#{release_info&.release_id}</a>"
         end
         UI.user_error!(NO_INSTALL_URL_ERROR_MESSAGE) if install_url.nil?
+
         qr_code_url = "https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=#{CGI.escape(install_url)}"
         [qr_code_url, extra_metadata]
-      end
-
-      # A method to build the Hash of metadata, based on the explicit ones passed by the user as parameter + the implicit ones from `AppCenterInfo`
-      #
-      # @param [Hash<Symbol, Any>] params The action's parameters, as received by `self.run`
-      # @param [AppCenterInfo] app_center_info The model object containing all the values related to App Center information
-      # @return [Hash<String, String>] A hash of all the metadata, gathered from both the explicit and the implicit ones
-      #
-      def self.consolidate_metadata(params, app_center_info)
-        metadata = params[:metadata]&.transform_keys(&:to_s) || {}
-        metadata['Build Number'] ||= app_center_info.version
-        metadata['Version'] ||= app_center_info.short_version
-        metadata[app_center_info.os == 'Android' ? 'Application ID' : 'Bundle ID'] ||= app_center_info.bundle_id
-        # (Feel free to add more CI-specific env vars in the line below to support other CI providers if you need)
-        metadata['Commit'] ||= ENV.fetch('BUILDKITE_COMMIT', nil) || other_action.last_git_commit[:abbreviated_commit_hash]
-        metadata
       end
 
       # Creates an HTML `<img>` tag for an icon URL or the image URL to represent a given Buildkite emoji
@@ -117,10 +131,9 @@ module Fastlane
       # @param [String] url_or_emoji A `String` which can be:
       #  - Either a valid URI to an image
       #  - Or a string formatted like `:emojiname:`, using a valid Buildite emoji name as defined in https://github.com/buildkite/emojis
-      # @param [String] alt The alt text to use for the `<img>` tag
       # @return [String] The `<img …>` tag with the proper image and alt tag
       #
-      def self.img_tag(url_or_emoji, alt: '')
+      def self.img_tag(url_or_emoji)
         return nil if url_or_emoji.nil?
 
         emoji = url_or_emoji.match(/:(.*):/)&.captures&.first
@@ -129,7 +142,7 @@ module Fastlane
                        elsif URI(url_or_emoji)
                          url_or_emoji
                        end
-        app_icon_url ? "<img alt='#{alt}' align='top' src='#{app_icon_url}' width='20px' />" : ''
+        app_icon_url ? "<img align='top' src='#{app_icon_url}' width='20px' />" : ''
       end
 
       #####################################################
@@ -145,98 +158,70 @@ module Fastlane
           Generates a string providing all the details of a prototype build, nicely-formatted as HTML.
           The returned string will typically be subsequently used by the `comment_on_pr` action to post that HTML as comment on a PR.
 
-          If you used the `appcenter_upload` lane (to upload the Prototype build to App Center) before calling this action, and pass
-          a value to the `app_center_org_name` parameter, then many of the parameters and metadata will be automatically extracted
-          from the `lane_context` provided by `appcenter_upload`, including:
+          If you used the `firebase_app_distribution` lane (to upload the Prototype build to Firebase App Distribution) before calling this action,
+          then many of the metadata will be automatically extracted from the `lane_context` provided by `firebase_app_distribution`:
 
-           - The `app_center_app_name`, `app_center_release_id` and installation URL to use for the QR code to point to that release in App Center
-           - The `app_icon`
-           - The app's Build Number / versionCode
-           - The app's Version / versionName
-           - The app's Bundle ID / Application ID
-           - A `footnote` mentioning the MC tool for Automatticians to add themselves to App Center
+          - "Version" (from `:displayVersion`) and "Build Number" (from `:buildVersion`)
+          - "Bundle ID" (extracted from `:firebaseConsoleUri`)
+          - "Commit" (from `BUILDKITE_COMMIT` environment variable or last git commit)
+          - "Installation URL" (from `:testingUri`)
 
-          This means that if you are using App Center to distribute your Prototype Build, the only parameters you *have* to provide
-          to this action are `app_display_name` and `app_center_org_name`; plus, for `metadata` most of the interesting values will already be pre-filled.
+          You can also pass additional metadata to this action via the `metadata` parameter, and it will be included in the HTML table of the comment.
 
-          Any of those implicit default values/metadata can of course be overridden by passing an explicit value to the appropriate parameter(s).
+          This means that if you are using Firebase App Distribution to distribute your Prototype Build, the can just provide
+          `app_display_name` and optionally `app_icon`, and the rest will be automatically inferred from the `lane_context`.
+
+
         DESC
       end
 
       def self.available_options
-        app_center_auto = '(will be automatically extracted from `lane_context if you used `appcenter_upload` to distribute your Prototype build)'
         [
           FastlaneCore::ConfigItem.new(
             key: :app_display_name,
-            env_name: 'FL_PROTOTYPE_BUILD_DETAILS_COMMENT_APP_DISPLAY_NAME',
             description: 'The display name to use for the app in the comment message',
             optional: false,
             type: String
           ),
           FastlaneCore::ConfigItem.new(
-            key: :app_center_org_name,
-            env_name: 'APPCENTER_OWNER_NAME', # Intentionally the same as the one used by the `appcenter_upload` action
-            description: 'The name of the organization in App Center (if you used `appcenter_upload` to distribute your Prototype build)',
-            type: String,
-            optional: true
-          ),
-          FastlaneCore::ConfigItem.new(
-            key: :app_center_app_name,
-            env_name: 'APPCENTER_APP_NAME', # Intentionally the same as the one used by the `appcenter_upload` action
-            description: "The name of the app in App Center #{app_center_auto}",
-            type: String,
-            optional: true,
-            default_value_dynamic: true # As it will be extracted from the `lane_context`` if you used `appcenter_upload``
-          ),
-          FastlaneCore::ConfigItem.new(
-            key: :app_center_release_id,
-            env_name: 'APPCENTER_RELEASE_ID',
-            description: "The release ID/Number in App Center #{app_center_auto}",
-            type: String,
-            optional: true,
-            default_value_dynamic: true # As it will be extracted from the `lane_context`` if you used `appcenter_upload``
-          ),
-          FastlaneCore::ConfigItem.new(
             key: :app_icon,
-            env_name: 'FL_PROTOTYPE_BUILD_DETAILS_COMMENT_APP_ICON',
-            description: "The name of an emoji from the https://github.com/buildkite/emojis list or the full image URL to use for the icon of the app in the message. #{app_center_auto}",
+            description: "The name of an emoji from the https://github.com/buildkite/emojis list or the full image URL to use for the icon of the app in the message",
             type: String,
-            optional: true,
-            default_value_dynamic: true # As it will be extracted from the `lane_context`` if you used `appcenter_upload``
+            default_value: ':firebase:'
           ),
           FastlaneCore::ConfigItem.new(
             key: :download_url,
-            env_name: 'FL_PROTOTYPE_BUILD_DETAILS_COMMENT_DOWNLOAD_URL',
-            description: 'The URL to download the build as a direct download. ' \
-             + 'If you uploaded the build to App Center, we recommend leaving this nil (the comment will use the URL to the App Center build for the QR code)',
+            description: <<~DESC,
+              The URL to use to download/install the build.
+              - If you used `firebase_app_distribution` to upload the build during the same `fastlane` run, you should leave this nil
+              - If you used `firebase_app_distribution` during a separate CI job, you can pass the firebase testing URI explicitly here (e.g. passing the value from the previous job via Buildkite metadata for example)
+              - Otherwise, you can provide a direct download URL for the build (e.g. link to Cloudfront or AppsCDN URL)
+            DESC
             type: String,
             optional: true,
             default_value: nil
           ),
           FastlaneCore::ConfigItem.new(
             key: :fold,
-            env_name: 'FL_PROTOTYPE_BUILD_DETAILS_COMMENT_FOLD',
             description: 'If true, will wrap the HTML table inside a <details> block (hidden by default)',
             type: Boolean,
             default_value: false
           ),
           FastlaneCore::ConfigItem.new(
             key: :metadata,
-            env_name: 'FL_PROTOTYPE_BUILD_DETAILS_COMMENT_METADATA',
             description: 'All additional metadata (as key/value pairs) you want to include in the HTML table of the comment. ' \
-             + 'If you are running this action after `appcenter_upload`, some metadata will automatically be added to this list too',
+             + 'If you are running this action after `firebase_app_distribution`, some metadata will automatically be added and merged with this list',
             type: Hash,
             optional: true,
-            default_value_dynamic: true # As some metadata will be auto-filled if you used `appcenter_upload`
+            default_value_dynamic: true # As some metadata will be auto-filled if you used `firebase_app_distribution`
           ),
           FastlaneCore::ConfigItem.new(
             key: :footnote,
-            env_name: 'FL_PROTOTYPE_BUILD_DETAILS_COMMENT_FOOTNOTE',
             description: 'Optional footnote to add below the HTML table of the comment. ' \
-             + 'If you are running this action after `appcenter_upload`, a default footnote for Automatticians will be used unless you provide an explicit value',
+             + 'If you are running this action after `firebase_app_distribution`, a default footnote for Automatticians will be used unless you provide an explicit value',
             type: String,
             optional: true,
-            default_value_dynamic: true # We have a default footnote for the case when you used App Center
+            default_value_dynamic: true # We have a default footnote for the case when you used Firebase App Distribution
           ),
         ]
       end
