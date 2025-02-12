@@ -19,7 +19,7 @@ module Fastlane
         # Build the comment parts and body
         icon_img_tag = img_tag(params[:app_icon])
         intro = "#{icon_img_tag}📲 You can test the changes from this Pull Request in <b>#{CGI.escape_html(app_display_name)}</b> by scanning the QR code below to install the corresponding build."
-        metadata_rows = metadata.compact.map { |key, value| "<tr><td><b>#{CGI.escape_html(key.to_s)}</b></td><td>#{value}</td></tr>" }
+        metadata_rows = metadata.compact.map { |key, value| "<tr><td><b>#{key}</b></td><td>#{value}</td></tr>" }
         footnote = params[:footnote] || (release_info.nil? ? '' : DEFAULT_FOOTNOTE)
 
         body = <<~COMMENT_BODY.chomp('')

@@ -8,16 +8,88 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
   end
 
   let(:custom_footnote) { '<em>Note: Google Sign-In is not available in those builds</em>' }
+  let(:valid_download_url) { 'https://example.com/myapp.apk' }
+  let(:valid_app_icon_url) { 'https://localhost/foo.png' }
+  let(:base_params) do
+    {
+      app_display_name: 'My App',
+      download_url: valid_download_url
+    }
+  end
 
-  it 'raises an error if neither Firebase info nor download_url is provided' do
-    # Clear the lane context to simulate no Firebase info
-    allow(Fastlane::Actions).to receive(:lane_context).and_return({})
+  describe 'error handling' do
+    it 'raises an error if neither Firebase info nor download_url is provided' do
+      allow(Fastlane::Actions).to receive(:lane_context).and_return({})
+      expect do
+        run_described_fastlane_action(app_display_name: 'My App')
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, described_class::NO_INSTALL_URL_ERROR_MESSAGE)
+    end
 
-    expect do
-      run_described_fastlane_action(
-        app_display_name: 'My App'
-      )
-    end.to raise_error(FastlaneCore::Interface::FastlaneError, described_class::NO_INSTALL_URL_ERROR_MESSAGE)
+    describe 'URL validation' do
+      it 'raises an error for invalid download URLs' do
+        expect do
+          run_described_fastlane_action(base_params.merge(download_url: 'not-a-url'))
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /Invalid URL/)
+      end
+
+      it 'raises an error for invalid app icon URLs' do
+        expect do
+          run_described_fastlane_action(base_params.merge(app_icon: 'not-a-url'))
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /Invalid URL/)
+      end
+
+      it 'accepts valid URLs with special characters' do
+        url_with_special_chars = 'https://example.com/path%20with%20spaces.apk'
+        expect do
+          run_described_fastlane_action(base_params.merge(download_url: url_with_special_chars))
+        end.not_to raise_error
+      end
+    end
+  end
+
+  describe 'HTML escaping' do
+    let(:app_name_with_html) { 'My <em>Cool</em> App' }
+    let(:metadata_with_html) do
+      {
+        'HTML Key': '<b>bold</b>',
+        'Link': '<a href="https://example.com">example.com</a>',
+        'Mixed &amp; Content': 'Version &amp; Build <strong>1.0</strong>'
+      }
+    end
+
+    it 'properly escapes HTML in app display name' do
+      comment = run_described_fastlane_action(base_params.merge(app_display_name: app_name_with_html))
+      expect(comment).to include '&lt;em&gt;Cool&lt;/em&gt;'
+      expect(comment).not_to include '<em>'
+    end
+
+    it 'does not escape HTML in metadata' do
+      comment = run_described_fastlane_action(base_params.merge(metadata: metadata_with_html))
+      # HTML in metadata should be preserved as-is, so we can e.g. use links or <code> tags
+      expect(comment).to include '<tr><td><b>HTML Key</b></td><td><b>bold</b></td>'
+      expect(comment).to include '<tr><td><b>Link</b></td><td><a href="https://example.com">example.com</a></td>'
+      expect(comment).to include '<tr><td><b>Mixed &amp; Content</b></td><td>Version &amp; Build <strong>1.0</strong></td>'
+    end
+  end
+
+  describe 'metadata handling' do
+    it 'handles empty metadata gracefully' do
+      comment = run_described_fastlane_action(base_params.merge(metadata: {}))
+      # Should still include default metadata
+      expect(comment).to include '<td><b>App Name</b></td>'
+      expect(comment).to include '<td><b>Commit</b></td>'
+    end
+
+    it 'handles nil metadata values' do
+      comment = run_described_fastlane_action(base_params.merge(metadata: { 'Nil Value': nil }))
+      expect(comment).not_to include '<td><b>Nil Value</b></td>'
+    end
+
+    it 'handles very long metadata values' do
+      long_value = 'a' * 1000
+      comment = run_described_fastlane_action(base_params.merge(metadata: { 'Long Value': long_value }))
+      expect(comment).to include long_value
+    end
   end
 
   describe 'cases common to all operating modes' do
@@ -252,7 +324,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
       metadata = {
         'Version Name': '28.2',
         'Version Code': '1280200108',
-        Flavor: 'Debug'
+        'Flavor': 'Debug'
       }
 
       comment = run_described_fastlane_action(
@@ -306,6 +378,34 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         <em>Note: Google Sign-In is not available in those builds</em>
         </details>
       EXPECTED_COMMENT
+    end
+  end
+
+  describe 'app_icon handling' do
+    context 'when providing an URL' do
+      it 'includes the icon in the intro text' do
+        comment = run_described_fastlane_action(base_params.merge(app_icon: valid_app_icon_url))
+        expect(comment).to include "<img align='top' src='#{valid_app_icon_url}' width='20px' alt='App Icon' />📲 "
+      end
+    end
+
+    context 'when providing an emoji code' do
+      it 'includes the icon in the intro text' do
+        comment = run_described_fastlane_action(base_params.merge(app_icon: ':jetpack:'))
+        expect(comment).to include "<img align='top' src='https://raw.githubusercontent.com/buildkite/emojis/main/img-buildkite-64/jetpack.png' width='20px' alt='App Icon' />📲 "
+      end
+
+      it 'handles emoji codes with special characters' do
+        comment = run_described_fastlane_action(base_params.merge(app_icon: ':plus-one:'))
+        expect(comment).to include 'plus-one.png'
+      end
+    end
+
+    context 'when no icon is provided' do
+      it 'uses the default firebase icon' do
+        comment = run_described_fastlane_action(base_params.merge(app_icon: nil))
+        expect(comment).to include 'firebase.png'
+      end
     end
   end
 end
