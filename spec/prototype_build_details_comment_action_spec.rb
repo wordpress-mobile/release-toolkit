@@ -52,7 +52,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
     let(:metadata_with_html) do
       {
         'HTML Key': '<b>bold</b>',
-        'Link': '<a href="https://example.com">example.com</a>',
+        Link: '<a href="https://example.com">example.com</a>',
         'Mixed &amp; Content': 'Version &amp; Build <strong>1.0</strong>'
       }
     end
@@ -324,7 +324,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
       metadata = {
         'Version Name': '28.2',
         'Version Code': '1280200108',
-        'Flavor': 'Debug'
+        Flavor: 'Debug'
       }
 
       comment = run_described_fastlane_action(

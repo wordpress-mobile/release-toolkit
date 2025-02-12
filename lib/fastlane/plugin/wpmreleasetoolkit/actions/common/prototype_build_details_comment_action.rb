@@ -76,9 +76,10 @@ module Fastlane
           return nil if ctx.nil?
 
           # Extract platform info from Firebase Console URI
-          os, bundle_id, release_id = if ctx[:firebaseConsoleUri]
-                                      URI(ctx[:firebaseConsoleUri]).path.match(%r{project/.*/appdistribution/app/([^:]*):([^/]*)/releases/(.*)})&.captures
-                                    end
+          if ctx[:firebaseConsoleUri]
+            uri = URI(ctx[:firebaseConsoleUri])
+            os, bundle_id, release_id = uri.path.match(%r{project/.*/appdistribution/app/([^:]*):([^/]*)/releases/(.*)})&.captures
+          end
 
           new(
             display_version: ctx[:displayVersion],
