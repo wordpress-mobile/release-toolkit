@@ -24,18 +24,18 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
     describe 'app_display_name' do
       it 'includes the app display name as part of the intro text' do
         comment = run_described_fastlane_action(
-          app_display_name: 'My Cool App',
+          app_display_name: 'My Cool App & Co.',
           download_url: 'https://localhost/foo.apk'
         )
-        expect(comment).to include '📲 You can test the changes from this Pull Request in <b>My Cool App</b>'
+        expect(comment).to include '📲 You can test the changes from this Pull Request in <b>My Cool App &amp; Co.</b>'
       end
 
       it 'includes the app display name as part of implicit metadata' do
         comment = run_described_fastlane_action(
-          app_display_name: 'My Cool App',
+          app_display_name: 'My Cool App & Co.',
           download_url: 'https://localhost/foo.apk'
         )
-        expect(comment).to include '<td><b>App Name</b></td><td>My Cool App</td>'
+        expect(comment).to include '<td><b>App Name</b></td><td>My Cool App &amp; Co.</td>'
       end
     end
 
@@ -47,7 +47,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
             app_icon: 'https://localhost/foo.png',
             download_url: 'https://localhost/foo.apk'
           )
-          expect(comment).to include "<img align='top' src='https://localhost/foo.png' width='20px' />📲 "
+          expect(comment).to include "<img align='top' src='https://localhost/foo.png' width='20px' alt='App Icon' />📲 "
         end
       end
 
@@ -58,7 +58,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
             app_icon: ':jetpack:',
             download_url: 'https://localhost/foo.apk'
           )
-          expect(comment).to include "<img align='top' src='https://raw.githubusercontent.com/buildkite/emojis/main/img-buildkite-64/jetpack.png' width='20px' />📲 "
+          expect(comment).to include "<img align='top' src='https://raw.githubusercontent.com/buildkite/emojis/main/img-buildkite-64/jetpack.png' width='20px' alt='App Icon' />📲 "
         end
       end
     end
@@ -262,7 +262,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
       )
 
       expect(comment).to eq <<~EXPECTED_COMMENT
-        <p><img align='top' src='https://raw.githubusercontent.com/buildkite/emojis/main/img-buildkite-64/firebase.png' width='20px' />📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</p>
+        <p><img align='top' src='https://raw.githubusercontent.com/buildkite/emojis/main/img-buildkite-64/firebase.png' width='20px' alt='App Icon' />📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</p>
         <table>
         <tr>
           <td rowspan='6' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Fexample.com%2Fbestapp.apk' width='250' height='250' /></td>
@@ -292,7 +292,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
       )
 
       expect(comment).to eq <<~EXPECTED_COMMENT
-        <details><summary><img align='top' src='https://raw.githubusercontent.com/buildkite/emojis/main/img-buildkite-64/firebase.png' width='20px' />📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</summary>
+        <details><summary><img align='top' src='https://raw.githubusercontent.com/buildkite/emojis/main/img-buildkite-64/firebase.png' width='20px' alt='App Icon' />📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</summary>
         <table>
         <tr>
           <td rowspan='5' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Fexample.com%2Fbestapp.apk' width='250' height='250' /></td>

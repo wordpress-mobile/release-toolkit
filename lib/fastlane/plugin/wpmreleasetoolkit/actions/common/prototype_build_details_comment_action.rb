@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'cgi'
+require 'uri'
+
 module Fastlane
   module Actions
     class PrototypeBuildDetailsCommentAction < Action
@@ -15,15 +18,15 @@ module Fastlane
 
         # Build the comment parts and body
         icon_img_tag = img_tag(params[:app_icon])
-        intro = "#{icon_img_tag}📲 You can test the changes from this Pull Request in <b>#{app_display_name}</b> by scanning the QR code below to install the corresponding build."
-        metadata_rows = metadata.compact.map { |key, value| "<tr><td><b>#{key}</b></td><td>#{value}</td></tr>" }
+        intro = "#{icon_img_tag}📲 You can test the changes from this Pull Request in <b>#{CGI.escape_html(app_display_name)}</b> by scanning the QR code below to install the corresponding build."
+        metadata_rows = metadata.compact.map { |key, value| "<tr><td><b>#{CGI.escape_html(key.to_s)}</b></td><td>#{value}</td></tr>" }
         footnote = params[:footnote] || (release_info.nil? ? '' : DEFAULT_FOOTNOTE)
 
         body = <<~COMMENT_BODY.chomp('')
           <table>
           <tr>
             <td rowspan='#{metadata_rows.count + 1}' width='260px'><img src='#{qr_code_url}' width='250' height='250' /></td>
-            <td><b>App Name</b></td><td>#{app_display_name}</td>
+            <td><b>App Name</b></td><td>#{CGI.escape_html(app_display_name)}</td>
           </tr>
           #{metadata_rows.join("\n")}
           </table>
@@ -41,8 +44,6 @@ module Fastlane
       # @!group Helpers
       #####################################################
 
-      FIREBASE_APP_DISTRIBUTION_URL_REGEX = %r{^https?://firebaseappdistribution\.googleapis\.com/}
-
       NO_INSTALL_URL_ERROR_MESSAGE = <<~NO_URL_ERROR
         No URL provided to download or install the app.
          - Either use this action right after using `firebase_app_distribution` so this action can extract the download URL from the `lane_context`
@@ -51,29 +52,33 @@ module Fastlane
 
       DEFAULT_FOOTNOTE = '<em>Automatticians: You can use our internal self-serve MC tool to give yourself access to those builds if needed.</em>'
 
+      # Parse and validate a URL string
+      #
+      # @param [String] url The URL string to parse and validate
+      # @return [URI] The parsed URI object
+      # @raise [FastlaneCore::Interface::FastlaneError] if the URL is invalid
+      #
+      def self.parse_url!(url)
+        URI.parse(url).tap do |uri|
+          raise URI::InvalidURIError unless uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
+        end
+      rescue URI::InvalidURIError
+        UI.user_error!("Invalid URL: #{url}")
+      end
+
       # A small model/struct representing values exposed by Firebase App Distribution for a given release
       #
       FirebaseReleaseInfo = Struct.new(:display_version, :build_version, :testing_url, :os, :bundle_id, :release_id, keyword_init: true) do
         def self.from_lane_context
-          # Example of the `lane_context` value for `SharedValues::FIREBASE_APP_DISTRO_RELEASE`:
-          # release hash = {
-          #   name: "projects/430684962662/apps/1:430684962662:ios:641a719f9580b971a7d2a7/releases/00tgr1bfh8ipo",
-          #   createTime: "2025-02-03T17:34:26.961658Z",
-          #   # Note: the following URL includes an temporary access token that expires after 1h
-          #   binaryDownloadUri: "https://firebaseappdistribution.googleapis.com/app-binary-downloads/projects/430684962662/apps/1:430684962662:ios:641a719f9580b971a7d2a7/releases/00tgr1bfh8ipo/binaries/9cb6d32a0148a8e1562df50d61aebfd223ad6190df0bbc9c90acebd2c4687653/app.ipa?utm_source=fastlane&token=AFb1MRwAAAAAZ6EMN1h5Bbh036Y9NtcqZ-K8MBK5ervMh8_mGg8ubL8blLblEHpR0eL9_PjDhbwGvFfRHjkzIyWlVkXbMk_FZ6nVoVTrqAIc5aXKmD9Ahm0U0to77RjuWacmaj3UL00fjN-cHWyMuhIZdvor1cWFeIUG7_v6ghKeTFrHA0VNhE5I4aEJN0_UxDrjqXPDt6x-i3nVSffTVBT3ZnpZnb1mezqJFZNJIU2VnIAmvtWRjx-d7hRFArl32Os9nLhz2T71S5OIEGQj8WyLTL4LZWSduv-ehw4TW29Nz4f99HQvWdpWU8tZ3PQifpSRxwKkz0fqgco0W2FXfUut-vd9T0hXeGF4TlY",
-          #   buildVersion: "2579",
-          #   displayVersion: "2025.3",
-          #   testingUri: "https://appdistribution.firebase.google.com/testerapps/1:430684962662:ios:641a719f9580b971a7d2a7/releases/00tgr1bfh8ipo?utm_source=fastlane"
-          #   releaseNotes: {text: "- Build Number: `2580`\n- Branch: `dvdchr/firebase-prototype-poc`\n- Commit: [55906f5](https://github.com/bloom/DayOne-Apple/commit/55906f5bf87a598686aee50bf522f9cfb0a2815f)\n- Pull Request: [#25739](https://github.com/bloom/DayOne-Apple/pull/25739)\n"},
-          #   firebaseConsoleUri: "https://console.firebase.google.com/project/apps-infra-test/appdistribution/app/ios:com.bloombuilt.dayone-ios-prototype/releases/00tgr1bfh8ipo?utm_source=fastlane",
-          # }
-
           return nil unless defined?(SharedValues::FIREBASE_APP_DISTRO_RELEASE)
 
           ctx = Fastlane::Actions.lane_context[SharedValues::FIREBASE_APP_DISTRO_RELEASE]
           return nil if ctx.nil?
 
-          os, bundle_id, release_id = URI(ctx[:firebaseConsoleUri]).path.match(%r{project/.*/appdistribution/app/([^:]*):([^/]*)/releases/(.*)})&.captures unless ctx[:firebaseConsoleUri].nil?
+          # Extract platform info from Firebase Console URI
+          os, bundle_id, release_id = if ctx[:firebaseConsoleUri]
+                                      URI(ctx[:firebaseConsoleUri]).path.match(%r{project/.*/appdistribution/app/([^:]*):([^/]*)/releases/(.*)})&.captures
+                                    end
 
           new(
             display_version: ctx[:displayVersion],
@@ -94,9 +99,13 @@ module Fastlane
       #
       def self.generate_metadata_hash(params:, release_info:)
         metadata = params[:metadata]&.transform_keys(&:to_s) || {}
+
+        # Add Firebase-specific metadata if available
         metadata['Build Number'] ||= release_info&.build_version
         metadata['Version'] ||= release_info&.display_version
         metadata[release_info&.os == 'ios' ? 'Bundle ID' : 'Application ID'] ||= release_info&.bundle_id
+
+        # Add git metadata
         metadata['Commit'] ||= ENV.fetch('BUILDKITE_COMMIT', nil) || other_action.last_git_commit[:abbreviated_commit_hash]
         metadata
       end
@@ -108,20 +117,38 @@ module Fastlane
       # @return [(String, Hash<String,String>)] A tuple containing:
       #   - The URL for the QR Code
       #   - A Hash of the extra metadata key/value pairs to add to the existing metadata, to enrich them with download/install links
+      # @raise [FastlaneCore::Interface::FastlaneError] if no valid installation URL could be determined
       #
       def self.install_links(release_info:, download_url:)
         install_url = nil
         extra_metadata = {}
-        if download_url && !download_url.match?(FIREBASE_APP_DISTRIBUTION_URL_REGEX)
+        firebase_release_id = nil
+
+        # Validate and process direct download URL if provided
+        if download_url
+          uri = parse_url!(download_url)
           install_url = download_url
-          extra_metadata['Direct Download'] = "<a href='#{install_url}'><code>#{File.basename(install_url)}</code></a>"
+
+          if uri.host == 'appdistribution.firebase.google.com' && uri.path.start_with?('/testerapps/')
+            firebase_release_id = File.basename(uri.path)
+          else
+            filename = File.basename(uri.path)
+            extra_metadata['Direct Download'] = "<a href='#{CGI.escape_html(install_url)}'><code>#{CGI.escape_html(filename)}</code></a>"
+          end
         end
-        if release_info&.testing_url || download_url&.match?(FIREBASE_APP_DISTRIBUTION_URL_REGEX)
-          install_url = release_info&.testing_url || download_url
-          extra_metadata['Installation URL'] = "<a href='#{install_url}'>#{release_info&.release_id}</a>"
+
+        # Process Firebase testing URL if available from release_info
+        if release_info&.testing_url
+          install_url = release_info.testing_url
+          firebase_release_id = release_info.release_id
         end
+
         UI.user_error!(NO_INSTALL_URL_ERROR_MESSAGE) if install_url.nil?
 
+        # Add Installation URL metadata if we have a release_id
+        extra_metadata['Installation URL'] = "<a href='#{CGI.escape_html(install_url)}'>#{CGI.escape_html(firebase_release_id)}</a>" if firebase_release_id
+
+        # Generate QR code URL with proper escaping
         qr_code_url = "https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=#{CGI.escape(install_url)}"
         [qr_code_url, extra_metadata]
       end
@@ -132,6 +159,7 @@ module Fastlane
       #  - Either a valid URI to an image
       #  - Or a string formatted like `:emojiname:`, using a valid Buildite emoji name as defined in https://github.com/buildkite/emojis
       # @return [String] The `<img …>` tag with the proper image and alt tag
+      # @raise [FastlaneCore::Interface::FastlaneError] if the URL is invalid
       #
       def self.img_tag(url_or_emoji)
         return nil if url_or_emoji.nil?
@@ -139,10 +167,10 @@ module Fastlane
         emoji = url_or_emoji.match(/:(.*):/)&.captures&.first
         app_icon_url = if emoji
                          "https://raw.githubusercontent.com/buildkite/emojis/main/img-buildkite-64/#{emoji}.png"
-                       elsif URI(url_or_emoji)
-                         url_or_emoji
+                       else
+                         url_or_emoji.tap { parse_url!(url_or_emoji) }
                        end
-        app_icon_url ? "<img align='top' src='#{app_icon_url}' width='20px' />" : ''
+        app_icon_url ? "<img align='top' src='#{app_icon_url}' width='20px' alt='App Icon' />" : ''
       end
 
       #####################################################
