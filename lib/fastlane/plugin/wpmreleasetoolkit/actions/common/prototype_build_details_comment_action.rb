@@ -47,7 +47,7 @@ module Fastlane
         No URL provided to download or install the app.
          - Either use this action right after using `firebase_app_distribution` so this action can extract the download URL from the `lane_context`
          - Or provide an explicit value for the `download_url` parameter
-        NO_URL_ERROR
+      NO_URL_ERROR
 
       DEFAULT_FOOTNOTE = '<em>Automatticians: You can use our internal self-serve MC tool to give yourself access to those builds if needed.</em>'
 
@@ -68,7 +68,7 @@ module Fastlane
           #   firebaseConsoleUri: "https://console.firebase.google.com/project/apps-infra-test/appdistribution/app/ios:com.bloombuilt.dayone-ios-prototype/releases/00tgr1bfh8ipo?utm_source=fastlane",
           # }
 
-          return nil if !defined?(SharedValues::FIREBASE_APP_DISTRO_RELEASE)
+          return nil unless defined?(SharedValues::FIREBASE_APP_DISTRO_RELEASE)
 
           ctx = Fastlane::Actions.lane_context[SharedValues::FIREBASE_APP_DISTRO_RELEASE]
           return nil if ctx.nil?
@@ -185,7 +185,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :app_icon,
-            description: "The name of an emoji from the https://github.com/buildkite/emojis list or the full image URL to use for the icon of the app in the message",
+            description: 'The name of an emoji from the https://github.com/buildkite/emojis list or the full image URL to use for the icon of the app in the message',
             type: String,
             default_value: ':firebase:'
           ),
