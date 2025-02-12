@@ -22,7 +22,8 @@ module Fastlane
         app_icon ||= ':firebase:' if !release_info.nil? || (download_url && is_firebase_url?(download_url))
         intro = "#{img_tag(app_icon)}📲 You can test the changes from this Pull Request in <b>#{CGI.escape_html(app_display_name)}</b> by scanning the QR code below to install the corresponding build."
         metadata_rows = metadata.compact.map { |key, value| "<tr><td><b>#{key}</b></td><td>#{value}</td></tr>" }
-        footnote = params[:footnote] || (release_info.nil? ? '' : DEFAULT_FOOTNOTE)
+        footnote = params[:footnote]
+        footnote ||= DEFAULT_FOOTNOTE if !release_info.nil? || (download_url && is_firebase_url?(download_url))
 
         body = <<~COMMENT_BODY.chomp('')
           <table>

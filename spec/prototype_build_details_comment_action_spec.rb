@@ -317,6 +317,14 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
       )
       expect(comment).to include custom_footnote
     end
+
+    it 'includes the default footnote if no explicit one is provided but the download URL is a Firebase URL' do
+      comment = run_described_fastlane_action(
+        app_display_name: 'My App',
+        download_url: 'https://appdistribution.firebase.google.com/testerapps/1:123456:ios:abcdef/releases/xyz'
+      )
+      expect(comment).to include described_class::DEFAULT_FOOTNOTE
+    end
   end
 
   describe 'validating full comment' do
