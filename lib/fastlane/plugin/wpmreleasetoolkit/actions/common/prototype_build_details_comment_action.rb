@@ -187,20 +187,21 @@ module Fastlane
           Generates a string providing all the details of a prototype build, nicely-formatted as HTML.
           The returned string will typically be subsequently used by the `comment_on_pr` action to post that HTML as comment on a PR.
 
-          If you used the `firebase_app_distribution` lane (to upload the Prototype build to Firebase App Distribution) before calling this action,
-          then many of the metadata will be automatically extracted from the `lane_context` provided by `firebase_app_distribution`:
+          If you used the `firebase_app_distribution` action (to upload the Prototype build to Firebase App Distribution) before calling this action,
+          then many of the metadata will be automatically extracted from the `lane_context` it exposed:
 
           - "Version" (from `:displayVersion`) and "Build Number" (from `:buildVersion`)
           - "Bundle ID" (extracted from `:firebaseConsoleUri`)
           - "Commit" (from `BUILDKITE_COMMIT` environment variable or last git commit)
           - "Installation URL" (from `:testingUri`)
 
-          You can also pass additional metadata to this action via the `metadata` parameter, and it will be included in the HTML table of the comment.
+          You can also pass additional metadata to this action via the `metadata` parameter, and they will also be included in the HTML table of the comment.
 
           This means that if you are using Firebase App Distribution to distribute your Prototype Build, the can just provide
           `app_display_name` and optionally `app_icon`, and the rest will be automatically inferred from the `lane_context`.
 
-
+          If you are not using Firebase App Distribution, you can pass an explicit value for the `download_url` parameter,
+          and the action will use it to generate the installation link and QR code.
         DESC
       end
 
