@@ -8,17 +8,19 @@ module Fastlane
     class PrototypeBuildDetailsCommentAction < Action
       def self.run(params)
         app_display_name = params[:app_display_name]
+        download_url = params[:download_url]
         release_info = FirebaseReleaseInfo.from_lane_context
 
         # Merge explicit extra metadata passed from params with ones derived from FirebaseReleaseInfo
         metadata = generate_metadata_hash(params: params, release_info: release_info)
         # Build the installation link, QR code URL and extra metadata for download links from the available info
-        qr_code_url, extra_metadata = install_links(release_info: release_info, download_url: params[:download_url])
+        qr_code_url, extra_metadata = install_links(release_info: release_info, download_url: download_url)
         metadata.merge!(extra_metadata)
 
         # Build the comment parts and body
-        icon_img_tag = img_tag(params[:app_icon])
-        intro = "#{icon_img_tag}📲 You can test the changes from this Pull Request in <b>#{CGI.escape_html(app_display_name)}</b> by scanning the QR code below to install the corresponding build."
+        app_icon = params[:app_icon]
+        app_icon ||= ':firebase:' if !release_info.nil? || (download_url && is_firebase_url?(download_url))
+        intro = "#{img_tag(app_icon)}📲 You can test the changes from this Pull Request in <b>#{CGI.escape_html(app_display_name)}</b> by scanning the QR code below to install the corresponding build."
         metadata_rows = metadata.compact.map { |key, value| "<tr><td><b>#{key}</b></td><td>#{value}</td></tr>" }
         footnote = params[:footnote] || (release_info.nil? ? '' : DEFAULT_FOOTNOTE)
 
@@ -130,7 +132,7 @@ module Fastlane
           uri = parse_url!(download_url)
           install_url = download_url
 
-          if uri.host == 'appdistribution.firebase.google.com' && uri.path.start_with?('/testerapps/')
+          if is_firebase_url?(uri)
             firebase_release_id = File.basename(uri.path)
           else
             filename = File.basename(uri.path)
@@ -152,6 +154,17 @@ module Fastlane
         # Generate QR code URL with proper escaping
         qr_code_url = "https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=#{CGI.escape(install_url)}"
         [qr_code_url, extra_metadata]
+      end
+
+      # Determines if a given URI is a Firebase App Distribution URL
+      #
+      # @param [String, URI] url The URL to check, either as a String or an already-parsed URI
+      # @return [Boolean] true if the URL is a Firebase App Distribution URL
+      # @raise [FastlaneCore::Interface::FastlaneError] if the URL is invalid
+      #
+      def self.is_firebase_url?(url)
+        uri = url.is_a?(URI) ? url : parse_url!(url)
+        uri.host == 'appdistribution.firebase.google.com' && uri.path.start_with?('/testerapps/')
       end
 
       # Creates an HTML `<img>` tag for an icon URL or the image URL to represent a given Buildkite emoji
@@ -217,7 +230,7 @@ module Fastlane
             key: :app_icon,
             description: 'The name of an emoji from the https://github.com/buildkite/emojis list or the full image URL to use for the icon of the app in the message',
             type: String,
-            default_value: ':firebase:'
+            optional: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :download_url,
