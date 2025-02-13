@@ -231,14 +231,15 @@ module Fastlane
             key: :app_icon,
             description: 'The name of an emoji from the https://github.com/buildkite/emojis list or the full image URL to use for the icon of the app in the message',
             type: String,
-            optional: true
+            optional: true,
+            default_value_dynamic: true # Defaults to `:firebase:` only if `firebase_app_distribution` was used
           ),
           FastlaneCore::ConfigItem.new(
             key: :download_url,
             description: <<~DESC,
               The URL to use to download/install the build.
               - If you used `firebase_app_distribution` to upload the build during the same `fastlane` run, you should leave this nil
-              - If you used `firebase_app_distribution` during a separate CI job, you can pass the firebase testing URI explicitly here (e.g. passing the value from the previous job via Buildkite metadata for example)
+              - If you used `firebase_app_distribution` during a separate CI job, you can store the `:testingUri` of that call's returned hash (in e.g. Buildkite metadata), then pass that URI to this parameter
               - Otherwise, you can provide a direct download URL for the build (e.g. link to Cloudfront or AppsCDN URL)
             DESC
             type: String,
