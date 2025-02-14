@@ -105,9 +105,9 @@ module Fastlane
         metadata = params[:metadata]&.transform_keys(&:to_s) || {}
 
         # Add Firebase-specific metadata if available
-        metadata['Build Number'] ||= release_info&.build_version
-        metadata['Version'] ||= release_info&.display_version
-        metadata[release_info&.os == 'ios' ? 'Bundle ID' : 'Application ID'] ||= release_info&.bundle_id
+        metadata['Build Number'] ||= "<code>#{release_info&.build_version}</code>"
+        metadata['Version'] ||= "<code>#{release_info&.display_version}</code>"
+        metadata[release_info&.os == 'ios' ? 'Bundle ID' : 'Application ID'] ||= "<code>#{release_info&.bundle_id}</code>"
 
         # Add git metadata
         metadata['Commit'] ||= ENV.fetch('BUILDKITE_COMMIT', nil) || other_action.last_git_commit[:abbreviated_commit_hash]

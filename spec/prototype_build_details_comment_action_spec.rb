@@ -172,9 +172,9 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
       comment = run_described_fastlane_action(
         app_display_name: 'My App'
       )
-      expect(comment).to include '<td><b>Version</b></td><td>28.7</td>'
-      expect(comment).to include '<td><b>Build Number</b></td><td>1287003</td>'
-      expect(comment).to include '<td><b>Bundle ID</b></td><td>com.example.myapp</td>'
+      expect(comment).to include '<td><b>Version</b></td><td><code>28.7</code></td>'
+      expect(comment).to include '<td><b>Build Number</b></td><td><code>1287003</code></td>'
+      expect(comment).to include '<td><b>Bundle ID</b></td><td><code>com.example.myapp</code></td>'
       expect(comment).to include '<td><b>Installation URL</b></td><td><a href=\'https://appdistribution.firebase.google.com/testerapps/1:123456:ios:abcdef/releases/xyz\'>xyz</a></td>'
     end
 
@@ -196,9 +196,9 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         metadata: metadata
       )
       expect(comment).to include '<td><b>Version</b></td><td>42.3</td>' # explicitly provided, overriding the implicit value
-      expect(comment).not_to include '<td><b>Version</b></td><td>28.7</td>' # otherwise implicitly added if it were not overridden
+      expect(comment).not_to include '<td><b>Version</b></td><td><code>28.7</code></td>' # otherwise implicitly added if it were not overridden
       expect(comment).to include '<td><b>Build Number</b></td><td>4203008</td>' # explicitly provided, overriding the implicit value
-      expect(comment).not_to include '<td><b>Build Number</b></td><td>1287003</td>' # otherwise implicitly added if it were not overridden
+      expect(comment).not_to include '<td><b>Build Number</b></td><td><code>1287003</code></td>' # otherwise implicitly added if it were not overridden
       expect(comment).to include '<td><b>Build Config</b></td><td>Prototype</td>' # not overriding any implicit one
       # Additional inferred metadata rows: App Name, Bundle ID, Commit, Installation URL
       expect(comment).to include "<td rowspan='7'"
@@ -218,7 +218,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
       expect(comment).to include '<td><b>Version:Short</b></td><td>28.1</td>'
       expect(comment).to include '<td><b>Version:Long</b></td><td>281003</td>'
       expect(comment).to include '<td><b>Build Config</b></td><td>Prototype</td>'
-      expect(comment).to include '<td><b>Bundle ID</b></td><td>com.example.myapp</td>'
+      expect(comment).to include '<td><b>Bundle ID</b></td><td><code>com.example.myapp</code></td>'
       expect(comment).to include '<td><b>Commit</b></td><td>a1b2c3f</td>'
       expect(comment).to include "<td><b>Installation URL</b></td><td><a href='https://appdistribution.firebase.google.com/testerapps/1:123456:ios:abcdef/releases/xyz'>xyz</a></td>"
       # Additional inferred metadata rows: Build Number, Version
@@ -240,7 +240,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           comment = run_described_fastlane_action(
             app_display_name: 'My App'
           )
-          expect(comment).to include '<td><b>Application ID</b></td><td>com.example.myapp</td>'
+          expect(comment).to include '<td><b>Application ID</b></td><td><code>com.example.myapp</code></td>'
           expect(comment).not_to include 'Bundle ID'
         end
       end
@@ -259,7 +259,7 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
           comment = run_described_fastlane_action(
             app_display_name: 'My App'
           )
-          expect(comment).to include '<td><b>Bundle ID</b></td><td>com.example.myapp</td>'
+          expect(comment).to include '<td><b>Bundle ID</b></td><td><code>com.example.myapp</code></td>'
           expect(comment).not_to include 'Application ID'
         end
       end
@@ -346,12 +346,15 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         <p><img align='top' src='https://raw.githubusercontent.com/buildkite/emojis/main/img-buildkite-64/jetpack.png' width='20px' alt='App Icon' />📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</p>
         <table>
         <tr>
-          <td rowspan='6' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Fexample.com%2Fbestapp.apk' width='250' height='250' /></td>
+          <td rowspan='9' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Fexample.com%2Fbestapp.apk' width='250' height='250' /></td>
           <td><b>App Name</b></td><td>The Best App</td>
         </tr>
         <tr><td><b>Version Name</b></td><td>28.2</td></tr>
         <tr><td><b>Version Code</b></td><td>1280200108</td></tr>
         <tr><td><b>Flavor</b></td><td>Debug</td></tr>
+        <tr><td><b>Build Number</b></td><td><code></code></td></tr>
+        <tr><td><b>Version</b></td><td><code></code></td></tr>
+        <tr><td><b>Application ID</b></td><td><code></code></td></tr>
         <tr><td><b>Commit</b></td><td>a1b2c3f</td></tr>
         <tr><td><b>Direct Download</b></td><td><a href='https://example.com/bestapp.apk'><code>bestapp.apk</code></a></td></tr>
         </table>
@@ -376,11 +379,14 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         <details><summary>📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</summary>
         <table>
         <tr>
-          <td rowspan='5' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Fexample.com%2Fbestapp.apk' width='250' height='250' /></td>
+          <td rowspan='8' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Fexample.com%2Fbestapp.apk' width='250' height='250' /></td>
           <td><b>App Name</b></td><td>The Best App</td>
         </tr>
         <tr><td><b>Version Name</b></td><td>28.2</td></tr>
         <tr><td><b>Version Code</b></td><td>1280200108</td></tr>
+        <tr><td><b>Build Number</b></td><td><code></code></td></tr>
+        <tr><td><b>Version</b></td><td><code></code></td></tr>
+        <tr><td><b>Application ID</b></td><td><code></code></td></tr>
         <tr><td><b>Commit</b></td><td>a1b2c3f</td></tr>
         <tr><td><b>Direct Download</b></td><td><a href='https://example.com/bestapp.apk'><code>bestapp.apk</code></a></td></tr>
         </table>
