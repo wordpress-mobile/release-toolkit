@@ -6,7 +6,8 @@
 
 ### Breaking Changes
 
-_None_
+- The `prototype_build_details_comment` action now relies on the `lane_context` of `firebase_app_distribution` instead of the one from `appcenter_upload` for the implicit metadata and download URL to use in the comment.
+  This is in the context of us moving from App Center (which will be shut down in March 2025) to Firebase App Distribution as our primary mechanism to distribute prototype builds. [#630]
 
 ### New Features
 
@@ -18,7 +19,7 @@ _None_
 
 ### Internal Changes
 
-- The library now uses immutable literals, via `# frozen_strings_literal: true`. This may result in runtime issues that we will address ASAP once discovered [#626]
+- The library now uses immutable literals, via `# frozen_strings_literal: true`. This may result in runtime issues that we will address ASAP once discovered. [#626]
 
 ## 12.4.0
 
@@ -29,7 +30,7 @@ _None_
 
 ### Bug Fixes
 
-- Remove period from "Update draft release notes..." commit message [#622]
+- Remove period from "Update draft release notes..." commit message. [#622]
 
 ## 12.3.4
 
