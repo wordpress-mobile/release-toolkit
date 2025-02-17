@@ -37,7 +37,8 @@ module Fastlane
         helper.run(
           input_dir: resolve_path(params[:input_dir]),
           base_lang: params[:base_lang],
-          only_langs: params[:only_langs]
+          only_langs: params[:only_langs],
+          fail_on_extra_strings: params[:fail_on_extra_strings]
         )
       end
 
@@ -179,6 +180,14 @@ module Fastlane
             key: :check_duplicate_keys,
             env_name: 'FL_IOS_LINT_TRANSLATIONS_CHECK_DUPLICATE_KEYS',
             description: 'Checks the input files for duplicate keys',
+            optional: true,
+            default_value: true,
+            type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :fail_on_extra_strings,
+            env_name: 'FL_IOS_LINT_TRANSLATIONS_FAIL_ON_EXTRA_STRINGS',
+            description: 'Should we report violations when finding strings in translations that are not present in the base language',
             optional: true,
             default_value: true,
             type: Boolean
