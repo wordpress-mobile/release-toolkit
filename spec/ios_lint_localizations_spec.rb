@@ -214,10 +214,17 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       run_l10n_linter_test(data_file: 'extra-strings-in-translations-error')
     end
 
-    it 'do not report extra strings in translations when fail_on_extra_strings is false' do
+    it 'does not report extra strings in translations when fail_on_extra_strings is false' do
       run_l10n_linter_test(
         data_file: 'extra-strings-in-translations-no-error',
         fail_on_extra_strings: false
+      )
+    end
+
+    it 'does report extra strings in translations when fail_on_extra_strings is true' do
+      run_l10n_linter_test(
+        data_file: 'extra-strings-in-translations-error',
+        fail_on_extra_strings: true
       )
     end
   end
