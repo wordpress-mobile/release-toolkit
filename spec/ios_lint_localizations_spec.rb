@@ -59,11 +59,11 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     # Helper function that DRYs the code running each test.
     #
     # @param [String] data_file The name, without extension or "test-lint-ios-" prefix, of the YML file containing the test input and expected output.
-    # @param [Bool|nil] check_duplicate_keys If `nil`, the test will run the action with the default `check_duplicate_keys` parameter value.
-    #        If a `Bool` value is given, it will pass that.
-    #        Using either `Bool` or `nil` adds some cruft, but lets us validate the action default behavior, so it doesn't change unexpectedly.
-    # @param [Bool|nil] fail_on_extra_strings If `nil`, the test will run the action with the default `fail_on_extra_strings` parameter value.
-    #        If a `Bool` value is given, it will pass that.
+    # @param [Boolean, nil] check_duplicate_keys If `nil`, the test will run the action with the default `check_duplicate_keys` parameter value.
+    #        If a `Boolean` value is given, it will pass that.
+    #        Using either `Boolean` or `nil` adds some cruft, but lets us validate the action default behavior, so it doesn't change unexpectedly.
+    # @param [Boolean, nil] fail_on_extra_strings If `nil`, the test will run the action with the default `fail_on_extra_strings` parameter value.
+    #        If a `Boolean` value is given, it will pass that.
     #        Controls whether to report violations when finding strings in translations that are not present in the base language.
     #
     def run_l10n_linter_test(data_file:, check_duplicate_keys: nil, fail_on_extra_strings: nil)
