@@ -6,16 +6,30 @@
 
 ### Breaking Changes
 
+_None_
+
+### New Features
+
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 13.0.0
+
+### Breaking Changes
+
 - The `prototype_build_details_comment` action now relies on the `lane_context` of `firebase_app_distribution` instead of the one from `appcenter_upload` for the implicit metadata and download URL to use in the comment.
   This is in the context of us moving from App Center (which will be shut down in March 2025) to Firebase App Distribution as our primary mechanism to distribute prototype builds. [#630]
 
 ### New Features
 
 - The `ios_lint_localizations` action now accepts a `fail_on_strings_not_in_base_language` parameter (defaulting to `true`) to control whether to report violations when finding strings in translations that are not present in the base language. [#631]
-
-### Bug Fixes
-
-_None_
 
 ### Internal Changes
 
