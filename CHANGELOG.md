@@ -10,11 +10,21 @@ _None_
 
 ### New Features
 
-- The `ios_lint_localizations` action now accepts a `fail_on_strings_not_in_base_language` parameter (defaulting to `true`) to control whether to report violations when finding strings in translations that are not present in the base language. [#631]
+_None_
 
 ### Bug Fixes
 
 _None_
+
+### Internal Changes
+
+_None_
+
+## 12.5.0
+
+### New Features
+
+- The `ios_lint_localizations` action now accepts a `fail_on_strings_not_in_base_language` parameter (defaulting to `true`) to control whether to report violations when finding strings in translations that are not present in the base language. [#631]
 
 ### Internal Changes
 
