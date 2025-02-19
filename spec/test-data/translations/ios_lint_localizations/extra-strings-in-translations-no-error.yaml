@@ -1,0 +1,8 @@
+test_data:
+  en: |-
+    "base_string" = "This is in the base language";
+  fr: |-
+    "base_string" = "This is in French";
+    "extra_string" = "This string only exists in French";
+
+result: {}

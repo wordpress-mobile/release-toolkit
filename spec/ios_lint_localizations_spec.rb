@@ -59,11 +59,14 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     # Helper function that DRYs the code running each test.
     #
     # @param [String] data_file The name, without extension or "test-lint-ios-" prefix, of the YML file containing the test input and expected output.
-    # @param [Bool|nil] check_duplicate_keys If `nil`, the test will run the action with the default `check_duplicate_keys` parameter value.
-    #        If a `Bool` value is given, it will pass that.
-    #        Using either `Bool` or `nil` adds some cruft, but lets us validate the action default behavior, so it doesn't change unexpectedly.
+    # @param [Boolean, nil] check_duplicate_keys If `nil`, the test will run the action with the default `check_duplicate_keys` parameter value.
+    #        If a `Boolean` value is given, it will pass that.
+    #        Using either `Boolean` or `nil` adds some cruft, but lets us validate the action default behavior, so it doesn't change unexpectedly.
+    # @param [Boolean, nil] fail_on_strings_not_in_base_language If `nil`, the test will run the action with the default `fail_on_strings_not_in_base_language` parameter value.
+    #        If a `Boolean` value is given, it will pass that.
+    #        Controls whether to report violations when finding strings in translations that are not present in the base language.
     #
-    def run_l10n_linter_test(data_file:, check_duplicate_keys: nil)
+    def run_l10n_linter_test(data_file:, check_duplicate_keys: nil, fail_on_strings_not_in_base_language: nil)
       # Arrange: Prepare test files
       test_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', 'ios_lint_localizations', "#{data_file}.yaml")
       yml = YAML.load_file(test_file)
@@ -86,6 +89,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
         base_lang: 'en'
       }
       parameters[:check_duplicate_keys] = check_duplicate_keys unless check_duplicate_keys.nil?
+      parameters[:fail_on_strings_not_in_base_language] = fail_on_strings_not_in_base_language unless fail_on_strings_not_in_base_language.nil?
       result = run_described_fastlane_action(parameters)
 
       # Assert
@@ -204,6 +208,24 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       )
 
       expect(result).to eq({ 'fr' => ['`key3` expected placeholders for [Int] but found [] instead.'] })
+    end
+
+    it 'fails on strings not in base language by default' do
+      run_l10n_linter_test(data_file: 'extra-strings-in-translations-error')
+    end
+
+    it 'does not report strings not in base language when fail_on_strings_not_in_base_language is false' do
+      run_l10n_linter_test(
+        data_file: 'extra-strings-in-translations-no-error',
+        fail_on_strings_not_in_base_language: false
+      )
+    end
+
+    it 'does report strings not in base language when fail_on_strings_not_in_base_language is true' do
+      run_l10n_linter_test(
+        data_file: 'extra-strings-in-translations-error',
+        fail_on_strings_not_in_base_language: true
+      )
     end
   end
 end

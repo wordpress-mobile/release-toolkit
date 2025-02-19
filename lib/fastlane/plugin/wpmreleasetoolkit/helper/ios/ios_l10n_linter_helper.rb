@@ -60,11 +60,12 @@ module Fastlane
         #
         # @param [String] input_dir The path (ideally absolute) to the directory containing the `.lproj` folders to parse
         # @param [String] base_lang The code name (i.e the basename of one of the `.lproj` folders) of the locale to use as the baseline
+        # @param [String] fail_on_strings_not_in_base_language Whether to fail on strings not in base language
         # @return [Hash<String, Array<String>>] A hash of violations, keyed by language code, whose values are the list of violation messages for that language
         #
-        def run(input_dir:, base_lang: DEFAULT_BASE_LANG, only_langs: nil)
+        def run(input_dir:, base_lang: DEFAULT_BASE_LANG, only_langs: nil, fail_on_strings_not_in_base_language: true)
           check_swiftgen_installed || install_swiftgen!
-          find_diffs(input_dir: input_dir, base_lang: base_lang, only_langs: only_langs)
+          find_diffs(input_dir: input_dir, base_lang: base_lang, only_langs: only_langs, fail_on_strings_not_in_base_language: fail_on_strings_not_in_base_language)
         end
 
         ##################
@@ -160,11 +161,12 @@ module Fastlane
         # @param [String] input_dir The directory where the `.lproj` folders to scan are located
         # @param [String] base_lang The base language used as source of truth that all other languages will be compared against
         # @param [Array<String>] only_langs The list of languages to limit the generation for. Useful to focus only on a couple of issues or just one language
+        # @param [Boolean] fail_on_strings_not_in_base_language Whether to fail on strings not in base language
         # @return [Hash<String, Array<String>>] A hash of violations, keyed by language code, whose values are the list of violation messages for that language
         #
         # @note The returned Hash contains keys only for locales with violations. Locales parsed but without any violations found will not appear in the resulting hash.
         #
-        def find_diffs(input_dir:, base_lang:, only_langs: nil)
+        def find_diffs(input_dir:, base_lang:, only_langs: nil, fail_on_strings_not_in_base_language: true)
           Dir.mktmpdir('a8c-lint-translations-') do |tmpdir|
             # Run SwiftGen
             langs = only_langs.nil? ? nil : (only_langs + [base_lang]).uniq
@@ -181,8 +183,8 @@ module Fastlane
               next nil if params_for_lang.nil? || params_for_lang.empty?
 
               violations = params_for_lang.map do |key, param_types|
-                next "`#{key}` was unexpected, as it is not present in the base locale." if params_for_base_lang[key].nil?
-                next "`#{key}` expected placeholders for #{params_for_base_lang[key]} but found #{param_types} instead." if params_for_base_lang[key] != param_types
+                next "`#{key}` was unexpected, as it is not present in the base locale." if params_for_base_lang[key].nil? && fail_on_strings_not_in_base_language
+                next "`#{key}` expected placeholders for #{params_for_base_lang[key]} but found #{param_types} instead." if !params_for_base_lang[key].nil? && params_for_base_lang[key] != param_types
               end.compact
 
               [lang, violations] unless violations.empty?
