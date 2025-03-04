@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Introduce `upload_build_to_apps_cdn` action to upload a build binary to the Apps CDN. [#636]
 
 ### Bug Fixes
 
