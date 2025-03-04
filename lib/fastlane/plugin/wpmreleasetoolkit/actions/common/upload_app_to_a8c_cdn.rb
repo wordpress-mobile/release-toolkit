@@ -106,18 +106,23 @@ module Fastlane
         # Start building the multipart form data
         post_body = []
 
-        # Add metadata fields
-        post_body << "--#{boundary}\r\n"
-        post_body << "Content-Disposition: form-data; name=\"attrs\"\r\n\r\n"
-        post_body << attrs.to_json
-        post_body << "\r\n"
-
-        # Add the file
+        # Add the file first
         post_body << "--#{boundary}\r\n"
         post_body << "Content-Disposition: form-data; name=\"media[]\"; filename=\"#{File.basename(file_path)}\"\r\n"
         post_body << "Content-Type: application/octet-stream\r\n\r\n"
         post_body << File.binread(file_path)
-        post_body << "\r\n--#{boundary}--\r\n"
+        post_body << "\r\n"
+
+        # Add each attribute as a separate form field
+        attrs.each do |key, value|
+          post_body << "--#{boundary}\r\n"
+          post_body << "Content-Disposition: form-data; name=\"#{key}\"\r\n\r\n"
+          post_body << value.to_s
+          post_body << "\r\n"
+        end
+
+        # Add the closing boundary
+        post_body << "--#{boundary}--\r\n"
 
         [post_body.join, content_type]
       end
