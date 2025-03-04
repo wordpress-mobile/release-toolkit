@@ -13,16 +13,9 @@ module Fastlane
     end
 
     class UploadBuildToAppsCdnAction < Action
-      # The resource type is constant for this action
       RESOURCE_TYPE = 'Build'
-
-      # Valid post status values
       VALID_POST_STATUS = %w[publish draft].freeze
-
-      # Valid build types
       VALID_BUILD_TYPES = %w[Alpha Beta Nightly Production Prototype].freeze
-
-      # Valid platforms
       VALID_PLATFORMS = ['Android', 'iOS', 'Mac - Silicon', 'Mac - Intel', 'Mac - Any', 'Windows'].freeze
 
       def self.run(params)
@@ -47,7 +40,6 @@ module Fastlane
           post_status: params[:post_status], # Optional: may be nil
           release_notes: params[:release_notes] # Optional: may be nil
         }.compact
-
         request_body, content_type = build_multipart_request(parameters: parameters, file_path: file_path)
 
         # Create and send the HTTP request
