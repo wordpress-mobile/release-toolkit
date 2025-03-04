@@ -16,8 +16,8 @@ module Fastlane
       # The resource type is constant for this action
       RESOURCE_TYPE = 'Build'
 
-      # Valid post status values for WordPress media API
-      VALID_POST_STATUS = %w[publish draft pending future private].freeze
+      # Valid post status values
+      VALID_POST_STATUS = %w[publish draft].freeze
 
       # Valid build types
       VALID_BUILD_TYPES = %w[Alpha Beta Nightly Production Prototype].freeze
@@ -29,11 +29,8 @@ module Fastlane
         UI.message('Uploading app to a8c CDN...')
 
         file_path = params[:file_path]
-
-        # Validate file exists
         UI.user_error!("File not found at path '#{file_path}'") unless File.exist?(file_path)
 
-        # Prepare the API endpoint
         api_endpoint = "https://public-api.wordpress.com/rest/v1.1/sites/#{params[:site_id]}/media/new"
         uri = URI.parse(api_endpoint)
 
@@ -53,14 +50,13 @@ module Fastlane
 
         request_body, content_type = build_multipart_request(parameters: parameters, file_path: file_path)
 
-        # Create the HTTP request
+        # Create and send the HTTP request
         request = Net::HTTP::Post.new(uri.request_uri)
         request.body = request_body
         request['Content-Type'] = content_type
         request['Accept'] = 'application/json'
         request['Authorization'] = "Bearer #{params[:api_token]}"
 
-        # Send the request
         response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|
           http.request(request)
         end
@@ -69,13 +65,10 @@ module Fastlane
         case response
         when Net::HTTPSuccess
           json_response = JSON.parse(response.body)
-
-          # Extract the media details
           media = json_response['media'].first
           media_id = media['ID']
           media_url = media['URL']
 
-          # Store in lane context
           Actions.lane_context[SharedValues::A8C_CDN_UPLOADED_FILE_URL] = media_url
           Actions.lane_context[SharedValues::A8C_CDN_UPLOADED_FILE_ID] = media_id
 
@@ -92,9 +85,11 @@ module Fastlane
       end
 
       # Builds a multipart request body for the WordPress.com Media API
+      #
       # @param parameters [Hash] The parameters to include in the request as top-level form fields
       # @param file_path [String] The path to the file to upload
       # @return [Array] An array containing the request body and the content-type header
+      #
       def self.build_multipart_request(parameters:, file_path:)
         boundary = "----WebKitFormBoundary#{SecureRandom.hex(10)}"
         content_type = "multipart/form-data; boundary=#{boundary}"
@@ -166,7 +161,7 @@ module Fastlane
             key: :platform,
             env_name: 'A8C_CDN_PLATFORM',
             # Valid values can be found at https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-platform.php
-            description: 'The platform the build runs on (e.g. \'Android\', \'iOS\', \'Mac - Silicon\', \'Mac - Intel\', \'Mac - Any\', \'Windows\')',
+            description: "The platform the build runs on. One of: #{VALID_PLATFORMS.join(', ')}",
             optional: false,
             type: String,
             verify_block: proc do |value|
@@ -186,7 +181,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :build_type,
             # Valid values can be found at https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-build-type.php
-            description: 'The type of the build (e.g. \'Beta\')',
+            description: "The type of the build. One of: #{VALID_BUILD_TYPES.join(', ')}",
             optional: false,
             type: String,
             verify_block: proc do |value|

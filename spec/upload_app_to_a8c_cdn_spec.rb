@@ -355,7 +355,7 @@ describe Fastlane::Actions::UploadAppToA8cCdnAction do
             post_status: 'invalid_status',
             file_path: file_path
           )
-        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Post status must be one of: publish, draft, pending, future, private')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Post status must be one of: publish, draft')
       end
     end
 
