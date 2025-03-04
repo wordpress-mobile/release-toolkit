@@ -72,9 +72,7 @@ describe Fastlane::Actions::UploadAppToA8cCdnAction do
         )
 
         # Verify the result
-        expect(result[:id]).to eq(test_media_id)
-        expect(result[:url]).to eq(test_media_url)
-        expect(result[:response]['media'].first['ID']).to eq(test_media_id)
+        expect(result).to eq(test_media_url)
 
         # Verify the shared values
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::A8C_CDN_UPLOADED_FILE_URL]).to eq(test_media_url)
@@ -144,7 +142,7 @@ describe Fastlane::Actions::UploadAppToA8cCdnAction do
         )
 
         # Verify the result
-        expect(result[:id]).to eq(test_media_id)
+        expect(result).to eq(test_media_url)
 
         # Verify that the request was made with the correct parameters
         expect(WebMock).to(

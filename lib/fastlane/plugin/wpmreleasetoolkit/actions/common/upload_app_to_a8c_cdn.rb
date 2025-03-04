@@ -83,11 +83,7 @@ module Fastlane
           UI.message("Media ID: #{media_id}")
           UI.message("Media URL: #{media_url}")
 
-          {
-            id: media_id,
-            url: media_url,
-            response: json_response
-          }
+          media_url
         else
           UI.error("Failed to upload app to a8c CDN: #{response.code} #{response.message}")
           UI.error("Response body: #{response.body}")
@@ -136,11 +132,11 @@ module Fastlane
       end
 
       def self.return_value
-        'Returns a hash containing the uploaded file ID, URL, and the full API response'
+        'Returns the URL of the uploaded file'
       end
 
       def self.details
-        'Uploads an app binary file to the Automattic CDN using the WordPress.com Media Upload API'
+        'Uploads an app binary file to the Automattic CDN using the WordPress.com Media Upload API. See PCYsg-15tP-p2 internal a8c documentation for details.'
       end
 
       def self.available_options
