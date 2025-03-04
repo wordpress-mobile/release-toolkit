@@ -142,7 +142,8 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(
             key: :site_id,
-            description: 'The WordPress.com site ID to upload the media to',
+            env_name: 'A8C_CDN_SITE_ID',
+            description: 'The WordPress.com CDN site ID to upload the media to',
             optional: false,
             type: String,
             verify_block: proc do |value|
@@ -150,22 +151,35 @@ module Fastlane
             end
           ),
           FastlaneCore::ConfigItem.new(
-            key: :api_token,
-            description: 'WordPress.com API token for authentication',
-            optional: false,
-            type: String,
-            verify_block: proc do |value|
-              UI.user_error!('API token cannot be empty') if value.to_s.empty?
-            end
-          ),
-          FastlaneCore::ConfigItem.new(
             key: :product,
+            env_name: 'A8C_CDN_PRODUCT',
             # Valid values can be found at https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-product.php
             description: 'The product the build belongs to (e.g. \'WordPress.com Studio\')',
             optional: false,
             type: String,
             verify_block: proc do |value|
               UI.user_error!('Product cannot be empty') if value.to_s.empty?
+            end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :platform,
+            env_name: 'A8C_CDN_PLATFORM',
+            # Valid values can be found at https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-platform.php
+            description: 'The platform the build runs on (e.g. \'Android\', \'iOS\', \'Mac - Silicon\', \'Mac - Intel\', \'Mac - Any\', \'Windows\')',
+            optional: false,
+            type: String,
+            verify_block: proc do |value|
+              UI.user_error!('Platform cannot be empty') if value.to_s.empty?
+              UI.user_error!("Platform must be one of: #{VALID_PLATFORMS.join(', ')}") unless VALID_PLATFORMS.include?(value)
+            end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :file_path,
+            description: 'The path to the build file to upload',
+            optional: false,
+            type: String,
+            verify_block: proc do |value|
+              UI.user_error!("File not found at path '#{value}'") unless File.exist?(value)
             end
           ),
           FastlaneCore::ConfigItem.new(
@@ -189,14 +203,13 @@ module Fastlane
             end
           ),
           FastlaneCore::ConfigItem.new(
-            key: :platform,
-            # Valid values can be found at https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-platform.php
-            description: 'The platform the build runs on (e.g. \'Android\', \'iOS\', \'Mac - Silicon\', \'Mac - Intel\', \'Mac - Any\', \'Windows\')',
-            optional: false,
+            key: :post_status,
+            description: 'The post status (defaults to \'publish\')',
+            optional: true,
+            default_value: 'publish',
             type: String,
             verify_block: proc do |value|
-              UI.user_error!('Platform cannot be empty') if value.to_s.empty?
-              UI.user_error!("Platform must be one of: #{VALID_PLATFORMS.join(', ')}") unless VALID_PLATFORMS.include?(value)
+              UI.user_error!("Post status must be one of: #{VALID_POST_STATUS.join(', ')}") unless VALID_POST_STATUS.include?(value)
             end
           ),
           FastlaneCore::ConfigItem.new(
@@ -221,28 +234,19 @@ module Fastlane
             type: String
           ),
           FastlaneCore::ConfigItem.new(
-            key: :post_status,
-            description: 'The post status (defaults to \'publish\')',
-            optional: true,
-            default_value: 'publish',
-            type: String,
-            verify_block: proc do |value|
-              UI.user_error!("Post status must be one of: #{VALID_POST_STATUS.join(', ')}") unless VALID_POST_STATUS.include?(value)
-            end
-          ),
-          FastlaneCore::ConfigItem.new(
             key: :release_notes,
             description: 'The release notes to show with the build on the blog frontend',
             optional: true,
             type: String
           ),
           FastlaneCore::ConfigItem.new(
-            key: :file_path,
-            description: 'The path to the build file to upload',
+            key: :api_token,
+            env_name: 'WPCOM_API_TOKEN',
+            description: 'The WordPress.com API token for authentication',
             optional: false,
             type: String,
             verify_block: proc do |value|
-              UI.user_error!("File not found at path '#{value}'") unless File.exist?(value)
+              UI.user_error!('API token cannot be empty') if value.to_s.empty?
             end
           ),
         ]
