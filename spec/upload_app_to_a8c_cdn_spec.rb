@@ -23,6 +23,21 @@ describe Fastlane::Actions::UploadAppToA8cCdnAction do
     WebMock.allow_net_connect!
   end
 
+  # Helper method to build the expected multipart form data part
+  def expected_form_part(boundary:, name:, value:, filename: nil)
+    lines = ["--#{boundary}"]
+    if filename
+      lines << "Content-Disposition: form-data; name=\"#{name}\"; filename=\"#{filename}\""
+      lines << 'Content-Type: application/octet-stream'
+    else
+      lines << "Content-Disposition: form-data; name=\"#{name}\""
+    end
+
+    lines << ''
+    lines << value
+    lines.join("\r\n")
+  end
+
   describe 'uploading an app with valid parameters' do
     it 'successfully uploads the app and returns the media details' do
       with_tmp_file(named: 'test_app.zip', content: 'test app binary') do |file_path|
@@ -72,18 +87,23 @@ describe Fastlane::Actions::UploadAppToA8cCdnAction do
             expect(req.headers['Content-Type']).to include('multipart/form-data')
             expect(req.headers['Authorization']).to eq("Bearer #{test_api_token}")
 
-            # Check that the request body contains the expected data
-            expect(req.body).to include(test_product)
-            expect(req.body).to include(test_build_type)
-            expect(req.body).to include('Internal') # Capitalized from :internal
-            expect(req.body).to include(test_platform)
-            expect(req.body).to include('Build') # RESOURCE_TYPE constant
-            expect(req.body).to include(test_version)
-            expect(req.body).to include(test_build_number)
+            boundary = req.headers['Content-Type'].match(/boundary=([^;]+)/)[1]
 
-            # Check that the file is included
-            expect(req.body).to include('test app binary')
-            expect(req.body).to include('test_app.zip')
+            # Verify the media file is included with proper attributes
+            expect(req.body).to include(expected_form_part(boundary: boundary, name: 'media[]', value: 'test app binary', filename: 'test_app.zip'))
+
+            # Verify each parameter has the correct value
+            {
+              'product' => test_product,
+              'build_type' => test_build_type,
+              'visibility' => 'Internal', # Capitalized from :internal
+              'platform' => test_platform,
+              'resource_type' => 'Build', # RESOURCE_TYPE constant
+              'version' => test_version,
+              'build_number' => test_build_number
+            }.each do |name, value|
+              expect(req.body).to include(expected_form_part(boundary: boundary, name: name, value: value))
+            end
 
             true
           end
@@ -129,8 +149,10 @@ describe Fastlane::Actions::UploadAppToA8cCdnAction do
         # Verify that the request was made with the correct parameters
         expect(WebMock).to(
           have_requested(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new").with do |req|
+            boundary = req.headers['Content-Type'].match(/boundary=([^;]+)/)[1]
+
             # Check that the visibility is set to External
-            expect(req.body).to include('External')
+            expect(req.body).to include(expected_form_part(boundary: boundary, name: 'visibility', value: 'External'))
             true
           end
         )
