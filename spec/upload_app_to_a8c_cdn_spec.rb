@@ -162,7 +162,7 @@ describe Fastlane::Actions::UploadAppToA8cCdnAction do
             build_number: test_build_number,
             file_path: file_path
           )
-        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Upload to A8C CDN failed')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Upload to a8c CDN failed')
       end
     end
   end

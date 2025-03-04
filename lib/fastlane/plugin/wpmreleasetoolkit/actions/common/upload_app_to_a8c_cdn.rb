@@ -26,7 +26,7 @@ module Fastlane
       VALID_PLATFORMS = ['Android', 'iOS', 'Mac - Silicon', 'Mac - Intel', 'Mac - Any', 'Windows'].freeze
 
       def self.run(params)
-        UI.message('Uploading app to A8C CDN...')
+        UI.message('Uploading app to a8c CDN...')
 
         file_path = params[:file_path]
 
@@ -79,7 +79,7 @@ module Fastlane
           Actions.lane_context[SharedValues::A8C_CDN_UPLOADED_FILE_URL] = media_url
           Actions.lane_context[SharedValues::A8C_CDN_UPLOADED_FILE_ID] = media_id
 
-          UI.success('App successfully uploaded to A8C CDN')
+          UI.success('App successfully uploaded to a8c CDN')
           UI.message("Media ID: #{media_id}")
           UI.message("Media URL: #{media_url}")
 
@@ -89,9 +89,9 @@ module Fastlane
             response: json_response
           }
         else
-          UI.error("Failed to upload app to A8C CDN: #{response.code} #{response.message}")
+          UI.error("Failed to upload app to a8c CDN: #{response.code} #{response.message}")
           UI.error("Response body: #{response.body}")
-          UI.user_error!('Upload to A8C CDN failed')
+          UI.user_error!('Upload to a8c CDN failed')
         end
       end
 
