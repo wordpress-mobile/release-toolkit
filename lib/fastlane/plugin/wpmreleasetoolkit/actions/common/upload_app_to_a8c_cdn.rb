@@ -102,29 +102,29 @@ module Fastlane
       def self.build_multipart_request(parameters:, file_path:)
         boundary = "----WebKitFormBoundary#{SecureRandom.hex(10)}"
         content_type = "multipart/form-data; boundary=#{boundary}"
-
-        # Start building the multipart form data
         post_body = []
 
         # Add the file first
-        post_body << "--#{boundary}\r\n"
-        post_body << "Content-Disposition: form-data; name=\"media[]\"; filename=\"#{File.basename(file_path)}\"\r\n"
-        post_body << "Content-Type: application/octet-stream\r\n\r\n"
+        post_body << "--#{boundary}"
+        post_body << "Content-Disposition: form-data; name=\"media[]\"; filename=\"#{File.basename(file_path)}\""
+        post_body << 'Content-Type: application/octet-stream'
+        post_body << ''
         post_body << File.binread(file_path)
-        post_body << "\r\n"
+        post_body << ''
 
         # Add each parameter as a separate form field
         parameters.each do |key, value|
-          post_body << "--#{boundary}\r\n"
-          post_body << "Content-Disposition: form-data; name=\"#{key}\"\r\n\r\n"
+          post_body << "--#{boundary}"
+          post_body << "Content-Disposition: form-data; name=\"#{key}\""
+          post_body << ''
           post_body << value.to_s
-          post_body << "\r\n"
+          post_body << ''
         end
 
         # Add the closing boundary
-        post_body << "--#{boundary}--\r\n"
+        post_body << "--#{boundary}--"
 
-        [post_body.join, content_type]
+        [post_body.join("\r\n"), content_type]
       end
 
       def self.description
