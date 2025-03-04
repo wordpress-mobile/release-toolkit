@@ -8,11 +8,11 @@ require 'json'
 module Fastlane
   module Actions
     module SharedValues
-      A8C_CDN_UPLOADED_FILE_URL = :A8C_CDN_UPLOADED_FILE_URL
-      A8C_CDN_UPLOADED_FILE_ID = :A8C_CDN_UPLOADED_FILE_ID
+      APPS_CDN_UPLOADED_FILE_URL = :APPS_CDN_UPLOADED_FILE_URL
+      APPS_CDN_UPLOADED_FILE_ID = :APPS_CDN_UPLOADED_FILE_ID
     end
 
-    class UploadAppToA8cCdnAction < Action
+    class UploadBuildToAppsCdnAction < Action
       # The resource type is constant for this action
       RESOURCE_TYPE = 'Build'
 
@@ -26,7 +26,7 @@ module Fastlane
       VALID_PLATFORMS = ['Android', 'iOS', 'Mac - Silicon', 'Mac - Intel', 'Mac - Any', 'Windows'].freeze
 
       def self.run(params)
-        UI.message('Uploading app to a8c CDN...')
+        UI.message('Uploading build to apps CDN...')
 
         file_path = params[:file_path]
         UI.user_error!("File not found at path '#{file_path}'") unless File.exist?(file_path)
@@ -69,18 +69,18 @@ module Fastlane
           media_id = media['ID']
           media_url = media['URL']
 
-          Actions.lane_context[SharedValues::A8C_CDN_UPLOADED_FILE_URL] = media_url
-          Actions.lane_context[SharedValues::A8C_CDN_UPLOADED_FILE_ID] = media_id
+          Actions.lane_context[SharedValues::APPS_CDN_UPLOADED_FILE_URL] = media_url
+          Actions.lane_context[SharedValues::APPS_CDN_UPLOADED_FILE_ID] = media_id
 
-          UI.success('App successfully uploaded to a8c CDN')
+          UI.success('Build successfully uploaded to apps CDN')
           UI.message("Media ID: #{media_id}")
           UI.message("Media URL: #{media_url}")
 
           media_url
         else
-          UI.error("Failed to upload app to a8c CDN: #{response.code} #{response.message}")
+          UI.error("Failed to upload build to apps CDN: #{response.code} #{response.message}")
           UI.error("Response body: #{response.body}")
-          UI.user_error!('Upload to a8c CDN failed')
+          UI.user_error!('Upload to apps CDN failed')
         end
       end
 
@@ -119,7 +119,7 @@ module Fastlane
       end
 
       def self.description
-        'Uploads an app binary to the Automattic CDN'
+        'Uploads a build binary to the Apps CDN'
       end
 
       def self.authors
@@ -131,14 +131,17 @@ module Fastlane
       end
 
       def self.details
-        'Uploads an app binary file to the Automattic CDN using the WordPress.com Media Upload API. See PCYsg-15tP-p2 internal a8c documentation for details.'
+        <<~DETAILS
+          Uploads a build binary file to a WordPress blog that has the Apps CDN plugin enabled.
+          See PCYsg-15tP-p2 internal a8c documentation for details about the Apps CDN plugin.
+        DETAILS
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(
             key: :site_id,
-            env_name: 'A8C_CDN_SITE_ID',
+            env_name: 'APPS_CDN_SITE_ID',
             description: 'The WordPress.com CDN site ID to upload the media to',
             optional: false,
             type: String,
@@ -148,7 +151,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :product,
-            env_name: 'A8C_CDN_PRODUCT',
+            env_name: 'APPS_CDN_PRODUCT',
             # Valid values can be found at https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-product.php
             description: 'The product the build belongs to (e.g. \'WordPress.com Studio\')',
             optional: false,
@@ -159,7 +162,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :platform,
-            env_name: 'A8C_CDN_PLATFORM',
+            env_name: 'APPS_CDN_PLATFORM',
             # Valid values can be found at https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-platform.php
             description: "The platform the build runs on. One of: #{VALID_PLATFORMS.join(', ')}",
             optional: false,
@@ -254,7 +257,7 @@ module Fastlane
 
       def self.example_code
         [
-          'upload_app_to_a8c_cdn(
+          'upload_build_to_apps_cdn(
             site_id: "12345678",
             api_token: ENV["WPCOM_API_TOKEN"],
             product: "WordPress.com Studio",

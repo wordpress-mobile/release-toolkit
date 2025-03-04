@@ -3,7 +3,7 @@
 require_relative 'spec_helper'
 require 'webmock/rspec'
 
-describe Fastlane::Actions::UploadAppToA8cCdnAction do
+describe Fastlane::Actions::UploadBuildToAppsCdnAction do
   let(:test_site_id) { '12345678' }
   let(:test_api_token) { 'test_api_token' }
   let(:test_product) { 'WordPress.com Studio' }
@@ -38,8 +38,8 @@ describe Fastlane::Actions::UploadAppToA8cCdnAction do
     lines.join("\r\n")
   end
 
-  describe 'uploading an app with valid parameters' do
-    it 'successfully uploads the app and returns the media details' do
+  describe 'uploading a build with valid parameters' do
+    it 'successfully uploads the build and returns the media details' do
       with_tmp_file(named: 'test_app.zip', content: 'test app binary') do |file_path|
         # Stub the WordPress.com API request
         stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
@@ -75,8 +75,8 @@ describe Fastlane::Actions::UploadAppToA8cCdnAction do
         expect(result).to eq(test_media_url)
 
         # Verify the shared values
-        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::A8C_CDN_UPLOADED_FILE_URL]).to eq(test_media_url)
-        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::A8C_CDN_UPLOADED_FILE_ID]).to eq(test_media_id)
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPS_CDN_UPLOADED_FILE_URL]).to eq(test_media_url)
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPS_CDN_UPLOADED_FILE_ID]).to eq(test_media_id)
 
         # Verify that the request was made with the correct parameters
         expect(WebMock).to(
@@ -109,7 +109,7 @@ describe Fastlane::Actions::UploadAppToA8cCdnAction do
       end
     end
 
-    it 'successfully uploads the app with :external visibility' do
+    it 'successfully uploads the build with :external visibility' do
       with_tmp_file(named: 'test_app.zip', content: 'test app binary') do |file_path|
         # Stub the WordPress.com API request
         stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
@@ -182,7 +182,7 @@ describe Fastlane::Actions::UploadAppToA8cCdnAction do
             build_number: test_build_number,
             file_path: file_path
           )
-        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Upload to a8c CDN failed')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Upload to apps CDN failed')
       end
     end
   end
