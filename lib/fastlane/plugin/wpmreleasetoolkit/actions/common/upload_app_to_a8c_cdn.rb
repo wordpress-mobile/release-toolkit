@@ -38,7 +38,7 @@ module Fastlane
         uri = URI.parse(api_endpoint)
 
         # Create the request body and headers
-        attrs = {
+        parameters = {
           product: params[:product],
           build_type: params[:build_type],
           visibility: params[:visibility].to_s.capitalize,
@@ -51,7 +51,7 @@ module Fastlane
           release_notes: params[:release_notes] # Optional: may be nil
         }.compact
 
-        request_body, content_type = build_multipart_request(attrs: attrs, file_path: file_path)
+        request_body, content_type = build_multipart_request(parameters: parameters, file_path: file_path)
 
         # Create the HTTP request
         request = Net::HTTP::Post.new(uri.request_uri)
@@ -96,10 +96,10 @@ module Fastlane
       end
 
       # Builds a multipart request body for the WordPress.com Media API
-      # @param attrs [Hash] The attributes to include in the request
+      # @param parameters [Hash] The parameters to include in the request as top-level form fields
       # @param file_path [String] The path to the file to upload
       # @return [Array] An array containing the request body and the content-type header
-      def self.build_multipart_request(attrs:, file_path:)
+      def self.build_multipart_request(parameters:, file_path:)
         boundary = "----WebKitFormBoundary#{SecureRandom.hex(10)}"
         content_type = "multipart/form-data; boundary=#{boundary}"
 
@@ -113,8 +113,8 @@ module Fastlane
         post_body << File.binread(file_path)
         post_body << "\r\n"
 
-        # Add each attribute as a separate form field
-        attrs.each do |key, value|
+        # Add each parameter as a separate form field
+        parameters.each do |key, value|
           post_body << "--#{boundary}\r\n"
           post_body << "Content-Disposition: form-data; name=\"#{key}\"\r\n\r\n"
           post_body << value.to_s
