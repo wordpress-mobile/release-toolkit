@@ -16,6 +16,10 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
   let(:test_media_url) { 'https://example.com/uploads/app.zip' }
   let(:test_post_id) { '12345' }
   let(:test_post_url) { 'https://example.com/?p=12345' }
+  let(:test_date) { '2023-06-15T12:00:00Z' }
+  let(:test_mime_type) { 'application/zip' }
+  let(:test_filename) { 'test_app.zip' }
+  let(:test_file_content) { 'test app binary' }
 
   before do
     WebMock.disable_net_connect!
@@ -42,7 +46,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
 
   describe 'uploading a build with valid parameters' do
     it 'successfully uploads the build and returns the media details' do
-      with_tmp_file(named: 'test_app.zip', content: 'test app binary') do |file_path|
+      with_tmp_file(named: test_filename, content: test_file_content) do |file_path|
         # Stub the WordPress.com API request
         stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
           .to_return(
@@ -52,9 +56,9 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
                 {
                   ID: test_media_id,
                   URL: test_media_url,
-                  date: '2023-06-15T12:00:00Z',
-                  mime_type: 'application/zip',
-                  file: 'test_app.zip',
+                  date: test_date,
+                  mime_type: test_mime_type,
+                  file: test_filename,
                   post_ID: test_post_id
                 },
               ]
@@ -81,7 +85,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
         expect(result[:post_url]).to eq(test_post_url)
         expect(result[:media_id]).to eq(test_media_id)
         expect(result[:media_url]).to eq(test_media_url)
-        expect(result[:mime_type]).to eq('application/zip')
+        expect(result[:mime_type]).to eq(test_mime_type)
 
         # Verify the shared values
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPS_CDN_UPLOADED_FILE_URL]).to eq(test_media_url)
@@ -99,7 +103,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
             boundary = req.headers['Content-Type'].match(/boundary=([^;]+)/)[1]
 
             # Verify the media file is included with proper attributes
-            expect(req.body).to include(expected_form_part(boundary: boundary, name: 'media[]', value: 'test app binary', filename: 'test_app.zip'))
+            expect(req.body).to include(expected_form_part(boundary: boundary, name: 'media[]', value: test_file_content, filename: test_filename))
 
             # Verify each parameter has the correct value
             {
@@ -121,7 +125,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     end
 
     it 'successfully uploads the build with more optional parameters' do
-      with_tmp_file(named: 'test_app.zip', content: 'test app binary') do |file_path|
+      with_tmp_file(named: test_filename, content: test_file_content) do |file_path|
         # Stub the WordPress.com API request
         stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
           .to_return(
@@ -131,9 +135,9 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
                 {
                   ID: test_media_id,
                   URL: test_media_url,
-                  date: '2023-06-15T12:00:00Z',
-                  mime_type: 'application/zip',
-                  file: 'test_app.zip',
+                  date: test_date,
+                  mime_type: test_mime_type,
+                  file: test_filename,
                   post_ID: test_post_id
                 },
               ]
@@ -161,7 +165,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
         expect(result[:post_url]).to eq(test_post_url)
         expect(result[:media_id]).to eq(test_media_id)
         expect(result[:media_url]).to eq(test_media_url)
-        expect(result[:mime_type]).to eq('application/zip')
+        expect(result[:mime_type]).to eq(test_mime_type)
 
         # Verify that the request was made with the correct parameters
         expect(WebMock).to(
@@ -177,7 +181,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     end
 
     it 'handles API validation errors properly' do
-      with_tmp_file(named: 'test_app.zip', content: 'test app binary') do |file_path|
+      with_tmp_file(named: test_filename, content: test_file_content) do |file_path|
         # Stub the WordPress.com API request to return a validation error
         stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
           .to_return(
@@ -213,7 +217,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     end
 
     it 'handles non-JSON API errors properly' do
-      with_tmp_file(named: 'test_app.zip', content: 'test app binary') do |file_path|
+      with_tmp_file(named: test_filename, content: test_file_content) do |file_path|
         # Stub the WordPress.com API request to return a non-JSON error
         stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
           .to_return(
@@ -242,7 +246,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
 
   describe 'parameter validation' do
     it 'fails if site_id is empty' do
-      with_tmp_file(named: 'test_app.zip') do |file_path|
+      with_tmp_file(named: test_filename) do |file_path|
         expect do
           run_described_fastlane_action(
             site_id: '',
@@ -259,7 +263,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     end
 
     it 'fails if api_token is empty' do
-      with_tmp_file(named: 'test_app.zip') do |file_path|
+      with_tmp_file(named: test_filename) do |file_path|
         expect do
           run_described_fastlane_action(
             site_id: test_site_id,
@@ -276,7 +280,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     end
 
     it 'fails if product is empty' do
-      with_tmp_file(named: 'test_app.zip') do |file_path|
+      with_tmp_file(named: test_filename) do |file_path|
         expect do
           run_described_fastlane_action(
             site_id: test_site_id,
@@ -293,7 +297,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     end
 
     it 'fails if build_type is empty' do
-      with_tmp_file(named: 'test_app.zip') do |file_path|
+      with_tmp_file(named: test_filename) do |file_path|
         expect do
           run_described_fastlane_action(
             site_id: test_site_id,
@@ -310,7 +314,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     end
 
     it 'fails if build_type is not a valid value' do
-      with_tmp_file(named: 'test_app.zip') do |file_path|
+      with_tmp_file(named: test_filename) do |file_path|
         expect do
           run_described_fastlane_action(
             site_id: test_site_id,
@@ -327,7 +331,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     end
 
     it 'fails if visibility is not a valid symbol' do
-      with_tmp_file(named: 'test_app.zip') do |file_path|
+      with_tmp_file(named: test_filename) do |file_path|
         expect do
           run_described_fastlane_action(
             site_id: test_site_id,
@@ -344,7 +348,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     end
 
     it 'fails if platform is empty' do
-      with_tmp_file(named: 'test_app.zip') do |file_path|
+      with_tmp_file(named: test_filename) do |file_path|
         expect do
           run_described_fastlane_action(
             site_id: test_site_id,
@@ -361,7 +365,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     end
 
     it 'fails if platform is not a valid value' do
-      with_tmp_file(named: 'test_app.zip') do |file_path|
+      with_tmp_file(named: test_filename) do |file_path|
         expect do
           run_described_fastlane_action(
             site_id: test_site_id,
@@ -378,7 +382,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     end
 
     it 'fails if version is empty' do
-      with_tmp_file(named: 'test_app.zip') do |file_path|
+      with_tmp_file(named: test_filename) do |file_path|
         expect do
           run_described_fastlane_action(
             site_id: test_site_id,
@@ -395,7 +399,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     end
 
     it 'fails if post_status is not a valid value' do
-      with_tmp_file(named: 'test_app.zip') do |file_path|
+      with_tmp_file(named: test_filename) do |file_path|
         expect do
           run_described_fastlane_action(
             site_id: test_site_id,
