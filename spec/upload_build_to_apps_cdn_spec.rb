@@ -14,6 +14,8 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
   let(:test_build_number) { '42' }
   let(:test_media_id) { '987654' }
   let(:test_media_url) { 'https://example.com/uploads/app.zip' }
+  let(:test_post_id) { '12345' }
+  let(:test_post_url) { 'https://example.com/?p=12345' }
 
   before do
     WebMock.disable_net_connect!
@@ -51,7 +53,9 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
                   ID: test_media_id,
                   URL: test_media_url,
                   date: '2023-06-15T12:00:00Z',
-                  mime_type: 'application/zip'
+                  mime_type: 'application/zip',
+                  file: 'test_app.zip',
+                  post_ID: test_post_id
                 },
               ]
             }.to_json,
@@ -72,11 +76,18 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
         )
 
         # Verify the result
-        expect(result).to eq(test_media_url)
+        expect(result).to be_a(Hash)
+        expect(result[:post_id]).to eq(test_post_id)
+        expect(result[:post_url]).to eq(test_post_url)
+        expect(result[:media_id]).to eq(test_media_id)
+        expect(result[:media_url]).to eq(test_media_url)
+        expect(result[:mime_type]).to eq('application/zip')
 
         # Verify the shared values
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPS_CDN_UPLOADED_FILE_URL]).to eq(test_media_url)
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPS_CDN_UPLOADED_FILE_ID]).to eq(test_media_id)
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPS_CDN_UPLOADED_POST_ID]).to eq(test_post_id)
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPS_CDN_UPLOADED_POST_URL]).to eq(test_post_url)
 
         # Verify that the request was made with the correct parameters
         expect(WebMock).to(
@@ -121,7 +132,9 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
                   ID: test_media_id,
                   URL: test_media_url,
                   date: '2023-06-15T12:00:00Z',
-                  mime_type: 'application/zip'
+                  mime_type: 'application/zip',
+                  file: 'test_app.zip',
+                  post_ID: test_post_id
                 },
               ]
             }.to_json,
@@ -143,7 +156,12 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
         )
 
         # Verify the result
-        expect(result).to eq(test_media_url)
+        expect(result).to be_a(Hash)
+        expect(result[:post_id]).to eq(test_post_id)
+        expect(result[:post_url]).to eq(test_post_url)
+        expect(result[:media_id]).to eq(test_media_id)
+        expect(result[:media_url]).to eq(test_media_url)
+        expect(result[:mime_type]).to eq('application/zip')
 
         # Verify that the request was made with the correct parameters
         expect(WebMock).to(
@@ -157,20 +175,54 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
         )
       end
     end
-  end
 
-  describe 'handling API errors' do
-    it 'raises an error when the API returns a non-success response' do
-      with_tmp_file(named: 'test_app.zip') do |file_path|
-        # Stub the WordPress.com API request to return an error
+    it 'handles API validation errors properly' do
+      with_tmp_file(named: 'test_app.zip', content: 'test app binary') do |file_path|
+        # Stub the WordPress.com API request to return a validation error
         stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
           .to_return(
             status: 400,
-            body: { error: 'invalid_request', message: 'Invalid request' }.to_json,
+            body: {
+              errors: [
+                {
+                  file: 'test.txt',
+                  error: 'validation_error',
+                  message: 'A build with this data already exists, and you configured this request to error if a duplicate is found.'
+                },
+              ]
+            }.to_json,
             headers: { 'Content-Type' => 'application/json' }
           )
 
-        # Expect the action to raise an error
+        # Run the action and expect it to raise an error
+        expect do
+          run_described_fastlane_action(
+            site_id: test_site_id,
+            api_token: test_api_token,
+            product: test_product,
+            build_type: test_build_type,
+            visibility: test_visibility,
+            platform: test_platform,
+            version: test_version,
+            build_number: test_build_number,
+            file_path: file_path,
+            error_on_duplicate: true
+          )
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Upload to apps CDN failed')
+      end
+    end
+
+    it 'handles non-JSON API errors properly' do
+      with_tmp_file(named: 'test_app.zip', content: 'test app binary') do |file_path|
+        # Stub the WordPress.com API request to return a non-JSON error
+        stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
+          .to_return(
+            status: 500,
+            body: 'Internal Server Error',
+            headers: { 'Content-Type' => 'text/plain' }
+          )
+
+        # Run the action and expect it to raise an error
         expect do
           run_described_fastlane_action(
             site_id: test_site_id,

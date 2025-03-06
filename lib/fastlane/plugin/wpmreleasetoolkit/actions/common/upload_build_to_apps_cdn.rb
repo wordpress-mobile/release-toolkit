@@ -10,6 +10,8 @@ module Fastlane
     module SharedValues
       APPS_CDN_UPLOADED_FILE_URL = :APPS_CDN_UPLOADED_FILE_URL
       APPS_CDN_UPLOADED_FILE_ID = :APPS_CDN_UPLOADED_FILE_ID
+      APPS_CDN_UPLOADED_POST_ID = :APPS_CDN_UPLOADED_POST_ID
+      APPS_CDN_UPLOADED_POST_URL = :APPS_CDN_UPLOADED_POST_URL
     end
 
     class UploadBuildToAppsCdnAction < Action
@@ -57,22 +59,21 @@ module Fastlane
         # Handle the response
         case response
         when Net::HTTPSuccess
-          json_response = JSON.parse(response.body)
-          media = json_response['media'].first
-          media_id = media['ID']
-          media_url = media['URL']
+          result = parse_successful_response(response.body)
 
-          Actions.lane_context[SharedValues::APPS_CDN_UPLOADED_FILE_URL] = media_url
-          Actions.lane_context[SharedValues::APPS_CDN_UPLOADED_FILE_ID] = media_id
+          Actions.lane_context[SharedValues::APPS_CDN_UPLOADED_POST_ID] = result[:post_id]
+          Actions.lane_context[SharedValues::APPS_CDN_UPLOADED_POST_URL] = result[:post_url]
+          Actions.lane_context[SharedValues::APPS_CDN_UPLOADED_FILE_ID] = result[:media_id]
+          Actions.lane_context[SharedValues::APPS_CDN_UPLOADED_FILE_URL] = result[:media_url]
 
           UI.success('Build successfully uploaded to apps CDN')
-          UI.message("Media ID: #{media_id}")
-          UI.message("Media URL: #{media_url}")
+          UI.message("Post ID: #{result[:post_id]}")
+          UI.message("Post URL: #{result[:post_url]}")
 
-          media_url
+          result
         else
           UI.error("Failed to upload build to apps CDN: #{response.code} #{response.message}")
-          UI.error("Response body: #{response.body}")
+          UI.error(response.body)
           UI.user_error!('Upload to apps CDN failed')
         end
       end
@@ -111,6 +112,32 @@ module Fastlane
         [post_body.join("\r\n"), content_type]
       end
 
+      # Parse the successful response and return a hash with the upload details
+      #
+      # @param response_body [String] The raw response body from the API
+      # @return [Hash] A hash containing the upload details
+      def self.parse_successful_response(response_body)
+        json_response = JSON.parse(response_body)
+        media = json_response['media'].first
+        media_id = media['ID']
+        media_url = media['URL']
+        post_id = media['post_ID']
+
+        # Compute the post URL using the same base URL as media_url
+        post_url = URI.parse(media_url)
+        post_url.path = '/'
+        post_url.query = "p=#{post_id}"
+        post_url = post_url.to_s
+
+        {
+          post_id: post_id,
+          post_url: post_url,
+          media_id: media_id,
+          media_url: media_url,
+          mime_type: media['mime_type']
+        }
+      end
+
       def self.description
         'Uploads a build binary to the Apps CDN'
       end
@@ -120,7 +147,7 @@ module Fastlane
       end
 
       def self.return_value
-        'Returns the URL of the uploaded file'
+        'Returns a Hash containing the upload result: { post_id:, post_url:, media_id:, media_url:, mime_type: }. On error, raises a FastlaneError.'
       end
 
       def self.details
