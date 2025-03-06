@@ -109,7 +109,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
       end
     end
 
-    it 'successfully uploads the build with :external visibility' do
+    it 'successfully uploads the build with more optional parameters' do
       with_tmp_file(named: 'test_app.zip', content: 'test app binary') do |file_path|
         # Stub the WordPress.com API request
         stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
@@ -128,7 +128,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
             headers: { 'Content-Type' => 'application/json' }
           )
 
-        # Run the action with external visibility
+        # Run the action with external visibility and error_on_duplicate
         result = run_described_fastlane_action(
           site_id: test_site_id,
           api_token: test_api_token,
@@ -138,7 +138,8 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
           platform: test_platform,
           version: test_version,
           build_number: test_build_number,
-          file_path: file_path
+          file_path: file_path,
+          error_on_duplicate: true
         )
 
         # Verify the result

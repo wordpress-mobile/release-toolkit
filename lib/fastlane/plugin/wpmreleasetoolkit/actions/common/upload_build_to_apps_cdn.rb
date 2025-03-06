@@ -38,7 +38,8 @@ module Fastlane
           build_number: params[:build_number], # Optional: may be nil
           minimum_system_version: params[:minimum_system_version], # Optional: may be nil
           post_status: params[:post_status], # Optional: may be nil
-          release_notes: params[:release_notes] # Optional: may be nil
+          release_notes: params[:release_notes], # Optional: may be nil
+          error_on_duplicate: params[:error_on_duplicate] # defaults to false
         }.compact
         request_body, content_type = build_multipart_request(parameters: parameters, file_path: file_path)
 
@@ -231,6 +232,12 @@ module Fastlane
             type: String
           ),
           FastlaneCore::ConfigItem.new(
+            key: :error_on_duplicate,
+            description: 'If true, the action will error if a build matching the same metadata already exists. If false, any potential existing build matching the same metadata will be updated to replace the build with the new file',
+            default_value: false,
+            type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
             key: :api_token,
             env_name: 'WPCOM_API_TOKEN',
             description: 'The WordPress.com API token for authentication',
@@ -259,6 +266,18 @@ module Fastlane
             version: "20.0",
             build_number: "42",
             file_path: "path/to/app.zip"
+          )',
+          'upload_build_to_apps_cdn(
+            site_id: "12345678",
+            api_token: ENV["WPCOM_API_TOKEN"],
+            product: "WordPress.com Studio",
+            build_type: "Beta",
+            visibility: :external,
+            platform: "Android",
+            version: "20.0",
+            build_number: "42",
+            file_path: "path/to/app.apk",
+            error_on_duplicate: true
           )',
         ]
       end
