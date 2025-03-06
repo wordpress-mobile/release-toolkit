@@ -281,6 +281,15 @@ module Fastlane
         true
       end
 
+      def self.output
+        [
+          ['APPS_CDN_UPLOADED_FILE_URL', 'The URL of the uploaded file'],
+          ['APPS_CDN_UPLOADED_FILE_ID', 'The ID of the uploaded file'],
+          ['APPS_CDN_UPLOADED_POST_ID', 'The ID of the post / page created for the uploaded build'],
+          ['APPS_CDN_UPLOADED_POST_URL', 'The URL of the post / page created for the uploaded build'],
+        ]
+      end
+
       def self.example_code
         [
           'upload_build_to_apps_cdn(
