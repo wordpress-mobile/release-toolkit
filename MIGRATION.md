@@ -1,5 +1,11 @@
 # Migration Instructions for Major Releases
 
+## From 12.x to 13.0.0
+
+- The `prototype_build_details_comment` action have been updated to work with Firebase App Distribution instead of App Center [#630].
+   - If you were using the `prototype_build_details_comment` action in concert with the `appcenter_upload` action, you'll need to migrate to use `firebase_app_distribution` action instead, then adjust the parameters for `prototype_build_details_comment` accordingly (mostly removing the `appcenter_upload`-related ones like `app_center_org_name`).
+   - If you were using the `prototype_build_details_comment` action out of the context of App Center but with a `download_url` instead (e.g. Cloudfront URL), no update of the call site is needed.
+
 ## From 11.x to 12.0.0
 
 - `android_current_branch_is_hotfix` no longer supports the `build_gradle_path` parameter. Convert the project to define `versionName` and `versionCode` in `version.properties` and call `android_current_branch_is_hotfix` with `version_properties_path`.
