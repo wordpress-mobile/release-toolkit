@@ -6,12 +6,11 @@
 
 ### Breaking Changes
 
-- The `prototype_build_details_comment` action now relies on the `lane_context` of `firebase_app_distribution` instead of the one from `appcenter_upload` for the implicit metadata and download URL to use in the comment.
-  This is in the context of us moving from App Center (which will be shut down in March 2025) to Firebase App Distribution as our primary mechanism to distribute prototype builds. [#630]
+_None_
 
 ### New Features
 
-- Introduce `upload_build_to_apps_cdn` action to upload a build binary to the Apps CDN. [#636]
+_None_
 
 ### Bug Fixes
 
@@ -20,6 +19,17 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 13.0.0
+
+### Breaking Changes
+
+- The `prototype_build_details_comment` action now relies on the `lane_context` of `firebase_app_distribution` instead of the one from `appcenter_upload` for the implicit metadata and download URL to use in the comment.
+  This is in the context of us moving from App Center (which will be shut down in March 2025) to Firebase App Distribution as our primary mechanism to distribute prototype builds. [#630]
+
+### New Features
+
+- Introduce `upload_build_to_apps_cdn` action to upload a build binary to the Apps CDN. [#636]
 
 ## 12.5.0
 
