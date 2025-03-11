@@ -212,7 +212,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
             file_path: file_path,
             error_on_duplicate: true
           )
-        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Upload to apps CDN failed')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Upload to Apps CDN failed')
       end
     end
 
@@ -239,7 +239,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
             build_number: test_build_number,
             file_path: file_path
           )
-        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Upload to apps CDN failed')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Upload to Apps CDN failed')
       end
     end
   end

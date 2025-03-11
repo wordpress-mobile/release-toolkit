@@ -21,7 +21,7 @@ module Fastlane
       VALID_PLATFORMS = ['Android', 'iOS', 'Mac - Silicon', 'Mac - Intel', 'Mac - Any', 'Windows'].freeze
 
       def self.run(params)
-        UI.message('Uploading build to apps CDN...')
+        UI.message('Uploading build to Apps CDN...')
 
         file_path = params[:file_path]
         UI.user_error!("File not found at path '#{file_path}'") unless File.exist?(file_path)
@@ -66,15 +66,15 @@ module Fastlane
           Actions.lane_context[SharedValues::APPS_CDN_UPLOADED_FILE_ID] = result[:media_id]
           Actions.lane_context[SharedValues::APPS_CDN_UPLOADED_FILE_URL] = result[:media_url]
 
-          UI.success('Build successfully uploaded to apps CDN')
+          UI.success('Build successfully uploaded to Apps CDN')
           UI.message("Post ID: #{result[:post_id]}")
           UI.message("Post URL: #{result[:post_url]}")
 
           result
         else
-          UI.error("Failed to upload build to apps CDN: #{response.code} #{response.message}")
+          UI.error("Failed to upload build to Apps CDN: #{response.code} #{response.message}")
           UI.error(response.body)
-          UI.user_error!('Upload to apps CDN failed')
+          UI.user_error!('Upload to Apps CDN failed')
         end
       end
 
