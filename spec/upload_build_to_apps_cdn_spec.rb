@@ -41,6 +41,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
 
     lines << ''
     lines << value
+    lines << "--#{boundary}"
     lines.join("\r\n")
   end
 
