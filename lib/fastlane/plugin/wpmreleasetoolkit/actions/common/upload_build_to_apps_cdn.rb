@@ -95,7 +95,6 @@ module Fastlane
         post_body << 'Content-Type: application/octet-stream'
         post_body << ''
         post_body << File.binread(file_path)
-        post_body << ''
 
         # Add each parameter as a separate form field
         parameters.each do |key, value|
@@ -103,7 +102,6 @@ module Fastlane
           post_body << "Content-Disposition: form-data; name=\"#{key}\""
           post_body << ''
           post_body << value.to_s
-          post_body << ''
         end
 
         # Add the closing boundary
