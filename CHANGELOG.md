@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Make fastlane log actions as collapsible groups in Buildkite. [#638]
 
 ### Bug Fixes
 
