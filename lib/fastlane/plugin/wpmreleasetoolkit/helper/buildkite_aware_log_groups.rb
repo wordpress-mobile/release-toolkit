@@ -2,7 +2,7 @@
 
 require 'fastlane'
 
-# This monkey-patch adds Buildkite-aware logs to fastlane so it generates collapsible lgo group in Buildkite for each action execution.
+# This monkey-patch adds Buildkite-aware logs to fastlane so it generates a collapsible log group in Buildkite for each action execution.
 #
 # @env `FASTLANE_DISABLE_ACTIONS_BUILDKITE_LOG_GROUPS`
 #     Set this variable to '1' to disable the auto-application of the monkey patch.
