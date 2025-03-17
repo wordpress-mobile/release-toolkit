@@ -9,6 +9,7 @@ module Fastlane
       DEFAULT_BRANCH = 'trunk'
 
       def self.run(params)
+        api_url = params[:api_url]
         token = params[:github_token]
         repository = params[:repository]
         source_branch = params[:source_branch]
@@ -41,6 +42,7 @@ module Fastlane
           Fastlane::Helper::GitHelper.checkout_and_pull(source_branch)
 
           create_backmerge_pr(
+            api_url: api_url,
             token: token,
             repository: repository,
             title: "Merge #{source_branch} into #{target_branch}",
@@ -76,6 +78,7 @@ module Fastlane
 
       # Creates a backmerge pull request using the `create_pull_request` Fastlane Action.
       #
+      # @param api_url [String] the GitHub API URL to use for creating the pull request
       # @param token [String] the GitHub token for authentication.
       # @param repository [String] the repository where the pull request will be created.
       # @param title [String] the title of the pull request.
@@ -90,7 +93,7 @@ module Fastlane
       #
       # @return [String] The URL of the created Pull Request, or `nil` if no PR was created.
       #
-      def self.create_backmerge_pr(token:, repository:, title:, head_branch:, base_branch:, labels:, milestone:, reviewers:, team_reviewers:, intermediate_branch_created_callback:)
+      def self.create_backmerge_pr(api_url:, token:, repository:, title:, head_branch:, base_branch:, labels:, milestone:, reviewers:, team_reviewers:, intermediate_branch_created_callback:) # rubocop:disable Metrics/ParameterLists
         # Do an early pre-check to see if the PR would be valid, but only if no callback (as a callback might add new commits on intermediate branch)
         if intermediate_branch_created_callback.nil? && !can_merge?(head_branch, into: base_branch)
           UI.error("Nothing to merge from #{head_branch} into #{base_branch}. Skipping PR creation.")
@@ -136,6 +139,7 @@ module Fastlane
         BODY
 
         other_action.create_pull_request(
+          api_url: api_url,
           api_token: token,
           repo: repository,
           title: title,
@@ -192,6 +196,10 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :api_url,
+                                       description: 'The GitHub API URL to use for creating the pull request. Primarily used when working with GitHub Enterprise instances',
+                                       optional: true,
+                                       type: String),
           FastlaneCore::ConfigItem.new(key: :repository,
                                        env_name: 'GHHELPER_REPOSITORY',
                                        description: 'The remote path of the GH repository on which we work',

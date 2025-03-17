@@ -41,7 +41,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
     end
   end
 
-  def stub_expected_pull_requests(expected_backmerge_branches:, source_branch:, labels: [], milestone_number: nil, reviewers: nil, team_reviewers: nil, branch_exists_on_remote: false, nothing_to_merge_between: [])
+  def stub_expected_pull_requests(expected_backmerge_branches:, source_branch:, labels: [], milestone_number: nil, reviewers: nil, team_reviewers: nil, branch_exists_on_remote: false, nothing_to_merge_between: [], api_url: nil)
     expected_backmerge_branches.map do |target_branch|
       expected_intermediate_branch = "merge/#{source_branch.gsub('/', '-')}-into-#{target_branch.gsub('/', '-')}"
 
@@ -70,7 +70,8 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
         labels: labels,
         milestone: milestone_number,
         reviewers: reviewers,
-        team_reviewers: team_reviewers
+        team_reviewers: team_reviewers,
+        api_url: api_url
       ).and_return(mock_pr_url(target_branch))
 
       expected_intermediate_branch
@@ -291,6 +292,31 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
 
         expect(result).to eq([mock_pr_url(default_branch)])
       end
+    end
+  end
+
+  context 'when providing an api_url' do
+    it 'creates a backmerge PR using the provided api_url' do
+      stub_git_release_branches([])
+
+      source_branch = 'release/30.6'
+      api_url = 'https://github.company.com/api/v3'
+
+      stub_expected_pull_requests(
+        expected_backmerge_branches: [default_branch],
+        source_branch: source_branch,
+        api_url: api_url
+      )
+
+      result = run_described_fastlane_action(
+        github_token: test_token,
+        repository: test_repo,
+        source_branch: source_branch,
+        default_branch: default_branch,
+        api_url: api_url
+      )
+
+      expect(result).to eq([mock_pr_url(default_branch)])
     end
   end
 
