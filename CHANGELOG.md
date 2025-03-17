@@ -11,6 +11,7 @@ _None_
 ### New Features
 
 - Make fastlane log actions as collapsible groups in Buildkite. [#638]
+- Add `api_url` parameter to `create_release_backmerge_pull_request` to support GitHub Enterprise. [#641]
 
 ### Bug Fixes
 
