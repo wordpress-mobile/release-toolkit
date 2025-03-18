@@ -111,7 +111,9 @@ module Fastlane
 
         # Call the callback if one was provided to allow the use to add commits on the intermediate branch (e.g. solve conflicts)
         unless intermediate_branch_created_callback.nil?
-          intermediate_branch_created_callback.call(base_branch, intermediate_branch)
+          Dir.chdir(FastlaneCore::FastlaneFolder.path) do
+            intermediate_branch_created_callback.call(base_branch, intermediate_branch)
+          end
           # Make sure the callback block didn't switch branches
           other_action.ensure_git_branch(branch: "^#{intermediate_branch}$")
 
