@@ -58,7 +58,11 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
 
       expect(Fastlane::Helper::GitHelper).to receive(:checkout_and_pull).with(source_branch)
       expect(Fastlane::Helper::GitHelper).to receive(:create_branch).with(expected_intermediate_branch)
-      expect(other_action_mock).to receive(:push_to_git_remote).with(tags: false)
+      expect(other_action_mock).to receive(:push_to_git_remote).with(
+        tags: false,
+        remote_branch: expected_intermediate_branch,
+        set_upstream: true
+      )
 
       allow(other_action_mock).to receive(:create_pull_request).with(
         api_token: test_token,

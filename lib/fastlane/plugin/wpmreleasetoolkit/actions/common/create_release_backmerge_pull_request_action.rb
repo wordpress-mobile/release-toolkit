@@ -123,7 +123,7 @@ module Fastlane
           end
         end
 
-        other_action.push_to_git_remote(tags: false)
+        other_action.push_to_git_remote(tags: false, remote_branch: intermediate_branch, set_upstream: true)
 
         pr_body = <<~BODY
           Merging `#{head_branch}` into `#{base_branch}`.
