@@ -195,54 +195,63 @@ module Fastlane
       end
 
       def self.available_options
+        # Parameters we want to forward from Fastlane's create_pull_request action
+        forwarded_param_keys = %i[
+          api_url
+          labels
+          assignees
+          reviewers
+          team_reviewers
+        ].freeze
+
+        forwarded_params = Fastlane::Actions::CreatePullRequestAction.available_options.select do |opt|
+          forwarded_param_keys.include?(opt.key)
+        end
+
         [
-          FastlaneCore::ConfigItem.new(key: :api_url,
-                                       description: 'The GitHub API URL to use for creating the pull request. Primarily used when working with GitHub Enterprise instances',
-                                       optional: true,
-                                       type: String),
-          FastlaneCore::ConfigItem.new(key: :repository,
-                                       env_name: 'GHHELPER_REPOSITORY',
-                                       description: 'The remote path of the GH repository on which we work',
-                                       optional: false,
-                                       type: String),
-          FastlaneCore::ConfigItem.new(key: :source_branch,
-                                       description: 'The source branch to create a backmerge PR from, in the format `release/x.y.z`',
-                                       optional: false,
-                                       type: String),
-          FastlaneCore::ConfigItem.new(key: :default_branch,
-                                       description: 'The default branch to target if no newer release branches exist',
-                                       optional: true,
-                                       default_value: DEFAULT_BRANCH,
-                                       type: String),
-          FastlaneCore::ConfigItem.new(key: :target_branches,
-                                       description: 'Array of target branches for the backmerge. If empty, the action will determine target branches by finding all `release/x.y.z` branches with a `x.y.z` version greater than the version in source branch\'s name. If none are found, it will target `default_branch`', # rubocop:disable Layout/LineLength
-                                       optional: true,
-                                       default_value: [],
-                                       type: Array),
-          FastlaneCore::ConfigItem.new(key: :labels,
-                                       description: 'The labels that should be assigned to the backmerge PRs',
-                                       optional: true,
-                                       default_value: [],
-                                       type: Array),
-          FastlaneCore::ConfigItem.new(key: :milestone_title,
-                                       description: 'The title of the milestone to assign to the created PRs',
-                                       optional: true,
-                                       type: String),
-          FastlaneCore::ConfigItem.new(key: :reviewers,
-                                       description: 'An array of GitHub users that will be assigned to the pull request',
-                                       optional: true,
-                                       type: Array),
-          FastlaneCore::ConfigItem.new(key: :team_reviewers,
-                                       description: 'An array of GitHub team slugs that will be assigned to the pull request',
-                                       optional: true,
-                                       type: Array),
-          FastlaneCore::ConfigItem.new(key: :intermediate_branch_created_callback,
-                                       description: 'Callback to allow for the caller to perform operations on the intermediate branch (e.g. pushing new commits to pre-solve conflicts) before creating the PR. ' \
-                                        + 'The callback receives two parameters: the base (target) branch for the PR and the intermediate branch name that has been created.' \
-                                        + 'Note that if you use the callback to add new commits to the intermediate branch, you are responsible for git-pushing them too',
-                                       optional: true,
-                                       type: Proc),
-          Fastlane::Helper::GithubHelper.github_token_config_item,
+          *forwarded_params,
+          Fastlane::Helper::GithubHelper.github_token_config_item, # we forward `github_token` to `api_token` in the `create_pull_request` action
+          FastlaneCore::ConfigItem.new(
+            key: :repository,
+            env_name: 'GHHELPER_REPOSITORY',
+            description: 'The remote path of the GH repository on which we work',
+            optional: false,
+            type: String
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :source_branch,
+            description: 'The source branch to create a backmerge PR from, in the format `release/x.y.z`',
+            optional: false,
+            type: String
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :default_branch,
+            description: 'The default branch to target if no newer release branches exist',
+            optional: true,
+            default_value: DEFAULT_BRANCH,
+            type: String
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :target_branches,
+            description: 'Array of target branches for the backmerge. If empty, the action will determine target branches by finding all `release/x.y.z` branches with a `x.y.z` version greater than the version in source branch\'s name. If none are found, it will target `default_branch`',
+            optional: true,
+            default_value: [],
+            type: Array
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :milestone_title,
+            description: 'The title of the milestone to assign to the created PRs',
+            optional: true,
+            type: String
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :intermediate_branch_created_callback,
+            description: 'Callback to allow for the caller to perform operations on the intermediate branch (e.g. pushing new commits to pre-solve conflicts) before creating the PR. ' \
+             + 'The callback receives two parameters: the base (target) branch for the PR and the intermediate branch name that has been created.' \
+             + 'Note that if you use the callback to add new commits to the intermediate branch, you are responsible for git-pushing them too',
+            optional: true,
+            type: Proc
+          ),
         ]
       end
 

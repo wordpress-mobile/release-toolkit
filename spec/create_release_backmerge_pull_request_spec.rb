@@ -41,7 +41,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
     end
   end
 
-  def stub_expected_pull_requests(expected_backmerge_branches:, source_branch:, labels: [], milestone_number: nil, reviewers: nil, team_reviewers: nil, branch_exists_on_remote: false, nothing_to_merge_between: [], api_url: nil)
+  def stub_expected_pull_requests(expected_backmerge_branches:, source_branch:, labels: nil, milestone_number: nil, reviewers: nil, team_reviewers: nil, branch_exists_on_remote: false, nothing_to_merge_between: [], api_url: 'https://api.github.com')
     expected_backmerge_branches.map do |target_branch|
       expected_intermediate_branch = "merge/#{source_branch.gsub('/', '-')}-into-#{target_branch.gsub('/', '-')}"
 
@@ -86,6 +86,8 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
     allow(Fastlane::Helper::GitHelper).to receive(:delete_remote_branch_if_exists!)
     allow(Git).to receive(:open).and_return(git_client)
     allow(Fastlane::Action).to receive(:other_action).and_return(other_action_mock)
+    # Stub git rev-parse command used by CreatePullRequestAction when getting default branch value
+    allow(Fastlane::Actions).to receive(:sh).with('git rev-parse --abbrev-ref HEAD', { log: false }).and_return('main')
   end
 
   context 'when `target_branches` is provided' do
@@ -238,7 +240,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
   context 'when providing labels' do
     [
       %w[java ruby perl],
-      [],
+      nil,
     ].each do |labels|
       it "creates a backmerge PR setting the labels: #{labels}" do
         stub_git_release_branches([])
