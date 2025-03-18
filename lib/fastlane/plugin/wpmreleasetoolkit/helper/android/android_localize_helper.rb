@@ -342,7 +342,10 @@ module Fastlane
         #
         def self.post_process_xml!(translated_xml, locale_code:, original_xml:)
           copy_orig_attributes = lambda do |node, xpath|
-            orig_attributes = original_xml.xpath(xpath)&.first&.attribute_nodes&.to_h do |attr|
+            found_node = original_xml.xpath(xpath)&.first
+            return unless found_node
+
+            orig_attributes = found_node.attribute_nodes&.to_h do |attr|
               [[attr.namespace&.prefix, attr.name].compact.join(':'), attr.value]
             end
             orig_attributes&.each { |k, v| node[k] = v unless k == 'name' }
