@@ -339,6 +339,17 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
       expect(comment).to include "<td><b>Direct Download</b></td><td><a href='https://example.com/myapp.apk'><code>myapp.apk</code></a></td>"
     end
 
+    it 'does not include rows for FAD metadata' do
+      comment = run_described_fastlane_action(
+        app_display_name: 'My App',
+        download_url: 'https://example.com/myapp.apk'
+      )
+      expect(comment).not_to include %r{<td>.*Build Number.*</td>}
+      expect(comment).not_to include %r{<td>.*Version.*</td>}
+      expect(comment).not_to include %r{<td>.*Bundle ID.*</td>}
+      expect(comment).not_to include %r{<td>.*Application ID.*</td>}
+    end
+
     it 'does not include any default footnote if no explicit footnote is provided' do
       comment = run_described_fastlane_action(
         app_display_name: 'My App',
@@ -384,15 +395,12 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         <p><img align='top' src='https://raw.githubusercontent.com/buildkite/emojis/main/img-buildkite-64/jetpack.png' width='20px' alt='App Icon' />📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</p>
         <table>
         <tr>
-          <td rowspan='9' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Fexample.com%2Fbestapp.apk' width='250' height='250' /></td>
+          <td rowspan='6' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Fexample.com%2Fbestapp.apk' width='250' height='250' /></td>
           <td><b>App Name</b></td><td>The Best App</td>
         </tr>
         <tr><td><b>Version Name</b></td><td>28.2</td></tr>
         <tr><td><b>Version Code</b></td><td>1280200108</td></tr>
         <tr><td><b>Flavor</b></td><td>Debug</td></tr>
-        <tr><td><b>Build Number</b></td><td><code></code></td></tr>
-        <tr><td><b>Version</b></td><td><code></code></td></tr>
-        <tr><td><b>Application ID</b></td><td><code></code></td></tr>
         <tr><td><b>Commit</b></td><td>a1b2c3f</td></tr>
         <tr><td><b>Direct Download</b></td><td><a href='https://example.com/bestapp.apk'><code>bestapp.apk</code></a></td></tr>
         </table>
@@ -417,14 +425,11 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         <details><summary>📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</summary>
         <table>
         <tr>
-          <td rowspan='8' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Fexample.com%2Fbestapp.apk' width='250' height='250' /></td>
+          <td rowspan='5' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Fexample.com%2Fbestapp.apk' width='250' height='250' /></td>
           <td><b>App Name</b></td><td>The Best App</td>
         </tr>
         <tr><td><b>Version Name</b></td><td>28.2</td></tr>
         <tr><td><b>Version Code</b></td><td>1280200108</td></tr>
-        <tr><td><b>Build Number</b></td><td><code></code></td></tr>
-        <tr><td><b>Version</b></td><td><code></code></td></tr>
-        <tr><td><b>Application ID</b></td><td><code></code></td></tr>
         <tr><td><b>Commit</b></td><td>a1b2c3f</td></tr>
         <tr><td><b>Direct Download</b></td><td><a href='https://example.com/bestapp.apk'><code>bestapp.apk</code></a></td></tr>
         </table>
