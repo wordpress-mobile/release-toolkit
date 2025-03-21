@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Fix an issue where `prototype_build_details_comment` added some unexpected metadata rows in the comment table if we didn't use `firebase_app_distribution` (e.g. for Prototype Builds uploaded to S3 and not using FAD) [#642]
 
 ### Internal Changes
 
