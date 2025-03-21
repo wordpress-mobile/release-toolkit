@@ -102,12 +102,15 @@ module Fastlane
       # @return [Hash<String, String>] A hash of all the metadata, consolidated from both the explicit and the implicit ones
       #
       def self.generate_metadata_hash(params:, release_info:)
+        # Add explicit metadata provided by the caller
         metadata = params[:metadata]&.transform_keys(&:to_s) || {}
 
         # Add Firebase-specific metadata if available
-        metadata['Build Number'] ||= "<code>#{release_info&.build_version}</code>"
-        metadata['Version'] ||= "<code>#{release_info&.display_version}</code>"
-        metadata[release_info&.os == 'ios' ? 'Bundle ID' : 'Application ID'] ||= "<code>#{release_info&.bundle_id}</code>"
+        unless release_info.nil?
+          metadata['Build Number'] ||= "<code>#{release_info.build_version}</code>"
+          metadata['Version'] ||= "<code>#{release_info.display_version}</code>"
+          metadata[release_info.os == 'ios' ? 'Bundle ID' : 'Application ID'] ||= "<code>#{release_info.bundle_id}</code>"
+        end
 
         # Add git metadata
         metadata['Commit'] ||= ENV.fetch('BUILDKITE_COMMIT', nil) || other_action.last_git_commit[:abbreviated_commit_hash]

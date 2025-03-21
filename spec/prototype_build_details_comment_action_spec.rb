@@ -111,26 +111,64 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
       end
     end
 
-    describe 'app_icon' do
+    describe 'app_icon handling' do
       context 'when providing an URL' do
         it 'includes the icon in the intro text' do
-          comment = run_described_fastlane_action(
-            app_display_name: 'My Cool App',
-            app_icon: 'https://localhost/foo.png',
-            download_url: 'https://localhost/foo.apk'
-          )
-          expect(comment).to include "<img align='top' src='https://localhost/foo.png' width='20px' alt='App Icon' />📲 "
+          comment = run_described_fastlane_action(base_params.merge(app_icon: valid_app_icon_url))
+          expect(comment).to include "<img align='top' src='#{valid_app_icon_url}' width='20px' alt='App Icon' />📲 "
         end
       end
 
       context 'when providing an emoji code' do
         it 'includes the icon in the intro text' do
-          comment = run_described_fastlane_action(
-            app_display_name: 'My Cool App',
-            app_icon: ':jetpack:',
-            download_url: 'https://localhost/foo.apk'
-          )
+          comment = run_described_fastlane_action(base_params.merge(app_icon: ':jetpack:'))
           expect(comment).to include "<img align='top' src='https://raw.githubusercontent.com/buildkite/emojis/main/img-buildkite-64/jetpack.png' width='20px' alt='App Icon' />📲 "
+        end
+
+        it 'handles emoji codes with special characters' do
+          comment = run_described_fastlane_action(base_params.merge(app_icon: ':plus-one:'))
+          expect(comment).to include 'plus-one.png'
+        end
+      end
+
+      context 'when no icon is provided' do
+        context 'when using Firebase App Distribution' do
+          let(:firebase_release_info) do
+            {
+              displayVersion: '28.7',
+              buildVersion: '1287003',
+              testingUri: 'https://appdistribution.firebase.google.com/testerapps/1:123456:ios:abcdef/releases/xyz',
+              firebaseConsoleUri: 'https://console.firebase.google.com/project/apps-test/appdistribution/app/ios:com.example.myapp/releases/xyz'
+            }
+          end
+
+          before do
+            stub_const('Fastlane::Actions::SharedValues::FIREBASE_APP_DISTRO_RELEASE', :firebase_app_distro_release)
+            allow(Fastlane::Actions).to receive(:lane_context).and_return({ firebase_app_distro_release: firebase_release_info })
+          end
+
+          it 'uses the firebase icon' do
+            comment = run_described_fastlane_action(app_display_name: 'My App')
+            expect(comment).to include 'firebase.png'
+          end
+        end
+
+        context 'when using a Firebase download URL' do
+          it 'uses the firebase icon' do
+            comment = run_described_fastlane_action(
+              app_display_name: 'My App',
+              download_url: 'https://appdistribution.firebase.google.com/testerapps/1:123456:ios:abcdef/releases/xyz'
+            )
+            expect(comment).to include 'firebase.png'
+          end
+        end
+
+        context 'when using a non-Firebase download URL' do
+          it 'does not include any icon' do
+            comment = run_described_fastlane_action(base_params.merge(app_icon: nil))
+            expect(comment).not_to include 'firebase.png'
+            expect(comment).to match(/^<p>📲 You can test/)
+          end
         end
       end
     end
@@ -301,6 +339,17 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
       expect(comment).to include "<td><b>Direct Download</b></td><td><a href='https://example.com/myapp.apk'><code>myapp.apk</code></a></td>"
     end
 
+    it 'does not include rows for FAD metadata' do
+      comment = run_described_fastlane_action(
+        app_display_name: 'My App',
+        download_url: 'https://example.com/myapp.apk'
+      )
+      expect(comment).not_to include %r{<td>.*Build Number.*</td>}
+      expect(comment).not_to include %r{<td>.*Version.*</td>}
+      expect(comment).not_to include %r{<td>.*Bundle ID.*</td>}
+      expect(comment).not_to include %r{<td>.*Application ID.*</td>}
+    end
+
     it 'does not include any default footnote if no explicit footnote is provided' do
       comment = run_described_fastlane_action(
         app_display_name: 'My App',
@@ -346,15 +395,12 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         <p><img align='top' src='https://raw.githubusercontent.com/buildkite/emojis/main/img-buildkite-64/jetpack.png' width='20px' alt='App Icon' />📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</p>
         <table>
         <tr>
-          <td rowspan='9' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Fexample.com%2Fbestapp.apk' width='250' height='250' /></td>
+          <td rowspan='6' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Fexample.com%2Fbestapp.apk' width='250' height='250' /></td>
           <td><b>App Name</b></td><td>The Best App</td>
         </tr>
         <tr><td><b>Version Name</b></td><td>28.2</td></tr>
         <tr><td><b>Version Code</b></td><td>1280200108</td></tr>
         <tr><td><b>Flavor</b></td><td>Debug</td></tr>
-        <tr><td><b>Build Number</b></td><td><code></code></td></tr>
-        <tr><td><b>Version</b></td><td><code></code></td></tr>
-        <tr><td><b>Application ID</b></td><td><code></code></td></tr>
         <tr><td><b>Commit</b></td><td>a1b2c3f</td></tr>
         <tr><td><b>Direct Download</b></td><td><a href='https://example.com/bestapp.apk'><code>bestapp.apk</code></a></td></tr>
         </table>
@@ -379,82 +425,17 @@ describe Fastlane::Actions::PrototypeBuildDetailsCommentAction do
         <details><summary>📲 You can test the changes from this Pull Request in <b>The Best App</b> by scanning the QR code below to install the corresponding build.</summary>
         <table>
         <tr>
-          <td rowspan='8' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Fexample.com%2Fbestapp.apk' width='250' height='250' /></td>
+          <td rowspan='5' width='260px'><img src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&qzone=4&data=https%3A%2F%2Fexample.com%2Fbestapp.apk' width='250' height='250' /></td>
           <td><b>App Name</b></td><td>The Best App</td>
         </tr>
         <tr><td><b>Version Name</b></td><td>28.2</td></tr>
         <tr><td><b>Version Code</b></td><td>1280200108</td></tr>
-        <tr><td><b>Build Number</b></td><td><code></code></td></tr>
-        <tr><td><b>Version</b></td><td><code></code></td></tr>
-        <tr><td><b>Application ID</b></td><td><code></code></td></tr>
         <tr><td><b>Commit</b></td><td>a1b2c3f</td></tr>
         <tr><td><b>Direct Download</b></td><td><a href='https://example.com/bestapp.apk'><code>bestapp.apk</code></a></td></tr>
         </table>
         <em>Note: Google Sign-In is not available in those builds</em>
         </details>
       EXPECTED_COMMENT
-    end
-  end
-
-  describe 'app_icon handling' do
-    context 'when providing an URL' do
-      it 'includes the icon in the intro text' do
-        comment = run_described_fastlane_action(base_params.merge(app_icon: valid_app_icon_url))
-        expect(comment).to include "<img align='top' src='#{valid_app_icon_url}' width='20px' alt='App Icon' />📲 "
-      end
-    end
-
-    context 'when providing an emoji code' do
-      it 'includes the icon in the intro text' do
-        comment = run_described_fastlane_action(base_params.merge(app_icon: ':jetpack:'))
-        expect(comment).to include "<img align='top' src='https://raw.githubusercontent.com/buildkite/emojis/main/img-buildkite-64/jetpack.png' width='20px' alt='App Icon' />📲 "
-      end
-
-      it 'handles emoji codes with special characters' do
-        comment = run_described_fastlane_action(base_params.merge(app_icon: ':plus-one:'))
-        expect(comment).to include 'plus-one.png'
-      end
-    end
-
-    context 'when no icon is provided' do
-      context 'when using Firebase App Distribution' do
-        let(:firebase_release_info) do
-          {
-            displayVersion: '28.7',
-            buildVersion: '1287003',
-            testingUri: 'https://appdistribution.firebase.google.com/testerapps/1:123456:ios:abcdef/releases/xyz',
-            firebaseConsoleUri: 'https://console.firebase.google.com/project/apps-test/appdistribution/app/ios:com.example.myapp/releases/xyz'
-          }
-        end
-
-        before do
-          stub_const('Fastlane::Actions::SharedValues::FIREBASE_APP_DISTRO_RELEASE', :firebase_app_distro_release)
-          allow(Fastlane::Actions).to receive(:lane_context).and_return({ firebase_app_distro_release: firebase_release_info })
-        end
-
-        it 'uses the firebase icon' do
-          comment = run_described_fastlane_action(app_display_name: 'My App')
-          expect(comment).to include 'firebase.png'
-        end
-      end
-
-      context 'when using a Firebase download URL' do
-        it 'uses the firebase icon' do
-          comment = run_described_fastlane_action(
-            app_display_name: 'My App',
-            download_url: 'https://appdistribution.firebase.google.com/testerapps/1:123456:ios:abcdef/releases/xyz'
-          )
-          expect(comment).to include 'firebase.png'
-        end
-      end
-
-      context 'when using a non-Firebase download URL' do
-        it 'does not include any icon' do
-          comment = run_described_fastlane_action(base_params.merge(app_icon: nil))
-          expect(comment).not_to include 'firebase.png'
-          expect(comment).to match(/^<p>📲 You can test/)
-        end
-      end
     end
   end
 end
