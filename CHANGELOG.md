@@ -11,9 +11,11 @@ _None_
 ### New Features
 
 - Make fastlane log actions as collapsible groups in Buildkite. [#638]
+- Add `api_url` parameter to `create_release_backmerge_pull_request` to support GitHub Enterprise. Also, updated the code so the intermediate branch tracks its remote branch after pushing. [#641]
 
 ### Bug Fixes
 
+- Fix issue in `create_release_backmerge_pull_request` where calling another fastlane action from the `intermediate_branch_created_callback` proc now behaves correctly. [#641]
 - Fix an issue where `prototype_build_details_comment` added some unexpected metadata rows in the comment table if we didn't use `firebase_app_distribution` (e.g. for Prototype Builds uploaded to S3 and not using FAD) [#642]
 
 ### Internal Changes

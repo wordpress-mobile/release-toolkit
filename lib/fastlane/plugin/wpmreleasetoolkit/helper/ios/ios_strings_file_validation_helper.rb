@@ -65,10 +65,10 @@ module Fastlane
         # Inspects the given `.strings` file for duplicated keys, returning them if any.
         #
         # @param [String] file The path to the file to inspect.
-        # @return [Hash<String, Array<Int>] Hash with the dublipcated keys.
+        # @return [Hash<String, Array<Int>] Hash with the duplicated keys.
         #         Each element has the duplicated key (from the `.strings`) as key and an array of line numbers where the key occurs as value.
         def self.find_duplicated_keys(file:)
-          keys_with_lines = Hash.new([])
+          keys_with_lines = Hash.new { |h, k| h[k] = [] }
 
           state = State.new(context: :root, buffer: StringIO.new, in_escaped_ctx: false, found_key: nil)
 

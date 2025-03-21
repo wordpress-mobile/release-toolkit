@@ -54,7 +54,7 @@ module Fastlane
           csv = "Version\t#{devices.join("\t")}\n"
           app_sizes.each do |details|
             build_number = details['cfBundleVersion']
-            sizes = details['sizesInBytes'].select { |name, _| devices.include?(name) }
+            sizes = details['sizesInBytes'].slice(*devices)
             csv += "#{build_number}\t" + devices.map { |d| sz(sizes[d]['compressed']) }.join("\t") + "\n"
           end
           csv
@@ -64,7 +64,7 @@ module Fastlane
           devices = DEFAULT_DEVICES if devices.nil? || devices.empty?
           app_sizes.map do |details|
             build_number = details['cfBundleVersion']
-            sizes = details['sizesInBytes'].select { |name, _| devices.include?(name) }
+            sizes = details['sizesInBytes'].slice(*devices)
             col_size = devices.map(&:length).max
             table = "| #{build_number.ljust(col_size)} | Download | Install  |\n"
             table += "|:#{'-' * col_size}-|---------:|---------:|\n"
