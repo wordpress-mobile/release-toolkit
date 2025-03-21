@@ -11,11 +11,11 @@ _None_
 ### New Features
 
 - Make fastlane log actions as collapsible groups in Buildkite. [#638]
-- Add `api_url` parameter to `create_release_backmerge_pull_request` to support GitHub Enterprise. [#641]
+- Add `api_url` parameter to `create_release_backmerge_pull_request` to support GitHub Enterprise. Also, updated the code so the intermediate branch tracks its remote branch after pushing. [#641]
 
 ### Bug Fixes
 
-_None_
+- Fix issue in `create_release_backmerge_pull_request` where calling another fastlane action from the `intermediate_branch_created_callback` proc now behaves correctly. [#641]
 
 ### Internal Changes
 
