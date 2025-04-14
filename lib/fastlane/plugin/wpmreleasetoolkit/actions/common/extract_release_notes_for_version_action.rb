@@ -10,11 +10,11 @@ module Fastlane
         release_notes_file_path = params[:release_notes_file_path]
         extracted_notes_file_path = params[:extracted_notes_file_path]
 
-        extracted_notes = ''
+        extracted_lines = []
         extract_notes(release_notes_file_path, version) do |line|
-          extracted_notes += line
+          extracted_lines << line
         end
-        extracted_notes.chomp!('') # Remove any extra empty line(s) at the end
+        extracted_notes = extracted_lines.join.chomp('') # Combine lines and remove any extra empty line(s) at the end
 
         unless extracted_notes_file_path.nil? || extracted_notes_file_path.empty?
           File.write(extracted_notes_file_path, extracted_notes)
