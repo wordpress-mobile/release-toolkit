@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Fix error in `extract_release_notes_for_version`, avoiding modifying a frozen string. [#644]
 
 ### Internal Changes
 
