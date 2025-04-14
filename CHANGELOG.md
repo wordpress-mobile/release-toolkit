@@ -14,11 +14,17 @@ _None_
 
 ### Bug Fixes
 
-- Fix error in `extract_release_notes_for_version`, avoiding modifying a frozen string. [#644]
+_None_
 
 ### Internal Changes
 
 _None_
+
+## 13.1.1
+
+### Bug Fixes
+
+- Fix error in `extract_release_notes_for_version`, avoiding modifying a frozen string. [#644]
 
 ## 13.1.0
 
