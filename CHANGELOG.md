@@ -14,11 +14,17 @@ _None_
 
 ### Bug Fixes
 
-- `create_release_backmerge_pull_request`: fix the backmerge PR branch validation in CI. [#646]
+_None_
 
 ### Internal Changes
 
 _None_
+
+## 13.1.2
+
+### Bug Fixes
+
+- `create_release_backmerge_pull_request`: fix the backmerge PR branch validation in CI. [#646]
 
 ## 13.1.1
 
