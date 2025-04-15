@@ -52,7 +52,7 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
         allow(described_class).to receive(:can_merge?).with(head, into: base).and_return(false)
       end
 
-      allow(other_action_mock).to receive(:ensure_git_branch).with({ branch: "^#{expected_intermediate_branch}$" }).and_return(true)
+      allow(Fastlane::Helper::GitHelper).to receive(:current_git_branch).and_return(expected_intermediate_branch)
 
       next unless nothing_to_merge_between.nil? || nothing_to_merge_between.empty?
 
@@ -418,7 +418,8 @@ describe Fastlane::Actions::CreateReleaseBackmergePullRequestAction do
       )
 
       intermediate_branch = "merge/release-30.6-into-#{default_branch}"
-      expect(other_action_mock).to receive(:ensure_git_branch).with(branch: "^#{intermediate_branch}$")
+      allow(Fastlane::Helper::GitHelper).to receive(:current_git_branch).and_return(intermediate_branch)
+
       allow(Fastlane::UI).to receive(:message).with(anything)
       expect(Fastlane::UI).to receive(:message).with("branch created callback was called! #{default_branch} #{intermediate_branch}")
 
