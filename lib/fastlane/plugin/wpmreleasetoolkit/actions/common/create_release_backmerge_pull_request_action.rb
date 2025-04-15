@@ -114,8 +114,12 @@ module Fastlane
           Dir.chdir(FastlaneCore::FastlaneFolder.path) do
             intermediate_branch_created_callback.call(base_branch, intermediate_branch)
           end
+
           # Make sure the callback block didn't switch branches
-          other_action.ensure_git_branch(branch: "^#{intermediate_branch}$")
+          current_branch = Fastlane::Helper::GitHelper.current_git_branch
+          unless current_branch == intermediate_branch
+            UI.user_error!("The callback switched branches. Expected to be on '#{intermediate_branch}' branch but was on '#{current_branch}'.")
+          end
 
           # When a callback was provided, do the pre-check about valid PR _only_ at that point, in case the callback added new commits
           unless can_merge?(intermediate_branch, into: base_branch)
