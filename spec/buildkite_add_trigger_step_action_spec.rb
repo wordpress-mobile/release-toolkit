@@ -54,6 +54,16 @@ describe Fastlane::Actions::BuildkiteAddTriggerStepAction do
       .and_return(['', '', instance_double(Process::Status, success?: true)])
   end
 
+  # Unset the `BUILDKITE_PIPELINE_SLUG` env var while running each test case
+  # Otherwise when we run the tests on CI, the env var would be set as part of it running as a Buildkite job,
+  # and this would mess up our test environment and bias the test results
+  around do |example|
+    original_value = ENV['BUILDKITE_PIPELINE_SLUG']
+    ENV.delete('BUILDKITE_PIPELINE_SLUG')
+    example.run
+    ENV['BUILDKITE_PIPELINE_SLUG'] = original_value if original_value
+  end
+
   context 'when all required parameters are provided' do
     it 'uploads the correct pipeline YAML' do
       expect(Open3).to receive(:capture3)
