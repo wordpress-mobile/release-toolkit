@@ -310,7 +310,7 @@ describe Fastlane::Actions::BuildkiteAddTriggerStepAction do
     end
 
     it 'includes depends_on when provided with multiple values' do
-      multiple_dependencies = ['step-1', 'step-2', 'step-3']
+      multiple_dependencies = %w[step-1 step-2 step-3]
       expect(Open3).to receive(:capture3)
         .with('buildkite-agent', 'pipeline', 'upload', stdin_data: expected_yaml(depends_on: multiple_dependencies))
 
