@@ -11,6 +11,7 @@ describe Fastlane::Actions::BuildkiteAddTriggerStepAction do
   let(:buildkite_pipeline_slug) { 'test-pipeline' }
   let(:async) { false }
   let(:label) { nil } # Will use default
+  let(:depends_on) { nil } # Will use default
 
   def expected_yaml(
     pipeline_file: self.pipeline_file,
@@ -20,7 +21,8 @@ describe Fastlane::Actions::BuildkiteAddTriggerStepAction do
     extra_env: environment,
     buildkite_pipeline_slug: self.buildkite_pipeline_slug,
     async: self.async,
-    label: self.label
+    label: self.label,
+    depends_on: self.depends_on
   )
     # Calculate the label based on whether a custom one was provided
     actual_label = label || ":buildkite: Trigger #{build_name} on #{branch}"
@@ -28,19 +30,23 @@ describe Fastlane::Actions::BuildkiteAddTriggerStepAction do
     # Merge the environment with PIPELINE, ensuring PIPELINE is always set correctly
     actual_env = extra_env.merge('PIPELINE' => pipeline_file)
 
+    # Build the step hash
+    step = {
+      'trigger' => buildkite_pipeline_slug,
+      'label' => actual_label,
+      'async' => async,
+      'build' => {
+        'branch' => branch,
+        'message' => message,
+        'env' => actual_env
+      }
+    }
+
+    # Add depends_on if provided
+    step['depends_on'] = depends_on unless depends_on.nil?
+
     {
-      'steps' => [
-        {
-          'trigger' => buildkite_pipeline_slug,
-          'label' => actual_label,
-          'async' => async,
-          'build' => {
-            'branch' => branch,
-            'message' => message,
-            'env' => actual_env
-          }
-        },
-      ]
+      'steps' => [step]
     }.to_yaml
   end
 
@@ -54,14 +60,15 @@ describe Fastlane::Actions::BuildkiteAddTriggerStepAction do
       .and_return(['', '', instance_double(Process::Status, success?: true)])
   end
 
-  # Unset the `BUILDKITE_PIPELINE_SLUG` env var while running each test case
-  # Otherwise when we run the tests on CI, the env var would be set as part of it running as a Buildkite job,
-  # and this would mess up our test environment and bias the test results
+  # Unset both BUILDKITE_PIPELINE_SLUG and BUILDKITE_STEP_KEY env vars while running each test case
   around do |example|
-    original_value = ENV['BUILDKITE_PIPELINE_SLUG']
+    original_pipeline_slug = ENV['BUILDKITE_PIPELINE_SLUG']
+    original_step_key = ENV['BUILDKITE_STEP_KEY']
     ENV.delete('BUILDKITE_PIPELINE_SLUG')
+    ENV.delete('BUILDKITE_STEP_KEY')
     example.run
-    ENV['BUILDKITE_PIPELINE_SLUG'] = original_value if original_value
+    ENV['BUILDKITE_PIPELINE_SLUG'] = original_pipeline_slug if original_pipeline_slug
+    ENV['BUILDKITE_STEP_KEY'] = original_step_key if original_step_key
   end
 
   context 'when all required parameters are provided' do
@@ -280,6 +287,99 @@ describe Fastlane::Actions::BuildkiteAddTriggerStepAction do
         branch: branch,
         message: message,
         environment: custom_env,
+        buildkite_pipeline_slug: buildkite_pipeline_slug,
+        async: async
+      )
+    end
+  end
+
+  context 'when testing depends_on parameter' do
+    it 'includes depends_on when provided with a single value' do
+      expect(Open3).to receive(:capture3)
+        .with('buildkite-agent', 'pipeline', 'upload', stdin_data: expected_yaml(depends_on: ['step-1']))
+
+      run_described_fastlane_action(
+        pipeline_file: pipeline_file,
+        branch: branch,
+        message: message,
+        environment: environment,
+        buildkite_pipeline_slug: buildkite_pipeline_slug,
+        async: async,
+        depends_on: 'step-1'
+      )
+    end
+
+    it 'includes depends_on when provided with multiple values' do
+      multiple_dependencies = ['step-1', 'step-2', 'step-3']
+      expect(Open3).to receive(:capture3)
+        .with('buildkite-agent', 'pipeline', 'upload', stdin_data: expected_yaml(depends_on: multiple_dependencies))
+
+      run_described_fastlane_action(
+        pipeline_file: pipeline_file,
+        branch: branch,
+        message: message,
+        environment: environment,
+        buildkite_pipeline_slug: buildkite_pipeline_slug,
+        async: async,
+        depends_on: multiple_dependencies
+      )
+    end
+
+    it 'does not include depends_on when provided with an empty array' do
+      empty_dependencies = []
+      expect(Open3).to receive(:capture3)
+        .with('buildkite-agent', 'pipeline', 'upload', stdin_data: expected_yaml)
+
+      run_described_fastlane_action(
+        pipeline_file: pipeline_file,
+        branch: branch,
+        message: message,
+        environment: environment,
+        buildkite_pipeline_slug: buildkite_pipeline_slug,
+        async: async,
+        depends_on: empty_dependencies
+      )
+    end
+
+    it 'uses BUILDKITE_STEP_KEY env var when depends_on is not provided and env var is set' do
+      ENV['BUILDKITE_STEP_KEY'] = 'step-from-env'
+      expect(Open3).to receive(:capture3)
+        .with('buildkite-agent', 'pipeline', 'upload', stdin_data: expected_yaml(depends_on: ['step-from-env']))
+
+      run_described_fastlane_action(
+        pipeline_file: pipeline_file,
+        branch: branch,
+        message: message,
+        environment: environment,
+        buildkite_pipeline_slug: buildkite_pipeline_slug,
+        async: async
+      )
+    end
+
+    it 'does not include depends_on when not provided and BUILDKITE_STEP_KEY is not set' do
+      expect(Open3).to receive(:capture3)
+        .with('buildkite-agent', 'pipeline', 'upload', stdin_data: expected_yaml)
+
+      run_described_fastlane_action(
+        pipeline_file: pipeline_file,
+        branch: branch,
+        message: message,
+        environment: environment,
+        buildkite_pipeline_slug: buildkite_pipeline_slug,
+        async: async
+      )
+    end
+
+    it 'does not include depends_on when not provided and BUILDKITE_STEP_KEY is empty string' do
+      ENV['BUILDKITE_STEP_KEY'] = ''
+      expect(Open3).to receive(:capture3)
+        .with('buildkite-agent', 'pipeline', 'upload', stdin_data: expected_yaml)
+
+      run_described_fastlane_action(
+        pipeline_file: pipeline_file,
+        branch: branch,
+        message: message,
+        environment: environment,
         buildkite_pipeline_slug: buildkite_pipeline_slug,
         async: async
       )

@@ -15,6 +15,7 @@ module Fastlane
         buildkite_pipeline_slug = params[:buildkite_pipeline_slug]
         async = params[:async]
         label = params[:label] || ":buildkite: Trigger #{build_name} on #{branch}"
+        depends_on = params[:depends_on]&.then { |v| v.empty? ? nil : Array(v) }
 
         # Add the PIPELINE environment variable to the environment hash
         environment = environment.merge('PIPELINE' => pipeline_file)
@@ -30,8 +31,9 @@ module Fastlane
                 'branch' => branch,
                 'message' => message,
                 'env' => environment
-              }
-            },
+              },
+              'depends_on' => depends_on
+            }.compact,
           ]
         }.to_yaml
 
@@ -108,6 +110,14 @@ module Fastlane
             description: 'Whether to trigger the build asynchronously (true) or wait for it to complete (false). Defaults to false',
             type: Boolean,
             default_value: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :depends_on,
+            env_name: 'BUILDKITE_STEP_KEY', # This is the env var that Buildkite sets for the current step
+            description: 'The steps to depend on before triggering the build. Defaults to the current step this action is called from, if said step has a `key:` attribute set. Use an empty array to explicitly not depend on any step even if the current step has a `key`',
+            type: Array,
+            default_value: [],
+            optional: true
           ),
         ]
       end
