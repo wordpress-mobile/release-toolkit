@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Introduce `buildkite_add_trigger_step` action, to insert a `trigger:` step in the current pipeline to trigger a child build from the current build. [#648]
 
 ### Bug Fixes
 
