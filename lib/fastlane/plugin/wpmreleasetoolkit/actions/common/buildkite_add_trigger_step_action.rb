@@ -38,10 +38,10 @@ module Fastlane
         }.to_yaml
 
         # Use buildkite-agent to upload the pipeline
-        _stdout, stderr, _status = Open3.capture3('buildkite-agent', 'pipeline', 'upload', stdin_data: trigger_yaml)
+        _stdout, stderr, status = Open3.capture3('buildkite-agent', 'pipeline', 'upload', stdin_data: trigger_yaml)
 
         # Check for errors
-        UI.user_error!("Failed to upload pipeline: #{stderr}") unless stderr.empty?
+        UI.user_error!("Failed to upload pipeline: #{stderr}") unless status.success?
 
         # Log success
         UI.success("Added a trigger step to the current Buildkite build to start a new build for #{pipeline_file} on branch #{branch}")

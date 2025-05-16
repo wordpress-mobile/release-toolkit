@@ -130,14 +130,32 @@ describe Fastlane::Actions::BuildkiteAddTriggerStepAction do
     end
   end
 
-  context 'when the pipeline upload fails' do
-    it 'raises a user error with the error message' do
+  context 'when pipeline upload errors' do
+    it 'raises a user error when the command fails' do
       error_message = 'Failed to upload pipeline'
       allow(Open3).to receive(:capture3)
         .with('buildkite-agent', 'pipeline', 'upload', stdin_data: expected_yaml)
         .and_return(['', error_message, instance_double(Process::Status, success?: false)])
 
       expect(FastlaneCore::UI).to receive(:user_error!).with("Failed to upload pipeline: #{error_message}")
+
+      run_described_fastlane_action(
+        pipeline_file: pipeline_file,
+        branch: branch,
+        message: message,
+        environment: environment,
+        buildkite_pipeline_slug: buildkite_pipeline_slug,
+        async: async
+      )
+    end
+
+    it 'does not error when the command succeeds, even with stderr output' do
+      stderr_message = 'Some warning message'
+      allow(Open3).to receive(:capture3)
+        .with('buildkite-agent', 'pipeline', 'upload', stdin_data: expected_yaml)
+        .and_return(['', stderr_message, instance_double(Process::Status, success?: true)])
+
+      expect(FastlaneCore::UI).not_to receive(:user_error!)
 
       run_described_fastlane_action(
         pipeline_file: pipeline_file,
