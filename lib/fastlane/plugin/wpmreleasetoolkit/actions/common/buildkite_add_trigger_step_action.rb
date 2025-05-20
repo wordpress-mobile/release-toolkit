@@ -61,8 +61,8 @@ module Fastlane
         <<~DETAILS
           This action adds a `trigger` step to the current Buildkite build, to start a separate build from the current one.
 
-          This is slightly different to `buildkite-agent pipeline upload`-ing the YAML steps of the build directly to the current build,
-            as this approach ensures the triggered build starts from a clean and independant context.
+          This is slightly different from `buildkite-agent pipeline upload`-ing the YAML steps of the build directly to the current build,
+            as this approach ensures the triggered build starts from a clean and independent context.
             - This is particularly important if the build being triggered rely on the fact that the current build pushed new commits
               to the Git branch and we want the new build's steps to start from the new commit.
             - This is also necessary for cases where we run builds on a mirror of the original Git repo (e.g. for pipelines of repos hosted
