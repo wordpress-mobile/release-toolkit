@@ -52,7 +52,7 @@ describe Fastlane::Actions::BuildkiteAddTriggerStepAction do
 
   before do
     # Mock the git command to return our test branch
-    allow(described_class).to receive(:`).with('git rev-parse --abbrev-ref HEAD').and_return(branch)
+    allow(described_class).to receive(:sh).with('git', 'rev-parse', '--abbrev-ref', 'HEAD').and_return("#{branch}\n")
 
     # Mock the pipeline upload command to return a success status
     allow(Open3).to receive(:capture3)

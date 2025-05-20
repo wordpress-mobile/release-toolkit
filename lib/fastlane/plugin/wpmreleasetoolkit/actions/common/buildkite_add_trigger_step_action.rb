@@ -16,7 +16,7 @@ module Fastlane
         pipeline_file = params[:pipeline_file]
         build_name = File.basename(pipeline_file, '.yml')
         message = params[:message] || build_name
-        branch = params[:branch] || `git rev-parse --abbrev-ref HEAD`.strip
+        branch = params[:branch] || sh('git', 'rev-parse', '--abbrev-ref', 'HEAD').strip
         environment = params[:environment] || {}
         buildkite_pipeline_slug = params[:buildkite_pipeline_slug]
         async = params[:async]
