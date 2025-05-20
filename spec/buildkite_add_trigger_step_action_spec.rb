@@ -60,15 +60,27 @@ describe Fastlane::Actions::BuildkiteAddTriggerStepAction do
       .and_return(['', '', instance_double(Process::Status, success?: true)])
   end
 
-  # Unset both BUILDKITE_PIPELINE_SLUG and BUILDKITE_STEP_KEY env vars while running each test case
+  # Stub BUILDKITE_* env vars while running each test case
   around do |example|
     original_pipeline_slug = ENV['BUILDKITE_PIPELINE_SLUG']
     original_step_key = ENV['BUILDKITE_STEP_KEY']
+    original_job_id = ENV['BUILDKITE_JOB_ID']
+
+    # Unset BUILDKITE_PIPELINE_SLUG and BUILDKITE_STEP_KEY env vars because they'd otherwise be used as default values for ConfigItems of the action
     ENV.delete('BUILDKITE_PIPELINE_SLUG')
     ENV.delete('BUILDKITE_STEP_KEY')
+    # Set BUILDKITE_JOB_ID to a non-empty value to satisfy the check in the action, unless `remove_job_id: true` is used in the example metadata
+    if example.metadata[:remove_job_id]
+      ENV.delete('BUILDKITE_JOB_ID')
+    else
+      ENV['BUILDKITE_JOB_ID'] = '1337'
+    end
+
     example.run
+
     ENV['BUILDKITE_PIPELINE_SLUG'] = original_pipeline_slug if original_pipeline_slug
     ENV['BUILDKITE_STEP_KEY'] = original_step_key if original_step_key
+    ENV['BUILDKITE_JOB_ID'] = original_job_id if original_job_id
   end
 
   context 'when all required parameters are provided' do
@@ -191,6 +203,20 @@ describe Fastlane::Actions::BuildkiteAddTriggerStepAction do
           async: async
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, /No value found for 'buildkite_pipeline_slug'/)
+    end
+
+    it 'raises an error when BUILDKITE_JOB_ID is not set', :remove_job_id do
+      # NOTE: the `:remove_job_id` metadata set on this spec example is used in the `around` block to unset BUILDKITE_JOB_ID for this test
+      expect do
+        run_described_fastlane_action(
+          pipeline_file: pipeline_file,
+          branch: branch,
+          message: message,
+          environment: environment,
+          buildkite_pipeline_slug: buildkite_pipeline_slug,
+          async: async
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, Fastlane::Actions::BuildkiteAddTriggerStepAction::BUILDKITE_ENV_ERROR_MESSAGE)
     end
   end
 

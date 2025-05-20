@@ -5,7 +5,13 @@ require 'open3'
 module Fastlane
   module Actions
     class BuildkiteAddTriggerStepAction < Action
+      BUILDKITE_ENV_ERROR_MESSAGE = 'This action can only be run from within a Buildkite build'
+
       def self.run(params)
+        unless ENV.key?('BUILDKITE_JOB_ID')
+          UI.user_error!(BUILDKITE_ENV_ERROR_MESSAGE)
+        end
+
         # Extract parameters
         pipeline_file = params[:pipeline_file]
         build_name = File.basename(pipeline_file, '.yml')
