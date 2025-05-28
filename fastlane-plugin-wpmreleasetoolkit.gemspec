@@ -37,9 +37,14 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'octokit', '~> 6.1'
   spec.add_dependency 'parallel', '~> 1.14'
   spec.add_dependency 'plist', '~> 3.1'
+  spec.add_dependency 'PoParser', '~> 3.2'
   spec.add_dependency 'progress_bar', '~> 1.3'
   spec.add_dependency 'rake', '>= 12.3', '< 14.0'
-  spec.add_dependency 'rake-compiler', '~> 1.0'
+  spec.add_dependency 'rake-compiler-dock', '~> 1.0'
+  spec.add_dependency 'rqrcode', '~> 2.0'
+  spec.add_dependency 'rubocop', '~> 1.50'
+  spec.add_dependency 'ruby-progressbar', '~> 1.11'
+  spec.add_dependency 'twitter_cldr', '~> 6.11'
   spec.add_dependency 'xcodeproj', '~> 1.22'
 
   # `google-cloud-storage` is required by fastlane, but we pin it in case it's not in the future

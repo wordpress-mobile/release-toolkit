@@ -1,0 +1,182 @@
+# frozen_string_literal: true
+
+require 'poparser'
+require 'twitter_cldr'
+
+module Fastlane
+  module Helper
+    class FluentLocalizationHelper
+      # Represents a parsed Fluent entry
+      FluentEntry = Struct.new(:key, :value, :comment, :line_number) do
+        def initialize(key:, value:, comment: nil, line_number: nil)
+          super(key, value, comment, line_number)
+        end
+      end
+
+      # Parse a Fluent (.ftl) file and return an array of FluentEntry objects
+      def self.parse_fluent_file(file_path)
+        entries = []
+        current_comment = nil
+
+        File.readlines(file_path, encoding: 'utf-8').each_with_index do |line, index|
+          line = line.strip
+          line_number = index + 1
+
+          # Skip empty lines
+          next if line.empty?
+
+          # Handle comments
+          if line.start_with?('#')
+            current_comment = current_comment ? "#{current_comment}\n#{line[1..].strip}" : line[1..].strip
+            next
+          end
+
+          # Handle key-value pairs
+          next unless line.include?('=')
+
+          key, value = line.split('=', 2)
+          key = key.strip
+          value = value.strip
+
+          entries << FluentEntry.new(
+            key: key,
+            value: value,
+            comment: current_comment,
+            line_number: line_number
+          )
+
+          current_comment = nil
+        end
+
+        entries
+      end
+
+      # Convert Fluent entries to PO format
+      def self.fluent_to_po(fluent_file:, fluent_entries:, locale:, project_name:, project_version:)
+        po = PoParser::Po.new
+
+        # Create header entry
+        header_lines = generate_po_header_lines(locale: locale, project_name: project_name, project_version: project_version)
+        po.add({
+                 msgid: '',
+                 msgstr: header_lines
+               })
+
+        fluent_entries.each do |entry|
+          entry_hash = {
+            msgid: entry.key,
+            msgstr: entry.value,
+            reference: "#{fluent_file}:#{entry.line_number}"
+          }
+
+          # Add extracted comment if present
+          entry_hash[:translator_comment] = entry.comment if entry.comment
+
+          # We can also add `entry_hash[:flag]` to add a `#,` flag in the PO
+
+          po.add(entry_hash)
+        end
+
+        po.to_s
+      end
+
+      # Parse a PO (.po) file and return array of entries
+      def self.parse_po_file(file_path)
+        content = File.read(file_path, encoding: 'utf-8')
+        po = PoParser.parse(content)
+
+        # Filter out header entry and return only translated entries
+        po.entries.reject { |entry| entry.msgid.to_s.empty? }
+      end
+
+      # Convert PO entries back to Fluent format
+      def self.po_to_fluent(po_entries)
+        fluent_content = ''
+
+        po_entries.each do |entry|
+          # Skip untranslated entries
+          next if entry.msgstr.to_s.empty?
+
+          # Add extracted comments if present
+          if entry.translator_comment && !entry.translator_comment.to_s.empty?
+            entry.translator_comment.to_s.split("\n").each do |comment_line|
+              next if comment_line.strip.empty?
+
+              fluent_content += "# #{comment_line.strip}\n"
+            end
+          end
+
+          # Add the Fluent entry
+          fluent_content += "#{entry.msgid} = #{entry.msgstr}\n"
+          fluent_content += "\n"
+        end
+
+        fluent_content
+      end
+
+      # Generate PO file header lines for PoParser
+      def self.generate_po_header_lines(locale:, project_name:, project_version:)
+        timestamp = Time.now.strftime('%Y-%m-%d %H:%M%z')
+        plural_rule = get_plural_rule(locale)
+
+        [
+          "Project-Id-Version: #{project_name} #{project_version}\\n",
+          'Report-Msgid-Bugs-To: \\n',
+          "POT-Creation-Date: #{timestamp}\\n",
+          "PO-Revision-Date: #{timestamp}\\n",
+          'Last-Translator: \\n',
+          'Language-Team: \\n',
+          "Language: #{locale}\\n",
+          'MIME-Version: 1.0\\n',
+          'Content-Type: text/plain; charset=UTF-8\\n',
+          'Content-Transfer-Encoding: 8bit\\n',
+          "Plural-Forms: #{plural_rule || 'nplurals=2; plural=(n != 1);'}\\n",
+        ]
+      end
+
+      # Check if a string contains Fluent variables (e.g., {$variable})
+      def self.contains_variables?(text)
+        text.match?(/\{\$[^}]+\}/)
+      end
+
+      # Get plural rule for a locale using TwitterCLDR data
+      def self.get_plural_rule(locale)
+        # Normalize locale (e.g., en-US -> en, pt-BR -> pt)
+        lang_code = locale.split('-').first.to_sym
+
+        # Get plural categories for the language from TwitterCldr
+        plural_categories = TwitterCldr::Formatters::Plurals::Rules.all_for(lang_code)
+        return nil if plural_categories.empty?
+
+        nplurals = plural_categories.length
+
+        # Use a simple mapping based on the number of plural categories
+        # This covers the most common cases without hardcoding complex expressions
+        case nplurals
+        when 1
+          # Languages like Chinese, Japanese, Korean
+          'nplurals=1; plural=0;'
+        when 2
+          # Most Germanic and Romance languages (English, German, Spanish, etc.)
+          'nplurals=2; plural=(n != 1);'
+        when 3
+          # Slavic languages (Russian, Polish, etc.)
+          # Use a generic 3-form rule that works for most Slavic languages
+          'nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);'
+        when 4
+          # Languages like Slovenian
+          'nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);'
+        when 6
+          # Arabic and a few other languages
+          'nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);'
+        else
+          # Fallback to simple English-style rule
+          'nplurals=2; plural=(n != 1);'
+        end
+      rescue StandardError
+        # If TwitterCldr fails for any reason, fallback to English-style rule
+        'nplurals=2; plural=(n != 1);'
+      end
+    end
+  end
+end
