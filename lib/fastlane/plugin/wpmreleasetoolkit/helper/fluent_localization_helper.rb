@@ -22,8 +22,11 @@ module Fastlane
           line = line.strip
           line_number = index + 1
 
-          # Skip empty lines
-          next if line.empty?
+          # Reset comment when encountering blank lines
+          if line.empty?
+            current_comment = nil
+            next
+          end
 
           # Handle comments
           if line.start_with?('#')
@@ -69,8 +72,8 @@ module Fastlane
             reference: "#{fluent_file}:#{entry.line_number}"
           }
 
-          # Add extracted comment if present
-          entry_hash[:translator_comment] = entry.comment if entry.comment
+          # Add extracted Fluent comment if present
+          entry_hash[:translator_comment] = entry.comment.gsub("\n", "\n# ") if entry.comment
 
           # We can also add `entry_hash[:flag]` to add a `#,` flag in the PO
 
