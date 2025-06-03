@@ -73,11 +73,7 @@ module Fastlane
           po_entry.msgid = entry.key
           po_entry.msgstr = entry.value
           po_entry.references = ["#{fluent_file}:#{entry.line_number}"]
-
-          # Add Fluent comment if present; always using translator comments for simplicity sake
           po_entry.translator_comment = entry.comment
-
-          # We can also add `po_entry.flag` to add a `#,` flag in the PO
 
           po[nil, entry.key] = po_entry
         end
