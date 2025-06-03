@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-require 'poparser'
+require 'gettext'
+require 'gettext/po_parser'
+require 'gettext/po'
 
 module Fastlane
   module Actions
