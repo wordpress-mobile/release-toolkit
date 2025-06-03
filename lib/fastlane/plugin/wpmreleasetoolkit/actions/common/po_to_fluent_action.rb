@@ -41,14 +41,12 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(
             key: :input_file,
-            env_name: 'PO_TO_FLUENT_INPUT_FILE',
             description: 'Path to the input PO (.po) file',
             optional: false,
             type: String
           ),
           FastlaneCore::ConfigItem.new(
             key: :output_file,
-            env_name: 'PO_TO_FLUENT_OUTPUT_FILE',
             description: 'Path to the output Fluent (.ftl) file',
             optional: false,
             type: String
