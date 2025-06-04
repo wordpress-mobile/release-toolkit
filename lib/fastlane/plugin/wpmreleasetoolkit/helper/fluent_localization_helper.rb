@@ -162,9 +162,6 @@ module Fastlane
         when 1
           # Languages like Chinese, Japanese, Korean
           'nplurals=1; plural=0;'
-        when 2
-          # Most Germanic and Romance languages (English, German, Spanish, etc.)
-          'nplurals=2; plural=(n != 1);'
         when 3
           # Slavic languages (Russian, Polish, etc.)
           # Use a generic 3-form rule that works for most Slavic languages
@@ -176,7 +173,7 @@ module Fastlane
           # Arabic and a few other languages
           'nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);'
         else
-          # Fallback to simple English-style rule
+          # Most Germanic and Romance languages (English, German, Spanish, etc.) and fallback
           'nplurals=2; plural=(n != 1);'
         end
       rescue StandardError
