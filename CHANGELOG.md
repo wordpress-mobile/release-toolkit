@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Introduce `fluent_to_po_action` and `po_to_fluent_action` for bidirectional conversion between Fluent (.ftl) and PO (.po) localization files to facilitate GlotPress integration workflows. [#650]
 
 ### Bug Fixes
 
