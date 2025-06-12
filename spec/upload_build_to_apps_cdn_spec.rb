@@ -5,6 +5,7 @@ require 'webmock/rspec'
 
 describe Fastlane::Actions::UploadBuildToAppsCdnAction do
   let(:test_site_id) { '12345678' }
+  let(:api_url) { "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new" }
   let(:test_api_token) { 'test_api_token' }
   let(:test_product) { 'WordPress.com Studio' }
   let(:test_build_type) { 'Beta' }
@@ -20,7 +21,8 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
   let(:test_mime_type) { 'application/zip' }
   let(:test_filename) { 'test_app.zip' }
   let(:test_file_content) { 'test app binary' }
-  let(:test_boundary) { '----WebKitFormBoundary0123456789abcdefabcd' }
+  let(:test_sha) { 'abcdef1234567890' }
+  let(:test_boundary) { '----WebKitFormBoundarydabad0001234dabad000' }
   let(:stub_success_response) do
     {
       media: [
@@ -31,14 +33,14 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
           mime_type: test_mime_type,
           file: test_filename,
           post_ID: test_post_id
-        }
+        },
       ]
     }.to_json
   end
 
   before do
     WebMock.disable_net_connect!
-    allow(SecureRandom).to receive(:hex).with(10).and_return('0123456789abcdefabcd')
+    allow(SecureRandom).to receive(:hex).with(10).and_return('dabad0001234dabad000')
   end
 
   after do
@@ -64,7 +66,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     it 'successfully uploads the build and returns the media details' do
       with_tmp_file(named: test_filename, content: test_file_content) do |file_path|
         # Stub the WordPress.com API request
-        stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
+        stub_request(:post, api_url)
           .to_return(
             status: 200,
             body: stub_success_response,
@@ -100,7 +102,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
 
         # Verify that the request was made with the correct parameters
         expect(WebMock).to(
-          have_requested(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new").with do |req|
+          have_requested(:post, api_url).with do |req|
             # Check that the request contains the expected headers
             expect(req.headers['Content-Type']).to include('multipart/form-data')
             expect(req.headers['Authorization']).to eq("Bearer #{test_api_token}")
@@ -131,7 +133,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     it 'successfully uploads the build with more optional parameters' do
       with_tmp_file(named: test_filename, content: test_file_content) do |file_path|
         # Stub the WordPress.com API request
-        stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
+        stub_request(:post, api_url)
           .to_return(
             status: 200,
             body: stub_success_response,
@@ -150,7 +152,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
           version: test_version,
           build_number: test_build_number,
           file_path: file_path,
-          sha: 'abcdef1234567890',
+          sha: test_sha,
           error_on_duplicate: true
         )
 
@@ -164,11 +166,11 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
 
         # Verify that the request was made with the correct parameters
         expect(WebMock).to(
-          have_requested(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new").with do |req|
+          have_requested(:post, api_url).with do |req|
             # Check that the visibility is set to External
             expect(req.body).to include(expected_form_part(name: 'visibility', value: 'External'))
             expect(req.body).to include(expected_form_part(name: 'install_type', value: 'Update'))
-            expect(req.body).to include(expected_form_part(name: 'sha', value: 'abcdef1234567890'))
+            expect(req.body).to include(expected_form_part(name: 'sha', value: test_sha))
             true
           end
         )
@@ -178,7 +180,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     it 'handles API validation errors properly' do
       with_tmp_file(named: test_filename, content: test_file_content) do |file_path|
         # Stub the WordPress.com API request to return a validation error
-        stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
+        stub_request(:post, api_url)
           .to_return(
             status: 400,
             body: {
@@ -214,7 +216,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     it 'handles non-JSON API errors properly' do
       with_tmp_file(named: test_filename, content: test_file_content) do |file_path|
         # Stub the WordPress.com API request to return a non-JSON error
-        stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
+        stub_request(:post, api_url)
           .to_return(
             status: 500,
             body: 'Internal Server Error',
@@ -240,7 +242,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
 
     it 'does not include sha if it is not provided' do
       with_tmp_file(named: test_filename, content: test_file_content) do |file_path|
-        stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
+        stub_request(:post, api_url)
           .to_return(
             status: 200,
             body: stub_success_response,
@@ -260,7 +262,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
         )
 
         expect(WebMock).to(
-          have_requested(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new").with do |req|
+          have_requested(:post, api_url).with do |req|
             # Verify the media file is included with proper attributes
             expect(req.body).to include(expected_form_part(name: 'media[]', value: test_file_content, filename: test_filename))
 
