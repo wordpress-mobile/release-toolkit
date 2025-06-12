@@ -20,9 +20,11 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
   let(:test_mime_type) { 'application/zip' }
   let(:test_filename) { 'test_app.zip' }
   let(:test_file_content) { 'test app binary' }
+  let(:test_boundary) { '----WebKitFormBoundary0123456789abcdefabcd' }
 
   before do
     WebMock.disable_net_connect!
+    allow(SecureRandom).to receive(:hex).with(10).and_return('0123456789abcdefabcd')
   end
 
   after do
@@ -30,18 +32,17 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
   end
 
   # Helper method to build the expected multipart form data part
-  def expected_form_part(boundary:, name:, value:, filename: nil)
-    lines = ["--#{boundary}"]
+  def expected_form_part(name:, value:, filename: nil)
+    lines = ["--#{test_boundary}"]
     if filename
       lines << "Content-Disposition: form-data; name=\"#{name}\"; filename=\"#{filename}\""
       lines << 'Content-Type: application/octet-stream'
     else
       lines << "Content-Disposition: form-data; name=\"#{name}\""
     end
-
     lines << ''
     lines << value
-    lines << "--#{boundary}"
+    lines << "--#{test_boundary}"
     lines.join("\r\n")
   end
 
@@ -101,10 +102,8 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
             expect(req.headers['Content-Type']).to include('multipart/form-data')
             expect(req.headers['Authorization']).to eq("Bearer #{test_api_token}")
 
-            boundary = req.headers['Content-Type'].match(/boundary=([^;]+)/)[1]
-
             # Verify the media file is included with proper attributes
-            expect(req.body).to include(expected_form_part(boundary: boundary, name: 'media[]', value: test_file_content, filename: test_filename))
+            expect(req.body).to include(expected_form_part(name: 'media[]', value: test_file_content, filename: test_filename))
 
             # Verify each parameter has the correct value
             {
@@ -114,9 +113,10 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
               'platform' => test_platform,
               'resource_type' => 'Build', # RESOURCE_TYPE constant
               'version' => test_version,
-              'build_number' => test_build_number
+              'build_number' => test_build_number,
+              'install_type' => 'Full Install'
             }.each do |name, value|
-              expect(req.body).to include(expected_form_part(boundary: boundary, name: name, value: value))
+              expect(req.body).to include(expected_form_part(name: name, value: value))
             end
 
             true
@@ -152,11 +152,13 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
           api_token: test_api_token,
           product: test_product,
           build_type: test_build_type,
+          install_type: 'Update',
           visibility: :external,
           platform: test_platform,
           version: test_version,
           build_number: test_build_number,
           file_path: file_path,
+          sha: 'abcdef1234567890',
           error_on_duplicate: true
         )
 
@@ -171,10 +173,10 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
         # Verify that the request was made with the correct parameters
         expect(WebMock).to(
           have_requested(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new").with do |req|
-            boundary = req.headers['Content-Type'].match(/boundary=([^;]+)/)[1]
-
             # Check that the visibility is set to External
-            expect(req.body).to include(expected_form_part(boundary: boundary, name: 'visibility', value: 'External'))
+            expect(req.body).to include(expected_form_part(name: 'visibility', value: 'External'))
+            expect(req.body).to include(expected_form_part(name: 'install_type', value: 'Update'))
+            expect(req.body).to include(expected_form_part(name: 'sha', value: 'abcdef1234567890'))
             true
           end
         )
@@ -241,6 +243,64 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
             file_path: file_path
           )
         end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Upload to Apps CDN failed')
+      end
+    end
+
+    it 'does not include sha if it is not provided' do
+      with_tmp_file(named: test_filename, content: test_file_content) do |file_path|
+        stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
+          .to_return(
+            status: 200,
+            body: {
+              media: [
+                {
+                  ID: test_media_id,
+                  URL: test_media_url,
+                  date: test_date,
+                  mime_type: test_mime_type,
+                  file: test_filename,
+                  post_ID: test_post_id
+                },
+              ]
+            }.to_json,
+            headers: { 'Content-Type' => 'application/json' }
+          )
+
+        run_described_fastlane_action(
+          site_id: test_site_id,
+          api_token: test_api_token,
+          product: test_product,
+          build_type: test_build_type,
+          visibility: test_visibility,
+          platform: test_platform,
+          version: test_version,
+          build_number: test_build_number,
+          file_path: file_path
+        )
+
+        expect(WebMock).to(
+          have_requested(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new").with do |req|
+            # Verify the media file is included with proper attributes
+            expect(req.body).to include(expected_form_part(name: 'media[]', value: test_file_content, filename: test_filename))
+
+            # Verify each parameter has the correct value
+            {
+              'product' => test_product,
+              'build_type' => test_build_type,
+              'visibility' => 'Internal', # Capitalized from :internal
+              'platform' => test_platform,
+              'resource_type' => 'Build', # RESOURCE_TYPE constant
+              'version' => test_version,
+              'build_number' => test_build_number,
+              'install_type' => 'Full Install'
+            }.each do |name, value|
+              expect(req.body).to include(expected_form_part(name: name, value: value))
+            end
+
+            expect(req.body).not_to include(expected_form_part(name: 'sha', value: 'abcdef1234567890'))
+            true
+          end
+        )
       end
     end
   end
@@ -430,6 +490,24 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
           file_path: 'non_existent_file.zip'
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, "File not found at path 'non_existent_file.zip'")
+    end
+
+    it 'fails if install_type is not valid' do
+      with_tmp_file(named: test_filename) do |file_path|
+        expect do
+          run_described_fastlane_action(
+            site_id: test_site_id,
+            api_token: test_api_token,
+            product: test_product,
+            build_type: test_build_type,
+            visibility: test_visibility,
+            platform: test_platform,
+            version: test_version,
+            file_path: file_path,
+            install_type: 'InvalidType'
+          )
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Install type must be one of: Full Install, Update')
+      end
     end
   end
 end

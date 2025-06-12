@@ -19,6 +19,7 @@ module Fastlane
       VALID_POST_STATUS = %w[publish draft].freeze
       VALID_BUILD_TYPES = %w[Alpha Beta Nightly Production Prototype].freeze
       VALID_PLATFORMS = ['Android', 'iOS', 'Mac - Silicon', 'Mac - Intel', 'Mac - Any', 'Windows'].freeze
+      VALID_INSTALL_TYPES = ['Full Install', 'Update'].freeze
 
       def self.run(params)
         UI.message('Uploading build to Apps CDN...')
@@ -36,11 +37,13 @@ module Fastlane
           visibility: params[:visibility].to_s.capitalize,
           platform: params[:platform],
           resource_type: RESOURCE_TYPE,
+          install_type: params[:install_type],
           version: params[:version],
           build_number: params[:build_number], # Optional: may be nil
           minimum_system_version: params[:minimum_system_version], # Optional: may be nil
           post_status: params[:post_status], # Optional: may be nil
           release_notes: params[:release_notes], # Optional: may be nil
+          sha: params[:sha], # Optional: may be nil
           error_on_duplicate: params[:error_on_duplicate] # defaults to false
         }.compact
         request_body, content_type = build_multipart_request(parameters: parameters, file_path: file_path)
@@ -271,6 +274,21 @@ module Fastlane
             verify_block: proc do |value|
               UI.user_error!('API token cannot be empty') if value.to_s.empty?
             end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :install_type,
+            description: "The install type for the build. One of: #{VALID_INSTALL_TYPES.join(', ')}",
+            default_value: 'Full Install',
+            type: String,
+            verify_block: proc do |value|
+              UI.user_error!("Install type must be one of: #{VALID_INSTALL_TYPES.join(', ')}") unless VALID_INSTALL_TYPES.include?(value)
+            end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :sha,
+            description: 'A string representing the release, e.g. the most recent commit hash, cryptographic token, etc',
+            optional: true,
+            type: String
           ),
         ]
       end
