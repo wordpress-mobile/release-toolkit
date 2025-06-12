@@ -278,7 +278,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
               expect(req.body).to include(expected_form_part(name: name, value: value))
             end
 
-            expect(req.body).not_to include(expected_form_part(name: 'sha', value: 'abcdef1234567890'))
+            expect(req.body).not_to match(/Content-Disposition: form-data; name="sha"/)
             true
           end
         )
