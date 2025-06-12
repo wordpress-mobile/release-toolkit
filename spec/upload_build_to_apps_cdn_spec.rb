@@ -21,6 +21,20 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
   let(:test_filename) { 'test_app.zip' }
   let(:test_file_content) { 'test app binary' }
   let(:test_boundary) { '----WebKitFormBoundary0123456789abcdefabcd' }
+  let(:stub_success_response) do
+    {
+      media: [
+        {
+          ID: test_media_id,
+          URL: test_media_url,
+          date: test_date,
+          mime_type: test_mime_type,
+          file: test_filename,
+          post_ID: test_post_id
+        }
+      ]
+    }.to_json
+  end
 
   before do
     WebMock.disable_net_connect!
@@ -53,18 +67,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
         stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
           .to_return(
             status: 200,
-            body: {
-              media: [
-                {
-                  ID: test_media_id,
-                  URL: test_media_url,
-                  date: test_date,
-                  mime_type: test_mime_type,
-                  file: test_filename,
-                  post_ID: test_post_id
-                },
-              ]
-            }.to_json,
+            body: stub_success_response,
             headers: { 'Content-Type' => 'application/json' }
           )
 
@@ -131,18 +134,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
         stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
           .to_return(
             status: 200,
-            body: {
-              media: [
-                {
-                  ID: test_media_id,
-                  URL: test_media_url,
-                  date: test_date,
-                  mime_type: test_mime_type,
-                  file: test_filename,
-                  post_ID: test_post_id
-                },
-              ]
-            }.to_json,
+            body: stub_success_response,
             headers: { 'Content-Type' => 'application/json' }
           )
 
@@ -251,18 +243,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
         stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
           .to_return(
             status: 200,
-            body: {
-              media: [
-                {
-                  ID: test_media_id,
-                  URL: test_media_url,
-                  date: test_date,
-                  mime_type: test_mime_type,
-                  file: test_filename,
-                  post_ID: test_post_id
-                },
-              ]
-            }.to_json,
+            body: stub_success_response,
             headers: { 'Content-Type' => 'application/json' }
           )
 
