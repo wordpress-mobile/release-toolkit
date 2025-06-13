@@ -21,7 +21,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
   let(:test_mime_type) { 'application/zip' }
   let(:test_filename) { 'test_app.zip' }
   let(:test_file_content) { 'test app binary' }
-  let(:test_sha) { 'abcdef1234567890' }
+  let(:test_sha) { 'badc0ffeebadf00d' }
   let(:test_boundary) { '----WebKitFormBoundarydabad0001234dabad000' }
   let(:stub_success_response) do
     {
