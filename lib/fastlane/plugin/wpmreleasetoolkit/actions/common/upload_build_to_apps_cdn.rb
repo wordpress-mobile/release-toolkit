@@ -214,6 +214,15 @@ module Fastlane
             end
           ),
           FastlaneCore::ConfigItem.new(
+            key: :install_type,
+            description: "The install type for the build. One of: #{VALID_INSTALL_TYPES.join(', ')}",
+            default_value: 'Full Install',
+            type: String,
+            verify_block: proc do |value|
+              UI.user_error!("Install type must be one of: #{VALID_INSTALL_TYPES.join(', ')}") unless VALID_INSTALL_TYPES.include?(value)
+            end
+          ),
+          FastlaneCore::ConfigItem.new(
             key: :visibility,
             description: 'The visibility of the build (:internal or :external)',
             optional: false,
@@ -260,6 +269,12 @@ module Fastlane
             type: String
           ),
           FastlaneCore::ConfigItem.new(
+            key: :sha,
+            description: 'A string representing the release, e.g. the most recent commit hash, cryptographic token, etc',
+            optional: true,
+            type: String
+          ),
+          FastlaneCore::ConfigItem.new(
             key: :error_on_duplicate,
             description: 'If true, the action will error if a build matching the same metadata already exists. If false, any potential existing build matching the same metadata will be updated to replace the build with the new file',
             default_value: false,
@@ -274,21 +289,6 @@ module Fastlane
             verify_block: proc do |value|
               UI.user_error!('API token cannot be empty') if value.to_s.empty?
             end
-          ),
-          FastlaneCore::ConfigItem.new(
-            key: :install_type,
-            description: "The install type for the build. One of: #{VALID_INSTALL_TYPES.join(', ')}",
-            default_value: 'Full Install',
-            type: String,
-            verify_block: proc do |value|
-              UI.user_error!("Install type must be one of: #{VALID_INSTALL_TYPES.join(', ')}") unless VALID_INSTALL_TYPES.include?(value)
-            end
-          ),
-          FastlaneCore::ConfigItem.new(
-            key: :sha,
-            description: 'A string representing the release, e.g. the most recent commit hash, cryptographic token, etc',
-            optional: true,
-            type: String
           ),
         ]
       end
