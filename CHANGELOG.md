@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- Update `upload_build_to_apps_cdn` action with newly-added `install_type` and `sha` API parameters. [#651]
+_None_
 
 ### Bug Fixes
 
@@ -19,6 +19,12 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 13.3.0
+
+### New Features
+
+- Update `upload_build_to_apps_cdn` action with newly-added `install_type` and `sha` API parameters. [#651]
 
 ## 13.2.0
 
