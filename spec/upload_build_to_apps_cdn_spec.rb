@@ -5,6 +5,7 @@ require 'webmock/rspec'
 
 describe Fastlane::Actions::UploadBuildToAppsCdnAction do
   let(:test_site_id) { '12345678' }
+  let(:api_url) { "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new" }
   let(:test_api_token) { 'test_api_token' }
   let(:test_product) { 'WordPress.com Studio' }
   let(:test_build_type) { 'Beta' }
@@ -20,9 +21,26 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
   let(:test_mime_type) { 'application/zip' }
   let(:test_filename) { 'test_app.zip' }
   let(:test_file_content) { 'test app binary' }
+  let(:test_sha) { 'badc0ffeebadf00d' }
+  let(:test_boundary) { '----WebKitFormBoundarydabad0001234dabad000' }
+  let(:stub_success_response) do
+    {
+      media: [
+        {
+          ID: test_media_id,
+          URL: test_media_url,
+          date: test_date,
+          mime_type: test_mime_type,
+          file: test_filename,
+          post_ID: test_post_id
+        },
+      ]
+    }.to_json
+  end
 
   before do
     WebMock.disable_net_connect!
+    allow(SecureRandom).to receive(:hex).with(10).and_return('dabad0001234dabad000')
   end
 
   after do
@@ -30,18 +48,17 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
   end
 
   # Helper method to build the expected multipart form data part
-  def expected_form_part(boundary:, name:, value:, filename: nil)
-    lines = ["--#{boundary}"]
+  def expected_form_part(name:, value:, filename: nil)
+    lines = ["--#{test_boundary}"]
     if filename
       lines << "Content-Disposition: form-data; name=\"#{name}\"; filename=\"#{filename}\""
       lines << 'Content-Type: application/octet-stream'
     else
       lines << "Content-Disposition: form-data; name=\"#{name}\""
     end
-
     lines << ''
     lines << value
-    lines << "--#{boundary}"
+    lines << "--#{test_boundary}"
     lines.join("\r\n")
   end
 
@@ -49,21 +66,10 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     it 'successfully uploads the build and returns the media details' do
       with_tmp_file(named: test_filename, content: test_file_content) do |file_path|
         # Stub the WordPress.com API request
-        stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
+        stub_request(:post, api_url)
           .to_return(
             status: 200,
-            body: {
-              media: [
-                {
-                  ID: test_media_id,
-                  URL: test_media_url,
-                  date: test_date,
-                  mime_type: test_mime_type,
-                  file: test_filename,
-                  post_ID: test_post_id
-                },
-              ]
-            }.to_json,
+            body: stub_success_response,
             headers: { 'Content-Type' => 'application/json' }
           )
 
@@ -96,15 +102,13 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
 
         # Verify that the request was made with the correct parameters
         expect(WebMock).to(
-          have_requested(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new").with do |req|
+          have_requested(:post, api_url).with do |req|
             # Check that the request contains the expected headers
             expect(req.headers['Content-Type']).to include('multipart/form-data')
             expect(req.headers['Authorization']).to eq("Bearer #{test_api_token}")
 
-            boundary = req.headers['Content-Type'].match(/boundary=([^;]+)/)[1]
-
             # Verify the media file is included with proper attributes
-            expect(req.body).to include(expected_form_part(boundary: boundary, name: 'media[]', value: test_file_content, filename: test_filename))
+            expect(req.body).to include(expected_form_part(name: 'media[]', value: test_file_content, filename: test_filename))
 
             # Verify each parameter has the correct value
             {
@@ -114,9 +118,10 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
               'platform' => test_platform,
               'resource_type' => 'Build', # RESOURCE_TYPE constant
               'version' => test_version,
-              'build_number' => test_build_number
+              'build_number' => test_build_number,
+              'install_type' => 'Full Install'
             }.each do |name, value|
-              expect(req.body).to include(expected_form_part(boundary: boundary, name: name, value: value))
+              expect(req.body).to include(expected_form_part(name: name, value: value))
             end
 
             true
@@ -128,21 +133,10 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     it 'successfully uploads the build with more optional parameters' do
       with_tmp_file(named: test_filename, content: test_file_content) do |file_path|
         # Stub the WordPress.com API request
-        stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
+        stub_request(:post, api_url)
           .to_return(
             status: 200,
-            body: {
-              media: [
-                {
-                  ID: test_media_id,
-                  URL: test_media_url,
-                  date: test_date,
-                  mime_type: test_mime_type,
-                  file: test_filename,
-                  post_ID: test_post_id
-                },
-              ]
-            }.to_json,
+            body: stub_success_response,
             headers: { 'Content-Type' => 'application/json' }
           )
 
@@ -152,11 +146,13 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
           api_token: test_api_token,
           product: test_product,
           build_type: test_build_type,
+          install_type: 'Update',
           visibility: :external,
           platform: test_platform,
           version: test_version,
           build_number: test_build_number,
           file_path: file_path,
+          sha: test_sha,
           error_on_duplicate: true
         )
 
@@ -170,11 +166,11 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
 
         # Verify that the request was made with the correct parameters
         expect(WebMock).to(
-          have_requested(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new").with do |req|
-            boundary = req.headers['Content-Type'].match(/boundary=([^;]+)/)[1]
-
+          have_requested(:post, api_url).with do |req|
             # Check that the visibility is set to External
-            expect(req.body).to include(expected_form_part(boundary: boundary, name: 'visibility', value: 'External'))
+            expect(req.body).to include(expected_form_part(name: 'visibility', value: 'External'))
+            expect(req.body).to include(expected_form_part(name: 'install_type', value: 'Update'))
+            expect(req.body).to include(expected_form_part(name: 'sha', value: test_sha))
             true
           end
         )
@@ -184,7 +180,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     it 'handles API validation errors properly' do
       with_tmp_file(named: test_filename, content: test_file_content) do |file_path|
         # Stub the WordPress.com API request to return a validation error
-        stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
+        stub_request(:post, api_url)
           .to_return(
             status: 400,
             body: {
@@ -220,7 +216,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
     it 'handles non-JSON API errors properly' do
       with_tmp_file(named: test_filename, content: test_file_content) do |file_path|
         # Stub the WordPress.com API request to return a non-JSON error
-        stub_request(:post, "https://public-api.wordpress.com/rest/v1.1/sites/#{test_site_id}/media/new")
+        stub_request(:post, api_url)
           .to_return(
             status: 500,
             body: 'Internal Server Error',
@@ -241,6 +237,53 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
             file_path: file_path
           )
         end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Upload to Apps CDN failed')
+      end
+    end
+
+    it 'does not include sha if it is not provided' do
+      with_tmp_file(named: test_filename, content: test_file_content) do |file_path|
+        stub_request(:post, api_url)
+          .to_return(
+            status: 200,
+            body: stub_success_response,
+            headers: { 'Content-Type' => 'application/json' }
+          )
+
+        run_described_fastlane_action(
+          site_id: test_site_id,
+          api_token: test_api_token,
+          product: test_product,
+          build_type: test_build_type,
+          visibility: test_visibility,
+          platform: test_platform,
+          version: test_version,
+          build_number: test_build_number,
+          file_path: file_path
+        )
+
+        expect(WebMock).to(
+          have_requested(:post, api_url).with do |req|
+            # Verify the media file is included with proper attributes
+            expect(req.body).to include(expected_form_part(name: 'media[]', value: test_file_content, filename: test_filename))
+
+            # Verify each parameter has the correct value
+            {
+              'product' => test_product,
+              'build_type' => test_build_type,
+              'visibility' => 'Internal', # Capitalized from :internal
+              'platform' => test_platform,
+              'resource_type' => 'Build', # RESOURCE_TYPE constant
+              'version' => test_version,
+              'build_number' => test_build_number,
+              'install_type' => 'Full Install'
+            }.each do |name, value|
+              expect(req.body).to include(expected_form_part(name: name, value: value))
+            end
+
+            expect(req.body).not_to match(/Content-Disposition: form-data; name="sha"/)
+            true
+          end
+        )
       end
     end
   end
@@ -430,6 +473,24 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
           file_path: 'non_existent_file.zip'
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, "File not found at path 'non_existent_file.zip'")
+    end
+
+    it 'fails if install_type is not valid' do
+      with_tmp_file(named: test_filename) do |file_path|
+        expect do
+          run_described_fastlane_action(
+            site_id: test_site_id,
+            api_token: test_api_token,
+            product: test_product,
+            build_type: test_build_type,
+            visibility: test_visibility,
+            platform: test_platform,
+            version: test_version,
+            file_path: file_path,
+            install_type: 'InvalidType'
+          )
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Install type must be one of: Full Install, Update')
+      end
     end
   end
 end

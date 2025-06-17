@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Update `upload_build_to_apps_cdn` action with newly-added `install_type` and `sha` API parameters. [#651]
 
 ### Bug Fixes
 
