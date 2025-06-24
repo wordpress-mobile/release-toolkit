@@ -402,10 +402,13 @@ module Fastlane
       end
 
       def create_image(width, height, background = 'transparent')
-        background.paint.to_hex
+        # The paint method we call below modifies the string in place.
+        # But if the string is frozen, we need to dup it first, otherwise we'll get a frozen string error.
+        working_background = background.frozen? ? background.dup : background
+        working_background.paint.to_hex
 
         Image.new(width, height) do
-          self.background_color = background
+          self.background_color = working_background
         end
       end
 
