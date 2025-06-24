@@ -24,10 +24,12 @@ module Fastlane
     class PromoScreenshots
       def initialize
         if $skip_magick
-          message = "PromoScreenshots feature is currently disabled.\n"
-          message << "Please, install RMagick if you aim to generate the PromoScreenshots.\n"
-          message << "'bundle install --with screenshots' should do it if your project is configured for PromoScreenshots.\n"
-          message << 'Aborting.'
+          message = <<~MSG
+            PromoScreenshots feature is currently disabled.
+            Please, install RMagick if you aim to generate the PromoScreenshots.
+            'bundle install --with screenshots' should do it if your project is configured for PromoScreenshots.
+            Aborting.
+          MSG
           UI.user_error!(message)
         end
 
