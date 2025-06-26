@@ -14,11 +14,17 @@ _None_
 
 ### Bug Fixes
 
-- Fix `can't modify frozen String: "transparent"` and other `FrozenError` crashes in `promo_screenshots_action`. [#653]
+_None_
 
 ### Internal Changes
 
 _None_
+
+## 13.3.1
+
+### Bug Fixes
+
+- Fix `can't modify frozen String: "transparent"` and other `FrozenError` crashes in `promo_screenshots_action`. [#653]
 
 ## 13.3.0
 
