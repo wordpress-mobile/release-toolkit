@@ -3,7 +3,7 @@
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
-      MAX_TOTAL_DIGITS = 9
+      MAX_TOTAL_DIGITS = 8
 
       # The `DerivedBuildCodeFormatter` class is a specialized build code formatter for derived build codes.
       # It takes in an AppVersion object and derives a build code from it.
@@ -107,7 +107,7 @@ module Fastlane
         def validate_total_digits!(major_digits, minor_digits, patch_digits, build_digits)
           total_digits = major_digits + minor_digits + patch_digits + build_digits
 
-          # Limit total digits to 9 (excluding prefix)
+          # Limit total digits to 8 (excluding prefix)
           return if total_digits <= MAX_TOTAL_DIGITS
 
           UI.user_error!("Total digit count (#{total_digits}) exceeds maximum allowed (#{MAX_TOTAL_DIGITS}). " \

@@ -149,16 +149,16 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
     context 'with valid digit counts' do
       it 'accepts digit counts from 1 to 3 individually' do
         (1..3).each do |count|
-          # Test each parameter individually with safe defaults for others
-          expect { described_class.new(major_digits: count) }.not_to raise_error
-          expect { described_class.new(minor_digits: count) }.not_to raise_error
-          expect { described_class.new(patch_digits: count) }.not_to raise_error
-          expect { described_class.new(build_digits: count) }.not_to raise_error
+          # Test each parameter individually with safe defaults for others that stay within 8 digit limit
+          expect { described_class.new(major_digits: count, minor_digits: 1, patch_digits: 1, build_digits: 1) }.not_to raise_error
+          expect { described_class.new(major_digits: 1, minor_digits: count, patch_digits: 1, build_digits: 1) }.not_to raise_error
+          expect { described_class.new(major_digits: 1, minor_digits: 1, patch_digits: count, build_digits: 1) }.not_to raise_error
+          expect { described_class.new(major_digits: 1, minor_digits: 1, patch_digits: 1, build_digits: count) }.not_to raise_error
         end
       end
 
-      it 'accepts mixed valid digit counts within 9 total digits' do
-        # 1 + 2 + 2 + 3 = 8 digits <= 9
+      it 'accepts mixed valid digit counts within 8 total digits' do
+        # 1 + 2 + 2 + 3 = 8 digits <= 8
         expect { described_class.new(major_digits: 1, minor_digits: 2, patch_digits: 2, build_digits: 3) }.not_to raise_error
       end
     end
@@ -177,16 +177,18 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
         expect { described_class.new(patch_digits: nil) }.to raise_error(/Digit count must be an integer, got: NilClass/)
       end
 
-      it 'rejects configurations exceeding 9 total digits' do
-        # 3 + 3 + 3 + 3 = 12 digits > 9
-        expect { described_class.new(major_digits: 3, minor_digits: 3, patch_digits: 3, build_digits: 3) }.to raise_error(/Total digit count \(12\) exceeds maximum allowed \(9\)/)
+      it 'rejects configurations exceeding 8 total digits' do
+        # 3 + 3 + 3 + 3 = 12 digits > 8
+        expect { described_class.new(major_digits: 3, minor_digits: 3, patch_digits: 3, build_digits: 3) }.to raise_error(/Total digit count \(12\) exceeds maximum allowed \(8\)/)
+        # 2 + 2 + 2 + 3 = 9 digits > 8
+        expect { described_class.new(major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 3) }.to raise_error(/Total digit count \(9\) exceeds maximum allowed \(8\)/)
       end
 
-      it 'accepts configurations within and at 9 total digit limit' do
-        # 2 + 2 + 2 + 2 = 8 digits <= 9 (default config)
+      it 'accepts configurations within and at 8 total digit limit' do
+        # 2 + 2 + 2 + 2 = 8 digits <= 8 (default config)
         expect { described_class.new }.not_to raise_error
-        # 2 + 2 + 2 + 3 = 9 digits = 9 (at limit)
-        expect { described_class.new(major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 3) }.not_to raise_error
+        # 2 + 2 + 2 + 2 = 8 digits = 8 (at limit)
+        expect { described_class.new(major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 2) }.not_to raise_error
       end
     end
   end
