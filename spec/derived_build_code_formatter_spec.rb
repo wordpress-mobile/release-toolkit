@@ -223,4 +223,80 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
       end
     end
   end
+
+  describe 'version component validation' do
+    context 'with valid version components within digit limits' do
+      it 'accepts version components that fit within their digit limits' do
+        formatter = described_class.new(major_digits: 1, minor_digits: 2, patch_digits: 2, build_digits: 3)
+
+        # Valid cases: major=9 (1 digit), minor=99 (2 digits), patch=99 (2 digits), build=999 (3 digits)
+        version = Fastlane::Models::AppVersion.new(9, 99, 99, 999)
+        expect { formatter.build_code(version: version) }.not_to raise_error
+      end
+
+      it 'accepts version components at exactly the digit limit' do
+        formatter = described_class.new(major_digits: 2, minor_digits: 1, patch_digits: 3, build_digits: 2)
+
+        # Edge cases: exactly at limits
+        version = Fastlane::Models::AppVersion.new(99, 9, 999, 99)
+        expect { formatter.build_code(version: version) }.not_to raise_error
+      end
+    end
+
+    context 'with invalid version components exceeding digit limits' do
+      it 'rejects major version exceeding digit limit' do
+        formatter = described_class.new(major_digits: 1, minor_digits: 2, patch_digits: 2, build_digits: 2)
+        version = Fastlane::Models::AppVersion.new(10, 1, 1, 1) # major=10 > max(9) for 1 digit
+
+        expect { formatter.build_code(version: version) }.to raise_error(
+          /Version component value \(10\) exceeds maximum allowed for 1 digit\(s\) \(max: 9\)/
+        )
+      end
+
+      it 'rejects minor version exceeding digit limit' do
+        formatter = described_class.new(major_digits: 2, minor_digits: 1, patch_digits: 2, build_digits: 2)
+        version = Fastlane::Models::AppVersion.new(1, 23, 4, 5) # minor=23 > max(9) for 1 digit
+
+        expect { formatter.build_code(version: version) }.to raise_error(
+          /Version component value \(23\) exceeds maximum allowed for 1 digit\(s\) \(max: 9\)/
+        )
+      end
+
+      it 'rejects patch version exceeding digit limit' do
+        formatter = described_class.new(major_digits: 2, minor_digits: 2, patch_digits: 1, build_digits: 2)
+        version = Fastlane::Models::AppVersion.new(1, 2, 34, 5) # patch=34 > max(9) for 1 digit
+
+        expect { formatter.build_code(version: version) }.to raise_error(
+          /Version component value \(34\) exceeds maximum allowed for 1 digit\(s\) \(max: 9\)/
+        )
+      end
+
+      it 'rejects build number exceeding digit limit' do
+        formatter = described_class.new(major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 1)
+        version = Fastlane::Models::AppVersion.new(1, 2, 3, 46) # build_number=46 > max(9) for 1 digit
+
+        expect { formatter.build_code(version: version) }.to raise_error(
+          /Version component value \(46\) exceeds maximum allowed for 1 digit\(s\) \(max: 9\)/
+        )
+      end
+
+      it 'provides helpful error messages with different digit limits' do
+        formatter = described_class.new(major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 2)
+        version = Fastlane::Models::AppVersion.new(123, 4, 5, 6) # major=123 > max(99) for 2 digits
+
+        expect { formatter.build_code(version: version) }.to raise_error(
+          /Version component value \(123\) exceeds maximum allowed for 2 digit\(s\) \(max: 99\).*Consider increasing the corresponding _digits parameter/
+        )
+      end
+
+      it 'validates the first component that exceeds limits' do
+        formatter = described_class.new(major_digits: 1, minor_digits: 1, patch_digits: 1, build_digits: 1)
+        version = Fastlane::Models::AppVersion.new(12, 34, 56, 78) # All exceed 1 digit limit, but major is checked first
+
+        expect { formatter.build_code(version: version) }.to raise_error(
+          /Version component value \(12\) exceeds maximum allowed for 1 digit\(s\) \(max: 9\)/
+        )
+      end
+    end
+  end
 end

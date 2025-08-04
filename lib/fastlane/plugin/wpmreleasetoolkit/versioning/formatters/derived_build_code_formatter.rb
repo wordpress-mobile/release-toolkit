@@ -45,6 +45,12 @@ module Fastlane
         # @return [String] The formatted build code string.
         #
         def build_code(build_code = nil, version:)
+          # Validate that version components fit within their configured digit limits
+          validate_version_component_fits!(component_value: version.major, digit_limit: @major_digits)
+          validate_version_component_fits!(component_value: version.minor, digit_limit: @minor_digits)
+          validate_version_component_fits!(component_value: version.patch, digit_limit: @patch_digits)
+          validate_version_component_fits!(component_value: version.build_number, digit_limit: @build_digits)
+
           result = [
             @prefix,
             version.major.to_s.rjust(@major_digits, '0'),
@@ -108,6 +114,23 @@ module Fastlane
 
           UI.user_error!("Total digit count (#{total_digits}) exceeds maximum allowed (#{MAX_TOTAL_DIGITS}). " \
                          "Current config: major(#{major_digits}) + minor(#{minor_digits}) + patch(#{patch_digits}) + build(#{build_digits}) digits")
+        end
+
+        # Validates that a version component value fits within its configured digit limit.
+        #
+        # @param [Integer] component_value The version component value to validate
+        # @param [Integer] digit_limit The maximum number of digits allowed for this component
+        #
+        # @raise [StandardError] If the component value exceeds the digit limit
+        #
+        def validate_version_component_fits!(component_value:, digit_limit:)
+          # Calculate the maximum value that fits in the digit limit
+          max_value = (10**digit_limit) - 1
+
+          return if component_value <= max_value
+
+          UI.user_error!("Version component value (#{component_value}) exceeds maximum allowed " \
+                         "for #{digit_limit} digit(s) (max: #{max_value}). Consider increasing the corresponding _digits parameter.")
         end
       end
     end
