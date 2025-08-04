@@ -67,16 +67,9 @@ module Fastlane
           end
 
           # Check if it's a valid integer
-          begin
-            prefix_int = Integer(prefix_str)
-          rescue ArgumentError
-            UI.user_error!("Prefix must be an integer digit (0-9) or empty string, got: '#{prefix_str}'")
-          end
+          return if ('0'..'9').include?(prefix_str)
 
-          # Check if it's within valid range (0-9)
-          return if prefix_int.between?(0, 9)
-
-          UI.user_error!("Prefix must be a single digit (0-9), got: #{prefix_int}")
+          UI.user_error!("Prefix must be an integer digit (0-9) or empty string, got: '#{prefix_str}'")
         end
       end
     end
