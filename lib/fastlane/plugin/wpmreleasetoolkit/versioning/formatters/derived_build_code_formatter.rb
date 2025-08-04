@@ -8,9 +8,9 @@ module Fastlane
       class DerivedBuildCodeFormatter
         # Initialize the formatter with a configurable prefix.
         #
-        # @param [String] prefix The prefix to use for the build code. Must be a single digit (0-9), or the empty string. Defaults to '1' for backward compatibility.
+        # @param [String] prefix The prefix to use for the build code. Must be a single digit (0-9), or empty string / nil.
         #
-        def initialize(prefix: '1')
+        def initialize(prefix: nil)
           prefix ||= ''
           validate_prefix!(prefix)
           @prefix = prefix.to_s
