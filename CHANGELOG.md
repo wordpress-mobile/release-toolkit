@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Add the possibility to configure DerivedBuildCodeFormatter configure a versioning prefix instead of always defaulting to 1. [#656]
 
 ### Bug Fixes
 
