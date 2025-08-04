@@ -63,6 +63,22 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
         expect(build_code_string.to_s).to eq('1')
       end
     end
+
+    context 'with nil prefix' do
+      it 'treats nil prefix as empty string and derives build code without prefix' do
+        version = Fastlane::Models::AppVersion.new(1, 2, 3, 4)
+        formatter = described_class.new(prefix: nil)
+        build_code_string = formatter.build_code(version: version)
+        expect(build_code_string.to_s).to eq('1020304')
+      end
+
+      it 'treats nil prefix as empty string for two-digit major version' do
+        version = Fastlane::Models::AppVersion.new(12, 34, 56, 78)
+        formatter = described_class.new(prefix: nil)
+        build_code_string = formatter.build_code(version: version)
+        expect(build_code_string.to_s).to eq('12345678')
+      end
+    end
   end
 
   describe 'prefix validation' do
