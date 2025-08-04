@@ -39,12 +39,7 @@ module Fastlane
             build_number: version.build_number
           )
 
-          # Only trim leading zeros when prefix is empty (to avoid removing explicit "0" prefix)
-          if @prefix.empty?
-            result.gsub(/^0+/, '')
-          else
-            result
-          end
+          result.gsub(/^0+/, '')
         end
 
         private
