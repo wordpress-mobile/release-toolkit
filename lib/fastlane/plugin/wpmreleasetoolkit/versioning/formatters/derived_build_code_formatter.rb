@@ -10,13 +10,13 @@ module Fastlane
       class DerivedBuildCodeFormatter
         # Initialize the formatter with configurable prefix and digit counts.
         #
-        # @param [String] prefix The prefix to use for the build code. Must be a single digit (0-9), or the empty string. Defaults to '1' for backward compatibility.
+        # @param [String] prefix The prefix to use for the build code. Must be a single digit (0-9), or empty string / nil.
         # @param [Integer] major_digits Number of digits for major version. Defaults to 2.
         # @param [Integer] minor_digits Number of digits for minor version. Defaults to 2.
         # @param [Integer] patch_digits Number of digits for patch version. Defaults to 2.
         # @param [Integer] build_digits Number of digits for build number. Defaults to 2.
         #
-        def initialize(prefix: '1', major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 2)
+        def initialize(prefix: nil, major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 2)
           prefix ||= ''
           validate_prefix!(prefix)
           validate_digit_count!(major_digits)
