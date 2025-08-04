@@ -11,6 +11,7 @@ _None_
 ### New Features
 
 - Add the possibility to configure in DerivedBuildCodeFormatter a versioning prefix instead of always defaulting to 1. [#656]
+- Add configurable number of digits in version components in DerivedBuildCodeFormatter. [#657]
 
 ### Bug Fixes
 
