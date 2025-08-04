@@ -45,7 +45,6 @@ module Fastlane
         # @return [String] The formatted build code string.
         #
         def build_code(build_code = nil, version:)
-          # Use manual padding to avoid security risks with dynamic format strings
           result = [
             @prefix,
             version.major.to_s.rjust(@major_digits, '0'),
