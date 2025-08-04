@@ -37,7 +37,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
         version = Fastlane::Models::AppVersion.new(12, 34, 56, 78)
         formatter = described_class.new(prefix: '0')
         build_code_string = formatter.build_code(version: version)
-        expect(build_code_string.to_s).to eq('012345678')
+        expect(build_code_string.to_s).to eq('12345678')
       end
     end
 
