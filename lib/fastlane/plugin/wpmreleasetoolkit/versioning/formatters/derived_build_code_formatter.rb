@@ -3,23 +3,39 @@
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
+      MAX_TOTAL_DIGITS = 9
+
       # The `DerivedBuildCodeFormatter` class is a specialized build code formatter for derived build codes.
       # It takes in an AppVersion object and derives a build code from it.
       class DerivedBuildCodeFormatter
-        # Initialize the formatter with a configurable prefix.
+        # Initialize the formatter with configurable prefix and digit counts.
         #
         # @param [String] prefix The prefix to use for the build code. Must be a single digit (0-9), or the empty string. Defaults to '1' for backward compatibility.
+        # @param [Integer] major_digits Number of digits for major version. Defaults to 2.
+        # @param [Integer] minor_digits Number of digits for minor version. Defaults to 2.
+        # @param [Integer] patch_digits Number of digits for patch version. Defaults to 2.
+        # @param [Integer] build_digits Number of digits for build number. Defaults to 2.
         #
-        def initialize(prefix: '1')
+        def initialize(prefix: '1', major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 2)
           prefix ||= ''
           validate_prefix!(prefix)
+          validate_digit_count!(major_digits)
+          validate_digit_count!(minor_digits)
+          validate_digit_count!(patch_digits)
+          validate_digit_count!(build_digits)
+          validate_total_digits!(major_digits, minor_digits, patch_digits, build_digits)
+
           @prefix = prefix.to_s
+          @major_digits = major_digits
+          @minor_digits = minor_digits
+          @patch_digits = patch_digits
+          @build_digits = build_digits
         end
 
         # Calculate the next derived build code.
         #
         # This method derives a new build code from the given AppVersion object by concatenating the configured prefix,
-        # the major version, the minor version, the patch version, and the build number.
+        # the major version, the minor version, the patch version, and the build number with configurable digit counts.
         #
         # @param [AppVersion] version The AppVersion object to derive the next build code from.
         #
@@ -29,10 +45,11 @@ module Fastlane
         # @return [String] The formatted build code string.
         #
         def build_code(build_code = nil, version:)
+          # Build dynamic format string based on configured digit counts
+          format_string = "%<prefix>s%<major>.#{@major_digits}i%<minor>.#{@minor_digits}i%<patch>.#{@patch_digits}i%<build_number>.#{@build_digits}i"
+
           result = format(
-            # The prefix is configurable to allow for additional platforms or
-            # extensions that could use a different digit prefix such as 2, etc.
-            '%<prefix>s%<major>.2i%<minor>.2i%<patch>.2i%<build_number>.2i',
+            format_string,
             prefix: @prefix,
             major: version.major,
             minor: version.minor,
@@ -66,6 +83,35 @@ module Fastlane
           return if ('0'..'9').include?(prefix_str)
 
           UI.user_error!("Prefix must be an integer digit (0-9) or empty string, got: '#{prefix_str}'")
+        end
+
+        # Validates that the digit count is a valid positive integer within reasonable limits.
+        #
+        # @param [Integer] digit_count The digit count to validate
+        #
+        # @raise [StandardError] If the digit count is invalid
+        #
+        def validate_digit_count!(digit_count)
+          # Check if it's an integer
+          unless digit_count.is_a?(Integer)
+            UI.user_error!("Digit count must be an integer, got: #{digit_count.class}")
+          end
+
+          return if digit_count.between?(1, 3)
+
+          UI.user_error!("Digit count must be between 1 and 3 digits, got: #{digit_count}")
+        end
+
+        # Validates that the total number of digits (excluding prefix) doesn't exceed the maximum for multiplatform compatibility.
+        #
+        def validate_total_digits!(major_digits, minor_digits, patch_digits, build_digits)
+          total_digits = major_digits + minor_digits + patch_digits + build_digits
+
+          # Limit total digits to 9 (excluding prefix)
+          return if total_digits <= MAX_TOTAL_DIGITS
+
+          UI.user_error!("Total digit count (#{total_digits}) exceeds maximum allowed (#{MAX_TOTAL_DIGITS}). " \
+                         "Current config: major(#{major_digits}) + minor(#{minor_digits}) + patch(#{patch_digits}) + build(#{build_digits}) digits")
         end
       end
     end
