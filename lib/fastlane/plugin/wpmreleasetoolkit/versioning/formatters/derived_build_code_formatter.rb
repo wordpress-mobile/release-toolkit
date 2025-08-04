@@ -45,17 +45,14 @@ module Fastlane
         # @return [String] The formatted build code string.
         #
         def build_code(build_code = nil, version:)
-          # Build dynamic format string based on configured digit counts
-          format_string = "%<prefix>s%<major>.#{@major_digits}i%<minor>.#{@minor_digits}i%<patch>.#{@patch_digits}i%<build_number>.#{@build_digits}i"
-
-          result = format(
-            format_string,
-            prefix: @prefix,
-            major: version.major,
-            minor: version.minor,
-            patch: version.patch,
-            build_number: version.build_number
-          )
+          # Use manual padding to avoid security risks with dynamic format strings
+          result = [
+            @prefix,
+            version.major.to_s.rjust(@major_digits, '0'),
+            version.minor.to_s.rjust(@minor_digits, '0'),
+            version.patch.to_s.rjust(@patch_digits, '0'),
+            version.build_number.to_s.rjust(@build_digits, '0'),
+          ].join
 
           result.gsub(/^0+/, '')
         end
