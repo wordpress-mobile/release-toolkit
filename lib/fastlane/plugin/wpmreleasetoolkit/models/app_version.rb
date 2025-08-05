@@ -33,6 +33,14 @@ module Fastlane
       def to_s
         "#{@major}.#{@minor}.#{@patch}.#{@build_number}"
       end
+
+      # Returns an array of the version components.
+      #
+      # @return [Array<Integer>] an array of the version components.
+      #
+      def components
+        [@major, @minor, @patch, @build_number]
+      end
     end
   end
 end
