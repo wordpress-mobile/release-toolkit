@@ -4,6 +4,8 @@ module Fastlane
   module Wpmreleasetoolkit
     module Versioning
       MAX_TOTAL_DIGITS = 8
+      MIN_DIGIT_COUNT = 1
+      MAX_DIGIT_COUNT = 3
 
       # The `DerivedBuildCodeFormatter` class is a specialized build code formatter for derived build codes.
       # It takes in an AppVersion object and derives a build code from it.
@@ -87,9 +89,9 @@ module Fastlane
             UI.user_error!("Digit count must be an integer, got: #{digit_count.class}")
           end
 
-          return if digit_count.between?(1, 3)
+          return if digit_count.between?(MIN_DIGIT_COUNT, MAX_DIGIT_COUNT)
 
-          UI.user_error!("Digit count must be between 1 and 3 digits, got: #{digit_count}")
+          UI.user_error!("Digit count must be between #{MIN_DIGIT_COUNT} and #{MAX_DIGIT_COUNT} digits, got: #{digit_count}")
         end
 
         # Validates that the total number of digits (excluding prefix) doesn't exceed the maximum for multiplatform compatibility.
