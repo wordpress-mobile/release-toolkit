@@ -3,6 +3,7 @@
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
+       # Max total for `*_digits` params, not counting prefix
       MAX_TOTAL_DIGITS = 8
       MIN_DIGIT_COUNT = 1
       MAX_DIGIT_COUNT = 3
@@ -99,6 +100,8 @@ module Fastlane
 
         # Validates that the total number of digits (excluding prefix) doesn't exceed the maximum for multiplatform compatibility.
         #
+        # Since Google Play's max versionCode is ≈ 2_000_000_000, we want to avoid being too close to the limit
+        # as this would then block us from submitting any updates for that app if we reached it.
         def validate_total_digits!(digits_list)
           total_digits = digits_list.sum
 
