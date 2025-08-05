@@ -249,7 +249,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
         version = Fastlane::Models::AppVersion.new(10, 1, 1, 1) # major=10 > max(9) for 1 digit
 
         expect { formatter.build_code(version: version) }.to raise_error(
-          /Version component value \(10\) exceeds maximum allowed for 1 digit\(s\) \(max: 9\)/
+          /Version component value \(10\) exceeds maximum allowed width of 1 characters/
         )
       end
 
@@ -258,7 +258,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
         version = Fastlane::Models::AppVersion.new(1, 23, 4, 5) # minor=23 > max(9) for 1 digit
 
         expect { formatter.build_code(version: version) }.to raise_error(
-          /Version component value \(23\) exceeds maximum allowed for 1 digit\(s\) \(max: 9\)/
+          /Version component value \(23\) exceeds maximum allowed width of 1 characters/
         )
       end
 
@@ -267,7 +267,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
         version = Fastlane::Models::AppVersion.new(1, 2, 34, 5) # patch=34 > max(9) for 1 digit
 
         expect { formatter.build_code(version: version) }.to raise_error(
-          /Version component value \(34\) exceeds maximum allowed for 1 digit\(s\) \(max: 9\)/
+          /Version component value \(34\) exceeds maximum allowed width of 1 characters/
         )
       end
 
@@ -276,7 +276,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
         version = Fastlane::Models::AppVersion.new(1, 2, 3, 46) # build_number=46 > max(9) for 1 digit
 
         expect { formatter.build_code(version: version) }.to raise_error(
-          /Version component value \(46\) exceeds maximum allowed for 1 digit\(s\) \(max: 9\)/
+          /Version component value \(46\) exceeds maximum allowed width of 1 characters/
         )
       end
 
@@ -285,7 +285,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
         version = Fastlane::Models::AppVersion.new(123, 4, 5, 6) # major=123 > max(99) for 2 digits
 
         expect { formatter.build_code(version: version) }.to raise_error(
-          /Version component value \(123\) exceeds maximum allowed for 2 digit\(s\) \(max: 99\).*Consider increasing the corresponding _digits parameter/
+          /Version component value \(123\) exceeds maximum allowed width of 2 characters.*Consider increasing the corresponding `\*_digits` parameter/
         )
       end
 
@@ -294,7 +294,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
         version = Fastlane::Models::AppVersion.new(12, 34, 56, 78) # All exceed 1 digit limit, but major is checked first
 
         expect { formatter.build_code(version: version) }.to raise_error(
-          /Version component value \(12\) exceeds maximum allowed for 1 digit\(s\) \(max: 9\)/
+          /Version component value \(12\) exceeds maximum allowed width of 1 characters/
         )
       end
     end

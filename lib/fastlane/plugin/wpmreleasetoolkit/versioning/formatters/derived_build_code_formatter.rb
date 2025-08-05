@@ -19,17 +19,12 @@ module Fastlane
         def initialize(prefix: nil, major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 2)
           prefix ||= ''
           validate_prefix!(prefix)
-          validate_digit_count!(major_digits)
-          validate_digit_count!(minor_digits)
-          validate_digit_count!(patch_digits)
-          validate_digit_count!(build_digits)
-          validate_total_digits!(major_digits, minor_digits, patch_digits, build_digits)
+
+          @digit_counts = [major_digits, minor_digits, patch_digits, build_digits]
+          @digit_counts.each { |d| validate_digit_count!(d) }
+          validate_total_digits!(@digit_counts)
 
           @prefix = prefix.to_s
-          @major_digits = major_digits
-          @minor_digits = minor_digits
-          @patch_digits = patch_digits
-          @build_digits = build_digits
         end
 
         # Calculate the next derived build code.
@@ -44,22 +39,16 @@ module Fastlane
         #
         # @return [String] The formatted build code string.
         #
-        def build_code(build_code = nil, version:)
-          # Validate that version components fit within their configured digit limits
-          validate_version_component_fits!(component_value: version.major, digit_limit: @major_digits)
-          validate_version_component_fits!(component_value: version.minor, digit_limit: @minor_digits)
-          validate_version_component_fits!(component_value: version.patch, digit_limit: @patch_digits)
-          validate_version_component_fits!(component_value: version.build_number, digit_limit: @build_digits)
-
-          result = [
-            @prefix,
-            version.major.to_s.rjust(@major_digits, '0'),
-            version.minor.to_s.rjust(@minor_digits, '0'),
-            version.patch.to_s.rjust(@patch_digits, '0'),
-            version.build_number.to_s.rjust(@build_digits, '0'),
-          ].join
-
-          result.gsub(/^0+/, '')
+        def build_code(_build_code = nil, version:)
+          formatted_components = version.components.zip(@digit_counts).map do |value, width|
+            comp = value.to_s.rjust(width, '0')
+            if comp.length > width
+              UI.user_error!("Version component value (#{value}) exceeds maximum allowed width of #{width} characters. " \
+                             "Consider increasing the corresponding `*_digits` parameter of your `#{self.class.name}`")
+            end
+            comp
+          end
+          [@prefix, *formatted_components].join.gsub(/^0+/, '')
         end
 
         private
@@ -106,31 +95,14 @@ module Fastlane
 
         # Validates that the total number of digits (excluding prefix) doesn't exceed the maximum for multiplatform compatibility.
         #
-        def validate_total_digits!(major_digits, minor_digits, patch_digits, build_digits)
-          total_digits = major_digits + minor_digits + patch_digits + build_digits
+        def validate_total_digits!(digits_list)
+          total_digits = digits_list.sum
 
           # Limit total digits to 8 (excluding prefix)
           return if total_digits <= MAX_TOTAL_DIGITS
 
           UI.user_error!("Total digit count (#{total_digits}) exceeds maximum allowed (#{MAX_TOTAL_DIGITS}). " \
-                         "Current config: major(#{major_digits}) + minor(#{minor_digits}) + patch(#{patch_digits}) + build(#{build_digits}) digits")
-        end
-
-        # Validates that a version component value fits within its configured digit limit.
-        #
-        # @param [Integer] component_value The version component value to validate
-        # @param [Integer] digit_limit The maximum number of digits allowed for this component
-        #
-        # @raise [StandardError] If the component value exceeds the digit limit
-        #
-        def validate_version_component_fits!(component_value:, digit_limit:)
-          # Calculate the maximum value that fits in the digit limit
-          max_value = (10**digit_limit) - 1
-
-          return if component_value <= max_value
-
-          UI.user_error!("Version component value (#{component_value}) exceeds maximum allowed " \
-                         "for #{digit_limit} digit(s) (max: #{max_value}). Consider increasing the corresponding _digits parameter.")
+                         "Current config: major(#{digits_list[0]}) + minor(#{digits_list[1]}) + patch(#{digits_list[2]}) + build(#{digits_list[3]}) digits")
         end
       end
     end
