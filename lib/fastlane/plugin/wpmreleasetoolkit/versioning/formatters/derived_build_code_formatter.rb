@@ -3,7 +3,7 @@
 module Fastlane
   module Wpmreleasetoolkit
     module Versioning
-       # Max total for `*_digits` params, not counting prefix
+      # Max total for `*_digits` params, not counting prefix
       MAX_TOTAL_DIGITS = 8
       MIN_DIGIT_COUNT = 1
       MAX_DIGIT_COUNT = 3
