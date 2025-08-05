@@ -118,7 +118,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
         expect(build_code_string.to_s).to eq('5123456')
       end
 
-      it 'trims leading zeros correctly with larger major' do
+      it 'trims leading zeros correctly with larger number of major digits' do
         version = Fastlane::Models::AppVersion.new(7, 8, 9, 10)
         formatter = described_class.new(prefix: '', major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 2)
         build_code_string = formatter.build_code(version: version)
@@ -225,7 +225,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
   end
 
   describe 'version component validation' do
-    context 'with valid version components within digit limits' do
+    context 'with version components within digit limits' do
       it 'accepts version components that fit within their digit limits' do
         formatter = described_class.new(major_digits: 1, minor_digits: 2, patch_digits: 2, build_digits: 3)
 
@@ -243,10 +243,10 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
       end
     end
 
-    context 'with invalid version components exceeding digit limits' do
+    context 'with version components exceeding digit limits' do
       it 'rejects major version exceeding digit limit' do
         formatter = described_class.new(major_digits: 1, minor_digits: 2, patch_digits: 2, build_digits: 2)
-        version = Fastlane::Models::AppVersion.new(10, 1, 1, 1) # major=10 > max(9) for 1 digit
+        version = Fastlane::Models::AppVersion.new(10, 1, 1, 1) # major=10 is longer than 1 digit
 
         expect { formatter.build_code(version: version) }.to raise_error(
           /Version component value \(10\) exceeds maximum allowed width of 1 characters/
