@@ -20,7 +20,7 @@ module Fastlane
         #
         def initialize(prefix: nil, major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 2)
           validate_prefix!(prefix)
-          @prefix = (prefix || '').to_s
+          @prefix = prefix.to_s
 
           @digit_counts = [major_digits, minor_digits, patch_digits, build_digits]
           @digit_counts.each { |d| validate_digit_count!(d) }
