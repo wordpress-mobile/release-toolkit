@@ -19,9 +19,8 @@ module Fastlane
         # @param [Integer] build_digits Number of digits for build number. Must be between 1–3. Defaults to 2.
         #
         def initialize(prefix: nil, major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 2)
-          prefix ||= ''
           validate_prefix!(prefix)
-          @prefix = prefix.to_s
+          @prefix = (prefix || '').to_s
 
           @digit_counts = [major_digits, minor_digits, patch_digits, build_digits]
           @digit_counts.each { |d| validate_digit_count!(d) }
@@ -61,6 +60,10 @@ module Fastlane
         # @raise [StandardError] If the prefix is invalid
         #
         def validate_prefix!(prefix)
+          unless prefix.nil? || prefix.is_a?(String) || prefix.is_a?(Integer)
+            UI.user_error!("Prefix must be a string or integer, got: #{prefix.class}")
+          end
+
           prefix_str = prefix.to_s
 
           # Allow empty string

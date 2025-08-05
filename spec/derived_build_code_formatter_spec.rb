@@ -146,6 +146,9 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
   end
 
   describe 'digit count validation' do
+    # Generate all combinations of [1,2,3] for each of the 4 digit count parameters
+    all_digit_combinations = Array.new(4, [1, 2, 3]).reduce(&:product).map(&:flatten)
+
     context 'with valid digit counts' do
       it 'accepts digit counts from 1 to 3 individually' do
         (1..3).each do |count|
@@ -157,9 +160,12 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
         end
       end
 
-      it 'accepts mixed valid digit counts within 8 total digits' do
-        # 1 + 2 + 2 + 3 = 8 digits <= 8
-        expect { described_class.new(major_digits: 1, minor_digits: 2, patch_digits: 2, build_digits: 3) }.not_to raise_error
+      context 'with mixed valid digit counts within 8 total digits' do
+        all_digit_combinations.select { |combination| combination.sum <= 8 }.each do |major, minor, patch, build|
+          it "accepts #{major},#{minor},#{patch},#{build} digit combination" do
+            expect { described_class.new(major_digits: major, minor_digits: minor, patch_digits: patch, build_digits: build) }.not_to raise_error
+          end
+        end
       end
     end
 
@@ -177,18 +183,12 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
         expect { described_class.new(patch_digits: nil) }.to raise_error(/Digit count must be an integer, got: NilClass/)
       end
 
-      it 'rejects configurations exceeding 8 total digits' do
-        # 3 + 3 + 3 + 3 = 12 digits > 8
-        expect { described_class.new(major_digits: 3, minor_digits: 3, patch_digits: 3, build_digits: 3) }.to raise_error(/Total digit count \(12\) exceeds maximum allowed \(8\)/)
-        # 2 + 2 + 2 + 3 = 9 digits > 8
-        expect { described_class.new(major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 3) }.to raise_error(/Total digit count \(9\) exceeds maximum allowed \(8\)/)
-      end
-
-      it 'accepts configurations within and at 8 total digit limit' do
-        # 2 + 2 + 2 + 2 = 8 digits <= 8 (default config)
-        expect { described_class.new }.not_to raise_error
-        # 2 + 2 + 2 + 2 = 8 digits = 8 (at limit)
-        expect { described_class.new(major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 2) }.not_to raise_error
+      context 'with configurations exceeding 8 total digits' do
+        all_digit_combinations.select { |combination| combination.sum > 8 }.each do |major, minor, patch, build|
+          it "rejects #{major},#{minor},#{patch},#{build} digit combination (total: #{major + minor + patch + build})" do
+            expect { described_class.new(major_digits: major, minor_digits: minor, patch_digits: patch, build_digits: build) }.to raise_error(/Total digit count \(#{major + minor + patch + build}\) exceeds maximum allowed \(8\)/)
+          end
+        end
       end
     end
   end
@@ -208,6 +208,10 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
       it 'accepts integer inputs' do
         expect { described_class.new(prefix: 5) }.not_to raise_error
       end
+
+      it 'accepts nil prefix' do
+        expect { described_class.new(prefix: nil) }.not_to raise_error
+      end
     end
 
     context 'with invalid prefixes' do
@@ -220,6 +224,16 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
         # Non-numeric characters
         expect { described_class.new(prefix: 'a') }.to raise_error(/Prefix must be an integer digit/)
         expect { described_class.new(prefix: '@') }.to raise_error(/Prefix must be an integer digit/)
+      end
+
+      it 'rejects non-string and non-integer prefix types' do
+        # Arrays, hashes, and other objects
+        expect { described_class.new(prefix: []) }.to raise_error(/Prefix must be a string or integer/)
+        expect { described_class.new(prefix: {}) }.to raise_error(/Prefix must be a string or integer/)
+        expect { described_class.new(prefix: Object.new) }.to raise_error(/Prefix must be a string or integer/)
+        expect { described_class.new(prefix: true) }.to raise_error(/Prefix must be a string or integer/)
+        expect { described_class.new(prefix: false) }.to raise_error(/Prefix must be a string or integer/)
+        expect { described_class.new(prefix: 3.14) }.to raise_error(/Prefix must be a string or integer/)
       end
     end
   end
