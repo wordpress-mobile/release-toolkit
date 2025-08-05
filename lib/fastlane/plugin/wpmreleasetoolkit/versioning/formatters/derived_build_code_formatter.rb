@@ -19,12 +19,11 @@ module Fastlane
         def initialize(prefix: nil, major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 2)
           prefix ||= ''
           validate_prefix!(prefix)
+          @prefix = prefix.to_s
 
           @digit_counts = [major_digits, minor_digits, patch_digits, build_digits]
           @digit_counts.each { |d| validate_digit_count!(d) }
           validate_total_digits!(@digit_counts)
-
-          @prefix = prefix.to_s
         end
 
         # Calculate the next derived build code.
