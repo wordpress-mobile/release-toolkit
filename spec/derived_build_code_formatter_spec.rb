@@ -269,7 +269,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
 
       it 'rejects minor version exceeding digit limit' do
         formatter = described_class.new(major_digits: 2, minor_digits: 1, patch_digits: 2, build_digits: 2)
-        version = Fastlane::Models::AppVersion.new(1, 23, 4, 5) # minor=23 > max(9) for 1 digit
+        version = Fastlane::Models::AppVersion.new(1, 23, 4, 5) # minor=23 is longer than 1 digit
 
         expect { formatter.build_code(version: version) }.to raise_error(
           /Version component value \(23\) exceeds maximum allowed width of 1 characters/
@@ -278,7 +278,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
 
       it 'rejects patch version exceeding digit limit' do
         formatter = described_class.new(major_digits: 2, minor_digits: 2, patch_digits: 1, build_digits: 2)
-        version = Fastlane::Models::AppVersion.new(1, 2, 34, 5) # patch=34 > max(9) for 1 digit
+        version = Fastlane::Models::AppVersion.new(1, 2, 34, 5) # patch=34 is longer than 1 digit
 
         expect { formatter.build_code(version: version) }.to raise_error(
           /Version component value \(34\) exceeds maximum allowed width of 1 characters/
@@ -287,7 +287,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
 
       it 'rejects build number exceeding digit limit' do
         formatter = described_class.new(major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 1)
-        version = Fastlane::Models::AppVersion.new(1, 2, 3, 46) # build_number=46 > max(9) for 1 digit
+        version = Fastlane::Models::AppVersion.new(1, 2, 3, 46) # build_number=46 is longer than 1 digit
 
         expect { formatter.build_code(version: version) }.to raise_error(
           /Version component value \(46\) exceeds maximum allowed width of 1 characters/
@@ -296,7 +296,7 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::DerivedBuildCodeFormatter do
 
       it 'provides helpful error messages with different digit limits' do
         formatter = described_class.new(major_digits: 2, minor_digits: 2, patch_digits: 2, build_digits: 2)
-        version = Fastlane::Models::AppVersion.new(123, 4, 5, 6) # major=123 > max(99) for 2 digits
+        version = Fastlane::Models::AppVersion.new(123, 4, 5, 6) # major=123 is longer than 2 digits
 
         expect { formatter.build_code(version: version) }.to raise_error(
           /Version component value \(123\) exceeds maximum allowed width of 2 characters.*Consider increasing the corresponding `\*_digits` parameter/
