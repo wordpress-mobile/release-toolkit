@@ -10,8 +10,7 @@ _None_
 
 ### New Features
 
-- Add the possibility to configure in `DerivedBuildCodeFormatter` a versioning prefix instead of always defaulting to 1. [#656]
-- Add configurable number of digits in version components in `DerivedBuildCodeFormatter`. [#657]
+_None_
 
 ### Bug Fixes
 
@@ -20,6 +19,13 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 13.4.0
+
+### New Features
+
+- Add the possibility to configure in `DerivedBuildCodeFormatter` a versioning prefix instead of always defaulting to 1. [#656]
+- Add configurable number of digits in version components in `DerivedBuildCodeFormatter`. [#657]
 
 ## 13.3.1
 
