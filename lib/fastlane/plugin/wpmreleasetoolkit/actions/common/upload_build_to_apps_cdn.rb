@@ -15,11 +15,35 @@ module Fastlane
     end
 
     class UploadBuildToAppsCdnAction < Action
+      # See https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-resource-type.php
       RESOURCE_TYPE = 'Build'
+      # These are from the WordPress.com API, not the Apps CDN plugin
       VALID_POST_STATUS = %w[publish draft].freeze
-      VALID_BUILD_TYPES = %w[Alpha Beta Nightly Production Prototype].freeze
-      VALID_PLATFORMS = ['Android', 'iOS', 'Mac - Silicon', 'Mac - Intel', 'Mac - Any', 'Windows'].freeze
-      VALID_INSTALL_TYPES = ['Full Install', 'Update'].freeze
+      # See https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-build-type.php
+      VALID_BUILD_TYPES = %w[
+        Alpha
+        Beta
+        Nightly
+        Production
+        Prototype
+      ].freeze
+      # See https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-platform.php
+      VALID_PLATFORMS = [
+        'Android',
+        'iOS',
+        'Mac - Silicon',
+        'Mac - Intel',
+        'Mac - Any',
+        'Windows',
+        'Microsoft Store',
+      ].freeze
+      # See https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-install-type.php
+      VALID_INSTALL_TYPES = [
+        'Full Install',
+        'Update',
+      ].freeze
+      # See https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-visibility.php
+      VALID_VISIBILITIES = %i[internal external].freeze
 
       def self.run(params)
         UI.message('Uploading build to Apps CDN...')
@@ -179,6 +203,8 @@ module Fastlane
             type: String,
             verify_block: proc do |value|
               UI.user_error!('Product cannot be empty') if value.to_s.empty?
+              # Unlike for other parameters, we don't validate the product value against a list of valid values because we expect this list of
+              # supported products to be updated on the backend from time to time and we don't want to have to update the toolkit every time for it.
             end
           ),
           FastlaneCore::ConfigItem.new(
@@ -228,7 +254,7 @@ module Fastlane
             optional: false,
             type: Symbol,
             verify_block: proc do |value|
-              UI.user_error!('Visibility must be either :internal or :external') unless %i[internal external].include?(value)
+              UI.user_error!("Visibility must be one of: #{VALID_VISIBILITIES.map { "`:#{_1}`" }.join(', ')}") unless VALID_VISIBILITIES.include?(value.to_s.downcase.to_sym)
             end
           ),
           FastlaneCore::ConfigItem.new(
