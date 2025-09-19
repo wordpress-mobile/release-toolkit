@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- `upload_build_to_apps_cdn`: Add support for `Microsoft Store` as an allowed value for the `platform` parameter. [#661]
+_None_
 
 ### Bug Fixes
 
@@ -19,6 +19,12 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 13.5.0
+
+### New Features
+
+- `upload_build_to_apps_cdn`: Add support for `Microsoft Store` as an allowed value for the `platform` parameter. [#661]
 
 ## 13.4.0
 
