@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- `upload_build_to_apps_cdn`: Add support for `Microsoft Store` as an allowed value for the `platform` parameter. [#661]
 
 ### Bug Fixes
 

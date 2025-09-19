@@ -387,7 +387,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
             version: test_version,
             file_path: file_path
           )
-        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Visibility must be either :internal or :external')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Visibility must be one of: `:internal`, `:external`')
       end
     end
 
@@ -421,7 +421,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
             version: test_version,
             file_path: file_path
           )
-        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Platform must be one of: Android, iOS, Mac - Silicon, Mac - Intel, Mac - Any, Windows')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Platform must be one of: Android, iOS, Mac - Silicon, Mac - Intel, Mac - Any, Windows, Microsoft Store')
       end
     end
 
