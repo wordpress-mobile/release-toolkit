@@ -44,14 +44,42 @@ module Fastlane
       # @param [String] repository The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`)
       # @param [Sawyer::Resource, String] milestone The milestone object, or title of the milestone, we want to fetch the list of PRs for (e.g.: `16.9`)
       # @param [Boolean] include_closed If set to true, will include both opened and closed PRs. Otherwise, will only include opened PRs.
-      # @return [Array<Sawyer::Resource>] A list of the PRs for the given milestone, sorted by number
+      # @return [Array<Sawyer::Resource>] A list of the PRs and issues for the given milestone, sorted by number
       #
       def get_prs_and_issues_for_milestone(repository:, milestone:, include_closed: false)
+        # While the `/search` API used with a classic tokens returns both issues and PRs, using a fine-grained tokens always require either 'is:issue' or 'is:pull-request',
+        # therefore we need to make two separate calls to cover both cases
+        issues = search_milestone_items(repository: repository, milestone: milestone, type: :issue, include_closed: include_closed)
+        prs = search_milestone_items(repository: repository, milestone: milestone, type: :pr, include_closed: include_closed)
+
+        (issues + prs).sort_by(&:number)
+      end
+
+      # Search for issues or PRs for a given milestone
+      #
+      # @param [String] repository The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`)
+      # @param [Sawyer::Resource, String] milestone The milestone object, or title of the milestone
+      # @param [Symbol] type The type of items to search for (:issue or :pr/:pull_request)
+      # @param [Boolean] include_closed If set to true, will include both opened and closed items. Otherwise, will only include opened items.
+      # @return [Array<Sawyer::Resource>] A list of issues or PRs for the given milestone
+      #
+      def search_milestone_items(repository:, milestone:, type:, include_closed: false)
         milestone_title = milestone.is_a?(Sawyer::Resource) ? milestone.title : milestone
-        query = %(repo:#{repository} milestone:"#{milestone_title}")
+
+        # Map type symbol to GitHub search qualifier
+        type_qualifier = case type
+                         when :issue
+                           'is:issue'
+                         when :pr, :pull_request
+                           'is:pull-request'
+                         else
+                           raise ArgumentError, "Invalid type: #{type}. Must be :issue or :pr"
+                         end
+
+        query = %(repo:#{repository} milestone:"#{milestone_title}" #{type_qualifier})
         query += ' is:open' unless include_closed
 
-        client.search_issues(query)[:items].sort_by(&:number)
+        client.search_issues(query)[:items]
       end
 
       # Set/Update the milestone assigned to a given PR or issue

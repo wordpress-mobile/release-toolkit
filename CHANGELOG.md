@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Fix GitHub API search queries to support fine-grained tokens in addition to classic tokens. Fine-grained tokens require explicit `is:issue` or `is:pull-request` qualifiers in search queries. [#TBD]
 
 ### Internal Changes
 
