@@ -220,33 +220,51 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     it 'returns only opened PRs for a given milestone by default' do
-      search_results = [101, 103].map { |num| sawyer_resource_stub(number: num) }
+      issue_results = [101].map { |num| sawyer_resource_stub(number: num) }
+      pr_results = [103].map { |num| sawyer_resource_stub(number: num) }
+
       allow(client).to receive(:search_issues)
-        .with(%(repo:#{test_repo} milestone:"12.3 New Version" is:open))
-        .and_return({ items: search_results })
+        .with(%(repo:#{test_repo} milestone:"12.3 New Version" is:issue is:open))
+        .and_return({ items: issue_results })
+
+      allow(client).to receive(:search_issues)
+        .with(%(repo:#{test_repo} milestone:"12.3 New Version" is:pull-request is:open))
+        .and_return({ items: pr_results })
 
       result = helper.get_prs_and_issues_for_milestone(repository: test_repo, milestone: '12.3 New Version')
-      expect(result).to eq(search_results)
+      expect(result.map(&:number)).to eq([101, 103])
     end
 
     it 'returns only opened PRs for a given milestone if include_closed is false' do
-      search_results = [101, 103].map { |num| sawyer_resource_stub(number: num) }
+      issue_results = [101].map { |num| sawyer_resource_stub(number: num) }
+      pr_results = [103].map { |num| sawyer_resource_stub(number: num) }
+
       allow(client).to receive(:search_issues)
-        .with(%(repo:#{test_repo} milestone:"12.3 New Version" is:open))
-        .and_return({ items: search_results })
+        .with(%(repo:#{test_repo} milestone:"12.3 New Version" is:issue is:open))
+        .and_return({ items: issue_results })
+
+      allow(client).to receive(:search_issues)
+        .with(%(repo:#{test_repo} milestone:"12.3 New Version" is:pull-request is:open))
+        .and_return({ items: pr_results })
 
       result = helper.get_prs_and_issues_for_milestone(repository: test_repo, milestone: '12.3 New Version', include_closed: false)
-      expect(result).to eq(search_results)
+      expect(result.map(&:number)).to eq([101, 103])
     end
 
     it 'returns both opened and closed PRs of a milestone if include_closed is true' do
-      search_results = [101, 102, 103, 104].map { |num| sawyer_resource_stub(number: num) }
+      issue_results = [101, 102].map { |num| sawyer_resource_stub(number: num) }
+      pr_results = [103, 104].map { |num| sawyer_resource_stub(number: num) }
+
       allow(client).to receive(:search_issues)
-        .with(%(repo:#{test_repo} milestone:"12.3 New Version"))
-        .and_return({ items: search_results })
+        .with(%(repo:#{test_repo} milestone:"12.3 New Version" is:issue))
+        .and_return({ items: issue_results })
+
+      allow(client).to receive(:search_issues)
+        .with(%(repo:#{test_repo} milestone:"12.3 New Version" is:pull-request))
+        .and_return({ items: pr_results })
 
       result = helper.get_prs_and_issues_for_milestone(repository: test_repo, milestone: '12.3 New Version', include_closed: true)
-      expect(result).to eq(search_results)
+      expect(result.map(&:number)).to eq([101, 102, 103, 104])
     end
   end
 
