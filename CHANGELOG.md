@@ -14,11 +14,17 @@ _None_
 
 ### Bug Fixes
 
-- Fix GitHub API search queries to support fine-grained tokens in addition to classic tokens. Fine-grained tokens require explicit `is:issue` or `is:pull-request` qualifiers in search queries. [#663]
+_None_
 
 ### Internal Changes
 
 _None_
+
+## 13.5.1
+
+### Bug Fixes
+
+- Fix GitHub API search queries to support fine-grained tokens in addition to classic tokens. Fine-grained tokens require explicit `is:issue` or `is:pull-request` qualifiers in search queries. [#663]
 
 ## 13.5.0
 
