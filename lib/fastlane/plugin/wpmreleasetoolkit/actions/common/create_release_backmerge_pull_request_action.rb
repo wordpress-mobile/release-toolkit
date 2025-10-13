@@ -124,6 +124,7 @@ module Fastlane
           # When a callback was provided, do the pre-check about valid PR _only_ at that point, in case the callback added new commits
           unless can_merge?(intermediate_branch, into: base_branch)
             UI.error("Nothing to merge from #{intermediate_branch} into #{base_branch}. Skipping PR creation.")
+            Action.sh('git', 'checkout', head_branch) # Switch to original branch so we can delete the intermediate branch
             Fastlane::Helper::GitHelper.delete_local_branch_if_exists!(intermediate_branch)
             return nil
           end
