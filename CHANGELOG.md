@@ -14,11 +14,17 @@ _None_
 
 ### Bug Fixes
 
-- Fix a bug in `create_release_backmerge_pull_request` when you pass a `intermediate_branch_created_callback` callback but there's ultimately nothing to merge. [#665]
+_None_
 
 ### Internal Changes
 
 _None_
+
+## 13.5.2
+
+### Bug Fixes
+
+- Fix a bug in `create_release_backmerge_pull_request` when you pass a `intermediate_branch_created_callback` callback but there's ultimately nothing to merge. [#665]
 
 ## 13.5.1
 
