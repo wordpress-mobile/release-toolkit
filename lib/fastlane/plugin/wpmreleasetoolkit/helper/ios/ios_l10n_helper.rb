@@ -168,13 +168,12 @@ module Fastlane
           query_params = (filters || {}).transform_keys { |k| "filters[#{k}]" }.merge(format: 'strings')
           url = "#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}"
 
-          downloader = Fastlane::Helper::GlotPressDownloader.new(
-            url: url,
-            locale: locale,
-            auto_retry: true
-          )
           begin
-            downloader.download do |response_body|
+            Fastlane::Helper::GlotPressDownloader.download(
+              url: url,
+              locale: locale,
+              auto_retry: true
+            ) do |response_body|
               if destination.is_a?(String)
                 File.write(destination, response_body)
               else

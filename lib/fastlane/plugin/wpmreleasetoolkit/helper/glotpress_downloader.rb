@@ -25,6 +25,19 @@ module Fastlane
         @auto_retry_attempt_counter = 0
       end
 
+      # Convenience class method to download in a single call
+      #
+      # @param [String] url The URL to download from
+      # @param [String] locale The locale being downloaded (for logging purposes)
+      # @param [Boolean] auto_retry Whether to automatically retry on rate limiting (429 errors)
+      # @yield [String] The response body if the download was successful
+      # @return The result of the block if provided, or true/false indicating success if no block provided
+      #
+      #
+      def self.download(url:, locale:, auto_retry: false, &)
+        new(url: url, locale: locale, auto_retry: auto_retry).download(&)
+      end
+
       # Downloads data from GlotPress
       #
       # @yield [String] The response body if the download was successful

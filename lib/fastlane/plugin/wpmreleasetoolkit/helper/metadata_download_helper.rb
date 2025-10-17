@@ -18,12 +18,11 @@ module Fastlane
 
       # Downloads data from GlotPress, in JSON format
       def download(target_locale, glotpress_url, is_source)
-        downloader = GlotPressDownloader.new(
+        GlotPressDownloader.download(
           url: glotpress_url,
           locale: target_locale,
           auto_retry: @auto_retry
-        )
-        downloader.download do |response_body|
+        ) do |response_body|
           handle_glotpress_response(response_body: response_body, locale: target_locale, is_source: is_source)
         end
       end
