@@ -105,7 +105,7 @@ module Fastlane
         elsif UI.interactive? && UI.confirm("Retry downloading `#{@locale}` after receiving 429 from the API?")
           download_from_url(url) { |body| yield body if block_given? }
         else
-          UI.error("Abandoning `#{@locale}` download as requested.")
+          UI.error("Abandoning `#{@locale}` download.")
           false
         end
       end
