@@ -289,12 +289,10 @@ module Fastlane
           url = "#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}"
 
           downloader = Fastlane::Helper::GlotPressDownloader.new(auto_retry: true)
-          result = nil
           downloader.download(url, locale) do |response_body|
             # Replace tabs with spaces (GlotPress uses tabs, but we prefer spaces)
-            result = Nokogiri::XML(response_body.gsub("\t", '    '), nil, Encoding::UTF_8.to_s)
+            Nokogiri::XML(response_body.gsub("\t", '    '), nil, Encoding::UTF_8.to_s)
           end
-          result
         end
         private_class_method :download_glotpress_export_file
 

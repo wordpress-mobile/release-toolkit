@@ -26,26 +26,17 @@ module Fastlane
       # @param [String] url The URL to download from
       # @param [String] locale The locale being downloaded (for logging purposes)
       # @yield [String] The response body if the download was successful
+      # @return The result of the block if provided, or true/false indicating success
       #
       def download(url, locale)
         @current_locale = locale # Store for error handling
         uri = URI(url)
         response = make_request(uri)
-        handle_response(response: response, locale: locale, original_uri: uri) do |body|
-          yield body if block_given?
-        end
-      end
-
-      # Downloads data from GlotPress and returns the response body
-      #
-      # @param [String] url The URL to download from
-      # @param [String] locale The locale being downloaded (for logging purposes)
-      # @return [String, nil] The response body if successful, nil otherwise
-      #
-      def download_and_return(url, locale)
         result = nil
-        download(url, locale) { |body| result = body }
-        result
+        success = handle_response(response: response, locale: locale, original_uri: uri) do |body|
+          result = yield body if block_given?
+        end
+        block_given? ? result : success
       end
 
       private
