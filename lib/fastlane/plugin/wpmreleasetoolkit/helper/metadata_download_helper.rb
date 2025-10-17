@@ -12,13 +12,18 @@ module Fastlane
       def initialize(target_folder, target_files, auto_retry)
         @target_folder = target_folder
         @target_files = target_files
-        @downloader = GlotPressDownloader.new(auto_retry: auto_retry)
+        @auto_retry = auto_retry
         @alternates = {}
       end
 
       # Downloads data from GlotPress, in JSON format
       def download(target_locale, glotpress_url, is_source)
-        @downloader.download(glotpress_url, target_locale) do |response_body|
+        downloader = GlotPressDownloader.new(
+          url: glotpress_url,
+          locale: target_locale,
+          auto_retry: @auto_retry
+        )
+        downloader.download do |response_body|
           handle_glotpress_response(response_body: response_body, locale: target_locale, is_source: is_source)
         end
       end

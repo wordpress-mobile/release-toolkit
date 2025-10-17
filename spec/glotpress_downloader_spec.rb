@@ -11,25 +11,44 @@ describe Fastlane::Helper::GlotPressDownloader do
       stub_request(:get, test_url)
         .to_return(status: 200, body: 'test content')
 
-      downloader = described_class.new(auto_retry: false)
+      downloader = described_class.new(url: test_url, locale: locale, auto_retry: false)
       result = nil
-      downloader.download(test_url, locale) { |body| result = body }
+      downloader.download { |body| result = body }
 
       expect(result).to eq('test content')
     end
 
-    it 'resets retry counter on success' do
-      # First request fails with 429, second succeeds
+    it 'resets retry counter at start of download' do
+      # Counter should be reset to 0 at the start of download() call
+      downloader = described_class.new(url: test_url, locale: locale, auto_retry: true)
+
+      # Manually set counter to simulate previous state
+      downloader.instance_variable_set(:@auto_retry_attempt_counter, 5)
+      expect(downloader.auto_retry_attempt_counter).to eq(5)
+
+      # After download starts, counter should be reset
+      stub_request(:get, test_url)
+        .to_return(status: 200, body: 'success')
+
+      downloader.download { |body| body }
+
+      # Counter reset to 0 at start, no retries needed, so still 0
+      expect(downloader.auto_retry_attempt_counter).to eq(0)
+    end
+
+    it 'preserves retry counter value after successful retry' do
+      # Counter should reflect the number of retries that occurred
       stub_request(:get, test_url)
         .to_return(status: 429)
         .then.to_return(status: 200, body: 'success')
 
-      downloader = described_class.new(auto_retry: true)
+      downloader = described_class.new(url: test_url, locale: locale, auto_retry: true)
       allow(downloader).to receive(:sleep).with(20)
 
-      downloader.download(test_url, locale) { |body| body }
+      downloader.download { |body| body }
 
-      expect(downloader.auto_retry_attempt_counter).to eq(0)
+      # Counter shows 1 retry occurred
+      expect(downloader.auto_retry_attempt_counter).to eq(1)
     end
   end
 
@@ -39,13 +58,13 @@ describe Fastlane::Helper::GlotPressDownloader do
         .to_return(status: 429)
         .then.to_return(status: 200, body: 'success after retry')
 
-      downloader = described_class.new(auto_retry: true)
+      downloader = described_class.new(url: test_url, locale: locale, auto_retry: true)
       result = nil
 
       # Stub sleep globally to avoid waiting 20 seconds
       allow(downloader).to receive(:sleep).with(20)
 
-      downloader.download(test_url, locale) { |body| result = body }
+      downloader.download { |body| result = body }
 
       expect(result).to eq('success after retry')
       expect(a_request(:get, test_url)).to have_been_made.times(2)
@@ -59,27 +78,27 @@ describe Fastlane::Helper::GlotPressDownloader do
         .then.to_return(status: 429)
         .then.to_return(status: 200, body: 'finally success')
 
-      downloader = described_class.new(auto_retry: true)
+      downloader = described_class.new(url: test_url, locale: locale, auto_retry: true)
       allow(downloader).to receive(:sleep).with(20)
 
-      downloader.download(test_url, locale) { |body| body }
+      downloader.download { |body| body }
 
-      # Counter resets to 0 after success
-      expect(downloader.auto_retry_attempt_counter).to eq(0)
+      # Counter shows 3 retries occurred
+      expect(downloader.auto_retry_attempt_counter).to eq(3)
       expect(a_request(:get, test_url)).to have_been_made.times(4)
     end
 
     it 'stops retrying after max attempts' do
       stub_request(:get, test_url).to_return(status: 429)
 
-      downloader = described_class.new(auto_retry: true)
+      downloader = described_class.new(url: test_url, locale: locale, auto_retry: true)
       allow(downloader).to receive(:sleep).with(20)
 
       # Mock CI environment and UI to avoid prompts
       allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(true)
       allow(FastlaneCore::UI).to receive(:error)
 
-      downloader.download(test_url, locale) { |body| body }
+      downloader.download { |body| body }
 
       # Should try: 1 initial + 30 retries = 31 total
       expect(a_request(:get, test_url)).to have_been_made.times(31)
@@ -88,13 +107,13 @@ describe Fastlane::Helper::GlotPressDownloader do
     it 'does not auto-retry when auto_retry is disabled' do
       stub_request(:get, test_url).to_return(status: 429)
 
-      downloader = described_class.new(auto_retry: false)
+      downloader = described_class.new(url: test_url, locale: locale, auto_retry: false)
 
       # Mock UI methods to avoid prompts
       allow(FastlaneCore::UI).to receive(:error)
       allow(FastlaneCore::UI).to receive(:confirm).and_return(false)
 
-      downloader.download(test_url, locale) { |body| body }
+      downloader.download { |body| body }
 
       # Should only try once (no auto-retry)
       expect(a_request(:get, test_url)).to have_been_made.once
@@ -109,9 +128,9 @@ describe Fastlane::Helper::GlotPressDownloader do
       stub_request(:get, redirect_url)
         .to_return(status: 200, body: 'redirected content')
 
-      downloader = described_class.new(auto_retry: false)
+      downloader = described_class.new(url: test_url, locale: locale, auto_retry: false)
       result = nil
-      downloader.download(test_url, locale) { |body| result = body }
+      downloader.download { |body| result = body }
 
       expect(result).to eq('redirected content')
       expect(a_request(:get, test_url)).to have_been_made.once
@@ -123,13 +142,13 @@ describe Fastlane::Helper::GlotPressDownloader do
     it 'handles 404 errors gracefully in CI' do
       stub_request(:get, test_url).to_return(status: 404, body: 'Not Found')
 
-      downloader = described_class.new(auto_retry: false)
+      downloader = described_class.new(url: test_url, locale: locale, auto_retry: false)
 
       # Mock CI environment
       allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(true)
       allow(FastlaneCore::UI).to receive(:error)
 
-      result = downloader.download(test_url, locale) { |body| body }
+      result = downloader.download { |body| body }
 
       expect(result).to be_falsey
       expect(a_request(:get, test_url)).to have_been_made.once

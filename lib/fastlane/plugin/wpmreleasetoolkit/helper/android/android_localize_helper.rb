@@ -288,8 +288,12 @@ module Fastlane
           query_params = filters.transform_keys { |k| "filters[#{k}]" }.merge(format: 'android')
           url = "#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}"
 
-          downloader = Fastlane::Helper::GlotPressDownloader.new(auto_retry: true)
-          downloader.download(url, locale) do |response_body|
+          downloader = Fastlane::Helper::GlotPressDownloader.new(
+            url: url,
+            locale: locale,
+            auto_retry: true
+          )
+          downloader.download do |response_body|
             # Replace tabs with spaces (GlotPress uses tabs, but we prefer spaces)
             Nokogiri::XML(response_body.gsub("\t", '    '), nil, Encoding::UTF_8.to_s)
           end
