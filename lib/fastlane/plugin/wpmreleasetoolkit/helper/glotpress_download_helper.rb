@@ -26,7 +26,7 @@ module Fastlane
       # @param [String] url The URL to download from
       # @param [String] locale The locale being downloaded (for logging purposes)
       # @yield [String] The response body if the download was successful
-      # @return The result of the block if provided, or true/false indicating success
+      # @return The result of the block if provided, or true/false indicating success if no block provided
       #
       def download(url, locale)
         @current_locale = locale # Store for error handling
