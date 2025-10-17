@@ -4,7 +4,7 @@ require 'fastlane_core/ui/ui'
 require 'fileutils'
 require 'nokogiri'
 require 'open-uri'
-require_relative '../glotpress_download_helper'
+require_relative '../glotpress_downloader'
 
 module Fastlane
   UI = FastlaneCore::UI unless Fastlane.const_defined?('UI')

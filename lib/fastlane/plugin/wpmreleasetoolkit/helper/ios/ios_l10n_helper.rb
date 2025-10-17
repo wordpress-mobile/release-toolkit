@@ -6,7 +6,7 @@ require 'nokogiri'
 require 'open3'
 require 'open-uri'
 require 'tempfile'
-require_relative '../glotpress_download_helper'
+require_relative '../glotpress_downloader'
 
 module Fastlane
   module Helper
