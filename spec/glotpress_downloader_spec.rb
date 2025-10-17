@@ -94,8 +94,8 @@ describe Fastlane::Helper::GlotPressDownloader do
       downloader = described_class.new(url: test_url, locale: locale, auto_retry: true)
       allow(downloader).to receive(:sleep).with(20)
 
-      # Mock CI environment and UI to avoid prompts
-      allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(true)
+      # Mock non-interactive environment to avoid prompts
+      allow(FastlaneCore::UI).to receive(:interactive?).and_return(false)
       allow(FastlaneCore::UI).to receive(:error)
 
       downloader.download { |body| body }
@@ -139,13 +139,13 @@ describe Fastlane::Helper::GlotPressDownloader do
   end
 
   describe 'error handling' do
-    it 'handles 404 errors gracefully in CI' do
+    it 'handles 404 errors gracefully in non-interactive mode' do
       stub_request(:get, test_url).to_return(status: 404, body: 'Not Found')
 
       downloader = described_class.new(url: test_url, locale: locale, auto_retry: false)
 
-      # Mock CI environment
-      allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(true)
+      # Mock non-interactive environment
+      allow(FastlaneCore::UI).to receive(:interactive?).and_return(false)
       allow(FastlaneCore::UI).to receive(:error)
 
       result = downloader.download { |body| body }

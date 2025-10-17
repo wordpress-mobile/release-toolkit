@@ -56,7 +56,7 @@ module Fastlane
       rescue StandardError => e
         # Network errors, connection errors, etc.
         UI.error("Error downloading locale `#{@locale}` — #{e.message} (#{uri})")
-        retry if !FastlaneCore::Helper.is_ci? && UI.confirm("Retry downloading `#{@locale}`?")
+        retry if UI.interactive? && UI.confirm("Retry downloading `#{@locale}`?")
         nil
       end
 
@@ -88,7 +88,7 @@ module Fastlane
           # Unexpected status code (including 404, 500, etc.)
           status_line = "#{response.code} #{response.message}"
           UI.error("Error downloading locale `#{@locale}` — #{status_line} (#{original_uri})")
-          if !FastlaneCore::Helper.is_ci? && UI.confirm("Retry downloading `#{@locale}`?")
+          if UI.interactive? && UI.confirm("Retry downloading `#{@locale}`?")
             download_from_url(url) { |body| yield body if block_given? }
           else
             false
@@ -102,7 +102,7 @@ module Fastlane
           sleep(AUTO_RETRY_SLEEP_TIME)
           @auto_retry_attempt_counter += 1
           download_from_url(url) { |body| yield body if block_given? }
-        elsif !FastlaneCore::Helper.is_ci? && UI.confirm("Retry downloading `#{@locale}` after receiving 429 from the API?")
+        elsif UI.interactive? && UI.confirm("Retry downloading `#{@locale}` after receiving 429 from the API?")
           download_from_url(url) { |body| yield body if block_given? }
         else
           UI.error("Abandoning `#{@locale}` download as requested.")
