@@ -2,13 +2,11 @@
 
 require 'net/http'
 require 'json'
+require_relative 'glotpress_downloader'
 
 module Fastlane
   module Helper
     class MetadataDownloader
-      AUTO_RETRY_SLEEP_TIME = 20
-      MAX_AUTO_RETRY_ATTEMPTS = 30
-
       attr_reader :target_folder, :target_files
 
       def initialize(target_folder, target_files, auto_retry)
@@ -16,14 +14,17 @@ module Fastlane
         @target_files = target_files
         @auto_retry = auto_retry
         @alternates = {}
-        @auto_retry_attempt_counter = 0
       end
 
       # Downloads data from GlotPress, in JSON format
       def download(target_locale, glotpress_url, is_source)
-        uri = URI(glotpress_url)
-        response = Net::HTTP.get_response(uri)
-        handle_glotpress_download(response: response, locale: target_locale, is_source: is_source)
+        GlotPressDownloader.download(
+          url: glotpress_url,
+          locale: target_locale,
+          auto_retry: @auto_retry
+        ) do |response_body|
+          handle_glotpress_response(response_body: response_body, locale: target_locale, is_source: is_source)
+        end
       end
 
       # Parse JSON data and update the local files
@@ -105,39 +106,16 @@ module Fastlane
 
       private
 
-      def handle_glotpress_download(response:, locale:, is_source:)
-        case response.code
-        when '200'
-          # All good, parse the result
-          UI.success("Successfully downloaded `#{locale}`.")
-          @alternates.clear
-          loc_data = begin
-            JSON.parse(response.body)
-          rescue StandardError
-            loc_data = nil
-          end
-          parse_data(locale, loc_data, is_source)
-          reparse_alternates(target_locale, loc_data, is_source) unless @alternates.empty?
-        when '301'
-          # Follow the redirect
-          UI.message("Received 301 for `#{locale}`. Following redirect...")
-          download(locale, response.header['location'], is_source)
-        when '429'
-          # We got rate-limited, auto_retry or offer to try again with a prompt
-          if @auto_retry && @auto_retry_attempt_counter <= MAX_AUTO_RETRY_ATTEMPTS
-            UI.message("Received 429 for `#{locale}`. Auto retrying in #{AUTO_RETRY_SLEEP_TIME} seconds...")
-            sleep(AUTO_RETRY_SLEEP_TIME)
-            @auto_retry_attempt_counter += 1
-            download(locale, response.uri, is_source)
-          elsif UI.confirm("Retry downloading `#{locale}` after receiving 429 from the API?")
-            download(locale, response.uri, is_source)
-          else
-            UI.error("Abandoning `#{locale}` download as requested.")
-          end
-        else
-          message = "Received unexpected #{response.code} from request to URI #{response.uri}."
-          UI.abort_with_message!(message) unless UI.confirm("#{message} Continue anyway?")
+      def handle_glotpress_response(response_body:, locale:, is_source:)
+        # Parse the JSON response
+        @alternates.clear
+        loc_data = begin
+          JSON.parse(response_body)
+        rescue StandardError
+          nil
         end
+        parse_data(locale, loc_data, is_source)
+        reparse_alternates(locale, loc_data, is_source) unless @alternates.empty?
       end
     end
   end

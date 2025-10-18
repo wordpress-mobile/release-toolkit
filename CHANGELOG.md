@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Extract GlotPress download and retry logic into a shared `GlotPressDownloader` helper class. [#667]
 
 ## 13.5.2
 

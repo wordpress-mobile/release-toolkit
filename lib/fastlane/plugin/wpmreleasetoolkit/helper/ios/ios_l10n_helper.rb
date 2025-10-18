@@ -6,6 +6,7 @@ require 'nokogiri'
 require 'open3'
 require 'open-uri'
 require 'tempfile'
+require_relative '../glotpress_downloader'
 
 module Fastlane
   module Helper
@@ -165,16 +166,22 @@ module Fastlane
         #
         def self.download_glotpress_export_file(project_url:, locale:, filters:, destination:)
           query_params = (filters || {}).transform_keys { |k| "filters[#{k}]" }.merge(format: 'strings')
-          uri = URI.parse("#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}")
-
-          # Set an unambiguous User Agent so GlotPress won't rate-limit us
-          options = { 'User-Agent' => Wpmreleasetoolkit::USER_AGENT }
+          url = "#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}"
 
           begin
-            IO.copy_stream(uri.open(options), destination)
+            Fastlane::Helper::GlotPressDownloader.download(
+              url: url,
+              locale: locale,
+              auto_retry: true
+            ) do |response_body|
+              if destination.is_a?(String)
+                File.write(destination, response_body)
+              else
+                destination.write(response_body)
+              end
+            end
           rescue StandardError => e
-            UI.error "Error downloading locale `#{locale}` — #{e.message} (#{uri})"
-            retry if e.is_a?(OpenURI::HTTPError) && UI.confirm("Retry downloading `#{locale}`?")
+            UI.error "Error downloading locale `#{locale}` — #{e.message} (#{url})"
             nil
           end
         end

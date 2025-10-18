@@ -4,6 +4,7 @@ require 'fastlane_core/ui/ui'
 require 'fileutils'
 require 'nokogiri'
 require 'open-uri'
+require_relative '../glotpress_downloader'
 
 module Fastlane
   UI = FastlaneCore::UI unless Fastlane.const_defined?('UI')
@@ -285,17 +286,15 @@ module Fastlane
         #
         def self.download_glotpress_export_file(project_url:, locale:, filters:)
           query_params = filters.transform_keys { |k| "filters[#{k}]" }.merge(format: 'android')
-          uri = URI.parse("#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}")
+          url = "#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}"
 
-          # Set an unambiguous User Agent so GlotPress won't rate-limit us
-          options = { 'User-Agent' => Wpmreleasetoolkit::USER_AGENT }
-
-          begin
-            uri.open(options) { |f| Nokogiri::XML(f.read.gsub("\t", '    '), nil, Encoding::UTF_8.to_s) }
-          rescue StandardError => e
-            UI.error "Error downloading #{locale} - #{e.message}"
-            retry if e.is_a?(OpenURI::HTTPError) && UI.confirm("Retry downloading `#{locale}`?")
-            nil
+          Fastlane::Helper::GlotPressDownloader.download(
+            url: url,
+            locale: locale,
+            auto_retry: true
+          ) do |response_body|
+            # Replace tabs with spaces (GlotPress uses tabs, but we prefer spaces)
+            Nokogiri::XML(response_body.gsub("\t", '    '), nil, Encoding::UTF_8.to_s)
           end
         end
         private_class_method :download_glotpress_export_file
