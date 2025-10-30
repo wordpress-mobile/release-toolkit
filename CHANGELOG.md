@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- `upload_build_to_apps_cdn`: Update the list of valid values for `platform` to now support _both_ `x86` and `ARM64` for the `Microsoft Store` and `Windows` platforms. [#669]
 
 ### Bug Fixes
 
