@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Fix `NoMethodError` (`undefined method 'trigger_action_by_name' for nil:NilClass`) when running `configure_setup`. [#670]
 
 ### Internal Changes
 
