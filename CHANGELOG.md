@@ -10,15 +10,25 @@ _None_
 
 ### New Features
 
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 13.6.0
+
+### New Features
+
 - `upload_build_to_apps_cdn`: Update the list of valid values for `platform` to now support _both_ `x86` and `ARM64` for the `Microsoft Store` and `Windows` platforms. [#669]
 
 ### Bug Fixes
 
 - Fix `NoMethodError` (`undefined method 'trigger_action_by_name' for nil:NilClass`) when running `configure_setup`. [#670]
-
-### Internal Changes
-
-_None_
 
 ## 13.5.3
 
