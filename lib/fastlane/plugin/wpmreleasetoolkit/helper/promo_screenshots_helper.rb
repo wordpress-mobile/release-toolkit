@@ -4,7 +4,7 @@ require 'tmpdir'
 begin
   $skip_magick = false
   require 'RMagick'
-rescue LoadError
+rescue LoadError, RuntimeError
   $skip_magick = true
 end
 require 'json'

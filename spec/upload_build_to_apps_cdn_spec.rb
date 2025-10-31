@@ -421,7 +421,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
             version: test_version,
             file_path: file_path
           )
-        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Platform must be one of: Android, iOS, Mac - Silicon, Mac - Intel, Mac - Any, Windows, Microsoft Store')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Platform must be one of: #{described_class::VALID_PLATFORMS.join(', ')}")
       end
     end
 

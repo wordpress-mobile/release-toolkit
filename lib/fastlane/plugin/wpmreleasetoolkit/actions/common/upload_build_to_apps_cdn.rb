@@ -34,8 +34,10 @@ module Fastlane
         'Mac - Silicon',
         'Mac - Intel',
         'Mac - Any',
-        'Windows',
-        'Microsoft Store',
+        'Windows - x86',
+        'Windows - ARM64',
+        'Microsoft Store - x86',
+        'Microsoft Store - ARM64',
       ].freeze
       # See https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-install-type.php
       VALID_INSTALL_TYPES = [
