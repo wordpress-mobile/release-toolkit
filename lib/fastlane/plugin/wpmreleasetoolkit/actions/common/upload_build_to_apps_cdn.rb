@@ -35,8 +35,10 @@ module Fastlane
         'Mac - Intel',
         'Mac - Any',
         'Windows - x86',
+        'Windows - x64',
         'Windows - ARM64',
         'Microsoft Store - x86',
+        'Microsoft Store - x64',
         'Microsoft Store - ARM64',
       ].freeze
       # See https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-install-type.php
