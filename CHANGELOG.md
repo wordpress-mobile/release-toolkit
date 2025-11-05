@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- `upload_build_to_apps_cdn`: Update the list of valid values for `platform` to add support for `Microsoft Store - x64` and `Windows - x64`. [#672]
+_None_
 
 ### Bug Fixes
 
@@ -19,6 +19,12 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 13.7.0
+
+### New Features
+
+- `upload_build_to_apps_cdn`: Update the list of valid values for `platform` to add support for `Microsoft Store - x64` and `Windows - x64`. [#672]
 
 ## 13.6.0
 
