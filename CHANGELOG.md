@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- `upload_build_to_apps_cdn`: Add additional Sparkle meta fields `critical_update` and `phased_rollout_interval` [#673]
 
 ### Bug Fixes
 
