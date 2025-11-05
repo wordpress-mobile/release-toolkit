@@ -69,6 +69,8 @@ module Fastlane
           version: params[:version],
           build_number: params[:build_number], # Optional: may be nil
           minimum_system_version: params[:minimum_system_version], # Optional: may be nil
+          critical_update: params[:critical_update], # Optional: may be nil
+          phased_rollout_interval: params[:phased_rollout_interval], # Optional: may be nil
           post_status: params[:post_status], # Optional: may be nil
           release_notes: params[:release_notes], # Optional: may be nil
           sha: params[:sha], # Optional: may be nil
@@ -291,6 +293,18 @@ module Fastlane
             description: 'The minimum version for the provided platform (e.g. \'13.0\' for macOS Ventura)',
             optional: true,
             type: String
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :critical_update,
+            description: 'Whether the build is a critical update',
+            optional: true,
+            type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :phased_rollout_interval,
+            description: 'The interval for the phased rollout (in seconds)',
+            optional: true,
+            type: Integer
           ),
           FastlaneCore::ConfigItem.new(
             key: :release_notes,
