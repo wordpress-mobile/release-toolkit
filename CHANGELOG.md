@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- `upload_build_to_apps_cdn`: Add additional Sparkle meta fields `critical_update` and `phased_rollout_interval` [#673]
+- `upload_build_to_apps_cdn`: Add additional Sparkle meta fields `critical_update` and `phased_rollout_interval`. [#673]
 
 ### Bug Fixes
 
@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Updated CI pipeline (Xcode VM used for builds, ci-toolkit plugin, docker plugin). [#677]
 
 ## 13.7.0
 
