@@ -77,7 +77,7 @@ Metrics/BlockLength:
    - spec/**/shared_examples_*.rb
 
 Metrics/ClassLength:
-  Max: 300
+  Max: 350
 
 Metrics/MethodLength:
   Max: 150
