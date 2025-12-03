@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- `upload_build_to_apps_cdn`: Add additional Sparkle meta fields `critical_update` and `phased_rollout_interval` [#673]
+_None_
 
 ### Bug Fixes
 
@@ -19,6 +19,12 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 13.8.0
+
+### New Features
+
+- `upload_build_to_apps_cdn`: Add additional Sparkle meta fields `critical_update` and `phased_rollout_interval` [#673]
 
 ## 13.7.0
 
