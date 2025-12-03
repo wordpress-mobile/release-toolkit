@@ -2,6 +2,6 @@
 
 module Fastlane
   module Wpmreleasetoolkit
-    VERSION = '13.7.0'
+    VERSION = '13.8.0'
   end
 end
