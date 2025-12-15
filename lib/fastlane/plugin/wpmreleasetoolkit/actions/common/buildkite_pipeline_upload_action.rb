@@ -21,7 +21,9 @@ module Fastlane
         if env_file && File.exist?(env_file)
           UI.message(" - Sourcing environment file beforehand: #{env_file}")
 
-          sh(environment, "source #{env_file.shellescape} && buildkite-agent pipeline upload #{pipeline_file.shellescape}")
+          # Use `.` instead of `source` for POSIX compliance - works across all shells (sh/dash/bash/zsh)
+          # while `source` isn't always present
+          sh(environment, ". #{env_file.shellescape} && buildkite-agent pipeline upload #{pipeline_file.shellescape}")
         else
           sh(environment, 'buildkite-agent', 'pipeline', 'upload', pipeline_file)
         end

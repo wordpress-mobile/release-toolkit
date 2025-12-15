@@ -60,7 +60,7 @@ describe Fastlane::Actions::BuildkitePipelineUploadAction do
       allow(File).to receive(:exist?).with(env_file).and_return(true)
       expect(Fastlane::Action).to receive(:sh).with(
         environment,
-        "source #{env_file.shellescape} && buildkite-agent pipeline upload #{loaded_pipeline_file.shellescape}"
+        ". #{env_file.shellescape} && buildkite-agent pipeline upload #{loaded_pipeline_file.shellescape}"
       )
       expect_upload_pipeline_message
       expect_sourcing_env_file_message(env_file)
@@ -92,7 +92,7 @@ describe Fastlane::Actions::BuildkitePipelineUploadAction do
       allow(File).to receive(:exist?).with(env_file).and_return(true)
       expect(Fastlane::Action).to receive(:sh).with(
         environment_default,
-        "source #{env_file.shellescape} && buildkite-agent pipeline upload #{loaded_pipeline_file.shellescape}"
+        ". #{env_file.shellescape} && buildkite-agent pipeline upload #{loaded_pipeline_file.shellescape}"
       )
       expect_upload_pipeline_message
       expect_sourcing_env_file_message(env_file)
@@ -122,7 +122,7 @@ describe Fastlane::Actions::BuildkitePipelineUploadAction do
       allow(File).to receive(:exist?).with(env_file_default).and_return(true)
       expect(Fastlane::Action).to receive(:sh).with(
         environment_default,
-        "source #{env_file_default} && buildkite-agent pipeline upload #{loaded_pipeline_file.shellescape}"
+        ". #{env_file_default} && buildkite-agent pipeline upload #{loaded_pipeline_file.shellescape}"
       )
       expect_upload_pipeline_message
       expect_sourcing_env_file_message(env_file_default)

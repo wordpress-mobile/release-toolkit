@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- `buildkite_pipeline_upload`: Fix compatibility issues by using POSIX-compliant `.` instead of bash-specific `source` command. [#681]
 
 ### Internal Changes
 
