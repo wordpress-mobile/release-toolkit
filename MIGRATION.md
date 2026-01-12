@@ -1,5 +1,72 @@
 # Migration Instructions for Major Releases
 
+## From 13.x to 14.0.0
+
+### Metadata Source Actions
+
+The `ios_update_metadata_source` and `an_update_metadata_source` actions are now deprecated. Use `gp_update_metadata_source` instead:
+
+```ruby
+# Before (iOS)
+ios_update_metadata_source(
+  po_file_path: 'path/to/AppStoreStrings.pot',
+  source_files: { app_name: 'path/to/name.txt' },
+  release_version: '1.0'
+)
+
+# Before (Android)
+an_update_metadata_source(
+  po_file_path: 'path/to/PlayStoreStrings.po',
+  source_files: { app_name: 'path/to/name.txt' },
+  release_version: '1.0'
+)
+
+# After (both platforms)
+gp_update_metadata_source(
+  po_file_path: 'path/to/AppStoreStrings.pot',
+  source_files: { app_name: 'path/to/name.txt' },
+  release_version: '1.0',
+  commit_changes: true  # Set to true if you want auto-commit (like ios_update_metadata_source did)
+)
+```
+
+### Translator Comments in PO Files
+
+**Important:** The new `gp_update_metadata_source` action regenerates PO files from scratch. Any existing translator comments (lines starting with `#.`) in your PO files will be **lost** unless you explicitly add them to your `source_files` hash.
+
+To preserve translator comments, update your `source_files` to use the new hash format with `:path` and `:comment` keys:
+
+```ruby
+# Before (comments in PO file will be lost)
+source_files: {
+  app_store_subtitle: 'path/to/subtitle.txt',
+  app_store_keywords: 'path/to/keywords.txt'
+}
+
+# After (comments are preserved in generated PO)
+source_files: {
+  app_store_subtitle: {
+    path: 'path/to/subtitle.txt',
+    comment: 'translators: Limit to 30 characters!'
+  },
+  app_store_keywords: {
+    path: 'path/to/keywords.txt',
+    comment: "translators: Delimit with commas.\nLimit to 100 characters."
+  },
+  # Simple paths still work for entries without comments
+  app_name: 'path/to/name.txt'
+}
+```
+
+**Migration steps:**
+1. Check your existing `.po`/`.pot` files for any `#.` comment lines
+2. Extract those comments and add them to the `source_files` hash in your Fastfile
+3. Replace `ios_update_metadata_source`/`an_update_metadata_source` with `gp_update_metadata_source`
+
+### PO File Entry Ordering
+
+Generated PO files now have entries sorted **alphabetically by `msgctxt`**. This ensures deterministic output across runs. If you have tests or tooling that depend on a specific entry order, they may need to be updated.
+
 ## From 12.x to 13.0.0
 
 - The `prototype_build_details_comment` action have been updated to work with Firebase App Distribution instead of App Center [#630].
