@@ -355,6 +355,115 @@ describe Fastlane::Helper::PoFileGenerator do
       end
     end
 
+    context 'with translator comments' do
+      it 'adds extracted comment when source_files value is a hash with comment' do
+        in_tmp_dir do |dir|
+          source_path = File.join(dir, 'subtitle.txt')
+          File.write(source_path, 'Your store in your pocket')
+
+          generator = described_class.new(
+            release_version: '1.0',
+            source_files: {
+              app_store_subtitle: {
+                path: source_path,
+                comment: 'translators: Limit to 30 characters!'
+              }
+            }
+          )
+
+          result = generator.generate
+
+          expect(result).to include('#. translators: Limit to 30 characters!')
+          expect(result).to include('msgctxt "app_store_subtitle"')
+        end
+      end
+
+      it 'handles multiline comments' do
+        in_tmp_dir do |dir|
+          source_path = File.join(dir, 'screenshot.txt')
+          File.write(source_path, 'Screenshot text')
+
+          generator = described_class.new(
+            release_version: '1.0',
+            source_files: {
+              'app_store_screenshot-1' => {
+                path: source_path,
+                comment: "translators: Line one.\nLine two."
+              }
+            }
+          )
+
+          result = generator.generate
+
+          expect(result).to include('#. translators: Line one.')
+          expect(result).to include('#. Line two.')
+        end
+      end
+
+      it 'works with string values for backward compatibility' do
+        in_tmp_dir do |dir|
+          source_path = File.join(dir, 'name.txt')
+          File.write(source_path, 'My App')
+
+          generator = described_class.new(
+            release_version: '1.0',
+            source_files: { app_name: source_path }
+          )
+
+          result = generator.generate
+
+          expect(result).to include('msgctxt "app_name"')
+          expect(result).not_to include('#.')
+        end
+      end
+
+      it 'mixes string and hash values in source_files' do
+        in_tmp_dir do |dir|
+          name_path = File.join(dir, 'name.txt')
+          File.write(name_path, 'My App')
+
+          subtitle_path = File.join(dir, 'subtitle.txt')
+          File.write(subtitle_path, 'Great app')
+
+          generator = described_class.new(
+            release_version: '1.0',
+            source_files: {
+              app_name: name_path,
+              app_subtitle: {
+                path: subtitle_path,
+                comment: 'translators: Keep it short'
+              }
+            }
+          )
+
+          result = generator.generate
+
+          expect(result).to include('msgctxt "app_name"')
+          expect(result).to include('msgctxt "app_subtitle"')
+          expect(result).to include('#. translators: Keep it short')
+        end
+      end
+
+      it 'handles hash without comment key' do
+        in_tmp_dir do |dir|
+          source_path = File.join(dir, 'name.txt')
+          File.write(source_path, 'My App')
+
+          generator = described_class.new(
+            release_version: '1.0',
+            source_files: {
+              app_name: { path: source_path }
+            }
+          )
+
+          result = generator.generate
+
+          expect(result).to include('msgctxt "app_name"')
+          expect(result).not_to include('#.')
+        end
+      end
+    end
+
     context 'with entry ordering' do
       it 'sorts entries alphabetically by msgctxt' do
         in_tmp_dir do |dir|

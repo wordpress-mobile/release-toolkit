@@ -10,9 +10,30 @@ module Fastlane
     #
     # This class generates gettext PO files from a hash of source files,
     # handling special cases like versioned release notes and what's new entries.
+    #
+    # @example Basic usage with file paths
+    #   generator = PoFileGenerator.new(
+    #     release_version: '1.0',
+    #     source_files: {
+    #       app_name: '/path/to/name.txt',
+    #       description: '/path/to/desc.txt'
+    #     }
+    #   )
+    #
+    # @example With translator comments
+    #   generator = PoFileGenerator.new(
+    #     release_version: '1.0',
+    #     source_files: {
+    #       app_store_subtitle: {
+    #         path: '/path/to/subtitle.txt',
+    #         comment: 'translators: Limit to 30 characters!'
+    #       },
+    #       description: '/path/to/desc.txt'  # no comment
+    #     }
+    #   )
     class PoFileGenerator
       # @param release_version [String] The release version (e.g., "1.23")
-      # @param source_files [Hash] A hash mapping keys to file paths
+      # @param source_files [Hash] A hash mapping keys to file paths (String) or hashes with :path and :comment keys
       # @param existing_po_path [String, nil] Optional path to existing PO file (needed for release_note to preserve n-1)
       def initialize(release_version:, source_files:, existing_po_path: nil)
         @release_version = release_version
@@ -30,9 +51,10 @@ module Fastlane
 
         # Collect all entries first, then sort by msgctxt for deterministic output
         entries = []
-        @source_files.each do |key, file_path|
-          content = File.read(file_path)
-          entries.concat(create_entries_for_key(key.to_sym, content))
+        @source_files.each do |key, value|
+          path, comment = extract_path_and_comment(value)
+          content = File.read(path)
+          entries.concat(create_entries_for_key(key.to_sym, content, comment))
         end
 
         # Sort entries alphabetically by msgctxt and add to PO
@@ -85,38 +107,52 @@ module Fastlane
         msgstr.gsub(/PO-Revision-Date:.*\n/, "PO-Revision-Date: #{current_time}\n")
       end
 
-      def create_entries_for_key(key, content)
-        case key
-        when :whats_new
-          [create_whats_new_entry(content)]
-        when :release_note
-          create_release_note_entries(content)
-        when :release_note_short
-          create_release_note_short_entries(content)
+      # Extracts path and comment from a source_files value
+      # @param value [String, Hash] Either a file path string or a hash with :path and optional :comment
+      # @return [Array<String, String|nil>] A tuple of [path, comment]
+      def extract_path_and_comment(value)
+        case value
+        when String
+          [value, nil]
+        when Hash
+          [value[:path], value[:comment]]
         else
-          [create_standard_entry(key.to_s, content)]
+          raise ArgumentError, "Invalid source_files value: expected String or Hash, got #{value.class}"
         end
       end
 
-      def create_standard_entry(msgctxt, content)
-        create_entry(msgctxt, content.rstrip)
+      def create_entries_for_key(key, content, comment = nil)
+        case key
+        when :whats_new
+          [create_whats_new_entry(content, comment)]
+        when :release_note
+          create_release_note_entries(content, comment)
+        when :release_note_short
+          create_release_note_short_entries(content, comment)
+        else
+          [create_standard_entry(key.to_s, content, comment)]
+        end
       end
 
-      def create_whats_new_entry(content)
+      def create_standard_entry(msgctxt, content, comment = nil)
+        create_entry(msgctxt, content.rstrip, comment)
+      end
+
+      def create_whats_new_entry(content, comment = nil)
         msgctxt = "v#{@release_version}-whats-new"
         # Ensure content ends with newline for multiline formatting
         msgid = content.end_with?("\n") ? content : "#{content}\n"
-        create_entry(msgctxt, msgid)
+        create_entry(msgctxt, msgid, comment)
       end
 
-      def create_release_note_entries(content)
+      def create_release_note_entries(content, comment = nil)
         entries = []
 
         # Generate new entry for current version
         new_key = release_note_key_for_version(@release_version)
         msgid = "#{@release_version}:\n#{content}"
         msgid = "#{msgid}\n" unless msgid.end_with?("\n")
-        entries << create_entry(new_key, msgid)
+        entries << create_entry(new_key, msgid, comment)
 
         # Preserve the n-1 entry from existing file if available
         previous_entry = find_previous_release_note(:release_note)
@@ -125,7 +161,7 @@ module Fastlane
         entries
       end
 
-      def create_release_note_short_entries(content)
+      def create_release_note_short_entries(content, comment = nil)
         return [] if content.strip.empty?
 
         entries = []
@@ -134,7 +170,7 @@ module Fastlane
         new_key = release_note_short_key_for_version(@release_version)
         msgid = "#{@release_version}:\n#{content}"
         msgid = "#{msgid}\n" unless msgid.end_with?("\n")
-        entries << create_entry(new_key, msgid)
+        entries << create_entry(new_key, msgid, comment)
 
         # Preserve the n-1 entry from existing file if available
         previous_entry = find_previous_release_note(:release_note_short)
@@ -166,11 +202,12 @@ module Fastlane
         nil
       end
 
-      def create_entry(msgctxt, msgid)
+      def create_entry(msgctxt, msgid, comment = nil)
         entry = GetText::POEntry.new(:msgctxt)
         entry.msgctxt = msgctxt
         entry.msgid = msgid
         entry.msgstr = ''
+        entry.extracted_comment = comment if comment
         entry
       end
 

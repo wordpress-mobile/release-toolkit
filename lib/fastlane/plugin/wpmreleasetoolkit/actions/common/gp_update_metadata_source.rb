@@ -28,15 +28,17 @@ module Fastlane
       end
 
       def self.validate_source_files(source_files)
-        source_files.each_value do |file_path|
+        source_files.each_value do |value|
+          file_path = value.is_a?(Hash) ? value[:path] : value
           UI.user_error!("Couldn't find file at path '#{file_path}'") unless File.exist?(file_path)
         end
       end
 
       def self.commit_changes(params)
         Action.sh("git add #{params[:po_file_path]}")
-        params[:source_files].each_value do |file|
-          Action.sh("git add #{file}")
+        params[:source_files].each_value do |value|
+          file_path = value.is_a?(Hash) ? value[:path] : value
+          Action.sh("git add #{file_path}")
         end
 
         repo_status = Actions.sh('git status --porcelain')
@@ -55,7 +57,24 @@ module Fastlane
       end
 
       def self.details
-        'Generates a .po file from source .txt files for localization via GlotPress.'
+        <<~DETAILS
+          Generates a .po file from source .txt files for localization via GlotPress.
+
+          The `source_files` parameter accepts either simple file paths or hashes with path and comment:
+
+          ```ruby
+          source_files: {
+            # Simple path (no translator comment)
+            app_name: 'path/to/name.txt',
+
+            # Hash with path and translator comment
+            app_store_subtitle: {
+              path: 'path/to/subtitle.txt',
+              comment: 'translators: Limit to 30 characters!'
+            }
+          }
+          ```
+        DETAILS
       end
 
       def self.available_options
@@ -75,7 +94,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :source_files,
                                        env_name: 'FL_UPDATE_METADATA_SOURCE_SOURCE_FILES',
-                                       description: 'Hash mapping keys to source file paths',
+                                       description: 'Hash mapping keys to file paths (String) or hashes with :path and optional :comment',
                                        type: Hash,
                                        verify_block: proc do |value|
                                          UI.user_error!("No source files given, pass using `source_files: { key: 'path' }`") unless value && !value.empty?
