@@ -9,6 +9,9 @@ module Fastlane
         UI.message "PO file path: #{params[:po_file_path]}"
         UI.message "Release version: #{params[:release_version]}"
 
+        # Check local repo status if we're going to commit changes
+        other_action.ensure_git_status_clean if params[:commit_changes]
+
         validate_source_files(params[:source_files])
 
         generator = Fastlane::Helper::PoFileGenerator.new(
@@ -20,12 +23,27 @@ module Fastlane
         generator.write(params[:po_file_path])
 
         UI.message "File #{params[:po_file_path]} updated!"
+
+        commit_changes(params) if params[:commit_changes]
       end
 
       def self.validate_source_files(source_files)
         source_files.each_value do |file_path|
           UI.user_error!("Couldn't find file at path '#{file_path}'") unless File.exist?(file_path)
         end
+      end
+
+      def self.commit_changes(params)
+        Action.sh("git add #{params[:po_file_path]}")
+        params[:source_files].each_value do |file|
+          Action.sh("git add #{file}")
+        end
+
+        repo_status = Actions.sh('git status --porcelain')
+        repo_clean = repo_status.empty?
+        return if repo_clean
+
+        Action.sh('git commit -m "Update metadata strings"')
       end
 
       #####################################################
@@ -62,6 +80,10 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("No source files given, pass using `source_files: { key: 'path' }`") unless value && !value.empty?
                                        end),
+          FastlaneCore::ConfigItem.new(key: :commit_changes,
+                                       description: 'If true, checks git status is clean, then adds and commits the changes',
+                                       type: Boolean,
+                                       default_value: false),
         ]
       end
 

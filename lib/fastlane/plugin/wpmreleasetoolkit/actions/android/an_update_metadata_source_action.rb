@@ -1,31 +1,16 @@
 # frozen_string_literal: true
 
-require_relative '../../helper/metadata/po_file_generator'
-
 module Fastlane
   module Actions
     class AnUpdateMetadataSourceAction < Action
       def self.run(params)
-        UI.message "PO file path: #{params[:po_file_path]}"
-        UI.message "Release version: #{params[:release_version]}"
+        UI.deprecated('`an_update_metadata_source` is deprecated. Please use `gp_update_metadata_source` instead.')
 
-        validate_source_files(params[:source_files])
-
-        generator = Fastlane::Helper::PoFileGenerator.new(
-          release_version: params[:release_version],
+        other_action.gp_update_metadata_source(
+          po_file_path: params[:po_file_path],
           source_files: params[:source_files],
-          existing_po_path: params[:po_file_path]
+          release_version: params[:release_version]
         )
-
-        generator.write(params[:po_file_path])
-
-        UI.message "File #{params[:po_file_path]} updated!"
-      end
-
-      def self.validate_source_files(source_files)
-        source_files.each_value do |file_path|
-          UI.user_error!("Couldn't find file at path '#{file_path}'") unless File.exist?(file_path)
-        end
       end
 
       #####################################################
@@ -78,6 +63,10 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:android].include?(platform)
+      end
+
+      def self.deprecated?
+        true
       end
     end
   end

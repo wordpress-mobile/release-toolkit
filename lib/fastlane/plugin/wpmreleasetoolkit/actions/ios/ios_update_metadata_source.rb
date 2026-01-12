@@ -4,23 +4,14 @@ module Fastlane
   module Actions
     class IosUpdateMetadataSourceAction < Action
       def self.run(params)
-        # Check local repo status
-        other_action.ensure_git_status_clean
+        UI.deprecated('`ios_update_metadata_source` is deprecated. Please use `gp_update_metadata_source` with `commit_changes: true` instead.')
 
-        other_action.gp_update_metadata_source(po_file_path: params[:po_file_path],
-                                               source_files: params[:source_files],
-                                               release_version: params[:release_version])
-
-        Action.sh("git add #{params[:po_file_path]}")
-        params[:source_files].each_value do |file|
-          Action.sh("git add #{file}")
-        end
-
-        repo_status = Actions.sh('git status --porcelain')
-        repo_clean = repo_status.empty?
-        return if repo_clean
-
-        Action.sh('git commit -m "Update metadata strings"')
+        other_action.gp_update_metadata_source(
+          po_file_path: params[:po_file_path],
+          source_files: params[:source_files],
+          release_version: params[:release_version],
+          commit_changes: true
+        )
       end
 
       #####################################################
@@ -36,9 +27,6 @@ module Fastlane
       end
 
       def self.available_options
-        # Define all options your action supports.
-
-        # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :po_file_path,
                                        env_name: 'FL_IOS_UPDATE_METADATA_SOURCE_PO_FILE_PATH',
@@ -76,6 +64,10 @@ module Fastlane
 
       def self.is_supported?(platform)
         %i[ios mac].include?(platform)
+      end
+
+      def self.deprecated?
+        true
       end
     end
   end
