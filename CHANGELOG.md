@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Add `commit_changes` option to `gp_update_metadata_source` to optionally commit changes after updating the PO file. [#684]
 
 ### Bug Fixes
 
@@ -18,7 +18,13 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Consolidate PO file update logic on `gp_update_metadata_source` action. [#684]
+- Remove legacy `MetadataBlock` classes replaced by the new `PoFileGenerator`. [#684]
+
+### Deprecated
+
+- `an_update_metadata_source` action is deprecated; use `gp_update_metadata_source` instead. [#684]
+- `ios_update_metadata_source` action is deprecated; use `gp_update_metadata_source` with `commit_changes: true` instead. [#684]
 
 ## 13.8.1
 
