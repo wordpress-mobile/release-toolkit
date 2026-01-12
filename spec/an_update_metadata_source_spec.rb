@@ -33,16 +33,17 @@ describe Fastlane::Actions::AnUpdateMetadataSourceAction do
         }
       )
 
+      # Entries are sorted alphabetically by msgctxt
       expected = <<~'PO'
+        msgctxt "release_note_0122"
+        msgid "previous version notes required to have current one added"
+        msgstr ""
+
         msgctxt "release_note_0123"
         msgid ""
         "1.23:\n"
         "- release notes\n"
         "- more release notes\n"
-        msgstr ""
-
-        msgctxt "release_note_0122"
-        msgid "previous version notes required to have current one added"
         msgstr ""
 
       PO
