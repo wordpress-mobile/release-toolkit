@@ -4,7 +4,7 @@ require 'spec_helper'
 require 'shared_examples_for_update_metadata_source_action'
 
 describe Fastlane::Actions::AnUpdateMetadataSourceAction do
-  include_examples 'update_metadata_source_action', whats_new_fails: true
+  include_examples 'update_metadata_source_action'
 
   it 'combines the given `release_version` and `release_notes` in a new block, keeps the n-1 ones, and deletes the others' do
     in_tmp_dir do |dir|
@@ -44,6 +44,7 @@ describe Fastlane::Actions::AnUpdateMetadataSourceAction do
         msgctxt "release_note_0122"
         msgid "previous version notes required to have current one added"
         msgstr ""
+
       PO
       expect(File.read(output_path).inspect).to eq(expected.inspect)
     end

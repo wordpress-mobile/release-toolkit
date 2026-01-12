@@ -16,5 +16,5 @@ describe Fastlane::Actions::IosUpdateMetadataSourceAction do
     allow(Fastlane::Actions::EnsureGitStatusCleanAction).to receive(:run)
   end
 
-  include_examples 'update_metadata_source_action', whats_new_fails: false
+  include_examples 'update_metadata_source_action'
 end
