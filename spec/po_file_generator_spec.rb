@@ -355,6 +355,69 @@ describe Fastlane::Helper::PoFileGenerator do
       end
     end
 
+    context 'with entry ordering' do
+      it 'sorts entries alphabetically by msgctxt' do
+        in_tmp_dir do |dir|
+          # Create source files in non-alphabetical order
+          zebra_path = File.join(dir, 'zebra.txt')
+          File.write(zebra_path, 'Zebra content')
+
+          apple_path = File.join(dir, 'apple.txt')
+          File.write(apple_path, 'Apple content')
+
+          mango_path = File.join(dir, 'mango.txt')
+          File.write(mango_path, 'Mango content')
+
+          generator = described_class.new(
+            release_version: '1.0',
+            source_files: {
+              zebra: zebra_path,
+              apple: apple_path,
+              mango: mango_path
+            }
+          )
+
+          result = generator.generate
+          msgctxts = result.scan(/msgctxt "([^"]+)"/).flatten
+
+          expect(msgctxts).to eq(%w[apple mango zebra])
+        end
+      end
+
+      it 'sorts release_note entries with other entries' do
+        in_tmp_dir do |dir|
+          existing_po_path = File.join(dir, 'existing.po')
+          existing_content = <<~PO
+            msgctxt "release_note_0122"
+            msgid "Previous notes"
+            msgstr ""
+          PO
+          File.write(existing_po_path, existing_content)
+
+          release_path = File.join(dir, 'release.txt')
+          File.write(release_path, 'New notes')
+
+          zebra_path = File.join(dir, 'zebra.txt')
+          File.write(zebra_path, 'Zebra content')
+
+          generator = described_class.new(
+            release_version: '1.23',
+            source_files: {
+              zebra: zebra_path,
+              release_note: release_path
+            },
+            existing_po_path: existing_po_path
+          )
+
+          result = generator.generate
+          msgctxts = result.scan(/msgctxt "([^"]+)"/).flatten
+
+          # release_note entries should be sorted with other entries
+          expect(msgctxts).to eq(%w[release_note_0122 release_note_0123 zebra])
+        end
+      end
+    end
+
     context 'with generated output' do
       it 'ends with a trailing newline' do
         in_tmp_dir do |dir|
