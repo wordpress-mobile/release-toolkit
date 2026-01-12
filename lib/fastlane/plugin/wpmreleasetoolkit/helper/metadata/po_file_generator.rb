@@ -42,45 +42,45 @@ module Fastlane
 
       private
 
-      def add_entries_for_key(po, key, content)
+      def add_entries_for_key(po_data, key, content)
         case key
         when :whats_new
-          add_whats_new_entry(po, content)
+          add_whats_new_entry(po_data, content)
         when :release_note
-          add_release_note_entries(po, content)
+          add_release_note_entries(po_data, content)
         when :release_note_short
-          add_release_note_short_entries(po, content)
+          add_release_note_short_entries(po_data, content)
         else
-          add_standard_entry(po, key.to_s, content)
+          add_standard_entry(po_data, key.to_s, content)
         end
       end
 
-      def add_standard_entry(po, msgctxt, content)
+      def add_standard_entry(po_data, msgctxt, content)
         entry = create_entry(msgctxt, content.rstrip)
-        po[entry.msgctxt, entry.msgid] = entry
+        po_data[entry.msgctxt, entry.msgid] = entry
       end
 
-      def add_whats_new_entry(po, content)
+      def add_whats_new_entry(po_data, content)
         msgctxt = "v#{@release_version}-whats-new"
         # Ensure content ends with newline for multiline formatting
         msgid = content.end_with?("\n") ? content : "#{content}\n"
         entry = create_entry(msgctxt, msgid)
-        po[entry.msgctxt, entry.msgid] = entry
+        po_data[entry.msgctxt, entry.msgid] = entry
       end
 
-      def add_release_note_entries(po, content)
+      def add_release_note_entries(po_data, content)
         # Generate new entry for current version
         new_key = release_note_key_for_version(@release_version)
         msgid = "#{@release_version}:\n#{content}"
         msgid = "#{msgid}\n" unless msgid.end_with?("\n")
         entry = create_entry(new_key, msgid)
-        po[entry.msgctxt, entry.msgid] = entry
+        po_data[entry.msgctxt, entry.msgid] = entry
 
         # Preserve the n-1 entry from existing file if available
-        preserve_previous_release_note(po, :release_note)
+        preserve_previous_release_note(po_data, :release_note)
       end
 
-      def add_release_note_short_entries(po, content)
+      def add_release_note_short_entries(po_data, content)
         return if content.strip.empty?
 
         # Generate new entry for current version
@@ -88,13 +88,13 @@ module Fastlane
         msgid = "#{@release_version}:\n#{content}"
         msgid = "#{msgid}\n" unless msgid.end_with?("\n")
         entry = create_entry(new_key, msgid)
-        po[entry.msgctxt, entry.msgid] = entry
+        po_data[entry.msgctxt, entry.msgid] = entry
 
         # Preserve the n-1 entry from existing file if available
-        preserve_previous_release_note(po, :release_note_short)
+        preserve_previous_release_note(po_data, :release_note_short)
       end
 
-      def preserve_previous_release_note(po, type)
+      def preserve_previous_release_note(po_data, type)
         return unless @existing_po_path && File.exist?(@existing_po_path)
 
         keep_key = case type
@@ -107,7 +107,7 @@ module Fastlane
         existing_entry = find_entry_in_existing_po(keep_key)
         return unless existing_entry
 
-        po[existing_entry.msgctxt, existing_entry.msgid] = existing_entry
+        po_data[existing_entry.msgctxt, existing_entry.msgid] = existing_entry
       end
 
       def find_entry_in_existing_po(target_msgctxt)

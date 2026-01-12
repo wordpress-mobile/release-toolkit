@@ -240,7 +240,7 @@ describe Fastlane::Helper::PoFileGenerator do
       end
     end
 
-    context 'output format' do
+    context 'with generated output' do
       it 'ends with a trailing newline' do
         in_tmp_dir do |dir|
           source_path = File.join(dir, 'name.txt')
