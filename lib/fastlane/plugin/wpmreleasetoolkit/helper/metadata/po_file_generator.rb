@@ -45,6 +45,8 @@ module Fastlane
       # @return [String] The generated PO file content
       def generate
         po = GetText::PO.new
+        # Disable GetText's internal sorting so we control entry order via our own sort_by(:msgctxt)
+        po.order = :none
 
         # Preserve header from existing PO file if available
         add_header(po)
