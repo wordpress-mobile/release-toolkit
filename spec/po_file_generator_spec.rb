@@ -240,6 +240,121 @@ describe Fastlane::Helper::PoFileGenerator do
       end
     end
 
+    context 'with header preservation' do
+      it 'preserves header from existing PO file' do
+        in_tmp_dir do |dir|
+          existing_po_path = File.join(dir, 'existing.po')
+          existing_content = <<~PO
+            # Test comment line 1
+            # Test comment line 2
+            msgid ""
+            msgstr ""
+            "PO-Revision-Date: 2019-01-03 17:30-0000\\n"
+            "MIME-Version: 1.0\\n"
+            "Content-Type: text/plain; charset=UTF-8\\n"
+            "Project-Id-Version: Test Project\\n"
+
+            msgctxt "old_entry"
+            msgid "Old content"
+            msgstr ""
+          PO
+          File.write(existing_po_path, existing_content)
+
+          source_path = File.join(dir, 'name.txt')
+          File.write(source_path, 'Test App')
+
+          generator = described_class.new(
+            release_version: '1.0',
+            source_files: { name: source_path },
+            existing_po_path: existing_po_path
+          )
+
+          result = generator.generate
+
+          expect(result).to include('# Test comment line 1')
+          expect(result).to include('# Test comment line 2')
+          expect(result).to include('Project-Id-Version: Test Project')
+          expect(result).to include('MIME-Version: 1.0')
+        end
+      end
+
+      it 'updates PO-Revision-Date to current time' do
+        in_tmp_dir do |dir|
+          existing_po_path = File.join(dir, 'existing.po')
+          existing_content = <<~PO
+            msgid ""
+            msgstr ""
+            "PO-Revision-Date: 2019-01-03 17:30-0000\\n"
+            "MIME-Version: 1.0\\n"
+          PO
+          File.write(existing_po_path, existing_content)
+
+          source_path = File.join(dir, 'name.txt')
+          File.write(source_path, 'Test App')
+
+          generator = described_class.new(
+            release_version: '1.0',
+            source_files: { name: source_path },
+            existing_po_path: existing_po_path
+          )
+
+          result = generator.generate
+
+          # Should not contain the old date
+          expect(result).not_to include('2019-01-03')
+          # Should contain a recent date (current year)
+          expect(result).to match(/PO-Revision-Date: \d{4}-\d{2}-\d{2}/)
+        end
+      end
+
+      it 'generates output without header when no existing file provided' do
+        in_tmp_dir do |dir|
+          source_path = File.join(dir, 'name.txt')
+          File.write(source_path, 'Test App')
+
+          generator = described_class.new(
+            release_version: '1.0',
+            source_files: { name: source_path }
+          )
+
+          result = generator.generate
+
+          # Should not have a header entry
+          expect(result).not_to include('PO-Revision-Date')
+          # But should have the content entry
+          expect(result).to include('msgctxt "name"')
+        end
+      end
+
+      it 'generates output without header when existing file has no header' do
+        in_tmp_dir do |dir|
+          existing_po_path = File.join(dir, 'existing.po')
+          existing_content = <<~PO
+            msgctxt "old_entry"
+            msgid "Old content"
+            msgstr ""
+          PO
+          File.write(existing_po_path, existing_content)
+
+          source_path = File.join(dir, 'name.txt')
+          File.write(source_path, 'Test App')
+
+          generator = described_class.new(
+            release_version: '1.0',
+            source_files: { name: source_path },
+            existing_po_path: existing_po_path
+          )
+
+          result = generator.generate
+
+          # Should not have a header entry
+          expect(result).not_to include('PO-Revision-Date')
+          # But should have the content entry
+          expect(result).to include('msgctxt "name"')
+        end
+      end
+    end
+
     context 'with generated output' do
       it 'ends with a trailing newline' do
         in_tmp_dir do |dir|

@@ -25,6 +25,9 @@ module Fastlane
       def generate
         po = GetText::PO.new
 
+        # Preserve header from existing PO file if available
+        add_header(po)
+
         @source_files.each do |key, file_path|
           content = File.read(file_path)
           add_entries_for_key(po, key.to_sym, content)
@@ -41,6 +44,39 @@ module Fastlane
       end
 
       private
+
+      def add_header(po_data)
+        return unless @existing_po_path && File.exist?(@existing_po_path)
+
+        existing_po = GetText::PO.new
+        parser = GetText::POParser.new
+        parser.parse_file(@existing_po_path, existing_po)
+
+        # Get the header entry (empty msgid)
+        header = existing_po['']
+        return unless header
+
+        # Update PO-Revision-Date to current time
+        updated_msgstr = update_revision_date(header.msgstr)
+
+        # Create new header entry preserving comments
+        new_header = GetText::POEntry.new(:normal)
+        new_header.msgid = ''
+        new_header.msgstr = updated_msgstr
+        new_header.translator_comment = header.translator_comment if header.translator_comment
+
+        po_data[new_header.msgctxt, new_header.msgid] = new_header
+      rescue StandardError
+        # If header parsing fails, continue without header
+        nil
+      end
+
+      def update_revision_date(msgstr)
+        return msgstr unless msgstr
+
+        current_time = Time.now.strftime('%Y-%m-%d %H:%M%z')
+        msgstr.gsub(/PO-Revision-Date:.*\n/, "PO-Revision-Date: #{current_time}\n")
+      end
 
       def add_entries_for_key(po_data, key, content)
         case key
