@@ -64,7 +64,7 @@ module Fastlane
           po[entry.msgctxt, entry.msgid] = entry
         end
 
-        # GetText::PO#to_s doesn't add a trailing newline, but our tests expect one
+        # GetText::PO#to_s doesn't add a trailing newline
         "#{po}\n"
       end
 

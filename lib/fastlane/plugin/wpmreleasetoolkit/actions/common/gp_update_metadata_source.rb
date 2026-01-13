@@ -35,17 +35,18 @@ module Fastlane
       end
 
       def self.commit_changes(params)
-        Action.sh("git add #{params[:po_file_path]}")
+        files_to_add = [params[:po_file_path]]
         params[:source_files].each_value do |value|
           file_path = value.is_a?(Hash) ? value[:path] : value
-          Action.sh("git add #{file_path}")
+          files_to_add << file_path
         end
 
-        repo_status = Actions.sh('git status --porcelain')
-        repo_clean = repo_status.empty?
-        return if repo_clean
-
-        Action.sh('git commit -m "Update metadata strings"')
+        other_action.git_add(path: files_to_add)
+        other_action.git_commit(
+          path: files_to_add,
+          message: 'Update metadata strings',
+          allow_nothing_to_commit: true
+        )
       end
 
       #####################################################
