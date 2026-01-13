@@ -78,7 +78,7 @@ module Fastlane
         revision_date = Time.now.strftime('%Y-%m-%d %H:%M%z')
         generator = "fastlane-plugin-wpmreleasetoolkit #{Fastlane::Wpmreleasetoolkit::VERSION}"
 
-        header_content = <<~HEADER.chomp
+        header_content = <<~HEADER
           PO-Revision-Date: #{revision_date}
           MIME-Version: 1.0
           Content-Type: text/plain; charset=UTF-8
