@@ -16,8 +16,7 @@ module Fastlane
 
         generator = Fastlane::Helper::PoFileGenerator.new(
           release_version: params[:release_version],
-          source_files: params[:source_files],
-          existing_po_path: params[:po_file_path]
+          source_files: params[:source_files]
         )
 
         generator.write(params[:po_file_path])

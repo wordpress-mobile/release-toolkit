@@ -2,7 +2,7 @@
 
 require 'gettext/po'
 require 'gettext/po_entry'
-require 'gettext/po_parser'
+require_relative '../../version'
 
 module Fastlane
   module Helper
@@ -34,11 +34,9 @@ module Fastlane
     class PoFileGenerator
       # @param release_version [String] The release version (e.g., "1.23")
       # @param source_files [Hash] A hash mapping keys to file paths (String) or hashes with :path and :comment keys
-      # @param existing_po_path [String, nil] Optional path to existing PO file (needed for release_note to preserve n-1)
-      def initialize(release_version:, source_files:, existing_po_path: nil)
+      def initialize(release_version:, source_files:)
         @release_version = release_version
         @source_files = source_files
-        @existing_po_path = existing_po_path
       end
 
       # Generates the PO file content as a string
@@ -48,7 +46,7 @@ module Fastlane
         # Disable GetText's internal sorting so we control entry order via our own sort_by(:msgctxt)
         po.order = :none
 
-        # Preserve header from existing PO file if available
+        # Add standard PO header
         add_header(po)
 
         # Collect all entries first, then sort by msgctxt for deterministic output
@@ -77,36 +75,22 @@ module Fastlane
       private
 
       def add_header(po_data)
-        return unless @existing_po_path && File.exist?(@existing_po_path)
+        revision_date = Time.now.strftime('%Y-%m-%d %H:%M%z')
+        generator = "fastlane-plugin-wpmreleasetoolkit #{Fastlane::Wpmreleasetoolkit::VERSION}"
 
-        existing_po = GetText::PO.new
-        parser = GetText::POParser.new
-        parser.parse_file(@existing_po_path, existing_po)
+        header_content = <<~HEADER.chomp
+          PO-Revision-Date: #{revision_date}
+          MIME-Version: 1.0
+          Content-Type: text/plain; charset=UTF-8
+          Content-Transfer-Encoding: 8bit
+          Plural-Forms: nplurals=2; plural=n != 1;
+          X-Generator: #{generator}
+        HEADER
 
-        # Get the header entry (empty msgid)
-        header = existing_po['']
-        return unless header
-
-        # Update PO-Revision-Date to current time
-        updated_msgstr = update_revision_date(header.msgstr)
-
-        # Create new header entry preserving comments
-        new_header = GetText::POEntry.new(:normal)
-        new_header.msgid = ''
-        new_header.msgstr = updated_msgstr
-        new_header.translator_comment = header.translator_comment if header.translator_comment
-
-        po_data[new_header.msgctxt, new_header.msgid] = new_header
-      rescue StandardError
-        # If header parsing fails, continue without header
-        nil
-      end
-
-      def update_revision_date(msgstr)
-        return msgstr unless msgstr
-
-        current_time = Time.now.strftime('%Y-%m-%d %H:%M%z')
-        msgstr.gsub(/PO-Revision-Date:.*\n/, "PO-Revision-Date: #{current_time}\n")
+        header = GetText::POEntry.new(:normal)
+        header.msgid = ''
+        header.msgstr = header_content
+        po_data[header.msgctxt, header.msgid] = header
       end
 
       # Extracts path and comment from a source_files value
@@ -148,60 +132,19 @@ module Fastlane
       end
 
       def create_release_note_entries(content, comment = nil)
-        entries = []
-
-        # Generate new entry for current version
-        new_key = release_note_key_for_version(@release_version)
+        key = release_note_key_for_version(@release_version)
         msgid = "#{@release_version}:\n#{content}"
         msgid = "#{msgid}\n" unless msgid.end_with?("\n")
-        entries << create_entry(new_key, msgid, comment)
-
-        # Preserve the n-1 entry from existing file if available
-        previous_entry = find_previous_release_note(:release_note)
-        entries << previous_entry if previous_entry
-
-        entries
+        [create_entry(key, msgid, comment)]
       end
 
       def create_release_note_short_entries(content, comment = nil)
         return [] if content.strip.empty?
 
-        entries = []
-
-        # Generate new entry for current version
-        new_key = release_note_short_key_for_version(@release_version)
+        key = release_note_short_key_for_version(@release_version)
         msgid = "#{@release_version}:\n#{content}"
         msgid = "#{msgid}\n" unless msgid.end_with?("\n")
-        entries << create_entry(new_key, msgid, comment)
-
-        # Preserve the n-1 entry from existing file if available
-        previous_entry = find_previous_release_note(:release_note_short)
-        entries << previous_entry if previous_entry
-
-        entries
-      end
-
-      def find_previous_release_note(type)
-        return nil unless @existing_po_path && File.exist?(@existing_po_path)
-
-        keep_key = case type
-                   when :release_note
-                     release_note_key_for_previous_version(@release_version)
-                   when :release_note_short
-                     release_note_short_key_for_previous_version(@release_version)
-                   end
-
-        find_entry_in_existing_po(keep_key)
-      end
-
-      def find_entry_in_existing_po(target_msgctxt)
-        existing_po = GetText::PO.new
-        parser = GetText::POParser.new
-        parser.parse_file(@existing_po_path, existing_po)
-
-        existing_po.find { |entry| entry.msgctxt == target_msgctxt }
-      rescue StandardError
-        nil
+        [create_entry(key, msgid, comment)]
       end
 
       def create_entry(msgctxt, msgid, comment = nil)
@@ -218,35 +161,14 @@ module Fastlane
         "release_note_#{major.to_s.rjust(2, '0')}#{minor}"
       end
 
-      def release_note_key_for_previous_version(version)
-        major, minor = previous_version(version)
-        "release_note_#{major.to_s.rjust(2, '0')}#{minor}"
-      end
-
       def release_note_short_key_for_version(version)
         major, minor = parse_version(version)
-        "release_note_short_#{major.to_s.rjust(2, '0')}#{minor}"
-      end
-
-      def release_note_short_key_for_previous_version(version)
-        major, minor = previous_version(version)
         "release_note_short_#{major.to_s.rjust(2, '0')}#{minor}"
       end
 
       def parse_version(version)
         parts = version.split('.')
         [Integer(parts[0]), Integer(parts[1])]
-      end
-
-      def previous_version(version)
-        major, minor = parse_version(version)
-        if minor.zero?
-          major -= 1
-          minor = 9
-        else
-          minor -= 1
-        end
-        [major, minor]
       end
     end
   end

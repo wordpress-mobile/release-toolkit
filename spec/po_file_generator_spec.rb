@@ -139,70 +139,6 @@ describe Fastlane::Helper::PoFileGenerator do
           expect(result).to include('"- Feature 2\n"')
         end
       end
-
-      it 'preserves the n-1 release note from existing file' do
-        in_tmp_dir do |dir|
-          # Create existing PO file with previous release note
-          existing_po_path = File.join(dir, 'existing.po')
-          existing_content = <<~PO
-            msgctxt "release_note_0122"
-            msgid "Previous release notes"
-            msgstr ""
-
-            msgctxt "release_note_0121"
-            msgid "Older release notes"
-            msgstr ""
-          PO
-          File.write(existing_po_path, existing_content)
-
-          # Create new release notes
-          source_path = File.join(dir, 'release_notes.txt')
-          File.write(source_path, 'New release notes')
-
-          generator = described_class.new(
-            release_version: '1.23',
-            source_files: { release_note: source_path },
-            existing_po_path: existing_po_path
-          )
-
-          result = generator.generate
-
-          # Should have new entry
-          expect(result).to include('msgctxt "release_note_0123"')
-          # Should preserve n-1 entry
-          expect(result).to include('msgctxt "release_note_0122"')
-          expect(result).to include('msgid "Previous release notes"')
-          # Should NOT include older entries
-          expect(result).not_to include('release_note_0121')
-        end
-      end
-
-      it 'handles version 1.0 (wraps to previous major version)' do
-        in_tmp_dir do |dir|
-          # For version 1.0, the n-1 version is 0.9, so the key is release_note_009
-          existing_po_path = File.join(dir, 'existing.po')
-          existing_content = <<~PO
-            msgctxt "release_note_009"
-            msgid "Previous major version notes"
-            msgstr ""
-          PO
-          File.write(existing_po_path, existing_content)
-
-          source_path = File.join(dir, 'release_notes.txt')
-          File.write(source_path, 'First release of v1')
-
-          generator = described_class.new(
-            release_version: '1.0',
-            source_files: { release_note: source_path },
-            existing_po_path: existing_po_path
-          )
-
-          result = generator.generate
-
-          expect(result).to include('msgctxt "release_note_010"')
-          expect(result).to include('msgctxt "release_note_009"')
-        end
-      end
     end
 
     context 'with release_note_short entries' do
@@ -240,74 +176,8 @@ describe Fastlane::Helper::PoFileGenerator do
       end
     end
 
-    context 'with header preservation' do
-      it 'preserves header from existing PO file' do
-        in_tmp_dir do |dir|
-          existing_po_path = File.join(dir, 'existing.po')
-          existing_content = <<~PO
-            # Test comment line 1
-            # Test comment line 2
-            msgid ""
-            msgstr ""
-            "PO-Revision-Date: 2019-01-03 17:30-0000\\n"
-            "MIME-Version: 1.0\\n"
-            "Content-Type: text/plain; charset=UTF-8\\n"
-            "Project-Id-Version: Test Project\\n"
-
-            msgctxt "old_entry"
-            msgid "Old content"
-            msgstr ""
-          PO
-          File.write(existing_po_path, existing_content)
-
-          source_path = File.join(dir, 'name.txt')
-          File.write(source_path, 'Test App')
-
-          generator = described_class.new(
-            release_version: '1.0',
-            source_files: { name: source_path },
-            existing_po_path: existing_po_path
-          )
-
-          result = generator.generate
-
-          expect(result).to include('# Test comment line 1')
-          expect(result).to include('# Test comment line 2')
-          expect(result).to include('Project-Id-Version: Test Project')
-          expect(result).to include('MIME-Version: 1.0')
-        end
-      end
-
-      it 'updates PO-Revision-Date to current time' do
-        in_tmp_dir do |dir|
-          existing_po_path = File.join(dir, 'existing.po')
-          existing_content = <<~PO
-            msgid ""
-            msgstr ""
-            "PO-Revision-Date: 2019-01-03 17:30-0000\\n"
-            "MIME-Version: 1.0\\n"
-          PO
-          File.write(existing_po_path, existing_content)
-
-          source_path = File.join(dir, 'name.txt')
-          File.write(source_path, 'Test App')
-
-          generator = described_class.new(
-            release_version: '1.0',
-            source_files: { name: source_path },
-            existing_po_path: existing_po_path
-          )
-
-          result = generator.generate
-
-          # Should not contain the old date
-          expect(result).not_to include('2019-01-03')
-          # Should contain a recent date (current year)
-          expect(result).to match(/PO-Revision-Date: \d{4}-\d{2}-\d{2}/)
-        end
-      end
-
-      it 'generates output without header when no existing file provided' do
+    context 'with header generation' do
+      it 'generates a header with standard PO fields' do
         in_tmp_dir do |dir|
           source_path = File.join(dir, 'name.txt')
           File.write(source_path, 'Test App')
@@ -319,38 +189,44 @@ describe Fastlane::Helper::PoFileGenerator do
 
           result = generator.generate
 
-          # Should not have a header entry
-          expect(result).not_to include('PO-Revision-Date')
-          # But should have the content entry
-          expect(result).to include('msgctxt "name"')
+          expect(result).to include('MIME-Version: 1.0')
+          expect(result).to include('Content-Type: text/plain; charset=UTF-8')
+          expect(result).to include('Content-Transfer-Encoding: 8bit')
+          expect(result).to include('Plural-Forms: nplurals=2; plural=n != 1;')
+          expect(result).to include('X-Generator: fastlane-plugin-wpmreleasetoolkit')
         end
       end
 
-      it 'generates output without header when existing file has no header' do
+      it 'includes PO-Revision-Date with current timestamp' do
         in_tmp_dir do |dir|
-          existing_po_path = File.join(dir, 'existing.po')
-          existing_content = <<~PO
-            msgctxt "old_entry"
-            msgid "Old content"
-            msgstr ""
-          PO
-          File.write(existing_po_path, existing_content)
-
           source_path = File.join(dir, 'name.txt')
           File.write(source_path, 'Test App')
 
           generator = described_class.new(
             release_version: '1.0',
-            source_files: { name: source_path },
-            existing_po_path: existing_po_path
+            source_files: { name: source_path }
           )
 
           result = generator.generate
 
-          # Should not have a header entry
-          expect(result).not_to include('PO-Revision-Date')
-          # But should have the content entry
-          expect(result).to include('msgctxt "name"')
+          # Should contain a date in YYYY-MM-DD format
+          expect(result).to match(/PO-Revision-Date: \d{4}-\d{2}-\d{2} \d{2}:\d{2}[+-]\d{4}/)
+        end
+      end
+
+      it 'includes gem version in X-Generator field' do
+        in_tmp_dir do |dir|
+          source_path = File.join(dir, 'name.txt')
+          File.write(source_path, 'Test App')
+
+          generator = described_class.new(
+            release_version: '1.0',
+            source_files: { name: source_path }
+          )
+
+          result = generator.generate
+
+          expect(result).to include("X-Generator: fastlane-plugin-wpmreleasetoolkit #{Fastlane::Wpmreleasetoolkit::VERSION}")
         end
       end
     end
@@ -495,14 +371,6 @@ describe Fastlane::Helper::PoFileGenerator do
 
       it 'sorts release_note entries with other entries' do
         in_tmp_dir do |dir|
-          existing_po_path = File.join(dir, 'existing.po')
-          existing_content = <<~PO
-            msgctxt "release_note_0122"
-            msgid "Previous notes"
-            msgstr ""
-          PO
-          File.write(existing_po_path, existing_content)
-
           release_path = File.join(dir, 'release.txt')
           File.write(release_path, 'New notes')
 
@@ -514,15 +382,14 @@ describe Fastlane::Helper::PoFileGenerator do
             source_files: {
               zebra: zebra_path,
               release_note: release_path
-            },
-            existing_po_path: existing_po_path
+            }
           )
 
           result = generator.generate
           msgctxts = result.scan(/msgctxt "([^"]+)"/).flatten
 
           # release_note entries should be sorted with other entries
-          expect(msgctxts).to eq(%w[release_note_0122 release_note_0123 zebra])
+          expect(msgctxts).to eq(%w[release_note_0123 zebra])
         end
       end
     end

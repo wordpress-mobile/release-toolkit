@@ -33,7 +33,6 @@ module Fastlane
                                        type: String,
                                        verify_block: proc do |value|
                                          UI.user_error!("No .po file path given, pass using `po_file_path: 'file path'`") unless value && !value.empty?
-                                         UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :release_version,
                                        env_name: 'FL_UPDATE_METADATA_SOURCE_RELEASE_VERSION',
