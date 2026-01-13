@@ -76,7 +76,7 @@ module Fastlane
 
       def add_header(po_data)
         revision_date = Time.now.strftime('%Y-%m-%d %H:%M%z')
-        generator = "fastlane-plugin-wpmreleasetoolkit #{Fastlane::Wpmreleasetoolkit::VERSION}"
+        generator = "#{Fastlane::Wpmreleasetoolkit::NAME} #{Fastlane::Wpmreleasetoolkit::VERSION}"
 
         header_content = <<~HEADER
           PO-Revision-Date: #{revision_date}

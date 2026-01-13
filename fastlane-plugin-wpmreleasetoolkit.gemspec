@@ -5,12 +5,12 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'fastlane/plugin/wpmreleasetoolkit/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'fastlane-plugin-wpmreleasetoolkit'
+  spec.name          = Fastlane::Wpmreleasetoolkit::NAME
   spec.version       = Fastlane::Wpmreleasetoolkit::VERSION
   spec.author        = 'Automattic'
   spec.email         = 'mobile@automattic.com'
 
-  spec.summary       = 'GitHub helper functions'
+  spec.summary       = 'Fastlane plugin for release automation'
   spec.homepage      = 'https://github.com/wordpress-mobile/release-toolkit'
   spec.license       = 'MIT'
 
