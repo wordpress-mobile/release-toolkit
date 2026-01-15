@@ -432,8 +432,12 @@ module Fastlane
           return resolved_path if !resolved_path.nil? && resolved_path.exist?
         end
 
-        message = "Unable to locate #{path}"
-        UI.crash!(message)
+        message = <<~MESSAGE
+          Unable to locate #{path}.
+
+          Did you run the automation to generate the screenshots?
+        MESSAGE
+        UI.user_error!(message)
       end
 
       def resolve_text_into_path(text, locale)
