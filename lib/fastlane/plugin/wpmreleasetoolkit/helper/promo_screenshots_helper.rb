@@ -407,8 +407,8 @@ module Fastlane
         working_background = background.frozen? ? background.dup : background
         working_background.paint.to_hex
 
-        Image.new(width, height) do
-          self.background_color = working_background
+        Image.new(width, height) do |info|
+          info.background_color = working_background
         end
       end
 
