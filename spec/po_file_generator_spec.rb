@@ -118,6 +118,22 @@ describe Fastlane::Helper::PoFileGenerator do
           expect(result).to include('"- Bug fix\n"')
         end
       end
+
+      it 'skips empty whats_new content' do
+        in_tmp_dir do |dir|
+          source_path = File.join(dir, 'whats_new.txt')
+          File.write(source_path, '   ')
+
+          generator = described_class.new(
+            release_version: '1.23',
+            source_files: { whats_new: source_path }
+          )
+
+          result = generator.generate
+
+          expect(result).not_to include('whats-new')
+        end
+      end
     end
 
     context 'with release_note entries' do
@@ -460,6 +476,51 @@ describe Fastlane::Helper::PoFileGenerator do
 
         expect(File.exist?(output_path)).to be true
         expect(File.read(output_path)).to include('msgctxt "name"')
+      end
+    end
+  end
+
+  describe 'error handling' do
+    context 'with invalid version format' do
+      it 'raises user error for version without minor component' do
+        in_tmp_dir do |dir|
+          source_path = File.join(dir, 'release.txt')
+          File.write(source_path, 'Notes')
+
+          generator = described_class.new(
+            release_version: '1',
+            source_files: { release_note: source_path }
+          )
+
+          expect { generator.generate }.to raise_error(FastlaneCore::Interface::FastlaneError, /Invalid version format '1'/)
+        end
+      end
+
+      it 'raises user error for version with non-integer components' do
+        in_tmp_dir do |dir|
+          source_path = File.join(dir, 'release.txt')
+          File.write(source_path, 'Notes')
+
+          generator = described_class.new(
+            release_version: 'foo.bar',
+            source_files: { release_note: source_path }
+          )
+
+          expect { generator.generate }.to raise_error(FastlaneCore::Interface::FastlaneError, /major and minor must be integers/)
+        end
+      end
+    end
+
+    context 'with invalid source_files hash' do
+      it 'raises user error when hash is missing :path key' do
+        generator = described_class.new(
+          release_version: '1.0',
+          source_files: {
+            app_name: { comment: 'A comment but no path' }
+          }
+        )
+
+        expect { generator.generate }.to raise_error(FastlaneCore::Interface::FastlaneError, /Hash must contain :path key/)
       end
     end
   end

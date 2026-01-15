@@ -9,9 +9,6 @@ module Fastlane
         UI.message "PO file path: #{params[:po_file_path]}"
         UI.message "Release version: #{params[:release_version]}"
 
-        # Check local repo status if we're going to commit changes
-        other_action.ensure_git_status_clean if params[:commit_changes]
-
         validate_source_files(params[:source_files])
 
         generator = Fastlane::Helper::PoFileGenerator.new(
@@ -100,7 +97,7 @@ module Fastlane
                                          UI.user_error!("No source files given, pass using `source_files: { key: 'path' }`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :commit_changes,
-                                       description: 'If true, checks git status is clean, then adds and commits the changes',
+                                       description: 'If true, adds and commits the changes',
                                        type: Boolean,
                                        default_value: false),
         ]

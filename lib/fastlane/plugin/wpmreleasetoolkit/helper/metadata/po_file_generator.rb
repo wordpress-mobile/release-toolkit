@@ -101,6 +101,7 @@ module Fastlane
         when String
           [value, nil]
         when Hash
+          UI.user_error!("Hash must contain :path key, got: #{value.keys}") unless value.key?(:path)
           [value[:path], value[:comment]]
         else
           raise ArgumentError, "Invalid source_files value: expected String or Hash, got #{value.class}"
@@ -110,7 +111,7 @@ module Fastlane
       def create_entries_for_key(key, content, comment = nil)
         case key
         when :whats_new
-          [create_whats_new_entry(content, comment)]
+          create_whats_new_entries(content, comment)
         when :release_note
           create_release_note_entries(content, comment)
         when :release_note_short
@@ -124,11 +125,13 @@ module Fastlane
         create_entry(msgctxt, content.rstrip, comment)
       end
 
-      def create_whats_new_entry(content, comment = nil)
+      def create_whats_new_entries(content, comment = nil)
+        return [] if content.strip.empty?
+
         msgctxt = "v#{@release_version}-whats-new"
         # Ensure content ends with newline for multiline formatting
         msgid = content.end_with?("\n") ? content : "#{content}\n"
-        create_entry(msgctxt, msgid, comment)
+        [create_entry(msgctxt, msgid, comment)]
       end
 
       def create_release_note_entries(content, comment = nil)
@@ -157,18 +160,27 @@ module Fastlane
       end
 
       def release_note_key_for_version(version)
-        major, minor = parse_version(version)
-        "release_note_#{major.to_s.rjust(2, '0')}#{minor}"
+        versioned_key('release_note', version)
       end
 
       def release_note_short_key_for_version(version)
+        versioned_key('release_note_short', version)
+      end
+
+      def versioned_key(prefix, version)
         major, minor = parse_version(version)
-        "release_note_short_#{major.to_s.rjust(2, '0')}#{minor}"
+        "#{prefix}_#{major.to_s.rjust(2, '0')}#{minor}"
       end
 
       def parse_version(version)
         parts = version.split('.')
-        [Integer(parts[0]), Integer(parts[1])]
+        UI.user_error!("Invalid version format '#{version}': expected 'major.minor' (e.g., '1.2')") if parts.length < 2
+
+        begin
+          [Integer(parts[0]), Integer(parts[1])]
+        rescue ArgumentError
+          UI.user_error!("Invalid version format '#{version}': major and minor must be integers")
+        end
       end
     end
   end
