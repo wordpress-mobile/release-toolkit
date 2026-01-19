@@ -62,6 +62,8 @@ module Fastlane
 
           UI.message("Unable to find device #{entry['device']}.") if device.nil?
 
+          UI.verbose("Processing entry:\n#{JSON.pretty_generate(entry)}")
+
           width = device['canvas_size'][0]
           height = device['canvas_size'][1]
 
