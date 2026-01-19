@@ -18,7 +18,8 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Improved efficiency and refined the logs of the `promo_screenshots` action. [#685]
+- Updated minimum Fastlane requirement to 2.231.0. [#685]
 
 ## 13.8.1
 
