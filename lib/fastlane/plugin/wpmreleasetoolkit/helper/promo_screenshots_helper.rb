@@ -458,6 +458,7 @@ module Fastlane
         elsif can_resolve_path(localized_file)
           resolve_path(localized_file).realpath.to_s
         else
+          UI.important("Could not identify '#{localized_file}' as a file path or the file was not found. Will use its value as a raw string. This may result in undesired annotations.")
           format(text, 'source')
         end
       end
