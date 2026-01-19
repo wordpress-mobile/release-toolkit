@@ -287,7 +287,7 @@ module Fastlane
         begin
           temp_text_file = Tempfile.new
 
-          Action.sh(
+          Actions.sh(
             'drawText',
             "html=#{text}",
             "maxWidth=#{width}",
