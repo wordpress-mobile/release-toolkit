@@ -33,7 +33,13 @@ module Fastlane
           UI.user_error!(message)
         end
 
-        UI.user_error!('`drawText` not found – install it using `brew install automattic/build-tools/drawText`.') unless system('command -v drawText > /dev/null')
+        UI.user_error!('`drawText` not found – install it using `brew install automattic/build-tools/drawText`.') unless self.class.draw_text_available?
+      end
+
+      def self.draw_text_available?
+        return @draw_text_available if defined?(@draw_text_available)
+
+        @draw_text_available = system('command -v drawText', %i[out err] => File::NULL)
       end
 
       def read_config(config_file_path)
