@@ -287,7 +287,7 @@ module Fastlane
         begin
           temp_text_file = Tempfile.new
 
-          system(
+          Action.sh(
             'drawText',
             "html=#{text}",
             "maxWidth=#{width}",
@@ -295,7 +295,8 @@ module Fastlane
             "output=#{temp_text_file.path}",
             "fontSize=#{font_size}",
             "stylesheet=#{stylesheet_path}",
-            "alignment=#{position}"
+            "alignment=#{position}",
+            log: false
           )
 
           text_content = open_image(temp_text_file.path).trim
