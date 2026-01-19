@@ -93,7 +93,7 @@ module Fastlane
             FileUtils.rm_rf(path)
             Dir.mkdir(path)
           else
-            UI.user_error!("Exiting to avoid overwriting #{description}.")
+            UI.abort_with_message!("Exiting to avoid overwriting #{description}.")
           end
         else
           Dir.mkdir(path)
