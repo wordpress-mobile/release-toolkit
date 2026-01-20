@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'buildkit', '~> 1.5'
   spec.add_dependency 'chroma', '0.2.0'
   spec.add_dependency 'diffy', '~> 3.3'
-  spec.add_dependency 'fastlane', '~> 2.213'
+  spec.add_dependency 'fastlane', '~> 2.231'
   spec.add_dependency 'gettext', '~> 3.5'
   spec.add_dependency 'git', '~> 1.3'
   spec.add_dependency 'java-properties', '~> 0.3.0'

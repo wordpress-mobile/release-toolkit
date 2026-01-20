@@ -22,6 +22,8 @@ _None_
 
 - Consolidate PO file update logic on `gp_update_metadata_source` action. [#684]
 - Remove legacy `MetadataBlock` classes replaced by the new `PoFileGenerator`. [#684]
+- Improved efficiency and refined the logs of the `promo_screenshots` action. [#685]
+- Updated minimum Fastlane requirement to 2.231.0. [#685]
 
 ### Deprecated
 

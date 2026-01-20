@@ -33,7 +33,13 @@ module Fastlane
           UI.user_error!(message)
         end
 
-        UI.user_error!('`drawText` not found – install it using `brew install automattic/build-tools/drawText`.') unless system('command -v drawText')
+        UI.user_error!('`drawText` not found – install it using `brew install automattic/build-tools/drawText`.') unless self.class.draw_text_available?
+      end
+
+      def self.draw_text_available?
+        return @draw_text_available if defined?(@draw_text_available)
+
+        @draw_text_available = system('command -v drawText', %i[out err] => File::NULL)
       end
 
       def read_config(config_file_path)
@@ -287,7 +293,17 @@ module Fastlane
         begin
           temp_text_file = Tempfile.new
 
-          Action.sh('drawText', "html=#{text}", "maxWidth=#{width}", "maxHeight=#{height}", "output=#{temp_text_file.path}", "fontSize=#{font_size}", "stylesheet=#{stylesheet_path}", "alignment=#{position}")
+          Actions.sh(
+            'drawText',
+            "html=#{text}",
+            "maxWidth=#{width}",
+            "maxHeight=#{height}",
+            "output=#{temp_text_file.path}",
+            "fontSize=#{font_size}",
+            "stylesheet=#{stylesheet_path}",
+            "alignment=#{position}",
+            log: false
+          )
 
           text_content = open_image(temp_text_file.path).trim
           text_frame = create_image(width, height)
@@ -407,8 +423,8 @@ module Fastlane
         working_background = background.frozen? ? background.dup : background
         working_background.paint.to_hex
 
-        Image.new(width, height) do
-          self.background_color = working_background
+        Image.new(width, height) do |info|
+          info.background_color = working_background
         end
       end
 
@@ -432,8 +448,12 @@ module Fastlane
           return resolved_path if !resolved_path.nil? && resolved_path.exist?
         end
 
-        message = "Unable to locate #{path}"
-        UI.crash!(message)
+        message = <<~MESSAGE
+          Unable to locate #{path}.
+
+          Did you run the automation to generate the screenshots?
+        MESSAGE
+        UI.user_error!(message)
       end
 
       def resolve_text_into_path(text, locale)
@@ -444,6 +464,7 @@ module Fastlane
         elsif can_resolve_path(localized_file)
           resolve_path(localized_file).realpath.to_s
         else
+          UI.important("Could not identify '#{localized_file}' as a file path or the file was not found. Will use its value as a raw string. This may result in undesired annotations.")
           format(text, 'source')
         end
       end
