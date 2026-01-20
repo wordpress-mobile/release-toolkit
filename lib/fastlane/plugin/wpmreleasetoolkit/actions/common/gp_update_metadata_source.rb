@@ -18,7 +18,7 @@ module Fastlane
 
         generator.write(params[:po_file_path])
 
-        UI.message "File #{params[:po_file_path]} updated!"
+        UI.success "File #{params[:po_file_path]} updated!"
 
         commit_changes(params) if params[:commit_changes]
       end
