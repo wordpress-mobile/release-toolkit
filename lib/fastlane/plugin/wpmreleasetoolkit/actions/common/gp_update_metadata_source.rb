@@ -31,15 +31,9 @@ module Fastlane
       end
 
       def self.commit_changes(params)
-        files_to_add = [params[:po_file_path]]
-        params[:source_files].each_value do |value|
-          file_path = value.is_a?(Hash) ? value[:path] : value
-          files_to_add << file_path
-        end
-
-        other_action.git_add(path: files_to_add)
+        other_action.git_add(path: params[:po_file_path])
         other_action.git_commit(
-          path: files_to_add,
+          path: params[:po_file_path],
           message: 'Update metadata strings',
           allow_nothing_to_commit: true
         )
