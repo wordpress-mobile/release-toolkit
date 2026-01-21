@@ -6,6 +6,24 @@
 
 ### Breaking Changes
 
+_None_
+
+### New Features
+
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 14.0.0
+
+### Breaking Changes
+
 - Generated PO files now have entries sorted **alphabetically by `msgctxt`** for deterministic output. This may affect tests or tooling that depend on a specific entry order. [#684]
 - Existing translator comments (`#.` lines) in PO files will be **lost** when regenerating unless explicitly added to the `source_files` parameter. See `MIGRATION.md` for instructions on preserving comments. [#684]
 
@@ -13,10 +31,6 @@
 
 - Add `commit_changes` option to `gp_update_metadata_source` to optionally commit changes after updating the PO file. [#684]
 - Add support for translator comments in `gp_update_metadata_source` via a new hash format for `source_files` entries: `{ path: 'file.txt', comment: 'translators: ...' }`. Simple string paths are still supported for entries without comments. [#684]
-
-### Bug Fixes
-
-_None_
 
 ### Internal Changes
 
