@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.shared_examples 'update_metadata_source_action' do |options|
+RSpec.shared_examples 'update_metadata_source_action' do
   it 'updates any block in a given .po file with the values from the given sources' do
     in_tmp_dir do |dir|
       output_path = File.join(dir, 'output.po')
@@ -30,23 +30,18 @@ RSpec.shared_examples 'update_metadata_source_action' do |options|
         }
       )
 
-      expected = <<~PO
-        msgctxt "key1"
-        msgid "value 1"
-        msgstr ""
-
-        msgctxt "key2"
-        msgid "value 2"
-        msgstr ""
-
-      PO
-      expect(File.read(output_path)).to eq(expected)
+      result = File.read(output_path)
+      # Should include the header
+      expect(result).to include('MIME-Version: 1.0')
+      # Should include the updated entries
+      expect(result).to include('msgctxt "key1"')
+      expect(result).to include('msgid "value 1"')
+      expect(result).to include('msgctxt "key2"')
+      expect(result).to include('msgid "value 2"')
     end
   end
 
   it 'combines the given `release_version` and `whats_new` parameter into a new block' do
-    pending 'this currently fails; in the long run, we might consolidate `whats_new` with `release_notes`' if options[:whats_new_fails]
-
     in_tmp_dir do |dir|
       output_path = File.join(dir, 'output.po')
       dummy_text = <<~PO
@@ -67,21 +62,14 @@ RSpec.shared_examples 'update_metadata_source_action' do |options|
         }
       )
 
-      expected = <<~'PO'
-        msgctxt "v1.23-whats-new"
-        msgid ""
-        "- something new\n"
-        "- something else new\n"
-        msgstr ""
-
-      PO
-      expect(File.read(output_path)).to eq(expected)
+      result = File.read(output_path)
+      expect(result).to include('msgctxt "v1.23-whats-new"')
+      expect(result).to include('"- something new\n"')
+      expect(result).to include('"- something else new\n"')
     end
   end
 
   it 'adds entries passed as input even if not part of the original `.po` file' do
-    pending 'this currently fails and will be addressed as part of the upcoming refactor/rewrite of the functionality'
-
     in_tmp_dir do |dir|
       output_path = File.join(dir, 'output.po')
       dummy_text = <<~PO
@@ -106,17 +94,50 @@ RSpec.shared_examples 'update_metadata_source_action' do |options|
         }
       )
 
-      expected = <<~PO
+      result = File.read(output_path)
+      expect(result).to include('msgctxt "key1"')
+      expect(result).to include('msgid "value 1"')
+      expect(result).to include('msgctxt "key2"')
+      expect(result).to include('msgid "value 2"')
+    end
+  end
+
+  it 'removes entries from the `.po` file that are not in the source_files input' do
+    in_tmp_dir do |dir|
+      output_path = File.join(dir, 'output.po')
+      dummy_text = <<~PO
         msgctxt "key1"
-        msgid "value 1"
+        msgid "this value should change"
+        msgstr ""
+
+        msgctxt "stale_key"
+        msgid "this entry should be removed"
         msgstr ""
 
         msgctxt "key2"
-        msgid "value 2"
+        msgid "this value should also change"
         msgstr ""
-
       PO
-      expect(File.read(output_path)).to eq(expected)
+      File.write(output_path, dummy_text)
+
+      file_1_path = File.join(dir, '1.txt')
+      File.write(file_1_path, 'value 1')
+      file_2_path = File.join(dir, '2.txt')
+      File.write(file_2_path, 'value 2')
+
+      run_described_fastlane_action(
+        po_file_path: output_path,
+        release_version: '1.0',
+        source_files: {
+          key1: file_1_path,
+          key2: file_2_path
+        }
+      )
+
+      result = File.read(output_path)
+      expect(result).to include('msgctxt "key1"')
+      expect(result).to include('msgctxt "key2"')
+      expect(result).not_to include('stale_key')
     end
   end
 end

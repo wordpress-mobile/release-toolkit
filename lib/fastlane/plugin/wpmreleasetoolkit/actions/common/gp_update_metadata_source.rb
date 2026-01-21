@@ -1,117 +1,42 @@
 # frozen_string_literal: true
 
-require_relative '../../helper/metadata/release_note_metadata_block'
-require_relative '../../helper/metadata/release_note_short_metadata_block'
-require_relative '../../helper/metadata/whats_new_metadata_block'
+require_relative '../../helper/metadata/po_file_generator'
 
 module Fastlane
   module Actions
     class GpUpdateMetadataSourceAction < Action
       def self.run(params)
-        # fastlane will take care of reading in the parameter and fetching the environment variable:
-        UI.message "Parameter .po file path: #{params[:po_file_path]}"
+        UI.message "PO file path: #{params[:po_file_path]}"
         UI.message "Release version: #{params[:release_version]}"
 
-        # Init
-        create_block_parsers(params[:release_version], params[:source_files])
+        validate_source_files(params[:source_files])
 
-        # Do
-        check_source_files(params[:source_files])
-        temp_po_name = create_temp_po(params)
-        swap_po(params[:po_file_path], temp_po_name)
+        generator = Fastlane::Helper::PoFileGenerator.new(
+          release_version: params[:release_version],
+          source_files: params[:source_files]
+        )
 
-        UI.message "File #{params[:po_file_path]} updated!"
+        generator.write(params[:po_file_path])
+
+        UI.success "File #{params[:po_file_path]} updated!"
+
+        commit_changes(params) if params[:commit_changes]
       end
 
-      # Verifies that all the source files are available
-      # to this action
-      def self.check_source_files(source_files)
-        source_files.each_value do |file_path|
+      def self.validate_source_files(source_files)
+        source_files.each_value do |value|
+          file_path = value.is_a?(Hash) ? value[:path] : value
           UI.user_error!("Couldn't find file at path '#{file_path}'") unless File.exist?(file_path)
         end
       end
 
-      # Creates a temp po file merging
-      # new data for known tags
-      # and the data already in the original
-      # .po fo the others.
-      def self.create_temp_po(params)
-        orig = params[:po_file_path]
-        target = create_target_file_path(orig)
-
-        # Clear if older exists
-        FileUtils.rm_f(target)
-
-        # Create the new one
-        begin
-          File.open(target, 'a') do |fw|
-            File.open(orig, 'r').each do |fr|
-              write_target_block(fw, fr)
-            end
-          end
-        rescue StandardError
-          FileUtils.rm_f(target)
-          raise
-        end
-
-        target
-      end
-
-      # Deletes the old po and moves the temp one
-      # to the final location
-      def self.swap_po(orig_file_path, temp_file_path)
-        FileUtils.rm_f(orig_file_path)
-        File.rename(temp_file_path, orig_file_path)
-      end
-
-      # Generates the temp file path
-      def self.create_target_file_path(orig_file_path)
-        "#{File.dirname(orig_file_path)}/#{File.basename(orig_file_path, '.*')}.tmp"
-      end
-
-      # Creates the block instances
-      def self.create_block_parsers(release_version, block_files)
-        @blocks = []
-
-        # Inits default handler
-        @blocks.push Fastlane::Helper::UnknownMetadataBlock.new
-
-        # Init special handlers
-        block_files.each do |key, file_path|
-          case key
-          when :release_note
-            @blocks.push Fastlane::Helper::ReleaseNoteMetadataBlock.new(key, file_path, release_version)
-          when :whats_new
-            @blocks.push Fastlane::Helper::WhatsNewMetadataBlock.new(key, file_path, release_version)
-          else
-            @blocks.push Fastlane::Helper::StandardMetadataBlock.new(key, file_path)
-          end
-        end
-
-        # Sets the default
-        @current_block = @blocks[0]
-      end
-
-      # Manages tags depending on the type
-      def self.write_target_block(fw, line)
-        if is_block_id(line)
-          key = line.split[1].tr('\"', '')
-          @blocks.each do |block|
-            @current_block = block if block.is_handler_for(key)
-          end
-        end
-
-        @current_block = @blocks.first if is_comment(line)
-
-        @current_block.handle_line(fw, line)
-      end
-
-      def self.is_block_id(line)
-        line.start_with?('msgctxt')
-      end
-
-      def self.is_comment(line)
-        line.start_with?('#')
+      def self.commit_changes(params)
+        other_action.git_add(path: params[:po_file_path])
+        other_action.git_commit(
+          path: params[:po_file_path],
+          message: 'Update metadata strings',
+          allow_nothing_to_commit: true
+        )
       end
 
       #####################################################
@@ -119,39 +44,56 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Updates a .po file with new data from .txt files'
+        'Generates a .po file from source .txt files'
       end
 
       def self.details
-        'You can use this action to update the .po file that contains the string to load to GlotPress for localization.'
+        <<~DETAILS
+          Generates a .po file from source .txt files for localization via GlotPress.
+
+          The `source_files` parameter accepts either simple file paths or hashes with path and comment:
+
+          ```ruby
+          source_files: {
+            # Simple path (no translator comment)
+            app_name: 'path/to/name.txt',
+
+            # Hash with path and translator comment
+            app_store_subtitle: {
+              path: 'path/to/subtitle.txt',
+              comment: 'translators: Limit to 30 characters!'
+            }
+          }
+          ```
+        DETAILS
       end
 
       def self.available_options
-        # Define all options your action supports.
-
-        # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :po_file_path,
                                        env_name: 'FL_UPDATE_METADATA_SOURCE_PO_FILE_PATH',
-                                       description: 'The path of the .po file to update',
+                                       description: 'The path of the .po file to generate',
                                        type: String,
                                        verify_block: proc do |value|
-                                         UI.user_error!("No .po file path for UpdateMetadataSourceAction given, pass using `po_file_path: 'file path'`") unless value && !value.empty?
-                                         UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
+                                         UI.user_error!("No .po file path given, pass using `po_file_path: 'file path'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :release_version,
                                        env_name: 'FL_UPDATE_METADATA_SOURCE_RELEASE_VERSION',
-                                       description: 'The release version of the app (to use to mark the release notes)',
+                                       description: 'The release version of the app (used for release notes)',
                                        verify_block: proc do |value|
-                                         UI.user_error!("No relase version for UpdateMetadataSourceAction given, pass using `release_version: 'version'`") unless value && !value.empty?
+                                         UI.user_error!("No release version given, pass using `release_version: 'version'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :source_files,
                                        env_name: 'FL_UPDATE_METADATA_SOURCE_SOURCE_FILES',
-                                       description: 'The hash with the path to the source files and the key to use to include their content',
+                                       description: 'Hash mapping keys to file paths (String) or hashes with :path and optional :comment',
                                        type: Hash,
                                        verify_block: proc do |value|
-                                         UI.user_error!("No source file hash for UpdateMetadataSourceAction given, pass using `source_files: 'source file hash'`") unless value && !value.empty?
+                                         UI.user_error!("No source files given, pass using `source_files: { key: 'path' }`") unless value && !value.empty?
                                        end),
+          FastlaneCore::ConfigItem.new(key: :commit_changes,
+                                       description: 'If true, adds and commits the changes',
+                                       type: Boolean,
+                                       default_value: false),
         ]
       end
 
@@ -159,7 +101,6 @@ module Fastlane
       end
 
       def self.return_value
-        # If your method provides a return value, you can describe here what it does
       end
 
       def self.authors
