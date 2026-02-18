@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Bumped `faraday` to address security vulnerability [#689]
 
 ## 14.0.0
 
