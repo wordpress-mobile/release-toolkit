@@ -26,3 +26,6 @@ vendor/swiftgen
 
 # Build Products
 *.gem
+
+# AI Agents
+.claude/settings.local.json
