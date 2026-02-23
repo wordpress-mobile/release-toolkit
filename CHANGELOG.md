@@ -18,7 +18,8 @@ _None_
 
 ### Internal Changes
 
-- Bumped `faraday` to address security vulnerability [#689]
+- Bumped `faraday` to address security vulnerability. [#689]
+- Bumped `nokogiri` to address security vulnerability. [#693]
 
 ## 14.0.0
 
