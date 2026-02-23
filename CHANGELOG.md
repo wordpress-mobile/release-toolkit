@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Enhance `AGENTS.md` with comprehensive project guidance for AI agents. [#692]
 
 ## 14.0.0
 
