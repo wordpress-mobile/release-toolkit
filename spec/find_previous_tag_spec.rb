@@ -97,6 +97,22 @@ describe Fastlane::Actions::FindPreviousTagAction do
     expect(tag).to eq('v1.7.3')
   end
 
+  it 'excludes tags matching multiple exclude patterns' do
+    # Arrange
+    stub_current_commit_tag(nil)
+    stub_main_command(
+      %w[git describe --tags --abbrev=0 --match v* --exclude *alpha* --exclude *beta*],
+      stdout: 'v1.7.3'
+    )
+    # Act
+    tag = run_described_fastlane_action(
+      pattern: 'v*',
+      exclude: %w[*alpha* *beta*]
+    )
+    # Assert
+    expect(tag).to eq('v1.7.3')
+  end
+
   it 'returns nil if no previous commit could be found' do
     # Arrange
     stub_current_commit_tag(nil)

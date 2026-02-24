@@ -8,7 +8,7 @@ module Fastlane
     class FindPreviousTagAction < Action
       def self.run(params)
         tag_pattern = params[:pattern]
-        exclude_pattern = params[:exclude]
+        exclude_patterns = Array(params[:exclude])
 
         # Make sure we have all the latest tags fetched locally
         Actions.sh('git', 'fetch', '--tags', '--force') { nil }
@@ -18,7 +18,7 @@ module Fastlane
         # Finally find the previous tag matching the provided pattern, and that is not the current commit
         git_cmd = %w[git describe --tags --abbrev=0]
         git_cmd += ['--match', tag_pattern] unless tag_pattern.nil?
-        git_cmd += ['--exclude', exclude_pattern] unless exclude_pattern.nil?
+        exclude_patterns.each { |p| git_cmd += ['--exclude', p] }
         git_cmd += ['--exclude', current_commit_tag] unless current_commit_tag.empty?
         Actions.sh(*git_cmd) { |exit_status, stdout, _| exit_status.success? ? stdout.chomp : nil }
       end
@@ -41,7 +41,8 @@ module Fastlane
           reachable from the current commit and that matches a specific naming pattern
 
           e.g. `find_previous_tag(pattern: '12.3.*.*')`, `find_previous_tag(pattern: '12.3-rc-*')`,
-          `find_previous_tag(pattern: 'v*', exclude: '*beta*')`
+          `find_previous_tag(pattern: 'v*', exclude: '*beta*')`,
+          `find_previous_tag(pattern: 'v*', exclude: ['*alpha*', '*beta*'])`
         DETAILS
       end
 
@@ -53,10 +54,11 @@ module Fastlane
                                        default_value: nil,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :exclude,
-                                       description: 'An _fnmatch_-style pattern of tags to exclude from the search (maps to `git describe --exclude`)',
+                                       description: 'One or more _fnmatch_-style patterns of tags to exclude from the search (maps to `git describe --exclude`). ' \
+                                                    'Can be a single string or an array of strings',
                                        optional: true,
                                        default_value: nil,
-                                       type: String),
+                                       is_string: false),
         ]
       end
 
