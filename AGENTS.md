@@ -22,6 +22,7 @@ bundle exec rubocop                     # Run linter
 bundle exec rubocop -a                  # Auto-fix lint issues
 bundle exec yard doc                    # Generate docs, open in browser
 bundle exec yard stats --list-undoc     # Show undocumented methods
+gem build                               # Build the gem (no arguments — auto-picks the gemspec)
 rake new_release                        # Start a new release (interactive)
 ```
 
