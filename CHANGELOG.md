@@ -10,11 +10,21 @@ _None_
 
 ### New Features
 
-- Added optional `exclude` parameter to `find_previous_tag` action, mapping to git's `--exclude` flag. This allows skipping beta/pre-release tags when searching for the previous stable release tag [#696]
+_None_
 
 ### Bug Fixes
 
 _None_
+
+### Internal Changes
+
+_None_
+
+## 14.1.0
+
+### New Features
+
+- Added optional `exclude` parameter to `find_previous_tag` action, mapping to git's `--exclude` flag. This allows skipping beta/pre-release tags when searching for the previous stable release tag [#696]
 
 ### Internal Changes
 
