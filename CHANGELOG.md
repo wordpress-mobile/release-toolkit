@@ -19,6 +19,8 @@ _None_
 ### Internal Changes
 
 - Enhance `AGENTS.md` with comprehensive project guidance for AI agents. [#692]
+- Bumped `faraday` to address security vulnerability. [#689]
+- Bumped `nokogiri` to address security vulnerability. [#693]
 
 ## 14.0.0
 
