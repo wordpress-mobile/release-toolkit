@@ -52,6 +52,35 @@ describe Fastlane::Configuration do
     end
   end
 
+  describe '#valid?' do
+    it 'returns true when project_name and branch are present' do
+      config = described_class.new(project_name: 'MyProject', branch: 'trunk')
+      expect(config.valid?).to be true
+    end
+
+    it 'returns false when project_name is empty' do
+      config = described_class.new(project_name: '', branch: 'trunk')
+      expect(config.valid?).to be false
+    end
+
+    it 'returns false when project_name is nil' do
+      config = described_class.new(branch: 'trunk')
+      config.project_name = nil
+      expect(config.valid?).to be false
+    end
+
+    it 'returns false when branch is empty' do
+      config = described_class.new(project_name: 'MyProject', branch: '')
+      expect(config.valid?).to be false
+    end
+
+    it 'returns false when branch is nil' do
+      config = described_class.new(project_name: 'MyProject')
+      config.branch = nil
+      expect(config.valid?).to be false
+    end
+  end
+
   describe '#add_file_to_copy' do
     it 'adds files to copy' do
       expect(subject.files_to_copy).to eq([])

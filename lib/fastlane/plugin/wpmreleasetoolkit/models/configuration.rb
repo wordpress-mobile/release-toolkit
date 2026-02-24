@@ -29,6 +29,11 @@ module Fastlane
       files_to_copy << file
     end
 
+    def valid?
+      !project_name.nil? && !project_name.empty? &&
+        !branch.nil? && !branch.empty?
+    end
+
     def to_hash
       {
         project_name: project_name,
