@@ -75,7 +75,7 @@ describe Fastlane::Actions::FindPreviousTagAction do
     # Act
     tag = run_described_fastlane_action(
       pattern: 'v*',
-      exclude: '*beta*'
+      exclude: ['*beta*']
     )
     # Assert
     expect(tag).to eq('v1.7.3')
@@ -91,7 +91,7 @@ describe Fastlane::Actions::FindPreviousTagAction do
     # Act
     tag = run_described_fastlane_action(
       pattern: 'v*',
-      exclude: '*beta*'
+      exclude: ['*beta*']
     )
     # Assert
     expect(tag).to eq('v1.7.3')

@@ -8,7 +8,7 @@ module Fastlane
     class FindPreviousTagAction < Action
       def self.run(params)
         tag_pattern = params[:pattern]
-        exclude_patterns = Array(params[:exclude])
+        exclude_patterns = params[:exclude] || []
 
         # Make sure we have all the latest tags fetched locally
         Actions.sh('git', 'fetch', '--tags', '--force') { nil }
@@ -41,7 +41,7 @@ module Fastlane
           reachable from the current commit and that matches a specific naming pattern
 
           e.g. `find_previous_tag(pattern: '12.3.*.*')`, `find_previous_tag(pattern: '12.3-rc-*')`,
-          `find_previous_tag(pattern: 'v*', exclude: '*beta*')`,
+          `find_previous_tag(pattern: 'v*', exclude: ['*beta*'])`,
           `find_previous_tag(pattern: 'v*', exclude: ['*alpha*', '*beta*'])`
         DETAILS
       end
@@ -54,11 +54,10 @@ module Fastlane
                                        default_value: nil,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :exclude,
-                                       description: 'One or more _fnmatch_-style patterns of tags to exclude from the search (maps to `git describe --exclude`). ' \
-                                                    'Can be a single string or an array of strings',
+                                       description: 'An array of _fnmatch_-style patterns of tags to exclude from the search (maps to `git describe --exclude`)',
                                        optional: true,
                                        default_value: nil,
-                                       is_string: false),
+                                       type: Array),
         ]
       end
 
