@@ -24,6 +24,14 @@ module Fastlane
         @build_number = build_number
       end
 
+      # Returns whether this version is a patch (hotfix) release.
+      #
+      # @return [Boolean] true if the patch component is greater than zero.
+      #
+      def patch?
+        @patch.positive?
+      end
+
       # Converts the AppVersion object to a string representation.
       # This should only be used for internal debugging/testing purposes, not to write versions in version files
       # In order to format an `AppVersion` into a `String`, you should use the appropriate `VersionFormatter` for your project instead.

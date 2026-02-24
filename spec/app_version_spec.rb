@@ -25,6 +25,18 @@ describe Fastlane::Models::AppVersion do
     end
   end
 
+  describe '#patch?' do
+    it 'returns true when patch is greater than zero' do
+      app_version = described_class.new(1, 2, 3)
+      expect(app_version.patch?).to be true
+    end
+
+    it 'returns false when patch is zero' do
+      app_version = described_class.new(1, 2, 0)
+      expect(app_version.patch?).to be false
+    end
+  end
+
   describe '#to_s' do
     it 'returns the version as a formatted string' do
       app_version = described_class.new(2, 3, 4, 5)
