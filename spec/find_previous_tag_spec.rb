@@ -65,6 +65,70 @@ describe Fastlane::Actions::FindPreviousTagAction do
     expect(tag).to eq('12.2')
   end
 
+  it 'excludes tags matching the exclude pattern' do
+    # Arrange
+    stub_current_commit_tag(nil)
+    stub_main_command(
+      %w[git describe --tags --abbrev=0 --match v* --exclude *beta*],
+      stdout: 'v1.7.3'
+    )
+    # Act
+    tag = run_described_fastlane_action(
+      pattern: 'v*',
+      exclude: ['*beta*']
+    )
+    # Assert
+    expect(tag).to eq('v1.7.3')
+  end
+
+  it 'excludes both the exclude pattern and the current commit tag' do
+    # Arrange
+    stub_current_commit_tag('v1.8.0')
+    stub_main_command(
+      %w[git describe --tags --abbrev=0 --match v* --exclude *beta* --exclude v1.8.0],
+      stdout: 'v1.7.3'
+    )
+    # Act
+    tag = run_described_fastlane_action(
+      pattern: 'v*',
+      exclude: ['*beta*']
+    )
+    # Assert
+    expect(tag).to eq('v1.7.3')
+  end
+
+  it 'auto-converts a single exclude string into an array' do
+    # Arrange
+    stub_current_commit_tag(nil)
+    stub_main_command(
+      %w[git describe --tags --abbrev=0 --match v* --exclude *beta*],
+      stdout: 'v1.7.3'
+    )
+    # Act — Fastlane's ConfigItem auto-converts a String to Array when type is Array
+    tag = run_described_fastlane_action(
+      pattern: 'v*',
+      exclude: '*beta*'
+    )
+    # Assert
+    expect(tag).to eq('v1.7.3')
+  end
+
+  it 'excludes tags matching multiple exclude patterns' do
+    # Arrange
+    stub_current_commit_tag(nil)
+    stub_main_command(
+      %w[git describe --tags --abbrev=0 --match v* --exclude *alpha* --exclude *beta*],
+      stdout: 'v1.7.3'
+    )
+    # Act
+    tag = run_described_fastlane_action(
+      pattern: 'v*',
+      exclude: %w[*alpha* *beta*]
+    )
+    # Assert
+    expect(tag).to eq('v1.7.3')
+  end
+
   it 'returns nil if no previous commit could be found' do
     # Arrange
     stub_current_commit_tag(nil)
