@@ -97,6 +97,22 @@ describe Fastlane::Actions::FindPreviousTagAction do
     expect(tag).to eq('v1.7.3')
   end
 
+  it 'auto-converts a single exclude string into an array' do
+    # Arrange
+    stub_current_commit_tag(nil)
+    stub_main_command(
+      %w[git describe --tags --abbrev=0 --match v* --exclude *beta*],
+      stdout: 'v1.7.3'
+    )
+    # Act — Fastlane's ConfigItem auto-converts a String to Array when type is Array
+    tag = run_described_fastlane_action(
+      pattern: 'v*',
+      exclude: '*beta*'
+    )
+    # Assert
+    expect(tag).to eq('v1.7.3')
+  end
+
   it 'excludes tags matching multiple exclude patterns' do
     # Arrange
     stub_current_commit_tag(nil)
