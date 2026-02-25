@@ -4,7 +4,7 @@ This file provides guidance to AI agents when working with code in this reposito
 
 ## Overview
 
-Release Toolkit is a fastlane plugin  implemented as a Ruby gem (`fastlane-plugin-wpmreleasetoolkit`) providing actions and helper utilities for release automation of Automattic's mobile apps. It standardizes the release process across multiple products (WordPress, Jetpack, WooCommerce, DayOne, PocketCats, Tumblr, Studio, …), repositories, and platforms (iOS, Android, macOS).
+Release Toolkit is a _fastlane_ plugin  implemented as a Ruby gem (`fastlane-plugin-wpmreleasetoolkit`) providing actions and helper utilities for release automation of Automattic's mobile apps. It standardizes the release process across multiple products (WordPress, Jetpack, WooCommerce, Day One, Pocket Casts, Tumblr, Studio, …), repositories, and platforms (iOS, Android, macOS).
 
 - **Language**: Ruby (version in `.ruby-version`, minimum in `fastlane-plugin-wpmreleasetoolkit.gemspec`)
 - **Framework**: Fastlane plugin
@@ -22,6 +22,7 @@ bundle exec rubocop                     # Run linter
 bundle exec rubocop -a                  # Auto-fix lint issues
 bundle exec yard doc                    # Generate docs, open in browser
 bundle exec yard stats --list-undoc     # Show undocumented methods
+gem build                               # Build the gem (no arguments — auto-picks the gemspec)
 rake new_release                        # Start a new release (interactive)
 ```
 
