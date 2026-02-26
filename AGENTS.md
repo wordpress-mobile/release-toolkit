@@ -15,7 +15,7 @@ Release Toolkit is a _fastlane_ plugin  implemented as a Ruby gem (`fastlane-plu
 ## Quick Start
 
 ```sh
-bundle install && gem build && bundle exec rubocop && bundle exec rspec
+bundle install && bundle exec rubocop && bundle exec rspec
 ```
 
 ## Build and Development Commands
