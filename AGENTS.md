@@ -12,6 +12,12 @@ Release Toolkit is a _fastlane_ plugin  implemented as a Ruby gem (`fastlane-plu
 - **Main branch**: `trunk`
 - **Gem version**: defined in `lib/fastlane/plugin/wpmreleasetoolkit/version.rb`
 
+## Quick Start
+
+```sh
+bundle install && gem build && bundle exec rubocop && bundle exec rspec
+```
+
 ## Build and Development Commands
 
 ```sh
@@ -215,3 +221,7 @@ Runtime and development dependencies with version constraints are defined in `fa
 - **gettext** — i18n/PO files
 - **google-cloud-storage** — GCS uploads
 - **buildkit** — Buildkite API
+
+## Common Pitfalls
+
+- **Don't inspect or edit `vendor/bundle/` unless necessary** — The bundled gems live there and are managed by Bundler.
