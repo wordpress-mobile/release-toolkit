@@ -224,4 +224,4 @@ Runtime and development dependencies with version constraints are defined in `fa
 
 ## Common Pitfalls
 
-- **Don't inspect or edit `vendor/bundle/` unless necessary** — The bundled gems live there and are managed by Bundler.
+- **Don't inspect or edit `vendor/` unless necessary** — The bundled gems and SwiftGen binaries live there.
