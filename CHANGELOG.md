@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Added new `update_apps_cdn_build_metadata` action to update metadata (e.g. visibility) of an existing build on the Apps CDN without re-uploading the file. This enables a two-phase release flow: upload builds as Internal first, then flip to External at publish time. [#TBD]
 
 ### Bug Fixes
 
