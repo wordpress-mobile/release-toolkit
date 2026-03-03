@@ -10,6 +10,13 @@ module Fastlane
     class ListAppsCdnBuildsAction < Action
       VALID_VISIBILITIES = %i[internal external].freeze
 
+      # Extract the name of the first term in a taxonomy from an API post response.
+      # Terms are keyed by display name, e.g. { 'Internal' => { 'name' => 'Internal', 'slug' => 'internal' } }
+      def self.term_name(post, taxonomy)
+        term = post.dig('terms', taxonomy)&.values&.first
+        term&.[]('name')
+      end
+
       def self.run(params)
         UI.message('Listing Apps CDN builds...')
 
@@ -48,20 +55,13 @@ module Fastlane
           end
 
           builds = posts.map do |post|
-            visibility_terms = post.dig('terms', 'visibility') || {}
-            visibility_key = visibility_terms.keys.first
-            platform_terms = post.dig('terms', 'platform') || {}
-            platform_key = platform_terms.keys.first
-            build_type_terms = post.dig('terms', 'build_type') || {}
-            build_type_key = build_type_terms.keys.first
-
             {
               post_id: post['ID'],
               title: post['title'],
-              version: post.dig('terms', 'version')&.keys&.first,
-              visibility: visibility_key&.downcase,
-              platform: platform_key,
-              build_type: build_type_key
+              version: term_name(post, 'version'),
+              visibility: term_name(post, 'visibility')&.downcase,
+              platform: term_name(post, 'platform'),
+              build_type: term_name(post, 'build_type')
             }
           end
 

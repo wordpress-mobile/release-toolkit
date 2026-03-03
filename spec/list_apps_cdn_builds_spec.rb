@@ -51,10 +51,6 @@ describe Fastlane::Actions::ListAppsCdnBuildsAction do
     WebMock.disable_net_connect!
   end
 
-  after do
-    WebMock.allow_net_connect!
-  end
-
   describe 'listing builds with no filters' do
     it 'returns all builds' do
       stub_request(:get, api_url)
