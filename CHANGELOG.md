@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- Added new `list_apps_cdn_builds` action to list builds on the Apps CDN with optional filtering by visibility (server-side) and version (client-side). This enables querying CDN builds directly by version instead of embedding post IDs in GitHub releases. [#xxx]
+- Added new `list_apps_cdn_builds` action to list builds on the Apps CDN with optional filtering by visibility (server-side) and version (client-side). This enables querying CDN builds directly by version instead of embedding post IDs in GitHub releases. [#702]
 
 ### Bug Fixes
 
