@@ -32,6 +32,8 @@ module Fastlane
         request['Authorization'] = "Bearer #{params[:api_token]}"
 
         response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|
+          http.open_timeout = 10
+          http.read_timeout = 30
           http.request(request)
         end
 

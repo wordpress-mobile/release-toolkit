@@ -256,5 +256,4 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
       end.to raise_error(FastlaneCore::Interface::FastlaneError, 'No metadata to update. Provide at least one of: visibility, post_status')
     end
   end
-
 end
