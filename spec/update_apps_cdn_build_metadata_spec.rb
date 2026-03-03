@@ -26,10 +26,6 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
     WebMock.disable_net_connect!
   end
 
-  after do
-    WebMock.allow_net_connect!
-  end
-
   describe 'updating visibility' do
     it 'successfully updates the visibility to external' do
       stub_request(:post, api_url)
