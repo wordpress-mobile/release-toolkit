@@ -14,20 +14,24 @@ module Fastlane
       def self.run(params)
         UI.message("Updating Apps CDN build metadata for post #{params[:post_id]}...")
 
-        api_endpoint = "https://public-api.wordpress.com/rest/v1.1/sites/#{params[:site_id]}/posts/#{params[:post_id]}"
+        # Build the JSON body for the WP REST API v2
+        body = {}
+        body['status'] = params[:post_status] if params[:post_status]
+
+        if params[:visibility]
+          term_id = lookup_visibility_term_id(site_id: params[:site_id], api_token: params[:api_token], visibility: params[:visibility])
+          body['visibility'] = [term_id]
+        end
+
+        UI.user_error!('No metadata to update. Provide at least one of: visibility, post_status') if body.empty?
+
+        api_endpoint = "https://public-api.wordpress.com/wp/v2/sites/#{params[:site_id]}/a8c_cdn_build/#{params[:post_id]}"
         uri = URI.parse(api_endpoint)
-
-        # Build the update form data
-        form_data = {}
-        form_data['terms[visibility]'] = params[:visibility].to_s.capitalize if params[:visibility]
-        form_data['status'] = params[:post_status] if params[:post_status]
-
-        UI.user_error!('No metadata to update. Provide at least one of: visibility, post_status') if form_data.empty?
 
         # Create and send the HTTP request
         request = Net::HTTP::Post.new(uri.request_uri)
-        request.body = URI.encode_www_form(form_data)
-        request['Content-Type'] = 'application/x-www-form-urlencoded'
+        request.body = JSON.generate(body)
+        request['Content-Type'] = 'application/json'
         request['Accept'] = 'application/json'
         request['Authorization'] = "Bearer #{params[:api_token]}"
 
@@ -41,7 +45,7 @@ module Fastlane
         case response
         when Net::HTTPSuccess
           result = JSON.parse(response.body)
-          post_id = result['ID']
+          post_id = result['id']
 
           UI.success("Successfully updated Apps CDN build metadata for post #{post_id}")
 
@@ -50,6 +54,32 @@ module Fastlane
           UI.error("Failed to update Apps CDN build metadata: #{response.code} #{response.message}")
           UI.error(response.body)
           UI.user_error!('Update of Apps CDN build metadata failed')
+        end
+      end
+
+      # Look up the taxonomy term ID for a visibility value (e.g. :internal -> 1316)
+      def self.lookup_visibility_term_id(site_id:, api_token:, visibility:)
+        slug = visibility.to_s.downcase
+        api_endpoint = "https://public-api.wordpress.com/wp/v2/sites/#{site_id}/visibility?slug=#{slug}"
+        uri = URI.parse(api_endpoint)
+
+        request = Net::HTTP::Get.new(uri.request_uri)
+        request['Accept'] = 'application/json'
+        request['Authorization'] = "Bearer #{api_token}"
+
+        response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|
+          http.open_timeout = 10
+          http.read_timeout = 30
+          http.request(request)
+        end
+
+        case response
+        when Net::HTTPSuccess
+          terms = JSON.parse(response.body)
+          UI.user_error!("No visibility term found for '#{slug}'") if terms.empty?
+          terms.first['id']
+        else
+          UI.user_error!("Failed to look up visibility term '#{slug}': #{response.code} #{response.message}")
         end
       end
 
@@ -67,8 +97,8 @@ module Fastlane
 
       def self.details
         <<~DETAILS
-          Updates metadata (such as visibility) for an existing build post on a WordPress blog
-          that has the Apps CDN plugin enabled, using the WordPress.com REST API.
+          Updates metadata (such as post status or visibility) for an existing build post on a WordPress blog
+          that has the Apps CDN plugin enabled, using the WordPress.com REST API (WP v2).
           See PCYsg-15tP-p2 internal a8c documentation for details about the Apps CDN plugin.
         DETAILS
       end
@@ -135,7 +165,7 @@ module Fastlane
             site_id: "12345678",
             api_token: ENV["WPCOM_API_TOKEN"],
             post_id: 98765,
-            visibility: :external
+            post_status: "publish"
           )',
           'update_apps_cdn_build_metadata(
             site_id: "12345678",
