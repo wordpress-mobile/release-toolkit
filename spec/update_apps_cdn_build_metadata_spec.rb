@@ -6,7 +6,9 @@ require 'webmock/rspec'
 describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
   let(:test_site_id) { '12345678' }
   let(:test_post_id) { 98_765 }
+  let(:second_post_id) { 54_321 }
   let(:api_url) { "https://public-api.wordpress.com/wp/v2/sites/#{test_site_id}/a8c_cdn_build/#{test_post_id}" }
+  let(:second_api_url) { "https://public-api.wordpress.com/wp/v2/sites/#{test_site_id}/a8c_cdn_build/#{second_post_id}" }
   let(:visibility_term_url) { "https://public-api.wordpress.com/wp/v2/sites/#{test_site_id}/visibility" }
   let(:test_api_token) { 'test_api_token' }
 
@@ -44,15 +46,16 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
           headers: { 'Content-Type' => 'application/json' }
         )
 
-      result = run_described_fastlane_action(
+      results = run_described_fastlane_action(
         site_id: test_site_id,
         api_token: test_api_token,
-        post_id: test_post_id,
+        post_ids: [test_post_id],
         visibility: :external
       )
 
-      expect(result).to be_a(Hash)
-      expect(result[:post_id]).to eq(test_post_id)
+      expect(results).to be_an(Array)
+      expect(results.size).to eq(1)
+      expect(results.first[:post_id]).to eq(test_post_id)
 
       expect(WebMock).to(
         have_requested(:post, api_url).with do |req|
@@ -87,14 +90,14 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
           headers: { 'Content-Type' => 'application/json' }
         )
 
-      result = run_described_fastlane_action(
+      results = run_described_fastlane_action(
         site_id: test_site_id,
         api_token: test_api_token,
-        post_id: test_post_id,
+        post_ids: [test_post_id],
         visibility: :internal
       )
 
-      expect(result[:post_id]).to eq(test_post_id)
+      expect(results.first[:post_id]).to eq(test_post_id)
 
       expect(WebMock).to(
         have_requested(:post, api_url).with do |req|
@@ -103,6 +106,47 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
           true
         end
       )
+    end
+  end
+
+  describe 'batch updating multiple posts' do
+    it 'updates all posts with a single visibility term lookup' do
+      stub_request(:get, visibility_term_url)
+        .with(query: { 'slug' => 'external' })
+        .to_return(
+          status: 200,
+          body: [{ 'id' => external_term_id, 'name' => 'External', 'slug' => 'external' }].to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        )
+
+      stub_request(:post, api_url)
+        .to_return(
+          status: 200,
+          body: { id: test_post_id }.to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        )
+
+      stub_request(:post, second_api_url)
+        .to_return(
+          status: 200,
+          body: { id: second_post_id }.to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        )
+
+      results = run_described_fastlane_action(
+        site_id: test_site_id,
+        api_token: test_api_token,
+        post_ids: [test_post_id, second_post_id],
+        visibility: :external
+      )
+
+      expect(results.size).to eq(2)
+      expect(results.map { |r| r[:post_id] }).to eq([test_post_id, second_post_id])
+
+      # Visibility term lookup should have been called only once
+      expect(WebMock).to have_requested(:get, visibility_term_url).with(query: { 'slug' => 'external' }).once
+      expect(WebMock).to have_requested(:post, api_url).once
+      expect(WebMock).to have_requested(:post, second_api_url).once
     end
   end
 
@@ -115,14 +159,14 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
           headers: { 'Content-Type' => 'application/json' }
         )
 
-      result = run_described_fastlane_action(
+      results = run_described_fastlane_action(
         site_id: test_site_id,
         api_token: test_api_token,
-        post_id: test_post_id,
+        post_ids: [test_post_id],
         post_status: 'draft'
       )
 
-      expect(result[:post_id]).to eq(test_post_id)
+      expect(results.first[:post_id]).to eq(test_post_id)
 
       expect(WebMock).to(
         have_requested(:post, api_url).with do |req|
@@ -151,15 +195,15 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
           headers: { 'Content-Type' => 'application/json' }
         )
 
-      result = run_described_fastlane_action(
+      results = run_described_fastlane_action(
         site_id: test_site_id,
         api_token: test_api_token,
-        post_id: test_post_id,
+        post_ids: [test_post_id],
         visibility: :external,
         post_status: 'publish'
       )
 
-      expect(result[:post_id]).to eq(test_post_id)
+      expect(results.first[:post_id]).to eq(test_post_id)
 
       expect(WebMock).to(
         have_requested(:post, api_url).with do |req|
@@ -185,10 +229,10 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
         run_described_fastlane_action(
           site_id: test_site_id,
           api_token: test_api_token,
-          post_id: test_post_id,
+          post_ids: [test_post_id],
           post_status: 'publish'
         )
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Update of Apps CDN build metadata failed')
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, "Update of Apps CDN build metadata failed for post #{test_post_id}")
     end
 
     it 'handles server errors properly' do
@@ -203,10 +247,10 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
         run_described_fastlane_action(
           site_id: test_site_id,
           api_token: test_api_token,
-          post_id: test_post_id,
+          post_ids: [test_post_id],
           post_status: 'publish'
         )
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Update of Apps CDN build metadata failed')
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, "Update of Apps CDN build metadata failed for post #{test_post_id}")
     end
 
     it 'handles visibility term lookup failure' do
@@ -222,7 +266,7 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
         run_described_fastlane_action(
           site_id: test_site_id,
           api_token: test_api_token,
-          post_id: test_post_id,
+          post_ids: [test_post_id],
           visibility: :external
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, "No visibility term found for 'external'")
@@ -235,7 +279,7 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
         run_described_fastlane_action(
           site_id: '',
           api_token: test_api_token,
-          post_id: test_post_id,
+          post_ids: [test_post_id],
           post_status: 'publish'
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Site ID cannot be empty')
@@ -246,21 +290,43 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
         run_described_fastlane_action(
           site_id: test_site_id,
           api_token: '',
-          post_id: test_post_id,
+          post_ids: [test_post_id],
           post_status: 'publish'
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, 'API token cannot be empty')
     end
 
-    it 'fails if post_id is not a positive integer' do
+    it 'fails if post_ids is a single integer instead of an array' do
       expect do
         run_described_fastlane_action(
           site_id: test_site_id,
           api_token: test_api_token,
-          post_id: -1,
+          post_ids: test_post_id,
           post_status: 'publish'
         )
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Post ID must be a positive integer')
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /value must be either `Array` or `comma-separated String`/)
+    end
+
+    it 'fails if post_ids is empty' do
+      expect do
+        run_described_fastlane_action(
+          site_id: test_site_id,
+          api_token: test_api_token,
+          post_ids: [],
+          post_status: 'publish'
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Post IDs must be a non-empty array')
+    end
+
+    it 'fails if post_ids contains a non-positive integer' do
+      expect do
+        run_described_fastlane_action(
+          site_id: test_site_id,
+          api_token: test_api_token,
+          post_ids: [-1],
+          post_status: 'publish'
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Each post ID must be a positive integer, got: -1')
     end
 
     it 'fails if visibility is not a valid symbol' do
@@ -268,7 +334,7 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
         run_described_fastlane_action(
           site_id: test_site_id,
           api_token: test_api_token,
-          post_id: test_post_id,
+          post_ids: [test_post_id],
           visibility: :public
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Visibility must be one of: `:internal`, `:external`')
@@ -279,7 +345,7 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
         run_described_fastlane_action(
           site_id: test_site_id,
           api_token: test_api_token,
-          post_id: test_post_id,
+          post_ids: [test_post_id],
           post_status: 'invalid_status'
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Post status must be one of: publish, draft')
@@ -290,7 +356,7 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
         run_described_fastlane_action(
           site_id: test_site_id,
           api_token: test_api_token,
-          post_id: test_post_id
+          post_ids: [test_post_id]
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, 'No metadata to update. Provide at least one of: visibility, post_status')
     end

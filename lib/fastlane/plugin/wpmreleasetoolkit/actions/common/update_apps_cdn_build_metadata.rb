@@ -12,9 +12,10 @@ module Fastlane
       VALID_POST_STATUS = %w[publish draft].freeze
 
       def self.run(params)
-        UI.message("Updating Apps CDN build metadata for post #{params[:post_id]}...")
+        post_ids = params[:post_ids]
+        UI.message("Updating Apps CDN build metadata for #{post_ids.size} post(s): #{post_ids.join(', ')}...")
 
-        # Build the JSON body for the WP REST API v2
+        # Build the base JSON body for the WP REST API v2
         body = {}
         body['status'] = params[:post_status] if params[:post_status]
 
@@ -25,15 +26,24 @@ module Fastlane
 
         UI.user_error!('No metadata to update. Provide at least one of: visibility, post_status') if body.empty?
 
-        api_endpoint = "https://public-api.wordpress.com/wp/v2/sites/#{params[:site_id]}/a8c_cdn_build/#{params[:post_id]}"
+        results = post_ids.map do |post_id|
+          update_single_post(site_id: params[:site_id], api_token: params[:api_token], post_id: post_id, body: body)
+        end
+
+        UI.success("Successfully updated Apps CDN build metadata for #{results.size} post(s)")
+        results
+      end
+
+      # Update a single CDN build post with the given body.
+      def self.update_single_post(site_id:, api_token:, post_id:, body:)
+        api_endpoint = "https://public-api.wordpress.com/wp/v2/sites/#{site_id}/a8c_cdn_build/#{post_id}"
         uri = URI.parse(api_endpoint)
 
-        # Create and send the HTTP request
         request = Net::HTTP::Post.new(uri.request_uri)
         request.body = JSON.generate(body)
         request['Content-Type'] = 'application/json'
         request['Accept'] = 'application/json'
-        request['Authorization'] = "Bearer #{params[:api_token]}"
+        request['Authorization'] = "Bearer #{api_token}"
 
         response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|
           http.open_timeout = 10
@@ -41,19 +51,18 @@ module Fastlane
           http.request(request)
         end
 
-        # Handle the response
         case response
         when Net::HTTPSuccess
           result = JSON.parse(response.body)
-          post_id = result['id']
+          updated_id = result['id']
 
-          UI.success("Successfully updated Apps CDN build metadata for post #{post_id}")
+          UI.message("  Updated post #{updated_id}")
 
-          { post_id: post_id }
+          { post_id: updated_id }
         else
-          UI.error("Failed to update Apps CDN build metadata: #{response.code} #{response.message}")
+          UI.error("Failed to update Apps CDN build metadata for post #{post_id}: #{response.code} #{response.message}")
           UI.error(response.body)
-          UI.user_error!('Update of Apps CDN build metadata failed')
+          UI.user_error!("Update of Apps CDN build metadata failed for post #{post_id}")
         end
       end
 
@@ -84,7 +93,7 @@ module Fastlane
       end
 
       def self.description
-        'Updates metadata of an existing build on the Apps CDN'
+        'Updates metadata of one or more existing builds on the Apps CDN'
       end
 
       def self.authors
@@ -92,13 +101,14 @@ module Fastlane
       end
 
       def self.return_value
-        'Returns a Hash containing { post_id: }. On error, raises a FastlaneError.'
+        'Returns an Array of Hashes, each containing { post_id: }. On error, raises a FastlaneError.'
       end
 
       def self.details
         <<~DETAILS
-          Updates metadata (such as post status or visibility) for an existing build post on a WordPress blog
+          Updates metadata (such as post status or visibility) for one or more existing build posts on a WordPress blog
           that has the Apps CDN plugin enabled, using the WordPress.com REST API (WP v2).
+          When updating visibility for multiple posts, the visibility term ID is looked up only once.
           See PCYsg-15tP-p2 internal a8c documentation for details about the Apps CDN plugin.
         DETAILS
       end
@@ -116,12 +126,15 @@ module Fastlane
             end
           ),
           FastlaneCore::ConfigItem.new(
-            key: :post_id,
-            description: 'The ID of the build post to update',
+            key: :post_ids,
+            description: 'The IDs of the build posts to update',
             optional: false,
-            type: Integer,
+            type: Array,
             verify_block: proc do |value|
-              UI.user_error!('Post ID must be a positive integer') unless value.is_a?(Integer) && value.positive?
+              UI.user_error!('Post IDs must be a non-empty array') unless value.is_a?(Array) && !value.empty?
+              value.each do |id|
+                UI.user_error!("Each post ID must be a positive integer, got: #{id.inspect}") unless id.is_a?(Integer) && id.positive?
+              end
             end
           ),
           FastlaneCore::ConfigItem.new(
@@ -164,15 +177,14 @@ module Fastlane
           'update_apps_cdn_build_metadata(
             site_id: "12345678",
             api_token: ENV["WPCOM_API_TOKEN"],
-            post_id: 98765,
+            post_ids: [98765],
             post_status: "publish"
           )',
           'update_apps_cdn_build_metadata(
             site_id: "12345678",
             api_token: ENV["WPCOM_API_TOKEN"],
-            post_id: 98765,
-            visibility: :internal,
-            post_status: "draft"
+            post_ids: [12345, 67890, 11111],
+            visibility: :external
           )',
         ]
       end
