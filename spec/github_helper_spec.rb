@@ -555,11 +555,21 @@ describe Fastlane::Helper::GithubHelper do
       expect(url).to eq(release_url)
     end
 
-    def create_release(is_draft:, assets: [])
+    it 'uses a custom name when provided' do
+      custom_name = 'Version 1.0'
+      options = { body: test_description, draft: true, name: custom_name, prerelease: false, target_commitish: test_target }
+      expect(client).to receive(:create_release).with(test_repo, test_tag, options)
+      allow(client).to receive(:create_release).and_return(html_url: release_url)
+      url = create_release(is_draft: true, name: custom_name)
+      expect(url).to eq(release_url)
+    end
+
+    def create_release(is_draft:, assets: [], name: nil)
       helper = described_class.new(github_token: 'Fake-GitHubToken-123')
       helper.create_release(
         repository: test_repo,
         version: test_tag,
+        name: name,
         target: test_target,
         description: test_description,
         assets: assets,

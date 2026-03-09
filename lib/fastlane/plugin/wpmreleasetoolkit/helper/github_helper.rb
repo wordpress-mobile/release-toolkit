@@ -166,7 +166,8 @@ module Fastlane
       # Creates a Release on GitHub as a Draft
       #
       # @param [String] repository The repository to create the GitHub release on. Typically a repo slug (<org>/<repo>).
-      # @param [String] version The version for which to create this release. Will be used both as the name of the tag and the name of the release.
+      # @param [String] version The version for which to create this release. Will be used as the git tag name.
+      # @param [String?] name The display name (title) of the GitHub release. Defaults to the version if not provided.
       # @param [String?] target The commit SHA or branch name that this release will point to when it's published and creates the tag.
       #        If nil (the default), will use the repo's current HEAD commit at the time this method is called.
       #        Unused if the tag already exists.
@@ -175,11 +176,11 @@ module Fastlane
       # @param [TrueClass|FalseClass] prerelease Indicates if this should be created as a pre-release (i.e. for alpha/beta)
       # @param [TrueClass|FalseClass] is_draft Indicates if this should be created as a draft release
       #
-      def create_release(repository:, version:, description:, assets:, prerelease:, is_draft:, target: nil)
+      def create_release(repository:, version:, description:, assets:, prerelease:, is_draft:, target: nil, name: nil)
         release = client.create_release(
           repository,
           version, # tag name
-          name: version, # release name
+          name: name || version, # release name
           target_commitish: target || Git.open(Dir.pwd).log.first.sha,
           prerelease: prerelease,
           draft: is_draft,
