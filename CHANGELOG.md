@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- Added optional `name` parameter to `create_github_release` action, allowing a custom release title independent of the git tag. Defaults to `version` for backward compatibility. [#703]
+_None_
 
 ### Bug Fixes
 
@@ -19,6 +19,12 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 14.2.0
+
+### New Features
+
+- Added optional `name` parameter to `create_github_release` action, allowing a custom release title independent of the git tag. Defaults to `version` for backward compatibility. [#703]
 
 ## 14.1.0
 
