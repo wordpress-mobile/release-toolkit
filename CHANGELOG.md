@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Added optional `name` parameter to `create_github_release` action, allowing a custom release title independent of the git tag. Defaults to `version` for backward compatibility. [#703]
 
 ### Bug Fixes
 
