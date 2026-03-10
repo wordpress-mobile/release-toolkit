@@ -4,6 +4,7 @@ require 'fastlane/action'
 require 'net/http'
 require 'uri'
 require 'json'
+require_relative '../../helper/apps_cdn_helper'
 
 module Fastlane
   module Actions
@@ -17,8 +18,7 @@ module Fastlane
     class UploadBuildToAppsCdnAction < Action
       # See https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-resource-type.php
       RESOURCE_TYPE = 'Build'
-      # These are from the WordPress.com API, not the Apps CDN plugin
-      VALID_POST_STATUS = %w[publish draft].freeze
+      VALID_POST_STATUS = Helper::AppsCdnHelper::VALID_POST_STATUS
       # See https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-build-type.php
       VALID_BUILD_TYPES = %w[
         Alpha
@@ -48,8 +48,7 @@ module Fastlane
         'Full Install',
         'Update',
       ].freeze
-      # See https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-visibility.php
-      VALID_VISIBILITIES = %i[internal external].freeze
+      VALID_VISIBILITIES = Helper::AppsCdnHelper::VALID_VISIBILITIES
 
       def self.run(params)
         UI.message('Uploading build to Apps CDN...')
@@ -57,7 +56,7 @@ module Fastlane
         file_path = params[:file_path]
         UI.user_error!("File not found at path '#{file_path}'") unless File.exist?(file_path)
 
-        api_endpoint = "https://public-api.wordpress.com/rest/v1.1/sites/#{params[:site_id]}/media/new"
+        api_endpoint = Helper::AppsCdnHelper.rest_v1_1_url(site_id: params[:site_id], path: 'media/new')
         uri = URI.parse(api_endpoint)
 
         # Create the request body and headers

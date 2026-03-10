@@ -4,12 +4,13 @@ require 'fastlane/action'
 require 'net/http'
 require 'uri'
 require 'json'
+require_relative '../../helper/apps_cdn_helper'
 
 module Fastlane
   module Actions
     class UpdateAppsCdnBuildMetadataAction < Action
-      VALID_VISIBILITIES = %i[internal external].freeze
-      VALID_POST_STATUS = %w[publish draft].freeze
+      VALID_VISIBILITIES = Helper::AppsCdnHelper::VALID_VISIBILITIES
+      VALID_POST_STATUS = Helper::AppsCdnHelper::VALID_POST_STATUS
 
       def self.run(params)
         post_ids = params[:post_ids]
@@ -36,7 +37,7 @@ module Fastlane
 
       # Update a single CDN build post with the given body.
       def self.update_single_post(site_id:, api_token:, post_id:, body:)
-        api_endpoint = "https://public-api.wordpress.com/wp/v2/sites/#{site_id}/a8c_cdn_build/#{post_id}"
+        api_endpoint = Helper::AppsCdnHelper.wp_v2_url(site_id: site_id, path: "a8c_cdn_build/#{post_id}")
         uri = URI.parse(api_endpoint)
 
         request = Net::HTTP::Post.new(uri.request_uri)
@@ -69,7 +70,7 @@ module Fastlane
       # Look up the taxonomy term ID for a visibility value (e.g. :internal -> 1316)
       def self.lookup_visibility_term_id(site_id:, api_token:, visibility:)
         slug = visibility.to_s.downcase
-        api_endpoint = "https://public-api.wordpress.com/wp/v2/sites/#{site_id}/visibility?slug=#{slug}"
+        api_endpoint = Helper::AppsCdnHelper.wp_v2_url(site_id: site_id, path: "visibility?slug=#{slug}")
         uri = URI.parse(api_endpoint)
 
         request = Net::HTTP::Get.new(uri.request_uri)
