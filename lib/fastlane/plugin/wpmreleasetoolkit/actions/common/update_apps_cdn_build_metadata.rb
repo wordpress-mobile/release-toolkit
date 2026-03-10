@@ -59,7 +59,7 @@ module Fastlane
 
           UI.message("  Updated post #{updated_id}")
 
-          { post_id: updated_id }
+          updated_id
         else
           UI.error("Failed to update Apps CDN build metadata for post #{post_id}: #{response.code} #{response.message}")
           UI.error(response.body)
@@ -102,7 +102,7 @@ module Fastlane
       end
 
       def self.return_value
-        'Returns an Array of Hashes, each containing { post_id: }. On error, raises a FastlaneError.'
+        'Returns an Array of post IDs (Integer) that were successfully updated. On error, raises a FastlaneError.'
       end
 
       def self.details

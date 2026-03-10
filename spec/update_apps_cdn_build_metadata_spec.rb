@@ -55,7 +55,7 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
 
       expect(results).to be_an(Array)
       expect(results.size).to eq(1)
-      expect(results.first[:post_id]).to eq(test_post_id)
+      expect(results.first).to eq(test_post_id)
 
       expect(WebMock).to(
         have_requested(:post, api_url).with do |req|
@@ -97,7 +97,7 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
         visibility: :internal
       )
 
-      expect(results.first[:post_id]).to eq(test_post_id)
+      expect(results.first).to eq(test_post_id)
 
       expect(WebMock).to(
         have_requested(:post, api_url).with do |req|
@@ -141,7 +141,7 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
       )
 
       expect(results.size).to eq(2)
-      expect(results.map { |r| r[:post_id] }).to eq([test_post_id, second_post_id])
+      expect(results).to eq([test_post_id, second_post_id])
 
       # Visibility term lookup should have been called only once
       expect(WebMock).to have_requested(:get, visibility_term_url).with(query: { 'slug' => 'external' }).once
@@ -166,7 +166,7 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
         post_status: 'draft'
       )
 
-      expect(results.first[:post_id]).to eq(test_post_id)
+      expect(results.first).to eq(test_post_id)
 
       expect(WebMock).to(
         have_requested(:post, api_url).with do |req|
@@ -203,7 +203,7 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
         post_status: 'publish'
       )
 
-      expect(results.first[:post_id]).to eq(test_post_id)
+      expect(results.first).to eq(test_post_id)
 
       expect(WebMock).to(
         have_requested(:post, api_url).with do |req|
