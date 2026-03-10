@@ -35,7 +35,14 @@ module Fastlane
         results
       end
 
-      # Update a single CDN build post with the given body.
+      # Update a single CDN build post with the given body via the WP REST API v2.
+      #
+      # @param site_id [String] the WordPress.com site ID
+      # @param api_token [String] the WordPress.com API bearer token
+      # @param post_id [Integer] the ID of the post to update
+      # @param body [Hash] the JSON body to send in the POST request
+      # @return [Integer] the ID of the updated post
+      # @raise [FastlaneCore::Interface::FastlaneError] if the API returns a non-success response
       def self.update_single_post(site_id:, api_token:, post_id:, body:)
         api_endpoint = Helper::AppsCdnHelper.wp_v2_url(site_id: site_id, path: "a8c_cdn_build/#{post_id}")
         uri = URI.parse(api_endpoint)
@@ -67,7 +74,13 @@ module Fastlane
         end
       end
 
-      # Look up the taxonomy term ID for a visibility value (e.g. :internal -> 1316)
+      # Look up the taxonomy term ID for a visibility value (e.g. :internal -> 1316).
+      #
+      # @param site_id [String] the WordPress.com site ID
+      # @param api_token [String] the WordPress.com API bearer token
+      # @param visibility [Symbol] the visibility to look up (:internal or :external)
+      # @return [Integer] the taxonomy term ID for the given visibility
+      # @raise [FastlaneCore::Interface::FastlaneError] if no term is found or the API returns a non-success response
       def self.lookup_visibility_term_id(site_id:, api_token:, visibility:)
         slug = visibility.to_s.downcase
         api_endpoint = Helper::AppsCdnHelper.wp_v2_url(site_id: site_id, path: "visibility?slug=#{slug}")
