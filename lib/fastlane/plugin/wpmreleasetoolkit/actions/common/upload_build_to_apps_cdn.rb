@@ -256,7 +256,7 @@ module Fastlane
             description: 'The visibility of the build (:internal or :external)',
             optional: false,
             type: Symbol,
-            verify_block: Helper::AppsCdnHelper.verify_visibility
+            verify_block: Helper::AppsCdnHelper.verify_visibility_param
           ),
           FastlaneCore::ConfigItem.new(
             key: :post_status,
@@ -264,7 +264,7 @@ module Fastlane
             optional: true,
             default_value: 'publish',
             type: String,
-            verify_block: Helper::AppsCdnHelper.verify_post_status
+            verify_block: Helper::AppsCdnHelper.verify_post_status_param
           ),
           FastlaneCore::ConfigItem.new(
             key: :version,

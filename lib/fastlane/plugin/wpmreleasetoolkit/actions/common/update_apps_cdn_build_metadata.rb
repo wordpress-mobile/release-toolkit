@@ -160,14 +160,14 @@ module Fastlane
             description: 'The new visibility for the build (:internal or :external)',
             optional: true,
             type: Symbol,
-            verify_block: Helper::AppsCdnHelper.verify_visibility
+            verify_block: Helper::AppsCdnHelper.verify_visibility_param
           ),
           FastlaneCore::ConfigItem.new(
             key: :post_status,
             description: "The new post status ('publish' or 'draft')",
             optional: true,
             type: String,
-            verify_block: Helper::AppsCdnHelper.verify_post_status
+            verify_block: Helper::AppsCdnHelper.verify_post_status_param
           ),
         ]
       end
