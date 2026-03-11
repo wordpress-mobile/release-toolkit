@@ -2,7 +2,6 @@
 
 require 'fastlane/action'
 require 'net/http'
-require 'uri'
 require 'json'
 require_relative '../../helper/apps_cdn_helper'
 
@@ -44,8 +43,7 @@ module Fastlane
       # @return [Integer] the ID of the updated post
       # @raise [FastlaneCore::Interface::FastlaneError] if the API returns a non-success response
       def self.update_single_post(site_id:, api_token:, post_id:, body:)
-        api_endpoint = Helper::AppsCdnHelper.wp_v2_url(site_id: site_id, path: "a8c_cdn_build/#{post_id}")
-        uri = URI.parse(api_endpoint)
+        uri = Helper::AppsCdnHelper.wp_v2_url(site_id: site_id, path: "a8c_cdn_build/#{post_id}")
 
         request = Net::HTTP::Post.new(uri.request_uri)
         request.body = JSON.generate(body)
@@ -83,8 +81,7 @@ module Fastlane
       # @raise [FastlaneCore::Interface::FastlaneError] if no term is found or the API returns a non-success response
       def self.lookup_visibility_term_id(site_id:, api_token:, visibility:)
         slug = visibility.to_s.downcase
-        api_endpoint = Helper::AppsCdnHelper.wp_v2_url(site_id: site_id, path: "visibility?slug=#{slug}")
-        uri = URI.parse(api_endpoint)
+        uri = Helper::AppsCdnHelper.wp_v2_url(site_id: site_id, path: "visibility?slug=#{slug}")
 
         request = Net::HTTP::Get.new(uri.request_uri)
         request['Accept'] = 'application/json'

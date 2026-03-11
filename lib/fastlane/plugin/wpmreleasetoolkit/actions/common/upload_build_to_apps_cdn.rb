@@ -56,8 +56,7 @@ module Fastlane
         file_path = params[:file_path]
         UI.user_error!("File not found at path '#{file_path}'") unless File.exist?(file_path)
 
-        api_endpoint = Helper::AppsCdnHelper.rest_v1_1_url(site_id: params[:site_id], path: 'media/new')
-        uri = URI.parse(api_endpoint)
+        uri = Helper::AppsCdnHelper.rest_v1_1_url(site_id: params[:site_id], path: 'media/new')
 
         # Create the request body and headers
         parameters = {
