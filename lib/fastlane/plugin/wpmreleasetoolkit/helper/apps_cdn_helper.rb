@@ -30,6 +30,26 @@ module Fastlane
       def self.wp_v2_url(site_id:, path:)
         URI.parse("#{API_BASE_URL}/wp/v2/sites/#{site_id}/#{path}")
       end
+
+      # Returns a proc that validates a visibility value against {VALID_VISIBILITIES}.
+      # Intended for use as a `verify_block` in Fastlane ConfigItem definitions.
+      #
+      # @return [Proc] a proc that raises FastlaneError if the value is invalid
+      def self.verify_visibility
+        proc do |value|
+          UI.user_error!("Visibility must be one of: #{VALID_VISIBILITIES.map { "`:#{_1}`" }.join(', ')}") unless VALID_VISIBILITIES.include?(value.to_s.downcase.to_sym)
+        end
+      end
+
+      # Returns a proc that validates a post status value against {VALID_POST_STATUS}.
+      # Intended for use as a `verify_block` in Fastlane ConfigItem definitions.
+      #
+      # @return [Proc] a proc that raises FastlaneError if the value is invalid
+      def self.verify_post_status
+        proc do |value|
+          UI.user_error!("Post status must be one of: #{VALID_POST_STATUS.join(', ')}") unless VALID_POST_STATUS.include?(value)
+        end
+      end
     end
   end
 end

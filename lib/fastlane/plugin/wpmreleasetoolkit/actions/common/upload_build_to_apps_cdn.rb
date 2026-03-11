@@ -18,7 +18,6 @@ module Fastlane
     class UploadBuildToAppsCdnAction < Action
       # See https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-resource-type.php
       RESOURCE_TYPE = 'Build'
-      VALID_POST_STATUS = Helper::AppsCdnHelper::VALID_POST_STATUS
       # See https://github.a8c.com/Automattic/wpcom/blob/trunk/wp-content/lib/a8c/cdn/src/enums/enum-build-type.php
       VALID_BUILD_TYPES = %w[
         Alpha
@@ -48,8 +47,6 @@ module Fastlane
         'Full Install',
         'Update',
       ].freeze
-      VALID_VISIBILITIES = Helper::AppsCdnHelper::VALID_VISIBILITIES
-
       def self.run(params)
         UI.message('Uploading build to Apps CDN...')
 
@@ -259,9 +256,7 @@ module Fastlane
             description: 'The visibility of the build (:internal or :external)',
             optional: false,
             type: Symbol,
-            verify_block: proc do |value|
-              UI.user_error!("Visibility must be one of: #{VALID_VISIBILITIES.map { "`:#{_1}`" }.join(', ')}") unless VALID_VISIBILITIES.include?(value.to_s.downcase.to_sym)
-            end
+            verify_block: Helper::AppsCdnHelper.verify_visibility
           ),
           FastlaneCore::ConfigItem.new(
             key: :post_status,
@@ -269,9 +264,7 @@ module Fastlane
             optional: true,
             default_value: 'publish',
             type: String,
-            verify_block: proc do |value|
-              UI.user_error!("Post status must be one of: #{VALID_POST_STATUS.join(', ')}") unless VALID_POST_STATUS.include?(value)
-            end
+            verify_block: Helper::AppsCdnHelper.verify_post_status
           ),
           FastlaneCore::ConfigItem.new(
             key: :version,

@@ -8,9 +8,6 @@ require_relative '../../helper/apps_cdn_helper'
 module Fastlane
   module Actions
     class UpdateAppsCdnBuildMetadataAction < Action
-      VALID_VISIBILITIES = Helper::AppsCdnHelper::VALID_VISIBILITIES
-      VALID_POST_STATUS = Helper::AppsCdnHelper::VALID_POST_STATUS
-
       def self.run(params)
         post_ids = params[:post_ids]
         UI.message("Updating Apps CDN build metadata for #{post_ids.size} post(s): #{post_ids.join(', ')}...")
@@ -163,18 +160,14 @@ module Fastlane
             description: 'The new visibility for the build (:internal or :external)',
             optional: true,
             type: Symbol,
-            verify_block: proc do |value|
-              UI.user_error!("Visibility must be one of: #{VALID_VISIBILITIES.map { "`:#{_1}`" }.join(', ')}") unless VALID_VISIBILITIES.include?(value.to_s.downcase.to_sym)
-            end
+            verify_block: Helper::AppsCdnHelper.verify_visibility
           ),
           FastlaneCore::ConfigItem.new(
             key: :post_status,
             description: "The new post status ('publish' or 'draft')",
             optional: true,
             type: String,
-            verify_block: proc do |value|
-              UI.user_error!("Post status must be one of: #{VALID_POST_STATUS.join(', ')}") unless VALID_POST_STATUS.include?(value)
-            end
+            verify_block: Helper::AppsCdnHelper.verify_post_status
           ),
         ]
       end
