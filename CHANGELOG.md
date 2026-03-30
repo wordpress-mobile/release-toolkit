@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Remove explicit `activesupport` version constraint (`< 8`) from gemspec to avoid forcing downstream projects to downgrade their ActiveSupport version. [#709]
 
 ## 14.3.0
 
