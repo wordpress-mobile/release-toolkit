@@ -10,10 +10,11 @@ module Fastlane
         require_relative '../../helper/release_notes_helper'
         require_relative '../../helper/git_helper'
 
-        UI.user_error!('You must provide either `next_version` or `new_version`') if params[:next_version].nil? && params[:new_version].nil?
+        UI.user_error!('You must provide a non-empty value for either `next_version` or `new_version`') if params[:next_version].to_s.strip.empty? && params[:new_version].to_s.strip.empty?
 
         path = params[:release_notes_file_path]
-        next_version = params[:next_version] || Fastlane::Helper::Ios::VersionHelper.calc_next_release_version(params[:new_version])
+        next_version = params[:next_version]&.strip
+        next_version = Fastlane::Helper::Ios::VersionHelper.calc_next_release_version(params[:new_version]) if next_version.nil? || next_version.empty?
 
         Fastlane::Helper::ReleaseNotesHelper.add_new_section(path: path, section_title: next_version)
         Fastlane::Helper::GitHelper.commit(message: "Release Notes: add new section for next version (#{next_version})", files: path)

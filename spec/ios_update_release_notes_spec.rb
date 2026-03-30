@@ -120,7 +120,23 @@ describe Fastlane::Actions::IosUpdateReleaseNotesAction do
           run_described_fastlane_action(
             release_notes_file_path: release_notes_txt
           )
-        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'You must provide either `next_version` or `new_version`')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'You must provide a non-empty value for either `next_version` or `new_version`')
+      end
+    end
+
+    it 'raises an error when next_version is an empty string' do
+      in_tmp_dir do |tmp_dir|
+        # Arrange
+        release_notes_txt = File.join(tmp_dir, 'RELEASE-NOTES.txt')
+        File.write(release_notes_txt, content)
+
+        # Act & Assert
+        expect do
+          run_described_fastlane_action(
+            next_version: '',
+            release_notes_file_path: release_notes_txt
+          )
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'You must provide a non-empty value for either `next_version` or `new_version`')
       end
     end
   end
