@@ -85,27 +85,19 @@ describe Fastlane::Actions::IosUpdateReleaseNotesAction do
       end
     end
 
-    it 'prefers next_version over new_version when both are provided' do
+    it 'raises an error when both new_version and next_version are provided' do
       in_tmp_dir do |tmp_dir|
         # Arrange
         release_notes_txt = File.join(tmp_dir, 'RELEASE-NOTES.txt')
         File.write(release_notes_txt, content)
 
-        expected_section = <<~CONTENT
-          8.10
-          -----
-
-
-        CONTENT
-
-        # Act
-        run_described_fastlane_action(
-          new_version: '8.9',
-          next_version: '8.10'
-        )
-
-        # Assert — next_version wins, not the computed 9.0 from new_version
-        expect(File.read(release_notes_txt)).to eq(expected_section + content)
+        # Act & Assert
+        expect do
+          run_described_fastlane_action(
+            new_version: '8.9',
+            next_version: '8.10'
+          )
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /Unresolved conflict between options/)
       end
     end
 
