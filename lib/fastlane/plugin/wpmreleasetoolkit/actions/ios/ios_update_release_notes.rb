@@ -10,8 +10,10 @@ module Fastlane
         require_relative '../../helper/release_notes_helper'
         require_relative '../../helper/git_helper'
 
+        UI.user_error!('You must provide either `next_version` or `new_version`') if params[:next_version].nil? && params[:new_version].nil?
+
         path = params[:release_notes_file_path]
-        next_version = Fastlane::Helper::Ios::VersionHelper.calc_next_release_version(params[:new_version])
+        next_version = params[:next_version] || Fastlane::Helper::Ios::VersionHelper.calc_next_release_version(params[:new_version])
 
         Fastlane::Helper::ReleaseNotesHelper.add_new_section(path: path, section_title: next_version)
         Fastlane::Helper::GitHelper.commit(message: "Release Notes: add new section for next version (#{next_version})", files: path)
@@ -36,6 +38,15 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :new_version,
                                        env_name: 'FL_IOS_UPDATE_RELEASE_NOTES_VERSION',
                                        description: 'The version we are currently freezing; An empty entry for the _next_ version after this one will be added to the release notes',
+                                       deprecated: 'Use `next_version` instead. This parameter computes the next version using a built-in calculator ' \
+                                                   'that assumes the minor version rolls over to the next major at 9, which is incorrect for apps using semantic versioning',
+                                       optional: true,
+                                       type: String),
+          FastlaneCore::ConfigItem.new(key: :next_version,
+                                       description: 'The next version to use as the section title in the release notes. ' \
+                                                    'When provided, this value is used directly instead of computing it from `new_version`. ' \
+                                                    'Use this if your app does not follow the default versioning convention (minor capped at 9)',
+                                       optional: true,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :release_notes_file_path,
                                        env_name: 'FL_IOS_UPDATE_RELEASE_NOTES_FILE_PATH',
