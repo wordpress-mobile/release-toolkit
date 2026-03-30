@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Added optional `next_version` parameter to `android_update_release_notes` and `ios_update_release_notes` actions, allowing callers to provide the next version directly instead of relying on the built-in calculator that assumes minor version caps at 9. This fixes incorrect version bumps (e.g., 8.9 → 9.0 instead of 8.10) for apps using semantic versioning. [#706]
 
 ### Internal Changes
 

@@ -61,5 +61,75 @@ describe Fastlane::Actions::AndroidUpdateReleaseNotesAction do
         expect(File.read(changelog_md)).to eq(new_section + content)
       end
     end
+
+    it 'uses next_version directly when provided' do
+      in_tmp_dir do |tmp_dir|
+        # Arrange
+        release_notes_txt = File.join(tmp_dir, 'RELEASE-NOTES.txt')
+        File.write(release_notes_txt, content)
+
+        expected_section = <<~CONTENT
+          8.10
+          -----
+
+
+        CONTENT
+
+        # Act
+        run_described_fastlane_action(
+          next_version: '8.10'
+        )
+
+        # Assert
+        expect(File.read(release_notes_txt)).to eq(expected_section + content)
+      end
+    end
+
+    it 'raises an error when both new_version and next_version are provided' do
+      in_tmp_dir do |tmp_dir|
+        # Arrange
+        release_notes_txt = File.join(tmp_dir, 'RELEASE-NOTES.txt')
+        File.write(release_notes_txt, content)
+
+        # Act & Assert
+        expect do
+          run_described_fastlane_action(
+            new_version: '8.9',
+            next_version: '8.10'
+          )
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /Unresolved conflict between options/)
+      end
+    end
+
+    it 'raises an error when neither new_version nor next_version is provided' do
+      in_tmp_dir do |tmp_dir|
+        # Arrange
+        release_notes_txt = File.join(tmp_dir, 'RELEASE-NOTES.txt')
+        File.write(release_notes_txt, content)
+
+        # Act & Assert
+        expect do
+          run_described_fastlane_action(
+            release_notes_file_path: release_notes_txt
+          )
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'You must provide a non-empty value for either `next_version` or `new_version`')
+      end
+    end
+
+    it 'raises an error when next_version is an empty string' do
+      in_tmp_dir do |tmp_dir|
+        # Arrange
+        release_notes_txt = File.join(tmp_dir, 'RELEASE-NOTES.txt')
+        File.write(release_notes_txt, content)
+
+        # Act & Assert
+        expect do
+          run_described_fastlane_action(
+            next_version: '',
+            release_notes_file_path: release_notes_txt
+          )
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'You must provide a non-empty value for either `next_version` or `new_version`')
+      end
+    end
   end
 end
