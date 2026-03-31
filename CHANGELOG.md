@@ -18,7 +18,8 @@ _None_
 
 ### Internal Changes
 
-- Remove explicit `activesupport` version constraint (`< 8`) from gemspec to avoid forcing downstream projects to downgrade their ActiveSupport version. [#709]
+- Remove explicit `activesupport` version constraint (`< 8`) from gemspec and re-add it as an explicit runtime dependency (`>= 6.1, < 9`) since production code uses it. [#709]
+- Update RuboCop configuration: fix obsolete `Naming/PredicateName` cop rename, move permanent style choices from `.rubocop_todo.yml` to `.rubocop.yml`, and fix a `Style/FileOpen` violation. [#709]
 
 ## 14.3.0
 
