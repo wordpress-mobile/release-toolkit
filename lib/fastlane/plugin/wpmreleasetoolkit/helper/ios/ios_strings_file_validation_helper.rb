@@ -9,7 +9,7 @@ module Fastlane
         #   :maybe_block_comment_end, :in_quoted_key,
         #   :after_quoted_key_before_eq, :after_quoted_key_and_equal,
         #   :in_quoted_value, :after_quoted_value
-        State = Struct.new(:context, :buffer, :in_escaped_ctx, :found_key, keyword_init: true)
+        State = Struct.new(:context, :buffer, :in_escaped_ctx, :found_key)
 
         TRANSITIONS = {
           root: {
