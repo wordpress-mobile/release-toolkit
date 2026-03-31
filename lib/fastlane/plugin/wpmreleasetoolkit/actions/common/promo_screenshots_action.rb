@@ -2,7 +2,7 @@
 
 require 'fileutils'
 require 'fastlane/action'
-require 'active_support/all'
+require 'json'
 require_relative '../../helper/promo_screenshots_helper'
 
 module Fastlane
@@ -187,7 +187,7 @@ module Fastlane
         config_entries
           .flat_map do |entry|
           languages.map do |language|
-            new_entry = entry.deep_dup
+            new_entry = Marshal.load(Marshal.dump(entry))
 
             # Not every output file will have a screenshot, so handle cases where no
             # screenshot file is defined

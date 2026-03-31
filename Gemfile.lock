@@ -2,7 +2,6 @@ PATH
   remote: .
   specs:
     fastlane-plugin-wpmreleasetoolkit (14.3.0)
-      activesupport (>= 6.1, < 9)
       buildkit (~> 1.5)
       chroma (= 0.2.0)
       diffy (~> 3.3)
@@ -481,6 +480,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activesupport (~> 7.2)
   buildkite-test_collector (~> 2.3)
   bundler (~> 2.0)
   cocoapods (~> 1.10)
