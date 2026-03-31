@@ -187,7 +187,7 @@ module Fastlane
         config_entries
           .flat_map do |entry|
           languages.map do |language|
-            new_entry = Marshal.load(Marshal.dump(entry))
+            new_entry = Marshal.load(Marshal.dump(entry)) # trick to do a _deep_ copy (`.dup` would only do shallow one)
 
             # Not every output file will have a screenshot, so handle cases where no
             # screenshot file is defined
