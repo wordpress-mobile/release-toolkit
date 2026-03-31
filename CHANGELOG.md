@@ -18,7 +18,8 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Remove `activesupport` as a runtime dependency — replace the only production usage (`deep_dup`) with `Marshal` deep copy — and move it to a dev-only dependency for specs. [#709]
+- Update RuboCop configuration: fix obsolete `Naming/PredicateName` cop rename, move permanent style choices from `.rubocop_todo.yml` to `.rubocop.yml`, and fix a `Style/FileOpen` violation. [#709]
 
 ## 14.3.0
 

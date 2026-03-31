@@ -23,6 +23,7 @@ Buildkite::TestCollector.configure(hook: :rspec)
 module SpecHelper
 end
 
+require 'active_support/all' # ActiveSupport methods (e.g. Time.use_zone, String#to_time) used by some specs
 require 'fastlane' # to import the Action super class
 require 'fastlane/plugin/wpmreleasetoolkit' # import the actual plugin
 

@@ -26,7 +26,7 @@ module Fastlane
 
       def self.extract_notes(release_notes_file_path, version)
         state = :discarding
-        File.open(release_notes_file_path).each do |line|
+        File.foreach(release_notes_file_path) do |line|
           case state
           when :discarding
             state = :evaluating if line.match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/) && (line.strip == version)

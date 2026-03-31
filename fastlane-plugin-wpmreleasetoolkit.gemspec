@@ -26,7 +26,6 @@ Gem::Specification.new do |spec|
   # since this would cause a circular dependency
 
   # spec.add_dependency 'your-dependency', '~> 1.0.0'
-  spec.add_dependency 'activesupport', '>= 6.1.7.1', '< 8' # Required for fastlane to not crash when importing this plugin
   spec.add_dependency 'buildkit', '~> 1.5'
   spec.add_dependency 'chroma', '0.2.0'
   spec.add_dependency 'diffy', '~> 3.3'
@@ -46,8 +45,9 @@ Gem::Specification.new do |spec|
   # `google-cloud-storage` is required by fastlane, but we pin it in case it's not in the future
   spec.add_dependency 'google-cloud-storage', '~> 1.31'
 
+  # Only needed for specs (Time.use_zone, String#to_time, Hash#slice!)
+  spec.add_development_dependency 'activesupport', '~> 8.1'
   spec.add_development_dependency 'bundler', '~> 2.0'
-  spec.add_development_dependency 'cocoapods', '~> 1.10'
   # Use at least Fastlane 2.210.0 to ensure compatibility with the Xcode 14 toolchain
   # See https://github.com/fastlane/fastlane/releases/tag/2.210.0
   spec.add_development_dependency 'fastlane', '~> 2.210'

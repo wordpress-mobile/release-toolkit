@@ -63,13 +63,13 @@ describe Fastlane::Actions::OpenaiAskAction do
     if expected_prompt.nil? || expected_prompt.empty?
       expect(messages.length).to eq(1)
       expect(messages[0]['role']).to eq('user')
-      expect(messages[0]['content']).to eq(['type' => 'text', 'text' => question_param])
+      expect(messages[0]['content']).to eq([{ 'type' => 'text', 'text' => question_param }])
     else
       expect(messages.length).to eq(2)
       expect(messages[0]['role']).to eq('system')
-      expect(messages[0]['content']).to eq(['type' => 'text', 'text' => expected_prompt])
+      expect(messages[0]['content']).to eq([{ 'type' => 'text', 'text' => expected_prompt }])
       expect(messages[1]['role']).to eq('user')
-      expect(messages[1]['content']).to eq(['type' => 'text', 'text' => question_param])
+      expect(messages[1]['content']).to eq([{ 'type' => 'text', 'text' => question_param }])
     end
 
     # Ensure the request has been made and return the action response for it to be validated in calling test

@@ -71,7 +71,7 @@ module Fastlane
 
       # A small model/struct representing values exposed by Firebase App Distribution for a given release
       #
-      FirebaseReleaseInfo = Struct.new(:display_version, :build_version, :testing_url, :os, :bundle_id, :release_id, keyword_init: true) do
+      FirebaseReleaseInfo = Struct.new(:display_version, :build_version, :testing_url, :os, :bundle_id, :release_id) do
         def self.from_lane_context
           return nil unless defined?(SharedValues::FIREBASE_APP_DISTRO_RELEASE)
 

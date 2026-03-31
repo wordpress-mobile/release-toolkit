@@ -54,6 +54,18 @@ Style/FetchEnvVar:
 Style/HashSyntax:
   EnforcedShorthandSyntax: never
 
+########## Naming Rules
+
+# 76 methods in this gem use `is_`/`has_`/`have_` prefixes. These are part of the public API
+# and renaming them would be a breaking change for consumers.
+Naming/PredicatePrefix:
+  Enabled: false
+
+# Many flagged methods are part of Fastlane's Action API contract (e.g. `self.run`)
+# or are public API methods that cannot be renamed without breaking consumers.
+Naming/PredicateMethod:
+  Enabled: false
+
 ########## Gemspec Rules
 
 # This was turned on by default after updating Rubocop to `1.50.2`. We want to disable this for now because
@@ -61,6 +73,23 @@ Style/HashSyntax:
 # https://github.com/wordpress-mobile/release-toolkit/pull/464#pullrequestreview-1396569313 for more discussion
 Gemspec/RequireMFA:
   Enabled: false
+
+# Dev dependencies are defined in the gemspec, which is the standard pattern for this project.
+Gemspec/DevelopmentDependencies:
+  Exclude:
+    - 'fastlane-plugin-wpmreleasetoolkit.gemspec'
+
+########## Style Rules
+
+# No class-level documentation is required — this is a Fastlane plugin, not a library with public docs.
+Style/Documentation:
+  Enabled: false
+
+# These files intentionally reopen external modules (Nokogiri, Fastlane).
+Style/OneClassPerFile:
+  Exclude:
+    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/android/android_localize_helper.rb'
+    - 'lib/fastlane/plugin/wpmreleasetoolkit/helper/ci_helper.rb'
 
 ########## Metrics / Max Lengths Rules
 
@@ -106,4 +135,16 @@ RSpec/MultipleMemoizedHelpers:
   Enabled: false
 
 RSpec/MultipleExpectations:
+  Enabled: false
+
+# The project consistently uses `receive` style across 136 usages — this is the preferred style.
+RSpec/MessageSpies:
+  EnforcedStyle: receive
+
+# Spec structure uses up to 5 levels of nesting, which is acceptable for this project.
+RSpec/NestedGroups:
+  Max: 5
+
+# Spec file paths don't follow the default RuboCop convention due to the plugin's namespace structure.
+RSpec/SpecFilePathFormat:
   Enabled: false
