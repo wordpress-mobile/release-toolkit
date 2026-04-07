@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require_relative '../lib/fastlane/plugin/wpmreleasetoolkit/env_manager/env_manager'
 
 describe EnvManager do
   let(:errors) { [] }
