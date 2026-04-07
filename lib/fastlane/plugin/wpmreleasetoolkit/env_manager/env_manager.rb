@@ -7,14 +7,12 @@ require 'fastlane'
 
 # Manages loading of environment variables from a .env and accessing them in a user-friendly way.
 class EnvManager
-  @env_path = nil
-  @env_example_path = nil
-  @print_error_lambda = nil
+  attr_reader :env_path, :env_example_path
 
   # Set up by loading the .env file with the given name.
   #
   # TODO: We could go one step and guess the name based on the repo URL.
-  def self.set_up(
+  def initialize(
     env_file_name:,
     env_file_folder: File.join(Dir.home, '.a8c-apps'),
     example_env_file_path: 'fastlane/example.env',
@@ -29,7 +27,7 @@ class EnvManager
   end
 
   # Use this instead of getting values from `ENV` directly. It will throw an error if the requested value is missing or empty.
-  def self.get_required_env!(key)
+  def get_required_env!(key)
     unless ENV.key?(key)
       message = "Environment variable '#{key}' is not set."
 
@@ -53,7 +51,7 @@ class EnvManager
 
     value = ENV.fetch(key)
 
-    UI.user_error!("Env var for key #{key} is set but empty. Please set a value for #{key}.") if value.to_s.empty?
+    @print_error_lambda.call("Env var for key #{key} is set but empty. Please set a value for #{key}.") if value.to_s.empty?
 
     value
   end
@@ -61,12 +59,28 @@ class EnvManager
   # Use this to ensure all env vars a lane requires are set.
   #
   # The best place to call this is at the start of a lane, to fail early.
-  def self.require_env_vars!(*keys)
+  def require_env_vars!(*keys)
     keys.each { |key| get_required_env!(key) }
   end
 
-  def self.running_on_ci?
+  # Class-level convenience methods that delegate to a default instance.
+  # This preserves the existing API: `EnvManager.set_up(...)` then `EnvManager.get_required_env!(...)`.
+
+  def self.set_up(**args)
+    @default = new(**args)
+  end
+
+  def self.get_required_env!(key)
+    @default.get_required_env!(key)
+  end
+
+  def self.require_env_vars!(*keys)
+    @default.require_env_vars!(*keys)
+  end
+
+  private
+
+  def running_on_ci?
     ENV['CI'] == 'true'
   end
-  private_class_method :running_on_ci?
 end
