@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Add `EnvManager` class for loading `.env` files and accessing required environment variables with user-friendly error messages. [#578]
 
 ### Bug Fixes
 
