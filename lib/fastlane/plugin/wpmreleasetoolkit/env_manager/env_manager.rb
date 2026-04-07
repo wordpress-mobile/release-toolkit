@@ -68,4 +68,5 @@ class EnvManager
   def self.running_on_ci?
     ENV['CI'] == 'true'
   end
+  private_class_method :running_on_ci?
 end
