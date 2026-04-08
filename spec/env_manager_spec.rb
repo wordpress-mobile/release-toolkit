@@ -69,6 +69,42 @@ describe EnvManager do
         expect(ENV.fetch('TEST_INIT_VAR', nil)).to eq('loaded')
       end
     end
+
+    it 'warns when the env file does not exist' do
+      ENV.delete('CI')
+
+      expect(FastlaneCore::UI).to receive(:important).with(/env file not found/)
+
+      described_class.new(
+        env_file_name: 'nonexistent.env',
+        env_file_folder: '/tmp/no-such-dir',
+        print_error_lambda: print_error_lambda
+      )
+    end
+
+    it 'does not warn when the env file exists' do
+      with_tmp_file(named: 'exists.env', content: '') do |path|
+        expect(FastlaneCore::UI).not_to receive(:important)
+
+        described_class.new(
+          env_file_name: File.basename(path),
+          env_file_folder: File.dirname(path),
+          print_error_lambda: print_error_lambda
+        )
+      end
+    end
+
+    it 'does not warn on CI even if the env file is missing' do
+      ENV['CI'] = 'true'
+
+      expect(FastlaneCore::UI).not_to receive(:important)
+
+      described_class.new(
+        env_file_name: 'nonexistent.env',
+        env_file_folder: '/tmp/no-such-dir',
+        print_error_lambda: print_error_lambda
+      )
+    end
   end
 
   describe '#get_required_env!' do

@@ -22,7 +22,10 @@ class EnvManager
     @env_example_path = example_env_file_path
     @print_error_lambda = print_error_lambda
 
-    # We don't check for @env_path to exist here
+    unless File.exist?(@env_path) || running_on_ci?
+      FastlaneCore::UI.important("Warning: env file not found at #{@env_path}. Environment variables may not be loaded.")
+    end
+
     Dotenv.load(@env_path)
   end
 
