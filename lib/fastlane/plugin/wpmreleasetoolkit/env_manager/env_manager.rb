@@ -68,6 +68,32 @@ class EnvManager
     keys.each { |key| get_required_env!(key) }
   end
 
+  # CI environment helpers — read common metadata from the CI provider.
+
+  def build_number
+    ENV.fetch('BUILDKITE_BUILD_NUMBER', '0')
+  end
+
+  def branch_name
+    ENV.fetch('BUILDKITE_BRANCH', nil)
+  end
+
+  def commit_hash
+    ENV.fetch('BUILDKITE_COMMIT', nil)
+  end
+
+  # Returns the PR number as an Integer, or nil if not running on a PR build.
+  # Buildkite sets BUILDKITE_PULL_REQUEST to 'false' (not nil) when not on a PR.
+  def pull_request_number
+    pr_num = ENV.fetch('BUILDKITE_PULL_REQUEST', 'false')
+    pr_num == 'false' ? nil : Integer(pr_num)
+  end
+
+  # Returns a human-readable label: "PR #123" for PR builds, or the branch name otherwise.
+  def pr_number_or_branch_name
+    pull_request_number&.then { |num| "PR ##{num}" } || branch_name
+  end
+
   # Class-level convenience methods that delegate to a default instance.
   # This preserves the existing API: `EnvManager.set_up(...)` then `EnvManager.get_required_env!(...)`.
 

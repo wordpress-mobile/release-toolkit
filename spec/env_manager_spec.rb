@@ -205,6 +205,101 @@ describe EnvManager do
     end
   end
 
+  describe 'CI environment helpers' do
+    subject(:manager) do
+      described_class.new(
+        env_file_name: 'test.env',
+        env_file_folder: '/tmp',
+        print_error_lambda: print_error_lambda
+      )
+    end
+
+    describe '#build_number' do
+      it 'returns the Buildkite build number' do
+        ENV['BUILDKITE_BUILD_NUMBER'] = '42'
+
+        expect(manager.build_number).to eq('42')
+      end
+
+      it 'defaults to 0 when not set' do
+        ENV.delete('BUILDKITE_BUILD_NUMBER')
+
+        expect(manager.build_number).to eq('0')
+      end
+    end
+
+    describe '#branch_name' do
+      it 'returns the Buildkite branch' do
+        ENV['BUILDKITE_BRANCH'] = 'feature/cool'
+
+        expect(manager.branch_name).to eq('feature/cool')
+      end
+
+      it 'returns nil when not set' do
+        ENV.delete('BUILDKITE_BRANCH')
+
+        expect(manager.branch_name).to be_nil
+      end
+    end
+
+    describe '#commit_hash' do
+      it 'returns the Buildkite commit' do
+        ENV['BUILDKITE_COMMIT'] = 'abc123'
+
+        expect(manager.commit_hash).to eq('abc123')
+      end
+
+      it 'returns nil when not set' do
+        ENV.delete('BUILDKITE_COMMIT')
+
+        expect(manager.commit_hash).to be_nil
+      end
+    end
+
+    describe '#pull_request_number' do
+      it 'returns the PR number as an integer' do
+        ENV['BUILDKITE_PULL_REQUEST'] = '99'
+
+        expect(manager.pull_request_number).to eq(99)
+      end
+
+      it 'returns nil when set to false' do
+        ENV['BUILDKITE_PULL_REQUEST'] = 'false'
+
+        expect(manager.pull_request_number).to be_nil
+      end
+
+      it 'returns nil when not set' do
+        ENV.delete('BUILDKITE_PULL_REQUEST')
+
+        expect(manager.pull_request_number).to be_nil
+      end
+    end
+
+    describe '#pr_number_or_branch_name' do
+      it 'returns PR label when on a PR build' do
+        ENV['BUILDKITE_PULL_REQUEST'] = '42'
+        ENV['BUILDKITE_BRANCH'] = 'feature/x'
+
+        expect(manager.pr_number_or_branch_name).to eq('PR #42')
+      end
+
+      it 'falls back to branch name when not on a PR' do
+        ENV['BUILDKITE_PULL_REQUEST'] = 'false'
+        ENV['BUILDKITE_BRANCH'] = 'trunk'
+
+        expect(manager.pr_number_or_branch_name).to eq('trunk')
+      end
+
+      it 'returns nil when neither PR nor branch is set' do
+        ENV.delete('BUILDKITE_PULL_REQUEST')
+        ENV.delete('BUILDKITE_BRANCH')
+
+        expect(manager.pr_number_or_branch_name).to be_nil
+      end
+    end
+  end
+
   describe 'class-level convenience methods' do
     before do
       described_class.set_up(
