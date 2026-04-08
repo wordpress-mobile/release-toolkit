@@ -172,6 +172,8 @@ describe EnvManager do
       )
     end
 
+    after { described_class.reset! }
+
     describe '.get_required_env!' do
       it 'delegates to the default instance' do
         ENV['CLASS_KEY'] = 'class_value'
@@ -187,6 +189,28 @@ describe EnvManager do
 
         expect(described_class.get_required_env!('CK1')).to eq('v1')
         expect(described_class.get_required_env!('CK2')).to eq('v2')
+      end
+    end
+
+    describe '.reset!' do
+      it 'clears the default instance' do
+        expect(described_class).to be_configured
+
+        described_class.reset!
+
+        expect(described_class).not_to be_configured
+      end
+    end
+
+    describe '.configured?' do
+      it 'returns false before set_up' do
+        described_class.reset!
+
+        expect(described_class).not_to be_configured
+      end
+
+      it 'returns true after set_up' do
+        expect(described_class).to be_configured
       end
     end
   end

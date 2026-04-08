@@ -78,6 +78,16 @@ class EnvManager
     @default.require_env_vars!(*keys)
   end
 
+  # Clears the default instance, useful for test teardown.
+  def self.reset!
+    @default = nil
+  end
+
+  # Returns true if a default instance has been configured via `.set_up`.
+  def self.configured?
+    !@default.nil?
+  end
+
   private
 
   def running_on_ci?
