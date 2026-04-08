@@ -11,6 +11,9 @@ describe EnvManager do
     end
   end
 
+  let(:warnings) { [] }
+  let(:print_warning_lambda) { ->(message) { warnings << message } }
+
   # Capture and restore ENV state around each test
   around do |example|
     saved_env = ENV.to_h
@@ -73,37 +76,40 @@ describe EnvManager do
     it 'warns when the env file does not exist' do
       ENV.delete('CI')
 
-      expect(FastlaneCore::UI).to receive(:important).with(/env file not found/)
-
       described_class.new(
         env_file_name: 'nonexistent.env',
         env_file_folder: '/tmp/no-such-dir',
-        print_error_lambda: print_error_lambda
+        print_error_lambda: print_error_lambda,
+        print_warning_lambda: print_warning_lambda
       )
+
+      expect(warnings).to include(a_string_matching(/env file not found/))
     end
 
     it 'does not warn when the env file exists' do
       with_tmp_file(named: 'exists.env', content: '') do |path|
-        expect(FastlaneCore::UI).not_to receive(:important)
-
         described_class.new(
           env_file_name: File.basename(path),
           env_file_folder: File.dirname(path),
-          print_error_lambda: print_error_lambda
+          print_error_lambda: print_error_lambda,
+          print_warning_lambda: print_warning_lambda
         )
+
+        expect(warnings).to be_empty
       end
     end
 
     it 'does not warn on CI even if the env file is missing' do
       ENV['CI'] = 'true'
 
-      expect(FastlaneCore::UI).not_to receive(:important)
-
       described_class.new(
         env_file_name: 'nonexistent.env',
         env_file_folder: '/tmp/no-such-dir',
-        print_error_lambda: print_error_lambda
+        print_error_lambda: print_error_lambda,
+        print_warning_lambda: print_warning_lambda
       )
+
+      expect(warnings).to be_empty
     end
   end
 

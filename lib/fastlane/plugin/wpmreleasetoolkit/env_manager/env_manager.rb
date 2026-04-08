@@ -16,14 +16,16 @@ class EnvManager
     env_file_name:,
     env_file_folder: File.join(Dir.home, '.a8c-apps'),
     example_env_file_path: 'fastlane/example.env',
-    print_error_lambda: ->(message) { FastlaneCore::UI.user_error!(message) }
+    print_error_lambda: ->(message) { FastlaneCore::UI.user_error!(message) },
+    print_warning_lambda: ->(message) { FastlaneCore::UI.important(message) }
   )
     @env_path = File.join(env_file_folder, env_file_name)
     @env_example_path = example_env_file_path
     @print_error_lambda = print_error_lambda
+    @print_warning_lambda = print_warning_lambda
 
     unless File.exist?(@env_path) || running_on_ci?
-      FastlaneCore::UI.important("Warning: env file not found at #{@env_path}. Environment variables may not be loaded.")
+      @print_warning_lambda.call("Warning: env file not found at #{@env_path}. Environment variables may not be loaded.")
     end
 
     Dotenv.load(@env_path)
