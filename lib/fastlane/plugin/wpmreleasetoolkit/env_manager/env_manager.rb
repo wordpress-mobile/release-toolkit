@@ -98,6 +98,8 @@ class EnvManager
   # This preserves the existing API: `EnvManager.set_up(...)` then `EnvManager.get_required_env!(...)`.
 
   def self.set_up(**args)
+    FastlaneCore::UI.user_error!('EnvManager is already configured. Call `EnvManager.reset!` before calling `EnvManager.set_up(...)` again.') if configured?
+
     @default = new(**args)
   end
 

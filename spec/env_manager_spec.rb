@@ -313,6 +313,21 @@ describe EnvManager do
 
     after { described_class.reset! }
 
+    describe '.set_up' do
+      it 'raises a clear error when called twice without reset' do
+        expect do
+          described_class.set_up(
+            env_file_name: 'other.env',
+            env_file_folder: '/tmp',
+            print_error_lambda: print_error_lambda
+          )
+        end.to raise_error(
+          FastlaneCore::Interface::FastlaneError,
+          'EnvManager is already configured. Call `EnvManager.reset!` before calling `EnvManager.set_up(...)` again.'
+        )
+      end
+    end
+
     describe '.get_required_env!' do
       it 'delegates to the default instance' do
         ENV['CLASS_KEY'] = 'class_value'
