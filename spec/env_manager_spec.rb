@@ -20,6 +20,7 @@ describe EnvManager do
     example.run
   ensure
     ENV.replace(saved_env)
+    described_class.default_print_error_lambda = nil
   end
 
   describe '#initialize' do
@@ -321,10 +322,7 @@ describe EnvManager do
             env_file_folder: '/tmp',
             print_error_lambda: print_error_lambda
           )
-        end.to raise_error(
-          FastlaneCore::Interface::FastlaneError,
-          'EnvManager is already configured. Call `EnvManager.reset!` before calling `EnvManager.set_up(...)` again.'
-        )
+        end.to raise_error('EnvManager is already configured. Call `EnvManager.reset!` before calling `EnvManager.set_up(...)` again.')
       end
     end
 
@@ -337,9 +335,10 @@ describe EnvManager do
 
       it 'raises a clear error when called before set_up' do
         described_class.reset!
+        described_class.default_print_error_lambda = print_error_lambda
 
         expect { described_class.get_required_env!('CLASS_KEY') }
-          .to raise_error(FastlaneCore::Interface::FastlaneError, 'EnvManager is not configured. Call `EnvManager.set_up(...)` first.')
+          .to raise_error('EnvManager is not configured. Call `EnvManager.set_up(...)` first.')
       end
     end
 
@@ -354,9 +353,10 @@ describe EnvManager do
 
       it 'raises a clear error when called before set_up' do
         described_class.reset!
+        described_class.default_print_error_lambda = print_error_lambda
 
         expect { described_class.require_env_vars!('CK1', 'CK2') }
-          .to raise_error(FastlaneCore::Interface::FastlaneError, 'EnvManager is not configured. Call `EnvManager.set_up(...)` first.')
+          .to raise_error('EnvManager is not configured. Call `EnvManager.set_up(...)` first.')
       end
     end
 

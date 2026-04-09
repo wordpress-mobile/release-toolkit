@@ -9,6 +9,10 @@ require 'fastlane'
 class EnvManager
   attr_reader :env_path, :env_example_path
 
+  class << self
+    attr_writer :default_print_error_lambda
+  end
+
   # Set up by loading the .env file with the given name.
   #
   # TODO: We could go one step and guess the name based on the repo URL.
@@ -98,7 +102,7 @@ class EnvManager
   # This preserves the existing API: `EnvManager.set_up(...)` then `EnvManager.get_required_env!(...)`.
 
   def self.set_up(**args)
-    FastlaneCore::UI.user_error!('EnvManager is already configured. Call `EnvManager.reset!` before calling `EnvManager.set_up(...)` again.') if configured?
+    default_print_error_lambda.call('EnvManager is already configured. Call `EnvManager.reset!` before calling `EnvManager.set_up(...)` again.') if configured?
 
     @default = new(**args)
   end
@@ -124,7 +128,11 @@ class EnvManager
   def self.default!
     return @default if configured?
 
-    FastlaneCore::UI.user_error!('EnvManager is not configured. Call `EnvManager.set_up(...)` first.')
+    default_print_error_lambda.call('EnvManager is not configured. Call `EnvManager.set_up(...)` first.')
+  end
+
+  def self.default_print_error_lambda
+    @default&.instance_variable_get(:@print_error_lambda) || @default_print_error_lambda || ->(message) { FastlaneCore::UI.user_error!(message) }
   end
 
   private
