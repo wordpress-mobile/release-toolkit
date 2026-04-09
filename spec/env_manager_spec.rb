@@ -301,6 +301,8 @@ describe EnvManager do
   end
 
   describe 'class-level convenience methods' do
+    before { described_class.reset! }
+
     before do
       described_class.set_up(
         env_file_name: 'test.env',
@@ -317,6 +319,13 @@ describe EnvManager do
 
         expect(described_class.get_required_env!('CLASS_KEY')).to eq('class_value')
       end
+
+      it 'raises a clear error when called before set_up' do
+        described_class.reset!
+
+        expect { described_class.get_required_env!('CLASS_KEY') }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, 'EnvManager is not configured. Call `EnvManager.set_up(...)` first.')
+      end
     end
 
     describe '.require_env_vars!' do
@@ -326,6 +335,13 @@ describe EnvManager do
 
         expect(described_class.get_required_env!('CK1')).to eq('v1')
         expect(described_class.get_required_env!('CK2')).to eq('v2')
+      end
+
+      it 'raises a clear error when called before set_up' do
+        described_class.reset!
+
+        expect { described_class.require_env_vars!('CK1', 'CK2') }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, 'EnvManager is not configured. Call `EnvManager.set_up(...)` first.')
       end
     end
 

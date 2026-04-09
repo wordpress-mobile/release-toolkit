@@ -102,11 +102,11 @@ class EnvManager
   end
 
   def self.get_required_env!(key)
-    @default.get_required_env!(key)
+    default!.get_required_env!(key)
   end
 
   def self.require_env_vars!(*keys)
-    @default.require_env_vars!(*keys)
+    default!.require_env_vars!(*keys)
   end
 
   # Clears the default instance, useful for test teardown.
@@ -117,6 +117,12 @@ class EnvManager
   # Returns true if a default instance has been configured via `.set_up`.
   def self.configured?
     !@default.nil?
+  end
+
+  def self.default!
+    return @default if configured?
+
+    FastlaneCore::UI.user_error!('EnvManager is not configured. Call `EnvManager.set_up(...)` first.')
   end
 
   private
