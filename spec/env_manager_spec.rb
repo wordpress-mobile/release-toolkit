@@ -302,9 +302,8 @@ describe EnvManager do
   end
 
   describe 'class-level convenience methods' do
-    before { described_class.reset! }
-
     before do
+      described_class.reset!
       described_class.set_up(
         env_file_name: 'test.env',
         env_file_folder: '/tmp',
