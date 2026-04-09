@@ -197,6 +197,16 @@ describe EnvManager do
       expect(result_b).to eq('b')
     end
 
+    it 'accepts an array of keys' do
+      ENV['KEY_A'] = 'a'
+      ENV['KEY_B'] = 'b'
+
+      manager.require_env_vars!(%w[KEY_A KEY_B])
+
+      expect(manager.get_required_env!('KEY_A')).to eq('a')
+      expect(manager.get_required_env!('KEY_B')).to eq('b')
+    end
+
     it 'raises on the first missing key' do
       ENV['KEY_A'] = 'a'
       ENV.delete('KEY_B')

@@ -69,7 +69,7 @@ class EnvManager
   #
   # The best place to call this is at the start of a lane, to fail early.
   def require_env_vars!(*keys)
-    keys.each { |key| get_required_env!(key) }
+    keys.flatten.each { |key| get_required_env!(key) }
   end
 
   # CI environment helpers — read common metadata from the CI provider.
