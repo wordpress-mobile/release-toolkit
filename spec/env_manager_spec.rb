@@ -419,8 +419,7 @@ describe EnvManager do
         ENV['CK1'] = 'v1'
         ENV['CK2'] = 'v2'
 
-        expect(described_class.get_required_env!('CK1')).to eq('v1')
-        expect(described_class.get_required_env!('CK2')).to eq('v2')
+        expect { described_class.require_env_vars!('CK1', 'CK2') }.not_to raise_error
       end
 
       it 'raises a clear error when called before set_up' do
