@@ -102,7 +102,10 @@ class EnvManager
   # This preserves the existing API: `EnvManager.set_up(...)` then `EnvManager.get_required_env!(...)`.
 
   def self.set_up(**args)
-    default_print_error_lambda.call('EnvManager is already configured. Call `EnvManager.reset!` before calling `EnvManager.set_up(...)` again.') if configured?
+    if configured?
+      default_print_error_lambda.call('EnvManager is already configured. Call `EnvManager.reset!` before calling `EnvManager.set_up(...)` again.')
+      return @default
+    end
 
     @default = new(**args)
   end

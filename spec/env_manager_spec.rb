@@ -333,6 +333,30 @@ describe EnvManager do
           )
         end.to raise_error('EnvManager is already configured. Call `EnvManager.reset!` before calling `EnvManager.set_up(...)` again.')
       end
+
+      it 'does not overwrite the default instance when the error lambda does not raise' do
+        # Set up with a non-raising error lambda so we can verify the guard behavior
+        described_class.reset!
+        non_raising_errors = []
+        non_raising_lambda = ->(message) { non_raising_errors << message }
+
+        described_class.set_up(
+          env_file_name: 'test.env',
+          env_file_folder: '/tmp',
+          print_error_lambda: non_raising_lambda
+        )
+        original_default = described_class.send(:instance_variable_get, :@default)
+
+        # Second call should not overwrite the original
+        described_class.set_up(
+          env_file_name: 'other.env',
+          env_file_folder: '/tmp',
+          print_error_lambda: non_raising_lambda
+        )
+
+        expect(described_class.send(:instance_variable_get, :@default)).to equal(original_default)
+        expect(non_raising_errors).to include(a_string_matching(/already configured/))
+      end
     end
 
     describe '.get_required_env!' do
