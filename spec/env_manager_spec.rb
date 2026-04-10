@@ -165,6 +165,21 @@ describe EnvManager do
         expect { manager.get_required_env!('MISSING_KEY') }
           .to raise_error(%r{test\.env not found in /tmp/nonexistent-env-folder})
       end
+
+      it 'raises KeyError even when the error lambda does not raise' do
+        ENV['CI'] = 'true'
+        non_raising_errors = []
+
+        non_raising_manager = described_class.new(
+          env_file_name: 'test.env',
+          env_file_folder: '/tmp',
+          print_error_lambda: ->(message) { non_raising_errors << message }
+        )
+
+        expect { non_raising_manager.get_required_env!('MISSING_KEY') }
+          .to raise_error(KeyError, /MISSING_KEY/)
+        expect(non_raising_errors).to include(a_string_matching(/not set/))
+      end
     end
 
     it 'prints an error when the env var is set but empty' do
@@ -172,6 +187,21 @@ describe EnvManager do
 
       expect { manager.get_required_env!('EMPTY_KEY') }
         .to raise_error(/is set but empty/)
+    end
+
+    it 'raises ArgumentError for empty values even when the error lambda does not raise' do
+      ENV['EMPTY_KEY'] = ''
+      non_raising_errors = []
+
+      non_raising_manager = described_class.new(
+        env_file_name: 'test.env',
+        env_file_folder: '/tmp',
+        print_error_lambda: ->(message) { non_raising_errors << message }
+      )
+
+      expect { non_raising_manager.get_required_env!('EMPTY_KEY') }
+        .to raise_error(ArgumentError, /is set but empty/)
+      expect(non_raising_errors).to include(a_string_matching(/is set but empty/))
     end
   end
 

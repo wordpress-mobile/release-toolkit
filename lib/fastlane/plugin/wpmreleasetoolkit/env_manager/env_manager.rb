@@ -40,27 +40,35 @@ class EnvManager
     unless ENV.key?(key)
       message = "Environment variable '#{key}' is not set."
 
-      if running_on_ci?
-        @print_error_lambda.call(message)
-      elsif File.exist?(@env_path)
-        @print_error_lambda.call("#{message} Consider adding it to #{@env_path}.")
-      else
-        env_file_dir = File.dirname(@env_path)
-        env_file_name = File.basename(@env_path)
+      error_message =
+        if running_on_ci?
+          message
+        elsif File.exist?(@env_path)
+          "#{message} Consider adding it to #{@env_path}."
+        else
+          env_file_dir = File.dirname(@env_path)
+          env_file_name = File.basename(@env_path)
 
-        @print_error_lambda.call <<~MSG
-          #{env_file_name} not found in #{env_file_dir} while looking for env var #{key}.
+          <<~MSG
+            #{env_file_name} not found in #{env_file_dir} while looking for env var #{key}.
 
-          Please copy #{@env_example_path} to #{@env_path} and fill in the value for #{key}.
+            Please copy #{@env_example_path} to #{@env_path} and fill in the value for #{key}.
 
-          mkdir -p #{env_file_dir} && cp #{@env_example_path} #{@env_path}
-        MSG
-      end
+            mkdir -p #{env_file_dir} && cp #{@env_example_path} #{@env_path}
+          MSG
+        end
+
+      @print_error_lambda.call(error_message)
+      raise KeyError, error_message
     end
 
     value = ENV.fetch(key)
 
-    @print_error_lambda.call("Env var for key #{key} is set but empty. Please set a value for #{key}.") if value.to_s.empty?
+    if value.to_s.empty?
+      empty_message = "Env var for key #{key} is set but empty. Please set a value for #{key}."
+      @print_error_lambda.call(empty_message)
+      raise ArgumentError, empty_message
+    end
 
     value
   end
