@@ -166,6 +166,20 @@ describe EnvManager do
           .to raise_error(%r{test\.env not found in /tmp/nonexistent-env-folder})
       end
 
+      it 'escapes paths with spaces in the shell command' do
+        ENV.delete('CI')
+
+        spaced_manager = described_class.new(
+          env_file_name: 'test.env',
+          env_file_folder: '/tmp/path with spaces',
+          example_env_file_path: 'lane/example file.env',
+          print_error_lambda: print_error_lambda
+        )
+
+        expect { spaced_manager.get_required_env!('MISSING_KEY') }
+          .to raise_error(%r{mkdir -p /tmp/path\\ with\\ spaces && cp lane/example\\ file\.env /tmp/path\\ with\\ spaces/test\.env})
+      end
+
       it 'raises KeyError even when the error lambda does not raise' do
         ENV['CI'] = 'true'
         non_raising_errors = []

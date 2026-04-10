@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'dotenv'
+require 'shellwords'
 # TODO: It would be nice to decouple this from Fastlane.
 # To give a good UX in the current use case, however, it's best to access the Fastlane UI methods directly.
 require 'fastlane'
@@ -54,7 +55,7 @@ class EnvManager
 
             Please copy #{@env_example_path} to #{@env_path} and fill in the value for #{key}.
 
-            mkdir -p #{env_file_dir} && cp #{@env_example_path} #{@env_path}
+            mkdir -p #{Shellwords.shellescape(env_file_dir)} && cp #{Shellwords.shellescape(@env_example_path)} #{Shellwords.shellescape(@env_path)}
           MSG
         end
 
