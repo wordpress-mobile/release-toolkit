@@ -373,6 +373,15 @@ describe EnvManager do
         expect { described_class.get_required_env!('CLASS_KEY') }
           .to raise_error('EnvManager is not configured. Call `EnvManager.set_up(...)` first.')
       end
+
+      it 'raises even when the error lambda does not raise' do
+        described_class.reset!
+        described_class.default_print_error_lambda = ->(message) { errors << message }
+
+        expect { described_class.get_required_env!('CLASS_KEY') }
+          .to raise_error(RuntimeError, 'EnvManager is not configured. Call `EnvManager.set_up(...)` first.')
+        expect(errors).to include(a_string_matching(/not configured/))
+      end
     end
 
     describe '.require_env_vars!' do

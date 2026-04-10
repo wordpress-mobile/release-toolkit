@@ -131,7 +131,9 @@ class EnvManager
   def self.default!
     return @default if configured?
 
-    default_print_error_lambda.call('EnvManager is not configured. Call `EnvManager.set_up(...)` first.')
+    message = 'EnvManager is not configured. Call `EnvManager.set_up(...)` first.'
+    default_print_error_lambda.call(message)
+    raise message
   end
 
   def self.default_print_error_lambda
