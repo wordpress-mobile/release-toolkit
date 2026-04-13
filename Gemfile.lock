@@ -5,6 +5,7 @@ PATH
       buildkit (~> 1.5)
       chroma (= 0.2.0)
       diffy (~> 3.3)
+      dotenv (~> 2.8)
       fastlane (~> 2.231)
       gettext (~> 3.5)
       git (~> 1.3)
