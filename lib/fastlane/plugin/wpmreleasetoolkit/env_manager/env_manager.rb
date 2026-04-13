@@ -158,7 +158,16 @@ class EnvManager
 
   private
 
+  # Consider any non-empty, non-falsy value of `CI` to mean we're running on CI.
+  # Most CI providers set `CI=true`, but some use `CI=1`.
+  #
+  # Note: the CI helpers above (`build_number`, etc.) remain Buildkite-specific —
+  # see the block comment on them. Detection via `CI` is a de facto standard and
+  # cheap to generalize; value-fetching is not.
   def running_on_ci?
-    ENV['CI'] == 'true'
+    value = ENV.fetch('CI', nil)
+    return false if value.nil? || value.empty?
+
+    !%w[false 0].include?(value.downcase)
   end
 end

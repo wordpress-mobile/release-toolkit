@@ -112,6 +112,38 @@ describe EnvManager do
 
       expect(warnings).to be_empty
     end
+
+    # Guard against the common pitfall of a strict `CI == 'true'` check —
+    # some providers set `CI=1` or similar truthy values.
+    %w[true TRUE 1 yes on].each do |ci_value|
+      it "treats CI=#{ci_value.inspect} as running on CI" do
+        ENV['CI'] = ci_value
+
+        described_class.new(
+          env_file_name: 'nonexistent.env',
+          env_file_folder: '/tmp/no-such-dir',
+          print_error_lambda: print_error_lambda,
+          print_warning_lambda: print_warning_lambda
+        )
+
+        expect(warnings).to be_empty
+      end
+    end
+
+    %w[false FALSE 0].each do |ci_value|
+      it "does not treat CI=#{ci_value.inspect} as running on CI" do
+        ENV['CI'] = ci_value
+
+        described_class.new(
+          env_file_name: 'nonexistent.env',
+          env_file_folder: '/tmp/no-such-dir',
+          print_error_lambda: print_error_lambda,
+          print_warning_lambda: print_warning_lambda
+        )
+
+        expect(warnings).not_to be_empty
+      end
+    end
   end
 
   describe '#get_required_env!' do
