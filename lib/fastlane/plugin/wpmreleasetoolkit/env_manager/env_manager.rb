@@ -8,7 +8,7 @@ require 'fastlane'
 
 # Manages loading of environment variables from a .env and accessing them in a user-friendly way.
 class EnvManager
-  attr_reader :env_path, :env_example_path
+  attr_reader :env_path, :env_example_path, :print_error_lambda
 
   class << self
     attr_writer :default_print_error_lambda
@@ -153,7 +153,7 @@ class EnvManager
   end
 
   def self.default_print_error_lambda
-    @default&.instance_variable_get(:@print_error_lambda) || @default_print_error_lambda || ->(message) { FastlaneCore::UI.user_error!(message) }
+    @default&.print_error_lambda || @default_print_error_lambda || ->(message) { FastlaneCore::UI.user_error!(message) }
   end
 
   private
