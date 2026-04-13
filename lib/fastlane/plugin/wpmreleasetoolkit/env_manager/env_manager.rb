@@ -85,7 +85,7 @@ class EnvManager
   #
   # Notice that given Buildkite is the only CI provider we use, they are Buildkite-dependent.
   #
-  # If this were to be adopted more broadly, we'd need a two-tier approch:
+  # If this were to be adopted more broadly, we'd need a two-tier approach:
   # 1. Detect which CI is in use
   # 2. Use its specific env vars
   # 3. Maybe fallback to best guess or outright error if no vendor detected
