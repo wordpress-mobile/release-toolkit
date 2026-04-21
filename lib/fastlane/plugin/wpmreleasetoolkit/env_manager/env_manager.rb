@@ -2,8 +2,6 @@
 
 require 'dotenv'
 require 'shellwords'
-# TODO: It would be nice to decouple this from Fastlane.
-# To give a good UX in the current use case, however, it's best to access the Fastlane UI methods directly.
 require 'fastlane'
 
 module Fastlane
@@ -17,8 +15,6 @@ module Fastlane
       end
 
       # Set up by loading the .env file with the given name.
-      #
-      # TODO: We could go one step and guess the name based on the repo URL.
       def initialize(
         env_file_name:,
         env_file_folder: File.join(Dir.home, '.a8c-apps'),
