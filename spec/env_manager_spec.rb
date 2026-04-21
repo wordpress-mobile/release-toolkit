@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EnvManager do
+describe Fastlane::Wpmreleasetoolkit::EnvManager do
   let(:errors) { [] }
   let(:print_error_lambda) do
     lambda do |message|
