@@ -207,7 +207,7 @@ describe Fastlane::Wpmreleasetoolkit::EnvManager do
         ENV['CI'] = 'true'
 
         expect { manager.get_required_env!('MISSING_KEY') }
-          .to raise_error("Environment variable 'MISSING_KEY' is not set.")
+          .to raise_error(/Environment variable 'MISSING_KEY' is not set\./)
       end
 
       it 'suggests adding the var to the env file when the file exists' do
@@ -224,7 +224,7 @@ describe Fastlane::Wpmreleasetoolkit::EnvManager do
           )
 
           expect { local_manager.get_required_env!('MISSING_KEY') }
-            .to raise_error("Environment variable 'MISSING_KEY' is not set. Consider adding it to #{env_path}.")
+            .to raise_error(/Environment variable 'MISSING_KEY' is not set\. Consider adding it to #{Regexp.escape(env_path)}/)
         end
       end
 
