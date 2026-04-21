@@ -62,15 +62,52 @@ describe EnvManager do
       expect(manager.env_example_path).to eq('fastlane/example.env')
     end
 
-    it 'loads the .env file via Dotenv' do
+    it 'loads values from the .env file without mutating ENV' do
+      ENV.delete('TEST_INIT_VAR')
+
       with_tmp_file(named: 'test.env', content: "TEST_INIT_VAR=loaded\n") do |path|
-        described_class.new(
+        manager = described_class.new(
           env_file_name: File.basename(path),
           env_file_folder: File.dirname(path),
           print_error_lambda: print_error_lambda
         )
 
-        expect(ENV.fetch('TEST_INIT_VAR', nil)).to eq('loaded')
+        expect(manager.get_required_env!('TEST_INIT_VAR')).to eq('loaded')
+        expect(ENV.fetch('TEST_INIT_VAR', nil)).to be_nil
+      end
+    end
+
+    it 'keeps multiple instances isolated from each other' do
+      with_tmp_file(named: 'a.env', content: "SHARED_KEY=from_a\n") do |path_a|
+        with_tmp_file(named: 'b.env', content: "SHARED_KEY=from_b\n") do |path_b|
+          manager_a = described_class.new(
+            env_file_name: File.basename(path_a),
+            env_file_folder: File.dirname(path_a),
+            print_error_lambda: print_error_lambda
+          )
+          manager_b = described_class.new(
+            env_file_name: File.basename(path_b),
+            env_file_folder: File.dirname(path_b),
+            print_error_lambda: print_error_lambda
+          )
+
+          expect(manager_a.get_required_env!('SHARED_KEY')).to eq('from_a')
+          expect(manager_b.get_required_env!('SHARED_KEY')).to eq('from_b')
+        end
+      end
+    end
+
+    it 'lets values in the process ENV take precedence over the .env file' do
+      ENV['PRECEDENCE_KEY'] = 'from_env'
+
+      with_tmp_file(named: 'p.env', content: "PRECEDENCE_KEY=from_file\n") do |path|
+        manager = described_class.new(
+          env_file_name: File.basename(path),
+          env_file_folder: File.dirname(path),
+          print_error_lambda: print_error_lambda
+        )
+
+        expect(manager.get_required_env!('PRECEDENCE_KEY')).to eq('from_env')
       end
     end
 

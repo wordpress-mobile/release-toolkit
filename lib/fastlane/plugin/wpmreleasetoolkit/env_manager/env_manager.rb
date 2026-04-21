@@ -33,12 +33,15 @@ class EnvManager
       @print_warning_lambda.call("Warning: env file not found at #{@env_path}. Environment variables may not be loaded.")
     end
 
-    Dotenv.load(@env_path)
+    # Parse rather than load so we don't mutate the global ENV. Each instance
+    # gets its own view, and values from the process environment (e.g. set by
+    # CI) still take precedence — see `env_value`.
+    @loaded_env = File.exist?(@env_path) ? Dotenv.parse(@env_path) : {}
   end
 
   # Use this instead of getting values from `ENV` directly. It will throw an error if the requested value is missing or empty.
   def get_required_env!(key)
-    unless ENV.key?(key)
+    unless env_var_set?(key)
       message = "Environment variable '#{key}' is not set."
 
       error_message =
@@ -63,7 +66,7 @@ class EnvManager
       raise KeyError, error_message
     end
 
-    value = ENV.fetch(key)
+    value = env_value(key)
 
     if value.to_s.empty?
       empty_message = "Env var for key #{key} is set but empty. Please set a value for #{key}."
@@ -157,6 +160,16 @@ class EnvManager
   end
 
   private
+
+  # Process ENV takes precedence over values loaded from the .env file, matching
+  # the original `Dotenv.load` (no-override) semantics.
+  def env_var_set?(key)
+    ENV.key?(key) || @loaded_env.key?(key)
+  end
+
+  def env_value(key)
+    ENV.key?(key) ? ENV.fetch(key) : @loaded_env[key]
+  end
 
   # Consider any non-empty, non-falsy value of `CI` to mean we're running on CI.
   # Most CI providers set `CI=true`, but some use `CI=1`.
