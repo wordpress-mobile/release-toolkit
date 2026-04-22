@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- Add `Fastlane::Wpmreleasetoolkit::EnvManager` for loading `.env` files and accessing required environment variables with user-friendly error messages. Repos that maintain their own `EnvManager` can switch to this centralized implementation. [#578]
+_None_
 
 ### Bug Fixes
 
@@ -19,6 +19,12 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 14.4.0
+
+### New Features
+
+- Add `Fastlane::Wpmreleasetoolkit::EnvManager` for loading `.env` files and accessing required environment variables with user-friendly error messages. Repos that maintain their own `EnvManager` can switch to this centralized implementation. [#578]
 
 ## 14.3.1
 
