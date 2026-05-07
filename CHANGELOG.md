@@ -14,11 +14,17 @@ _None_
 
 ### Bug Fixes
 
-- Bump the floor of the `nokogiri` dependency to `>= 1.19.3` to pull in the fix for [GHSA-c4rq-3m3g-8wgx](https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-c4rq-3m3g-8wgx) (CSS selector ReDoS). [#714]
+_None_
 
 ### Internal Changes
 
 _None_
+
+## 14.4.1
+
+### Bug Fixes
+
+- Bump the floor of the `nokogiri` dependency to `>= 1.19.3` to pull in the fix for [GHSA-c4rq-3m3g-8wgx](https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-c4rq-3m3g-8wgx) (CSS selector ReDoS). [#714]
 
 ## 14.4.0
 
