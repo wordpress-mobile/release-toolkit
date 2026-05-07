@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'gettext', '~> 3.5'
   spec.add_dependency 'git', '~> 1.3'
   spec.add_dependency 'java-properties', '~> 0.3.0'
-  spec.add_dependency 'nokogiri', '~> 1.11'
+  spec.add_dependency 'nokogiri', '~> 1.19', '>= 1.19.3'
   spec.add_dependency 'octokit', '~> 6.1'
   spec.add_dependency 'parallel', '~> 1.14'
   spec.add_dependency 'plist', '~> 3.1'
