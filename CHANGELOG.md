@@ -10,11 +10,11 @@ _None_
 
 ### New Features
 
-_None_
+- `openai_ask`: support OpenAI tool-use (function calling) via new `tools`, `tool_handlers`, and `max_tool_iterations` parameters. When `tools` are provided, the action runs a tool-use loop: the model can invoke tools whose handlers run locally and whose return values are sent back as `role: tool` messages, until the model produces a plain text response or the iteration cap is reached. Backwards-compatible — when `tools` is omitted, behavior is unchanged. [#XXX]
 
 ### Bug Fixes
 
-_None_
+- `openai_ask`: switch the documented examples to non-interpolated heredocs so generating action documentation no longer raises `NameError` for placeholder variables. [#XXX]
 
 ### Internal Changes
 
