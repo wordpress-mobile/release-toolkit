@@ -54,7 +54,7 @@ module Fastlane
       def self.run_with_tools(prompt:, question:, tools:, tool_handlers:, max_tool_iterations:, headers:)
         messages = [
           format_message(role: 'system', text: prompt),
-          format_message(role: 'user', text: question)
+          format_message(role: 'user', text: question),
         ].compact
 
         max_tool_iterations.times do

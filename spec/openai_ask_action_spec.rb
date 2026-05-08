@@ -63,12 +63,12 @@ describe Fastlane::Actions::OpenaiAskAction do
                 id: tool_call_id,
                 type: 'function',
                 function: { name: name, arguments: arguments_json }
-              }
+              },
             ]
           },
           logprobs: nil,
           finish_reason: 'tool_calls'
-        }
+        },
       ]
     }.to_json
   end
@@ -161,7 +161,7 @@ describe Fastlane::Actions::OpenaiAskAction do
               required: ['text']
             }
           }
-        }
+        },
       ]
     end
 
