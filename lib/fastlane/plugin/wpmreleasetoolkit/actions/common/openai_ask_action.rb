@@ -28,7 +28,9 @@ module Fastlane
         question = params[:question]
         model = params[:model] || DEFAULT_MODEL
         tools = params[:tools]
-        tool_handlers = params[:tool_handlers] || {}
+        # Tool names from the OpenAI API are always JSON strings. Normalize handler keys so
+        # callers can register handlers with either string or symbol keys without surprises.
+        tool_handlers = (params[:tool_handlers] || {}).transform_keys(&:to_s)
         max_tool_iterations = params[:max_tool_iterations] || DEFAULT_MAX_TOOL_ITERATIONS
 
         headers = {
@@ -149,18 +151,32 @@ module Fastlane
           end
 
         handler = tool_handlers[name]
-        result =
-          if handler
-            handler.call(args)
-          else
-            { error: "No handler defined for tool '#{name}'" }
-          end
+        result = invoke_tool_handler(name: name, handler: handler, args: args)
 
         {
           role: 'tool',
           tool_call_id: tool_call['id'],
           content: result.to_json
         }
+      end
+
+      # Invokes a tool handler safely. Returns a JSON-serializable Hash that will be
+      # sent back to the model as the `content` of a `role: tool` message.
+      #
+      # - Missing handler: structured `{ error: ... }` so the model can recover.
+      # - Handler raised: structured `{ error:, exception:, message: }` so the model can
+      #   see the failure and adjust. The loop keeps going rather than aborting the lane
+      #   mid-conversation — the model is the better judge of whether the failure is
+      #   recoverable than a global `rescue` here.
+      def self.invoke_tool_handler(name:, handler:, args:)
+        return { error: "No handler defined for tool '#{name}'" } if handler.nil?
+        return { error: "Handler for tool '#{name}' is not callable (got #{handler.class})" } unless handler.respond_to?(:call)
+
+        begin
+          handler.call(args)
+        rescue StandardError => e
+          { error: "Handler for tool '#{name}' raised", exception: e.class.name, message: e.message }
+        end
       end
 
       #####################################################
@@ -277,7 +293,9 @@ module Fastlane
                                        optional: true,
                                        default_value: nil,
                                        type: Array,
-                                       skip_type_validation: true),
+                                       verify_block: proc do |value|
+                                         UI.user_error!('Parameter `tools` must be a non-empty Array when provided') if value.empty?
+                                       end),
           FastlaneCore::ConfigItem.new(key: :tool_handlers,
                                        description: 'Hash of tool name to a callable (e.g. a Proc) invoked when the model calls that tool. ' \
                                                     'The callable receives the parsed arguments Hash and must return a JSON-serializable value, ' \
@@ -285,13 +303,19 @@ module Fastlane
                                        optional: true,
                                        default_value: nil,
                                        type: Hash,
-                                       skip_type_validation: true),
+                                       verify_block: proc do |value|
+                                         non_callable = value.reject { |_k, v| v.respond_to?(:call) }
+                                         UI.user_error!("Parameter `tool_handlers` values must respond to :call. Non-callable handlers: #{non_callable.keys}") if non_callable.any?
+                                       end),
           FastlaneCore::ConfigItem.new(key: :max_tool_iterations,
                                        description: 'Maximum number of tool-use loop iterations before the action fails. ' \
                                                     'Only used when `tools` are provided',
                                        optional: true,
                                        default_value: DEFAULT_MAX_TOOL_ITERATIONS,
-                                       type: Integer),
+                                       type: Integer,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Parameter `max_tool_iterations` must be >= 1 (got #{value})") if value < 1
+                                       end),
         ]
       end
 

@@ -348,5 +348,112 @@ describe Fastlane::Actions::OpenaiAskAction do
         { 'error' => "No handler defined for tool 'unregistered_tool'" }
       )
     end
+
+    it 'looks up handlers by string key even when registered with symbol keys' do
+      tool_handlers = {
+        check_length: ->(_args) { { ok: true, source: 'symbol_keyed' } }
+      }
+
+      first_response = stubbed_tool_call_response(
+        tool_call_id: 'call_sym',
+        name: 'check_length',
+        arguments_json: { text: 'short' }.to_json
+      )
+      second_response = stubbed_response('Done.')
+
+      recorded_bodies = []
+      stub_request(:post, endpoint)
+        .with { |req| recorded_bodies << req.body }
+        .to_return(
+          { status: 200, body: first_response },
+          { status: 200, body: second_response }
+        )
+
+      described_class.run(
+        api_token: fake_token,
+        prompt: 'sys',
+        question: 'q',
+        tools: tools,
+        tool_handlers: tool_handlers
+      )
+
+      tool_result_msg = JSON.parse(recorded_bodies.last)['messages'].find { |m| m['role'] == 'tool' }
+      expect(JSON.parse(tool_result_msg['content'])).to eq({ 'ok' => true, 'source' => 'symbol_keyed' })
+    end
+
+    it 'returns a structured error tool result when the handler raises' do
+      tool_handlers = {
+        'check_length' => ->(_args) { raise ArgumentError, 'bad args' }
+      }
+
+      first_response = stubbed_tool_call_response(
+        tool_call_id: 'call_raise',
+        name: 'check_length',
+        arguments_json: '{}'
+      )
+      second_response = stubbed_response('Recovered.')
+
+      recorded_bodies = []
+      stub_request(:post, endpoint)
+        .with { |req| recorded_bodies << req.body }
+        .to_return(
+          { status: 200, body: first_response },
+          { status: 200, body: second_response }
+        )
+
+      result = described_class.run(
+        api_token: fake_token,
+        prompt: 'sys',
+        question: 'q',
+        tools: tools,
+        tool_handlers: tool_handlers
+      )
+
+      expect(result).to eq('Recovered.')
+
+      tool_result_msg = JSON.parse(recorded_bodies.last)['messages'].find { |m| m['role'] == 'tool' }
+      content = JSON.parse(tool_result_msg['content'])
+      expect(content['error']).to eq("Handler for tool 'check_length' raised")
+      expect(content['exception']).to eq('ArgumentError')
+      expect(content['message']).to eq('bad args')
+    end
+  end
+
+  describe 'parameter validation' do
+    it 'rejects max_tool_iterations < 1' do
+      expect do
+        run_described_fastlane_action(
+          api_token: fake_token,
+          prompt: 'sys',
+          question: 'q',
+          tools: [{ type: 'function', function: { name: 'noop', parameters: {} } }],
+          tool_handlers: { 'noop' => ->(_) { {} } },
+          max_tool_iterations: 0
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /max_tool_iterations.*must be >= 1/)
+    end
+
+    it 'rejects empty tools array' do
+      expect do
+        run_described_fastlane_action(
+          api_token: fake_token,
+          prompt: 'sys',
+          question: 'q',
+          tools: []
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /tools.*non-empty Array/)
+    end
+
+    it 'rejects tool_handlers with non-callable values' do
+      expect do
+        run_described_fastlane_action(
+          api_token: fake_token,
+          prompt: 'sys',
+          question: 'q',
+          tools: [{ type: 'function', function: { name: 'noop', parameters: {} } }],
+          tool_handlers: { 'noop' => 'not_a_proc' }
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /tool_handlers.*must respond to :call/)
+    end
   end
 end

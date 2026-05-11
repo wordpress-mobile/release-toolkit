@@ -12,6 +12,7 @@ _None_
 
 - `openai_ask`: support OpenAI tool-use (function calling) via new `tools`, `tool_handlers`, and `max_tool_iterations` parameters. When `tools` are provided, the action runs a tool-use loop: the model can invoke tools whose handlers run locally and whose return values are sent back as `role: tool` messages, until the model produces a plain text response or the iteration cap is reached. Backwards-compatible — when `tools` is omitted, behavior is unchanged. [#716]
 - `openai_ask`: support overriding the OpenAI model via a new optional `model` parameter. Defaults to `gpt-4o` (unchanged from the previously hardcoded value), so callers that don't pass `model` see no behavioral change. [#716]
+- `openai_ask`: tool-use loop is more robust to caller mistakes — `tool_handlers` keys can be either strings or symbols (normalized internally), exceptions raised inside a handler are surfaced to the model as a structured `{ error:, exception:, message: }` tool result rather than crashing the lane, and `tools` / `tool_handlers` / `max_tool_iterations` now validate their inputs (non-empty Array, callable values, integer >= 1). [#716]
 
 ### Bug Fixes
 
