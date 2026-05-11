@@ -413,9 +413,51 @@ describe Fastlane::Actions::OpenaiAskAction do
 
       tool_result_msg = JSON.parse(recorded_bodies.last)['messages'].find { |m| m['role'] == 'tool' }
       content = JSON.parse(tool_result_msg['content'])
-      expect(content['error']).to eq("Handler for tool 'check_length' raised")
+      expect(content['error']).to eq("Handler for tool 'check_length' raised an exception")
       expect(content['exception']).to eq('ArgumentError')
-      expect(content['message']).to eq('bad args')
+      # Exception message must NOT be forwarded to the model — it can carry secrets
+      # from the surrounding lane (tokens, file contents, etc.). Only the class name
+      # is sent; the full message is logged locally via `UI.error`.
+      expect(content).not_to have_key('message')
+      expect(tool_result_msg['content']).not_to include('bad args')
+    end
+
+    it 'short-circuits and never invokes the handler when tool arguments are not valid JSON' do
+      handler_calls = []
+      tool_handlers = {
+        'check_length' => lambda do |args|
+          handler_calls << args
+          { ok: true }
+        end
+      }
+
+      first_response = stubbed_tool_call_response(
+        tool_call_id: 'call_bad_json',
+        name: 'check_length',
+        arguments_json: 'this is not valid JSON {'
+      )
+      second_response = stubbed_response('Recovered.')
+
+      recorded_bodies = []
+      stub_request(:post, endpoint)
+        .with { |req| recorded_bodies << req.body }
+        .to_return(
+          { status: 200, body: first_response },
+          { status: 200, body: second_response }
+        )
+
+      result = described_class.run(
+        api_token: fake_token,
+        prompt: 'sys',
+        question: 'q',
+        tools: tools,
+        tool_handlers: tool_handlers
+      )
+
+      expect(result).to eq('Recovered.')
+      expect(handler_calls).to be_empty
+      tool_result_msg = JSON.parse(recorded_bodies.last)['messages'].find { |m| m['role'] == 'tool' }
+      expect(JSON.parse(tool_result_msg['content'])['error']).to match(/Invalid JSON arguments.*check_length/)
     end
   end
 

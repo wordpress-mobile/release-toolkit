@@ -143,15 +143,18 @@ module Fastlane
       def self.execute_tool_call(tool_call, tool_handlers)
         name = tool_call.dig('function', 'name')
         raw_args = tool_call.dig('function', 'arguments') || '{}'
-        args =
-          begin
-            JSON.parse(raw_args)
-          rescue JSON::ParserError => e
-            { '__error__' => "Invalid JSON arguments: #{e.message}" }
-          end
 
-        handler = tool_handlers[name]
-        result = invoke_tool_handler(name: name, handler: handler, args: args)
+        result =
+          begin
+            args = JSON.parse(raw_args)
+            invoke_tool_handler(name: name, handler: tool_handlers[name], args: args)
+          rescue JSON::ParserError
+            # Short-circuit: the handler never sees malformed args. Tell the model the
+            # tool-call payload was invalid so it can retry with valid JSON, and log the
+            # raw arguments locally for debugging without forwarding them to the API.
+            UI.error("Invalid JSON arguments for tool '#{name}'. Raw payload: #{raw_args}")
+            { error: "Invalid JSON arguments for tool '#{name}' — payload could not be parsed. Retry with valid JSON." }
+          end
 
         {
           role: 'tool',
@@ -160,14 +163,18 @@ module Fastlane
         }
       end
 
-      # Invokes a tool handler safely. Returns a JSON-serializable Hash that will be
-      # sent back to the model as the `content` of a `role: tool` message.
+      # Invokes a tool handler safely. Returns a JSON-serializable value that will be
+      # sent back to the model as the `content` of a `role: tool` message (the value
+      # may be a Hash, Array, scalar, etc. — whatever the handler returns).
       #
-      # - Missing handler: structured `{ error: ... }` so the model can recover.
-      # - Handler raised: structured `{ error:, exception:, message: }` so the model can
-      #   see the failure and adjust. The loop keeps going rather than aborting the lane
-      #   mid-conversation — the model is the better judge of whether the failure is
-      #   recoverable than a global `rescue` here.
+      # - Missing or non-callable handler: structured `{ error: ... }` so the model can recover.
+      # - Handler raised: structured `{ error:, exception: }` carrying only the exception class
+      #   so the model can see the failure category and adjust. The full message and backtrace
+      #   are logged locally via `UI.error` but NOT forwarded to the model, because tool
+      #   results are sent to OpenAI and handler exception messages can contain secrets
+      #   (tokens, file contents, internal API responses). The loop keeps going rather than
+      #   aborting the lane mid-conversation — the model is the better judge of whether the
+      #   failure is recoverable than a global `rescue` here.
       def self.invoke_tool_handler(name:, handler:, args:)
         return { error: "No handler defined for tool '#{name}'" } if handler.nil?
         return { error: "Handler for tool '#{name}' is not callable (got #{handler.class})" } unless handler.respond_to?(:call)
@@ -175,7 +182,8 @@ module Fastlane
         begin
           handler.call(args)
         rescue StandardError => e
-          { error: "Handler for tool '#{name}' raised", exception: e.class.name, message: e.message }
+          UI.error("Handler for tool '#{name}' raised #{e.class}: #{e.message}\n#{e.backtrace&.first(5)&.join("\n")}")
+          { error: "Handler for tool '#{name}' raised an exception", exception: e.class.name }
         end
       end
 
