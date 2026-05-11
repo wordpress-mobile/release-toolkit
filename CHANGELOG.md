@@ -10,13 +10,13 @@ _None_
 
 ### New Features
 
-- `openai_ask`: support OpenAI tool-use (function calling) via new `tools`, `tool_handlers`, and `max_tool_iterations` parameters. When `tools` are provided, the action runs a tool-use loop: the model can invoke tools whose handlers run locally and whose return values are sent back as `role: tool` messages, until the model produces a plain text response or the iteration cap is reached. Backwards-compatible — when `tools` is omitted, behavior is unchanged. [#XXX]
-- `openai_ask`: support overriding the OpenAI model via a new optional `model` parameter. Defaults to `gpt-4o` (unchanged from the previously hardcoded value), so callers that don't pass `model` see no behavioral change. [#XXX]
+- `openai_ask`: support OpenAI tool-use (function calling) via new `tools`, `tool_handlers`, and `max_tool_iterations` parameters. When `tools` are provided, the action runs a tool-use loop: the model can invoke tools whose handlers run locally and whose return values are sent back as `role: tool` messages, until the model produces a plain text response or the iteration cap is reached. Backwards-compatible — when `tools` is omitted, behavior is unchanged. [#716]
+- `openai_ask`: support overriding the OpenAI model via a new optional `model` parameter. Defaults to `gpt-4o` (unchanged from the previously hardcoded value), so callers that don't pass `model` see no behavioral change. [#716]
 
 ### Bug Fixes
 
-- `openai_ask`: switch the documented examples to non-interpolated heredocs so generating action documentation no longer raises `NameError` for placeholder variables. [#XXX]
-- `openai_ask`: fix `EXEMPLE` typo in the documented-example HEREDOC tags (`EXEMPLE` → `EXAMPLE`). No behavioral change. [#XXX]
+- `openai_ask`: switch the documented examples to non-interpolated heredocs so generating action documentation no longer raises `NameError` for placeholder variables. [#716]
+- `openai_ask`: fix `EXEMPLE` typo in the documented-example HEREDOC tags (`EXEMPLE` → `EXAMPLE`). No behavioral change. [#716]
 
 ### Internal Changes
 
