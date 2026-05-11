@@ -10,14 +10,11 @@ _None_
 
 ### New Features
 
-- `openai_ask`: support OpenAI tool-use (function calling) via new `tools`, `tool_handlers`, and `max_tool_iterations` parameters. When `tools` are provided, the action runs a tool-use loop: the model can invoke tools whose handlers run locally and whose return values are sent back as `role: tool` messages, until the model produces a plain text response or the iteration cap is reached. Backwards-compatible — when `tools` is omitted, behavior is unchanged. [#716]
-- `openai_ask`: support overriding the OpenAI model via a new optional `model` parameter. Defaults to `gpt-4o` (unchanged from the previously hardcoded value), so callers that don't pass `model` see no behavioral change. [#716]
-- `openai_ask`: tool-use loop is more robust to caller mistakes — `tool_handlers` keys can be either strings or symbols (normalized internally), exceptions raised inside a handler are surfaced to the model as a structured `{ error:, exception:, message: }` tool result rather than crashing the lane, and `tools` / `tool_handlers` / `max_tool_iterations` now validate their inputs (non-empty Array, callable values, integer >= 1). [#716]
+- `openai_ask`: support OpenAI tool-use (function calling) and model overrides. New optional parameters: `tools`, `tool_handlers`, and `max_tool_iterations` enable a multi-turn loop where the model invokes locally-defined tools and receives `role: tool` results until it produces a plain text response or hits the iteration cap; `model` overrides the previously hardcoded `gpt-4o`. Tool-handler keys may be strings or symbols (normalized internally), exceptions raised inside a handler are surfaced back to the model as structured `{ error:, exception:, message: }` tool results rather than crashing the lane, and the new parameters validate their inputs (non-empty Array, callable handlers, iteration cap >= 1). Backwards-compatible — when `tools` is omitted, behavior is unchanged. Also fixes a long-standing `NameError` when generating action documentation (documented examples are now non-interpolated heredocs) and a `EXEMPLE` typo in the example HEREDOC tags. [#716]
 
 ### Bug Fixes
 
-- `openai_ask`: switch the documented examples to non-interpolated heredocs so generating action documentation no longer raises `NameError` for placeholder variables. [#716]
-- `openai_ask`: fix `EXEMPLE` typo in the documented-example HEREDOC tags (`EXEMPLE` → `EXAMPLE`). No behavioral change. [#716]
+_None_
 
 ### Internal Changes
 
