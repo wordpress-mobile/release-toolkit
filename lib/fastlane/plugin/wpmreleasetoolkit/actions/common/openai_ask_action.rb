@@ -9,6 +9,7 @@ module Fastlane
     class OpenaiAskAction < Action
       OPENAI_API_ENDPOINT = URI('https://api.openai.com/v1/chat/completions').freeze
       DEFAULT_MAX_TOOL_ITERATIONS = 5
+      DEFAULT_MODEL = 'gpt-4o'
 
       PREDEFINED_PROMPTS = {
         release_notes: <<~PROMPT
@@ -25,6 +26,7 @@ module Fastlane
         prompt = params[:prompt]
         prompt = PREDEFINED_PROMPTS[prompt] if PREDEFINED_PROMPTS.key?(prompt)
         question = params[:question]
+        model = params[:model] || DEFAULT_MODEL
         tools = params[:tools]
         tool_handlers = params[:tool_handlers] || {}
         max_tool_iterations = params[:max_tool_iterations] || DEFAULT_MAX_TOOL_ITERATIONS
@@ -36,7 +38,7 @@ module Fastlane
 
         # Backwards-compatible single-shot path when no tools are provided.
         if tools.nil? || tools.empty?
-          body = request_body(prompt: prompt, question: question)
+          body = request_body(prompt: prompt, question: question, model: model)
           response = Net::HTTP.post(OPENAI_API_ENDPOINT, body, headers)
           return parse_text_response(response)
         end
@@ -44,6 +46,7 @@ module Fastlane
         run_with_tools(
           prompt: prompt,
           question: question,
+          model: model,
           tools: tools,
           tool_handlers: tool_handlers,
           max_tool_iterations: max_tool_iterations,
@@ -51,14 +54,14 @@ module Fastlane
         )
       end
 
-      def self.run_with_tools(prompt:, question:, tools:, tool_handlers:, max_tool_iterations:, headers:)
+      def self.run_with_tools(prompt:, question:, model:, tools:, tool_handlers:, max_tool_iterations:, headers:)
         messages = [
           format_message(role: 'system', text: prompt),
           format_message(role: 'user', text: question),
         ].compact
 
         max_tool_iterations.times do
-          body = request_body_with_messages(messages: messages, tools: tools)
+          body = request_body_with_messages(messages: messages, tools: tools, model: model)
           response = Net::HTTP.post(OPENAI_API_ENDPOINT, body, headers)
           assistant_message = parse_assistant_message(response)
           tool_calls = assistant_message['tool_calls']
@@ -80,9 +83,9 @@ module Fastlane
         )
       end
 
-      def self.request_body(prompt:, question:)
+      def self.request_body(prompt:, question:, model: DEFAULT_MODEL)
         {
-          model: 'gpt-4o',
+          model: model,
           response_format: { type: 'text' },
           temperature: 1,
           max_tokens: 2048,
@@ -94,9 +97,9 @@ module Fastlane
         }.to_json
       end
 
-      def self.request_body_with_messages(messages:, tools:)
+      def self.request_body_with_messages(messages:, tools:, model: DEFAULT_MODEL)
         {
-          model: 'gpt-4o',
+          model: model,
           response_format: { type: 'text' },
           temperature: 1,
           max_tokens: 2048,
@@ -191,7 +194,7 @@ module Fastlane
 
       def self.examples
         [
-          <<~'EXEMPLE',
+          <<~'EXAMPLE',
             items = extract_release_notes_for_version(version: app_version, release_notes_file_path: 'RELEASE-NOTES.txt')
             nice_changelog = openai_ask(
               prompt: :release_notes, # Uses the pre-crafted prompt for App Store / Play Store release notes
@@ -199,8 +202,8 @@ module Fastlane
               api_token: get_required_env('OPENAI_API_TOKEN')
             )
             File.write(File.join('fastlane', 'metadata', 'android', 'en-US', 'changelogs', 'default.txt'), nice_changelog)
-          EXEMPLE
-          <<~'EXEMPLE',
+          EXAMPLE
+          <<~'EXAMPLE',
             # Tool-use loop: the model proposes release notes via a tool call; the handler validates
             # length locally and rejects until the model produces text under the limit.
             notes = openai_ask(
@@ -226,7 +229,7 @@ module Fastlane
                 }
               }
             )
-          EXEMPLE
+          EXAMPLE
         ]
       end
 
@@ -259,6 +262,12 @@ module Fastlane
                                        env_name: 'OPENAI_API_TOKEN',
                                        optional: false,
                                        sensitive: true,
+                                       type: String),
+          FastlaneCore::ConfigItem.new(key: :model,
+                                       description: 'The OpenAI model to send the request to (e.g. `gpt-4o`, `gpt-4o-mini`, `gpt-4.1`). ' \
+                                                    "Defaults to `#{DEFAULT_MODEL}`",
+                                       optional: true,
+                                       default_value: DEFAULT_MODEL,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :tools,
                                        description: 'Optional array of tool (function-calling) definitions in OpenAI format. ' \

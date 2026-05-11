@@ -116,6 +116,24 @@ describe Fastlane::Actions::OpenaiAskAction do
     expect(result).to eq('Hello! How can I assist you today?')
   end
 
+  it 'sends the configured model on the wire when overridden (single-shot path)' do
+    expected_req_body = described_class.request_body(prompt: 'sys', question: 'q', model: 'gpt-4o-mini')
+
+    stub = stub_request(:post, endpoint)
+           .with(body: expected_req_body)
+           .to_return(status: 200, body: stubbed_response('Hi.'))
+
+    run_described_fastlane_action(
+      api_token: fake_token,
+      prompt: 'sys',
+      question: 'q',
+      model: 'gpt-4o-mini'
+    )
+
+    expect(stub).to have_been_requested
+    expect(JSON.parse(expected_req_body)['model']).to eq('gpt-4o-mini')
+  end
+
   it 'calls the API with :release_notes prompt' do
     changelog = <<~CHANGELOG
       - [Internal] Fetch remote FF on site change [https://github.com/woocommerce/woocommerce-android/pull/12751]
@@ -272,6 +290,30 @@ describe Fastlane::Actions::OpenaiAskAction do
           max_tool_iterations: 2
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, /did not terminate after 2 iterations/)
+    end
+
+    it 'sends the configured model on the wire when overridden' do
+      tool_handlers = {
+        'check_length' => ->(_args) { { ok: true } }
+      }
+      first_response = stubbed_response('Done.')
+
+      recorded_bodies = []
+      stub_request(:post, endpoint)
+        .with { |req| recorded_bodies << req.body }
+        .to_return(status: 200, body: first_response)
+
+      described_class.run(
+        api_token: fake_token,
+        prompt: 'sys',
+        question: 'q',
+        model: 'gpt-4o-mini',
+        tools: tools,
+        tool_handlers: tool_handlers
+      )
+
+      body = JSON.parse(recorded_bodies.last)
+      expect(body['model']).to eq('gpt-4o-mini')
     end
 
     it 'returns an error tool result when no handler is registered for the called tool' do
