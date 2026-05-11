@@ -421,13 +421,17 @@ describe Fastlane::Actions::OpenaiAskAction do
 
   describe 'parameter validation' do
     it 'rejects max_tool_iterations < 1' do
+      # No `tool_handlers` here — `run_described_fastlane_action` inspects args into an
+      # eval'd lane, and `Proc#inspect` is not valid Ruby. The other tool-use specs that
+      # need a handler invoke `described_class.run` directly to avoid this. We don't need
+      # a handler to exercise the `max_tool_iterations` `verify_block` — it fires before
+      # the action body runs.
       expect do
         run_described_fastlane_action(
           api_token: fake_token,
           prompt: 'sys',
           question: 'q',
           tools: [{ type: 'function', function: { name: 'noop', parameters: {} } }],
-          tool_handlers: { 'noop' => ->(_) { {} } },
           max_tool_iterations: 0
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, /max_tool_iterations.*must be >= 1/)
