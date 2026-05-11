@@ -208,13 +208,15 @@ module Fastlane
             # length locally and rejects until the model produces text under the limit.
             notes = openai_ask(
               prompt: :release_notes,
-              question: "Write release notes for: #{items}. Use the submit_notes tool to submit your draft.",
+              question: "Write release notes for: #{items}. Call the validate_length tool with your draft and iterate until it accepts.",
               api_token: get_required_env('OPENAI_API_TOKEN'),
               tools: [{
                 type: 'function',
                 function: {
-                  name: 'submit_notes',
-                  description: 'Submits the proposed release notes for length validation.',
+                  name: 'validate_length',
+                  description: 'Validates the length of the proposed release notes against a 350-character budget. ' \
+                               'Returns `{ ok: true, length: }` if the text fits, or `{ ok: false, length:, max: }` otherwise. ' \
+                               'Call repeatedly with shorter drafts until it returns ok: true.',
                   parameters: {
                     type: 'object',
                     properties: { text: { type: 'string' } },
@@ -223,7 +225,7 @@ module Fastlane
                 }
               }],
               tool_handlers: {
-                'submit_notes' => ->(args) {
+                'validate_length' => ->(args) {
                   len = args['text'].length
                   len <= 350 ? { ok: true, length: len } : { ok: false, length: len, max: 350 }
                 }
