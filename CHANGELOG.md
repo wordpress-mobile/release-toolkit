@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- `openai_ask`: support OpenAI tool-use (function calling) and model overrides. New optional parameters: `tools`, `tool_handlers`, and `max_tool_iterations` enable a multi-turn loop where the model invokes locally-defined tools and receives `role: tool` results until it produces a plain text response or hits the iteration cap; `model` overrides the previously hardcoded `gpt-4o`. Tool-handler keys may be strings or symbols (normalized internally), exceptions raised inside a handler are surfaced back to the model as structured `{ error:, exception: }` tool results (carrying only the exception class — the message and backtrace are logged locally but not forwarded, since handler errors can contain secrets) rather than crashing the lane, and the new parameters validate their inputs (non-empty Array, callable handlers, iteration cap >= 1). Backwards-compatible — when `tools` is omitted, behavior is unchanged. Also fixes a long-standing `NameError` when generating action documentation (documented examples are now non-interpolated heredocs) and a `EXEMPLE` typo in the example HEREDOC tags. [#716]
 
 ### Bug Fixes
 
