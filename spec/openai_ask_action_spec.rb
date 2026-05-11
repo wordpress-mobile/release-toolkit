@@ -422,6 +422,49 @@ describe Fastlane::Actions::OpenaiAskAction do
       expect(tool_result_msg['content']).not_to include('bad args')
     end
 
+    it 'returns a structured error tool result when the handler returns a non-JSON-serializable value' do
+      # A class whose `to_json` blows up. Stand-in for a handler accidentally returning
+      # a Pathname, Proc, or other object that can't be serialized.
+      unserializable_class = Class.new do
+        def to_json(*_args)
+          raise 'cannot serialize'
+        end
+      end
+
+      tool_handlers = {
+        'check_length' => ->(_args) { unserializable_class.new }
+      }
+
+      first_response = stubbed_tool_call_response(
+        tool_call_id: 'call_unserializable',
+        name: 'check_length',
+        arguments_json: '{}'
+      )
+      second_response = stubbed_response('Recovered.')
+
+      recorded_bodies = []
+      stub_request(:post, endpoint)
+        .with { |req| recorded_bodies << req.body }
+        .to_return(
+          { status: 200, body: first_response },
+          { status: 200, body: second_response }
+        )
+
+      result = described_class.run(
+        api_token: fake_token,
+        prompt: 'sys',
+        question: 'q',
+        tools: tools,
+        tool_handlers: tool_handlers
+      )
+
+      expect(result).to eq('Recovered.')
+      tool_result_msg = JSON.parse(recorded_bodies.last)['messages'].find { |m| m['role'] == 'tool' }
+      expect(JSON.parse(tool_result_msg['content'])['error']).to match(/could not be serialized to JSON/)
+      # Exception message must NOT leak — only the class is acceptable in the structured payload.
+      expect(tool_result_msg['content']).not_to include('cannot serialize')
+    end
+
     it 'short-circuits and never invokes the handler when tool arguments are not valid JSON' do
       handler_calls = []
       tool_handlers = {

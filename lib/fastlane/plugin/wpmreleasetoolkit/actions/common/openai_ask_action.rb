@@ -159,8 +159,24 @@ module Fastlane
         {
           role: 'tool',
           tool_call_id: tool_call['id'],
-          content: result.to_json
+          content: serialize_tool_result(name: name, result: result)
         }
+      end
+
+      # Serializes a tool result to a JSON string. Handlers are contracted to return
+      # JSON-serializable values, but a buggy handler might return something like a
+      # `Pathname`, `Proc`, or a custom object whose `to_json` raises. Failing the
+      # whole conversation over a serialization error is harsh — instead, log locally
+      # and send a structured `{ error: ... }` back so the model can recover.
+      #
+      # The handler's class name is exposed (handler authorship is local, not secret)
+      # but the exception's message is NOT forwarded — same reasoning as
+      # `invoke_tool_handler`: handler-returned objects can carry secrets.
+      def self.serialize_tool_result(name:, result:)
+        JSON.generate(result)
+      rescue StandardError => e
+        UI.error("Could not serialize tool result for '#{name}': #{e.class}: #{e.message}. Result class: #{result.class}")
+        JSON.generate({ error: "Tool result for '#{name}' could not be serialized to JSON. Returned class: #{result.class}." })
       end
 
       # Invokes a tool handler safely. Returns a JSON-serializable value that will be
