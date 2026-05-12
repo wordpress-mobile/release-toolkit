@@ -134,6 +134,24 @@ describe Fastlane::Actions::OpenaiAskAction do
     expect(JSON.parse(expected_req_body)['model']).to eq('gpt-4o-mini')
   end
 
+  it 'ignores max_tool_iterations on the single-shot path' do
+    expected_req_body = described_class.request_body(prompt: 'sys', question: 'q')
+
+    stub = stub_request(:post, endpoint)
+           .with(body: expected_req_body)
+           .to_return(status: 200, body: stubbed_response('Hi.'))
+
+    result = described_class.run(
+      api_token: fake_token,
+      prompt: 'sys',
+      question: 'q',
+      max_tool_iterations: 'not used without tools'
+    )
+
+    expect(result).to eq('Hi.')
+    expect(stub).to have_been_requested
+  end
+
   it 'uses max_completion_tokens instead of deprecated max_tokens' do
     body = JSON.parse(described_class.request_body(prompt: 'sys', question: 'q'))
 

@@ -33,7 +33,6 @@ module Fastlane
         # callers can register handlers with either string or symbol keys without surprises.
         tool_handlers = (params[:tool_handlers] || {}).transform_keys(&:to_s)
         max_tool_iterations = params[:max_tool_iterations] || DEFAULT_MAX_TOOL_ITERATIONS
-        validate_max_tool_iterations!(max_tool_iterations)
 
         headers = {
           'Content-Type': 'application/json',
@@ -48,6 +47,7 @@ module Fastlane
         end
 
         validate_tools_array!(tools)
+        validate_max_tool_iterations!(max_tool_iterations)
         validate_tools!(tools)
         run_with_tools(
           prompt: prompt,
