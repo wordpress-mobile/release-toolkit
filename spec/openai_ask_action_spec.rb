@@ -454,7 +454,7 @@ describe Fastlane::Actions::OpenaiAskAction do
     end
 
     it 'returns a structured error tool result when the handler raises' do
-      expect(UI).not_to receive(:verbose)
+      expect(FastlaneCore::UI).not_to receive(:verbose)
 
       tool_handlers = {
         'check_length' => ->(_args) { raise ArgumentError, 'bad args' }
@@ -475,7 +475,7 @@ describe Fastlane::Actions::OpenaiAskAction do
           { status: 200, body: second_response }
         )
 
-      expect(UI).to receive(:error).with(
+      expect(FastlaneCore::UI).to receive(:error).with(
         satisfy do |message|
           message.include?("Handler for tool 'check_length' raised ArgumentError") &&
             !message.include?('bad args') &&
@@ -532,7 +532,7 @@ describe Fastlane::Actions::OpenaiAskAction do
           { status: 200, body: second_response }
         )
 
-      expect(UI).to receive(:error).with(
+      expect(FastlaneCore::UI).to receive(:error).with(
         satisfy do |message|
           message.include?("Could not serialize tool result for 'check_length': RuntimeError") &&
             !message.include?('cannot serialize')
@@ -578,7 +578,7 @@ describe Fastlane::Actions::OpenaiAskAction do
           { status: 200, body: second_response }
         )
 
-      expect(UI).to receive(:error).with(
+      expect(FastlaneCore::UI).to receive(:error).with(
         satisfy do |message|
           message.include?("Invalid JSON arguments for tool 'check_length'") &&
             !message.include?('secret_token=abc123')
@@ -601,8 +601,8 @@ describe Fastlane::Actions::OpenaiAskAction do
     end
 
     it 'does not log raw tool arguments even when verbose mode is enabled' do
-      expect(UI).to receive(:error).with(/Raw payload omitted/)
-      expect(UI).not_to receive(:verbose)
+      expect(FastlaneCore::UI).to receive(:error).with(/Raw payload omitted/)
+      expect(FastlaneCore::UI).not_to receive(:verbose)
 
       result = described_class.execute_tool_call(
         {
@@ -623,7 +623,7 @@ describe Fastlane::Actions::OpenaiAskAction do
     end
 
     it 'returns a structured error tool result for unsupported returned tool call types' do
-      expect(UI).to receive(:error).with(/Unsupported OpenAI tool call type 'custom'/)
+      expect(FastlaneCore::UI).to receive(:error).with(/Unsupported OpenAI tool call type 'custom'/)
 
       result = described_class.execute_tool_call(
         {
@@ -647,7 +647,7 @@ describe Fastlane::Actions::OpenaiAskAction do
     end
 
     it 'returns a clear structured error when a returned function tool call has no name' do
-      expect(UI).to receive(:error).with(/missing a non-empty function.name/)
+      expect(FastlaneCore::UI).to receive(:error).with(/missing a non-empty function.name/)
 
       result = described_class.execute_tool_call(
         {
@@ -707,6 +707,17 @@ describe Fastlane::Actions::OpenaiAskAction do
           prompt: 'sys',
           question: 'q',
           tools: []
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /tools.*non-empty Array/)
+    end
+
+    it 'rejects non-array tools when run directly' do
+      expect do
+        described_class.run(
+          api_token: fake_token,
+          prompt: 'sys',
+          question: 'q',
+          tools: 'not a tools array'
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, /tools.*non-empty Array/)
     end

@@ -47,7 +47,7 @@ module Fastlane
           return parse_text_response(response)
         end
 
-        UI.user_error!('Parameter `tools` must be a non-empty Array when provided') if tools.empty?
+        validate_tools_array!(tools)
         validate_tools!(tools)
         run_with_tools(
           prompt: prompt,
@@ -155,6 +155,10 @@ module Fastlane
       def self.validate_max_tool_iterations!(max_tool_iterations)
         UI.user_error!("Parameter `max_tool_iterations` must be an Integer (got #{max_tool_iterations.class})") unless max_tool_iterations.is_a?(Integer)
         UI.user_error!("Parameter `max_tool_iterations` must be >= 1 (got #{max_tool_iterations})") if max_tool_iterations < 1
+      end
+
+      def self.validate_tools_array!(tools)
+        UI.user_error!('Parameter `tools` must be a non-empty Array when provided') unless tools.is_a?(Array) && !tools.empty?
       end
 
       def self.validate_tools!(tools)
@@ -402,7 +406,7 @@ module Fastlane
                                        default_value: nil,
                                        type: Array,
                                        verify_block: proc do |value|
-                                         UI.user_error!('Parameter `tools` must be a non-empty Array when provided') if value.empty?
+                                         validate_tools_array!(value)
                                          validate_tools!(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :tool_handlers,
