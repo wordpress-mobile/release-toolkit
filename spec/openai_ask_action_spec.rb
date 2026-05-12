@@ -637,6 +637,29 @@ describe Fastlane::Actions::OpenaiAskAction do
         { 'error' => "Unsupported tool call type 'custom'. Only function tool calls are supported." }
       )
     end
+
+    it 'returns a clear structured error when a returned function tool call has no name' do
+      expect(UI).to receive(:error).with(/missing a non-empty function.name/)
+
+      result = described_class.execute_tool_call(
+        {
+          'id' => 'call_missing_name',
+          'type' => 'function',
+          'function' => {
+            'arguments' => '{}',
+          },
+        },
+        {
+          'validate_length' => ->(_args) { raise 'should not be called' },
+        }
+      )
+
+      expect(result[:role]).to eq('tool')
+      expect(result[:tool_call_id]).to eq('call_missing_name')
+      expect(JSON.parse(result[:content])).to eq(
+        { 'error' => 'Function tool call is missing a non-empty function.name.' }
+      )
+    end
   end
 
   describe 'parameter validation' do
@@ -714,6 +737,12 @@ describe Fastlane::Actions::OpenaiAskAction do
           ]
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, /missing function.name/)
+    end
+
+    it 'accepts symbol function names in tool definitions' do
+      expect do
+        described_class.validate_tools!([{ type: 'function', function: { name: :noop, parameters: {} } }])
+      end.not_to raise_error
     end
 
     it 'rejects tool_handlers with non-callable values' do

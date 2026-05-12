@@ -162,7 +162,7 @@ module Fastlane
 
           function = tool[:function] || tool['function']
           name = function[:name] || function['name'] if function.is_a?(Hash)
-          next if name.is_a?(String) && !name.empty?
+          next if valid_tool_name?(name)
 
           "tools[#{index}] missing function.name"
         end
@@ -181,10 +181,14 @@ module Fastlane
         (tool[:type] || tool['type']).to_s
       end
 
+      def self.valid_tool_name?(name)
+        (name.is_a?(String) || name.is_a?(Symbol)) && !name.to_s.empty?
+      end
+
       def self.execute_tool_call(tool_call, tool_handlers)
         return unsupported_tool_call_result(tool_call) unless function_tool_call?(tool_call)
 
-        name = tool_call.dig('function', 'name')
+        name = tool_call.dig('function', 'name').to_s
         raw_args = tool_call.dig('function', 'arguments') || '{}'
 
         result =
@@ -194,7 +198,8 @@ module Fastlane
           rescue JSON::ParserError
             # Short-circuit: the handler never sees malformed args. Tell the model the
             # tool-call payload was invalid so it can retry with valid JSON, and log the
-            # local failure without recording raw arguments that might contain secrets.
+            # local failure without recording raw arguments in normal logs. Verbose mode
+            # includes them for explicit debugging.
             UI.error("Invalid JSON arguments for tool '#{name}' in tool call '#{tool_call['id']}'. Raw payload omitted because it may contain secrets.")
             log_verbose_sensitive_diagnostics("Raw arguments for tool '#{name}' in tool call '#{tool_call['id']}': #{raw_args}")
             { error: "Invalid JSON arguments for tool '#{name}' — payload could not be parsed. Retry with valid JSON." }
@@ -212,19 +217,31 @@ module Fastlane
         return false unless tool_call['function'].is_a?(Hash)
 
         name = tool_call.dig('function', 'name')
-        name.is_a?(String) && !name.empty?
+        valid_tool_name?(name)
       end
 
       def self.unsupported_tool_call_result(tool_call)
         type = tool_call['type'] || '<missing>'
-        UI.error("Unsupported OpenAI tool call type '#{type}' in tool call '#{tool_call['id']}'. Only function tool calls are supported.")
+        error =
+          if type == 'function'
+            "Function tool call is missing a non-empty function.name."
+          else
+            "Unsupported tool call type '#{type}'. Only function tool calls are supported."
+          end
+        log_message =
+          if type == 'function'
+            "Invalid OpenAI function tool call '#{tool_call['id']}': missing a non-empty function.name."
+          else
+            "Unsupported OpenAI tool call type '#{type}' in tool call '#{tool_call['id']}'. Only function tool calls are supported."
+          end
+        UI.error(log_message)
 
         {
           role: 'tool',
           tool_call_id: tool_call['id'],
           content: serialize_tool_result(
             name: type,
-            result: { error: "Unsupported tool call type '#{type}'. Only function tool calls are supported." }
+            result: { error: error }
           )
         }
       end
@@ -257,9 +274,10 @@ module Fastlane
       # - Missing or non-callable handler: structured `{ error: ... }` so the model can recover.
       # - Handler raised: structured `{ error:, exception: }` carrying only the exception class
       #   so the model can see the failure category and adjust. The exception message and
-      #   backtrace are intentionally omitted from local logs and from the model response
+      #   backtrace are omitted from normal local logs and from the model response
       #   because tool results and CI logs can expose release secrets
-      #   (tokens, file contents, internal API responses). The loop keeps going rather than
+      #   (tokens, file contents, internal API responses). They are logged only when
+      #   fastlane verbose mode is enabled. The loop keeps going rather than
       #   aborting the lane mid-conversation — the model is the better judge of whether the
       #   failure is recoverable than a global `rescue` here.
       def self.invoke_tool_handler(name:, handler:, args:)
