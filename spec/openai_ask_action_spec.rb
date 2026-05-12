@@ -144,7 +144,7 @@ describe Fastlane::Actions::OpenaiAskAction do
   it 'opts out of storing Chat Completions by default' do
     body = JSON.parse(described_class.request_body(prompt: 'sys', question: 'q'))
 
-    expect(body['store']).to eq(false)
+    expect(body['store']).to be(false)
   end
 
   it 'calls the API with :release_notes prompt' do
@@ -277,7 +277,7 @@ describe Fastlane::Actions::OpenaiAskAction do
       expect(tool_result_msg['tool_call_id']).to eq('call_xyz')
       expect(JSON.parse(tool_result_msg['content'])).to eq({ 'ok' => false, 'message' => 'too long' })
       expect(body['tools']).to eq(JSON.parse(tools.to_json))
-      expect(body['store']).to eq(false)
+      expect(body['store']).to be(false)
       expect(body['max_completion_tokens']).to eq(described_class.const_get(:DEFAULT_MAX_COMPLETION_TOKENS))
       expect(body).not_to have_key('max_tokens')
     end
@@ -610,11 +610,11 @@ describe Fastlane::Actions::OpenaiAskAction do
           'type' => 'function',
           'function' => {
             'name' => 'check_length',
-            'arguments' => 'this is not valid JSON with secret_token=abc123 {',
-          },
+            'arguments' => 'this is not valid JSON with secret_token=abc123 {'
+          }
         },
         {
-          'check_length' => ->(_args) { raise 'should not be called' },
+          'check_length' => ->(_args) { raise 'should not be called' }
         }
       )
 
@@ -631,11 +631,11 @@ describe Fastlane::Actions::OpenaiAskAction do
           'type' => 'custom',
           'custom' => {
             'name' => 'custom_tool',
-            'input' => 'payload',
-          },
+            'input' => 'payload'
+          }
         },
         {
-          'custom_tool' => ->(_args) { raise 'should not be called' },
+          'custom_tool' => ->(_args) { raise 'should not be called' }
         }
       )
 
@@ -654,11 +654,11 @@ describe Fastlane::Actions::OpenaiAskAction do
           'id' => 'call_missing_name',
           'type' => 'function',
           'function' => {
-            'arguments' => '{}',
-          },
+            'arguments' => '{}'
+          }
         },
         {
-          'validate_length' => ->(_args) { raise 'should not be called' },
+          'validate_length' => ->(_args) { raise 'should not be called' }
         }
       )
 
@@ -721,8 +721,8 @@ describe Fastlane::Actions::OpenaiAskAction do
             {
               type: 'custom',
               custom: {
-                name: 'custom_tool',
-              },
+                name: 'custom_tool'
+              }
             },
           ]
         )
@@ -739,8 +739,8 @@ describe Fastlane::Actions::OpenaiAskAction do
             {
               type: 'function',
               function: {
-                parameters: {},
-              },
+                parameters: {}
+              }
             },
           ]
         )
