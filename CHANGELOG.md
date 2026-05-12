@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- `openai_ask`: improve tool-use handling by validating supported function tools, using `max_completion_tokens`, avoiding secret-bearing debug logs, and refusing to execute additional tool calls after `max_tool_iterations`.
 
 ### Internal Changes
 
