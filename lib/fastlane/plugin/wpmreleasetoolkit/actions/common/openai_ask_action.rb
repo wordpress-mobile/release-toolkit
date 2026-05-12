@@ -224,7 +224,7 @@ module Fastlane
         type = tool_call['type'] || '<missing>'
         error =
           if type == 'function'
-            "Function tool call is missing a non-empty function.name."
+            'Function tool call is missing a non-empty function.name.'
           else
             "Unsupported tool call type '#{type}'. Only function tool calls are supported."
           end

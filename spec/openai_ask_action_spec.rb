@@ -454,7 +454,6 @@ describe Fastlane::Actions::OpenaiAskAction do
     end
 
     it 'returns a structured error tool result when the handler raises' do
-      allow(FastlaneCore::Globals).to receive(:verbose?).and_return(true)
       expect(UI).not_to receive(:verbose)
 
       tool_handlers = {
@@ -602,7 +601,6 @@ describe Fastlane::Actions::OpenaiAskAction do
     end
 
     it 'does not log raw tool arguments even when verbose mode is enabled' do
-      allow(FastlaneCore::Globals).to receive(:verbose?).and_return(true)
       expect(UI).to receive(:error).with(/Raw payload omitted/)
       expect(UI).not_to receive(:verbose)
 
