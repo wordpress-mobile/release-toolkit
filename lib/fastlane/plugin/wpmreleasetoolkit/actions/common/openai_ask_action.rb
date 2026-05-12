@@ -98,6 +98,7 @@ module Fastlane
       def self.request_body(prompt:, question:, model: DEFAULT_MODEL)
         {
           model: model,
+          store: false,
           response_format: { type: 'text' },
           temperature: 1,
           max_completion_tokens: DEFAULT_MAX_COMPLETION_TOKENS,
@@ -112,6 +113,7 @@ module Fastlane
       def self.request_body_with_messages(messages:, tools:, model: DEFAULT_MODEL)
         {
           model: model,
+          store: false,
           response_format: { type: 'text' },
           temperature: 1,
           max_completion_tokens: DEFAULT_MAX_COMPLETION_TOKENS,
@@ -198,10 +200,8 @@ module Fastlane
           rescue JSON::ParserError
             # Short-circuit: the handler never sees malformed args. Tell the model the
             # tool-call payload was invalid so it can retry with valid JSON, and log the
-            # local failure without recording raw arguments in normal logs. Verbose mode
-            # includes them for explicit debugging.
+            # local failure without recording raw arguments that might contain secrets.
             UI.error("Invalid JSON arguments for tool '#{name}' in tool call '#{tool_call['id']}'. Raw payload omitted because it may contain secrets.")
-            log_verbose_sensitive_diagnostics("Raw arguments for tool '#{name}' in tool call '#{tool_call['id']}': #{raw_args}")
             { error: "Invalid JSON arguments for tool '#{name}' — payload could not be parsed. Retry with valid JSON." }
           end
 
@@ -259,12 +259,7 @@ module Fastlane
         JSON.generate(result)
       rescue StandardError => e
         UI.error("Could not serialize tool result for '#{name}': #{e.class}. Result class: #{result.class}. Error message omitted because it may contain secrets.")
-        log_verbose_sensitive_diagnostics("Tool result serialization error for '#{name}': #{e.class}: #{e.message}")
         JSON.generate({ error: "Tool result for '#{name}' could not be serialized to JSON. Returned class: #{result.class}." })
-      end
-
-      def self.log_verbose_sensitive_diagnostics(message)
-        UI.verbose(message) if FastlaneCore::Globals.verbose?
       end
 
       # Invokes a tool handler safely. Returns a JSON-serializable value that will be
@@ -274,10 +269,9 @@ module Fastlane
       # - Missing or non-callable handler: structured `{ error: ... }` so the model can recover.
       # - Handler raised: structured `{ error:, exception: }` carrying only the exception class
       #   so the model can see the failure category and adjust. The exception message and
-      #   backtrace are omitted from normal local logs and from the model response
+      #   backtrace are intentionally omitted from local logs and from the model response
       #   because tool results and CI logs can expose release secrets
-      #   (tokens, file contents, internal API responses). They are logged only when
-      #   fastlane verbose mode is enabled. The loop keeps going rather than
+      #   (tokens, file contents, internal API responses). The loop keeps going rather than
       #   aborting the lane mid-conversation — the model is the better judge of whether the
       #   failure is recoverable than a global `rescue` here.
       def self.invoke_tool_handler(name:, handler:, args:)
@@ -288,7 +282,6 @@ module Fastlane
           handler.call(args)
         rescue StandardError => e
           UI.error("Handler for tool '#{name}' raised #{e.class}. Error message and backtrace omitted because they may contain secrets.")
-          log_verbose_sensitive_diagnostics("Handler for tool '#{name}' raised #{e.class}: #{e.message}\n#{e.backtrace&.first(5)&.join("\n")}")
           { error: "Handler for tool '#{name}' raised an exception", exception: e.class.name }
         end
       end

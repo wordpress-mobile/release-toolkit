@@ -141,6 +141,12 @@ describe Fastlane::Actions::OpenaiAskAction do
     expect(body).not_to have_key('max_tokens')
   end
 
+  it 'opts out of storing Chat Completions by default' do
+    body = JSON.parse(described_class.request_body(prompt: 'sys', question: 'q'))
+
+    expect(body['store']).to eq(false)
+  end
+
   it 'calls the API with :release_notes prompt' do
     changelog = <<~CHANGELOG
       - [Internal] Fetch remote FF on site change [https://github.com/woocommerce/woocommerce-android/pull/12751]
@@ -271,6 +277,7 @@ describe Fastlane::Actions::OpenaiAskAction do
       expect(tool_result_msg['tool_call_id']).to eq('call_xyz')
       expect(JSON.parse(tool_result_msg['content'])).to eq({ 'ok' => false, 'message' => 'too long' })
       expect(body['tools']).to eq(JSON.parse(tools.to_json))
+      expect(body['store']).to eq(false)
       expect(body['max_completion_tokens']).to eq(described_class.const_get(:DEFAULT_MAX_COMPLETION_TOKENS))
       expect(body).not_to have_key('max_tokens')
     end
@@ -447,6 +454,9 @@ describe Fastlane::Actions::OpenaiAskAction do
     end
 
     it 'returns a structured error tool result when the handler raises' do
+      allow(FastlaneCore::Globals).to receive(:verbose?).and_return(true)
+      expect(UI).not_to receive(:verbose)
+
       tool_handlers = {
         'check_length' => ->(_args) { raise ArgumentError, 'bad args' }
       }
@@ -591,10 +601,10 @@ describe Fastlane::Actions::OpenaiAskAction do
       expect(tool_result_msg['content']).not_to include('secret_token=abc123')
     end
 
-    it 'logs sensitive diagnostics only when verbose mode is enabled' do
+    it 'does not log raw tool arguments even when verbose mode is enabled' do
       allow(FastlaneCore::Globals).to receive(:verbose?).and_return(true)
       expect(UI).to receive(:error).with(/Raw payload omitted/)
-      expect(UI).to receive(:verbose).with(/secret_token=abc123/)
+      expect(UI).not_to receive(:verbose)
 
       result = described_class.execute_tool_call(
         {
