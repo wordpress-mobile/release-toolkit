@@ -74,7 +74,7 @@ module Fastlane
           assistant_message = parse_assistant_message(response)
           tool_calls = assistant_message['tool_calls']
 
-          # No tool calls - model produced a final answer.
+          # No tool calls — model produced a final answer.
           return assistant_message['content'] if tool_calls.nil? || tool_calls.empty?
 
           if tool_iterations >= max_tool_iterations
@@ -151,22 +151,27 @@ module Fastlane
       end
 
       def self.validate_max_tool_iterations!(max_tool_iterations)
+        UI.user_error!("Parameter `max_tool_iterations` must be an Integer (got #{max_tool_iterations.class})") unless max_tool_iterations.is_a?(Integer)
         UI.user_error!("Parameter `max_tool_iterations` must be >= 1 (got #{max_tool_iterations})") if max_tool_iterations < 1
       end
 
       def self.validate_tools!(tools)
-        unsupported_tools = tools.each_with_index.filter_map do |tool, index|
+        invalid_tools = tools.each_with_index.filter_map do |tool, index|
           type = tool_type(tool)
-          next if type == 'function'
+          next "tools[#{index}] type #{type.empty? ? '<missing>' : type.inspect}" unless type == 'function'
 
-          "tools[#{index}] type #{type.empty? ? '<missing>' : type.inspect}"
+          function = tool[:function] || tool['function']
+          name = function[:name] || function['name'] if function.is_a?(Hash)
+          next if name.is_a?(String) && !name.empty?
+
+          "tools[#{index}] missing function.name"
         end
 
-        return if unsupported_tools.empty?
+        return if invalid_tools.empty?
 
         UI.user_error!(
-          'Parameter `tools` only supports OpenAI function tools. ' \
-          "Unsupported tool definitions: #{unsupported_tools.join(', ')}"
+          'Parameter `tools` only supports OpenAI function tools with a non-empty `function.name`. ' \
+          "Invalid tool definitions: #{invalid_tools.join(', ')}"
         )
       end
 
@@ -177,7 +182,7 @@ module Fastlane
       end
 
       def self.execute_tool_call(tool_call, tool_handlers)
-        return unsupported_tool_call_result(tool_call) unless tool_call['type'] == 'function' && tool_call['function'].is_a?(Hash)
+        return unsupported_tool_call_result(tool_call) unless function_tool_call?(tool_call)
 
         name = tool_call.dig('function', 'name')
         raw_args = tool_call.dig('function', 'arguments') || '{}'
@@ -191,7 +196,8 @@ module Fastlane
             # tool-call payload was invalid so it can retry with valid JSON, and log the
             # local failure without recording raw arguments that might contain secrets.
             UI.error("Invalid JSON arguments for tool '#{name}' in tool call '#{tool_call['id']}'. Raw payload omitted because it may contain secrets.")
-            { error: "Invalid JSON arguments for tool '#{name}' - payload could not be parsed. Retry with valid JSON." }
+            log_verbose_sensitive_diagnostics("Raw arguments for tool '#{name}' in tool call '#{tool_call['id']}': #{raw_args}")
+            { error: "Invalid JSON arguments for tool '#{name}' — payload could not be parsed. Retry with valid JSON." }
           end
 
         {
@@ -201,6 +207,14 @@ module Fastlane
         }
       end
 
+      def self.function_tool_call?(tool_call)
+        return false unless tool_call['type'] == 'function'
+        return false unless tool_call['function'].is_a?(Hash)
+
+        name = tool_call.dig('function', 'name')
+        name.is_a?(String) && !name.empty?
+      end
+
       def self.unsupported_tool_call_result(tool_call)
         type = tool_call['type'] || '<missing>'
         UI.error("Unsupported OpenAI tool call type '#{type}' in tool call '#{tool_call['id']}'. Only function tool calls are supported.")
@@ -208,29 +222,37 @@ module Fastlane
         {
           role: 'tool',
           tool_call_id: tool_call['id'],
-          content: JSON.generate({ error: "Unsupported tool call type '#{type}'. Only function tool calls are supported." })
+          content: serialize_tool_result(
+            name: type,
+            result: { error: "Unsupported tool call type '#{type}'. Only function tool calls are supported." }
+          )
         }
       end
 
       # Serializes a tool result to a JSON string. Handlers are contracted to return
       # JSON-serializable values, but a buggy handler might return something like a
       # `Pathname`, `Proc`, or a custom object whose `to_json` raises. Failing the
-      # whole conversation over a serialization error is harsh. Instead, log locally
+      # whole conversation over a serialization error is harsh — instead, log locally
       # and send a structured `{ error: ... }` back so the model can recover.
       #
       # The handler's class name is exposed (handler authorship is local, not secret)
-      # but the exception's message is NOT forwarded, using the same reasoning as
+      # but the exception's message is NOT forwarded — same reasoning as
       # `invoke_tool_handler`: handler-returned objects can carry secrets.
       def self.serialize_tool_result(name:, result:)
         JSON.generate(result)
       rescue StandardError => e
         UI.error("Could not serialize tool result for '#{name}': #{e.class}. Result class: #{result.class}. Error message omitted because it may contain secrets.")
+        log_verbose_sensitive_diagnostics("Tool result serialization error for '#{name}': #{e.class}: #{e.message}")
         JSON.generate({ error: "Tool result for '#{name}' could not be serialized to JSON. Returned class: #{result.class}." })
+      end
+
+      def self.log_verbose_sensitive_diagnostics(message)
+        UI.verbose(message) if FastlaneCore::Globals.verbose?
       end
 
       # Invokes a tool handler safely. Returns a JSON-serializable value that will be
       # sent back to the model as the `content` of a `role: tool` message (the value
-      # may be a Hash, Array, scalar, etc. - whatever the handler returns).
+      # may be a Hash, Array, scalar, etc. — whatever the handler returns).
       #
       # - Missing or non-callable handler: structured `{ error: ... }` so the model can recover.
       # - Handler raised: structured `{ error:, exception: }` carrying only the exception class
@@ -238,7 +260,7 @@ module Fastlane
       #   backtrace are intentionally omitted from local logs and from the model response
       #   because tool results and CI logs can expose release secrets
       #   (tokens, file contents, internal API responses). The loop keeps going rather than
-      #   aborting the lane mid-conversation - the model is the better judge of whether the
+      #   aborting the lane mid-conversation — the model is the better judge of whether the
       #   failure is recoverable than a global `rescue` here.
       def self.invoke_tool_handler(name:, handler:, args:)
         return { error: "No handler defined for tool '#{name}'" } if handler.nil?
@@ -248,6 +270,7 @@ module Fastlane
           handler.call(args)
         rescue StandardError => e
           UI.error("Handler for tool '#{name}' raised #{e.class}. Error message and backtrace omitted because they may contain secrets.")
+          log_verbose_sensitive_diagnostics("Handler for tool '#{name}' raised #{e.class}: #{e.message}\n#{e.backtrace&.first(5)&.join("\n")}")
           { error: "Handler for tool '#{name}' raised an exception", exception: e.class.name }
         end
       end
@@ -278,6 +301,7 @@ module Fastlane
           on each turn, if the model calls one or more tools, the corresponding handler is invoked locally
           and its return value is sent back to the model as a `role: tool` message. The loop ends when the
           model returns a plain text response, or before executing tool calls beyond `max_tool_iterations`.
+          The model gets one final API turn to answer after the last permitted local tool execution round.
         DETAILS
       end
 
@@ -361,7 +385,7 @@ module Fastlane
                                        default_value: DEFAULT_MODEL,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :tools,
-                                       description: 'Optional array of OpenAI function tool definitions. ' \
+                                       description: 'Optional array of OpenAI function tool definitions. Each definition must have a non-empty `function.name`. ' \
                                                     'When provided, the action runs a tool-use loop',
                                        optional: true,
                                        default_value: nil,
@@ -383,12 +407,13 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :max_tool_iterations,
                                        description: 'Maximum number of local tool execution rounds before the action fails. ' \
+                                                    'The model can receive one final API turn to answer after the last permitted tool result. ' \
                                                     'Only used when `tools` are provided',
                                        optional: true,
                                        default_value: DEFAULT_MAX_TOOL_ITERATIONS,
                                        type: Integer,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Parameter `max_tool_iterations` must be >= 1 (got #{value})") if value < 1
+                                         validate_max_tool_iterations!(value)
                                        end),
         ]
       end

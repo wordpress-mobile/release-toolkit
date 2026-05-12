@@ -172,7 +172,7 @@ describe Fastlane::Actions::OpenaiAskAction do
   describe 'with tool-use' do
     # Tool-use specs invoke `described_class.run` directly rather than
     # `run_described_fastlane_action`, because the latter inspects parameters
-    # into an eval'd Fastlane lane - and `Proc#inspect` is not valid Ruby.
+    # into an eval'd Fastlane lane — and `Proc#inspect` is not valid Ruby.
     let(:tools) do
       [
         {
@@ -488,7 +488,7 @@ describe Fastlane::Actions::OpenaiAskAction do
       content = JSON.parse(tool_result_msg['content'])
       expect(content['error']).to eq("Handler for tool 'check_length' raised an exception")
       expect(content['exception']).to eq('ArgumentError')
-      # Exception message must NOT be forwarded to the model - it can carry secrets
+      # Exception message must NOT be forwarded to the model — it can carry secrets
       # from the surrounding lane (tokens, file contents, etc.). Only the class name
       # is sent; the full message is also omitted from local logs.
       expect(content).not_to have_key('message')
@@ -541,7 +541,7 @@ describe Fastlane::Actions::OpenaiAskAction do
       expect(result).to eq('Recovered.')
       tool_result_msg = JSON.parse(recorded_bodies.last)['messages'].find { |m| m['role'] == 'tool' }
       expect(JSON.parse(tool_result_msg['content'])['error']).to match(/could not be serialized to JSON/)
-      # Exception message must NOT leak - only the class is acceptable in the structured payload.
+      # Exception message must NOT leak — only the class is acceptable in the structured payload.
       expect(tool_result_msg['content']).not_to include('cannot serialize')
     end
 
@@ -591,6 +591,29 @@ describe Fastlane::Actions::OpenaiAskAction do
       expect(tool_result_msg['content']).not_to include('secret_token=abc123')
     end
 
+    it 'logs sensitive diagnostics only when verbose mode is enabled' do
+      allow(FastlaneCore::Globals).to receive(:verbose?).and_return(true)
+      expect(UI).to receive(:error).with(/Raw payload omitted/)
+      expect(UI).to receive(:verbose).with(/secret_token=abc123/)
+
+      result = described_class.execute_tool_call(
+        {
+          'id' => 'call_bad_json',
+          'type' => 'function',
+          'function' => {
+            'name' => 'check_length',
+            'arguments' => 'this is not valid JSON with secret_token=abc123 {',
+          },
+        },
+        {
+          'check_length' => ->(_args) { raise 'should not be called' },
+        }
+      )
+
+      expect(JSON.parse(result[:content])['error']).to match(/Invalid JSON arguments.*check_length/)
+      expect(result[:content]).not_to include('secret_token=abc123')
+    end
+
     it 'returns a structured error tool result for unsupported returned tool call types' do
       expect(UI).to receive(:error).with(/Unsupported OpenAI tool call type 'custom'/)
 
@@ -618,10 +641,10 @@ describe Fastlane::Actions::OpenaiAskAction do
 
   describe 'parameter validation' do
     it 'rejects max_tool_iterations < 1' do
-      # No `tool_handlers` here - `run_described_fastlane_action` inspects args into an
+      # No `tool_handlers` here — `run_described_fastlane_action` inspects args into an
       # eval'd lane, and `Proc#inspect` is not valid Ruby. The other tool-use specs that
       # need a handler invoke `described_class.run` directly to avoid this. We don't need
-      # a handler to exercise the `max_tool_iterations` `verify_block` - it fires before
+      # a handler to exercise the `max_tool_iterations` `verify_block` — it fires before
       # the action body runs.
       expect do
         run_described_fastlane_action(
@@ -632,6 +655,18 @@ describe Fastlane::Actions::OpenaiAskAction do
           max_tool_iterations: 0
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, /max_tool_iterations.*must be >= 1/)
+    end
+
+    it 'rejects non-integer max_tool_iterations when run directly' do
+      expect do
+        described_class.run(
+          api_token: fake_token,
+          prompt: 'sys',
+          question: 'q',
+          tools: [{ type: 'function', function: { name: 'noop', parameters: {} } }],
+          max_tool_iterations: '2'
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /max_tool_iterations.*must be an Integer/)
     end
 
     it 'rejects empty tools array' do
@@ -661,6 +696,24 @@ describe Fastlane::Actions::OpenaiAskAction do
           ]
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, /only supports OpenAI function tools/)
+    end
+
+    it 'rejects function tool definitions without a function name' do
+      expect do
+        described_class.run(
+          api_token: fake_token,
+          prompt: 'sys',
+          question: 'q',
+          tools: [
+            {
+              type: 'function',
+              function: {
+                parameters: {},
+              },
+            },
+          ]
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /missing function.name/)
     end
 
     it 'rejects tool_handlers with non-callable values' do
