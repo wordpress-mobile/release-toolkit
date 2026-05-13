@@ -8,6 +8,7 @@ module Fastlane
   module Actions
     class OpenaiAskAction < Action
       OPENAI_API_ENDPOINT = URI('https://api.openai.com/v1/chat/completions').freeze
+      # Preserve the previous `max_tokens` ceiling while using the current API field.
       DEFAULT_MAX_COMPLETION_TOKENS = 2048
       DEFAULT_MAX_TOOL_ITERATIONS = 5
       DEFAULT_MODEL = 'gpt-4o'
@@ -49,6 +50,7 @@ module Fastlane
         validate_tools_array!(tools)
         validate_max_tool_iterations!(max_tool_iterations)
         validate_tools!(tools)
+
         run_with_tools(
           prompt: prompt,
           question: question,
@@ -164,7 +166,7 @@ module Fastlane
       def self.validate_tools!(tools)
         invalid_tools = tools.each_with_index.filter_map do |tool, index|
           type = tool_type(tool)
-          next "tools[#{index}] type #{type.empty? ? '<missing>' : type.inspect}" unless type == 'function'
+          next "tools[#{index}] type #{type.nil? ? '<missing>' : type.inspect}" unless type == 'function'
 
           function = tool[:function] || tool['function']
           name = function[:name] || function['name'] if function.is_a?(Hash)
@@ -182,9 +184,9 @@ module Fastlane
       end
 
       def self.tool_type(tool)
-        return '' unless tool.is_a?(Hash)
+        return nil unless tool.is_a?(Hash)
 
-        (tool[:type] || tool['type']).to_s
+        (tool[:type] || tool['type'])&.to_s
       end
 
       def self.valid_tool_name?(name)

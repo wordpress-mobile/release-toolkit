@@ -14,11 +14,11 @@ _None_
 
 ### Bug Fixes
 
-- `openai_ask`: improve tool-use handling by requiring named function tools, using `max_completion_tokens`, opting out of OpenAI request storage, omitting sensitive tool diagnostics from logs, and refusing to execute additional tool calls after `max_tool_iterations`. [#719]
+- `openai_ask`: avoid logging sensitive tool diagnostics and refuse to execute additional tool calls after `max_tool_iterations`. [#719]
 
 ### Internal Changes
 
-_None_
+- `openai_ask`: validate named function tools, use `max_completion_tokens`, and opt out of OpenAI request storage. [#719]
 
 ## 14.5.0
 
