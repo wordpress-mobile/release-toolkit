@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-- `openai_ask`: validate named function tools, use `max_completion_tokens`, and opt out of OpenAI request storage. [#719]
+- `openai_ask`: validate named function tools, default to `gpt-4.1`, use `max_completion_tokens`, and opt out of OpenAI request storage. [#719]
 
 ## 14.5.0
 

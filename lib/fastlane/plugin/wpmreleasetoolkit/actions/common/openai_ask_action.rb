@@ -11,7 +11,7 @@ module Fastlane
       # Preserve the previous `max_tokens` ceiling while using the current API field.
       DEFAULT_MAX_COMPLETION_TOKENS = 2048
       DEFAULT_MAX_TOOL_ITERATIONS = 5
-      DEFAULT_MODEL = 'gpt-4o'
+      DEFAULT_MODEL = 'gpt-4.1'
 
       PREDEFINED_PROMPTS = {
         release_notes: <<~PROMPT
@@ -396,7 +396,7 @@ module Fastlane
                                        sensitive: true,
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :model,
-                                       description: 'The OpenAI model to send the request to (e.g. `gpt-4o`, `gpt-4o-mini`, `gpt-4.1`). ' \
+                                       description: 'The OpenAI model to send the request to (e.g. `gpt-4.1`, `gpt-4.1-mini`, `gpt-4o`). ' \
                                                     "Defaults to `#{DEFAULT_MODEL}`",
                                        optional: true,
                                        default_value: DEFAULT_MODEL,

@@ -12,7 +12,7 @@ describe Fastlane::Actions::OpenaiAskAction do
         "id": "chatcmpl-Aa2NPY4sSWF5eKoW1aFBJmfc78y9p",
         "object": "chat.completion",
         "created": 1733152307,
-        "model": "gpt-4o-2024-08-06",
+        "model": "gpt-4.1-2025-04-14",
         "choices": [
           {
             "index": 0,
@@ -51,7 +51,7 @@ describe Fastlane::Actions::OpenaiAskAction do
       id: 'chatcmpl-toolcall',
       object: 'chat.completion',
       created: 1_733_152_308,
-      model: 'gpt-4o-2024-08-06',
+      model: 'gpt-4.1-2025-04-14',
       choices: [
         {
           index: 0,
@@ -157,6 +157,12 @@ describe Fastlane::Actions::OpenaiAskAction do
 
     expect(body['max_completion_tokens']).to eq(described_class.const_get(:DEFAULT_MAX_COMPLETION_TOKENS))
     expect(body).not_to have_key('max_tokens')
+  end
+
+  it 'uses gpt-4.1 as the default model' do
+    body = JSON.parse(described_class.request_body(prompt: 'sys', question: 'q'))
+
+    expect(body['model']).to eq('gpt-4.1')
   end
 
   it 'opts out of storing Chat Completions by default' do
