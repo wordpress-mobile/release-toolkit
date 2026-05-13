@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- `upload_build_to_apps_cdn`: Update the list of valid values for `platform` to add support for `Linux - x64` and `Linux - ARM64`. [#720]
+_None_
 
 ### Bug Fixes
 
@@ -19,6 +19,12 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 14.6.0
+
+### New Features
+
+- `upload_build_to_apps_cdn`: Update the list of valid values for `platform` to add support for `Linux - x64` and `Linux - ARM64`. [#720]
 
 ## 14.5.0
 
