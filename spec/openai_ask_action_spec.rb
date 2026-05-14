@@ -12,7 +12,7 @@ describe Fastlane::Actions::OpenaiAskAction do
         "id": "chatcmpl-Aa2NPY4sSWF5eKoW1aFBJmfc78y9p",
         "object": "chat.completion",
         "created": 1733152307,
-        "model": "gpt-4o-2024-08-06",
+        "model": "gpt-4.1-2025-04-14",
         "choices": [
           {
             "index": 0,
@@ -51,7 +51,7 @@ describe Fastlane::Actions::OpenaiAskAction do
       id: 'chatcmpl-toolcall',
       object: 'chat.completion',
       created: 1_733_152_308,
-      model: 'gpt-4o-2024-08-06',
+      model: 'gpt-4.1-2025-04-14',
       choices: [
         {
           index: 0,
@@ -132,6 +132,43 @@ describe Fastlane::Actions::OpenaiAskAction do
 
     expect(stub).to have_been_requested
     expect(JSON.parse(expected_req_body)['model']).to eq('gpt-4o-mini')
+  end
+
+  it 'ignores max_tool_iterations on the single-shot path' do
+    expected_req_body = described_class.request_body(prompt: 'sys', question: 'q')
+
+    stub = stub_request(:post, endpoint)
+           .with(body: expected_req_body)
+           .to_return(status: 200, body: stubbed_response('Hi.'))
+
+    result = described_class.run(
+      api_token: fake_token,
+      prompt: 'sys',
+      question: 'q',
+      max_tool_iterations: 'not used without tools'
+    )
+
+    expect(result).to eq('Hi.')
+    expect(stub).to have_been_requested
+  end
+
+  it 'uses max_completion_tokens instead of deprecated max_tokens' do
+    body = JSON.parse(described_class.request_body(prompt: 'sys', question: 'q'))
+
+    expect(body['max_completion_tokens']).to eq(described_class.const_get(:DEFAULT_MAX_COMPLETION_TOKENS))
+    expect(body).not_to have_key('max_tokens')
+  end
+
+  it 'uses gpt-4.1 as the default model' do
+    body = JSON.parse(described_class.request_body(prompt: 'sys', question: 'q'))
+
+    expect(body['model']).to eq('gpt-4.1')
+  end
+
+  it 'opts out of storing Chat Completions by default' do
+    body = JSON.parse(described_class.request_body(prompt: 'sys', question: 'q'))
+
+    expect(body['store']).to be(false)
   end
 
   it 'calls the API with :release_notes prompt' do
@@ -264,21 +301,42 @@ describe Fastlane::Actions::OpenaiAskAction do
       expect(tool_result_msg['tool_call_id']).to eq('call_xyz')
       expect(JSON.parse(tool_result_msg['content'])).to eq({ 'ok' => false, 'message' => 'too long' })
       expect(body['tools']).to eq(JSON.parse(tools.to_json))
+      expect(body['store']).to be(false)
+      expect(body['max_completion_tokens']).to eq(described_class.const_get(:DEFAULT_MAX_COMPLETION_TOKENS))
+      expect(body).not_to have_key('max_tokens')
     end
 
     it 'fails when the loop exceeds max_tool_iterations' do
+      handler_calls = []
       tool_handlers = {
-        'check_length' => ->(_args) { { ok: false } }
+        'check_length' => lambda do |args|
+          handler_calls << args
+          { ok: false }
+        end
       }
 
-      # Always return a tool call — the loop should never terminate naturally.
-      perpetual_tool_call = stubbed_tool_call_response(
-        tool_call_id: 'call_loop',
+      # Always return tool calls; the third one must not be executed when the cap is 2.
+      first_tool_call = stubbed_tool_call_response(
+        tool_call_id: 'call_loop_1',
         name: 'check_length',
-        arguments_json: { text: 'x' }.to_json
+        arguments_json: { text: 'first' }.to_json
       )
-      stub_request(:post, endpoint)
-        .to_return(status: 200, body: perpetual_tool_call)
+      second_tool_call = stubbed_tool_call_response(
+        tool_call_id: 'call_loop_2',
+        name: 'check_length',
+        arguments_json: { text: 'second' }.to_json
+      )
+      third_tool_call = stubbed_tool_call_response(
+        tool_call_id: 'call_loop_3',
+        name: 'check_length',
+        arguments_json: { text: 'third' }.to_json
+      )
+      stub = stub_request(:post, endpoint)
+             .to_return(
+               { status: 200, body: first_tool_call },
+               { status: 200, body: second_tool_call },
+               { status: 200, body: third_tool_call }
+             )
 
       expect do
         described_class.run(
@@ -289,7 +347,45 @@ describe Fastlane::Actions::OpenaiAskAction do
           tool_handlers: tool_handlers,
           max_tool_iterations: 2
         )
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, /did not terminate after 2 iterations/)
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /did not produce a final answer after 2 tool iterations/)
+
+      expect(stub).to have_been_requested.times(3)
+      expect(handler_calls).to eq([{ 'text' => 'first' }, { 'text' => 'second' }])
+    end
+
+    it 'allows one final model response after the last permitted tool iteration' do
+      handler_calls = []
+      tool_handlers = {
+        'check_length' => lambda do |args|
+          handler_calls << args
+          { ok: true }
+        end
+      }
+      first_response = stubbed_tool_call_response(
+        tool_call_id: 'call_once',
+        name: 'check_length',
+        arguments_json: { text: 'draft' }.to_json
+      )
+      second_response = stubbed_response('Final answer.')
+
+      stub = stub_request(:post, endpoint)
+             .to_return(
+               { status: 200, body: first_response },
+               { status: 200, body: second_response }
+             )
+
+      result = described_class.run(
+        api_token: fake_token,
+        prompt: 'sys',
+        question: 'q',
+        tools: tools,
+        tool_handlers: tool_handlers,
+        max_tool_iterations: 1
+      )
+
+      expect(result).to eq('Final answer.')
+      expect(stub).to have_been_requested.twice
+      expect(handler_calls).to eq([{ 'text' => 'draft' }])
     end
 
     it 'sends the configured model on the wire when overridden' do
@@ -382,6 +478,8 @@ describe Fastlane::Actions::OpenaiAskAction do
     end
 
     it 'returns a structured error tool result when the handler raises' do
+      expect(FastlaneCore::UI).not_to receive(:verbose)
+
       tool_handlers = {
         'check_length' => ->(_args) { raise ArgumentError, 'bad args' }
       }
@@ -401,6 +499,14 @@ describe Fastlane::Actions::OpenaiAskAction do
           { status: 200, body: second_response }
         )
 
+      expect(FastlaneCore::UI).to receive(:error).with(
+        satisfy do |message|
+          message.include?("Handler for tool 'check_length' raised ArgumentError") &&
+            !message.include?('bad args') &&
+            !message.include?("\n")
+        end
+      )
+
       result = described_class.run(
         api_token: fake_token,
         prompt: 'sys',
@@ -417,7 +523,7 @@ describe Fastlane::Actions::OpenaiAskAction do
       expect(content['exception']).to eq('ArgumentError')
       # Exception message must NOT be forwarded to the model — it can carry secrets
       # from the surrounding lane (tokens, file contents, etc.). Only the class name
-      # is sent; the full message is logged locally via `UI.error`.
+      # is sent; the full message is also omitted from local logs.
       expect(content).not_to have_key('message')
       expect(tool_result_msg['content']).not_to include('bad args')
     end
@@ -450,6 +556,13 @@ describe Fastlane::Actions::OpenaiAskAction do
           { status: 200, body: second_response }
         )
 
+      expect(FastlaneCore::UI).to receive(:error).with(
+        satisfy do |message|
+          message.include?("Could not serialize tool result for 'check_length': RuntimeError") &&
+            !message.include?('cannot serialize')
+        end
+      )
+
       result = described_class.run(
         api_token: fake_token,
         prompt: 'sys',
@@ -477,7 +590,7 @@ describe Fastlane::Actions::OpenaiAskAction do
       first_response = stubbed_tool_call_response(
         tool_call_id: 'call_bad_json',
         name: 'check_length',
-        arguments_json: 'this is not valid JSON {'
+        arguments_json: 'this is not valid JSON with secret_token=abc123 {'
       )
       second_response = stubbed_response('Recovered.')
 
@@ -488,6 +601,13 @@ describe Fastlane::Actions::OpenaiAskAction do
           { status: 200, body: first_response },
           { status: 200, body: second_response }
         )
+
+      expect(FastlaneCore::UI).to receive(:error).with(
+        satisfy do |message|
+          message.include?("Invalid JSON arguments for tool 'check_length'") &&
+            !message.include?('secret_token=abc123')
+        end
+      )
 
       result = described_class.run(
         api_token: fake_token,
@@ -501,6 +621,76 @@ describe Fastlane::Actions::OpenaiAskAction do
       expect(handler_calls).to be_empty
       tool_result_msg = JSON.parse(recorded_bodies.last)['messages'].find { |m| m['role'] == 'tool' }
       expect(JSON.parse(tool_result_msg['content'])['error']).to match(/Invalid JSON arguments.*check_length/)
+      expect(tool_result_msg['content']).not_to include('secret_token=abc123')
+    end
+
+    it 'does not log raw tool arguments even when verbose mode is enabled' do
+      expect(FastlaneCore::UI).to receive(:error).with(/Raw payload omitted/)
+      expect(FastlaneCore::UI).not_to receive(:verbose)
+
+      result = described_class.execute_tool_call(
+        {
+          'id' => 'call_bad_json',
+          'type' => 'function',
+          'function' => {
+            'name' => 'check_length',
+            'arguments' => 'this is not valid JSON with secret_token=abc123 {'
+          }
+        },
+        {
+          'check_length' => ->(_args) { raise 'should not be called' }
+        }
+      )
+
+      expect(JSON.parse(result[:content])['error']).to match(/Invalid JSON arguments.*check_length/)
+      expect(result[:content]).not_to include('secret_token=abc123')
+    end
+
+    it 'returns a structured error tool result for unsupported returned tool call types' do
+      expect(FastlaneCore::UI).to receive(:error).with(/Unsupported OpenAI tool call type 'custom'/)
+
+      result = described_class.execute_tool_call(
+        {
+          'id' => 'call_custom',
+          'type' => 'custom',
+          'custom' => {
+            'name' => 'custom_tool',
+            'input' => 'payload'
+          }
+        },
+        {
+          'custom_tool' => ->(_args) { raise 'should not be called' }
+        }
+      )
+
+      expect(result[:role]).to eq('tool')
+      expect(result[:tool_call_id]).to eq('call_custom')
+      expect(JSON.parse(result[:content])).to eq(
+        { 'error' => "Unsupported tool call type 'custom'. Only function tool calls are supported." }
+      )
+    end
+
+    it 'returns a clear structured error when a returned function tool call has no name' do
+      expect(FastlaneCore::UI).to receive(:error).with(/missing a non-empty function.name/)
+
+      result = described_class.execute_tool_call(
+        {
+          'id' => 'call_missing_name',
+          'type' => 'function',
+          'function' => {
+            'arguments' => '{}'
+          }
+        },
+        {
+          'validate_length' => ->(_args) { raise 'should not be called' }
+        }
+      )
+
+      expect(result[:role]).to eq('tool')
+      expect(result[:tool_call_id]).to eq('call_missing_name')
+      expect(JSON.parse(result[:content])).to eq(
+        { 'error' => 'Function tool call is missing a non-empty function.name.' }
+      )
     end
   end
 
@@ -522,6 +712,18 @@ describe Fastlane::Actions::OpenaiAskAction do
       end.to raise_error(FastlaneCore::Interface::FastlaneError, /max_tool_iterations.*must be >= 1/)
     end
 
+    it 'rejects non-integer max_tool_iterations when run directly' do
+      expect do
+        described_class.run(
+          api_token: fake_token,
+          prompt: 'sys',
+          question: 'q',
+          tools: [{ type: 'function', function: { name: 'noop', parameters: {} } }],
+          max_tool_iterations: '2'
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /max_tool_iterations.*must be an Integer/)
+    end
+
     it 'rejects empty tools array' do
       expect do
         run_described_fastlane_action(
@@ -531,6 +733,59 @@ describe Fastlane::Actions::OpenaiAskAction do
           tools: []
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, /tools.*non-empty Array/)
+    end
+
+    it 'rejects non-array tools when run directly' do
+      expect do
+        described_class.run(
+          api_token: fake_token,
+          prompt: 'sys',
+          question: 'q',
+          tools: 'not a tools array'
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /tools.*non-empty Array/)
+    end
+
+    it 'rejects unsupported tool definition types' do
+      expect do
+        described_class.run(
+          api_token: fake_token,
+          prompt: 'sys',
+          question: 'q',
+          tools: [
+            {
+              type: 'custom',
+              custom: {
+                name: 'custom_tool'
+              }
+            },
+          ]
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /only supports OpenAI function tools/)
+    end
+
+    it 'rejects function tool definitions without a function name' do
+      expect do
+        described_class.run(
+          api_token: fake_token,
+          prompt: 'sys',
+          question: 'q',
+          tools: [
+            {
+              type: 'function',
+              function: {
+                parameters: {}
+              }
+            },
+          ]
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /missing function.name/)
+    end
+
+    it 'accepts symbol function names in tool definitions' do
+      expect do
+        described_class.validate_tools!([{ type: 'function', function: { name: :noop, parameters: {} } }])
+      end.not_to raise_error
     end
 
     it 'rejects tool_handlers with non-callable values' do

@@ -14,11 +14,11 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- `openai_ask`: avoid logging sensitive tool diagnostics and refuse to execute additional tool calls after `max_tool_iterations`. [#719]
 
 ### Internal Changes
 
-_None_
+- `openai_ask`: validate named function tools, default to `gpt-4.1`, use `max_completion_tokens`, and opt out of OpenAI request storage. [#719]
 
 ## 14.6.0
 
