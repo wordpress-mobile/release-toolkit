@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-_None_
+- `EnvManager`: populate the process `ENV` from the loaded `.env` file by default (no-override semantics — pre-existing `ENV` values win), so fastlane actions that read their `default_value:` from `ENV` find loaded secrets without callers having to thread them through explicitly. Pass `mutate_env: false` to opt out and keep the parse-only / instance-isolation semantics introduced in [#578]. `EnvManager.reset!` now also rolls back the keys it added. [#XXX]
 
 ### New Features
 

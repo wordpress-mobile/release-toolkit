@@ -15,10 +15,22 @@ module Fastlane
       end
 
       # Set up by loading the .env file with the given name.
+      #
+      # When `mutate_env` is true (the default), values from the .env file are
+      # layered into the process `ENV` using no-override semantics: keys already
+      # set in `ENV` (e.g. by CI) win. This lets fastlane actions that look up
+      # values via `ENV.fetch(...)` for their `default_value:` find them without
+      # the caller having to thread them through explicitly.
+      #
+      # Pass `mutate_env: false` to keep `ENV` pristine — values are still
+      # accessible via `get_required_env!`, but only through this instance.
+      # Useful for tests that want isolation, or for callers that prefer to
+      # control `ENV` themselves.
       def initialize(
         env_file_name:,
         env_file_folder: File.join(Dir.home, '.a8c-apps'),
         example_env_file_path: 'fastlane/example.env',
+        mutate_env: true,
         print_error_lambda: ->(message) { FastlaneCore::UI.user_error!(message) },
         print_warning_lambda: ->(message) { FastlaneCore::UI.important(message) }
       )
@@ -31,10 +43,29 @@ module Fastlane
           @print_warning_lambda.call("Warning: env file not found at #{@env_path}. Environment variables may not be loaded.")
         end
 
-        # Parse rather than load so we don't mutate the global ENV. Each instance
-        # gets its own view, and values from the process environment (e.g. set by
-        # CI) still take precedence — see `env_value`.
+        # Always parse rather than load: it lets us track exactly which keys we
+        # add to `ENV` so `reset!` can undo only those, without disturbing keys
+        # that pre-existed in the process environment.
         @loaded_env = File.exist?(@env_path) ? Dotenv.parse(@env_path) : {}
+        @mutated_keys = []
+
+        return unless mutate_env
+
+        @loaded_env.each do |key, value|
+          # No-override: anything already in `ENV` (e.g. set by CI) wins.
+          next if ENV.key?(key)
+
+          ENV[key] = value
+          @mutated_keys << key
+        end
+      end
+
+      # Remove from `ENV` any keys this instance added via `mutate_env: true`.
+      # Idempotent — calling more than once is safe. Used by `reset!` and
+      # available for callers that want to roll back manually.
+      def restore_env!
+        @mutated_keys.each { |key| ENV.delete(key) }
+        @mutated_keys = []
       end
 
       # Use this instead of getting values from `ENV` directly. It will throw an error if the requested value is missing or empty.
@@ -135,8 +166,10 @@ module Fastlane
         default!.require_env_vars!(*keys)
       end
 
-      # Clears the default instance, useful for test teardown.
+      # Clears the default instance, useful for test teardown. Also rolls back
+      # any `ENV` mutations the default instance performed via `mutate_env`.
       def self.reset!
+        @default&.restore_env!
         @default = nil
       end
 
