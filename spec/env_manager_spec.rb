@@ -413,6 +413,27 @@ describe Fastlane::Wpmreleasetoolkit::EnvManager do
       end
     end
 
+    it 'leaves a key alone when a later caller has overwritten it' do
+      ENV.delete('RESTORE_OVERWRITTEN_KEY')
+
+      with_tmp_file(named: 'restore.env', content: "RESTORE_OVERWRITTEN_KEY=loaded\n") do |path|
+        manager = described_class.new(
+          env_file_name: File.basename(path),
+          env_file_folder: File.dirname(path),
+          print_error_lambda: print_error_lambda
+        )
+
+        expect(ENV.fetch('RESTORE_OVERWRITTEN_KEY')).to eq('loaded')
+
+        # Simulate a later caller overwriting the value the manager set.
+        ENV['RESTORE_OVERWRITTEN_KEY'] = 'overwritten'
+
+        manager.restore_env!
+
+        expect(ENV.fetch('RESTORE_OVERWRITTEN_KEY')).to eq('overwritten')
+      end
+    end
+
     it 'is a no-op when mutate_env was false' do
       ENV.delete('NOOP_KEY')
 

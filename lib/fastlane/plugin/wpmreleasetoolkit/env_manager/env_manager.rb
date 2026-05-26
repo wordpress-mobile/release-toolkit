@@ -47,7 +47,10 @@ module Fastlane
         # add to `ENV` so `reset!` can undo only those, without disturbing keys
         # that pre-existed in the process environment.
         @loaded_env = File.exist?(@env_path) ? Dotenv.parse(@env_path) : {}
-        @mutated_keys = []
+        # Records the value this instance wrote for each key it added. On
+        # restore, we delete only if `ENV[key]` still matches — if a later
+        # caller overwrote it, their value is left alone.
+        @mutations = {}
 
         return unless mutate_env
 
@@ -56,16 +59,18 @@ module Fastlane
           next if ENV.key?(key)
 
           ENV[key] = value
-          @mutated_keys << key
+          @mutations[key] = value
         end
       end
 
-      # Remove from `ENV` any keys this instance added via `mutate_env: true`.
+      # Remove from `ENV` any keys this instance added via `mutate_env: true`,
+      # but only if the value is still the one we wrote. Keys that a later
+      # caller has overwritten are left untouched.
       # Idempotent — calling more than once is safe. Used by `reset!` and
       # available for callers that want to roll back manually.
       def restore_env!
-        @mutated_keys.each { |key| ENV.delete(key) }
-        @mutated_keys = []
+        @mutations.each { |key, value| ENV.delete(key) if ENV[key] == value }
+        @mutations = {}
       end
 
       # Use this instead of getting values from `ENV` directly. It will throw an error if the requested value is missing or empty.
