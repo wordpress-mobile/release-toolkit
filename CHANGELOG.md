@@ -19,7 +19,7 @@ _None_
 ### Internal Changes
 
 - `openai_ask`: validate named function tools, default to `gpt-4.1`, use `max_completion_tokens`, and opt out of OpenAI request storage. [#719]
-- Configure Dependabot to update Ruby dependencies daily, grouping minor/patch bumps under `ruby-minor-and-patch`.
+- Configure Dependabot to update Ruby dependencies daily, grouping minor/patch bumps under `ruby-minor-and-patch`. [#724]
 
 ## 14.6.0
 
