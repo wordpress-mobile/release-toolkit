@@ -131,7 +131,7 @@ Sets the origin of the screenshot text bounding box. This must be provided as an
 
 **`font_size`**
 
-Sets the font size for the screenshot text. If this value is too large, the compositor will crash saying it was unable to draw the text within the bounding box specifed in `text_size`.*
+Sets the font size for the screenshot text. If this value is too large, the compositor will crash saying it was unable to draw the text within the bounding box specified in `text_size`.*
 
 **`screenshot_size`**
 
