@@ -151,7 +151,7 @@ module Fastlane
       end
 
       ### A helper function to extract the distance from the provided string.
-      ### (ie – this function will recieve "behind 2" or "ahead 6" and return 2 or 6, respectively.
+      ### (ie – this function will receive "behind 2" or "ahead 6" and return 2 or 6, respectively.
       def self.parse_distance(match)
         distance = match.to_s.scan(/\d+/).first
 
@@ -265,7 +265,7 @@ module Fastlane
       end
 
       ## Updates the project encryption key defined in ~/.mobile-secrets/keys.json
-      ## The updated file is commited and push to the repo
+      ## The updated file is committed and push to the repo
       def self.update_project_encryption_key
         # Update keys.json with the new key
         keys_json = mobile_secrets_keys_json
