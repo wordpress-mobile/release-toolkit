@@ -273,7 +273,7 @@ describe Fastlane::Actions::UploadToS3Action do
           end
         end
 
-        # Untill we remove the deprecated skip_if_exists option, if_exists needs to be optional.
+        # Until we remove the deprecated skip_if_exists option, if_exists needs to be optional.
         # if_exists also has a verify_block that will throw if the given value doesn't match the allowed ones.
         # This test makes sure that if the user omits or set if_exists as nil, Fastlane bypasses the verify_block.
         # This is models a possible usage for the action—we want to be extra careful.
