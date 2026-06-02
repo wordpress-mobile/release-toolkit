@@ -14,7 +14,7 @@ module Fastlane
         attr_reader :install_path, :version
 
         # @param [String] install_path The path to install SwiftGen to. Usually something like "$PROJECT_DIR/vendor/swiftgen/#{SWIFTGEN_VERSION}".
-        #        It's recommended to provide an absolute path here rather than a relative one, to ensure it's not dependant on where the action is run from.
+        #        It's recommended to provide an absolute path here rather than a relative one, to ensure it's not dependent on where the action is run from.
         # @param [String] version The version of SwiftGen to use. This will be used both:
         #        - to check if the current version located in `install_path`, if it already exists, is the expected one
         #        - to know which version to download if there is not one installed in `install_path` yet
