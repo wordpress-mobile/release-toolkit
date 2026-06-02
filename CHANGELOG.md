@@ -15,6 +15,7 @@ _None_
 ### Bug Fixes
 
 - `openai_ask`: avoid logging sensitive tool diagnostics and refuse to execute additional tool calls after `max_tool_iterations`. [#719]
+- Bump the `fastlane` floor to `~> 2.235` to pull in `jwt >= 3.2.0`, fixing [GHSA-c32j-vqhx-rx3x](https://github.com/advisories/GHSA-c32j-vqhx-rx3x) (ruby-jwt empty-key HMAC bypass). [#728]
 
 ### Internal Changes
 
