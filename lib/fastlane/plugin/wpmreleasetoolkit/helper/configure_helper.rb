@@ -265,7 +265,7 @@ module Fastlane
       end
 
       ## Updates the project encryption key defined in ~/.mobile-secrets/keys.json
-      ## The updated file is committed and push to the repo
+      ## The updated file is committed and pushed to the repo
       def self.update_project_encryption_key
         # Update keys.json with the new key
         keys_json = mobile_secrets_keys_json
