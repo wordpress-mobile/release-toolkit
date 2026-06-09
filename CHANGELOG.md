@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-- `EnvManager`: populate the process `ENV` from the loaded `.env` file by default (no-override semantics — pre-existing `ENV` values win) [#578].
+- `EnvManager`: populate the process `ENV` from the loaded `.env` file by default (no-override semantics — pre-existing `ENV` values win) [#723].
 
 ### New Features
 
