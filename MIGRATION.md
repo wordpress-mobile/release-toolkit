@@ -1,5 +1,17 @@
 # Migration Instructions for Major Releases
 
+## From 14.x to 15.0.0
+
+### `EnvManager` populates the process `ENV` by default
+
+`EnvManager` now layers the values from the loaded `.env` file into the process `ENV` when you call `set_up`/`new`, so fastlane actions that resolve their `default_value:` via `ENV.fetch(...)` can see them. Pre-existing `ENV` entries always win (no-override), and `reset!` removes only the keys this instance added.
+
+This reverses the parse-only behavior introduced in `14.4.0` (#578), which kept `ENV` pristine and exposed values only through the `EnvManager` instance. If you upgraded to a `14.4.x`+ release and rely on `ENV` staying untouched, pass `mutate_env: false` to restore that behavior:
+
+```ruby
+EnvManager.set_up(env_file_name: '.myapp-env', mutate_env: false)
+```
+
 ## From 13.x to 14.0.0
 
 ### Metadata Source Actions
