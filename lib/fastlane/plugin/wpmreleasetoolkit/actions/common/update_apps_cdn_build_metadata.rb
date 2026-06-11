@@ -12,14 +12,11 @@ module Fastlane
         post_ids = params[:post_ids]
         UI.message("Updating Apps CDN build metadata for #{post_ids.size} post(s): #{post_ids.join(', ')}...")
 
-        # Build the base JSON body for the WP REST API v2
+        # Build the JSON body for the dedicated Apps CDN builds endpoint, which accepts
+        # the same string-based format as the upload flow (e.g. `visibility: 'Internal'`)
         body = {}
-        body['status'] = params[:post_status] if params[:post_status]
-
-        if params[:visibility]
-          term_id = lookup_visibility_term_id(site_id: params[:site_id], api_token: params[:api_token], visibility: params[:visibility])
-          body['visibility'] = [term_id]
-        end
+        body['post_status'] = params[:post_status] if params[:post_status]
+        body['visibility'] = params[:visibility].to_s.capitalize if params[:visibility]
 
         UI.user_error!('No metadata to update. Provide at least one of: visibility, post_status') if body.empty?
 
@@ -31,16 +28,17 @@ module Fastlane
         results
       end
 
-      # Update a single CDN build post with the given body via the WP REST API v2.
+      # Update a single CDN build post with the given body via the dedicated
+      # `/wpcom/v2/sites/{site_id}/a8c-cdn/builds/{post_id}` endpoint.
       #
       # @param site_id [String] the WordPress.com site ID
       # @param api_token [String] the WordPress.com API bearer token
-      # @param post_id [Integer] the ID of the post to update
+      # @param post_id [Integer] the ID of the build post to update
       # @param body [Hash] the JSON body to send in the POST request
       # @return [Integer] the ID of the updated post
       # @raise [FastlaneCore::Interface::FastlaneError] if the API returns a non-success response
       def self.update_single_post(site_id:, api_token:, post_id:, body:)
-        uri = Helper::AppsCdnHelper.wp_v2_url(site_id: site_id, path: "a8c_cdn_build/#{post_id}")
+        uri = Helper::AppsCdnHelper.wpcom_v2_url(site_id: site_id, path: "a8c-cdn/builds/#{post_id}")
 
         request = Net::HTTP::Post.new(uri.request_uri)
         request.body = JSON.generate(body)
@@ -69,37 +67,6 @@ module Fastlane
         end
       end
 
-      # Look up the taxonomy term ID for a visibility value (e.g. :internal -> 1316).
-      #
-      # @param site_id [String] the WordPress.com site ID
-      # @param api_token [String] the WordPress.com API bearer token
-      # @param visibility [Symbol] the visibility to look up (:internal or :external)
-      # @return [Integer] the taxonomy term ID for the given visibility
-      # @raise [FastlaneCore::Interface::FastlaneError] if no term is found or the API returns a non-success response
-      def self.lookup_visibility_term_id(site_id:, api_token:, visibility:)
-        slug = visibility.to_s.downcase
-        uri = Helper::AppsCdnHelper.wp_v2_url(site_id: site_id, path: "visibility?slug=#{slug}")
-
-        request = Net::HTTP::Get.new(uri.request_uri)
-        request['Accept'] = 'application/json'
-        request['Authorization'] = "Bearer #{api_token}"
-
-        response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|
-          http.open_timeout = 10
-          http.read_timeout = 30
-          http.request(request)
-        end
-
-        case response
-        when Net::HTTPSuccess
-          terms = JSON.parse(response.body)
-          UI.user_error!("No visibility term found for '#{slug}'") if terms.empty?
-          terms.first['id']
-        else
-          UI.user_error!("Failed to look up visibility term '#{slug}': #{response.code} #{response.message}")
-        end
-      end
-
       def self.description
         'Updates metadata of one or more existing builds on the Apps CDN'
       end
@@ -115,8 +82,8 @@ module Fastlane
       def self.details
         <<~DETAILS
           Updates metadata (such as post status or visibility) for one or more existing build posts on a WordPress blog
-          that has the Apps CDN plugin enabled, using the WordPress.com REST API (WP v2).
-          When updating visibility for multiple posts, the visibility term ID is looked up only once.
+          that has the Apps CDN plugin enabled, using the dedicated `/wpcom/v2/sites/{site_id}/a8c-cdn/builds/{post_id}`
+          endpoint. Standard WP REST API writes are blocked for builds, so this endpoint is the only way to update them.
           See PCYsg-15tP-p2 internal a8c documentation for details about the Apps CDN plugin.
         DETAILS
       end

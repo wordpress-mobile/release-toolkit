@@ -22,13 +22,13 @@ module Fastlane
         URI.parse("#{API_BASE_URL}/rest/v1.1/sites/#{site_id}/#{path}")
       end
 
-      # Builds a WordPress.com WP REST API v2 URI scoped to a site.
+      # Builds a WordPress.com REST API wpcom/v2 URI scoped to a site.
       #
       # @param site_id [String] the WordPress.com site ID
-      # @param path [String] the API path relative to the site (e.g. 'a8c_cdn_build/123')
+      # @param path [String] the API path relative to the site (e.g. 'a8c-cdn/builds/123')
       # @return [URI] the parsed full API URI
-      def self.wp_v2_url(site_id:, path:)
-        URI.parse("#{API_BASE_URL}/wp/v2/sites/#{site_id}/#{path}")
+      def self.wpcom_v2_url(site_id:, path:)
+        URI.parse("#{API_BASE_URL}/wpcom/v2/sites/#{site_id}/#{path}")
       end
 
       # Returns a proc that validates a visibility parameter value against {VALID_VISIBILITIES}.

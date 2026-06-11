@@ -7,21 +7,17 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
   let(:test_site_id) { '12345678' }
   let(:test_post_id) { 98_765 }
   let(:second_post_id) { 54_321 }
-  let(:api_url) { "https://public-api.wordpress.com/wp/v2/sites/#{test_site_id}/a8c_cdn_build/#{test_post_id}" }
-  let(:second_api_url) { "https://public-api.wordpress.com/wp/v2/sites/#{test_site_id}/a8c_cdn_build/#{second_post_id}" }
-  let(:visibility_term_url) { "https://public-api.wordpress.com/wp/v2/sites/#{test_site_id}/visibility" }
+  let(:api_url) { "https://public-api.wordpress.com/wpcom/v2/sites/#{test_site_id}/a8c-cdn/builds/#{test_post_id}" }
+  let(:second_api_url) { "https://public-api.wordpress.com/wpcom/v2/sites/#{test_site_id}/a8c-cdn/builds/#{second_post_id}" }
   let(:test_api_token) { 'test_api_token' }
-
-  let(:external_term_id) { 21_293 }
-  let(:internal_term_id) { 1_316 }
 
   let(:stub_success_response) do
     {
       id: test_post_id,
-      title: { rendered: 'WordPress.com Studio 1.7.5' },
-      status: 'publish',
-      visibility: [external_term_id],
-      class_list: ['visibility-external']
+      post_status: 'publish',
+      release_notes: 'Release 1.7.5',
+      visibility: 'External',
+      product: 'WordPress.com Studio'
     }.to_json
   end
 
@@ -31,14 +27,6 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
 
   describe 'updating visibility' do
     it 'successfully updates the visibility to external' do
-      stub_request(:get, visibility_term_url)
-        .with(query: { 'slug' => 'external' })
-        .to_return(
-          status: 200,
-          body: [{ 'id' => external_term_id, 'name' => 'External', 'slug' => 'external' }].to_json,
-          headers: { 'Content-Type' => 'application/json' }
-        )
-
       stub_request(:post, api_url)
         .to_return(
           status: 200,
@@ -62,25 +50,17 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
           expect(req.headers['Authorization']).to eq("Bearer #{test_api_token}")
           expect(req.headers['Content-Type']).to eq('application/json')
           body = JSON.parse(req.body)
-          expect(body['visibility']).to eq([external_term_id])
+          expect(body['visibility']).to eq('External')
           true
         end
       )
     end
 
     it 'successfully updates the visibility to internal' do
-      stub_request(:get, visibility_term_url)
-        .with(query: { 'slug' => 'internal' })
-        .to_return(
-          status: 200,
-          body: [{ 'id' => internal_term_id, 'name' => 'Internal', 'slug' => 'internal' }].to_json,
-          headers: { 'Content-Type' => 'application/json' }
-        )
-
       internal_response = {
         id: test_post_id,
-        visibility: [internal_term_id],
-        class_list: ['visibility-internal']
+        post_status: 'publish',
+        visibility: 'Internal'
       }.to_json
 
       stub_request(:post, api_url)
@@ -102,7 +82,7 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
       expect(WebMock).to(
         have_requested(:post, api_url).with do |req|
           body = JSON.parse(req.body)
-          expect(body['visibility']).to eq([internal_term_id])
+          expect(body['visibility']).to eq('Internal')
           true
         end
       )
@@ -110,15 +90,7 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
   end
 
   describe 'batch updating multiple posts' do
-    it 'updates all posts with a single visibility term lookup' do
-      stub_request(:get, visibility_term_url)
-        .with(query: { 'slug' => 'external' })
-        .to_return(
-          status: 200,
-          body: [{ 'id' => external_term_id, 'name' => 'External', 'slug' => 'external' }].to_json,
-          headers: { 'Content-Type' => 'application/json' }
-        )
-
+    it 'updates each post with a single request' do
       stub_request(:post, api_url)
         .to_return(
           status: 200,
@@ -143,8 +115,6 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
       expect(results.size).to eq(2)
       expect(results).to eq([test_post_id, second_post_id])
 
-      # Visibility term lookup should have been called only once
-      expect(WebMock).to have_requested(:get, visibility_term_url).with(query: { 'slug' => 'external' }).once
       expect(WebMock).to have_requested(:post, api_url).once
       expect(WebMock).to have_requested(:post, second_api_url).once
     end
@@ -155,7 +125,7 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
       stub_request(:post, api_url)
         .to_return(
           status: 200,
-          body: { id: test_post_id, status: 'draft' }.to_json,
+          body: { id: test_post_id, post_status: 'draft' }.to_json,
           headers: { 'Content-Type' => 'application/json' }
         )
 
@@ -171,7 +141,7 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
       expect(WebMock).to(
         have_requested(:post, api_url).with do |req|
           body = JSON.parse(req.body)
-          expect(body['status']).to eq('draft')
+          expect(body['post_status']).to eq('draft')
           true
         end
       )
@@ -180,14 +150,6 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
 
   describe 'updating multiple fields' do
     it 'successfully updates both visibility and post_status' do
-      stub_request(:get, visibility_term_url)
-        .with(query: { 'slug' => 'external' })
-        .to_return(
-          status: 200,
-          body: [{ 'id' => external_term_id, 'name' => 'External', 'slug' => 'external' }].to_json,
-          headers: { 'Content-Type' => 'application/json' }
-        )
-
       stub_request(:post, api_url)
         .to_return(
           status: 200,
@@ -208,8 +170,8 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
       expect(WebMock).to(
         have_requested(:post, api_url).with do |req|
           body = JSON.parse(req.body)
-          expect(body['visibility']).to eq([external_term_id])
-          expect(body['status']).to eq('publish')
+          expect(body['visibility']).to eq('External')
+          expect(body['post_status']).to eq('publish')
           true
         end
       )
@@ -221,7 +183,7 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
       stub_request(:post, api_url)
         .to_return(
           status: 403,
-          body: { code: 'rest_forbidden', message: 'You are not authorized.' }.to_json,
+          body: { code: 'rest_forbidden', message: 'You do not have permission to update builds.' }.to_json,
           headers: { 'Content-Type' => 'application/json' }
         )
 
@@ -231,6 +193,24 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
           api_token: test_api_token,
           post_ids: [test_post_id],
           post_status: 'publish'
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, "Update of Apps CDN build metadata failed for post #{test_post_id}")
+    end
+
+    it 'handles a non-existent build post properly' do
+      stub_request(:post, api_url)
+        .to_return(
+          status: 404,
+          body: { code: 'rest_build_not_found', message: 'Build not found.' }.to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        )
+
+      expect do
+        run_described_fastlane_action(
+          site_id: test_site_id,
+          api_token: test_api_token,
+          post_ids: [test_post_id],
+          visibility: :external
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, "Update of Apps CDN build metadata failed for post #{test_post_id}")
     end
@@ -251,25 +231,6 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
           post_status: 'publish'
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, "Update of Apps CDN build metadata failed for post #{test_post_id}")
-    end
-
-    it 'handles visibility term lookup failure' do
-      stub_request(:get, visibility_term_url)
-        .with(query: { 'slug' => 'external' })
-        .to_return(
-          status: 200,
-          body: [].to_json,
-          headers: { 'Content-Type' => 'application/json' }
-        )
-
-      expect do
-        run_described_fastlane_action(
-          site_id: test_site_id,
-          api_token: test_api_token,
-          post_ids: [test_post_id],
-          visibility: :external
-        )
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, "No visibility term found for 'external'")
     end
   end
 
