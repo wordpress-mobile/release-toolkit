@@ -42,18 +42,4 @@ Gem::Specification.new do |spec|
 
   # `google-cloud-storage` is required by fastlane, but we pin it in case it's not in the future
   spec.add_dependency 'google-cloud-storage', '~> 1.31'
-
-  # Only needed for specs (Time.use_zone, String#to_time, Hash#slice!)
-  spec.add_development_dependency 'activesupport', '~> 8.1'
-  spec.add_development_dependency 'bundler', '~> 2.0'
-  # Use at least Fastlane 2.210.0 to ensure compatibility with the Xcode 14 toolchain
-  # See https://github.com/fastlane/fastlane/releases/tag/2.210.0
-  spec.add_development_dependency 'fastlane', '~> 2.210'
-  spec.add_development_dependency 'pry', '~> 0.12.2'
-  spec.add_development_dependency 'rmagick', '~> 5.3'
-  spec.add_development_dependency 'rspec', '~> 3.8'
-  spec.add_development_dependency 'rspec_junit_formatter', '~> 0.4.1'
-  spec.add_development_dependency 'rubocop', '~> 1.65'
-  spec.add_development_dependency 'rubocop-rspec', '3.0'
-  spec.add_development_dependency 'simplecov', '~> 0.16.1'
 end
