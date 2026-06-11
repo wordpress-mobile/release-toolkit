@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export IMAGE_ID="xcode-26.1.1"
+export IMAGE_ID="xcode-27.0-beta"
 export CI_TOOLKIT="automattic/a8c-ci-toolkit#5.7.0"
 export DOCKER_PLUGIN="docker#v5.13.0"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
