@@ -12,10 +12,13 @@ gem 'danger-dangermattic', '~> 1.0'
 # Security:
 # - https://github.com/lostisland/faraday/pull/1665
 # - https://github.com/lostisland/faraday/pull/1681
+#
 # Faraday 2.0 is not compatible with Fastlane
-# Use at least Fastlane 2.210.0 to ensure compatibility with the Xcode 14 toolchain
-# See https://github.com/fastlane/fastlane/releases/tag/2.210.0
-gem 'fastlane', '~> 2.210'
+#
+# See also:
+# - https://github.com/fastlane/fastlane/issues/21334
+# - https://github.com/fastlane/fastlane/pull/30089
+gem 'faraday', '~> 1.10', '>= 1.10.5'
 gem 'pry', '~> 0.12.2'
 gem 'rmagick', '~> 5.3'
 gem 'rspec', '~> 3.8'
