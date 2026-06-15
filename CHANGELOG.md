@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Bump the pinned Ruby version (`.ruby-version`) to 3.3.4, which drives the CI test matrix and the gem-publish Docker image. [#732]
 
 ## 14.7.0
 
