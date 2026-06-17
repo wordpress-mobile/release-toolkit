@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Added `android_prune_orphaned_translations` action: removes `<string>`, `<string-array>` and `<plurals>` entries from `values-*/strings.xml` whose key is not declared in the source strings (the res dir's default `values/strings.xml`, optionally unioned with `additional_source_strings_paths`). Useful after downloading translations from GlotPress to avoid Lint `ExtraTranslation` errors from keys removed/renamed since the source was last synced.
 
 ### Bug Fixes
 
