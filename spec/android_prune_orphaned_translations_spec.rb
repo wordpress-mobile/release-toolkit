@@ -58,6 +58,37 @@ describe Fastlane::Actions::AndroidPruneOrphanedTranslationsAction do
     end
   end
 
+  it 'leaves non-locale qualifier directories (e.g. values-night) untouched' do
+    Dir.mktmpdir do |dir|
+      res_dir = File.join(dir, 'res')
+      write_file(File.join(res_dir, 'values', 'strings.xml'), default_strings)
+      # A non-locale qualifier dir with a key absent from the default must NOT be pruned.
+      night_file = File.join(res_dir, 'values-night', 'strings.xml')
+      night_content = <<~XML
+        <?xml version="1.0" encoding="UTF-8"?>
+        <resources>
+            <string name="night_only">Night</string>
+        </resources>
+      XML
+      write_file(night_file, night_content)
+      # A real locale dir with an orphan, to confirm pruning still happens there.
+      fr_file = File.join(res_dir, 'values-fr', 'strings.xml')
+      write_file(fr_file, <<~XML)
+        <?xml version="1.0" encoding="UTF-8"?>
+        <resources>
+            <string name="hello">Bonjour</string>
+            <string name="orphan_string">Orphelin</string>
+        </resources>
+      XML
+
+      pruned = run_described_fastlane_action(res_dir: res_dir)
+
+      expect(pruned).to eq(1)
+      expect(File.read(night_file)).to eq(night_content)
+      expect(File.read(fr_file)).not_to include('orphan_string')
+    end
+  end
+
   it 'treats keys from `additional_source_strings_paths` as valid (flavor overlay case)' do
     Dir.mktmpdir do |dir|
       res_dir = File.join(dir, 'res')

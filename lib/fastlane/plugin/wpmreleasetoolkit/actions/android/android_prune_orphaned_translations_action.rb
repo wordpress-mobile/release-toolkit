@@ -6,12 +6,19 @@ require 'nokogiri'
 module Fastlane
   module Actions
     class AndroidPruneOrphanedTranslationsAction < Action
+      # Matches an Android `values-<qualifier>` directory whose qualifier is a locale (a language code, optional
+      # region, or a BCP-47 `b+` form), so non-locale qualifier dirs (e.g. `values-night`, `values-v21`,
+      # `values-land`) are left untouched.
+      LOCALE_VALUES_DIR_REGEX = /\Avalues-(?:b\+[a-zA-Z]+(?:\+[a-zA-Z0-9]+)*|[a-z]{2,3}(?:-r(?:[A-Z]{2}|\d{3}))?)\z/
+
       def self.run(params)
         res_dir = params[:res_dir]
         source_paths = [File.join(res_dir, 'values', 'strings.xml')] + params[:additional_source_strings_paths]
         valid_keys = collect_keys(source_paths)
 
-        locale_files = Dir.glob(File.join(res_dir, 'values-*', 'strings.xml'))
+        locale_files = Dir.glob(File.join(res_dir, 'values-*', 'strings.xml')).select do |file|
+          File.basename(File.dirname(file)).match?(LOCALE_VALUES_DIR_REGEX)
+        end
         total_pruned = 0
 
         locale_files.each do |file|
