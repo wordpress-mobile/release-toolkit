@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require 'tmpdir'
+require 'fileutils'
 
 describe Fastlane::Actions::AndroidPruneOrphanedTranslationsAction do
   # Writes `content` to `path`, creating intermediate directories.
