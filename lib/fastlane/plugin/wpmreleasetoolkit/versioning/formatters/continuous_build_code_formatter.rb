@@ -14,8 +14,14 @@ module Fastlane
       #
       #   versionCode = (major * 10 + minor) * 10^build_digits + build_number
       #
-      # There is deliberately no patch input: in a continuous-trunk model hotfixes are disambiguated
-      # by the (globally monotonic) build number, not by a patch digit.
+      # It takes `major`, `minor`, and `build_number` as explicit arguments rather than an
+      # `AppVersion`, because the inputs come from different sources and an `AppVersion` does not
+      # model them: the marketing `major`/`minor` come from the parsed version, while `build_number`
+      # is an independent CI counter (e.g. `BUILDKITE_BUILD_NUMBER`). Notably, `AppVersion#build_number`
+      # means something else in this domain (the RC/beta iteration counter, e.g. `-rc-1`), so taking an
+      # `AppVersion` here would invite reading the wrong field. There is also no `patch`: in a
+      # continuous-trunk model the build number strictly orders every build and subsumes patch's
+      # ordering role (hotfixes get a new build number, not a patch digit in the code).
       #
       # Because the build number is globally monotonic and the version prefix only ever increases,
       # the resulting code is always strictly increasing — even if the build number eventually
@@ -40,7 +46,7 @@ module Fastlane
         # @param [Integer] major The major (marketing) version number.
         # @param [Integer] minor The minor (marketing) version number. Must be 9 or lower.
         # @param [Integer] build_number A high-cardinality, monotonically increasing build number
-        # (e.g. a Buildkite build number).
+        # (e.g. a Buildkite build number). This is a CI counter, not `AppVersion#build_number`.
         #
         # @return [Integer] The derived `versionCode`.
         #
