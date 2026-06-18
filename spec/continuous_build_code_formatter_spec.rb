@@ -59,5 +59,21 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::ContinuousBuildCodeFormatter d
       expect { described_class.new(build_digits: 0) }
         .to raise_error(/`build_digits` must be a positive integer, got: 0/)
     end
+
+    %w[major minor build_number].each do |component|
+      it "rejects a non-integer #{component} with a user-friendly error" do
+        args = { major: 26, minor: 9, build_number: 84_231 }
+        args[component.to_sym] = '1' # e.g. an unparsed value from an env var or file read
+        expect { described_class.new.build_code(**args) }
+          .to raise_error(/`#{component}` must be an integer, got: String/)
+      end
+
+      it "rejects a negative #{component}" do
+        args = { major: 26, minor: 9, build_number: 84_231 }
+        args[component.to_sym] = -1
+        expect { described_class.new.build_code(**args) }
+          .to raise_error(/`#{component}` must be a non-negative integer, got: -1/)
+      end
+    end
   end
 end
