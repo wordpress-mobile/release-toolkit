@@ -42,7 +42,7 @@ module Fastlane
 
       def self.details
         <<~DETAILS
-          Looks for an open Pull Request whose head is the given branch (optionally targeting a specific base),
+          Looks for an open Pull Request whose head is the given branch and which targets the given base,
           and returns its URL if found. Otherwise, creates a new Pull Request and returns its URL.
 
           This is useful for "rolling" automations (e.g. a daily translations or dependency-update job) that

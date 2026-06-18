@@ -309,7 +309,7 @@ module Fastlane
       # @param [String] repository The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`)
       # @param [String] head The head branch to look for. May be given as `branch` or as the fully-qualified `owner:branch`;
       #        when unqualified, it is automatically prefixed with the repository's owner.
-      # @param [String] base The base branch the PR should target. If nil, PRs targeting any base are considered.
+      # @param [String?] base The base branch the PR should target. If nil, PRs targeting any base are considered.
       # @param [String] state The PR state to match (`open`, `closed`, or `all`). Defaults to `open`.
       # @return [Sawyer::Resource, nil] The first matching Pull Request, or nil if none matches.
       #
