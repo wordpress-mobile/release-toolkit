@@ -34,6 +34,35 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::ContinuousBuildCodeFormatter d
     end
   end
 
+  # The build number is allowed to exceed 10^build_digits. The docstring guarantees ordering still
+  # holds in that case (overflow "only costs human-readability, not ordering") *because* the build
+  # number is globally monotonic. These lock that in — and guard against a future change such as
+  # masking the build number with `% 10**build_digits`, which would silently break ordering.
+  context 'when the build number overflows its reserved digits (10^build_digits)' do
+    it 'still increases within the same version across the overflow boundary' do
+      formatter = described_class.new(build_digits: 4) # 10^4 = 10_000
+      # 269 * 10_000 + 10_000 = 2_700_000   vs   269 * 10_000 + 9_999 = 2_699_999
+      expect(formatter.build_code(major: 26, minor: 9, build_number: 10_000))
+        .to be > formatter.build_code(major: 26, minor: 9, build_number: 9_999)
+    end
+
+    it 'still increases across a version bump while both build numbers are past the overflow point' do
+      formatter = described_class.new(build_digits: 4) # 10^4 = 10_000
+      # 270 * 10_000 + 25_001 = 2_725_001   vs   269 * 10_000 + 25_000 = 2_715_000
+      expect(formatter.build_code(major: 27, minor: 0, build_number: 25_001))
+        .to be > formatter.build_code(major: 26, minor: 9, build_number: 25_000)
+    end
+
+    it 'can render identically to a later version once overflowed — the documented readability cost, which is harmless under a monotonic build number' do
+      formatter = described_class.new(build_digits: 4) # 10^4 = 10_000
+      # Overflow makes the digits ambiguous: 26.9 build 10_000 and 27.0 build 0 both come out as 2_700_000.
+      # That's the "only costs human-readability" caveat — and it's safe because a globally monotonic
+      # build number means (27, 0, build: 0) never *follows* (26, 9, build: 10_000); the counter only goes up.
+      expect(formatter.build_code(major: 26, minor: 9, build_number: 10_000))
+        .to eq(formatter.build_code(major: 27, minor: 0, build_number: 0))
+    end
+  end
+
   describe 'validation' do
     it 'raises when minor is greater than 9' do
       expect { described_class.new.build_code(major: 26, minor: 10, build_number: 1) }
