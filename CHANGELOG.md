@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- Added `find_or_create_pull_request` action and `GithubHelper#find_pull_request`: returns the URL of the open Pull Request for a head branch, creating one only if none exists yet. Useful for "rolling" automations (e.g. a daily translations or dependency-update job) that force-push the same head branch on every run.
+- Added `find_or_create_pull_request` action and `GithubHelper#find_pull_request`: returns the URL of the open Pull Request for a head branch, creating one only if none exists yet. Useful for "rolling" automations (e.g. a daily translations or dependency-update job) that force-push the same head branch on every run. [#733]
 
 ### Bug Fixes
 
