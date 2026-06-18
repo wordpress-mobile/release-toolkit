@@ -14,6 +14,9 @@ module Fastlane
       def self.run(params)
         res_dir = params[:res_dir]
         source_paths = [File.join(res_dir, 'values', 'strings.xml')] + params[:additional_source_strings_paths]
+        source_paths.each do |path|
+          UI.user_error!("Source strings file not found: `#{path}`") unless File.file?(path)
+        end
         valid_keys = collect_keys(source_paths)
 
         locale_files = Dir.glob(File.join(res_dir, 'values-*', 'strings.xml')).select do |file|

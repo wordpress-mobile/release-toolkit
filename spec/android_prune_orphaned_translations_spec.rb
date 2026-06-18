@@ -139,4 +139,24 @@ describe Fastlane::Actions::AndroidPruneOrphanedTranslationsAction do
       expect(File.read(fr_file)).to eq(fr_content)
     end
   end
+
+  it 'raises a clear error when the res dir has no default strings file' do
+    Dir.mktmpdir do |dir|
+      res_dir = File.join(dir, 'res')
+      FileUtils.mkdir_p(res_dir)
+      expect do
+        run_described_fastlane_action(res_dir: res_dir)
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /Source strings file not found/)
+    end
+  end
+
+  it 'raises a clear error when an additional source strings path is missing' do
+    Dir.mktmpdir do |dir|
+      res_dir = File.join(dir, 'res')
+      write_file(File.join(res_dir, 'values', 'strings.xml'), default_strings)
+      expect do
+        run_described_fastlane_action(res_dir: res_dir, additional_source_strings_paths: [File.join(dir, 'missing.xml')])
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /Source strings file not found/)
+    end
+  end
 end
