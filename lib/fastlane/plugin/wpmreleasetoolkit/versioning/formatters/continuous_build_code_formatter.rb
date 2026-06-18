@@ -51,6 +51,12 @@ module Fastlane
         # @return [Integer] The derived `versionCode`.
         #
         def build_code(major:, minor:, build_number:)
+          # Validate up front so bad input (e.g. strings from env vars or file reads) raises a
+          # user-friendly error rather than an opaque `TypeError` from the arithmetic below.
+          validate_component!('major', major)
+          validate_component!('minor', minor)
+          validate_component!('build_number', build_number)
+
           # `major * 10 + minor` is only unambiguous while minor is a single digit.
           if minor > 9
             UI.user_error!("Minor version (#{minor}) must be 9 or lower to derive an unambiguous build code with `#{self.class.name}`")
@@ -67,6 +73,23 @@ module Fastlane
         end
 
         private
+
+        # Validates that a version component is a non-negative integer.
+        #
+        # @param [String] name The component name, used in the error message
+        # @param [Integer] value The value to validate
+        #
+        # @raise [StandardError] If the value is not a non-negative integer
+        #
+        def validate_component!(name, value)
+          unless value.is_a?(Integer)
+            UI.user_error!("`#{name}` must be an integer, got: #{value.class}")
+          end
+
+          return unless value.negative?
+
+          UI.user_error!("`#{name}` must be a non-negative integer, got: #{value}")
+        end
 
         # Validates that `build_digits` is a positive integer.
         #
