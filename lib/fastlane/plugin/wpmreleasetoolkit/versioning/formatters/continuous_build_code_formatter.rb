@@ -30,7 +30,7 @@ module Fastlane
       #
       # Unlike `DerivedBuildCodeFormatter` (fixed-width string concatenation capped at 8 total digits
       # and 3 digits per component, i.e. build <= 999), this formatter can hold a large build number.
-      # The two target different release models; this one does not replace the other.
+      # The two formatters target different release models; this one does not replace the other.
       class ContinuousBuildCodeFormatter
         # @param [Integer] build_digits Number of digits reserved for the build number, which sets the
         # multiplier applied to the `major * 10 + minor` prefix (multiplier = 10^build_digits).
