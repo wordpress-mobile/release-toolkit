@@ -46,6 +46,46 @@ describe Fastlane::Helper::GithubHelper do
     end
   end
 
+  describe '#find_pull_request' do
+    let(:test_repo) { 'repo-test/project-test' }
+    let(:found_pr) { double('PullRequest', html_url: 'https://github.com/repo-test/project-test/pull/42') } # rubocop:disable RSpec/VerifiedDoubles
+    let(:client) do
+      instance_double(
+        Octokit::Client,
+        pull_requests: [found_pr],
+        user: instance_double('User', name: 'test'),
+        'auto_paginate=': nil
+      )
+    end
+
+    before do
+      allow(Octokit::Client).to receive(:new).and_return(client)
+    end
+
+    it 'qualifies an unqualified head with the repository owner and forwards the base' do
+      expect(client).to receive(:pull_requests).with(test_repo, { state: 'open', head: 'repo-test:my-branch', base: 'trunk' })
+      find_pull_request(head: 'my-branch', base: 'trunk')
+    end
+
+    it 'uses an already-qualified head as-is and omits the base when not provided' do
+      expect(client).to receive(:pull_requests).with(test_repo, { state: 'open', head: 'someone:other-branch' })
+      find_pull_request(head: 'someone:other-branch')
+    end
+
+    it 'returns the first matching pull request' do
+      expect(find_pull_request(head: 'my-branch')).to eq(found_pr)
+    end
+
+    it 'returns nil when no pull request matches' do
+      allow(client).to receive(:pull_requests).and_return([])
+      expect(find_pull_request(head: 'my-branch')).to be_nil
+    end
+
+    def find_pull_request(head:, base: nil)
+      described_class.new(github_token: 'Fake-GitHubToken-123').find_pull_request(repository: test_repo, head: head, base: base)
+    end
+  end
+
   describe '#get_last_milestone' do
     let(:test_repo) { 'repo-test/project-test' }
     let(:last_stone) { mock_milestone('10.0') }

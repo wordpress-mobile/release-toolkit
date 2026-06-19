@@ -304,6 +304,23 @@ module Fastlane
         reuse_identifier
       end
 
+      # Find an existing Pull Request matching the given head (and optionally base) branch.
+      #
+      # @param [String] repository The repository name, including the organization (e.g. `wordpress-mobile/wordpress-ios`)
+      # @param [String] head The head branch to look for. May be given as `branch` or as the fully-qualified `owner:branch`;
+      #        when unqualified, it is automatically prefixed with the repository's owner.
+      # @param [String?] base The base branch the PR should target. If nil, PRs targeting any base are considered.
+      # @param [String] state The PR state to match (`open`, `closed`, or `all`). Defaults to `open`.
+      # @return [Sawyer::Resource, nil] The first matching Pull Request, or nil if none matches.
+      #
+      def find_pull_request(repository:, head:, base: nil, state: 'open')
+        qualified_head = head.include?(':') ? head : "#{repository.split('/').first}:#{head}"
+        options = { state: state, head: qualified_head }
+        options[:base] = base unless base.nil?
+
+        client.pull_requests(repository, options).first
+      end
+
       # Update a milestone for a repository
       #
       # @param [String] repository The repository name (including the organization)
