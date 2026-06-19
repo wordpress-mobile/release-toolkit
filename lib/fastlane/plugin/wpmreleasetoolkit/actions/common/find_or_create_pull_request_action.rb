@@ -26,6 +26,7 @@ module Fastlane
           repo: params[:repository],
           title: params[:title],
           body: params[:body],
+          draft: params[:draft],
           head: params[:head],
           base: params[:base],
           labels: params[:labels],
@@ -67,6 +68,7 @@ module Fastlane
         # Parameters we forward as-is from Fastlane's `create_pull_request` action
         forwarded_param_keys = %i[
           api_url
+          draft
           labels
           assignees
           reviewers

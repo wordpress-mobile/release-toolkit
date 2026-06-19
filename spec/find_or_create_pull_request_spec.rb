@@ -44,6 +44,7 @@ describe Fastlane::Actions::FindOrCreatePullRequestAction do
         repo: test_repo,
         title: 'Update translations',
         body: 'Sync translations from GlotPress',
+        draft: nil,
         head: test_head,
         base: test_base,
         labels: ['Localization'],
@@ -64,6 +65,24 @@ describe Fastlane::Actions::FindOrCreatePullRequestAction do
       )
 
       expect(result).to eq("https://github.com/#{test_repo}/pull/8")
+    end
+
+    it 'forwards draft: true when creating a draft PR' do
+      allow(github_helper).to receive(:find_pull_request).and_return(nil)
+      allow(other_action_mock).to receive(:create_pull_request)
+        .with(hash_including(draft: true))
+        .and_return("https://github.com/#{test_repo}/pull/9")
+
+      result = run_described_fastlane_action(
+        github_token: test_token,
+        repository: test_repo,
+        title: 'Update translations',
+        head: test_head,
+        base: test_base,
+        draft: true
+      )
+
+      expect(result).to eq("https://github.com/#{test_repo}/pull/9")
     end
   end
 end
