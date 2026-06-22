@@ -65,6 +65,11 @@ module Fastlane
           prefix = (major * 10) + minor
           code = (prefix * (10**@build_digits)) + build_number
 
+          # Sanity check: Play Store versionCodes must be positive integers.
+          if code <= 0
+            UI.user_error!("Derived build code (#{code}) must be a positive integer")
+          end
+
           if code > MAX_PLAY_STORE_VERSION_CODE
             UI.user_error!("Derived build code (#{code}) exceeds the maximum allowed Play Store versionCode (#{MAX_PLAY_STORE_VERSION_CODE})")
           end

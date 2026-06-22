@@ -79,6 +79,11 @@ describe Fastlane::Wpmreleasetoolkit::Versioning::ContinuousBuildCodeFormatter d
       expect(described_class.new.build_code(major: 210, minor: 0, build_number: 0)).to eq(2_100_000_000)
     end
 
+    it 'raises when the derived code is not positive (all-zeros input)' do
+      expect { described_class.new.build_code(major: 0, minor: 0, build_number: 0) }
+        .to raise_error(/Derived build code \(0\) must be a positive integer/)
+    end
+
     it 'rejects a non-integer build_digits' do
       expect { described_class.new(build_digits: '6') }
         .to raise_error(/`build_digits` must be an integer, got: String/)
