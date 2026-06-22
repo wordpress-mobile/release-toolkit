@@ -11,6 +11,7 @@ _None_
 ### New Features
 
 - Added `find_or_create_pull_request` action and `GithubHelper#find_pull_request`: returns the URL of the open Pull Request for a head branch, creating one only if none exists yet. Useful for "rolling" automations (e.g. a daily translations or dependency-update job) that force-push the same head branch on every run. [#733]
+- Added `ios_generate_pot_from_stringsdict` and `ios_generate_stringsdict_from_po` actions to round-trip iOS `.stringsdict` plural files through a gettext `.po`/`.pot`-based translation system (e.g. GlotPress). The forward action turns an English `.stringsdict` into a `.pot` template (one `msgid`/`msgid_plural` per plural variable); the reverse rebuilds a per-locale `.stringsdict` from a translated `.po`, mapping gettext's indexed plural forms back to CLDR plural categories (`one`/`few`/`many`/…) via the new `Ios::PluralRules` table and using the English `.stringsdict` as a structural template. The forward action round-trips only the `one`/`other` forms; other CLDR categories in the source (e.g. a `zero` literal override) are dropped with a warning. The reverse action likewise warns when a locale's plural entry is only partially translated. [#739]
 
 ### Bug Fixes
 
