@@ -39,6 +39,14 @@ describe Fastlane::Helper::Ios::L10nHelper do
       expect(File).to exist(invalid_fixture)
       expect(described_class.strings_file_type(path: invalid_fixture)).to be_nil
     end
+
+    it 'skips the redundant `plutil -lint` check when `assume_valid: true`, still detecting the format' do
+      text_fixture = fixture('Localizable-utf16.strings')
+      allow(Open3).to receive(:capture2).and_call_original
+      expect(Open3).not_to receive(:capture2).with('/usr/bin/plutil', '-lint', anything)
+
+      expect(described_class.strings_file_type(path: text_fixture, assume_valid: true)).to eq(:text)
+    end
   end
 
   describe '#merge_strings' do

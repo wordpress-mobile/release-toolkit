@@ -15,18 +15,24 @@ module Fastlane
         # Returns the type of a `.strings` file (XML, binary or ASCII)
         #
         # @param [String] path The path to the `.strings` file to check
+        # @param [Boolean] assume_valid Skip the `plutil -lint` validity check when the caller has already
+        #        confirmed the file parses (e.g. via `read_strings_file_as_hash`), avoiding a redundant
+        #        `plutil` invocation. Only the format detection (`file`) then runs.
         # @return [Symbol] The file format used by the `.strings` file. Can be one of:
         #         - `:text` for the ASCII-plist file format (containing typical `"key" = "value";` lines)
         #         - `:xml` for XML plist file format (can be used if machine-generated, especially since there's no official way/tool to generate the ASCII-plist file format as output)
         #         - `:binary` for binary plist file format (usually only true for `.strings` files converted by Xcode at compile time and included in the final `.app`/`.ipa`)
         #         - `nil` if the file does not exist or is neither of those format (e.g. not a `.strings` file at all)
         #
-        def self.strings_file_type(path:)
+        def self.strings_file_type(path:, assume_valid: false)
           return :text if File.empty?(path) # If completely empty file, consider it as a valid `.strings` files in textual format
 
-          # Start by checking it seems like a valid property-list file (and not e.g. an image or plain text file)
-          _, status = Open3.capture2('/usr/bin/plutil', '-lint', path)
-          return nil unless status.success?
+          # Start by checking it seems like a valid property-list file (and not e.g. an image or plain text file).
+          # A caller that has already parsed the file can skip this redundant check via `assume_valid: true`.
+          unless assume_valid
+            _, status = Open3.capture2('/usr/bin/plutil', '-lint', path)
+            return nil unless status.success?
+          end
 
           # If it is a valid property-list file, determine the actual format used
           format_desc, status = Open3.capture2('/usr/bin/file', path)

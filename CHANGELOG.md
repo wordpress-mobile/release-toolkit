@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- `L10nHelper.strings_file_type` (and `StringsFileValidationHelper.scan_for_duplicate_keys`) accept `assume_valid:` to skip a redundant `plutil -lint` when the caller has already parsed the file. [#____]
 
 ## 14.7.0
 
