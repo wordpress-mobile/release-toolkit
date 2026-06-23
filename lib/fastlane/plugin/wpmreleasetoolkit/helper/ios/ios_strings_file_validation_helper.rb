@@ -141,6 +141,28 @@ module Fastlane
 
           keys_with_lines.keep_if { |_, lines| lines.count > 1 }
         end
+
+        # Detects the file format and, when applicable, scans for duplicate keys — in one step, so
+        # callers don't each re-implement the "`:text`-only" gate. `find_duplicated_keys` only
+        # understands the flat ASCII-plist syntax; an xml/binary plist can't be tokenized by it (though
+        # `plutil` collapses any duplicate to its last value when parsing those anyway).
+        #
+        # @param [String] file The path to the `.strings` file to inspect.
+        # @param [Boolean] assume_valid Forwarded to `strings_file_type`: skip the redundant `plutil -lint`
+        #        when the caller has already confirmed the file parses.
+        # @return [Array] A `[status, payload]` pair, one of:
+        #         - `[:scanned, { key => [lines] }]` — a `:text` file we tokenized (hash empty if none).
+        #         - `[:unsupported_format, format]` — not a `:text` file (`:xml`, `:binary`, or `nil`); not scanned.
+        #         - `[:unscannable, error_message]` — a `:text` file the tokenizer couldn't read.
+        #         Each caller decides how to react (warn-and-skip, fail closed, …) from this one source of truth.
+        def self.scan_for_duplicate_keys(file:, assume_valid: false)
+          format = Fastlane::Helper::Ios::L10nHelper.strings_file_type(path: file, assume_valid: assume_valid)
+          return [:unsupported_format, format] unless format == :text
+
+          [:scanned, find_duplicated_keys(file: file)]
+        rescue StandardError => e
+          [:unscannable, e.message]
+        end
       end
     end
   end

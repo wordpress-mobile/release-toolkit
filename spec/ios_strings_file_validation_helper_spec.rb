@@ -97,4 +97,33 @@ describe Fastlane::Helper::Ios::StringsFileValidationHelper do
       end
     end
   end
+
+  describe '.scan_for_duplicate_keys' do
+    it 'returns `[:scanned, duplicates]` for a `:text` file, with the duplicate hash (empty if none)' do
+      with_tmp_file(named: 'dups.strings', content: "\"k\" = \"a\";\n\"k\" = \"b\";\n") do |path|
+        expect(described_class.scan_for_duplicate_keys(file: path)).to eq([:scanned, { 'k' => [1, 2] }])
+      end
+      with_tmp_file(named: 'unique.strings', content: "\"k\" = \"a\";\n\"j\" = \"b\";\n") do |path|
+        expect(described_class.scan_for_duplicate_keys(file: path)).to eq([:scanned, {}])
+      end
+    end
+
+    it 'returns `[:unsupported_format, format]` for a non-`:text` (XML) plist, without scanning' do
+      in_tmp_dir do |dir|
+        path = File.join(dir, 'x.strings')
+        Fastlane::Helper::Ios::L10nHelper.generate_strings_file_from_hash(translations: { 'a' => 'b' }, output_path: path)
+        status, format = described_class.scan_for_duplicate_keys(file: path)
+        expect(status).to eq(:unsupported_format)
+        expect(format).to eq(:xml)
+      end
+    end
+
+    it 'returns `[:unscannable, message]` for a `:text` plist the tokenizer cannot read' do
+      with_tmp_file(named: 'nested.strings', content: "\"k\" = { a = b; };\n") do |path|
+        status, message = described_class.scan_for_duplicate_keys(file: path)
+        expect(status).to eq(:unscannable)
+        expect(message).to match(/Invalid character/)
+      end
+    end
+  end
 end

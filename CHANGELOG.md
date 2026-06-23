@@ -15,9 +15,11 @@ _None_
 ### Bug Fixes
 
 - `StringsFileValidationHelper.find_duplicated_keys` now parses *unquoted* keys and values (valid `.strings` syntax, common in `InfoPlist.strings`) instead of raising `Invalid character`, matching the character set `plutil` accepts for unquoted strings (alphanumerics plus `_ . - $ : /`). This lets `ios_lint_localizations`' `check_duplicate_keys` work on `InfoPlist.strings`-style files. [#____]
+- `ios_lint_localizations`' `check_duplicate_keys` no longer crashes the lane on a file that parses as a property list but isn't a flat `.strings` (e.g. a nested-dictionary value); it now warns via `UI.important` and skips that file. [#____]
 
 ### Internal Changes
 
+- Centralized `.strings` duplicate-key detection behind `StringsFileValidationHelper.scan_for_duplicate_keys`, which detects the file format and returns a `[:scanned | :unsupported_format | :unscannable, payload]` tri-state that callers map to their own policy (warn-and-skip vs fail-closed). `ios_lint_localizations` now uses it. [#____]
 - `L10nHelper.strings_file_type` (and `StringsFileValidationHelper.scan_for_duplicate_keys`) accept `assume_valid:` to skip a redundant `plutil -lint` when the caller has already parsed the file. [#____]
 
 ## 14.7.0
