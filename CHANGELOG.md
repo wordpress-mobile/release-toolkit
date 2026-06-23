@@ -17,6 +17,7 @@ _None_
 - `StringsFileValidationHelper.find_duplicated_keys` now parses *unquoted* keys and values (valid `.strings` syntax, common in `InfoPlist.strings`) instead of raising `Invalid character`, matching the character set `plutil` accepts for unquoted strings (alphanumerics plus `_ . - $ : /`). This lets `ios_lint_localizations`' `check_duplicate_keys` work on `InfoPlist.strings`-style files. [#741]
 - `StringsFileValidationHelper.find_duplicated_keys` now also accepts comments placed *between* the tokens of a statement (e.g. `"key" /* note */ = "value";`), which `plutil` allows, instead of raising `Invalid character` on the `/`. [#741]
 - `ios_lint_localizations`' `check_duplicate_keys` no longer crashes the lane on a file that parses as a property list but isn't a flat `.strings` (e.g. a nested-dictionary value); it now warns via `UI.important` and skips that file. [#741]
+- `L10nHelper.merge_strings` now applies the key prefix to unquoted keys containing `. - $ : /` and to lines with an *unquoted* value (e.g. `CFBundleName = WordPress;`), matching the unquoted-string grammar `plutil` accepts. Previously those keys were written to the merged file without the prefix while still being bookkept *with* it, leaving the output inconsistent with the reported keys (which could resurface the very collisions the prefix avoids and break downstream key extraction). [#741]
 
 ### Internal Changes
 

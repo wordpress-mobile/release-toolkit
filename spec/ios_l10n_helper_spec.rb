@@ -100,6 +100,28 @@ describe Fastlane::Helper::Ios::L10nHelper do
       end
     end
 
+    it 'prefixes unquoted keys with unquoted values and keys containing `. - $ : /`' do
+      # Regression: prefixing must cover the full unquoted-string grammar `plutil` accepts — unquoted *values*
+      # (e.g. `CFBundleName = WordPress;`) and keys containing `. - $ : /` — so the written file stays consistent
+      # with the prefixed keys we report. (Previously only `[A-Z0-9_]` keys with a *quoted* value were prefixed,
+      # leaving these written without the prefix and resurfacing the very collisions the prefix avoids.)
+      content = <<~STRINGS
+        CFBundleName = WordPress;
+        com.automattic.app-id = "X";
+        "QuotedKey" = "Y";
+      STRINGS
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        input_file = File.join(tmp_dir, 'InfoPlist.strings')
+        File.write(input_file, content)
+        output_file = File.join(tmp_dir, 'output.strings')
+        described_class.merge_strings(paths: { input_file => 'pfx.' }, output_path: output_file)
+        merged = File.read(output_file)
+        expect(merged).to include('"pfx.CFBundleName" = WordPress;')
+        expect(merged).to include('"pfx.com.automattic.app-id" = "X";')
+        expect(merged).to include('"pfx.QuotedKey" = "Y";')
+      end
+    end
+
     it 'returns duplicate keys found' do
       paths = { fixture('Localizable-utf16.strings') => nil, fixture('non-latin-utf16.strings') => nil }
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
