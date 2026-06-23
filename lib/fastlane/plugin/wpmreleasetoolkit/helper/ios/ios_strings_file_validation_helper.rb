@@ -6,16 +6,29 @@ module Fastlane
       class StringsFileValidationHelper
         # context can be one of:
         #   :root, :maybe_comment_start, :in_line_comment, :in_block_comment,
-        #   :maybe_block_comment_end, :in_quoted_key,
-        #   :after_quoted_key_before_eq, :after_quoted_key_and_equal,
-        #   :in_quoted_value, :after_quoted_value
+        #   :maybe_block_comment_end, :in_quoted_key, :in_unquoted_key,
+        #   :after_quoted_key_before_eq, :after_quoted_key_and_eq,
+        #   :in_quoted_value, :in_unquoted_value, :after_quoted_value
         State = Struct.new(:context, :buffer, :in_escaped_ctx, :found_key)
+
+        # Characters allowed in an *unquoted* string — a key or a value. Unquoted strings are valid
+        # `.strings` syntax (the old-style ASCII property-list format) and are common in `InfoPlist.strings`
+        # (e.g. `CFBundleName = WordPress;`). `plutil` accepts alphanumerics plus `_ . - $ : /` in an
+        # unquoted string, so we match the same set: this scanner only ever runs on input `plutil` has
+        # already accepted, and matching its grammar keeps a file it parses from tripping the scanner.
+        # An unquoted key runs until the first whitespace or `=`; an unquoted value until whitespace or `;`.
+        UNQUOTED_STRING_CHARACTER = %r{[a-zA-Z0-9_.$:/-]}u
 
         TRANSITIONS = {
           root: {
             /\s/u => :root,
             '/' => :maybe_comment_start,
-            '"' => :in_quoted_key
+            '"' => :in_quoted_key,
+            # An unquoted key, e.g. `CFBundleName = "…";` as used by `InfoPlist.strings`.
+            UNQUOTED_STRING_CHARACTER => lambda do |state, c|
+              state.buffer.write(c)
+              :in_unquoted_key
+            end
           },
           maybe_comment_start: {
             '/' => :in_line_comment,
@@ -44,17 +57,39 @@ module Fastlane
               :in_quoted_key
             end
           },
+          in_unquoted_key: {
+            # The key ends at the first whitespace or `=`. Whitespace still expects an `=` next;
+            # an `=` moves straight on to the value.
+            /[\s=]/u => lambda do |state, c|
+              state.found_key = state.buffer.string.dup
+              state.buffer = StringIO.new
+              c == '=' ? :after_quoted_key_and_eq : :after_quoted_key_before_eq
+            end,
+            UNQUOTED_STRING_CHARACTER => lambda do |state, c|
+              state.buffer.write(c)
+              :in_unquoted_key
+            end
+          },
           after_quoted_key_before_eq: {
             /\s/u => :after_quoted_key_before_eq,
             '=' => :after_quoted_key_and_eq
           },
           after_quoted_key_and_eq: {
             /\s/u => :after_quoted_key_and_eq,
-            '"' => :in_quoted_value
+            '"' => :in_quoted_value,
+            # An unquoted value, e.g. `CFBundleName = WordPress;` as used by `InfoPlist.strings`.
+            UNQUOTED_STRING_CHARACTER => :in_unquoted_value
           },
           in_quoted_value: {
             '"' => :after_quoted_value,
             /./mu => :in_quoted_value
+          },
+          in_unquoted_value: {
+            # The value ends at the first whitespace or the terminating `;`. Its contents are irrelevant
+            # to duplicate-key detection, so — unlike a key — we don't buffer it.
+            ';' => :root,
+            /\s/u => :after_quoted_value,
+            UNQUOTED_STRING_CHARACTER => :in_unquoted_value
           },
           after_quoted_value: {
             /\s/u => :after_quoted_value,

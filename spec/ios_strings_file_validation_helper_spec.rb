@@ -54,14 +54,47 @@ describe Fastlane::Helper::Ios::StringsFileValidationHelper do
     end
   end
 
-  context 'when there are unquoted keys' do
-    it 'returns an error' do
-      # Unquoted strings are currently not supported by our validation helper in its current state, despite being a valid syntax, because we considered
-      # that it was not worth adding complexity to our state machine logic for this use case — we expect all the `.strings` files we plan to validate will
-      # come from GlotPress exports, and will thus always have their keys quoted.
-      # If support for unquoted strings is added to our validation helper in the future, feel free to update this test example accordingly.
-      expect { described_class.find_duplicated_keys(file: File.join(test_data_dir, 'ios_l10n_helper', 'expected-merged.strings')) }
-        .to raise_error(RuntimeError, 'Invalid character `I` found on line 21, col 1')
+  context 'when there are unquoted keys and values' do
+    # Unquoted strings — keys and values — are valid `.strings` syntax (the old-style ASCII plist format)
+    # and are common in `InfoPlist.strings` (e.g. `CFBundleDisplayName = WordPress;`).
+    it 'parses them alongside quoted keys without raising, finding no duplicates among unique keys' do
+      # `expected-merged.strings` mixes quoted (`key1`–`key3`) and unquoted (`InfoKey1`–`InfoKey3`) keys.
+      expect(described_class.find_duplicated_keys(file: File.join(test_data_dir, 'ios_l10n_helper', 'expected-merged.strings'))).to be_empty
+    end
+
+    it 'detects duplicates among unquoted keys, reporting each occurrence line' do
+      content = <<~STRINGS
+        CFBundleName = "WordPress";
+        NSCameraUsageDescription = "Take photos";
+        CFBundleName = "Jetpack";
+      STRINGS
+      with_tmp_file(named: 'InfoPlist.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to eq('CFBundleName' => [1, 3])
+      end
+    end
+
+    it 'parses unquoted *values* (not just keys) without raising, and finds duplicates among them' do
+      # `CFBundleName = WordPress;` (both key and value unquoted) is valid ASCII-plist that `plutil`
+      # parses; the scanner must tokenize it rather than choking on the unquoted value.
+      content = <<~STRINGS
+        CFBundleName = WordPress;
+        CFBundleShortVersionString = 1.0;
+        CFBundleName = Jetpack;
+      STRINGS
+      with_tmp_file(named: 'InfoPlist.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to eq('CFBundleName' => [1, 3])
+      end
+    end
+
+    it 'parses unquoted keys containing `.`, `-`, `_`, `$`, `:`, and `/` (the chars `plutil` allows)' do
+      content = <<~STRINGS
+        com.example.app-name_2 = "v";
+        a$b:c/d = "v";
+        a$b:c/d = "w";
+      STRINGS
+      with_tmp_file(named: 'InfoPlist.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to eq('a$b:c/d' => [2, 3])
+      end
     end
   end
 end

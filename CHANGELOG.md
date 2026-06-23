@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- `StringsFileValidationHelper.find_duplicated_keys` now parses *unquoted* keys and values (valid `.strings` syntax, common in `InfoPlist.strings`) instead of raising `Invalid character`, matching the character set `plutil` accepts for unquoted strings (alphanumerics plus `_ . - $ : /`). This lets `ios_lint_localizations`' `check_duplicate_keys` work on `InfoPlist.strings`-style files. [#____]
 
 ### Internal Changes
 
