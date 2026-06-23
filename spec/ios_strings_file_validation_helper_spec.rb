@@ -98,6 +98,47 @@ describe Fastlane::Helper::Ios::StringsFileValidationHelper do
     end
   end
 
+  context 'when comments appear between the tokens of a statement' do
+    # Comments are valid `.strings` syntax not only on their own line but also *between* the tokens of a
+    # statement — after a key, around the `=`, or before the terminating `;`. `plutil` accepts all of these,
+    # so the scanner must tokenize them rather than raising `Invalid character` on the `/`.
+    it 'parses comments after a key, around the `=`, and before the `;` without raising' do
+      content = <<~STRINGS
+        "afterKey" /* note */ = "1";
+        "aroundEq" = /* note */ "2";
+        "beforeSemicolon" = "3" /* note */;
+        unquotedKey /* note */ = unquotedValue;
+      STRINGS
+      with_tmp_file(named: 'Localizable.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to be_empty
+      end
+    end
+
+    it 'still detects duplicate keys in a file that also contains inline comments' do
+      content = <<~STRINGS
+        "dup" /* first */ = "1";
+        "unique" = "x";
+        "dup" = "2" /* second */;
+      STRINGS
+      with_tmp_file(named: 'Localizable.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to eq('dup' => [1, 3])
+      end
+    end
+
+    it 'does not mistake a `/`-leading unquoted value for the start of a comment' do
+      # A `/` right after `=` may begin a comment OR an unquoted value (e.g. a path or URL); the latter,
+      # which `plutil` accepts, must still parse rather than be swallowed as a comment.
+      content = <<~STRINGS
+        "path" = /usr/bin/tool;
+        "url" = https://example.com/x;
+        "path" = /opt;
+      STRINGS
+      with_tmp_file(named: 'Localizable.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to eq('path' => [1, 3])
+      end
+    end
+  end
+
   describe '.scan_for_duplicate_keys' do
     it 'returns `[:scanned, duplicates]` for a `:text` file, with the duplicate hash (empty if none)' do
       with_tmp_file(named: 'dups.strings', content: "\"k\" = \"a\";\n\"k\" = \"b\";\n") do |path|

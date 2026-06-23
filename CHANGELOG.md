@@ -15,6 +15,7 @@ _None_
 ### Bug Fixes
 
 - `StringsFileValidationHelper.find_duplicated_keys` now parses *unquoted* keys and values (valid `.strings` syntax, common in `InfoPlist.strings`) instead of raising `Invalid character`, matching the character set `plutil` accepts for unquoted strings (alphanumerics plus `_ . - $ : /`). This lets `ios_lint_localizations`' `check_duplicate_keys` work on `InfoPlist.strings`-style files. [#741]
+- `StringsFileValidationHelper.find_duplicated_keys` now also accepts comments placed *between* the tokens of a statement (e.g. `"key" /* note */ = "value";`), which `plutil` allows, instead of raising `Invalid character` on the `/`. [#741]
 - `ios_lint_localizations`' `check_duplicate_keys` no longer crashes the lane on a file that parses as a property list but isn't a flat `.strings` (e.g. a nested-dictionary value); it now warns via `UI.important` and skips that file. [#741]
 
 ### Internal Changes

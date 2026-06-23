@@ -5,11 +5,15 @@ module Fastlane
     module Ios
       class StringsFileValidationHelper
         # context can be one of:
-        #   :root, :maybe_comment_start, :in_line_comment, :in_block_comment,
+        #   :root, :maybe_comment_start, :maybe_comment_or_value, :in_line_comment, :in_block_comment,
         #   :maybe_block_comment_end, :in_quoted_key, :in_unquoted_key,
         #   :after_quoted_key_before_eq, :after_quoted_key_and_eq,
         #   :in_quoted_value, :in_unquoted_value, :after_quoted_value
-        State = Struct.new(:context, :buffer, :in_escaped_ctx, :found_key)
+        #
+        # `resume_context` holds the context to return to once a comment ends. Comments are valid not only at
+        # the top level but also *between* the tokens of a statement (e.g. `"key" /* note */ = "value";`), so a
+        # comment must resume the state it interrupted rather than always dropping back to `:root`.
+        State = Struct.new(:context, :buffer, :in_escaped_ctx, :found_key, :resume_context)
 
         # Characters allowed in an *unquoted* string — a key or a value. Unquoted strings are valid
         # `.strings` syntax (the old-style ASCII property-list format) and are common in `InfoPlist.strings`
@@ -18,6 +22,29 @@ module Fastlane
         # already accepted, and matching its grammar keeps a file it parses from tripping the scanner.
         # An unquoted key runs until the first whitespace or `=`; an unquoted value until whitespace or `;`.
         UNQUOTED_STRING_CHARACTER = %r{[a-zA-Z0-9_.$:/-]}u
+
+        # Enter a comment from an inter-token position, remembering where to resume once it ends.
+        # (`state.context` is still the originating state when a transition lambda runs — it's only reassigned
+        # to the lambda's return value afterwards — so this captures the state the comment interrupts.)
+        ENTER_COMMENT = lambda do |state, _c|
+          state.resume_context = state.context
+          :maybe_comment_start
+        end
+
+        # A `/` between `=` and the value is ambiguous: it can start a comment (`/* … */` or `// …`) or be the
+        # first character of an unquoted value (e.g. a path like `/usr/bin`). Defer the decision by one character
+        # via `:maybe_comment_or_value`.
+        ENTER_COMMENT_OR_VALUE = lambda do |state, _c|
+          state.resume_context = state.context
+          :maybe_comment_or_value
+        end
+
+        # Restore the context a comment interrupted (defaults to `:root`), then clear the saved context.
+        RESUME_AFTER_COMMENT = lambda do |state, _c|
+          resume = state.resume_context || :root
+          state.resume_context = :root
+          resume
+        end
 
         TRANSITIONS = {
           root: {
@@ -34,8 +61,19 @@ module Fastlane
             '/' => :in_line_comment,
             /\*/u => :in_block_comment
           },
+          # Reached only from `:after_quoted_key_and_eq`, where a leading `/` might begin a comment or an
+          # unquoted value. A `*` or `/` confirms a comment; anything else means the `/` was the value's first
+          # character (values aren't buffered, so we just continue scanning the value).
+          maybe_comment_or_value: {
+            /\*/u => :in_block_comment,
+            '/' => :in_line_comment,
+            /./mu => lambda do |state, _c|
+              state.resume_context = :root
+              :in_unquoted_value
+            end
+          },
           in_line_comment: {
-            "\n" => :root,
+            "\n" => RESUME_AFTER_COMMENT,
             /./u => :in_line_comment
           },
           in_block_comment: {
@@ -43,7 +81,7 @@ module Fastlane
             /./mu => :in_block_comment
           },
           maybe_block_comment_end: {
-            '/' => :root,
+            '/' => RESUME_AFTER_COMMENT,
             /./mu => :in_block_comment
           },
           in_quoted_key: {
@@ -71,10 +109,15 @@ module Fastlane
             end
           },
           after_quoted_key_before_eq: {
+            # A comment may sit between the key and the `=` (e.g. `"key" /* note */ = "value";`).
+            '/' => ENTER_COMMENT,
             /\s/u => :after_quoted_key_before_eq,
             '=' => :after_quoted_key_and_eq
           },
           after_quoted_key_and_eq: {
+            # A `/` here may start a comment or an unquoted value (which can contain `/`); disambiguate one char
+            # later. This entry must precede `UNQUOTED_STRING_CHARACTER` below, which also matches `/`.
+            '/' => ENTER_COMMENT_OR_VALUE,
             /\s/u => :after_quoted_key_and_eq,
             '"' => :in_quoted_value,
             # An unquoted value, e.g. `CFBundleName = WordPress;` as used by `InfoPlist.strings`.
@@ -92,6 +135,8 @@ module Fastlane
             UNQUOTED_STRING_CHARACTER => :in_unquoted_value
           },
           after_quoted_value: {
+            # A comment may sit between the value and the terminating `;` (e.g. `"key" = "value" /* note */;`).
+            '/' => ENTER_COMMENT,
             /\s/u => :after_quoted_value,
             ';' => :root
           }
@@ -105,7 +150,7 @@ module Fastlane
         def self.find_duplicated_keys(file:)
           keys_with_lines = Hash.new { |h, k| h[k] = [] }
 
-          state = State.new(context: :root, buffer: StringIO.new, in_escaped_ctx: false, found_key: nil)
+          state = State.new(context: :root, buffer: StringIO.new, in_escaped_ctx: false, found_key: nil, resume_context: :root)
 
           # Using our `each_utf8_line` helper instead of `File.readlines` ensures we can also read files that are
           # encoded in UTF-16, yet process each of their lines as a UTF-8 string, so that `RegExp#match?` don't throw
