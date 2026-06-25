@@ -138,10 +138,8 @@ describe Fastlane::Helper::Ios::L10nHelper do
         File.write(input_file, content)
         output_file = File.join(tmp_dir, 'output.strings')
         described_class.merge_strings(paths: { input_file => 'pfx.' }, output_path: output_file)
-        merged = File.read(output_file)
-        expect(merged).to include('"pfx.CFBundleName"')
-        expect(merged).to include('"pfx.AppName"')
-        expect(merged).to include('"pfx.DisplayName"')
+        merged_keys = described_class.read_strings_file_as_hash(path: output_file).keys
+        expect(merged_keys).to contain_exactly('pfx.CFBundleName', 'pfx.AppName', 'pfx.DisplayName')
       end
     end
 
