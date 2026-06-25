@@ -122,6 +122,46 @@ describe Fastlane::Helper::Ios::L10nHelper do
       end
     end
 
+    it 'prefixes keys when `.strings` comments sit between a statement\'s tokens' do
+      # Regression: the duplicate-key scanner accepts comments *between* a statement's tokens (e.g.
+      # `CFBundleName /* c */ = WordPress;`), and bookkeeping derives keys from `plutil`, which agrees.
+      # But the line-based rewrite only prefixes when `=` and the value are adjacent, so an inter-token
+      # comment leaves the key written unprefixed while still bookkept *with* the prefix — the exact
+      # collision/inconsistent-output the prefix exists to prevent.
+      content = <<~STRINGS
+        CFBundleName = WordPress /* trailing */;
+        AppName /* between key and = */ = WordPress;
+        DisplayName /* between key and = */ = "WordPress";
+      STRINGS
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        input_file = File.join(tmp_dir, 'InfoPlist.strings')
+        File.write(input_file, content)
+        output_file = File.join(tmp_dir, 'output.strings')
+        described_class.merge_strings(paths: { input_file => 'pfx.' }, output_path: output_file)
+        merged = File.read(output_file)
+        expect(merged).to include('"pfx.CFBundleName"')
+        expect(merged).to include('"pfx.AppName"')
+        expect(merged).to include('"pfx.DisplayName"')
+      end
+    end
+
+    it 'does not silently drop a key to a collision when an inter-token comment blocks prefixing' do
+      # The harm of the gap above: two files each carrying the same key behind an inter-token comment are
+      # bookkept under distinct prefixes (so no duplicate is reported), yet both are written verbatim —
+      # producing a genuine duplicate in the merged file that `plutil` later collapses to a single value.
+      content = "CFBundleName /* c */ = WordPress;\n"
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        file_a = File.join(tmp_dir, 'A.strings')
+        file_b = File.join(tmp_dir, 'B.strings')
+        File.write(file_a, content)
+        File.write(file_b, content)
+        output_file = File.join(tmp_dir, 'output.strings')
+        described_class.merge_strings(paths: { file_a => 'a.', file_b => 'b.' }, output_path: output_file)
+        merged_keys = described_class.read_strings_file_as_hash(path: output_file).keys
+        expect(merged_keys).to contain_exactly('a.CFBundleName', 'b.CFBundleName')
+      end
+    end
+
     it 'returns duplicate keys found' do
       paths = { fixture('Localizable-utf16.strings') => nil, fixture('non-latin-utf16.strings') => nil }
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
