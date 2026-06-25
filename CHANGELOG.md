@@ -11,6 +11,7 @@ _None_
 ### New Features
 
 - Added `find_or_create_pull_request` action and `GithubHelper#find_pull_request`: returns the URL of the open Pull Request for a head branch, creating one only if none exists yet. Useful for "rolling" automations (e.g. a daily translations or dependency-update job) that force-push the same head branch on every run. [#733]
+- Added `upload_github_release_assets` action and `GithubHelper#upload_release_assets` to upload or retry replacing assets on an existing GitHub release without disturbing unrelated assets. [#743]
 
 ### Bug Fixes
 

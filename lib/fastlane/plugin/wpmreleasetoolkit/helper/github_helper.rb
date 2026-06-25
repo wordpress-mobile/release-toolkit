@@ -192,6 +192,57 @@ module Fastlane
         release[:html_url]
       end
 
+      # Returns the GitHub release matching a given tag/version.
+      #
+      # @param [String] repository The repository to fetch the GitHub release from. Typically a repo slug (<org>/<repo>).
+      # @param [String] version The release version/tag to fetch.
+      # @return [Sawyer::Resource] The matching GitHub Release.
+      # @raise [Fastlane::UI::Error] UI.user_error! if the release does not exist.
+      #
+      def get_release(repository:, version:)
+        client.release_for_tag(repository, version)
+      rescue Octokit::NotFound
+        UI.user_error!("Could not find GitHub Release for tag #{version} in #{repository}")
+      end
+
+      # Uploads assets to an existing GitHub release, optionally replacing matching filenames.
+      #
+      # @param [String] repository The repository to upload the GitHub release assets to. Typically a repo slug (<org>/<repo>).
+      # @param [String] version The release version/tag to upload assets to.
+      # @param [Array<String>] assets List of local file paths to attach as release assets.
+      # @param [TrueClass|FalseClass] replace_existing Delete existing same-filename assets before uploading. When false, fail if a matching asset exists.
+      # @return [String] URL of the corresponding GitHub Release.
+      # @raise [Fastlane::UI::Error] UI.user_error! if the release or any local asset file does not exist.
+      #
+      def upload_release_assets(repository:, version:, assets:, replace_existing: true)
+        asset_paths = validate_release_assets!(assets)
+        release = get_release(repository: repository, version: version)
+        existing_assets = client.release_assets(release.url)
+
+        asset_paths.each do |file_path|
+          file_name = File.basename(file_path)
+          matching_assets = existing_assets.select { |asset| asset.name == file_name }
+
+          unless matching_assets.empty?
+            if replace_existing
+              matching_assets.each do |asset|
+                UI.message("Deleting existing GitHub Release asset #{asset.name}")
+                client.delete_release_asset(asset.url)
+              end
+              existing_assets -= matching_assets
+            else
+              UI.user_error!("GitHub Release #{version} already has an asset named #{file_name}. Set replace_existing: true to replace it.")
+            end
+          end
+
+          UI.message("Uploading #{file_path} to GitHub Release #{version}")
+          uploaded_asset = client.upload_asset(release.url, file_path, content_type: 'application/octet-stream')
+          existing_assets << uploaded_asset unless uploaded_asset.nil?
+        end
+
+        release.html_url
+      end
+
       # Use the GitHub API to generate release notes based on the list of PRs between current tag and previous tag.
       # @note This API uses the `.github/release.yml` config file to classify the PRs by category in the generated list according to PR labels.
       #
@@ -367,6 +418,19 @@ module Fastlane
       def set_branch_protection(repository:, branch:, **options)
         client.protect_branch(repository, branch, options)
       end
+
+      def validate_release_assets!(assets)
+        asset_paths = Array(assets)
+        UI.user_error!('You must provide at least one release asset') if asset_paths.empty?
+
+        asset_paths.each do |file_path|
+          UI.user_error!("Can't find file #{file_path}!") unless File.file?(file_path)
+        end
+
+        asset_paths
+      end
+
+      private :validate_release_assets!
 
       # Convert a response from the `/branch-protection` API endpoint into a Hash
       # suitable to be returned and/or reused to pass to a subsequent `/branch-protection` API request
