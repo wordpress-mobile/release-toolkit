@@ -10,8 +10,7 @@ _None_
 
 ### New Features
 
-- Added `find_or_create_pull_request` action and `GithubHelper#find_pull_request`: returns the URL of the open Pull Request for a head branch, creating one only if none exists yet. Useful for "rolling" automations (e.g. a daily translations or dependency-update job) that force-push the same head branch on every run. [#733]
-- Added `ContinuousBuildCodeFormatter`, which derives an Android Play Store `versionCode` for a "continuous trunk" release model as `(major * 10 + minor) * 10^build_digits + build_number` (default `build_digits: 6`). It encodes a high-cardinality, monotonically increasing build number (e.g. a Buildkite build number) that `DerivedBuildCodeFormatter` cannot hold, validates that `minor <= 9`, and guards against exceeding the Play Store's maximum `versionCode`. [#735]
+_None_
 
 ### Bug Fixes
 
@@ -20,6 +19,13 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 14.8.0
+
+### New Features
+
+- Added `find_or_create_pull_request` action and `GithubHelper#find_pull_request`: returns the URL of the open Pull Request for a head branch, creating one only if none exists yet. Useful for "rolling" automations (e.g. a daily translations or dependency-update job) that force-push the same head branch on every run. [#733]
+- Added `ContinuousBuildCodeFormatter`, which derives an Android Play Store `versionCode` for a "continuous trunk" release model as `(major * 10 + minor) * 10^build_digits + build_number` (default `build_digits: 6`). It encodes a high-cardinality, monotonically increasing build number (e.g. a Buildkite build number) that `DerivedBuildCodeFormatter` cannot hold, validates that `minor <= 9`, and guards against exceeding the Play Store's maximum `versionCode`. [#735]
 
 ## 14.7.0
 
