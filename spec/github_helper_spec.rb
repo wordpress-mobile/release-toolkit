@@ -665,6 +665,39 @@ describe Fastlane::Helper::GithubHelper do
       end.to raise_error(FastlaneCore::Interface::FastlaneError, "Can't find file missing-file.zip!")
     end
 
+    it 'fails clearly if an asset is not a file path' do
+      expect(client).not_to receive(:release_for_tag)
+      expect(client).not_to receive(:release_assets)
+      expect(client).not_to receive(:upload_asset)
+
+      expect do
+        upload_release_assets(assets: [123])
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'release_assets must contain file paths')
+    end
+
+    it 'fails without mutating GitHub when local assets have duplicate filenames' do
+      in_tmp_dir do |tmpdir|
+        first_dir = File.join(tmpdir, 'ios')
+        second_dir = File.join(tmpdir, 'tvos')
+        Dir.mkdir(first_dir)
+        Dir.mkdir(second_dir)
+
+        first_file_path = File.join(first_dir, 'test-app.zip')
+        second_file_path = File.join(second_dir, 'test-app.zip')
+        File.write(first_file_path, 'ios')
+        File.write(second_file_path, 'tvos')
+
+        expect(client).not_to receive(:release_for_tag)
+        expect(client).not_to receive(:release_assets)
+        expect(client).not_to receive(:delete_release_asset)
+        expect(client).not_to receive(:upload_asset)
+
+        expect do
+          upload_release_assets(assets: [first_file_path, second_file_path], replace_existing: false)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'release_assets must not contain duplicate filenames')
+      end
+    end
+
     it 'uploads one asset to the existing release' do
       with_tmp_file(named: 'test-app.zip') do |file_path|
         expect(client).to receive(:upload_asset).with(release_url, file_path, { content_type: 'application/octet-stream' })
