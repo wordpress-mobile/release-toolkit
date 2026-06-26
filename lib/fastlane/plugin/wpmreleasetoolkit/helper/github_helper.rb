@@ -424,6 +424,13 @@ module Fastlane
         UI.user_error!('You must provide at least one release asset') if asset_paths.empty?
 
         asset_paths.each do |file_path|
+          UI.user_error!('release_assets must contain file paths') unless file_path.is_a?(String) && !file_path.empty?
+        end
+
+        file_names = asset_paths.map { |file_path| File.basename(file_path) }
+        UI.user_error!('release_assets must not contain duplicate filenames') if file_names.uniq.length != file_names.length
+
+        asset_paths.each do |file_path|
           UI.user_error!("Can't find file #{file_path}!") unless File.file?(file_path)
         end
 
