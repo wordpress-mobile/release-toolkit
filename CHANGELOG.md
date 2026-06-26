@@ -10,8 +10,7 @@ _None_
 
 ### New Features
 
-- Added `find_or_create_pull_request` action and `GithubHelper#find_pull_request`: returns the URL of the open Pull Request for a head branch, creating one only if none exists yet. Useful for "rolling" automations (e.g. a daily translations or dependency-update job) that force-push the same head branch on every run. [#733]
-- Added `upload_github_release_assets` action and `GithubHelper#upload_release_assets` to upload or retry replacing assets on an existing GitHub release without disturbing unrelated assets. [#743]
+- `upload_github_release_assets` action: uploads assets on an existing GitHub release without disturbing unrelated assets. If assets exists already, it replaces them. [#743]
 
 ### Bug Fixes
 
@@ -20,6 +19,13 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 14.8.0
+
+### New Features
+
+- `find_or_create_pull_request` action: returns the URL of the open Pull Request for a head branch, creating one only if none exists yet. [#733]
+- `ContinuousBuildCodeFormatter`: derives an Android Play Store `versionCode` for a "continuous trunk" release model as `(major * 10 + minor) * 10^build_digits + build_number` (default `build_digits: 6`). [#735]
 
 ## 14.7.0
 
