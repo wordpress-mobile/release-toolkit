@@ -14,9 +14,6 @@ module Fastlane
       def self.run(params)
         res_dir = params[:res_dir]
         source_paths = [File.join(res_dir, 'values', 'strings.xml')] + params[:additional_source_strings_paths]
-        source_paths.each do |path|
-          UI.user_error!("Source strings file not found: `#{path}`") unless File.file?(path)
-        end
         valid_keys = collect_keys(source_paths)
 
         locale_files = Dir.glob(File.join(res_dir, 'values-*', 'strings.xml')).select do |file|
@@ -97,7 +94,11 @@ module Fastlane
             key: :res_dir,
             description: "Path to the Android project's `res` directory containing the `values-*` locale subdirectories to prune",
             type: String,
-            optional: false
+            optional: false,
+            verify_block: proc do |value|
+              source_path = File.join(value, 'values', 'strings.xml')
+              UI.user_error!("Source strings file not found: `#{source_path}`") unless File.file?(source_path)
+            end
           ),
           FastlaneCore::ConfigItem.new(
             key: :additional_source_strings_paths,
@@ -105,7 +106,12 @@ module Fastlane
                          '(e.g. a base module that the pruned `res_dir` overlays at build time)',
             type: Array,
             optional: true,
-            default_value: []
+            default_value: [],
+            verify_block: proc do |value|
+              value.each do |path|
+                UI.user_error!("Source strings file not found: `#{path}`") unless File.file?(path)
+              end
+            end
           ),
         ]
       end
