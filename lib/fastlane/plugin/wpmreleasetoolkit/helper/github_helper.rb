@@ -192,7 +192,7 @@ module Fastlane
         release[:html_url]
       end
 
-      # Returns the GitHub release matching a given tag/version.
+      # Returns the GitHub release matching a given tag/version, including draft releases.
       #
       # @param [String] repository The repository to fetch the GitHub release from. Typically a repo slug (<org>/<repo>).
       # @param [String] version The release version/tag to fetch.
@@ -200,8 +200,9 @@ module Fastlane
       # @raise [Fastlane::UI::Error] UI.user_error! if the release does not exist.
       #
       def get_release(repository:, version:)
-        client.release_for_tag(repository, version)
-      rescue Octokit::NotFound
+        release = client.releases(repository).find { |candidate| candidate.tag_name == version }
+        return release unless release.nil?
+
         UI.user_error!("Could not find GitHub Release for tag #{version} in #{repository}")
       end
 

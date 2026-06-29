@@ -624,7 +624,7 @@ describe Fastlane::Helper::GithubHelper do
     let(:test_version) { '1.0.0' }
     let(:release_url) { 'https://api.github.com/repos/repo-test/project-test/releases/123' }
     let(:release_html_url) { 'https://github.com/repo-test/project-test/releases/tag/1.0.0' }
-    let(:release) { sawyer_resource_stub(url: release_url, html_url: release_html_url) }
+    let(:release) { sawyer_resource_stub(url: release_url, html_url: release_html_url, tag_name: test_version) }
     let(:existing_assets) { [] }
     let(:uploaded_asset) { release_asset(name: 'test-app.zip', url: 'https://api.github.com/repos/repo-test/project-test/releases/assets/999') }
     let(:client) do
@@ -640,13 +640,13 @@ describe Fastlane::Helper::GithubHelper do
 
     before do
       allow(Octokit::Client).to receive(:new).and_return(client)
-      allow(client).to receive(:release_for_tag).with(test_repo, test_version).and_return(release)
+      allow(client).to receive(:releases).with(test_repo).and_return([release])
       allow(client).to receive(:release_assets).with(release_url).and_return(existing_assets)
       allow(client).to receive_messages(upload_asset: uploaded_asset, delete_release_asset: true)
     end
 
     it 'fails clearly if the release does not exist' do
-      allow(client).to receive(:release_for_tag).with(test_repo, test_version).and_raise(Octokit::NotFound)
+      allow(client).to receive(:releases).with(test_repo).and_return([])
 
       with_tmp_file(named: 'test-app.zip') do |file_path|
         expect do
@@ -656,7 +656,7 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     it 'fails clearly if an asset file does not exist' do
-      expect(client).not_to receive(:release_for_tag)
+      expect(client).not_to receive(:releases)
       expect(client).not_to receive(:release_assets)
       expect(client).not_to receive(:upload_asset)
 
@@ -666,7 +666,7 @@ describe Fastlane::Helper::GithubHelper do
     end
 
     it 'fails clearly if an asset is not a file path' do
-      expect(client).not_to receive(:release_for_tag)
+      expect(client).not_to receive(:releases)
       expect(client).not_to receive(:release_assets)
       expect(client).not_to receive(:upload_asset)
 
@@ -687,7 +687,7 @@ describe Fastlane::Helper::GithubHelper do
         File.write(first_file_path, 'ios')
         File.write(second_file_path, 'tvos')
 
-        expect(client).not_to receive(:release_for_tag)
+        expect(client).not_to receive(:releases)
         expect(client).not_to receive(:release_assets)
         expect(client).not_to receive(:delete_release_asset)
         expect(client).not_to receive(:upload_asset)
@@ -695,6 +695,22 @@ describe Fastlane::Helper::GithubHelper do
         expect do
           upload_release_assets(assets: [first_file_path, second_file_path], replace_existing: false)
         end.to raise_error(FastlaneCore::Interface::FastlaneError, 'release_assets must not contain duplicate filenames')
+      end
+    end
+
+    it 'uploads assets to a draft release' do
+      draft_release = sawyer_resource_stub(url: release_url, html_url: release_html_url, tag_name: test_version, draft: true)
+      other_release = sawyer_resource_stub(url: 'https://api.github.com/repos/repo-test/project-test/releases/456', html_url: 'https://github.com/repo-test/project-test/releases/tag/0.9.0', tag_name: '0.9.0')
+
+      allow(client).to receive(:releases).with(test_repo).and_return([other_release, draft_release])
+      allow(client).to receive(:release_assets).with(release_url).and_return([])
+
+      with_tmp_file(named: 'test-app.zip') do |file_path|
+        expect(client).to receive(:upload_asset).with(release_url, file_path, { content_type: 'application/octet-stream' })
+
+        result = upload_release_assets(assets: [file_path])
+
+        expect(result).to eq(release_html_url)
       end
     end
 
