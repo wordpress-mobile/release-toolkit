@@ -6,10 +6,18 @@ require 'nokogiri'
 module Fastlane
   module Actions
     class AndroidPruneOrphanedTranslationsAction < Action
-      # Matches an Android `values-<qualifier>` directory whose qualifier is a locale (a language code, optional
-      # region, or a BCP-47 `b+` form), so non-locale qualifier dirs (e.g. `values-night`, `values-v21`,
-      # `values-land`) are left untouched.
+      # Matches an Android `values-<qualifier>` directory whose qualifier is a locale: a 2- or 3-letter language
+      # code (`fr`, `kmr`), an optional region (`pt-rBR`, `es-r419`), or a BCP-47 `b+` form (`b+sr+Latn`), so
+      # non-locale qualifier dirs (e.g. `values-night`, `values-v21`, `values-land`) are left untouched.
       LOCALE_VALUES_DIR_REGEX = /\Avalues-(?:b\+[a-zA-Z]+(?:\+[a-zA-Z0-9]+)*|[a-z]{2,3}(?:-r(?:[A-Z]{2}|\d{3}))?)\z/
+
+      # Android UI-mode qualifiers, which are never locales:
+      # https://developer.android.com/guide/topics/resources/providing-resources#UiModeQualifier
+      # `car` is indistinguishable by shape from a 3-letter ISO 639 language code, so `LOCALE_VALUES_DIR_REGEX`
+      # would otherwise treat `values-car` as a locale and prune its (valid) car-mode resources. There's no purely
+      # syntactic way to tell the two apart, so we exclude the documented UI-mode qualifiers explicitly. (`car` is
+      # the only one short enough to currently match the regex; the rest are listed to capture the full set.)
+      UI_MODE_QUALIFIERS = %w[car desk television appliance watch vrheadset].freeze
 
       DEFAULT_SOURCE_STRINGS_FILE_NAME = 'strings.xml'
       DEFAULT_SOURCE_STRINGS_RELATIVE_PATH = File.join('values', DEFAULT_SOURCE_STRINGS_FILE_NAME).freeze
@@ -20,7 +28,8 @@ module Fastlane
         valid_keys = collect_keys(source_paths)
 
         locale_files = Dir.glob(File.join(res_dir, 'values-*', DEFAULT_SOURCE_STRINGS_FILE_NAME)).select do |file|
-          File.basename(File.dirname(file)).match?(LOCALE_VALUES_DIR_REGEX)
+          dir_name = File.basename(File.dirname(file))
+          dir_name.match?(LOCALE_VALUES_DIR_REGEX) && !UI_MODE_QUALIFIERS.include?(dir_name.delete_prefix('values-'))
         end
         total_pruned = 0
 

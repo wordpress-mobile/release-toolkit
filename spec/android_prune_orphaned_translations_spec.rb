@@ -109,6 +109,30 @@ describe Fastlane::Actions::AndroidPruneOrphanedTranslationsAction do
     end
   end
 
+  # `kmr` (Northern Kurdish) is a real 3-letter legacy locale used by e.g. WordPress-Android, so it must still be
+  # pruned — guarding against an over-eager "restrict locales to 2 letters" fix for the `values-car` collision.
+  it 'prunes 3-letter legacy locale directories (e.g. values-kmr)' do
+    Dir.mktmpdir do |dir|
+      res_dir = File.join(dir, 'res')
+      write_file(File.join(res_dir, 'values', 'strings.xml'), default_strings)
+      kmr_file = File.join(res_dir, 'values-kmr', 'strings.xml')
+      write_file(kmr_file, <<~XML)
+        <?xml version="1.0" encoding="UTF-8"?>
+        <resources>
+            <string name="hello">Silav</string>
+            <string name="orphan_string">Sêwî</string>
+        </resources>
+      XML
+
+      pruned = run_described_fastlane_action(res_dir: res_dir)
+
+      expect(pruned).to eq(1)
+      content = File.read(kmr_file)
+      expect(content).to include('name="hello"')
+      expect(content).not_to include('orphan_string')
+    end
+  end
+
   it 'treats keys from `additional_source_strings_paths` as valid (flavor overlay case)' do
     Dir.mktmpdir do |dir|
       res_dir = File.join(dir, 'res')
