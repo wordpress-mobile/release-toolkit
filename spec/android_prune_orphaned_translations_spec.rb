@@ -89,6 +89,26 @@ describe Fastlane::Actions::AndroidPruneOrphanedTranslationsAction do
     end
   end
 
+  it 'leaves car UI mode qualifier directories untouched' do
+    Dir.mktmpdir do |dir|
+      res_dir = File.join(dir, 'res')
+      write_file(File.join(res_dir, 'values', 'strings.xml'), default_strings)
+      car_file = File.join(res_dir, 'values-car', 'strings.xml')
+      car_content = <<~XML
+        <?xml version="1.0" encoding="UTF-8"?>
+        <resources>
+            <string name="car_only">Car</string>
+        </resources>
+      XML
+      write_file(car_file, car_content)
+
+      pruned = run_described_fastlane_action(res_dir: res_dir)
+
+      expect(pruned).to eq(0)
+      expect(File.read(car_file)).to eq(car_content)
+    end
+  end
+
   it 'treats keys from `additional_source_strings_paths` as valid (flavor overlay case)' do
     Dir.mktmpdir do |dir|
       res_dir = File.join(dir, 'res')
