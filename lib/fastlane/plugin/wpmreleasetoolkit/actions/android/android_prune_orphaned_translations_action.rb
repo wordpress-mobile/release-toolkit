@@ -11,12 +11,15 @@ module Fastlane
       # `values-land`) are left untouched.
       LOCALE_VALUES_DIR_REGEX = /\Avalues-(?:b\+[a-zA-Z]+(?:\+[a-zA-Z0-9]+)*|[a-z]{2,3}(?:-r(?:[A-Z]{2}|\d{3}))?)\z/
 
+      DEFAULT_SOURCE_STRINGS_FILE_NAME = 'strings.xml'
+      DEFAULT_SOURCE_STRINGS_RELATIVE_PATH = File.join('values', DEFAULT_SOURCE_STRINGS_FILE_NAME).freeze
+
       def self.run(params)
         res_dir = params[:res_dir]
-        source_paths = [File.join(res_dir, 'values', 'strings.xml')] + params[:additional_source_strings_paths]
+        source_paths = [File.join(res_dir, DEFAULT_SOURCE_STRINGS_RELATIVE_PATH)] + params[:additional_source_strings_paths]
         valid_keys = collect_keys(source_paths)
 
-        locale_files = Dir.glob(File.join(res_dir, 'values-*', 'strings.xml')).select do |file|
+        locale_files = Dir.glob(File.join(res_dir, 'values-*', DEFAULT_SOURCE_STRINGS_FILE_NAME)).select do |file|
           File.basename(File.dirname(file)).match?(LOCALE_VALUES_DIR_REGEX)
         end
         total_pruned = 0
@@ -96,7 +99,7 @@ module Fastlane
             type: String,
             optional: false,
             verify_block: proc do |value|
-              source_path = File.join(value, 'values', 'strings.xml')
+              source_path = File.join(value, DEFAULT_SOURCE_STRINGS_RELATIVE_PATH)
               UI.user_error!("Source strings file not found: `#{source_path}`") unless File.file?(source_path)
             end
           ),
