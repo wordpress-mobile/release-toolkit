@@ -72,7 +72,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Removes translations whose key is not present in the source strings, to avoid Lint `ExtraTranslation` errors'
+        'Removes translations whose keys are not present in the source strings, to avoid Lint `ExtraTranslation` errors'
       end
 
       def self.details
