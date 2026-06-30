@@ -14,11 +14,40 @@ _None_
 
 ### Bug Fixes
 
+_None_
+
+### Internal Changes
+
+_None_
+
+## 14.9.0
+
+### New Features
+
+- `upload_github_release_assets` action: uploads assets on an existing GitHub release without disturbing unrelated assets. If assets exists already, it replaces them. [#743]
+
+## 14.8.0
+
+### New Features
+
+- `find_or_create_pull_request` action: returns the URL of the open Pull Request for a head branch, creating one only if none exists yet. [#733]
+- `ContinuousBuildCodeFormatter`: derives an Android Play Store `versionCode` for a "continuous trunk" release model as `(major * 10 + minor) * 10^build_digits + build_number` (default `build_digits: 6`). [#735]
+
+## 14.7.0
+
+### New Features
+
+- Added new `update_apps_cdn_build_metadata` action to update metadata (e.g. visibility) of one or more existing builds on the Apps CDN without re-uploading the files, via the dedicated `/wpcom/v2/sites/{site_id}/a8c-cdn/builds/{post_id}` endpoint. Accepts an array of `post_ids`. This enables a two-phase release flow: upload builds as Internal first, then flip to External at publish time. [#701]
+
+### Bug Fixes
+
 - `openai_ask`: avoid logging sensitive tool diagnostics and refuse to execute additional tool calls after `max_tool_iterations`. [#719]
+- Bump the `fastlane` floor to `~> 2.235` to pull in `jwt >= 3.2.0`, fixing [GHSA-c32j-vqhx-rx3x](https://github.com/advisories/GHSA-c32j-vqhx-rx3x) (ruby-jwt empty-key HMAC bypass). [#728]
 
 ### Internal Changes
 
 - `openai_ask`: validate named function tools, default to `gpt-4.1`, use `max_completion_tokens`, and opt out of OpenAI request storage. [#719]
+- Configure Dependabot to update Ruby dependencies daily, grouping minor/patch bumps under `ruby-minor-and-patch`. [#724]
 
 ## 14.6.0
 

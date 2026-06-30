@@ -46,6 +46,46 @@ describe Fastlane::Helper::GithubHelper do
     end
   end
 
+  describe '#find_pull_request' do
+    let(:test_repo) { 'repo-test/project-test' }
+    let(:found_pr) { double('PullRequest', html_url: 'https://github.com/repo-test/project-test/pull/42') } # rubocop:disable RSpec/VerifiedDoubles
+    let(:client) do
+      instance_double(
+        Octokit::Client,
+        pull_requests: [found_pr],
+        user: instance_double('User', name: 'test'),
+        'auto_paginate=': nil
+      )
+    end
+
+    before do
+      allow(Octokit::Client).to receive(:new).and_return(client)
+    end
+
+    it 'qualifies an unqualified head with the repository owner and forwards the base' do
+      expect(client).to receive(:pull_requests).with(test_repo, { state: 'open', head: 'repo-test:my-branch', base: 'trunk' })
+      find_pull_request(head: 'my-branch', base: 'trunk')
+    end
+
+    it 'uses an already-qualified head as-is and omits the base when not provided' do
+      expect(client).to receive(:pull_requests).with(test_repo, { state: 'open', head: 'someone:other-branch' })
+      find_pull_request(head: 'someone:other-branch')
+    end
+
+    it 'returns the first matching pull request' do
+      expect(find_pull_request(head: 'my-branch')).to eq(found_pr)
+    end
+
+    it 'returns nil when no pull request matches' do
+      allow(client).to receive(:pull_requests).and_return([])
+      expect(find_pull_request(head: 'my-branch')).to be_nil
+    end
+
+    def find_pull_request(head:, base: nil)
+      described_class.new(github_token: 'Fake-GitHubToken-123').find_pull_request(repository: test_repo, head: head, base: base)
+    end
+  end
+
   describe '#get_last_milestone' do
     let(:test_repo) { 'repo-test/project-test' }
     let(:last_stone) { mock_milestone('10.0') }
@@ -576,6 +616,190 @@ describe Fastlane::Helper::GithubHelper do
         prerelease: false,
         is_draft: is_draft
       )
+    end
+  end
+
+  describe '#upload_release_assets' do
+    let(:test_repo) { 'repo-test/project-test' }
+    let(:test_version) { '1.0.0' }
+    let(:release_url) { 'https://api.github.com/repos/repo-test/project-test/releases/123' }
+    let(:release_html_url) { 'https://github.com/repo-test/project-test/releases/tag/1.0.0' }
+    let(:release) { sawyer_resource_stub(url: release_url, html_url: release_html_url, tag_name: test_version) }
+    let(:existing_assets) { [] }
+    let(:uploaded_asset) { release_asset(name: 'test-app.zip', url: 'https://api.github.com/repos/repo-test/project-test/releases/assets/999') }
+    let(:client) do
+      instance_double(
+        Octokit::Client,
+        user: instance_double('User', name: 'test'),
+        'auto_paginate=': nil
+      )
+    end
+    let(:helper) do
+      described_class.new(github_token: 'Fake-GitHubToken-123')
+    end
+
+    before do
+      allow(Octokit::Client).to receive(:new).and_return(client)
+      allow(client).to receive(:releases).with(test_repo).and_return([release])
+      allow(client).to receive(:release_assets).with(release_url).and_return(existing_assets)
+      allow(client).to receive_messages(upload_asset: uploaded_asset, delete_release_asset: true)
+    end
+
+    it 'fails clearly if the release does not exist' do
+      allow(client).to receive(:releases).with(test_repo).and_return([])
+
+      with_tmp_file(named: 'test-app.zip') do |file_path|
+        expect do
+          upload_release_assets(assets: [file_path])
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not find GitHub Release for tag #{test_version} in #{test_repo}")
+      end
+    end
+
+    it 'fails clearly if an asset file does not exist' do
+      expect(client).not_to receive(:releases)
+      expect(client).not_to receive(:release_assets)
+      expect(client).not_to receive(:upload_asset)
+
+      expect do
+        upload_release_assets(assets: ['missing-file.zip'])
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, "Can't find file missing-file.zip!")
+    end
+
+    it 'fails clearly if an asset is not a file path' do
+      expect(client).not_to receive(:releases)
+      expect(client).not_to receive(:release_assets)
+      expect(client).not_to receive(:upload_asset)
+
+      expect do
+        upload_release_assets(assets: [123])
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'release_assets must contain file paths')
+    end
+
+    it 'fails without mutating GitHub when local assets have duplicate filenames' do
+      in_tmp_dir do |tmpdir|
+        first_dir = File.join(tmpdir, 'ios')
+        second_dir = File.join(tmpdir, 'tvos')
+        Dir.mkdir(first_dir)
+        Dir.mkdir(second_dir)
+
+        first_file_path = File.join(first_dir, 'test-app.zip')
+        second_file_path = File.join(second_dir, 'test-app.zip')
+        File.write(first_file_path, 'ios')
+        File.write(second_file_path, 'tvos')
+
+        expect(client).not_to receive(:releases)
+        expect(client).not_to receive(:release_assets)
+        expect(client).not_to receive(:delete_release_asset)
+        expect(client).not_to receive(:upload_asset)
+
+        expect do
+          upload_release_assets(assets: [first_file_path, second_file_path], replace_existing: false)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, 'release_assets must not contain duplicate filenames')
+      end
+    end
+
+    it 'uploads assets to a draft release' do
+      draft_release = sawyer_resource_stub(url: release_url, html_url: release_html_url, tag_name: test_version, draft: true)
+      other_release = sawyer_resource_stub(url: 'https://api.github.com/repos/repo-test/project-test/releases/456', html_url: 'https://github.com/repo-test/project-test/releases/tag/0.9.0', tag_name: '0.9.0')
+
+      allow(client).to receive(:releases).with(test_repo).and_return([other_release, draft_release])
+      allow(client).to receive(:release_assets).with(release_url).and_return([])
+
+      with_tmp_file(named: 'test-app.zip') do |file_path|
+        expect(client).to receive(:upload_asset).with(release_url, file_path, { content_type: 'application/octet-stream' })
+
+        result = upload_release_assets(assets: [file_path])
+
+        expect(result).to eq(release_html_url)
+      end
+    end
+
+    it 'uploads one asset to the existing release' do
+      with_tmp_file(named: 'test-app.zip') do |file_path|
+        expect(client).to receive(:upload_asset).with(release_url, file_path, { content_type: 'application/octet-stream' })
+
+        result = upload_release_assets(assets: [file_path])
+
+        expect(result).to eq(release_html_url)
+      end
+    end
+
+    it 'uploads multiple assets to the existing release' do
+      in_tmp_dir do |tmpdir|
+        first_file_path = File.join(tmpdir, 'test-ios.zip')
+        second_file_path = File.join(tmpdir, 'test-tvos.zip')
+        File.write(first_file_path, 'ios')
+        File.write(second_file_path, 'tvos')
+
+        first_uploaded_asset = release_asset(name: 'test-ios.zip', url: 'https://api.github.com/repos/repo-test/project-test/releases/assets/1000')
+        second_uploaded_asset = release_asset(name: 'test-tvos.zip', url: 'https://api.github.com/repos/repo-test/project-test/releases/assets/1001')
+
+        expect(client).to receive(:upload_asset).with(release_url, first_file_path, { content_type: 'application/octet-stream' }).ordered.and_return(first_uploaded_asset)
+        expect(client).to receive(:upload_asset).with(release_url, second_file_path, { content_type: 'application/octet-stream' }).ordered.and_return(second_uploaded_asset)
+
+        result = upload_release_assets(assets: [first_file_path, second_file_path])
+
+        expect(result).to eq(release_html_url)
+      end
+    end
+
+    it 'replaces an existing asset with the same filename' do
+      existing_asset = release_asset(name: 'test-app.zip', url: 'https://api.github.com/repos/repo-test/project-test/releases/assets/1234')
+      allow(client).to receive(:release_assets).with(release_url).and_return([existing_asset])
+
+      with_tmp_file(named: 'test-app.zip') do |file_path|
+        expect(client).to receive(:delete_release_asset).with(existing_asset.url)
+        expect(client).to receive(:upload_asset).with(release_url, file_path, { content_type: 'application/octet-stream' })
+
+        result = upload_release_assets(assets: [file_path])
+
+        expect(result).to eq(release_html_url)
+      end
+    end
+
+    it 'preserves unrelated existing assets' do
+      matching_asset = release_asset(name: 'test-app.zip', url: 'https://api.github.com/repos/repo-test/project-test/releases/assets/1234')
+      unrelated_asset = release_asset(name: 'other-platform.zip', url: 'https://api.github.com/repos/repo-test/project-test/releases/assets/5678')
+      deleted_asset_urls = []
+
+      allow(client).to receive(:release_assets).with(release_url).and_return([matching_asset, unrelated_asset])
+      allow(client).to receive(:delete_release_asset) do |asset_url|
+        deleted_asset_urls << asset_url
+        true
+      end
+
+      with_tmp_file(named: 'test-app.zip') do |file_path|
+        upload_release_assets(assets: [file_path])
+      end
+
+      expect(deleted_asset_urls).to eq([matching_asset.url])
+    end
+
+    it 'fails without deleting or uploading when replace_existing is false and a matching asset exists' do
+      existing_asset = release_asset(name: 'test-app.zip', url: 'https://api.github.com/repos/repo-test/project-test/releases/assets/1234')
+      allow(client).to receive(:release_assets).with(release_url).and_return([existing_asset])
+
+      expect(client).not_to receive(:delete_release_asset)
+      expect(client).not_to receive(:upload_asset)
+
+      with_tmp_file(named: 'test-app.zip') do |file_path|
+        expect do
+          upload_release_assets(assets: [file_path], replace_existing: false)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "GitHub Release #{test_version} already has an asset named test-app.zip. Set replace_existing: true to replace it.")
+      end
+    end
+
+    def upload_release_assets(assets:, replace_existing: true)
+      helper.upload_release_assets(
+        repository: test_repo,
+        version: test_version,
+        assets: assets,
+        replace_existing: replace_existing
+      )
+    end
+
+    def release_asset(name:, url:)
+      sawyer_resource_stub(name: name, url: url)
     end
   end
 
