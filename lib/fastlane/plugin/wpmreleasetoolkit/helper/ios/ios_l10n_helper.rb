@@ -99,23 +99,13 @@ module Fastlane
               all_keys_found += string_keys
 
               tmp_file.write("/* MARK: - #{File.basename(input_file)} */\n\n")
-              # Read line-by-line to reduce memory footprint during content copy
-              read_utf8_lines(input_file).each do |line|
-                unless prefix.nil? || prefix.empty?
-                  # The `/u` modifier on the RegExps is to make them UTF-8.
-                  # The unquoted-key character set below matches what `plutil` accepts (alphanumerics plus
-                  # `_ . - $ : /`, as in `StringsFileValidationHelper::UNQUOTED_STRING_CHARACTER`) so that keys
-                  # containing `. - $ : /` (e.g. reverse-DNS keys) are prefixed like any other.
-                  line.gsub!(/^(\s*")/u, "\\1#{prefix}") # Lines starting with a quote are considered to be start of a key; add prefix right after the quote
-                  # Lines starting with an unquoted key followed by a `=` and a *quoted* value (typical in `InfoPlist.strings`).
-                  line.gsub!(%r{^(\s*)([a-zA-Z0-9_.$:/-]+)(\s*=\s*")}u, "\\1\"#{prefix}\\2\"\\3")
-                  # Lines starting with an unquoted key followed by a `=` and an *unquoted* value (e.g. `CFBundleName = WordPress;`).
-                  # The value is required to be a single unquoted token ending in `;` — an unquoted string can't contain spaces, so
-                  # this won't mistake comment prose like `and = a red herring for when…` (spaces in the "value") for a key/value pair.
-                  line.gsub!(%r{^(\s*)([a-zA-Z0-9_.$:/-]+)(\s*=\s*)([a-zA-Z0-9_.$:/-]+\s*;)}u, "\\1\"#{prefix}\\2\"\\3\\4")
-                end
-                tmp_file.write(line)
-              end
+              # Add the prefix to every key. We tokenize via `StringsFileValidationHelper.prefix_keys` rather than
+              # matching keys with a line-based regex, so that keys are found regardless of where `.strings` comments
+              # sit (e.g. `CFBundleName /* note */ = WordPress;`) and `key = value`-looking text inside a comment is
+              # left alone — keeping the written keys consistent with the (`plutil`-derived) keys bookkept above.
+              lines = read_utf8_lines(input_file)
+              lines = Fastlane::Helper::Ios::StringsFileValidationHelper.prefix_keys(lines: lines, prefix: prefix)
+              lines.each { |line| tmp_file.write(line) }
               tmp_file.write("\n")
             end
             tmp_file.close # ensure we flush the content to disk

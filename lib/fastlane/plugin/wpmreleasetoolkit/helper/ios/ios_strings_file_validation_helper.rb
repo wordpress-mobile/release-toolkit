@@ -208,6 +208,51 @@ module Fastlane
         rescue StandardError => e
           [:unscannable, e.message]
         end
+
+        # Rewrites `.strings` lines so every key carries `prefix`, leaving comments, values, whitespace and
+        # formatting untouched. A quoted key gets the prefix inside its quotes (`"key"` → `"<prefix>key"`); an
+        # unquoted key is wrapped in quotes (`key` → `"<prefix>key"`). Because it tokenizes the file the same way
+        # `find_duplicated_keys` does, it is comment-aware: a key sitting behind an inter-token comment (e.g.
+        # `key /* note */ = value;`) is still prefixed, and `key = value`-looking text *inside* a comment is left
+        # alone — a distinction a line-based regex can't reliably make.
+        #
+        # @param [Array<String>] lines The file's lines, already decoded to UTF-8 (e.g. via `L10nHelper.read_utf8_lines`).
+        # @param [String] prefix The prefix to insert before every key. A nil/empty prefix returns `lines` unchanged.
+        # @return [Array<String>] The rewritten lines.
+        def self.prefix_keys(lines:, prefix:)
+          return lines if prefix.nil? || prefix.empty?
+
+          state = State.new(context: :root, buffer: StringIO.new, in_escaped_ctx: false, found_key: nil, resume_context: :root)
+          lines.map do |line|
+            rewritten = +''
+            line.each_char do |c|
+              # Escaped characters only occur inside quoted strings or comments — never around a key boundary —
+              # so they're copied through verbatim (mirroring `find_duplicated_keys`' global escape handling).
+              if state.in_escaped_ctx || c == '\\'
+                state.in_escaped_ctx = !state.in_escaped_ctx
+                rewritten << c
+                next
+              end
+
+              previous_context = state.context
+              (_, transition) = TRANSITIONS[previous_context].find { |regex, _| c.match?(regex) } || [nil, nil]
+              raise "Invalid character `#{c}` found (current context: #{previous_context})" if transition.nil?
+
+              state.context = transition.is_a?(Proc) ? transition.call(state, c) : transition
+
+              if previous_context == :root && state.context == :in_quoted_key
+                rewritten << c << prefix # opening `"` of a quoted key — the prefix goes inside the quotes
+              elsif previous_context == :root && state.context == :in_unquoted_key
+                rewritten << '"' << prefix << c    # first char of an unquoted key — open a quote + prefix, then the char
+              elsif previous_context == :in_unquoted_key && state.context != :in_unquoted_key
+                rewritten << '"' << c              # the unquoted key just ended — close the quote, then the delimiter
+              else
+                rewritten << c
+              end
+            end
+            rewritten
+          end
+        end
       end
     end
   end
