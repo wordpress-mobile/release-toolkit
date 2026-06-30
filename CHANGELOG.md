@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- `upload_github_release_assets` action: uploads assets on an existing GitHub release without disturbing unrelated assets. If assets exists already, it replaces them. [#743]
+_None_
 
 ### Bug Fixes
 
@@ -19,6 +19,12 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 14.9.0
+
+### New Features
+
+- `upload_github_release_assets` action: uploads assets on an existing GitHub release without disturbing unrelated assets. If assets exists already, it replaces them. [#743]
 
 ## 14.8.0
 
