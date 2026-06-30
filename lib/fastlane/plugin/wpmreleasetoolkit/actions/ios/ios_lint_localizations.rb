@@ -62,7 +62,7 @@ module Fastlane
             duplicate_keys[language] = payload.map { |key, value| "`#{key}` was found at multiple lines: #{value.join(', ')}" } unless payload.empty?
           when :unsupported_format
             UI.important <<~WRONG_FORMAT
-              File `#{path}` is in #{payload} format, while finding duplicate keys only make sense on files that are in ASCII-plist format.
+              File `#{path}` is in #{payload} format, while finding duplicate keys can only occurr on files that are in ASCII-plist format.
               Since your files are in #{payload} format, you should probably disable the `check_duplicate_keys` option from this `#{action_name}` call.
             WRONG_FORMAT
           when :unscannable
