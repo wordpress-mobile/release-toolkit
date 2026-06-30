@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- `upload_github_release_assets` action: uploads assets on an existing GitHub release without disturbing unrelated assets. If assets exists already, it replaces them. [#743]
 
 ### Bug Fixes
 
