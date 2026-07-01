@@ -160,6 +160,22 @@ describe Fastlane::Helper::Ios::L10nHelper do
       end
     end
 
+    it 'does not crash merging a text `.strings` file whose value is a nested dictionary' do
+      # Regression: `merge_strings` bookkeeps keys via `plutil` (which parses a nested-dictionary value
+      # fine) but re-tokenizes the raw lines through `prefix_keys`, which raises `Invalid character` on
+      # the `{`. Such a file is still `:text` and passes the format gate, so a public `ios_merge_strings_files`
+      # run that previously copied the line through now aborts. It should degrade gracefully instead of raising.
+      content = %("k" = { a = b; };\n)
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        input_file = File.join(tmp_dir, 'InfoPlist.strings')
+        File.write(input_file, content)
+        output_file = File.join(tmp_dir, 'output.strings')
+        expect do
+          described_class.merge_strings(paths: { input_file => 'pfx.' }, output_path: output_file)
+        end.not_to raise_error
+      end
+    end
+
     it 'returns duplicate keys found' do
       paths = { fixture('Localizable-utf16.strings') => nil, fixture('non-latin-utf16.strings') => nil }
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
