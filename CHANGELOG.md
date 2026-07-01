@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Bump `faraday` and `nokogiri` to address security vulnerabilities. [#749]
 
 ### Internal Changes
 
