@@ -15,6 +15,7 @@ _None_
 ### Bug Fixes
 
 - Bump `faraday` and `nokogiri` to address security vulnerabilities. [#749]
+- Bump `concurrent-ruby` to address CVE-2026-54904 / GHSA-h8w8-99g7-qmvj.
 
 ### Internal Changes
 
