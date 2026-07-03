@@ -267,10 +267,10 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     end
 
     it 'warns and skips (without crashing) a file that parses as a plist but is not a flat `.strings`' do
-      # A nested-dictionary value is a valid old-style plist that `plutil` accepts but the duplicate-key
-      # scanner can't tokenize. This used to crash the lane (the scanner raised, uncaught); now it is
-      # surfaced via `UI.important` and the file is skipped.
-      write_localizable('en', "\"k\" = { a = b; };\n")
+      # A `<data>` value is a valid old-style plist that `plutil` accepts but the duplicate-key scanner can't
+      # tokenize. This used to crash the lane (the scanner raised, uncaught); now it is surfaced via
+      # `UI.important` and the file is skipped. (Dictionary/array values, by contrast, are now tokenized.)
+      write_localizable('en', "\"k\" = <48656c6c6f>;\n")
       expect(FastlaneCore::UI).to receive(:important).with(/Could not check .* for duplicate keys/)
 
       result = nil

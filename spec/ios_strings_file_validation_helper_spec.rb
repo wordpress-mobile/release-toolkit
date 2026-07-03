@@ -139,6 +139,44 @@ describe Fastlane::Helper::Ios::StringsFileValidationHelper do
     end
   end
 
+  context 'when a value is a nested dictionary or array' do
+    # `plutil` accepts container values in the old-style ASCII plist (e.g. `"k" = { a = b; };` or `"k" = ( … );`),
+    # and they can nest. The tokenizer skips the container body — its inner keys are not top-level keys — while
+    # still tracking nesting so delimiters hidden inside quoted strings or comments don't end the value early,
+    # and still detecting duplicate *top-level* keys.
+    it 'does not treat keys inside a dictionary value as top-level keys' do
+      content = <<~STRINGS
+        "k" = { a = b; c = d; };
+        "j" = "v";
+      STRINGS
+      with_tmp_file(named: 'InfoPlist.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to be_empty
+      end
+    end
+
+    it 'detects duplicate top-level keys whose values are containers' do
+      content = <<~STRINGS
+        "k" = { a = b; };
+        "k" = ( "x", "y" );
+      STRINGS
+      with_tmp_file(named: 'InfoPlist.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to eq('k' => [1, 2])
+      end
+    end
+
+    it 'tracks nesting through delimiters hidden inside quoted strings and comments' do
+      # The inner `}` and `;` in the quoted `"c;d}"` and in the `/* } ; */` comment must NOT be read as
+      # structural — the container ends only at the real closing brace, so the second `"k"` is a duplicate.
+      content = <<~STRINGS
+        "k" = { a = { b = "c;d}"; }; /* } ; */ e = f; };
+        "k" = 1;
+      STRINGS
+      with_tmp_file(named: 'InfoPlist.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to eq('k' => [1, 2])
+      end
+    end
+  end
+
   describe '.scan_for_duplicate_keys' do
     it 'returns `[:scanned, duplicates]` for a `:text` file, with the duplicate hash (empty if none)' do
       with_tmp_file(named: 'dups.strings', content: "\"k\" = \"a\";\n\"k\" = \"b\";\n") do |path|
@@ -159,8 +197,14 @@ describe Fastlane::Helper::Ios::StringsFileValidationHelper do
       end
     end
 
-    it 'returns `[:unscannable, message]` for a `:text` plist the tokenizer cannot read' do
-      with_tmp_file(named: 'nested.strings', content: "\"k\" = { a = b; };\n") do |path|
+    it 'returns `[:scanned, …]` for a `:text` plist whose values are (now tokenizable) nested dictionaries or arrays' do
+      with_tmp_file(named: 'nested.strings', content: "\"k\" = { a = b; };\n\"j\" = ( \"x\", \"y\" );\n") do |path|
+        expect(described_class.scan_for_duplicate_keys(file: path)).to eq([:scanned, {}])
+      end
+    end
+
+    it 'returns `[:unscannable, message]` for a `:text` plist the tokenizer still cannot read (e.g. a `<data>` value)' do
+      with_tmp_file(named: 'data.strings', content: "\"k\" = <48656c6c6f>;\n") do |path|
         status, message = described_class.scan_for_duplicate_keys(file: path)
         expect(status).to eq(:unscannable)
         expect(message).to match(/Invalid character/)

@@ -13,7 +13,8 @@ module Fastlane
         # `resume_context` holds the context to return to once a comment ends. Comments are valid not only at
         # the top level but also *between* the tokens of a statement (e.g. `"key" /* note */ = "value";`), so a
         # comment must resume the state it interrupted rather than always dropping back to `:root`.
-        State = Struct.new(:context, :buffer, :in_escaped_ctx, :found_key, :resume_context)
+        # `depth` tracks how deeply nested we are inside a container value (`{ … }` / `( … )`); see `:in_container_value`.
+        State = Struct.new(:context, :buffer, :in_escaped_ctx, :found_key, :resume_context, :depth)
 
         # Characters allowed in an *unquoted* string — a key or a value. Unquoted strings are valid
         # `.strings` syntax (the old-style ASCII property-list format) and are common in `InfoPlist.strings`
@@ -44,6 +45,31 @@ module Fastlane
           resume = state.resume_context || :root
           state.resume_context = :root
           resume
+        end
+
+        # A value can be a nested container — a dictionary `{ … }` or an array `( … )` — which `plutil` accepts
+        # (e.g. `"k" = { a = b; };` or `"k" = ( "a", "b" );`). We don't rewrite or record anything *inside* a
+        # container: its inner keys are not top-level keys, and `prefix_keys` copies the value through verbatim.
+        # We only need to find the matching close delimiter, so we just count nesting depth. `OPEN_CONTAINER`
+        # doubles as the entry transition from `:after_quoted_key_and_eq` and as the nested-open transition.
+        OPEN_CONTAINER = lambda do |state, _c|
+          state.depth += 1
+          :in_container_value
+        end
+
+        # Close one level of nesting. The value is only finished — and we go back to expecting the terminating
+        # `;` — once depth returns to 0; otherwise we're still inside an outer container.
+        CLOSE_CONTAINER = lambda do |state, _c|
+          state.depth -= 1
+          state.depth.zero? ? :after_quoted_value : :in_container_value
+        end
+
+        # A `/` inside a container may start a comment — whose body can contain `{ } ( ) ; "` that must NOT count
+        # toward nesting — or just be an ordinary value character (e.g. a path). Defer the decision one char,
+        # resuming the container in either case.
+        ENTER_CONTAINER_COMMENT = lambda do |state, _c|
+          state.resume_context = :in_container_value
+          :maybe_container_comment
         end
 
         TRANSITIONS = {
@@ -120,6 +146,8 @@ module Fastlane
             '/' => ENTER_COMMENT_OR_VALUE,
             /\s/u => :after_quoted_key_and_eq,
             '"' => :in_quoted_value,
+            # A container value — a dictionary `{ … }` or an array `( … )`, which may nest (e.g. `"k" = { a = b; };`).
+            /[{(]/u => OPEN_CONTAINER,
             # An unquoted value, e.g. `CFBundleName = WordPress;` as used by `InfoPlist.strings`.
             UNQUOTED_STRING_CHARACTER => :in_unquoted_value
           },
@@ -139,6 +167,32 @@ module Fastlane
             '/' => ENTER_COMMENT,
             /\s/u => :after_quoted_value,
             ';' => :root
+          },
+          # Inside a container value (`{ … }` / `( … )`). We ignore the contents — inner keys aren't top-level
+          # keys and the value is copied verbatim by `prefix_keys` — and only track nesting so we can find the
+          # matching close. Quoted strings and comments are entered explicitly because their bodies can contain
+          # `{ } ( ) ;` that must not affect the depth count; everything else (`=`, `;`, `,`, whitespace, unquoted
+          # text, newlines) is consumed by the catch-all, which must stay LAST so the specific keys win first.
+          in_container_value: {
+            /[{(]/u => OPEN_CONTAINER,
+            /[})]/u => CLOSE_CONTAINER,
+            '"' => :in_container_quoted_string,
+            '/' => ENTER_CONTAINER_COMMENT,
+            /./mu => :in_container_value
+          },
+          # A quoted string inside a container. Skipped wholesale (its `{ } ( ) ; ,` are literal, not structural)
+          # until the closing quote returns us to the container. Escapes are handled globally (see the escape
+          # branch in `find_duplicated_keys`, whose allow-list includes this context).
+          in_container_quoted_string: {
+            '"' => :in_container_value,
+            /./mu => :in_container_quoted_string
+          },
+          # One char after a `/` inside a container: `*`/`/` confirm a comment (which resumes the container once
+          # it ends), anything else means the `/` was just a value character and we stay in the container.
+          maybe_container_comment: {
+            /\*/u => :in_block_comment,
+            '/' => :in_line_comment,
+            /./mu => :in_container_value
           }
         }.freeze
 
@@ -150,7 +204,7 @@ module Fastlane
         def self.find_duplicated_keys(file:)
           keys_with_lines = Hash.new { |h, k| h[k] = [] }
 
-          state = State.new(context: :root, buffer: StringIO.new, in_escaped_ctx: false, found_key: nil, resume_context: :root)
+          state = State.new(context: :root, buffer: StringIO.new, in_escaped_ctx: false, found_key: nil, resume_context: :root, depth: 0)
 
           # Using our `each_utf8_line` helper instead of `File.readlines` ensures we can also read files that are
           # encoded in UTF-16, yet process each of their lines as a UTF-8 string, so that `RegExp#match?` don't throw
@@ -161,7 +215,7 @@ module Fastlane
               # This is more straightforward than having to account for it in the `TRANSITIONS` table.
               if state.in_escaped_ctx || c == '\\'
                 # Just because we check for escaped characters at the global level, it doesn't mean we allow them in every context.
-                allowed_contexts_for_escaped_characters = %i[in_quoted_key in_quoted_value in_block_comment in_line_comment]
+                allowed_contexts_for_escaped_characters = %i[in_quoted_key in_quoted_value in_block_comment in_line_comment in_container_quoted_string]
                 raise "Found escaped character outside of allowed contexts on line #{line_no + 1} (current context: #{state.context})" unless allowed_contexts_for_escaped_characters.include?(state.context)
 
                 state.buffer.write(c) if state.context == :in_quoted_key
@@ -214,7 +268,9 @@ module Fastlane
         # unquoted key is wrapped in quotes (`key` → `"<prefix>key"`). Because it tokenizes the file the same way
         # `find_duplicated_keys` does, it is comment-aware: a key sitting behind an inter-token comment (e.g.
         # `key /* note */ = value;`) is still prefixed, and `key = value`-looking text *inside* a comment is left
-        # alone — a distinction a line-based regex can't reliably make.
+        # alone — a distinction a line-based regex can't reliably make. It is likewise container-aware: a
+        # dictionary or array value (`"k" = { … };` / `"k" = ( … );`, nesting allowed) has only its outer key
+        # prefixed, with the value — including any keys *inside* it — copied through verbatim.
         #
         # @param [Array<String>] lines The file's lines, already decoded to UTF-8 (e.g. via `L10nHelper.read_utf8_lines`).
         # @param [String] prefix The prefix to insert before every key. A nil/empty prefix returns `lines` unchanged.
@@ -222,7 +278,7 @@ module Fastlane
         def self.prefix_keys(lines:, prefix:)
           return lines if prefix.nil? || prefix.empty?
 
-          state = State.new(context: :root, buffer: StringIO.new, in_escaped_ctx: false, found_key: nil, resume_context: :root)
+          state = State.new(context: :root, buffer: StringIO.new, in_escaped_ctx: false, found_key: nil, resume_context: :root, depth: 0)
           lines.map do |line|
             rewritten = +''
             line.each_char do |c|
