@@ -160,19 +160,25 @@ describe Fastlane::Helper::Ios::L10nHelper do
       end
     end
 
-    it 'does not crash merging a text `.strings` file whose value is a nested dictionary' do
-      # Regression: `merge_strings` bookkeeps keys via `plutil` (which parses a nested-dictionary value
-      # fine) but re-tokenizes the raw lines through `prefix_keys`, which raises `Invalid character` on
-      # the `{`. Such a file is still `:text` and passes the format gate, so a public `ios_merge_strings_files`
-      # run that previously copied the line through now aborts. It should degrade gracefully instead of raising.
+    it 'copies a nested-dictionary value through unprefixed (with a warning) instead of crashing the merge' do
+      # Regression: `merge_strings` bookkeeps keys via `plutil` (which parses a nested-dictionary value fine)
+      # but rewrites keys by re-tokenizing the raw lines through `prefix_keys`, whose flat-`.strings` grammar
+      # has no `{` — so it raised `Invalid character`. Such a file is still `:text` and clears the format gate,
+      # so a public `ios_merge_strings_files` run that previously copied the line through would abort. It now
+      # degrades gracefully — copying the un-prefixable line verbatim and warning — like the scanner path.
       content = %("k" = { a = b; };\n)
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
         input_file = File.join(tmp_dir, 'InfoPlist.strings')
         File.write(input_file, content)
         output_file = File.join(tmp_dir, 'output.strings')
+
+        expect(FastlaneCore::UI).to receive(:important).with(a_string_including('Could not add prefix `pfx.`').and(a_string_including('unprefixed')))
         expect do
           described_class.merge_strings(paths: { input_file => 'pfx.' }, output_path: output_file)
         end.not_to raise_error
+
+        # The nested-dict line survives verbatim — unprefixed, since it has no flat `key = value` to rewrite.
+        expect(File.read(output_file)).to include('"k" = { a = b; };')
       end
     end
 

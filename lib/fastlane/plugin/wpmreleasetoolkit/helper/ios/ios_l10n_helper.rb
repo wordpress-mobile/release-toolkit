@@ -78,6 +78,9 @@ module Fastlane
         # @note The method is able to handle input files which are using different encodings,
         #       guessing the encoding of each input file using the BOM (and defaulting to UTF8).
         #       The generated file will always be in utf-8, by convention.
+        # @note If a file's keys can't be prefixed (e.g. it holds a nested-dictionary value, `"k" = { … };`,
+        #       which `plutil` accepts but the flat-`.strings` tokenizer can't rewrite), its lines are copied
+        #       through unprefixed with a warning rather than aborting the whole merge.
         #
         # @raise [RuntimeError] If one of the paths provided is not in text format (but XML or binary instead), or if any of the files are missing.
         #
@@ -104,7 +107,17 @@ module Fastlane
               # sit (e.g. `CFBundleName /* note */ = WordPress;`) and `key = value`-looking text inside a comment is
               # left alone — keeping the written keys consistent with the (`plutil`-derived) keys bookkept above.
               lines = read_utf8_lines(input_file)
-              lines = Fastlane::Helper::Ios::StringsFileValidationHelper.prefix_keys(lines: lines, prefix: prefix)
+              begin
+                lines = Fastlane::Helper::Ios::StringsFileValidationHelper.prefix_keys(lines: lines, prefix: prefix)
+              rescue StandardError => e
+                # `plutil` accepts flat-`.strings` constructs the tokenizer doesn't — most notably a nested-dictionary
+                # value (`"k" = { … };`), which parses fine (so the file clears the `:text` gate above) yet exposes no
+                # flat `key = value` for `prefix_keys` to rewrite, so it raises on the `{`. Fail soft: copy this file's
+                # lines through unprefixed rather than aborting the whole merge — mirroring the scanner path, where
+                # `scan_for_duplicate_keys` returns `:unscannable` instead of crashing the lane. `lines` is untouched
+                # by the raise (the assignment above never completes), so it still holds the original file contents.
+                UI.important("Could not add prefix `#{prefix}` to the keys in `#{input_file}` (#{e.message}); copying its lines through unprefixed.")
+              end
               lines.each { |line| tmp_file.write(line) }
               tmp_file.write("\n")
             end
