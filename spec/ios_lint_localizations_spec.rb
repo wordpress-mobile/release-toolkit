@@ -194,7 +194,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       File.write(File.join(fr_lproj, 'Localizable.strings'), File.read(xml_file))
 
       expected_message = <<~EXPECTED_WARNING
-        File `#{fr_lproj}/Localizable.strings` is in xml format, while finding duplicate keys only make sense on files that are in ASCII-plist format.
+        File `#{fr_lproj}/Localizable.strings` is in xml format, while finding duplicate keys can only occur on files that are in ASCII-plist format.
         Since your files are in xml format, you should probably disable the `check_duplicate_keys` option from this `ios_lint_localizations` call.
       EXPECTED_WARNING
       expect(FastlaneCore::UI).to receive(:important).with(expected_message)
