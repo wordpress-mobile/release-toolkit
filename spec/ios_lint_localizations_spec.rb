@@ -194,7 +194,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       File.write(File.join(fr_lproj, 'Localizable.strings'), File.read(xml_file))
 
       expected_message = <<~EXPECTED_WARNING
-        File `#{fr_lproj}/Localizable.strings` is in xml format, while finding duplicate keys only make sense on files that are in ASCII-plist format.
+        File `#{fr_lproj}/Localizable.strings` is in xml format, while finding duplicate keys can only occur on files that are in ASCII-plist format.
         Since your files are in xml format, you should probably disable the `check_duplicate_keys` option from this `ios_lint_localizations` call.
       EXPECTED_WARNING
       expect(FastlaneCore::UI).to receive(:important).with(expected_message)
@@ -267,10 +267,10 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     end
 
     it 'warns and skips (without crashing) a file that parses as a plist but is not a flat `.strings`' do
-      # A nested-dictionary value is a valid old-style plist that `plutil` accepts but the duplicate-key
-      # scanner can't tokenize. This used to crash the lane (the scanner raised, uncaught); now it is
-      # surfaced via `UI.important` and the file is skipped.
-      write_localizable('en', "\"k\" = { a = b; };\n")
+      # A `<data>` value is a valid old-style plist that `plutil` accepts but the duplicate-key scanner can't
+      # tokenize. This used to crash the lane (the scanner raised, uncaught); now it is surfaced via
+      # `UI.important` and the file is skipped. (Dictionary/array values, by contrast, are now tokenized.)
+      write_localizable('en', "\"k\" = <48656c6c6f>;\n")
       expect(FastlaneCore::UI).to receive(:important).with(/Could not check .* for duplicate keys/)
 
       result = nil

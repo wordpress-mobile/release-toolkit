@@ -78,6 +78,11 @@ module Fastlane
         # @note The method is able to handle input files which are using different encodings,
         #       guessing the encoding of each input file using the BOM (and defaulting to UTF8).
         #       The generated file will always be in utf-8, by convention.
+        # @note Dictionary- and array-valued entries (`"k" = { … };`, `"k" = ( … );`, nesting allowed) are
+        #       prefixed on their outer key with the value preserved verbatim. If a file still holds some
+        #       construct the tokenizer can't rewrite, its lines are copied through unprefixed with a warning
+        #       (and its keys are then bookkept unprefixed too, so the reported duplicates stay accurate)
+        #       rather than aborting the whole merge.
         #
         # @raise [RuntimeError] If one of the paths provided is not in text format (but XML or binary instead), or if any of the files are missing.
         #
@@ -94,17 +99,36 @@ module Fastlane
               raise "The file `#{input_file}` does not exist or is of unknown format." if fmt.nil?
               raise "The file `#{input_file}` is in #{fmt} format but we currently only support merging `.strings` files in text format." unless fmt == :text
 
-              string_keys = read_strings_file_as_hash(path: input_file).keys.map { |k| "#{prefix}#{k}" }
-              duplicates += (string_keys & all_keys_found) # Find duplicates using Array intersection, and add those to duplicates list
-              all_keys_found += string_keys
+              raw_keys = read_strings_file_as_hash(path: input_file).keys
 
               tmp_file.write("/* MARK: - #{File.basename(input_file)} */\n\n")
               # Add the prefix to every key. We tokenize via `StringsFileValidationHelper.prefix_keys` rather than
               # matching keys with a line-based regex, so that keys are found regardless of where `.strings` comments
               # sit (e.g. `CFBundleName /* note */ = WordPress;`) and `key = value`-looking text inside a comment is
-              # left alone — keeping the written keys consistent with the (`plutil`-derived) keys bookkept above.
+              # left alone. It also handles dictionary/array values (`"k" = { … };`) — prefixing the outer key and
+              # copying the value verbatim.
               lines = read_utf8_lines(input_file)
-              lines = Fastlane::Helper::Ios::StringsFileValidationHelper.prefix_keys(lines: lines, prefix: prefix)
+              applied_prefix = prefix
+              begin
+                lines = Fastlane::Helper::Ios::StringsFileValidationHelper.prefix_keys(lines: lines, prefix: prefix)
+              rescue StandardError => e
+                # `plutil` may still accept a construct the tokenizer can't rewrite: it parses fine (so the file
+                # clears the `:text` gate above) yet `prefix_keys` raises on it. Fail soft: copy this file's lines
+                # through unprefixed rather than aborting the whole merge — mirroring the scanner path, where
+                # `scan_for_duplicate_keys` returns `:unscannable` instead of crashing the lane. `lines` is untouched
+                # by the raise (the assignment above never completes), so it still holds the original file contents,
+                # and `applied_prefix` records that the keys went out *unprefixed* so the bookkeeping below matches.
+                applied_prefix = ''
+                UI.important("Could not add prefix `#{prefix}` to the keys in `#{input_file}` (#{e.message}); copying its lines through unprefixed.")
+              end
+
+              # Bookkeep the keys as they were actually written — prefixed, or unprefixed on the fail-soft path.
+              # Doing this *after* the rewrite keeps the reported duplicates consistent with the merged file even
+              # when prefixing fell back, so a genuine collision is still surfaced rather than silently collapsed.
+              string_keys = raw_keys.map { |k| "#{applied_prefix}#{k}" }
+              duplicates += (string_keys & all_keys_found) # Find duplicates using Array intersection, and add those to duplicates list
+              all_keys_found += string_keys
+
               lines.each { |line| tmp_file.write(line) }
               tmp_file.write("\n")
             end

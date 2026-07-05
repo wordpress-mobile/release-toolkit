@@ -160,6 +160,71 @@ describe Fastlane::Helper::Ios::L10nHelper do
       end
     end
 
+    it 'prefixes the outer key of a nested-dictionary value and preserves the value verbatim' do
+      # A dictionary/array value (`"k" = { … };`) is valid `:text` that `plutil` accepts; the tokenizer now
+      # prefixes the outer key and copies the container body through unchanged, rather than failing to rewrite it.
+      content = %("k" = { a = b; };\n)
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        input_file = File.join(tmp_dir, 'InfoPlist.strings')
+        File.write(input_file, content)
+        output_file = File.join(tmp_dir, 'output.strings')
+
+        expect(FastlaneCore::UI).not_to receive(:important)
+        described_class.merge_strings(paths: { input_file => 'pfx.' }, output_path: output_file)
+
+        # Outer key prefixed, nested value untouched — and the result still parses back to the prefixed key.
+        expect(File.read(output_file)).to include('"pfx.k" = { a = b; };')
+        expect(described_class.read_strings_file_as_hash(path: output_file).keys).to contain_exactly('pfx.k')
+      end
+    end
+
+    it 'keeps a container-valued key distinct from a same-named key in another file (no silent collision)' do
+      # Before containers were tokenizable, this file was written unprefixed while bookkept *with* the prefix, so
+      # a same-named key elsewhere collided in the merged output yet went unreported and was silently collapsed by
+      # `plutil`. Now the key is actually prefixed, so the two stay distinct and neither value is clobbered.
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        flat = File.join(tmp_dir, 'A.strings')
+        nested = File.join(tmp_dir, 'B.strings')
+        File.write(flat, %("MyKey" = "original";\n))
+        File.write(nested, %("MyKey" = { sub = val; };\n))
+        output_file = File.join(tmp_dir, 'output.strings')
+
+        duplicates = described_class.merge_strings(paths: { flat => nil, nested => 'pfx.' }, output_path: output_file)
+
+        expect(duplicates).to be_empty
+        merged = described_class.read_strings_file_as_hash(path: output_file)
+        expect(merged.keys).to contain_exactly('MyKey', 'pfx.MyKey')
+        expect(merged['MyKey']).to eq('original') # the flat file's value is not clobbered
+      end
+    end
+
+    it 'falls back to copying a file through unprefixed — and bookkeeps it unprefixed — when prefixing raises' do
+      # Backstop for any construct the tokenizer still can't rewrite: `merge_strings` warns and copies the file
+      # through unprefixed rather than aborting. Because it then bookkeeps those keys *unprefixed* (matching what
+      # was written), a genuine collision with another file is still reported instead of silently collapsing.
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        dest = File.join(tmp_dir, 'A.strings')
+        weird = File.join(tmp_dir, 'B.strings')
+        File.write(dest, %("shared" = "one";\n))
+        File.write(weird, %("shared" = "two";\n))
+        output_file = File.join(tmp_dir, 'output.strings')
+
+        # Force the fail-soft path for the prefixed file only, regardless of its content.
+        allow(Fastlane::Helper::Ios::StringsFileValidationHelper).to receive(:prefix_keys).and_wrap_original do |orig, **kwargs|
+          raise 'boom' if kwargs[:prefix] == 'pfx.'
+
+          orig.call(**kwargs)
+        end
+        expect(FastlaneCore::UI).to receive(:important).with(a_string_including('Could not add prefix `pfx.`').and(a_string_including('unprefixed')))
+
+        duplicates = described_class.merge_strings(paths: { dest => nil, weird => 'pfx.' }, output_path: output_file)
+
+        # B was written unprefixed, so its `shared` collides with A's `shared` — and that collision is REPORTED.
+        expect(duplicates).to eq(['shared'])
+        expect(File.read(output_file)).to include('"shared" = "two";')
+      end
+    end
+
     it 'returns duplicate keys found' do
       paths = { fixture('Localizable-utf16.strings') => nil, fixture('non-latin-utf16.strings') => nil }
       Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
