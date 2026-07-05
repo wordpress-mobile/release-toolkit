@@ -11,6 +11,7 @@ _None_
 ### New Features
 
 - Added `find_or_create_pull_request` action and `GithubHelper#find_pull_request`: returns the URL of the open Pull Request for a head branch, creating one only if none exists yet. Useful for "rolling" automations (e.g. a daily translations or dependency-update job) that force-push the same head branch on every run. [#733]
+- Added the platform-agnostic `StringPlaceholdersHelper` primitive (`placeholder_signature`, `placeholders_compatible?`, `incompatible_placeholder_changes`, `mixed_operators?`) and the `ios_lint_localization_placeholder_changes` action: fails when an existing localization key's source-language value changes its format placeholders — count, position, or argument type — between two versions of the base `.strings` file. Such a change silently breaks every existing translation filed under that key. Complements `ios_lint_localizations` on the temporal (base↔base across versions) axis. The action also aborts (by default, via `check_duplicate_keys`) when either input file defines a key more than once, since `plutil` silently keeps only the last value and a duplicate could otherwise hide a real placeholder change, and always aborts when a source value mixes positional (`%1$@`) and non-positional (`%@`) placeholders, which is invalid and makes the placeholder shape impossible to compare reliably. [#738]
 
 ### Bug Fixes
 
