@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- Added `find_or_create_pull_request` action and `GithubHelper#find_pull_request`: returns the URL of the open Pull Request for a head branch, creating one only if none exists yet. Useful for "rolling" automations (e.g. a daily translations or dependency-update job) that force-push the same head branch on every run. [#733]
+_None_
 
 ### Bug Fixes
 
@@ -20,11 +20,26 @@ _None_
 - `L10nHelper.merge_strings` now applies the key prefix via a comment-aware tokenizer, so it correctly prefixes unquoted keys containing `. - $ : /`, lines with an *unquoted* value (e.g. `CFBundleName = WordPress;`), and keys sitting behind an inter-token `.strings` comment (e.g. `CFBundleName /* note */ = WordPress;`) — matching the grammar `plutil` accepts. Previously the line-based matcher left those keys written to the merged file without the prefix while still bookkeeping them *with* it, leaving the output inconsistent with the reported keys (which could resurface the very collisions the prefix avoids and break downstream key extraction). [#741]
 - `StringsFileValidationHelper.find_duplicated_keys` (and `scan_for_duplicate_keys`) now tokenize dictionary- and array-valued entries (`"k" = { … };`, `"k" = ( … );`, nesting allowed), skipping the container body — so a `:text` file that uses them is scanned for duplicate *top-level* keys instead of returning `:unscannable`. [#750]
 - `L10nHelper.merge_strings` now prefixes the outer key of a dictionary/array-valued entry and copies the value through verbatim, instead of crashing on it — valid input `plutil` accepts that the flat-`.strings` tokenizer previously couldn't rewrite. If a file still holds a construct the tokenizer can't rewrite, its lines are copied through unprefixed with a `UI.important` warning (and its keys are bookkept unprefixed to match, so a genuine cross-file collision is still reported rather than silently collapsed) instead of aborting the whole merge. [#750]
+- Bump `faraday` and `nokogiri` to address security vulnerabilities. [#749]
+- Bump `concurrent-ruby` to address CVE-2026-54904 / GHSA-h8w8-99g7-qmvj. [#751]
 
 ### Internal Changes
 
 - Centralized `.strings` duplicate-key detection behind `StringsFileValidationHelper.scan_for_duplicate_keys`, which detects the file format and returns a `[:scanned | :unsupported_format | :unscannable, payload]` tri-state that callers map to their own policy (warn-and-skip vs fail-closed). `ios_lint_localizations` now uses it. [#741]
 - `L10nHelper.strings_file_type` (and `StringsFileValidationHelper.scan_for_duplicate_keys`) accept `assume_valid:` to skip a redundant `plutil -lint` when the caller has already parsed the file. [#741]
+
+## 14.9.0
+
+### New Features
+
+- `upload_github_release_assets` action: uploads assets on an existing GitHub release without disturbing unrelated assets. If assets exists already, it replaces them. [#743]
+
+## 14.8.0
+
+### New Features
+
+- `find_or_create_pull_request` action: returns the URL of the open Pull Request for a head branch, creating one only if none exists yet. [#733]
+- `ContinuousBuildCodeFormatter`: derives an Android Play Store `versionCode` for a "continuous trunk" release model as `(major * 10 + minor) * 10^build_digits + build_number` (default `build_digits: 6`). [#735]
 
 ## 14.7.0
 
