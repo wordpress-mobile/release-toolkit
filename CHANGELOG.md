@@ -10,16 +10,26 @@ _None_
 
 ### New Features
 
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 14.10.0
+
+### New Features
+
 - `android_prune_orphaned_translations` action: removes `<string>`, `<string-array>` and `<plurals>` entries from `values-*/strings.xml` whose keys are not declared in the source `values/strings.xml` optionally unioned with `additional_source_strings_paths`. [#734]
 
 ### Bug Fixes
 
 - Bump `faraday` and `nokogiri` to address security vulnerabilities. [#749]
 - Bump `concurrent-ruby` to address CVE-2026-54904 / GHSA-h8w8-99g7-qmvj. [#751]
-
-### Internal Changes
-
-_None_
 
 ## 14.9.0
 
