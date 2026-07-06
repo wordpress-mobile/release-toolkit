@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- `android_prune_orphaned_translations` action: removes `<string>`, `<string-array>` and `<plurals>` entries from `values-*/strings.xml` whose keys are not declared in the source `values/strings.xml` optionally unioned with `additional_source_strings_paths`. [#734]
 
 ### Bug Fixes
 
