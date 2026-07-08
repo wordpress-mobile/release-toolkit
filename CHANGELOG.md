@@ -14,15 +14,14 @@ _None_
 
 ### Bug Fixes
 
-- `StringsFileValidationHelper.find_duplicated_keys` now parses *unquoted* keys and values (valid `.strings` syntax, common in `InfoPlist.strings`) instead of raising `Invalid character`, matching the character set `plutil` accepts for unquoted strings (alphanumerics plus `_ . - $ : /`). This lets `ios_lint_localizations`' `check_duplicate_keys` work on `InfoPlist.strings`-style files. [#741]
-- `StringsFileValidationHelper.find_duplicated_keys` now also accepts comments placed *between* the tokens of a statement (e.g. `"key" /* note */ = "value";`), which `plutil` allows, instead of raising `Invalid character` on the `/`. [#741]
-- `ios_lint_localizations`' `check_duplicate_keys` no longer crashes the lane on a file that parses as a property list but isn't a flat `.strings` the scanner can tokenize (e.g. a `<data>` value); it now warns via `UI.important` and skips that file. [#741]
-- `L10nHelper.merge_strings` now applies the key prefix via a comment-aware tokenizer, so it correctly prefixes unquoted keys containing `. - $ : /`, lines with an *unquoted* value (e.g. `CFBundleName = WordPress;`), and keys sitting behind an inter-token `.strings` comment (e.g. `CFBundleName /* note */ = WordPress;`) — matching the grammar `plutil` accepts. Previously the line-based matcher left those keys written to the merged file without the prefix while still bookkeeping them *with* it, leaving the output inconsistent with the reported keys (which could resurface the very collisions the prefix avoids and break downstream key extraction). [#741]
+- `StringsFileValidationHelper.find_duplicated_keys` now parses unquoted keys/values and inter-token comments, matching the grammar `plutil` accepts, instead of raising `Invalid character`. This lets `ios_lint_localizations`' `check_duplicate_keys` work on `InfoPlist.strings`-style files. [#741]
+- `ios_lint_localizations`' `check_duplicate_keys` now warns and skips, rather than crashing, on a file that parses as a property list but isn't a tokenizable flat `.strings`. [#741]
+- `L10nHelper.merge_strings` now prefixes keys via a comment-aware tokenizer, so unquoted keys, unquoted values, and keys behind an inter-token comment are prefixed in the output consistently with the reported keys. [#741]
 
 ### Internal Changes
 
-- Centralized `.strings` duplicate-key detection behind `StringsFileValidationHelper.scan_for_duplicate_keys`, which detects the file format and returns a `[:scanned | :unsupported_format | :unscannable, payload]` tri-state that callers map to their own policy (warn-and-skip vs fail-closed). `ios_lint_localizations` now uses it. [#741]
-- `L10nHelper.strings_file_type` (and `StringsFileValidationHelper.scan_for_duplicate_keys`) accept `assume_valid:` to skip a redundant `plutil -lint` when the caller has already parsed the file. [#741]
+- Centralized `.strings` duplicate-key detection behind `StringsFileValidationHelper.scan_for_duplicate_keys`, returning a `[:scanned | :unsupported_format | :unscannable, payload]` tri-state that callers can map to their own warn-and-skip vs fail-closed policy. [#741]
+- `L10nHelper.strings_file_type` and `StringsFileValidationHelper.scan_for_duplicate_keys` accept `assume_valid:` to skip a redundant `plutil -lint` when the caller has already parsed the file. [#741]
 
 ## 14.10.0
 
