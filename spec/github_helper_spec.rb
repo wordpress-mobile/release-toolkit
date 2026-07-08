@@ -640,12 +640,14 @@ describe Fastlane::Helper::GithubHelper do
 
     before do
       allow(Octokit::Client).to receive(:new).and_return(client)
+      allow(client).to receive(:release_for_tag).with(test_repo, test_version).and_return(release)
       allow(client).to receive(:releases).with(test_repo).and_return([release])
       allow(client).to receive(:release_assets).with(release_url).and_return(existing_assets)
       allow(client).to receive_messages(upload_asset: uploaded_asset, delete_release_asset: true)
     end
 
     it 'fails clearly if the release does not exist' do
+      allow(client).to receive(:release_for_tag).with(test_repo, test_version).and_raise(Octokit::NotFound)
       allow(client).to receive(:releases).with(test_repo).and_return([])
 
       with_tmp_file(named: 'test-app.zip') do |file_path|
@@ -702,10 +704,39 @@ describe Fastlane::Helper::GithubHelper do
       draft_release = sawyer_resource_stub(url: release_url, html_url: release_html_url, tag_name: test_version, draft: true)
       other_release = sawyer_resource_stub(url: 'https://api.github.com/repos/repo-test/project-test/releases/456', html_url: 'https://github.com/repo-test/project-test/releases/tag/0.9.0', tag_name: '0.9.0')
 
+      allow(client).to receive(:release_for_tag).with(test_repo, test_version).and_raise(Octokit::NotFound)
       allow(client).to receive(:releases).with(test_repo).and_return([other_release, draft_release])
       allow(client).to receive(:release_assets).with(release_url).and_return([])
 
       with_tmp_file(named: 'test-app.zip') do |file_path|
+        expect(client).to receive(:upload_asset).with(release_url, file_path, { content_type: 'application/octet-stream' })
+
+        result = upload_release_assets(assets: [file_path])
+
+        expect(result).to eq(release_html_url)
+      end
+    end
+
+    it 'uses the release list without calling the direct release-by-tag lookup' do
+      draft_release = sawyer_resource_stub(url: 'draft-api-url', html_url: 'draft-html-url', tag_name: test_version, draft: true)
+
+      allow(client).to receive(:releases).with(test_repo).and_return([draft_release])
+      expect(client).not_to receive(:release_for_tag)
+      allow(client).to receive(:release_assets).with(draft_release.url).and_return([])
+
+      with_tmp_file(named: 'test-app.zip') do |file_path|
+        expect(client).to receive(:upload_asset).with(draft_release.url, file_path, { content_type: 'application/octet-stream' })
+
+        result = upload_release_assets(assets: [file_path])
+
+        expect(result).to eq(draft_release.html_url)
+      end
+    end
+
+    it 'falls back to the direct release-by-tag lookup when the release list misses' do
+      with_tmp_file(named: 'test-app.zip') do |file_path|
+        allow(client).to receive(:releases).with(test_repo).and_return([])
+        allow(client).to receive(:release_for_tag).with(test_repo, test_version).and_return(release)
         expect(client).to receive(:upload_asset).with(release_url, file_path, { content_type: 'application/octet-stream' })
 
         result = upload_release_assets(assets: [file_path])

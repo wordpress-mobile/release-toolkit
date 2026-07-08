@@ -200,7 +200,7 @@ module Fastlane
       # @raise [Fastlane::UI::Error] UI.user_error! if the release does not exist.
       #
       def get_release(repository:, version:)
-        release = client.releases(repository).find { |candidate| candidate.tag_name == version }
+        release = find_release(repository: repository, version: version)
         return release unless release.nil?
 
         UI.user_error!("Could not find GitHub Release for tag #{version} in #{repository}")
@@ -243,6 +243,22 @@ module Fastlane
 
         release.html_url
       end
+
+      def find_release(repository:, version:)
+        release = client.releases(repository).find { |candidate| candidate.tag_name == version }
+        return release unless release.nil?
+
+        release_for_tag(repository: repository, version: version)
+      end
+
+      def release_for_tag(repository:, version:)
+        client.release_for_tag(repository, version)
+      rescue Octokit::NotFound
+        nil
+      end
+
+      private :find_release
+      private :release_for_tag
 
       # Use the GitHub API to generate release notes based on the list of PRs between current tag and previous tag.
       # @note This API uses the `.github/release.yml` config file to classify the PRs by category in the generated list according to PR labels.
