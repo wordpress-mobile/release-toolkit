@@ -39,6 +39,14 @@ describe Fastlane::Helper::Ios::L10nHelper do
       expect(File).to exist(invalid_fixture)
       expect(described_class.strings_file_type(path: invalid_fixture)).to be_nil
     end
+
+    it 'skips the redundant `plutil -lint` check when `assume_valid: true`, still detecting the format' do
+      text_fixture = fixture('Localizable-utf16.strings')
+      allow(Open3).to receive(:capture2).and_call_original
+      expect(Open3).not_to receive(:capture2).with('/usr/bin/plutil', '-lint', anything)
+
+      expect(described_class.strings_file_type(path: text_fixture, assume_valid: true)).to eq(:text)
+    end
   end
 
   describe '#merge_strings' do
@@ -89,6 +97,131 @@ describe Fastlane::Helper::Ios::L10nHelper do
         # We should also not find duplicates anymore, given that `key1` and `key2` (duplicates from `Localizable-utf16.strings`
         # and `non-latin-utf16.strings` files) will now be prefixed differently, and thus made different during merge
         expect(duplicates).to be_empty
+      end
+    end
+
+    it 'prefixes unquoted keys with unquoted values and keys containing `. - $ : /`' do
+      # Regression: prefixing must cover the full unquoted-string grammar `plutil` accepts — unquoted *values*
+      # (e.g. `CFBundleName = WordPress;`) and keys containing `. - $ : /` — so the written file stays consistent
+      # with the prefixed keys we report. (Previously only `[A-Z0-9_]` keys with a *quoted* value were prefixed,
+      # leaving these written without the prefix and resurfacing the very collisions the prefix avoids.)
+      content = <<~STRINGS
+        CFBundleName = WordPress;
+        com.automattic.app-id = "X";
+        "QuotedKey" = "Y";
+      STRINGS
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        input_file = File.join(tmp_dir, 'InfoPlist.strings')
+        File.write(input_file, content)
+        output_file = File.join(tmp_dir, 'output.strings')
+        described_class.merge_strings(paths: { input_file => 'pfx.' }, output_path: output_file)
+        merged = File.read(output_file)
+        expect(merged).to include('"pfx.CFBundleName" = WordPress;')
+        expect(merged).to include('"pfx.com.automattic.app-id" = "X";')
+        expect(merged).to include('"pfx.QuotedKey" = "Y";')
+      end
+    end
+
+    it 'prefixes keys when `.strings` comments sit between a statement\'s tokens' do
+      # Regression: the duplicate-key scanner accepts comments *between* a statement's tokens (e.g.
+      # `CFBundleName /* c */ = WordPress;`), and bookkeeping derives keys from `plutil`, which agrees.
+      # But the line-based rewrite only prefixes when `=` and the value are adjacent, so an inter-token
+      # comment leaves the key written unprefixed while still bookkept *with* the prefix — the exact
+      # collision/inconsistent-output the prefix exists to prevent.
+      content = <<~STRINGS
+        CFBundleName = WordPress /* trailing */;
+        AppName /* between key and = */ = WordPress;
+        DisplayName /* between key and = */ = "WordPress";
+      STRINGS
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        input_file = File.join(tmp_dir, 'InfoPlist.strings')
+        File.write(input_file, content)
+        output_file = File.join(tmp_dir, 'output.strings')
+        described_class.merge_strings(paths: { input_file => 'pfx.' }, output_path: output_file)
+        merged_keys = described_class.read_strings_file_as_hash(path: output_file).keys
+        expect(merged_keys).to contain_exactly('pfx.CFBundleName', 'pfx.AppName', 'pfx.DisplayName')
+      end
+    end
+
+    it 'does not silently drop a key to a collision when an inter-token comment blocks prefixing' do
+      # The harm of the gap above: two files each carrying the same key behind an inter-token comment are
+      # bookkept under distinct prefixes (so no duplicate is reported), yet both are written verbatim —
+      # producing a genuine duplicate in the merged file that `plutil` later collapses to a single value.
+      content = "CFBundleName /* c */ = WordPress;\n"
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        file_a = File.join(tmp_dir, 'A.strings')
+        file_b = File.join(tmp_dir, 'B.strings')
+        File.write(file_a, content)
+        File.write(file_b, content)
+        output_file = File.join(tmp_dir, 'output.strings')
+        described_class.merge_strings(paths: { file_a => 'a.', file_b => 'b.' }, output_path: output_file)
+        merged_keys = described_class.read_strings_file_as_hash(path: output_file).keys
+        expect(merged_keys).to contain_exactly('a.CFBundleName', 'b.CFBundleName')
+      end
+    end
+
+    it 'prefixes the outer key of a nested-dictionary value and preserves the value verbatim' do
+      # A dictionary/array value (`"k" = { … };`) is valid `:text` that `plutil` accepts; the tokenizer now
+      # prefixes the outer key and copies the container body through unchanged, rather than failing to rewrite it.
+      content = %("k" = { a = b; };\n)
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        input_file = File.join(tmp_dir, 'InfoPlist.strings')
+        File.write(input_file, content)
+        output_file = File.join(tmp_dir, 'output.strings')
+
+        expect(FastlaneCore::UI).not_to receive(:important)
+        described_class.merge_strings(paths: { input_file => 'pfx.' }, output_path: output_file)
+
+        # Outer key prefixed, nested value untouched — and the result still parses back to the prefixed key.
+        expect(File.read(output_file)).to include('"pfx.k" = { a = b; };')
+        expect(described_class.read_strings_file_as_hash(path: output_file).keys).to contain_exactly('pfx.k')
+      end
+    end
+
+    it 'keeps a container-valued key distinct from a same-named key in another file (no silent collision)' do
+      # Before containers were tokenizable, this file was written unprefixed while bookkept *with* the prefix, so
+      # a same-named key elsewhere collided in the merged output yet went unreported and was silently collapsed by
+      # `plutil`. Now the key is actually prefixed, so the two stay distinct and neither value is clobbered.
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        flat = File.join(tmp_dir, 'A.strings')
+        nested = File.join(tmp_dir, 'B.strings')
+        File.write(flat, %("MyKey" = "original";\n))
+        File.write(nested, %("MyKey" = { sub = val; };\n))
+        output_file = File.join(tmp_dir, 'output.strings')
+
+        duplicates = described_class.merge_strings(paths: { flat => nil, nested => 'pfx.' }, output_path: output_file)
+
+        expect(duplicates).to be_empty
+        merged = described_class.read_strings_file_as_hash(path: output_file)
+        expect(merged.keys).to contain_exactly('MyKey', 'pfx.MyKey')
+        expect(merged['MyKey']).to eq('original') # the flat file's value is not clobbered
+      end
+    end
+
+    it 'falls back to copying a file through unprefixed — and bookkeeps it unprefixed — when prefixing raises' do
+      # Backstop for any construct the tokenizer still can't rewrite: `merge_strings` warns and copies the file
+      # through unprefixed rather than aborting. Because it then bookkeeps those keys *unprefixed* (matching what
+      # was written), a genuine collision with another file is still reported instead of silently collapsing.
+      Dir.mktmpdir('a8c-release-toolkit-l10n-helper-tests-') do |tmp_dir|
+        dest = File.join(tmp_dir, 'A.strings')
+        weird = File.join(tmp_dir, 'B.strings')
+        File.write(dest, %("shared" = "one";\n))
+        File.write(weird, %("shared" = "two";\n))
+        output_file = File.join(tmp_dir, 'output.strings')
+
+        # Force the fail-soft path for the prefixed file only, regardless of its content.
+        allow(Fastlane::Helper::Ios::StringsFileValidationHelper).to receive(:prefix_keys).and_wrap_original do |orig, **kwargs|
+          raise 'boom' if kwargs[:prefix] == 'pfx.'
+
+          orig.call(**kwargs)
+        end
+        expect(FastlaneCore::UI).to receive(:important).with(a_string_including('Could not add prefix `pfx.`').and(a_string_including('unprefixed')))
+
+        duplicates = described_class.merge_strings(paths: { dest => nil, weird => 'pfx.' }, output_path: output_file)
+
+        # B was written unprefixed, so its `shared` collides with A's `shared` — and that collision is REPORTED.
+        expect(duplicates).to eq(['shared'])
+        expect(File.read(output_file)).to include('"shared" = "two";')
       end
     end
 

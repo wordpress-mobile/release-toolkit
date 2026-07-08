@@ -14,11 +14,14 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- `StringsFileValidationHelper.find_duplicated_keys` now parses unquoted keys/values and inter-token comments, matching the grammar `plutil` accepts, instead of raising `Invalid character`. This lets `ios_lint_localizations`' `check_duplicate_keys` work on `InfoPlist.strings`-style files. [#741]
+- `ios_lint_localizations`' `check_duplicate_keys` now warns and skips, rather than crashing, on a file that parses as a property list but isn't a tokenizable flat `.strings`. [#741]
+- `L10nHelper.merge_strings` now prefixes keys via a comment-aware tokenizer, so unquoted keys, unquoted values, and keys behind an inter-token comment are prefixed in the output consistently with the reported keys. [#741]
 
 ### Internal Changes
 
-_None_
+- Centralized `.strings` duplicate-key detection behind `StringsFileValidationHelper.scan_for_duplicate_keys`, returning a `[:scanned | :unsupported_format | :unscannable, payload]` tri-state that callers can map to their own warn-and-skip vs fail-closed policy. [#741]
+- `L10nHelper.strings_file_type` and `StringsFileValidationHelper.scan_for_duplicate_keys` accept `assume_valid:` to skip a redundant `plutil -lint` when the caller has already parsed the file. [#741]
 
 ## 14.10.0
 

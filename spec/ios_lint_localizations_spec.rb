@@ -194,7 +194,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       File.write(File.join(fr_lproj, 'Localizable.strings'), File.read(xml_file))
 
       expected_message = <<~EXPECTED_WARNING
-        File `#{fr_lproj}/Localizable.strings` is in xml format, while finding duplicate keys only make sense on files that are in ASCII-plist format.
+        File `#{fr_lproj}/Localizable.strings` is in xml format, while finding duplicate keys can only occur on files that are in ASCII-plist format.
         Since your files are in xml format, you should probably disable the `check_duplicate_keys` option from this `ios_lint_localizations` call.
       EXPECTED_WARNING
       expect(FastlaneCore::UI).to receive(:important).with(expected_message)
@@ -226,6 +226,56 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
         data_file: 'extra-strings-in-translations-error',
         fail_on_strings_not_in_base_language: true
       )
+    end
+  end
+
+  # Regression coverage for the unquoted-key/value parsing in `StringsFileValidationHelper`, which used
+  # to raise `Invalid character` on *unquoted* keys (valid `.strings` syntax, common in `InfoPlist.strings`)
+  # and so crashed `check_duplicate_keys`. It now parses unquoted keys and detects duplicates among them.
+  context 'duplicate-key detection on files with unquoted keys' do
+    let(:input_dir) { Dir.mktmpdir('a8c-lint-l10n-unquoted-') }
+
+    after { FileUtils.remove_entry(input_dir) }
+
+    def write_localizable(lang, content)
+      lproj = File.join(input_dir, "#{lang}.lproj")
+      FileUtils.mkdir_p(lproj)
+      File.write(File.join(lproj, 'Localizable.strings'), content)
+    end
+
+    it 'parses unquoted keys instead of raising, and detects duplicates among them' do
+      write_localizable('en', <<~STRINGS)
+        okay_key = "value";
+        NSCameraUsageDescription = "Take photos";
+        NSCameraUsageDescription = "Take a photo";
+        "quoted_key" = "value";
+      STRINGS
+
+      result = nil
+      expect { result = described_class.find_duplicated_keys({ input_dir: input_dir }) }.not_to raise_error
+      expect(result).to eq('en' => ['`NSCameraUsageDescription` was found at multiple lines: 2, 3'])
+    end
+
+    it 'reports no duplicates when unquoted keys are unique (mixed with quoted keys)' do
+      write_localizable('en', <<~STRINGS)
+        CFBundleName = "WordPress";
+        NSCameraUsageDescription = "Take photos";
+        "quoted_key" = "value";
+      STRINGS
+
+      expect(described_class.find_duplicated_keys({ input_dir: input_dir })).to eq({})
+    end
+
+    it 'warns and skips (without crashing) a file that parses as a plist but is not a flat `.strings`' do
+      # A `<data>` value is a valid old-style plist that `plutil` accepts but the duplicate-key scanner can't
+      # tokenize. This used to crash the lane (the scanner raised, uncaught); now it is surfaced via
+      # `UI.important` and the file is skipped. (Dictionary/array values, by contrast, are now tokenized.)
+      write_localizable('en', "\"k\" = <48656c6c6f>;\n")
+      expect(FastlaneCore::UI).to receive(:important).with(/Could not check .* for duplicate keys/)
+
+      result = nil
+      expect { result = described_class.find_duplicated_keys({ input_dir: input_dir }) }.not_to raise_error
+      expect(result).to eq({})
     end
   end
 end
