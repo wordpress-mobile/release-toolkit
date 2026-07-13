@@ -717,7 +717,7 @@ describe Fastlane::Helper::GithubHelper do
       end
     end
 
-    it 'uses the release list without calling the direct release-by-tag lookup' do
+    it 'uses the release list if available' do
       draft_release = sawyer_resource_stub(url: 'draft-api-url', html_url: 'draft-html-url', tag_name: test_version, draft: true)
 
       allow(client).to receive(:releases).with(test_repo).and_return([draft_release])
