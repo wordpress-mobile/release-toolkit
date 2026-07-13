@@ -21,6 +21,7 @@ _None_
 
 ### Internal Changes
 
+- Added regression coverage for `upload_github_release_assets` direct release lookup errors. [#755]
 - Centralized `.strings` duplicate-key detection behind `StringsFileValidationHelper.scan_for_duplicate_keys`, returning a `[:scanned | :unsupported_format | :unscannable, payload]` tri-state that callers can map to their own warn-and-skip vs fail-closed policy. [#741]
 - `L10nHelper.strings_file_type` and `StringsFileValidationHelper.scan_for_duplicate_keys` accept `assume_valid:` to skip a redundant `plutil -lint` when the caller has already parsed the file. [#741]
 

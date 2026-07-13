@@ -745,6 +745,20 @@ describe Fastlane::Helper::GithubHelper do
       end
     end
 
+    it 'does not hide unexpected direct release lookup errors' do
+      allow(client).to receive(:releases).with(test_repo).and_return([])
+      allow(client).to receive(:release_for_tag).with(test_repo, test_version).and_raise(Octokit::TooManyRequests)
+
+      with_tmp_file(named: 'test-app.zip') do |file_path|
+        expect(client).not_to receive(:release_assets)
+        expect(client).not_to receive(:upload_asset)
+
+        expect do
+          upload_release_assets(assets: [file_path])
+        end.to raise_error(Octokit::TooManyRequests)
+      end
+    end
+
     it 'uploads one asset to the existing release' do
       with_tmp_file(named: 'test-app.zip') do |file_path|
         expect(client).to receive(:upload_asset).with(release_url, file_path, { content_type: 'application/octet-stream' })
