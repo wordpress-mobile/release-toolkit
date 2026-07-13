@@ -22,9 +22,6 @@ Gem::Specification.new do |spec|
   spec.bindir = 'bin'
   spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
 
-  # Don't add a dependency to fastlane or fastlane_re
-  # since this would cause a circular dependency
-
   # spec.add_dependency 'your-dependency', '~> 1.0.0'
   spec.add_dependency 'buildkit', '~> 1.5'
   spec.add_dependency 'chroma', '0.2.0'
