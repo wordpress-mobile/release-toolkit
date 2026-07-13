@@ -17,6 +17,7 @@ _None_
 - `StringsFileValidationHelper.find_duplicated_keys` now parses unquoted keys/values and inter-token comments, matching the grammar `plutil` accepts, instead of raising `Invalid character`. This lets `ios_lint_localizations`' `check_duplicate_keys` work on `InfoPlist.strings`-style files. [#741]
 - `ios_lint_localizations`' `check_duplicate_keys` now warns and skips, rather than crashing, on a file that parses as a property list but isn't a tokenizable flat `.strings`. [#741]
 - `L10nHelper.merge_strings` now prefixes keys via a comment-aware tokenizer, so unquoted keys, unquoted values, and keys behind an inter-token comment are prefixed in the output consistently with the reported keys. [#741]
+- Bump `fastlane` to `~> 2.237` to pull in `excon >= 1.5.0`, fixing CVE-2026-54171 / GHSA-48rx-c7pg-q66r. [#754]
 - `upload_github_release_assets`: make release lookup more resilient by falling back to GitHub's direct release-by-tag lookup when the releases list does not include the requested release. [#753]
 
 ### Internal Changes
