@@ -254,6 +254,8 @@ module Fastlane
       def release_for_tag(repository:, version:)
         client.release_for_tag(repository, version)
       rescue Octokit::NotFound
+        # A 404 only means the fallback did not find a published release.
+        # Other API errors should be surfaced.
         nil
       end
 
