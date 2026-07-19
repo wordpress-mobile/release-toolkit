@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- New `macos_verify_code_signing` action, asserting that a macOS app bundle is signed, signed by the expected authority, accepted by Gatekeeper, and has a notarization ticket stapled to it. [#PRNUMBER]
 
 ### Bug Fixes
 
