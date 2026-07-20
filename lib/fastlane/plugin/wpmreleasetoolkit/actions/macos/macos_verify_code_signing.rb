@@ -84,22 +84,13 @@ module Fastlane
 
       def self.details
         <<~DETAILS
-          Verify that the given macOS artifacts are signed, and optionally notarized, so that a build
-          that is unsigned or signed with the wrong identity fails the CI job instead of shipping.
-
-          `electron-builder`, in particular, only warns when it can't find a valid signing identity: it
-          skips signing and produces an artifact that looks fine until users try to launch it.
+          Verify that the given macOS artifacts are signed, and optionally notarized.
 
           The checks that apply are picked from the artifact's extension:
 
           - `.app` — the signature is valid and satisfies its designated requirement, Gatekeeper accepts
             the bundle for execution, and a notarization ticket is stapled to it.
-          - `.dmg` — a notarization ticket is stapled to the image. Disk images are frequently left
-            unsigned (`electron-builder` signs only the app inside), in which case the signature checks
-            are skipped with a warning rather than failing.
-
-          Run with `verify_notarization: false` at a point in the build where the artifact has been
-          signed but not notarized yet, such as from an `electron-builder` `afterSign` hook.
+          - `.dmg` — a notarization ticket is stapled to the image.
         DETAILS
       end
 
