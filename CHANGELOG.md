@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- New `macos_verify_code_signing` action, asserting that a macOS app bundle is signed, signed by the expected authority, accepted by Gatekeeper, and has a notarization ticket stapled to it. [#757]
+- New `macos_verify_code_signing` action, asserting that macOS artifacts are signed, signed by the expected authority, accepted by Gatekeeper, and have a notarization ticket stapled to them. Handles `.app` bundles and `.dmg` disk images, picking the checks that apply to each. [#757]
 
 ### Bug Fixes
 

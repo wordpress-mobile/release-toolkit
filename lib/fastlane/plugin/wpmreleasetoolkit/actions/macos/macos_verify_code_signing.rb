@@ -4,35 +4,74 @@ module Fastlane
   module Actions
     class MacosVerifyCodeSigningAction < Action
       def self.run(params)
-        app_paths = Array(params[:app_path])
-        UI.user_error!('No app bundle to verify: `app_path` is empty') if app_paths.empty?
+        paths = Array(params[:artifact_path])
+        UI.user_error!('No artifact to verify: `artifact_path` is empty') if paths.empty?
 
-        app_paths.each do |app_path|
-          UI.user_error!("There is no app bundle at #{app_path}") unless File.exist?(app_path)
+        paths.each do |path|
+          UI.user_error!("There is no artifact at #{path}") unless File.exist?(path)
 
-          UI.message("Verifying code signing of #{app_path}")
+          UI.message("Verifying #{path}")
 
-          verify!("The code signature of #{app_path} is not valid", 'codesign', '--verify', '--deep', '--strict', '--verbose=2', app_path)
-          verify_authority!(app_path: app_path, expected_authority: params[:expected_authority]) unless params[:expected_authority].nil?
-
-          next unless params[:verify_notarization]
-
-          verify!("#{app_path} was rejected by Gatekeeper", 'spctl', '--assess', '--type', 'execute', '--verbose=2', app_path)
-          verify!("#{app_path} has no notarization ticket stapled to it", 'xcrun', 'stapler', 'validate', app_path)
+          case File.extname(path).downcase
+          when '.app'
+            verify_app_bundle(path: path, expected_authority: params[:expected_authority], verify_notarization: params[:verify_notarization])
+          when '.dmg'
+            verify_disk_image(path: path, expected_authority: params[:expected_authority], verify_notarization: params[:verify_notarization])
+          else
+            UI.user_error!("Don't know how to verify #{path}. Supported artifacts are `.app` bundles and `.dmg` disk images")
+          end
         end
 
-        UI.success("Verified code signing of #{app_paths.length} app bundle(s)")
+        UI.success("Verified #{paths.length} artifact(s)")
+      end
+
+      def self.verify_app_bundle(path:, expected_authority:, verify_notarization:)
+        verify!("The code signature of #{path} is not valid", 'codesign', '--verify', '--deep', '--strict', '--verbose=2', path)
+        verify_authority!(path: path, expected_authority: expected_authority) unless expected_authority.nil?
+
+        return unless verify_notarization
+
+        verify!("#{path} was rejected by Gatekeeper", 'spctl', '--assess', '--type', 'execute', '--verbose=2', path)
+        verify!("#{path} has no notarization ticket stapled to it", 'xcrun', 'stapler', 'validate', path)
+      end
+
+      # Unlike an app bundle, a disk image is often not signed at all — `electron-builder`, for one,
+      # only signs the app inside it. Gatekeeper then rejects the image itself with `no usable
+      # signature` even when it carries a notarization ticket, so the stapled ticket is the only
+      # check that means anything for an unsigned image.
+      #
+      def self.verify_disk_image(path:, expected_authority:, verify_notarization:)
+        if signed?(path)
+          verify_authority!(path: path, expected_authority: expected_authority) unless expected_authority.nil?
+          verify!("#{path} was rejected by Gatekeeper", 'spctl', '--assess', '--type', 'open', '--context', 'context:primary-signature', '--verbose=2', path) if verify_notarization
+        else
+          UI.important("#{path} is not signed — skipping its signature checks. Only the app it contains carries a signature.")
+        end
+
+        verify!("#{path} has no notarization ticket stapled to it", 'xcrun', 'stapler', 'validate', path) if verify_notarization
+      end
+
+      # Distinguishes an artifact that carries no signature at all from one whose signature is
+      # broken: the former is expected for a disk image, the latter always a failure.
+      #
+      def self.signed?(path)
+        exitstatus, output = sh('codesign', '--verify', '--strict', '--verbose=2', path) { |status, result, _| [status.exitstatus, result] }
+
+        return true if exitstatus.zero?
+        return false if output.include?('not signed at all')
+
+        UI.user_error!("The code signature of #{path} is not valid:\n#{output}")
       end
 
       def self.verify!(error_message, *command)
         sh(*command, error_callback: ->(_) { UI.user_error!(error_message) })
       end
 
-      def self.verify_authority!(app_path:, expected_authority:)
-        details = sh('codesign', '--display', '--verbose=2', app_path)
+      def self.verify_authority!(path:, expected_authority:)
+        details = sh('codesign', '--display', '--verbose=2', path)
         return if details.include?("Authority=#{expected_authority}")
 
-        UI.user_error!("#{app_path} is not signed by '#{expected_authority}':\n#{details}")
+        UI.user_error!("#{path} is not signed by '#{expected_authority}':\n#{details}")
       end
 
       #####################################################
@@ -40,35 +79,43 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Verify that macOS app bundles are properly code signed and notarized'
+        'Verify that macOS artifacts are properly code signed and notarized'
       end
 
       def self.details
         <<~DETAILS
-          Verify that the given macOS app bundles are signed, and optionally notarized, so that a build
+          Verify that the given macOS artifacts are signed, and optionally notarized, so that a build
           that is unsigned or signed with the wrong identity fails the CI job instead of shipping.
 
           `electron-builder`, in particular, only warns when it can't find a valid signing identity: it
           skips signing and produces an artifact that looks fine until users try to launch it.
 
-          Run with `verify_notarization: false` at a point in the build where the app has been signed
-          but not notarized yet, such as from an `electron-builder` `afterSign` hook.
+          The checks that apply are picked from the artifact's extension:
+
+          - `.app` — the signature is valid and satisfies its designated requirement, Gatekeeper accepts
+            the bundle for execution, and a notarization ticket is stapled to it.
+          - `.dmg` — a notarization ticket is stapled to the image. Disk images are frequently left
+            unsigned (`electron-builder` signs only the app inside), in which case the signature checks
+            are skipped with a warning rather than failing.
+
+          Run with `verify_notarization: false` at a point in the build where the artifact has been
+          signed but not notarized yet, such as from an `electron-builder` `afterSign` hook.
         DETAILS
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(
-            key: :app_path,
-            description: 'The path, or list of paths, to the `.app` bundle(s) to verify',
+            key: :artifact_path,
+            description: 'The path, or list of paths, to the `.app` bundle(s) or `.dmg` disk image(s) to verify',
             is_string: false,
             verify_block: proc do |value|
-              UI.user_error!('`app_path` must be a String or an Array of Strings') unless value.is_a?(String) || value.is_a?(Array)
+              UI.user_error!('`artifact_path` must be a String or an Array of Strings') unless value.is_a?(String) || value.is_a?(Array)
             end
           ),
           FastlaneCore::ConfigItem.new(
             key: :expected_authority,
-            description: 'The signing authority the app is expected to be signed by, e.g. `Developer ID Application: Automattic, Inc. (ABCDE12345)`. ' \
+            description: 'The signing authority the artifact is expected to be signed by, e.g. `Developer ID Application: Automattic, Inc. (ABCDE12345)`. ' \
                          + 'When omitted, any valid signature is accepted',
             type: String,
             optional: true,
@@ -76,7 +123,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :verify_notarization,
-            description: 'Whether to also assert that the app is accepted by Gatekeeper and has a notarization ticket stapled to it',
+            description: 'Whether to also assert that the artifact is accepted by Gatekeeper and has a notarization ticket stapled to it',
             type: Boolean,
             default_value: true
           ),
