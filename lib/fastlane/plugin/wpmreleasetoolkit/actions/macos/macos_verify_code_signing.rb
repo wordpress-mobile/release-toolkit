@@ -110,7 +110,10 @@ module Fastlane
             description: 'The path, or list of paths, to the `.app` bundle(s) or `.dmg` disk image(s) to verify',
             is_string: false,
             verify_block: proc do |value|
-              UI.user_error!('`artifact_path` must be a String or an Array of Strings') unless value.is_a?(String) || value.is_a?(Array)
+              next if value.is_a?(String)
+              next if value.is_a?(Array) && value.all?(String)
+
+              UI.user_error!('`artifact_path` must be a String or an Array of Strings')
             end
           ),
           FastlaneCore::ConfigItem.new(
