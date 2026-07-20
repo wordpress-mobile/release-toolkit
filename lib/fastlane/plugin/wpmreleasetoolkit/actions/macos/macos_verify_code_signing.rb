@@ -41,6 +41,10 @@ module Fastlane
       # check that means anything for an unsigned image.
       #
       def self.verify_disk_image(path:, expected_authority:, verify_notarization:)
+        # Said up front because `sh` logs a non-zero exit in red regardless of it being handled,
+        # which reads as a broken build in the CI log of an otherwise passing job.
+        UI.message("Checking whether #{path} is signed. Disk images usually aren't, so a `codesign` failure below is expected and tolerated.")
+
         if signed?(path)
           verify_authority!(path: path, expected_authority: expected_authority) unless expected_authority.nil?
           verify!("#{path} was rejected by Gatekeeper", 'spctl', '--assess', '--type', 'open', '--context', 'context:primary-signature', '--verbose=2', path) if verify_notarization
