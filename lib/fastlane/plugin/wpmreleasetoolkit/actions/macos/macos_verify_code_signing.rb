@@ -109,7 +109,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :expected_authority,
-            description: 'The signing authority the artifact is expected to be signed by, e.g. `Developer ID Application: Automattic, Inc. (ABCDE12345)`. ' \
+            description: 'The signing authority the artifact is expected to be signed by, e.g. `Developer ID Application: ACME, Inc. (ABCDE12345)`. ' \
                          + 'When omitted, any valid signature is accepted',
             type: String,
             optional: true,
