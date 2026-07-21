@@ -46,7 +46,7 @@ module Fastlane
       def self.verify_disk_image(path:, expected_authority:, verify_notarization:)
         # Said up front because `sh` logs a non-zero exit in red regardless of it being handled,
         # which reads as a broken build in the CI log of an otherwise passing job.
-        UI.message("Checking whether #{path} is signed. Disk images usually aren't, so a `codesign` failure below is expected and tolerated.")
+        UI.message("Checking whether #{path} is signed. Disk images usually aren't, so a `codesign` failure due to the image being unsigned is expected and tolerated (other signature failures will still fail).")
 
         if signed?(path)
           verify_authority!(path: path, expected_authority: expected_authority) unless expected_authority.nil?
