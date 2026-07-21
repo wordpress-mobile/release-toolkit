@@ -97,7 +97,7 @@ module Fastlane
 
           - `.app` — the signature is valid and satisfies its designated requirement, Gatekeeper accepts
             the bundle for execution, and a notarization ticket is stapled to it.
-          - `.dmg` — a notarization ticket is stapled to the image.
+          - `.dmg` — if the image is signed, the signature is valid (and can be checked against the expected authority) and Gatekeeper accepts opening it; when `verify_notarization` is true, a notarization ticket is stapled to the image.
         DETAILS
       end
 
