@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'fastlane/action'
+require 'fastlane_core/ui/ui'
+
 module Fastlane
   module Actions
     class MacosVerifyCodeSigningAction < Action
