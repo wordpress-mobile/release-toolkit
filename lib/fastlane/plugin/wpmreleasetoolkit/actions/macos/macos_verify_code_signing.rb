@@ -52,7 +52,7 @@ module Fastlane
           verify_authority!(path: path, expected_authority: expected_authority) unless expected_authority.nil?
           verify!("#{path} was rejected by Gatekeeper", 'spctl', '--assess', '--type', 'open', '--context', 'context:primary-signature', '--verbose=2', path) if verify_notarization
         else
-          UI.important("#{path} is not signed — skipping its signature checks. Only the app it contains carries a signature.")
+          UI.important("#{path} is not signed — skipping its signature checks. We expect that the app it contains is the one carrying the signature.")
         end
 
         verify!("#{path} has no notarization ticket stapled to it", 'xcrun', 'stapler', 'validate', path) if verify_notarization
