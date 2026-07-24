@@ -29,7 +29,7 @@ module Fastlane
       end
 
       def self.verify_app_bundle(path:, expected_authority:, verify_notarization:)
-        verify!("The code signature of #{path} is not valid", 'codesign', '--verify', '--deep', '--strict', '--verbose=2', path)
+        UI.user_error!("#{path} is not signed at all") unless signed?(path, deep: true)
         verify_authority!(path: path, expected_authority: expected_authority) unless expected_authority.nil?
 
         return unless verify_notarization
@@ -61,8 +61,14 @@ module Fastlane
       # Distinguishes an artifact that carries no signature at all from one whose signature is
       # broken: the former is expected for a disk image, the latter always a failure.
       #
-      def self.signed?(path)
-        exitstatus, output = sh('codesign', '--verify', '--strict', '--verbose=2', path) { |status, result, _| [status.exitstatus, result] }
+      # @param deep [Boolean] Whether to also verify the nested code an app bundle embeds.
+      #
+      def self.signed?(path, deep: false)
+        command = ['codesign', '--verify']
+        command << '--deep' if deep
+        command += ['--strict', '--verbose=2', path]
+
+        exitstatus, output = sh(*command) { |status, result, _| [status.exitstatus, result] }
 
         return true if exitstatus.zero?
         return false if output.include?('not signed at all')

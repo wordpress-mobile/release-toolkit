@@ -21,8 +21,8 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
     end
   end
 
-  def expect_codesign_verify_deep(path, exitstatus: 0)
-    expect_shell_command('codesign', '--verify', '--deep', '--strict', '--verbose=2', path, exitstatus: exitstatus)
+  def expect_codesign_verify_deep(path, exitstatus: 0, output: '')
+    expect_shell_command('codesign', '--verify', '--deep', '--strict', '--verbose=2', path, exitstatus: exitstatus, output: output)
   end
 
   def expect_codesign_verify(path, exitstatus: 0, output: '')
@@ -93,10 +93,20 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
 
     it 'fails when the signature is not valid' do
       with_artifacts('Test.app') do |(path)|
-        expect_codesign_verify_deep(path, exitstatus: 1)
+        expect_codesign_verify_deep(path, exitstatus: 1, output: "#{path}: invalid signature (code or signature have been modified)\n")
 
         expect { run_described_fastlane_action(artifact_path: path) }
           .to raise_error(FastlaneCore::Interface::FastlaneError, /The code signature of .*Test\.app is not valid/)
+      end
+    end
+
+    # Unlike a disk image, an app bundle without a signature is always a failure.
+    it 'fails when it is not signed at all' do
+      with_artifacts('Test.app') do |(path)|
+        expect_codesign_verify_deep(path, exitstatus: 1, output: "#{path}: code object is not signed at all\n")
+
+        expect { run_described_fastlane_action(artifact_path: path) }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, /Test\.app is not signed at all/)
       end
     end
 
