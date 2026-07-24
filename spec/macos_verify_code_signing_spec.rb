@@ -229,7 +229,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
 
   it 'fails when `artifact_path` is neither a String nor an Array' do
     expect { run_described_fastlane_action(artifact_path: 42) }
-      .to raise_error(FastlaneCore::Interface::FastlaneError, /`artifact_path` must be a String or an Array of Strings/)
+      .to raise_error(FastlaneCore::Interface::FastlaneError, /'artifact_path' value must be either `Array` or `comma-separated String`!/)
   end
 
   it 'fails when `artifact_path` is an Array of something other than Strings' do

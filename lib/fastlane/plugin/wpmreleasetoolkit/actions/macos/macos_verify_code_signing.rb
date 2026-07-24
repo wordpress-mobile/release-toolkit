@@ -7,7 +7,7 @@ module Fastlane
   module Actions
     class MacosVerifyCodeSigningAction < Action
       def self.run(params)
-        paths = Array(params[:artifact_path])
+        paths = params[:artifact_path]
         UI.user_error!('No artifact to verify: `artifact_path` is empty') if paths.empty?
 
         paths.each do |path|
@@ -112,12 +112,9 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :artifact_path,
             description: 'The path, or list of paths, to the `.app` bundle(s) or `.dmg` disk image(s) to verify',
-            is_string: false,
+            type: Array,
             verify_block: proc do |value|
-              next if value.is_a?(String)
-              next if value.is_a?(Array) && value.all?(String)
-
-              UI.user_error!('`artifact_path` must be a String or an Array of Strings')
+              UI.user_error!('`artifact_path` must be a String or an Array of Strings') unless value.all?(String)
             end
           ),
           FastlaneCore::ConfigItem.new(
