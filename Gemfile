@@ -18,7 +18,7 @@ gem 'danger-dangermattic', '~> 1.0'
 # See also:
 # - https://github.com/fastlane/fastlane/issues/21334
 # - https://github.com/fastlane/fastlane/pull/30089
-gem 'faraday', '~> 1.10', '>= 1.10.5'
+gem 'faraday', '~> 1.10', '>= 1.10.6'
 gem 'pry', '~> 0.12.2'
 gem 'rmagick', '~> 5.3'
 gem 'rspec', '~> 3.8'

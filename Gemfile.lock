@@ -440,7 +440,7 @@ DEPENDENCIES
   buildkite-test_collector (~> 2.3)
   codecov
   danger-dangermattic (~> 1.0)
-  faraday (~> 1.10, >= 1.10.5)
+  faraday (~> 1.10, >= 1.10.6)
   fastlane-plugin-wpmreleasetoolkit!
   pry (~> 0.12.2)
   rmagick (~> 5.3)
