@@ -438,11 +438,9 @@ PLATFORMS
 DEPENDENCIES
   activesupport (~> 8.1)
   buildkite-test_collector (~> 2.3)
-  bundler (~> 2.0)
   codecov
   danger-dangermattic (~> 1.0)
   faraday (~> 1.10, >= 1.10.6)
-  fastlane (~> 2.210)
   fastlane-plugin-wpmreleasetoolkit!
   pry (~> 0.12.2)
   rmagick (~> 5.3)
@@ -455,4 +453,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   2.6.8
+  4.0.17
