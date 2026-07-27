@@ -10,6 +10,20 @@ _None_
 
 ### New Features
 
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 14.11.0
+
+### New Features
+
 - New `macos_verify_code_signing` action, asserting that macOS artifacts are signed, signed by the expected authority, accepted by Gatekeeper, and have a notarization ticket stapled to them. Handles `.app` bundles and `.dmg` disk images, picking the checks that apply to each. [#757]
 
 ### Bug Fixes
