@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+Update the `Dangerfile`'s message about PR reviewers to suggest `apps-infra-tooling` team instead of `apps-infrastructure`. [#761]
 
 ## 14.11.1
 
