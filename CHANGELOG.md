@@ -14,11 +14,17 @@ _None_
 
 ### Bug Fixes
 
-- `create_github_release` no longer crashes with `FrozenError` when the optional `release_notes_file_path` is omitted. [#759]
+_None_
 
 ### Internal Changes
 
 _None_
+
+## 14.11.1
+
+### Bug Fixes
+
+- `create_github_release` no longer crashes with `FrozenError` when the optional `release_notes_file_path` is omitted. [#759]
 
 ## 14.11.0
 
