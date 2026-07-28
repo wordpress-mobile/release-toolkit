@@ -15,7 +15,7 @@ describe Fastlane::Actions::CreateGithubReleaseAction do
 
   context 'when no release notes file is provided' do
     it 'creates the release with an empty description' do
-      expect(github_helper).to receive(:create_release).with(
+      allow(github_helper).to receive(:create_release).with(
         repository: test_repo,
         version: test_version,
         name: nil,
@@ -52,7 +52,7 @@ describe Fastlane::Actions::CreateGithubReleaseAction do
       NOTES
 
       with_tmp_file(named: 'release-notes.txt', content: notes) do |notes_path|
-        expect(github_helper).to receive(:create_release).with(
+        allow(github_helper).to receive(:create_release).with(
           repository: test_repo,
           version: test_version,
           name: nil,
