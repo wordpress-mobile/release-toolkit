@@ -49,4 +49,4 @@ labels_checker.check(
   required_labels: []
 )
 
-warn("No reviewers have been set for this PR yet. Please request a review from **@\u2060wordpress-mobile/apps-infrastructure**.") unless github_utils.requested_reviewers?
+warn("No reviewers have been set for this PR yet. Please request a review from **@\u2060wordpress-mobile/apps-infra-tooling**.") unless github_utils.requested_reviewers?
