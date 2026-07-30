@@ -244,8 +244,26 @@ module Fastlane
         release.html_url
       end
 
+      # Returns all the GitHub Releases of a repository matching a given criteria, sorted from the oldest to the most recent one.
+      #
+      # @param [String] repository The repository to fetch the GitHub Releases from. Typically a repo slug (<org>/<repo>).
+      # @yield [Sawyer::Resource] Each GitHub Release of the repository, to decide whether it matches the criteria.
+      # @yieldreturn [TrueClass|FalseClass] `true` to include that GitHub Release in the returned list.
+      # @return [Array<Sawyer::Resource>] The matching GitHub Releases, sorted from the oldest to the most recently created one.
+      #
+      # @note A repository can legitimately host several GitHub Releases sharing the same name or tag—e.g. when `finalize_release`
+      #       is run more than once for the same version, creating one draft per run—and the GitHub API makes no promise about the
+      #       order in which it returns them. Callers must thus pick explicitly amongst the matches instead of relying on that order.
+      # @note The sort key is the release `id`, not `created_at`: once a GitHub Release is published, GitHub rewrites its `created_at`
+      #       to the date of the commit it targets, so `created_at` is not a reliable creation timestamp. Release `id`s, on the other
+      #       hand, are assigned by GitHub in increasing order as releases are created, including for drafts.
+      #
+      def matching_releases(repository:, &matcher)
+        client.releases(repository).select(&matcher).sort_by { |release| release[:id] }
+      end
+
       def find_release(repository:, version:)
-        release = client.releases(repository).find { |candidate| candidate.tag_name == version }
+        release = matching_releases(repository: repository) { |candidate| candidate.tag_name == version }.last
         return release unless release.nil?
 
         release_for_tag(repository: repository, version: version)
@@ -259,6 +277,7 @@ module Fastlane
         nil
       end
 
+      private :matching_releases
       private :find_release
       private :release_for_tag
 
@@ -306,12 +325,19 @@ module Fastlane
       # @param [Boolean] prerelease Indicates if this should be created as a pre-release (i.e. for alpha/beta)
       #
       # @return [String] URL of the corresponding GitHub Release
+      # @raise [Fastlane::UI::Error] UI.user_error! if no GitHub Release with that name exists.
+      #
+      # @note If several GitHub Releases share that same `name`—which happens when `finalize_release` is run more than once
+      #       for the same version, each run creating its own draft—the most recently created one is the one being published,
+      #       as it is the one targeting the latest commit of the release branch. The other, staler ones are left untouched.
       #
       def publish_release(repository:, name:, prerelease: nil)
-        releases = client.releases(repository)
-        release = releases.find { |r| r.name == name }
+        releases = matching_releases(repository: repository) { |release| release.name == name }
+        UI.user_error!("No release found with name #{name}") if releases.empty?
 
-        UI.user_error!("No release found with name #{name}") unless release
+        release = releases.last
+        UI.important("Found #{releases.count} GitHub Releases named `#{name}`. Publishing the most recently created one, targeting #{release.target_commitish}, and leaving the #{releases.count - 1} older one(s) untouched.") if releases.count > 1
+        UI.important("The most recent GitHub Release named `#{name}` (#{release.html_url}) is not a draft, but has already been published. Updating it nonetheless.") unless release.draft
 
         client.update_release(
           release.url,

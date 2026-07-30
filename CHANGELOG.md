@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- `publish_github_release` now publishes the most recently created GitHub Release when several share the same name—as happens when `finalize_release` is run more than once for the same version, each run creating its own draft—instead of whichever one the GitHub API happened to list first. It also warns when it finds more than one match, or when the release it publishes turns out to have been published already. The tag-based release lookup used by `upload_github_release_assets` picks the most recent match too. [#763]
 
 ### Internal Changes
 
