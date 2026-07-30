@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Run the `GitHelper` git-lfs specs against a sandboxed `GIT_CONFIG_GLOBAL` so they no longer remove the `[filter "lfs"]` section from the developer's global git config.
 
 ## 14.11.1
 
