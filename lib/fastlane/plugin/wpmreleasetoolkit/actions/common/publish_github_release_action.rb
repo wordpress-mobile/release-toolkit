@@ -36,11 +36,13 @@ module Fastlane
 
       def self.details
         <<~DETAILS
-          Publish an existing GitHub Release still in draft mode.
-
-          If several GitHub Releases share the same `name`—which happens when `finalize_release` is run more than
-          once for the same version, each run creating its own draft—the most recently created one is published,
+          Publish an existing draft GitHub Release.
+          
+          If several GitHub Releases share the same `name`, the most recently created one is published,
           as it is the one targeting the latest commit of the release branch.
+           
+          (Multiple releases can exist with the same `name` when the release finalization automation
+          is run more than once for the same version, each run creating its own draft.)
         DETAILS
       end
 

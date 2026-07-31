@@ -337,7 +337,7 @@ module Fastlane
 
         release = releases.last
         UI.important("Found #{releases.count} GitHub Releases named `#{name}`. Publishing the most recently created one, targeting #{release.target_commitish}, and leaving the #{releases.count - 1} older one(s) untouched.") if releases.count > 1
-        UI.important("The most recent GitHub Release named `#{name}` (#{release.html_url}) is not a draft, but has already been published. Updating it nonetheless.") unless release.draft
+        UI.important("The most recent GitHub Release named `#{name}` (#{release.html_url}) has already been published. Updating it nonetheless.") unless release.draft
 
         client.update_release(
           release.url,
