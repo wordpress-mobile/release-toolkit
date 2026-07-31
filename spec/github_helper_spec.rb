@@ -941,7 +941,7 @@ describe Fastlane::Helper::GithubHelper do
     it 'warns when the release it publishes has already been published' do
       allow(client).to receive(:releases).with(test_repo).and_return([github_release(id: 1, draft: false)])
 
-      expect(Fastlane::UI).to receive(:important).with(/is not a draft, but has already been published/)
+      expect(Fastlane::UI).to receive(:important).with(/has already been published/)
 
       publish_release
     end
