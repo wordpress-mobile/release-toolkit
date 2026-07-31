@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-- `publish_github_release` now publishes the most recently created GitHub Release when several share the same name, instead of whichever one the GitHub API happened to list first. It also warns when it finds more than one match, or when the release it publishes turns out to have been published already. The tag-based release lookup used by `upload_github_release_assets` picks the most recent match too. [#763]
+- `publish_github_release` now publishes the most recently created GitHub Release when several share the same name, instead of whichever one the GitHub API happened to list first. It also warns when it finds more than one match, or when the release it publishes turns out to have been published already. The tag-based release lookup used by `upload_github_release_assets` is deterministic too, preferring the published release that owns the tag, and falling back to the most recently created draft when no published release claims it. [#763]
 
 ### Internal Changes
 

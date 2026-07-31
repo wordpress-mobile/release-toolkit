@@ -750,6 +750,26 @@ describe Fastlane::Helper::GithubHelper do
       end
     end
 
+    it 'uses the release owning the tag rather than a more recent draft sharing it' do
+      # The state woocommerce-ios is left in after the 25.1 incident: the release that was published and owns the
+      # `25.1` tag, plus the never-cleaned-up draft created by the second `finalize_release` run, which has a higher
+      # id. A tag can only back one published release, so the published one wins despite being the older of the two.
+      published_release = sawyer_resource_stub(id: 351_929_162, url: 'published-api-url', html_url: 'published-html-url', tag_name: test_version, draft: false)
+      leftover_draft = sawyer_resource_stub(id: 352_002_205, url: 'draft-api-url', html_url: 'draft-html-url', tag_name: test_version, draft: true)
+
+      allow(client).to receive(:releases).with(test_repo).and_return([published_release, leftover_draft])
+      allow(client).to receive(:release_assets).with(published_release.url).and_return([])
+
+      with_tmp_file(named: 'test-app.zip') do |file_path|
+        expect(client).to receive(:upload_asset).with(published_release.url, file_path, { content_type: 'application/octet-stream' })
+        expect(client).not_to receive(:upload_asset).with(leftover_draft.url, any_args)
+
+        result = upload_release_assets(assets: [file_path])
+
+        expect(result).to eq(published_release.html_url)
+      end
+    end
+
     it 'falls back to the direct release-by-tag lookup when the release list misses' do
       with_tmp_file(named: 'test-app.zip') do |file_path|
         allow(client).to receive(:releases).with(test_repo).and_return([])

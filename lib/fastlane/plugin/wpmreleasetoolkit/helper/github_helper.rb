@@ -262,8 +262,18 @@ module Fastlane
         client.releases(repository).select(&matcher).sort_by { |release| release[:id] }
       end
 
+      # Returns the GitHub Release associated with a given tag, if any, including draft ones.
+      #
+      # @note Unlike a lookup by name, "the most recently created match" is not the right answer here: a git tag can
+      #       only ever back a single *published* release, so if one of the matches is not a draft then it is the
+      #       release owning that tag, and a more recent draft sharing the same `tag_name` is a leftover—typically
+      #       from a re-run of the release finalization—rather than a successor. Only when no published release
+      #       claims the tag yet do we fall back to the most recent draft, which is the case when uploading assets
+      #       to a release that has not been published yet.
+      #
       def find_release(repository:, version:)
-        release = matching_releases(repository: repository) { |candidate| candidate.tag_name == version }.last
+        matches = matching_releases(repository: repository) { |candidate| candidate.tag_name == version }
+        release = matches.reject { |candidate| candidate[:draft] }.last || matches.last
         return release unless release.nil?
 
         release_for_tag(repository: repository, version: version)
