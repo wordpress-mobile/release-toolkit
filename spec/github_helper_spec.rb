@@ -737,7 +737,9 @@ describe Fastlane::Helper::GithubHelper do
       stale_release = sawyer_resource_stub(id: 1, url: 'stale-api-url', html_url: 'stale-html-url', tag_name: test_version, draft: true)
       latest_release = sawyer_resource_stub(id: 2, url: 'latest-api-url', html_url: 'latest-html-url', tag_name: test_version, draft: true)
 
-      allow(client).to receive(:releases).with(test_repo).and_return([latest_release, stale_release])
+      # The stale release comes first, so that a lookup relying on the order the API happens to return the releases in
+      # would pick the wrong one.
+      allow(client).to receive(:releases).with(test_repo).and_return([stale_release, latest_release])
       expect(client).not_to receive(:release_for_tag)
       allow(client).to receive(:release_assets).with(latest_release.url).and_return([])
 
@@ -757,7 +759,9 @@ describe Fastlane::Helper::GithubHelper do
       published_release = sawyer_resource_stub(id: 351_929_162, url: 'published-api-url', html_url: 'published-html-url', tag_name: test_version, draft: false)
       leftover_draft = sawyer_resource_stub(id: 352_002_205, url: 'draft-api-url', html_url: 'draft-html-url', tag_name: test_version, draft: true)
 
-      allow(client).to receive(:releases).with(test_repo).and_return([published_release, leftover_draft])
+      # The leftover draft comes first, so that a lookup relying on the order the API happens to return the releases in
+      # would pick the wrong one.
+      allow(client).to receive(:releases).with(test_repo).and_return([leftover_draft, published_release])
       allow(client).to receive(:release_assets).with(published_release.url).and_return([])
 
       with_tmp_file(named: 'test-app.zip') do |file_path|
