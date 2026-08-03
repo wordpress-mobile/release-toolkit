@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'tempfile'
 require 'tmpdir'
 require_relative 'spec_helper'
 
@@ -57,15 +58,19 @@ describe Fastlane::Helper::GitHelper do
 
   it 'can detect a repository with Git-lfs enabled' do
     init_git_repo
-    `git lfs install`
-    expect(described_class.has_git_lfs?).to be true
+    with_sandboxed_global_git_config do
+      `git lfs install`
+      expect(described_class.has_git_lfs?).to be true
+    end
   end
 
   it 'can detect a repository without Git-lfs enabled' do
     init_git_repo
-    `git lfs uninstall &>/dev/null`
-    expect(described_class.is_git_repo?).to be true
-    expect(described_class.has_git_lfs?).to be false
+    with_sandboxed_global_git_config do
+      `git lfs uninstall &>/dev/null`
+      expect(described_class.is_git_repo?).to be true
+      expect(described_class.has_git_lfs?).to be false
+    end
   end
 
   describe 'commit(message:, files:)' do
@@ -260,6 +265,18 @@ end
 
 def init_git_repo
   `git init --initial-branch main || git init`
+end
+
+# `git lfs install` and `git lfs uninstall` write to the global scope unless told
+# otherwise, so without this the examples edit the developer's real `~/.gitconfig`.
+def with_sandboxed_global_git_config
+  Tempfile.create('gitconfig') do |file|
+    original = ENV['GIT_CONFIG_GLOBAL']
+    ENV['GIT_CONFIG_GLOBAL'] = file.path
+    yield
+  ensure
+    ENV['GIT_CONFIG_GLOBAL'] = original
+  end
 end
 
 def add_file_and_commit(file:, message:)
