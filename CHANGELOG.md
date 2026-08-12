@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- `GitHelper.delete_remote_branch_if_exists!` now detects branches directly on the remote instead of requiring a local remote-tracking ref. [#769]
 
 ### Internal Changes
 

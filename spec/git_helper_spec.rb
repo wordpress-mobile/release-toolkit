@@ -186,6 +186,33 @@ describe Fastlane::Helper::GitHelper do
     end
   end
 
+  describe 'delete_remote_branch_if_exists!' do
+    let(:branch_name) { 'automation/update' }
+    let(:remote_name) { 'upstream' }
+
+    before do
+      init_git_repo
+      add_file_and_commit(file: 'file.txt', message: 'Initial commit')
+
+      remote_path = File.join(@path, 'remote.git')
+      `git init --bare --initial-branch main #{remote_path}`
+      `git remote add #{remote_name} #{remote_path}`
+    end
+
+    it 'deletes a branch that exists on the remote without requiring a local tracking ref' do
+      `git push #{remote_name} HEAD:refs/heads/#{branch_name}`
+      `git update-ref -d refs/remotes/#{remote_name}/#{branch_name}`
+
+      expect(`git branch --remotes --list #{remote_name}/#{branch_name}`).to be_empty
+      expect(described_class.delete_remote_branch_if_exists!(branch_name, remote_name: remote_name)).to be true
+      expect(described_class.branch_exists_on_remote?(branch_name: branch_name, remote_name: remote_name)).to be false
+    end
+
+    it 'does nothing when the branch does not exist on the remote' do
+      expect(described_class.delete_remote_branch_if_exists!(branch_name, remote_name: remote_name)).to be false
+    end
+  end
+
   describe '#is_ignored?' do
     let(:path) { 'dummy.txt' }
 
