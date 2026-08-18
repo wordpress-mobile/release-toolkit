@@ -295,7 +295,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
           "#{gp_fake_url.chomp('/')}/#{locale[:glotpress]}/default/export-translations/?filters%5Bstatus%5D=custom-status&filters%5Bwarnings%5D=yes&format=android"
         end
         custom_gp_urls.each do |url|
-          stub_request(:get, url)
+          stub_request(:get, url).to_return(status: 200, body: '<resources />')
         end
 
         # Act
@@ -359,7 +359,28 @@ describe Fastlane::Helper::Android::LocalizeHelper do
             glotpress_filters: [{ status: 'current' }, { status: 'waiting' }],
             locales_map: [{ glotpress: 'fakegploc', android: 'fakeanloc' }]
           )
-        end.to raise_error(Fastlane::Helper::GlotPressDownloader::DownloadError, /500/)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /500/)
+
+        expect(File).not_to exist(generated_file('fakeanloc'))
+      end
+
+      it 'raises when no export filters are provided' do
+        expect do
+          described_class.download_from_glotpress(res_dir: tmpdir, glotpress_project_url: gp_fake_url, glotpress_filters: [], locales_map: [{ glotpress: 'fakegploc', android: 'fakeanloc' }])
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /At least one GlotPress filter is required/)
+      end
+    end
+
+    ['', '<html><body>Service unavailable</body></html>'].each do |response_body|
+      it "raises instead of writing an invalid successful export: #{response_body.inspect}" do
+        FileUtils.mkdir_p(File.dirname(generated_file(nil)))
+        FileUtils.cp(expected_file(nil), generated_file(nil))
+        stub_request(:get, "#{gp_fake_url.chomp('/')}/fakegploc/default/export-translations/?filters%5Bstatus%5D=current&format=android")
+          .to_return(status: 200, body: response_body)
+
+        expect do
+          described_class.download_from_glotpress(res_dir: tmpdir, glotpress_project_url: gp_fake_url, locales_map: [{ glotpress: 'fakegploc', android: 'fakeanloc' }])
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /Invalid Android translation export.*fakegploc/)
 
         expect(File).not_to exist(generated_file('fakeanloc'))
       end
@@ -384,7 +405,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
                # - https://github.com/bblimke/webmock/tree/33d8810c2828fc17010e15cc3f21ad2c726a966f#matching-requests
                # - https://github.com/bblimke/webmock/issues/276#issuecomment-28625436
                headers: { 'User-Agent' => 'Automattic App Release Automator; https://github.com/wordpress-mobile/release-toolkit/' }
-             ).to_return(status: 200, body: '')
+             ).to_return(status: 200, body: '<resources />')
 
       # Act
       described_class.download_from_glotpress(

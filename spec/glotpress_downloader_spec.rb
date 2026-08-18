@@ -27,6 +27,18 @@ describe Fastlane::Helper::GlotPressDownloader do
       expect(downloader.download).to be(true)
     end
 
+    it 'does not report success until the downloaded body has been accepted' do
+      stub_request(:get, test_url)
+        .to_return(status: 200, body: 'invalid content')
+      expect(FastlaneCore::UI).not_to receive(:success)
+
+      downloader = described_class.new(url: test_url, locale: locale, auto_retry: false)
+
+      expect do
+        downloader.download { raise 'invalid downloaded body' }
+      end.to raise_error(RuntimeError, 'invalid downloaded body')
+    end
+
     it 'resets retry counter at start of download' do
       # Counter should be reset to 0 at the start of download() call
       downloader = described_class.new(url: test_url, locale: locale, auto_retry: true)
@@ -105,11 +117,11 @@ describe Fastlane::Helper::GlotPressDownloader do
 
       # Mock non-interactive environment to avoid prompts
       allow(FastlaneCore::UI).to receive(:interactive?).and_return(false)
-      allow(FastlaneCore::UI).to receive(:error)
+      expect(FastlaneCore::UI).to receive(:error).with(/Error downloading locale `test-locale` — 429.*#{Regexp.escape(test_url)}/)
 
       expect do
         downloader.download { |body| body }
-      end.to raise_error(described_class::DownloadError, /429/)
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /429/)
 
       # Should try: 1 initial + 30 retries = 31 total
       expect(a_request(:get, test_url)).to have_been_made.times(31)
@@ -126,7 +138,7 @@ describe Fastlane::Helper::GlotPressDownloader do
 
       expect do
         downloader.download { |body| body }
-      end.to raise_error(described_class::DownloadError, /429/)
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /429/)
 
       # Should only try once (no auto-retry)
       expect(a_request(:get, test_url)).to have_been_made.once
@@ -150,6 +162,19 @@ describe Fastlane::Helper::GlotPressDownloader do
       expect(a_request(:get, redirect_url)).to have_been_made.once
     end
 
+    it 'resolves relative redirect locations' do
+      redirect_url = 'https://translate.wordpress.org/redirected'
+      stub_request(:get, test_url)
+        .to_return(status: 302, headers: { 'Location' => '/redirected' })
+      stub_request(:get, redirect_url)
+        .to_return(status: 200, body: 'redirected content')
+
+      downloader = described_class.new(url: test_url, locale: locale, auto_retry: false)
+
+      expect(downloader.download { |body| body }).to eq('redirected content')
+      expect(a_request(:get, redirect_url)).to have_been_made.once
+    end
+
     it 'raises when a redirect has no location header' do
       stub_request(:get, test_url).to_return(status: 302)
 
@@ -157,7 +182,17 @@ describe Fastlane::Helper::GlotPressDownloader do
 
       expect do
         downloader.download { |body| body }
-      end.to raise_error(described_class::DownloadError, 'Received 302 for `test-locale` but no location header was found.')
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, "Received 302 for `test-locale` but no location header was found (#{test_url}).")
+    end
+
+    it 'raises when the maximum number of redirects is exceeded' do
+      stub_request(:get, test_url)
+        .to_return(status: 302, headers: { 'Location' => test_url })
+
+      downloader = described_class.new(url: test_url, locale: locale, auto_retry: false)
+
+      expect { downloader.download { |body| body } }.to raise_error(FastlaneCore::Interface::FastlaneError, /Too many redirects/)
+      expect(a_request(:get, test_url)).to have_been_made.times(described_class::MAX_REDIRECTS + 1)
     end
   end
 
@@ -173,7 +208,7 @@ describe Fastlane::Helper::GlotPressDownloader do
 
       expect do
         downloader.download { |body| body }
-      end.to raise_error(described_class::DownloadError, /404/)
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /404/)
       expect(a_request(:get, test_url)).to have_been_made.once
     end
 
@@ -186,8 +221,15 @@ describe Fastlane::Helper::GlotPressDownloader do
 
       expect do
         downloader.download { |body| body }
-      end.to raise_error(described_class::DownloadError, /certificate verify failed/)
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /certificate verify failed/)
       expect(a_request(:get, test_url)).to have_been_made.once
+    end
+
+    it 'raises a clean user error for invalid URLs' do
+      invalid_url = 'https://translate.wordpress.org/an invalid path'
+      downloader = described_class.new(url: invalid_url, locale: locale, auto_retry: false)
+
+      expect { downloader.download { |body| body } }.to raise_error(FastlaneCore::Interface::FastlaneError, /Invalid URL for locale `test-locale`.*an invalid path/)
     end
   end
 end

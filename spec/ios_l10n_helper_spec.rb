@@ -400,7 +400,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
         # Act
         expect do
           described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'invalid', filters: nil, destination: dest)
-        end.to raise_error(Fastlane::Helper::GlotPressDownloader::DownloadError, /404 Not Found/)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /404 Not Found/)
         # Assert
         expect(stub).to have_been_made.once
         expect(error_messages).to eq(["Error downloading locale `invalid` — 404 Not Found (#{gp_fake_url}/invalid/default/export-translations/?format=strings)"])

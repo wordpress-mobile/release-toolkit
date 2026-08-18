@@ -196,20 +196,16 @@ module Fastlane
           query_params = (filters || {}).transform_keys { |k| "filters[#{k}]" }.merge(format: 'strings')
           url = "#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}"
 
-          begin
-            Fastlane::Helper::GlotPressDownloader.download(
-              url: url,
-              locale: locale,
-              auto_retry: true
-            ) do |response_body|
-              if destination.is_a?(String)
-                File.write(destination, response_body)
-              else
-                destination.write(response_body)
-              end
+          Fastlane::Helper::GlotPressDownloader.download(
+            url: url,
+            locale: locale,
+            auto_retry: true
+          ) do |response_body|
+            if destination.is_a?(String)
+              File.write(destination, response_body)
+            else
+              destination.write(response_body)
             end
-          rescue Fastlane::Helper::GlotPressDownloader::DownloadError
-            raise
           rescue StandardError => e
             UI.user_error!("Error writing downloaded locale `#{locale}` — #{e.message} (#{url})")
           end

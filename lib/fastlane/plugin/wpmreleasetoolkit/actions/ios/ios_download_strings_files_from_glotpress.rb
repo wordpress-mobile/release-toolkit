@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'tempfile'
+
 module Fastlane
   module Actions
     class IosDownloadStringsFilesFromGlotpressAction < Action
@@ -15,34 +17,45 @@ module Fastlane
           UI.message "Downloading translations for '#{lproj_name}' from GlotPress (#{glotpress_locale}) [#{params[:filters]}]..."
           lproj_dir = File.join(download_dir, "#{lproj_name}.lproj")
           destination = File.join(lproj_dir, "#{params[:table_basename]}.strings")
+          destination_mode = File.exist?(destination) ? File.stat(destination).mode & 0o7777 : 0o644
           FileUtils.mkdir_p(lproj_dir)
 
-          Fastlane::Helper::Ios::L10nHelper.download_glotpress_export_file(
-            project_url: params[:project_url],
-            locale: glotpress_locale,
-            filters: params[:filters],
-            destination: destination
-          )
-          # Do a quick check of the downloaded `.strings` file to ensure it looks valid
-          validate_strings_file(destination) unless params[:skip_file_validation]
+          Tempfile.create([params[:table_basename], '.strings'], lproj_dir) do |temporary_file|
+            Fastlane::Helper::Ios::L10nHelper.download_glotpress_export_file(
+              project_url: params[:project_url],
+              locale: glotpress_locale,
+              filters: params[:filters],
+              destination: temporary_file
+            )
+            temporary_file.flush
+            # Do a quick check of the downloaded `.strings` file to ensure it looks valid
+            validate_strings_file(temporary_file.path, display_path: destination) unless params[:skip_file_validation]
+            File.chmod(destination_mode, temporary_file.path)
+            temporary_file.close
+            FileUtils.mv(temporary_file.path, destination)
+          end
         end
       end
 
       # Validate that a `.strings` file downloaded from GlotPress seems valid and does not contain empty translations
-      def self.validate_strings_file(destination)
-        return unless File.exist?(destination) # If the file failed to download, don't try to validate an non-existing file. We'd already have a separate error for the download failure anyway.
+      def self.validate_strings_file(path, display_path: path)
+        UI.user_error!("The file exported from GlotPress was not created (`#{display_path}`)") unless File.exist?(path)
+        UI.user_error!("The file exported from GlotPress is empty (`#{display_path}`)") if File.empty?(path)
 
-        translations = Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: destination)
-        empty_keys = translations.select { |_, value| value.nil? || value.empty? }.keys.sort
-        unless empty_keys.empty?
-          UI.error(
-            "Found empty translations in `#{destination}` for the following keys: #{empty_keys.inspect}.\n" \
-              + "This is likely a GlotPress bug, and will lead to copies replaced by empty text in the UI.\n" \
-              + 'Please report this to the GlotPress team, and fix the file locally before continuing.'
-          )
+        translations = begin
+          Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: path)
+        rescue StandardError => e
+          UI.user_error!("Error while validating the file exported from GlotPress (`#{display_path}`) - #{e.message.chomp}")
         end
-      rescue StandardError => e
-        UI.error("Error while validating the file exported from GlotPress (`#{destination}`) - #{e.message.chomp}")
+
+        empty_keys = translations.select { |_, value| value.nil? || value.empty? }.keys.sort
+        return if empty_keys.empty?
+
+        UI.user_error!(
+          "Found empty translations in `#{display_path}` for the following keys: #{empty_keys.inspect}.\n" \
+            + "This is likely a GlotPress bug, and will lead to copies replaced by empty text in the UI.\n" \
+            + 'Please report this to the GlotPress team, and fix the file locally before continuing.'
+        )
       end
 
       #####################################################

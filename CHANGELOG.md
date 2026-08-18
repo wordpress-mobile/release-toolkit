@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-- Fail translation download actions when a GlotPress request or downloaded metadata is invalid, preventing CI jobs from silently succeeding without updated translations. [#771]
+- Fail translation download actions when a GlotPress request or downloaded translation data is invalid, preventing CI jobs from silently succeeding without updated translations. [#771]
 
 ### Internal Changes
 

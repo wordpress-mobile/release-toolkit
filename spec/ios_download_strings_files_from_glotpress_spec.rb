@@ -84,7 +84,7 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
         end
 
         # Assert
-        expect { act.call }.to raise_error(Fastlane::Helper::GlotPressDownloader::DownloadError, /404 Not Found/)
+        expect { act.call }.to raise_error(FastlaneCore::Interface::FastlaneError, /404 Not Found/)
         expect(stub).to have_been_made.once
         expect(File).not_to exist(File.join(tmp_dir, 'Base.lproj', 'Localizable.strings'))
         expect(error_messages).to eq(["Error downloading locale `unknown-locale` — 404 Not Found (#{gp_fake_url}/unknown-locale/default/export-translations/?filters%5Bstatus%5D=current&format=strings)"])
@@ -109,55 +109,46 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
       expect { act.call }.to raise_error(FastlaneCore::Interface::FastlaneError, "The parent directory `#{download_dir}` (which contains all the `*.lproj` subdirectories) must already exist")
     end
 
-    it 'reports if a downloaded file is not a valid `.strings` file' do
-      Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
-        # Arrange
-        stub = gp_stub(locale: 'fr-FR', query: { 'filters[status]': 'current', format: 'strings' }).to_return(body: 'some invalid strings file content')
-        error_messages = []
-        allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+    [
+      ['invalid', 'some invalid strings file content', /Error while validating the file exported from GlotPress.*Property List error/m],
+      ['empty', '', /file exported from GlotPress is empty/],
+    ].each do |description, response_body, expected_error|
+      it "raises without replacing the existing file if a download is #{description}" do
+        Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
+          stub = gp_stub(locale: 'fr-FR', query: { 'filters[status]': 'current', format: 'strings' }).to_return(body: response_body)
+          file = File.join(tmp_dir, 'fr.lproj', 'Localizable.strings')
+          FileUtils.mkdir_p(File.dirname(file))
+          File.write(file, 'existing valid content')
 
-        # Act
-        run_described_fastlane_action(
-          project_url: gp_fake_url,
-          locales: { 'fr-FR': 'fr' },
-          download_dir: tmp_dir
-        )
+          expect do
+            run_described_fastlane_action(project_url: gp_fake_url, locales: { 'fr-FR': 'fr' }, download_dir: tmp_dir)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, expected_error)
 
-        # Assert
-        expect(stub).to have_been_made.once
-        file = File.join(tmp_dir, 'fr.lproj', 'Localizable.strings')
-        expect(File).to exist(file)
-        expected_error = 'Property List error: Unexpected character s at line 1 / JSON error: JSON text did not start with array or object and option to allow fragments not set.'
-        expect(error_messages.count).to eq(1)
-        expect(error_messages.first).to start_with("Error while validating the file exported from GlotPress (`#{file}`) - #{file}: #{expected_error}") # Different versions of `plutil` might append the line/column as well, but not all.
+          expect(stub).to have_been_made.once
+          expect(File.read(file)).to eq('existing valid content')
+        end
       end
     end
 
-    it 'reports if a downloaded file has empty translations' do
+    it 'raises if a downloaded file has empty translations' do
       Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
         # Arrange
         stub = gp_stub(locale: 'fr-FR', query: { 'filters[status]': 'current', format: 'strings' })
                .to_return(body: ['"key1" = "value1";', '"key2" = "";', '"key3" = "";', '/* translators: use "" quotes please */', '"key4" = "value4";'].join("\n"))
-        error_messages = []
-        allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
 
         # Act
-        run_described_fastlane_action(
-          project_url: gp_fake_url,
-          locales: { 'fr-FR': 'fr' },
-          download_dir: tmp_dir
-        )
+        expect do
+          run_described_fastlane_action(
+            project_url: gp_fake_url,
+            locales: { 'fr-FR': 'fr' },
+            download_dir: tmp_dir
+          )
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /Found empty translations.*\["key2", "key3"\]/m)
 
         # Assert
         expect(stub).to have_been_made.once
         file = File.join(tmp_dir, 'fr.lproj', 'Localizable.strings')
-        expect(File).to exist(file)
-        expected_error = <<~MSG.chomp
-          Found empty translations in `#{file}` for the following keys: ["key2", "key3"].
-          This is likely a GlotPress bug, and will lead to copies replaced by empty text in the UI.
-          Please report this to the GlotPress team, and fix the file locally before continuing.
-        MSG
-        expect(error_messages).to eq([expected_error])
+        expect(File).not_to exist(file)
       end
     end
 

@@ -23,7 +23,7 @@ module Fastlane
           locale: target_locale,
           auto_retry: @auto_retry
         ) do |response_body|
-          handle_glotpress_response(response_body: response_body, locale: target_locale, is_source: is_source)
+          handle_glotpress_response(response_body: response_body, locale: target_locale, is_source: is_source, url: glotpress_url)
         end
       end
 
@@ -106,14 +106,27 @@ module Fastlane
 
       private
 
-      def handle_glotpress_response(response_body:, locale:, is_source:)
+      def handle_glotpress_response(response_body:, locale:, is_source:, url:)
         # Parse the JSON response
         @alternates.clear
         loc_data = JSON.parse(response_body)
+        unless valid_metadata_response?(loc_data)
+          UI.user_error!("Unexpected GlotPress metadata response for locale `#{locale}` (#{url})")
+        end
+
         parse_data(locale, loc_data, is_source)
         reparse_alternates(locale, loc_data, is_source) unless @alternates.empty?
-      rescue JSON::ParserError => e
-        UI.user_error!("Error parsing GlotPress response for locale `#{locale}` — #{e.message}")
+      rescue JSON::ParserError, TypeError => e
+        UI.user_error!("Error parsing GlotPress response for locale `#{locale}` — #{e.message} (#{url})")
+      end
+
+      def valid_metadata_response?(loc_data)
+        return loc_data.empty? if loc_data.is_a?(Array)
+        return false unless loc_data.is_a?(Hash) && !loc_data.empty?
+
+        loc_data.all? do |source, translations|
+          source.is_a?(String) && translations.is_a?(Array) && translations.all?(String)
+        end
       end
     end
   end

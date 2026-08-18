@@ -246,6 +246,7 @@ module Fastlane
         #
         def self.download_from_glotpress(res_dir:, glotpress_project_url:, locales_map:, glotpress_filters: { status: 'current' })
           glotpress_filters = [glotpress_filters] unless glotpress_filters.is_a?(Array)
+          UI.user_error!('At least one GlotPress filter is required.') if glotpress_filters.empty?
 
           orig_file = File.join(res_dir, 'values', 'strings.xml')
           orig_xml = File.open(orig_file) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
@@ -255,7 +256,6 @@ module Fastlane
               UI.message "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]}) [#{filters}]..."
               download_glotpress_export_file(project_url: glotpress_project_url, locale: lang_codes[:glotpress], filters: filters)
             end
-            next if all_xml_documents.empty?
 
             # Merge all XMLs together
             merged_xml = merge_xml_documents(all_xml_documents)
@@ -294,7 +294,17 @@ module Fastlane
             auto_retry: true
           ) do |response_body|
             # Replace tabs with spaces (GlotPress uses tabs, but we prefer spaces)
-            Nokogiri::XML(response_body.gsub("\t", '    '), nil, Encoding::UTF_8.to_s)
+            begin
+              xml = Nokogiri::XML(response_body.gsub("\t", '    '), nil, Encoding::UTF_8.to_s, &:strict)
+            rescue Nokogiri::XML::SyntaxError => e
+              UI.user_error!("Invalid Android translation export for locale `#{locale}` — #{e.message} (#{url})")
+            end
+
+            unless xml.root&.name == 'resources'
+              UI.user_error!("Invalid Android translation export for locale `#{locale}` — expected a `resources` root element (#{url})")
+            end
+
+            xml
           end
         end
         private_class_method :download_glotpress_export_file
