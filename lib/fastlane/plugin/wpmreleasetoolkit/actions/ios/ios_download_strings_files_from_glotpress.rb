@@ -17,19 +17,33 @@ module Fastlane
           UI.message "Downloading translations for '#{lproj_name}' from GlotPress (#{glotpress_locale}) [#{params[:filters]}]..."
           lproj_dir = File.join(download_dir, "#{lproj_name}.lproj")
           destination = File.join(lproj_dir, "#{params[:table_basename]}.strings")
-          destination_mode = File.exist?(destination) ? File.stat(destination).mode & 0o7777 : 0o644
           FileUtils.mkdir_p(lproj_dir)
 
-          Tempfile.create([params[:table_basename], '.strings'], lproj_dir) do |temporary_file|
+          unless params[:fail_on_error]
             Fastlane::Helper::Ios::L10nHelper.download_glotpress_export_file(
               project_url: params[:project_url],
               locale: glotpress_locale,
               filters: params[:filters],
-              destination: temporary_file
+              destination: destination
             )
+            validate_strings_file(destination) unless params[:skip_file_validation]
+            next
+          end
+
+          destination_mode = File.exist?(destination) ? File.stat(destination).mode & 0o7777 : 0o644
+          Tempfile.create([params[:table_basename], '.strings'], lproj_dir) do |temporary_file|
+            downloaded = Fastlane::Helper::Ios::L10nHelper.download_glotpress_export_file(
+              project_url: params[:project_url],
+              locale: glotpress_locale,
+              filters: params[:filters],
+              destination: temporary_file,
+              fail_on_error: true
+            )
+            next unless downloaded
+
             temporary_file.flush
             # Do a quick check of the downloaded `.strings` file to ensure it looks valid
-            validate_strings_file(temporary_file.path, display_path: destination) unless params[:skip_file_validation]
+            validate_strings_file(temporary_file.path, display_path: destination, fail_on_error: true) unless params[:skip_file_validation]
             File.chmod(destination_mode, temporary_file.path)
             temporary_file.close
             FileUtils.mv(temporary_file.path, destination)
@@ -38,25 +52,40 @@ module Fastlane
       end
 
       # Validate that a `.strings` file downloaded from GlotPress seems valid and does not contain empty translations
-      def self.validate_strings_file(path, display_path: path)
-        UI.user_error!("The file exported from GlotPress was not created (`#{display_path}`)") unless File.exist?(path)
-        UI.user_error!("The file exported from GlotPress is empty (`#{display_path}`)") if File.empty?(path)
+      def self.validate_strings_file(path, display_path: path, fail_on_error: false)
+        unless File.exist?(path)
+          report_validation_error("The file exported from GlotPress was not created (`#{display_path}`)", fail_on_error: fail_on_error) if fail_on_error
+          return
+        end
 
-        translations = begin
-          Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: path)
+        if File.empty?(path)
+          report_validation_error("The file exported from GlotPress is empty (`#{display_path}`)", fail_on_error: fail_on_error) if fail_on_error
+          return
+        end
+
+        translations = nil
+        begin
+          translations = Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: path)
         rescue StandardError => e
-          UI.user_error!("Error while validating the file exported from GlotPress (`#{display_path}`) - #{e.message.chomp}")
+          report_validation_error("Error while validating the file exported from GlotPress (`#{display_path}`) - #{e.message.chomp}", fail_on_error: fail_on_error)
+          return
         end
 
         empty_keys = translations.select { |_, value| value.nil? || value.empty? }.keys.sort
         return if empty_keys.empty?
 
-        UI.user_error!(
+        report_validation_error(
           "Found empty translations in `#{display_path}` for the following keys: #{empty_keys.inspect}.\n" \
             + "This is likely a GlotPress bug, and will lead to copies replaced by empty text in the UI.\n" \
-            + 'Please report this to the GlotPress team, and fix the file locally before continuing.'
+            + 'Please report this to the GlotPress team, and fix the file locally before continuing.',
+          fail_on_error: fail_on_error
         )
       end
+
+      def self.report_validation_error(message, fail_on_error:)
+        fail_on_error ? UI.user_error!(message) : UI.error(message)
+      end
+      private_class_method :report_validation_error
 
       #####################################################
       # @!group Documentation
@@ -102,6 +131,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :skip_file_validation,
                                        env_name: 'FL_IOS_DOWNLOAD_STRINGS_FILES_FROM_GLOTPRESS_SKIP_FILE_VALIDATION',
                                        description: 'If true, skips the validation of `.strings` files after download',
+                                       type: Fastlane::Boolean,
+                                       optional: true,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :fail_on_error,
+                                       env_name: 'FL_IOS_DOWNLOAD_STRINGS_FILES_FROM_GLOTPRESS_FAIL_ON_ERROR',
+                                       description: 'Whether to fail when a GlotPress request or downloaded response is invalid',
                                        type: Fastlane::Boolean,
                                        optional: true,
                                        default_value: false),

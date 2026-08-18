@@ -357,7 +357,8 @@ describe Fastlane::Helper::Android::LocalizeHelper do
             res_dir: tmpdir,
             glotpress_project_url: gp_fake_url,
             glotpress_filters: [{ status: 'current' }, { status: 'waiting' }],
-            locales_map: [{ glotpress: 'fakegploc', android: 'fakeanloc' }]
+            locales_map: [{ glotpress: 'fakegploc', android: 'fakeanloc' }],
+            fail_on_error: true
           )
         end.to raise_error(FastlaneCore::Interface::FastlaneError, /500/)
 
@@ -366,7 +367,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
 
       it 'raises when no export filters are provided' do
         expect do
-          described_class.download_from_glotpress(res_dir: tmpdir, glotpress_project_url: gp_fake_url, glotpress_filters: [], locales_map: [{ glotpress: 'fakegploc', android: 'fakeanloc' }])
+          described_class.download_from_glotpress(res_dir: tmpdir, glotpress_project_url: gp_fake_url, glotpress_filters: [], locales_map: [{ glotpress: 'fakegploc', android: 'fakeanloc' }], fail_on_error: true)
         end.to raise_error(FastlaneCore::Interface::FastlaneError, /At least one GlotPress filter is required/)
       end
     end
@@ -379,11 +380,23 @@ describe Fastlane::Helper::Android::LocalizeHelper do
           .to_return(status: 200, body: response_body)
 
         expect do
-          described_class.download_from_glotpress(res_dir: tmpdir, glotpress_project_url: gp_fake_url, locales_map: [{ glotpress: 'fakegploc', android: 'fakeanloc' }])
+          described_class.download_from_glotpress(res_dir: tmpdir, glotpress_project_url: gp_fake_url, locales_map: [{ glotpress: 'fakegploc', android: 'fakeanloc' }], fail_on_error: true)
         end.to raise_error(FastlaneCore::Interface::FastlaneError, /Invalid Android translation export.*fakegploc/)
 
         expect(File).not_to exist(generated_file('fakeanloc'))
       end
+    end
+
+    it 'retains permissive response handling by default' do
+      FileUtils.mkdir_p(File.dirname(generated_file(nil)))
+      FileUtils.cp(expected_file(nil), generated_file(nil))
+      body = '<html><body>Service unavailable</body></html>'
+      stub_request(:get, "#{gp_fake_url.chomp('/')}/fakegploc/default/export-translations/?filters%5Bstatus%5D=current&format=android").to_return(status: 200, body: body)
+
+      expect do
+        described_class.download_from_glotpress(res_dir: tmpdir, glotpress_project_url: gp_fake_url, locales_map: [{ glotpress: 'fakegploc', android: 'fakeanloc' }])
+      end.not_to raise_error
+      expect(File.read(generated_file('fakeanloc'))).to include('<html ')
     end
 
     it 'sets a predefined User Agent so GlotPress will not rate-limit us' do

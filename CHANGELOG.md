@@ -10,11 +10,11 @@ _None_
 
 ### New Features
 
-_None_
+- Add an opt-in `fail_on_error` mode to translation download actions so GlotPress request and response errors fail CI jobs. [#771]
 
 ### Bug Fixes
 
-- Fail translation download actions when a GlotPress request or downloaded translation data is invalid, preventing CI jobs from silently succeeding without updated translations. [#771]
+_None_
 
 ### Internal Changes
 

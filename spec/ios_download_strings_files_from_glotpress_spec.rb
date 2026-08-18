@@ -79,7 +79,8 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
           run_described_fastlane_action(
             project_url: gp_fake_url,
             locales: { 'unknown-locale': 'Base' },
-            download_dir: tmp_dir
+            download_dir: tmp_dir,
+            fail_on_error: true
           )
         end
 
@@ -109,6 +110,24 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
       expect { act.call }.to raise_error(FastlaneCore::Interface::FastlaneError, "The parent directory `#{download_dir}` (which contains all the `*.lproj` subdirectories) must already exist")
     end
 
+    it 'reports invalid files without failing by default' do
+      Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
+        body = 'some invalid strings file content'
+        stub = gp_stub(locale: 'fr-FR', query: { 'filters[status]': 'current', format: 'strings' }).to_return(body: body)
+        error_messages = []
+        allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+
+        expect do
+          run_described_fastlane_action(project_url: gp_fake_url, locales: { 'fr-FR': 'fr' }, download_dir: tmp_dir)
+        end.not_to raise_error
+
+        file = File.join(tmp_dir, 'fr.lproj', 'Localizable.strings')
+        expect(stub).to have_been_made.once
+        expect(File.read(file)).to eq(body)
+        expect(error_messages.first).to start_with('Error while validating the file exported from GlotPress')
+      end
+    end
+
     [
       ['invalid', 'some invalid strings file content', /Error while validating the file exported from GlotPress.*Property List error/m],
       ['empty', '', /file exported from GlotPress is empty/],
@@ -121,7 +140,7 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
           File.write(file, 'existing valid content')
 
           expect do
-            run_described_fastlane_action(project_url: gp_fake_url, locales: { 'fr-FR': 'fr' }, download_dir: tmp_dir)
+            run_described_fastlane_action(project_url: gp_fake_url, locales: { 'fr-FR': 'fr' }, download_dir: tmp_dir, fail_on_error: true)
           end.to raise_error(FastlaneCore::Interface::FastlaneError, expected_error)
 
           expect(stub).to have_been_made.once
@@ -141,7 +160,8 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
           run_described_fastlane_action(
             project_url: gp_fake_url,
             locales: { 'fr-FR': 'fr' },
-            download_dir: tmp_dir
+            download_dir: tmp_dir,
+            fail_on_error: true
           )
         end.to raise_error(FastlaneCore::Interface::FastlaneError, /Found empty translations.*\["key2", "key3"\]/m)
 

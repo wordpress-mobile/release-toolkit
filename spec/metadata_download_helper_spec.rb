@@ -18,7 +18,7 @@ describe Fastlane::Helper::MetadataDownloader do
     allow(FastlaneCore::UI).to receive(:interactive?).and_return(false)
 
     in_tmp_dir do |tmpdir|
-      downloader = described_class.new(tmpdir, target_files, false)
+      downloader = described_class.new(tmpdir, target_files, false, fail_on_error: true)
 
       expect do
         downloader.download('fr', test_url, false)
@@ -32,7 +32,7 @@ describe Fastlane::Helper::MetadataDownloader do
 
       in_tmp_dir do |tmpdir|
         existing_file = existing_metadata_file(tmpdir)
-        downloader = described_class.new(tmpdir, target_files, false)
+        downloader = described_class.new(tmpdir, target_files, false, fail_on_error: true)
 
         expect { downloader.download('fr', test_url, false) }.to raise_error(FastlaneCore::Interface::FastlaneError, /GlotPress.*locale `fr`.*#{Regexp.escape(test_url)}/)
         expect(File.read(existing_file)).to eq('Existing release notes')
@@ -45,10 +45,22 @@ describe Fastlane::Helper::MetadataDownloader do
 
     in_tmp_dir do |tmpdir|
       existing_file = existing_metadata_file(tmpdir)
-      downloader = described_class.new(tmpdir, target_files, false)
+      downloader = described_class.new(tmpdir, target_files, false, fail_on_error: true)
 
       downloader.download('fr', test_url, false)
 
+      expect(File).not_to exist(existing_file)
+    end
+  end
+
+  it 'retains legacy malformed-response handling by default' do
+    stub_request(:get, test_url).to_return(status: 200, body: '{')
+
+    in_tmp_dir do |tmpdir|
+      existing_file = existing_metadata_file(tmpdir)
+      downloader = described_class.new(tmpdir, target_files, false)
+
+      expect { downloader.download('fr', test_url, false) }.not_to raise_error
       expect(File).not_to exist(existing_file)
     end
   end

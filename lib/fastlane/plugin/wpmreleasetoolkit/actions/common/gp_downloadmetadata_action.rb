@@ -13,12 +13,13 @@ module Fastlane
         UI.message "Source locale: #{params[:source_locale].nil? ? '-' : params[:source_locale]}"
         UI.message "Path: #{params[:download_path]}"
         UI.message "Auto-retry: #{params[:auto_retry]}"
+        UI.message "Fail on error: #{params[:fail_on_error]}"
 
         # Check download path
         FileUtils.mkdir_p(params[:download_path])
 
         # Download
-        downloader = Fastlane::Helper::MetadataDownloader.new(params[:download_path], params[:target_files], params[:auto_retry])
+        downloader = Fastlane::Helper::MetadataDownloader.new(params[:download_path], params[:target_files], params[:auto_retry], fail_on_error: params[:fail_on_error])
 
         params[:locales].each do |loc|
           if loc.is_a?(Array)
@@ -77,6 +78,12 @@ module Fastlane
                                        type: FastlaneCore::Boolean,
                                        optional: true,
                                        default_value: true),
+          FastlaneCore::ConfigItem.new(key: :fail_on_error,
+                                       env_name: 'FL_DOWNLOAD_METADATA_FAIL_ON_ERROR',
+                                       description: 'Whether to fail when a GlotPress request or downloaded response is invalid',
+                                       type: FastlaneCore::Boolean,
+                                       optional: true,
+                                       default_value: false),
         ]
       end
 

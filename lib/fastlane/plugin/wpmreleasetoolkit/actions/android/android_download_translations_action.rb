@@ -19,7 +19,8 @@ module Fastlane
           res_dir: res_dir,
           glotpress_project_url: params[:glotpress_url],
           glotpress_filters: params[:status_filter].map { |s| { status: s } },
-          locales_map: params[:locales]
+          locales_map: params[:locales],
+          fail_on_error: params[:fail_on_error]
         )
 
         # Update submodules then lint translations
@@ -96,6 +97,13 @@ module Fastlane
             key: :skip_commit,
             env_name: 'FL_DOWNLOAD_TRANSLATIONS_SKIP_COMMIT',
             description: 'If set to true, will skip the commit step',
+            type: Boolean,
+            default_value: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :fail_on_error,
+            env_name: 'FL_DOWNLOAD_TRANSLATIONS_FAIL_ON_ERROR',
+            description: 'Whether to fail when a GlotPress request or downloaded response is invalid',
             type: Boolean,
             default_value: false
           ),

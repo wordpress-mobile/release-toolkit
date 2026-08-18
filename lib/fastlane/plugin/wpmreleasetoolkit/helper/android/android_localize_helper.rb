@@ -243,10 +243,11 @@ module Fastlane
         # @param [Array<Hash{Symbol=>String}>] locales_map
         #        An array of locales to download. Each item in the array must be a Hash
         #        with keys `:glotpress` and `:android` containing the respective locale codes.
+        # @param [Boolean] fail_on_error Whether to fail on request errors or invalid downloaded XML.
         #
-        def self.download_from_glotpress(res_dir:, glotpress_project_url:, locales_map:, glotpress_filters: { status: 'current' })
+        def self.download_from_glotpress(res_dir:, glotpress_project_url:, locales_map:, glotpress_filters: { status: 'current' }, fail_on_error: false)
           glotpress_filters = [glotpress_filters] unless glotpress_filters.is_a?(Array)
-          UI.user_error!('At least one GlotPress filter is required.') if glotpress_filters.empty?
+          UI.user_error!('At least one GlotPress filter is required.') if fail_on_error && glotpress_filters.empty?
 
           orig_file = File.join(res_dir, 'values', 'strings.xml')
           orig_xml = File.open(orig_file) { |f| Nokogiri::XML(f, nil, Encoding::UTF_8.to_s) }
@@ -254,8 +255,9 @@ module Fastlane
           locales_map.each do |lang_codes|
             all_xml_documents = glotpress_filters.map do |filters|
               UI.message "Downloading translations for '#{lang_codes[:android]}' from GlotPress (#{lang_codes[:glotpress]}) [#{filters}]..."
-              download_glotpress_export_file(project_url: glotpress_project_url, locale: lang_codes[:glotpress], filters: filters)
-            end
+              download_glotpress_export_file(project_url: glotpress_project_url, locale: lang_codes[:glotpress], filters: filters, fail_on_error: fail_on_error)
+            end.compact
+            next if all_xml_documents.empty?
 
             # Merge all XMLs together
             merged_xml = merge_xml_documents(all_xml_documents)
@@ -282,29 +284,35 @@ module Fastlane
         # @param [String] locale The GlotPress locale code to download strings for.
         # @param [Hash{Symbol=>String}] filters The hash of filters to apply when exporting from GlotPress.
         #                               Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
+        # @param [Boolean] fail_on_error Whether to fail on request errors or invalid downloaded XML.
         # @return [Nokogiri::XML::Document] the download XML document, parsed as a Nokogiri::XML object
         #
-        def self.download_glotpress_export_file(project_url:, locale:, filters:)
+        def self.download_glotpress_export_file(project_url:, locale:, filters:, fail_on_error:)
           query_params = filters.transform_keys { |k| "filters[#{k}]" }.merge(format: 'android')
           url = "#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}"
 
           Fastlane::Helper::GlotPressDownloader.download(
             url: url,
             locale: locale,
-            auto_retry: true
+            auto_retry: true,
+            fail_on_error: fail_on_error
           ) do |response_body|
             # Replace tabs with spaces (GlotPress uses tabs, but we prefer spaces)
-            begin
-              xml = Nokogiri::XML(response_body.gsub("\t", '    '), nil, Encoding::UTF_8.to_s, &:strict)
-            rescue Nokogiri::XML::SyntaxError => e
-              UI.user_error!("Invalid Android translation export for locale `#{locale}` — #{e.message} (#{url})")
-            end
+            if fail_on_error
+              begin
+                xml = Nokogiri::XML(response_body.gsub("\t", '    '), nil, Encoding::UTF_8.to_s, &:strict)
+              rescue Nokogiri::XML::SyntaxError => e
+                UI.user_error!("Invalid Android translation export for locale `#{locale}` — #{e.message} (#{url})")
+              end
 
-            unless xml.root&.name == 'resources'
-              UI.user_error!("Invalid Android translation export for locale `#{locale}` — expected a `resources` root element (#{url})")
-            end
+              unless xml.root&.name == 'resources'
+                UI.user_error!("Invalid Android translation export for locale `#{locale}` — expected a `resources` root element (#{url})")
+              end
 
-            xml
+              xml
+            else
+              Nokogiri::XML(response_body.gsub("\t", '    '), nil, Encoding::UTF_8.to_s)
+            end
           end
         end
         private_class_method :download_glotpress_export_file

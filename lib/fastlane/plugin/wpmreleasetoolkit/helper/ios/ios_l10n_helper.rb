@@ -191,15 +191,17 @@ module Fastlane
         # @param [Hash{Symbol=>String}] filters The hash of filters to apply when exporting from GlotPress.
         #                               Typical examples include `{ status: 'current' }` or `{ status: 'review' }`.
         # @param [String, IO] destination The path or `IO`-like instance, where to write the downloaded file on disk.
+        # @param [Boolean] fail_on_error Whether to fail on request errors.
         #
-        def self.download_glotpress_export_file(project_url:, locale:, filters:, destination:)
+        def self.download_glotpress_export_file(project_url:, locale:, filters:, destination:, fail_on_error: false)
           query_params = (filters || {}).transform_keys { |k| "filters[#{k}]" }.merge(format: 'strings')
           url = "#{project_url.chomp('/')}/#{locale}/default/export-translations/?#{URI.encode_www_form(query_params)}"
 
           Fastlane::Helper::GlotPressDownloader.download(
             url: url,
             locale: locale,
-            auto_retry: true
+            auto_retry: true,
+            fail_on_error: fail_on_error
           ) do |response_body|
             if destination.is_a?(String)
               File.write(destination, response_body)
@@ -207,7 +209,10 @@ module Fastlane
               destination.write(response_body)
             end
           rescue StandardError => e
-            UI.user_error!("Error writing downloaded locale `#{locale}` — #{e.message} (#{url})")
+            prefix = fail_on_error ? 'Error writing downloaded locale' : 'Error downloading locale'
+            message = "#{prefix} `#{locale}` — #{e.message} (#{url})"
+            fail_on_error ? UI.user_error!(message) : UI.error(message)
+            nil
           end
         end
       end
