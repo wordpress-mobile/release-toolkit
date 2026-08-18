@@ -102,7 +102,6 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :fail_on_error,
-            env_name: 'FL_DOWNLOAD_TRANSLATIONS_FAIL_ON_ERROR',
             description: 'Whether to fail when a GlotPress request or downloaded response is invalid',
             type: Boolean,
             default_value: false

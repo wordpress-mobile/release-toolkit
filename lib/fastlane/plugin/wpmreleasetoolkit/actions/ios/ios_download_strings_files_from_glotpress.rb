@@ -135,7 +135,6 @@ module Fastlane
                                        optional: true,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :fail_on_error,
-                                       env_name: 'FL_IOS_DOWNLOAD_STRINGS_FILES_FROM_GLOTPRESS_FAIL_ON_ERROR',
                                        description: 'Whether to fail when a GlotPress request or downloaded response is invalid',
                                        type: Fastlane::Boolean,
                                        optional: true,

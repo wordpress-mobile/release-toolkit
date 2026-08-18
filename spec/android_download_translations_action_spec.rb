@@ -23,5 +23,6 @@ describe Fastlane::Actions::AndroidDownloadTranslationsAction do
     option = described_class.available_options.find { |item| item.key == :fail_on_error }
 
     expect(option.default_value).to be(false)
+    expect(option.env_name).to be_nil
   end
 end

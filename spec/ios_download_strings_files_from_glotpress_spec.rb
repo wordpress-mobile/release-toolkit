@@ -12,6 +12,12 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
     stub_request(:get, "#{gp_fake_url}/#{locale}/default/export-translations/").with(query: query)
   end
 
+  it 'does not expose fail_on_error through an environment variable' do
+    option = described_class.available_options.find { |item| item.key == :fail_on_error }
+
+    expect(option.env_name).to be_nil
+  end
+
   describe 'downloading export files from GlotPress' do
     def test_gp_download(filters:, tablename:, expected_gp_params:)
       Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
