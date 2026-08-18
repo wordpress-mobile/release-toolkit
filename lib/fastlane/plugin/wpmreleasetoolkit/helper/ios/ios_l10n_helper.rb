@@ -212,7 +212,7 @@ module Fastlane
             prefix = fail_on_error ? 'Error writing downloaded locale' : 'Error downloading locale'
             message = "#{prefix} `#{locale}` — #{e.message} (#{url})"
             fail_on_error ? UI.user_error!(message) : UI.error(message)
-            nil
+            false
           end
         end
       end

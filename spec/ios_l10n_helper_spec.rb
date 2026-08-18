@@ -409,12 +409,14 @@ describe Fastlane::Helper::Ios::L10nHelper do
         stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations/").with(query: { format: 'strings' }).to_return(body: 'content')
         error_messages = []
         allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+        expect(FastlaneCore::UI).not_to receive(:success)
         dest = '/these/are/not/the/droids/you/are/looking/for.strings'
         # Act
-        described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: nil, destination: dest)
+        result = described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: nil, destination: dest)
         # Assert
         expect(stub).to have_been_made.once
         expect(File).not_to exist(dest)
+        expect(result).to be(false)
         expect(error_messages).to eq(["Error downloading locale `fr` — No such file or directory @ rb_sysopen - #{dest} (#{gp_fake_url}/fr/default/export-translations/?format=strings)"])
       end
     end

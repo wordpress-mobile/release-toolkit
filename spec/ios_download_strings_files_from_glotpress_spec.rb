@@ -134,6 +134,21 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
       end
     end
 
+    it 'raises before downloading if the strict destination is not a regular file' do
+      Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
+        destination = File.join(tmp_dir, 'fr.lproj', 'Localizable.strings')
+        FileUtils.mkdir_p(destination)
+        stub = gp_stub(locale: 'fr-FR', query: { 'filters[status]': 'current', format: 'strings' }).to_return(body: '"key" = "value";')
+
+        expect do
+          run_described_fastlane_action(project_url: gp_fake_url, locales: { 'fr-FR': 'fr' }, download_dir: tmp_dir, fail_on_error: true)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /destination.*not a regular file/i)
+
+        expect(stub).not_to have_been_made
+        expect(Dir).to be_empty(destination)
+      end
+    end
+
     [
       ['invalid', 'some invalid strings file content', /Error while validating the file exported from GlotPress.*Property List error/m],
       ['empty', '', /file exported from GlotPress is empty/],

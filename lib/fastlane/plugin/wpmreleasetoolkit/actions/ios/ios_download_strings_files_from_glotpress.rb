@@ -30,6 +30,10 @@ module Fastlane
             next
           end
 
+          if File.exist?(destination) && !File.file?(destination)
+            UI.user_error!("The destination `#{destination}` exists but is not a regular file")
+          end
+
           destination_mode = File.exist?(destination) ? File.stat(destination).mode & 0o7777 : 0o644
           Tempfile.create([params[:table_basename], '.strings'], lproj_dir) do |temporary_file|
             downloaded = Fastlane::Helper::Ios::L10nHelper.download_glotpress_export_file(
@@ -46,7 +50,7 @@ module Fastlane
             validate_strings_file(temporary_file.path, display_path: destination, fail_on_error: true) unless params[:skip_file_validation]
             File.chmod(destination_mode, temporary_file.path)
             temporary_file.close
-            FileUtils.mv(temporary_file.path, destination)
+            File.rename(temporary_file.path, destination)
           end
         end
       end

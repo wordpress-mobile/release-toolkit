@@ -39,6 +39,16 @@ describe Fastlane::Helper::GlotPressDownloader do
       end.to raise_error(RuntimeError, 'invalid downloaded body')
     end
 
+    it 'does not report success when the downloaded body is rejected' do
+      stub_request(:get, test_url)
+        .to_return(status: 200, body: 'rejected content')
+      expect(FastlaneCore::UI).not_to receive(:success)
+
+      downloader = described_class.new(url: test_url, locale: locale, auto_retry: false)
+
+      expect(downloader.download { false }).to be(false)
+    end
+
     it 'resets retry counter at start of download' do
       # Counter should be reset to 0 at the start of download() call
       downloader = described_class.new(url: test_url, locale: locale, auto_retry: true)

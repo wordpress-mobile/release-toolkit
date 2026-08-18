@@ -34,7 +34,7 @@ module Fastlane
       # @param [String] locale The locale being downloaded (for logging purposes)
       # @param [Boolean] auto_retry Whether to automatically retry on rate limiting (429 errors)
       # @param [Boolean] fail_on_error Whether to raise a Fastlane error after retry handling instead of returning false
-      # @yield [String] The response body if the download was successful
+      # @yield [String] The response body if the download was successful. Return `false` to reject it and suppress the success message.
       # @return The result of the block if provided, or true/false indicating success if no block is provided
       # @raise [FastlaneCore::Interface::FastlaneError] If the download fails after retry handling and `fail_on_error` is true
       #
@@ -44,7 +44,7 @@ module Fastlane
 
       # Downloads data from GlotPress
       #
-      # @yield [String] The response body if the download was successful
+      # @yield [String] The response body if the download was successful. Return `false` to reject it and suppress the success message.
       # @return The result of the block if provided, or true/false indicating success if no block is provided
       # @raise [FastlaneCore::Interface::FastlaneError] If the download fails after retry handling and `fail_on_error` is true
       #
@@ -101,7 +101,9 @@ module Fastlane
       def handle_response(response:, url:, original_uri:, redirect_count:, &)
         case response.code
         when '200'
-          yield(response.body) if block_given?
+          accepted = block_given? ? yield(response.body) : true
+          return false if accepted == false
+
           UI.success("Successfully downloaded `#{@locale}`.")
           true
         when '301', '302', '307', '308'
