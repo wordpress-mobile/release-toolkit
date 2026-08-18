@@ -109,13 +109,11 @@ module Fastlane
       def handle_glotpress_response(response_body:, locale:, is_source:)
         # Parse the JSON response
         @alternates.clear
-        loc_data = begin
-          JSON.parse(response_body)
-        rescue StandardError
-          nil
-        end
+        loc_data = JSON.parse(response_body)
         parse_data(locale, loc_data, is_source)
         reparse_alternates(locale, loc_data, is_source) unless @alternates.empty?
+      rescue JSON::ParserError => e
+        UI.user_error!("Error parsing GlotPress response for locale `#{locale}` — #{e.message}")
       end
     end
   end

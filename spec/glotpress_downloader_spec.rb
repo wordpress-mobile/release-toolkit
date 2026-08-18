@@ -18,6 +18,15 @@ describe Fastlane::Helper::GlotPressDownloader do
       expect(result).to eq('test content')
     end
 
+    it 'returns true when downloading without a block' do
+      stub_request(:get, test_url)
+        .to_return(status: 200, body: 'test content')
+
+      downloader = described_class.new(url: test_url, locale: locale, auto_retry: false)
+
+      expect(downloader.download).to be(true)
+    end
+
     it 'resets retry counter at start of download' do
       # Counter should be reset to 0 at the start of download() call
       downloader = described_class.new(url: test_url, locale: locale, auto_retry: true)
@@ -98,7 +107,9 @@ describe Fastlane::Helper::GlotPressDownloader do
       allow(FastlaneCore::UI).to receive(:interactive?).and_return(false)
       allow(FastlaneCore::UI).to receive(:error)
 
-      downloader.download { |body| body }
+      expect do
+        downloader.download { |body| body }
+      end.to raise_error(described_class::DownloadError, /429/)
 
       # Should try: 1 initial + 30 retries = 31 total
       expect(a_request(:get, test_url)).to have_been_made.times(31)
@@ -111,9 +122,11 @@ describe Fastlane::Helper::GlotPressDownloader do
 
       # Mock UI methods to avoid prompts
       allow(FastlaneCore::UI).to receive(:error)
-      allow(FastlaneCore::UI).to receive(:confirm).and_return(false)
+      allow(FastlaneCore::UI).to receive(:interactive?).and_return(false)
 
-      downloader.download { |body| body }
+      expect do
+        downloader.download { |body| body }
+      end.to raise_error(described_class::DownloadError, /429/)
 
       # Should only try once (no auto-retry)
       expect(a_request(:get, test_url)).to have_been_made.once
@@ -136,10 +149,20 @@ describe Fastlane::Helper::GlotPressDownloader do
       expect(a_request(:get, test_url)).to have_been_made.once
       expect(a_request(:get, redirect_url)).to have_been_made.once
     end
+
+    it 'raises when a redirect has no location header' do
+      stub_request(:get, test_url).to_return(status: 302)
+
+      downloader = described_class.new(url: test_url, locale: locale, auto_retry: false)
+
+      expect do
+        downloader.download { |body| body }
+      end.to raise_error(described_class::DownloadError, 'Received 302 for `test-locale` but no location header was found.')
+    end
   end
 
   describe 'error handling' do
-    it 'handles 404 errors gracefully in non-interactive mode' do
+    it 'raises on 404 errors in non-interactive mode' do
       stub_request(:get, test_url).to_return(status: 404, body: 'Not Found')
 
       downloader = described_class.new(url: test_url, locale: locale, auto_retry: false)
@@ -148,9 +171,22 @@ describe Fastlane::Helper::GlotPressDownloader do
       allow(FastlaneCore::UI).to receive(:interactive?).and_return(false)
       allow(FastlaneCore::UI).to receive(:error)
 
-      result = downloader.download { |body| body }
+      expect do
+        downloader.download { |body| body }
+      end.to raise_error(described_class::DownloadError, /404/)
+      expect(a_request(:get, test_url)).to have_been_made.once
+    end
 
-      expect(result).to be_falsey
+    it 'raises on SSL errors in non-interactive mode' do
+      stub_request(:get, test_url).to_raise(OpenSSL::SSL::SSLError.new('certificate verify failed'))
+
+      downloader = described_class.new(url: test_url, locale: locale, auto_retry: false)
+      allow(FastlaneCore::UI).to receive(:interactive?).and_return(false)
+      allow(FastlaneCore::UI).to receive(:error)
+
+      expect do
+        downloader.download { |body| body }
+      end.to raise_error(described_class::DownloadError, /certificate verify failed/)
       expect(a_request(:get, test_url)).to have_been_made.once
     end
   end

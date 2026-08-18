@@ -66,7 +66,7 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
   end
 
   describe 'error handling' do
-    it 'shows an error if an invalid locale is provided (404)' do
+    it 'raises if an invalid locale is provided (404)' do
       Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
         # Arrange
         stub = gp_stub(locale: 'unknown-locale', query: { 'filters[status]': 'current', format: 'strings' }).to_return(status: [404, 'Not Found'])
@@ -75,13 +75,16 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
         allow(FastlaneCore::UI).to receive(:confirm).and_return(false) # as we will be asked if we want to retry when getting a network error
 
         # Act
-        run_described_fastlane_action(
-          project_url: gp_fake_url,
-          locales: { 'unknown-locale': 'Base' },
-          download_dir: tmp_dir
-        )
+        act = lambda do
+          run_described_fastlane_action(
+            project_url: gp_fake_url,
+            locales: { 'unknown-locale': 'Base' },
+            download_dir: tmp_dir
+          )
+        end
 
         # Assert
+        expect { act.call }.to raise_error(Fastlane::Helper::GlotPressDownloader::DownloadError, /404 Not Found/)
         expect(stub).to have_been_made.once
         expect(File).not_to exist(File.join(tmp_dir, 'Base.lproj', 'Localizable.strings'))
         expect(error_messages).to eq(["Error downloading locale `unknown-locale` — 404 Not Found (#{gp_fake_url}/unknown-locale/default/export-translations/?filters%5Bstatus%5D=current&format=strings)"])

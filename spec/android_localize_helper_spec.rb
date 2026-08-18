@@ -340,6 +340,29 @@ describe Fastlane::Helper::Android::LocalizeHelper do
         expect(File.exist?(generated_file_path)).to be(true)
         expect(File.read(generated_file_path)).to eq(expected_merged_content)
       end
+
+      it 'raises instead of writing a partial export when one filter download fails' do
+        FileUtils.mkdir_p(File.dirname(generated_file(nil)))
+        FileUtils.cp(expected_file(nil), generated_file(nil))
+
+        stub_path = File.join(fixtures_dir, 'filters', 'current.xml')
+        stub_request(:get, "#{gp_fake_url.chomp('/')}/fakegploc/default/export-translations/?filters%5Bstatus%5D=current&format=android")
+          .to_return(status: 200, body: File.read(stub_path))
+        stub_request(:get, "#{gp_fake_url.chomp('/')}/fakegploc/default/export-translations/?filters%5Bstatus%5D=waiting&format=android")
+          .to_return(status: 500)
+        allow(FastlaneCore::UI).to receive(:interactive?).and_return(false)
+
+        expect do
+          described_class.download_from_glotpress(
+            res_dir: tmpdir,
+            glotpress_project_url: gp_fake_url,
+            glotpress_filters: [{ status: 'current' }, { status: 'waiting' }],
+            locales_map: [{ glotpress: 'fakegploc', android: 'fakeanloc' }]
+          )
+        end.to raise_error(Fastlane::Helper::GlotPressDownloader::DownloadError, /500/)
+
+        expect(File).not_to exist(generated_file('fakeanloc'))
+      end
     end
 
     it 'sets a predefined User Agent so GlotPress will not rate-limit us' do

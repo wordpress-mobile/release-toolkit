@@ -390,7 +390,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
     end
 
     describe 'invalid parameters' do
-      it 'prints an `UI.error` if passed a non-existing locale (or any other 404)' do
+      it 'raises if passed a non-existing locale (or any other 404)' do
         # Arrange
         stub = stub_request(:get, "#{gp_fake_url}/invalid/default/export-translations/").with(query: { format: 'strings' }).to_return(status: [404, 'Not Found'])
         error_messages = []
@@ -398,24 +398,26 @@ describe Fastlane::Helper::Ios::L10nHelper do
         allow(FastlaneCore::UI).to receive(:confirm).and_return(false) # as we will be asked if we want to retry when getting a network error
         dest = StringIO.new
         # Act
-        described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'invalid', filters: nil, destination: dest)
+        expect do
+          described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'invalid', filters: nil, destination: dest)
+        end.to raise_error(Fastlane::Helper::GlotPressDownloader::DownloadError, /404 Not Found/)
         # Assert
         expect(stub).to have_been_made.once
         expect(error_messages).to eq(["Error downloading locale `invalid` — 404 Not Found (#{gp_fake_url}/invalid/default/export-translations/?format=strings)"])
       end
 
-      it 'prints an `UI.error` if the destination cannot be written to' do
+      it 'raises if the destination cannot be written to' do
         # Arrange
         stub = stub_request(:get, "#{gp_fake_url}/fr/default/export-translations/").with(query: { format: 'strings' }).to_return(body: 'content')
-        error_messages = []
-        allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
         dest = '/these/are/not/the/droids/you/are/looking/for.strings'
         # Act
-        described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: nil, destination: dest)
+        act = lambda do
+          described_class.download_glotpress_export_file(project_url: gp_fake_url, locale: 'fr', filters: nil, destination: dest)
+        end
         # Assert
+        expect { act.call }.to raise_error(FastlaneCore::Interface::FastlaneError, /Error writing downloaded locale `fr`/)
         expect(stub).to have_been_made.once
         expect(File).not_to exist(dest)
-        expect(error_messages).to eq(["Error downloading locale `fr` — No such file or directory @ rb_sysopen - #{dest} (#{gp_fake_url}/fr/default/export-translations/?format=strings)"])
       end
     end
   end

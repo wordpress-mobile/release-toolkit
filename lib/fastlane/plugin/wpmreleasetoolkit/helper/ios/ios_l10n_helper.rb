@@ -208,9 +208,10 @@ module Fastlane
                 destination.write(response_body)
               end
             end
+          rescue Fastlane::Helper::GlotPressDownloader::DownloadError
+            raise
           rescue StandardError => e
-            UI.error "Error downloading locale `#{locale}` — #{e.message} (#{url})"
-            nil
+            UI.user_error!("Error writing downloaded locale `#{locale}` — #{e.message} (#{url})")
           end
         end
       end
