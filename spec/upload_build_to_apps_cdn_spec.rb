@@ -39,12 +39,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
   end
 
   before do
-    WebMock.disable_net_connect!(allow: 'analytics-api.buildkite.com')
     allow(SecureRandom).to receive(:hex).with(10).and_return('dabad0001234dabad000')
-  end
-
-  after do
-    WebMock.disable_net_connect!(allow: 'analytics-api.buildkite.com')
   end
 
   # Helper method to build the expected multipart form data part
