@@ -22,7 +22,7 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
   end
 
   before do
-    WebMock.disable_net_connect!
+    WebMock.disable_net_connect!(allow: 'analytics-api.buildkite.com')
   end
 
   describe 'updating visibility' do
