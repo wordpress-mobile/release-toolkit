@@ -2,6 +2,7 @@
 
 require 'fastlane/action'
 require_relative '../../helper/metadata_download_helper'
+require_relative '../../helper/config_item_helper'
 
 module Fastlane
   module Actions
@@ -78,11 +79,7 @@ module Fastlane
                                        type: FastlaneCore::Boolean,
                                        optional: true,
                                        default_value: true),
-          FastlaneCore::ConfigItem.new(key: :fail_on_error,
-                                       description: 'Whether to fail when a GlotPress request or downloaded response is invalid',
-                                       type: FastlaneCore::Boolean,
-                                       optional: true,
-                                       default_value: false),
+          FastlaneCore::ConfigItem.new(**Fastlane::Helper::ConfigItemHelper::OPT_IN_FAIL_ON_ERROR_CONFIG_ITEM_OPTIONS),
         ]
       end
 

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../../helper/config_item_helper'
+
 # This action is the new version of android_update_metadata (AndroidUpdateMetadataAction) and should now be used instead of that one
 
 module Fastlane
@@ -100,12 +102,7 @@ module Fastlane
             type: Boolean,
             default_value: false
           ),
-          FastlaneCore::ConfigItem.new(
-            key: :fail_on_error,
-            description: 'Whether to fail when a GlotPress request or downloaded response is invalid',
-            type: Boolean,
-            default_value: false
-          ),
+          FastlaneCore::ConfigItem.new(**Fastlane::Helper::ConfigItemHelper::OPT_IN_FAIL_ON_ERROR_CONFIG_ITEM_OPTIONS),
         ]
       end
 
