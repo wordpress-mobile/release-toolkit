@@ -75,6 +75,11 @@ module Fastlane
           return
         end
 
+        unless translations.is_a?(Hash) && translations.all? { |key, value| key.is_a?(String) && value.is_a?(String) }
+          report_validation_error("The file exported from GlotPress is not a string-to-string dictionary (`#{display_path}`)", fail_on_error: fail_on_error)
+          return
+        end
+
         empty_keys = translations.select { |_, value| value.nil? || value.empty? }.keys.sort
         return if empty_keys.empty?
 

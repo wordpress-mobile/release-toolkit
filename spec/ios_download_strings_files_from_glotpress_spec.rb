@@ -134,6 +134,24 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
       end
     end
 
+    it 'reports non-dictionary files without failing by default' do
+      Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
+        body = '("value")'
+        stub = gp_stub(locale: 'fr-FR', query: { 'filters[status]': 'current', format: 'strings' }).to_return(body: body)
+        error_messages = []
+        allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+
+        expect do
+          run_described_fastlane_action(project_url: gp_fake_url, locales: { 'fr-FR': 'fr' }, download_dir: tmp_dir)
+        end.not_to raise_error
+
+        file = File.join(tmp_dir, 'fr.lproj', 'Localizable.strings')
+        expect(stub).to have_been_made.once
+        expect(File.read(file)).to eq(body)
+        expect(error_messages).to contain_exactly(a_string_matching(/string-to-string dictionary.*#{Regexp.escape(file)}/))
+      end
+    end
+
     it 'raises before downloading if the strict destination is not a regular file' do
       Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
         destination = File.join(tmp_dir, 'fr.lproj', 'Localizable.strings')
@@ -152,6 +170,8 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
     [
       ['invalid', 'some invalid strings file content', /Error while validating the file exported from GlotPress.*Property List error/m],
       ['empty', '', /file exported from GlotPress is empty/],
+      ['not a dictionary', '("value")', /string-to-string dictionary/],
+      ['not string-to-string', '"key" = ("value");', /string-to-string dictionary/],
     ].each do |description, response_body, expected_error|
       it "raises without replacing the existing file if a download is #{description}" do
         Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
