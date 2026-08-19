@@ -107,8 +107,7 @@ describe Fastlane::Actions::GetPrsBetweenTagsAction do
   end
 
   describe 'error handling' do
-    def test_with_params(target_commitish: nil, previous_tag: nil, configuration_file_path: nil, error_msg: 'API Failure')
-      # Arrange
+    def stub_failing_api_call(target_commitish: nil, previous_tag: nil, configuration_file_path: nil, error_msg: 'API Failure')
       allow(client).to receive(:post).with(
         "repos/#{test_repo}/releases/generate-notes",
         config_file_path: configuration_file_path,
@@ -116,6 +115,16 @@ describe Fastlane::Actions::GetPrsBetweenTagsAction do
         tag_name: test_tag_name,
         target_commitish: target_commitish || test_head_ref
       ).and_raise(StandardError, error_msg)
+    end
+
+    def test_with_params(target_commitish: nil, previous_tag: nil, configuration_file_path: nil, error_msg: 'API Failure')
+      # Arrange
+      stub_failing_api_call(
+        target_commitish: target_commitish,
+        previous_tag: previous_tag,
+        configuration_file_path: configuration_file_path,
+        error_msg: error_msg
+      )
 
       # Act
       result = run_described_fastlane_action(
@@ -153,6 +162,43 @@ describe Fastlane::Actions::GetPrsBetweenTagsAction do
         previous_tag: '12.2',
         error_msg: '400 - Invalid previous_tag parameter'
       )
+    end
+
+    context 'when `fail_on_error` is enabled' do
+      it 'raises instead of returning the error message as the changelog' do
+        # Arrange
+        stub_failing_api_call(previous_tag: '12.2', error_msg: 'API Failure')
+
+        # Act & Assert
+        expect do
+          run_described_fastlane_action(
+            github_token: test_token,
+            repository: test_repo,
+            tag_name: test_tag_name,
+            previous_tag: '12.2',
+            fail_on_error: true
+          )
+        end.to raise_error(StandardError, 'API Failure')
+      end
+    end
+
+    context 'when `fail_on_error` is explicitly disabled' do
+      it 'returns the error message as the changelog, like the default does' do
+        # Arrange
+        stub_failing_api_call(previous_tag: '12.2', error_msg: 'API Failure')
+
+        # Act
+        result = run_described_fastlane_action(
+          github_token: test_token,
+          repository: test_repo,
+          tag_name: test_tag_name,
+          previous_tag: '12.2',
+          fail_on_error: false
+        )
+
+        # Assert
+        expect(result).to eq('❌ Error computing the list of PRs since 12.2: `API Failure`')
+      end
     end
   end
 end
