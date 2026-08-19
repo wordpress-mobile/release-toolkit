@@ -116,6 +116,23 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
       expect { act.call }.to raise_error(FastlaneCore::Interface::FastlaneError, "The parent directory `#{download_dir}` (which contains all the `*.lproj` subdirectories) must already exist")
     end
 
+    it 'does not replace an existing file when a permissive download fails' do
+      Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
+        stub = gp_stub(locale: 'fr-FR', query: { 'filters[status]': 'current', format: 'strings' }).to_return(status: [500, 'Internal Server Error'])
+        allow(FastlaneCore::UI).to receive(:confirm).and_return(false)
+        file = File.join(tmp_dir, 'fr.lproj', 'Localizable.strings')
+        FileUtils.mkdir_p(File.dirname(file))
+        File.write(file, 'existing valid content')
+
+        expect do
+          run_described_fastlane_action(project_url: gp_fake_url, locales: { 'fr-FR': 'fr' }, download_dir: tmp_dir)
+        end.not_to raise_error
+
+        expect(stub).to have_been_made.once
+        expect(File.read(file)).to eq('existing valid content')
+      end
+    end
+
     it 'reports invalid files without failing by default' do
       Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
         body = 'some invalid strings file content'
@@ -164,6 +181,23 @@ describe Fastlane::Actions::IosDownloadStringsFilesFromGlotpressAction do
 
         expect(stub).not_to have_been_made
         expect(Dir).to be_empty(destination)
+      end
+    end
+
+    it 'reports a non-regular destination without failing by default' do
+      Dir.mktmpdir('a8c-release-toolkit-tests-') do |tmp_dir|
+        destination = File.join(tmp_dir, 'fr.lproj', 'Localizable.strings')
+        FileUtils.mkdir_p(destination)
+        stub = gp_stub(locale: 'fr-FR', query: { 'filters[status]': 'current', format: 'strings' }).to_return(body: '"key" = "value";')
+        error_messages = []
+        allow(FastlaneCore::UI).to receive(:error) { |message| error_messages.append(message) }
+
+        expect do
+          run_described_fastlane_action(project_url: gp_fake_url, locales: { 'fr-FR': 'fr' }, download_dir: tmp_dir)
+        end.not_to raise_error
+
+        expect(stub).not_to have_been_made
+        expect(error_messages).to eq(["The destination `#{destination}` exists but is not a regular file"])
       end
     end
 

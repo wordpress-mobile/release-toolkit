@@ -209,8 +209,7 @@ module Fastlane
               destination.write(response_body)
             end
           rescue StandardError => e
-            prefix = fail_on_error ? 'Error writing downloaded locale' : 'Error downloading locale'
-            message = "#{prefix} `#{locale}` — #{e.message} (#{url})"
+            message = "Error writing downloaded locale `#{locale}` — #{e.message} (#{url})"
             fail_on_error ? UI.user_error!(message) : UI.error(message)
             false
           end

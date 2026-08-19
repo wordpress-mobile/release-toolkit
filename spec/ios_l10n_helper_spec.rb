@@ -417,7 +417,7 @@ describe Fastlane::Helper::Ios::L10nHelper do
         expect(stub).to have_been_made.once
         expect(File).not_to exist(dest)
         expect(result).to be(false)
-        expect(error_messages).to eq(["Error downloading locale `fr` — No such file or directory @ rb_sysopen - #{dest} (#{gp_fake_url}/fr/default/export-translations/?format=strings)"])
+        expect(error_messages).to eq(["Error writing downloaded locale `fr` — No such file or directory @ rb_sysopen - #{dest} (#{gp_fake_url}/fr/default/export-translations/?format=strings)"])
       end
     end
   end
