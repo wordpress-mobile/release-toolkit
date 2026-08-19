@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- `get_prs_between_tags` accepts a `fail_on_error:` parameter. When `true`, a failure to compute the changelog raises instead of being returned as the changelog text, so callers that publish a GitHub Release only after the action succeeds can stop rather than publish notes reading `❌ Error computing the list of PRs…`. Defaults to `false`, preserving the existing behavior. [#772]
+- `get_prs_between_tags` now accepts a `fail_on_error:` parameter. [#772]
 
 ### Bug Fixes
 
