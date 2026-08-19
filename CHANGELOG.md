@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- `get_prs_between_tags` now accepts a `fail_on_error:` parameter. [#772]
 
 ### Bug Fixes
 
