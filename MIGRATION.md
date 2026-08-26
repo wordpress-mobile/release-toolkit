@@ -2,7 +2,7 @@
 
 ## From 14.x to 15.0.0
 
-- The `ios_build_preflight` and `android_build_preflight` actions have been removed.
+- Remove calls to `ios_build_preflight` and `android_build_preflight` actions from your Fastfiles as they've been removed. They also applied legacy `.configure` secrets and ran dependency/tool checks, so you need to preserve any behavior your project still needs explicitly.
 
 ## From 13.x to 14.0.0
 
