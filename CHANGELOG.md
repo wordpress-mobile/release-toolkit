@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-_None_
+- The `ios_build_preflight` and `android_build_preflight` actions have been removed. [#773]
 
 ### New Features
 
