@@ -1,5 +1,10 @@
 # Migration Instructions for Major Releases
 
+## From 14.x to 15.0.0
+
+- The `ios_build_preflight` action has been removed. Delete any calls from your Fastfile.
+  It ran `configure_apply`, wiped DerivedData, checked for ImageMagick and Ghostscript, ran `bundle check`, and invoked `cocoapods`. Call those directly if a lane still needs them.
+
 ## From 13.x to 14.0.0
 
 ### Metadata Source Actions
