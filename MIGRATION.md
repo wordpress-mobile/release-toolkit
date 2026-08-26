@@ -2,7 +2,7 @@
 
 ## From 14.x to 15.0.0
 
-- The `ios_build_preflight` action has been removed.
+- The `ios_build_preflight` and `android_build_preflight` actions have been removed.
 
 ## From 13.x to 14.0.0
 
