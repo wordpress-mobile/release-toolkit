@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-- Remove the `ios_build_preflight` action.
+- Remove the `ios_build_preflight` action. [#773]
 
 ### New Features
 
