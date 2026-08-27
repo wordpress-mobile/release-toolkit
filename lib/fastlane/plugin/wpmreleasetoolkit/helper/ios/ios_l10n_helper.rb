@@ -15,18 +15,24 @@ module Fastlane
         # Returns the type of a `.strings` file (XML, binary or ASCII)
         #
         # @param [String] path The path to the `.strings` file to check
+        # @param [Boolean] assume_valid Skip the `plutil -lint` validity check when the caller has already
+        #        confirmed the file parses (e.g. via `read_strings_file_as_hash`), avoiding a redundant
+        #        `plutil` invocation. Only the format detection (`file`) then runs.
         # @return [Symbol] The file format used by the `.strings` file. Can be one of:
         #         - `:text` for the ASCII-plist file format (containing typical `"key" = "value";` lines)
         #         - `:xml` for XML plist file format (can be used if machine-generated, especially since there's no official way/tool to generate the ASCII-plist file format as output)
         #         - `:binary` for binary plist file format (usually only true for `.strings` files converted by Xcode at compile time and included in the final `.app`/`.ipa`)
         #         - `nil` if the file does not exist or is neither of those format (e.g. not a `.strings` file at all)
         #
-        def self.strings_file_type(path:)
+        def self.strings_file_type(path:, assume_valid: false)
           return :text if File.empty?(path) # If completely empty file, consider it as a valid `.strings` files in textual format
 
-          # Start by checking it seems like a valid property-list file (and not e.g. an image or plain text file)
-          _, status = Open3.capture2('/usr/bin/plutil', '-lint', path)
-          return nil unless status.success?
+          # Start by checking it seems like a valid property-list file (and not e.g. an image or plain text file).
+          # A caller that has already parsed the file can skip this redundant check via `assume_valid: true`.
+          unless assume_valid
+            _, status = Open3.capture2('/usr/bin/plutil', '-lint', path)
+            return nil unless status.success?
+          end
 
           # If it is a valid property-list file, determine the actual format used
           format_desc, status = Open3.capture2('/usr/bin/file', path)
@@ -72,6 +78,11 @@ module Fastlane
         # @note The method is able to handle input files which are using different encodings,
         #       guessing the encoding of each input file using the BOM (and defaulting to UTF8).
         #       The generated file will always be in utf-8, by convention.
+        # @note Dictionary- and array-valued entries (`"k" = { … };`, `"k" = ( … );`, nesting allowed) are
+        #       prefixed on their outer key with the value preserved verbatim. If a file still holds some
+        #       construct the tokenizer can't rewrite, its lines are copied through unprefixed with a warning
+        #       (and its keys are then bookkept unprefixed too, so the reported duplicates stay accurate)
+        #       rather than aborting the whole merge.
         #
         # @raise [RuntimeError] If one of the paths provided is not in text format (but XML or binary instead), or if any of the files are missing.
         #
@@ -88,20 +99,37 @@ module Fastlane
               raise "The file `#{input_file}` does not exist or is of unknown format." if fmt.nil?
               raise "The file `#{input_file}` is in #{fmt} format but we currently only support merging `.strings` files in text format." unless fmt == :text
 
-              string_keys = read_strings_file_as_hash(path: input_file).keys.map { |k| "#{prefix}#{k}" }
+              raw_keys = read_strings_file_as_hash(path: input_file).keys
+
+              tmp_file.write("/* MARK: - #{File.basename(input_file)} */\n\n")
+              # Add the prefix to every key. We tokenize via `StringsFileValidationHelper.prefix_keys` rather than
+              # matching keys with a line-based regex, so that keys are found regardless of where `.strings` comments
+              # sit (e.g. `CFBundleName /* note */ = WordPress;`) and `key = value`-looking text inside a comment is
+              # left alone. It also handles dictionary/array values (`"k" = { … };`) — prefixing the outer key and
+              # copying the value verbatim.
+              lines = read_utf8_lines(input_file)
+              applied_prefix = prefix
+              begin
+                lines = Fastlane::Helper::Ios::StringsFileValidationHelper.prefix_keys(lines: lines, prefix: prefix)
+              rescue StandardError => e
+                # `plutil` may still accept a construct the tokenizer can't rewrite: it parses fine (so the file
+                # clears the `:text` gate above) yet `prefix_keys` raises on it. Fail soft: copy this file's lines
+                # through unprefixed rather than aborting the whole merge — mirroring the scanner path, where
+                # `scan_for_duplicate_keys` returns `:unscannable` instead of crashing the lane. `lines` is untouched
+                # by the raise (the assignment above never completes), so it still holds the original file contents,
+                # and `applied_prefix` records that the keys went out *unprefixed* so the bookkeeping below matches.
+                applied_prefix = ''
+                UI.important("Could not add prefix `#{prefix}` to the keys in `#{input_file}` (#{e.message}); copying its lines through unprefixed.")
+              end
+
+              # Bookkeep the keys as they were actually written — prefixed, or unprefixed on the fail-soft path.
+              # Doing this *after* the rewrite keeps the reported duplicates consistent with the merged file even
+              # when prefixing fell back, so a genuine collision is still surfaced rather than silently collapsed.
+              string_keys = raw_keys.map { |k| "#{applied_prefix}#{k}" }
               duplicates += (string_keys & all_keys_found) # Find duplicates using Array intersection, and add those to duplicates list
               all_keys_found += string_keys
 
-              tmp_file.write("/* MARK: - #{File.basename(input_file)} */\n\n")
-              # Read line-by-line to reduce memory footprint during content copy
-              read_utf8_lines(input_file).each do |line|
-                unless prefix.nil? || prefix.empty?
-                  # The `/u` modifier on the RegExps is to make them UTF-8
-                  line.gsub!(/^(\s*")/u, "\\1#{prefix}") # Lines starting with a quote are considered to be start of a key; add prefix right after the quote
-                  line.gsub!(/^(\s*)([A-Z0-9_]+)(\s*=\s*")/ui, "\\1\"#{prefix}\\2\"\\3") # Lines starting with an identifier followed by a '=' are considered to be an unquoted key (typical in InfoPlist.strings files for example)
-                end
-                tmp_file.write(line)
-              end
+              lines.each { |line| tmp_file.write(line) }
               tmp_file.write("\n")
             end
             tmp_file.close # ensure we flush the content to disk

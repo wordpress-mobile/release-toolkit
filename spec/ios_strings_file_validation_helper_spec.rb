@@ -54,14 +54,161 @@ describe Fastlane::Helper::Ios::StringsFileValidationHelper do
     end
   end
 
-  context 'when there are unquoted keys' do
-    it 'returns an error' do
-      # Unquoted strings are currently not supported by our validation helper in its current state, despite being a valid syntax, because we considered
-      # that it was not worth adding complexity to our state machine logic for this use case — we expect all the `.strings` files we plan to validate will
-      # come from GlotPress exports, and will thus always have their keys quoted.
-      # If support for unquoted strings is added to our validation helper in the future, feel free to update this test example accordingly.
-      expect { described_class.find_duplicated_keys(file: File.join(test_data_dir, 'ios_l10n_helper', 'expected-merged.strings')) }
-        .to raise_error(RuntimeError, 'Invalid character `I` found on line 21, col 1')
+  context 'when there are unquoted keys and values' do
+    # Unquoted strings — keys and values — are valid `.strings` syntax (the old-style ASCII plist format)
+    # and are common in `InfoPlist.strings` (e.g. `CFBundleDisplayName = WordPress;`).
+    it 'parses them alongside quoted keys without raising, finding no duplicates among unique keys' do
+      # `expected-merged.strings` mixes quoted (`key1`–`key3`) and unquoted (`InfoKey1`–`InfoKey3`) keys.
+      expect(described_class.find_duplicated_keys(file: File.join(test_data_dir, 'ios_l10n_helper', 'expected-merged.strings'))).to be_empty
+    end
+
+    it 'detects duplicates among unquoted keys, reporting each occurrence line' do
+      content = <<~STRINGS
+        CFBundleName = "WordPress";
+        NSCameraUsageDescription = "Take photos";
+        CFBundleName = "Jetpack";
+      STRINGS
+      with_tmp_file(named: 'InfoPlist.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to eq('CFBundleName' => [1, 3])
+      end
+    end
+
+    it 'parses unquoted *values* (not just keys) without raising, and finds duplicates among them' do
+      # `CFBundleName = WordPress;` (both key and value unquoted) is valid ASCII-plist that `plutil`
+      # parses; the scanner must tokenize it rather than choking on the unquoted value.
+      content = <<~STRINGS
+        CFBundleName = WordPress;
+        CFBundleShortVersionString = 1.0;
+        CFBundleName = Jetpack;
+      STRINGS
+      with_tmp_file(named: 'InfoPlist.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to eq('CFBundleName' => [1, 3])
+      end
+    end
+
+    it 'parses unquoted keys containing `.`, `-`, `_`, `$`, `:`, and `/` (the chars `plutil` allows)' do
+      content = <<~STRINGS
+        com.example.app-name_2 = "v";
+        a$b:c/d = "v";
+        a$b:c/d = "w";
+      STRINGS
+      with_tmp_file(named: 'InfoPlist.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to eq('a$b:c/d' => [2, 3])
+      end
+    end
+  end
+
+  context 'when comments appear between the tokens of a statement' do
+    # Comments are valid `.strings` syntax not only on their own line but also *between* the tokens of a
+    # statement — after a key, around the `=`, or before the terminating `;`. `plutil` accepts all of these,
+    # so the scanner must tokenize them rather than raising `Invalid character` on the `/`.
+    it 'parses comments after a key, around the `=`, and before the `;` without raising' do
+      content = <<~STRINGS
+        "afterKey" /* note */ = "1";
+        "aroundEq" = /* note */ "2";
+        "beforeSemicolon" = "3" /* note */;
+        unquotedKey /* note */ = unquotedValue;
+      STRINGS
+      with_tmp_file(named: 'Localizable.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to be_empty
+      end
+    end
+
+    it 'still detects duplicate keys in a file that also contains inline comments' do
+      content = <<~STRINGS
+        "dup" /* first */ = "1";
+        "unique" = "x";
+        "dup" = "2" /* second */;
+      STRINGS
+      with_tmp_file(named: 'Localizable.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to eq('dup' => [1, 3])
+      end
+    end
+
+    it 'does not mistake a `/`-leading unquoted value for the start of a comment' do
+      # A `/` right after `=` may begin a comment OR an unquoted value (e.g. a path or URL); the latter,
+      # which `plutil` accepts, must still parse rather than be swallowed as a comment.
+      content = <<~STRINGS
+        "path" = /usr/bin/tool;
+        "url" = https://example.com/x;
+        "path" = /opt;
+      STRINGS
+      with_tmp_file(named: 'Localizable.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to eq('path' => [1, 3])
+      end
+    end
+  end
+
+  context 'when a value is a nested dictionary or array' do
+    # `plutil` accepts container values in the old-style ASCII plist (e.g. `"k" = { a = b; };` or `"k" = ( … );`),
+    # and they can nest. The tokenizer skips the container body — its inner keys are not top-level keys — while
+    # still tracking nesting so delimiters hidden inside quoted strings or comments don't end the value early,
+    # and still detecting duplicate *top-level* keys.
+    it 'does not treat keys inside a dictionary value as top-level keys' do
+      content = <<~STRINGS
+        "k" = { a = b; c = d; };
+        "j" = "v";
+      STRINGS
+      with_tmp_file(named: 'InfoPlist.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to be_empty
+      end
+    end
+
+    it 'detects duplicate top-level keys whose values are containers' do
+      content = <<~STRINGS
+        "k" = { a = b; };
+        "k" = ( "x", "y" );
+      STRINGS
+      with_tmp_file(named: 'InfoPlist.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to eq('k' => [1, 2])
+      end
+    end
+
+    it 'tracks nesting through delimiters hidden inside quoted strings and comments' do
+      # The inner `}` and `;` in the quoted `"c;d}"` and in the `/* } ; */` comment must NOT be read as
+      # structural — the container ends only at the real closing brace, so the second `"k"` is a duplicate.
+      content = <<~STRINGS
+        "k" = { a = { b = "c;d}"; }; /* } ; */ e = f; };
+        "k" = 1;
+      STRINGS
+      with_tmp_file(named: 'InfoPlist.strings', content: content) do |path|
+        expect(described_class.find_duplicated_keys(file: path)).to eq('k' => [1, 2])
+      end
+    end
+  end
+
+  describe '.scan_for_duplicate_keys' do
+    it 'returns `[:scanned, duplicates]` for a `:text` file, with the duplicate hash (empty if none)' do
+      with_tmp_file(named: 'dups.strings', content: "\"k\" = \"a\";\n\"k\" = \"b\";\n") do |path|
+        expect(described_class.scan_for_duplicate_keys(file: path)).to eq([:scanned, { 'k' => [1, 2] }])
+      end
+      with_tmp_file(named: 'unique.strings', content: "\"k\" = \"a\";\n\"j\" = \"b\";\n") do |path|
+        expect(described_class.scan_for_duplicate_keys(file: path)).to eq([:scanned, {}])
+      end
+    end
+
+    it 'returns `[:unsupported_format, format]` for a non-`:text` (XML) plist, without scanning' do
+      in_tmp_dir do |dir|
+        path = File.join(dir, 'x.strings')
+        Fastlane::Helper::Ios::L10nHelper.generate_strings_file_from_hash(translations: { 'a' => 'b' }, output_path: path)
+        status, format = described_class.scan_for_duplicate_keys(file: path)
+        expect(status).to eq(:unsupported_format)
+        expect(format).to eq(:xml)
+      end
+    end
+
+    it 'returns `[:scanned, …]` for a `:text` plist whose values are (now tokenizable) nested dictionaries or arrays' do
+      with_tmp_file(named: 'nested.strings', content: "\"k\" = { a = b; };\n\"j\" = ( \"x\", \"y\" );\n") do |path|
+        expect(described_class.scan_for_duplicate_keys(file: path)).to eq([:scanned, {}])
+      end
+    end
+
+    it 'returns `[:unscannable, message]` for a `:text` plist the tokenizer still cannot read (e.g. a `<data>` value)' do
+      with_tmp_file(named: 'data.strings', content: "\"k\" = <48656c6c6f>;\n") do |path|
+        status, message = described_class.scan_for_duplicate_keys(file: path)
+        expect(status).to eq(:unscannable)
+        expect(message).to match(/Invalid character/)
+      end
     end
   end
 end

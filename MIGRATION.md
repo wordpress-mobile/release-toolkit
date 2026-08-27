@@ -2,6 +2,8 @@
 
 ## From 14.x to 15.0.0
 
+- Remove calls to `ios_build_preflight` and `android_build_preflight` actions from your Fastfiles as they've been removed. They also applied legacy `.configure` secrets and ran dependency/tool checks, so you need to preserve any behavior your project still needs explicitly.
+
 ### `EnvManager` populates the process `ENV` by default
 
 `EnvManager` now layers the values from the loaded `.env` file into the process `ENV` when you call `set_up`/`new`, so fastlane actions that resolve their `default_value:` via `ENV.fetch(...)` can see them. Pre-existing `ENV` entries always win (no-override). `EnvManager.reset!` rolls back the keys the default instance added; for instances you created with `new`, call `restore_env!`.

@@ -640,12 +640,14 @@ describe Fastlane::Helper::GithubHelper do
 
     before do
       allow(Octokit::Client).to receive(:new).and_return(client)
+      allow(client).to receive(:release_for_tag).with(test_repo, test_version).and_return(release)
       allow(client).to receive(:releases).with(test_repo).and_return([release])
       allow(client).to receive(:release_assets).with(release_url).and_return(existing_assets)
       allow(client).to receive_messages(upload_asset: uploaded_asset, delete_release_asset: true)
     end
 
     it 'fails clearly if the release does not exist' do
+      allow(client).to receive(:release_for_tag).with(test_repo, test_version).and_raise(Octokit::NotFound)
       allow(client).to receive(:releases).with(test_repo).and_return([])
 
       with_tmp_file(named: 'test-app.zip') do |file_path|
@@ -702,6 +704,7 @@ describe Fastlane::Helper::GithubHelper do
       draft_release = sawyer_resource_stub(url: release_url, html_url: release_html_url, tag_name: test_version, draft: true)
       other_release = sawyer_resource_stub(url: 'https://api.github.com/repos/repo-test/project-test/releases/456', html_url: 'https://github.com/repo-test/project-test/releases/tag/0.9.0', tag_name: '0.9.0')
 
+      allow(client).to receive(:release_for_tag).with(test_repo, test_version).and_raise(Octokit::NotFound)
       allow(client).to receive(:releases).with(test_repo).and_return([other_release, draft_release])
       allow(client).to receive(:release_assets).with(release_url).and_return([])
 
@@ -711,6 +714,89 @@ describe Fastlane::Helper::GithubHelper do
         result = upload_release_assets(assets: [file_path])
 
         expect(result).to eq(release_html_url)
+      end
+    end
+
+    it 'uses the release list if available' do
+      draft_release = sawyer_resource_stub(url: 'draft-api-url', html_url: 'draft-html-url', tag_name: test_version, draft: true)
+
+      allow(client).to receive(:releases).with(test_repo).and_return([draft_release])
+      expect(client).not_to receive(:release_for_tag)
+      allow(client).to receive(:release_assets).with(draft_release.url).and_return([])
+
+      with_tmp_file(named: 'test-app.zip') do |file_path|
+        expect(client).to receive(:upload_asset).with(draft_release.url, file_path, { content_type: 'application/octet-stream' })
+
+        result = upload_release_assets(assets: [file_path])
+
+        expect(result).to eq(draft_release.html_url)
+      end
+    end
+
+    it 'uses the most recently created release when several share the same tag' do
+      stale_release = sawyer_resource_stub(id: 1, url: 'stale-api-url', html_url: 'stale-html-url', tag_name: test_version, draft: true)
+      latest_release = sawyer_resource_stub(id: 2, url: 'latest-api-url', html_url: 'latest-html-url', tag_name: test_version, draft: true)
+
+      # The stale release comes first, so that a lookup relying on the order the API happens to return the releases in
+      # would pick the wrong one.
+      allow(client).to receive(:releases).with(test_repo).and_return([stale_release, latest_release])
+      expect(client).not_to receive(:release_for_tag)
+      allow(client).to receive(:release_assets).with(latest_release.url).and_return([])
+
+      with_tmp_file(named: 'test-app.zip') do |file_path|
+        expect(client).to receive(:upload_asset).with(latest_release.url, file_path, { content_type: 'application/octet-stream' })
+
+        result = upload_release_assets(assets: [file_path])
+
+        expect(result).to eq(latest_release.html_url)
+      end
+    end
+
+    it 'uses the release owning the tag rather than a more recent draft sharing it' do
+      # The state woocommerce-ios is left in after the 25.1 incident: the release that was published and owns the
+      # `25.1` tag, plus the never-cleaned-up draft created by the second `finalize_release` run, which has a higher
+      # id. A tag can only back one published release, so the published one wins despite being the older of the two.
+      published_release = sawyer_resource_stub(id: 351_929_162, url: 'published-api-url', html_url: 'published-html-url', tag_name: test_version, draft: false)
+      leftover_draft = sawyer_resource_stub(id: 352_002_205, url: 'draft-api-url', html_url: 'draft-html-url', tag_name: test_version, draft: true)
+
+      # The leftover draft comes first, so that a lookup relying on the order the API happens to return the releases in
+      # would pick the wrong one.
+      allow(client).to receive(:releases).with(test_repo).and_return([leftover_draft, published_release])
+      allow(client).to receive(:release_assets).with(published_release.url).and_return([])
+
+      with_tmp_file(named: 'test-app.zip') do |file_path|
+        expect(client).to receive(:upload_asset).with(published_release.url, file_path, { content_type: 'application/octet-stream' })
+        expect(client).not_to receive(:upload_asset).with(leftover_draft.url, any_args)
+
+        result = upload_release_assets(assets: [file_path])
+
+        expect(result).to eq(published_release.html_url)
+      end
+    end
+
+    it 'falls back to the direct release-by-tag lookup when the release list misses' do
+      with_tmp_file(named: 'test-app.zip') do |file_path|
+        allow(client).to receive(:releases).with(test_repo).and_return([])
+        allow(client).to receive(:release_for_tag).with(test_repo, test_version).and_return(release)
+        expect(client).to receive(:upload_asset).with(release_url, file_path, { content_type: 'application/octet-stream' })
+
+        result = upload_release_assets(assets: [file_path])
+
+        expect(result).to eq(release_html_url)
+      end
+    end
+
+    it 'does not hide unexpected direct release lookup errors' do
+      allow(client).to receive(:releases).with(test_repo).and_return([])
+      allow(client).to receive(:release_for_tag).with(test_repo, test_version).and_raise(Octokit::TooManyRequests)
+
+      with_tmp_file(named: 'test-app.zip') do |file_path|
+        expect(client).not_to receive(:release_assets)
+        expect(client).not_to receive(:upload_asset)
+
+        expect do
+          upload_release_assets(assets: [file_path])
+        end.to raise_error(Octokit::TooManyRequests)
       end
     end
 
@@ -800,6 +886,137 @@ describe Fastlane::Helper::GithubHelper do
 
     def release_asset(name:, url:)
       sawyer_resource_stub(name: name, url: url)
+    end
+  end
+
+  describe '#publish_release' do
+    let(:test_repo) { 'repo-test/project-test' }
+    let(:test_name) { '25.1' }
+    let(:client) do
+      instance_double(
+        Octokit::Client,
+        user: instance_double('User', name: 'test'),
+        'auto_paginate=': nil
+      )
+    end
+    let(:helper) { described_class.new(github_token: 'Fake-GitHubToken-123') }
+
+    # Those two mirror the two GitHub Releases both named `25.1` that caused the WCiOS 25.1 incident: one draft per
+    # `finalize_release` run, the older one targeting the commit of the first run, the newer one that of the second run.
+    let(:stale_release) { github_release(id: 351_929_162, target_commitish: 'dbd800a', created_at: '2026-07-10T06:18:29Z') }
+    let(:latest_release) { github_release(id: 352_002_205, target_commitish: '558354d', created_at: '2026-07-10T09:27:00Z') }
+
+    before do
+      allow(Octokit::Client).to receive(:new).and_return(client)
+      allow(client).to receive(:update_release)
+    end
+
+    it 'fails clearly if no release matches the name' do
+      allow(client).to receive(:releases).with(test_repo).and_return([github_release(id: 1, name: '25.2')])
+
+      expect(client).not_to receive(:update_release)
+      expect { publish_release }.to raise_error(FastlaneCore::Interface::FastlaneError, "No release found with name #{test_name}")
+    end
+
+    it 'publishes the release matching the name, ignoring the ones named differently' do
+      allow(client).to receive(:releases).with(test_repo).and_return([github_release(id: 1, name: '25.2'), latest_release])
+
+      expect(client).to receive(:update_release).with(latest_release.url, { draft: false })
+
+      expect(publish_release).to eq(latest_release.html_url)
+    end
+
+    it 'publishes the most recently created release when several share the same name' do
+      allow(client).to receive(:releases).with(test_repo).and_return([stale_release, latest_release])
+
+      expect(client).to receive(:update_release).with(latest_release.url, { draft: false })
+
+      expect(publish_release).to eq(latest_release.html_url)
+    end
+
+    it 'publishes the most recently created release regardless of the order the API lists them in' do
+      allow(client).to receive(:releases).with(test_repo).and_return([latest_release, stale_release])
+
+      expect(client).to receive(:update_release).with(latest_release.url, { draft: false })
+
+      expect(publish_release).to eq(latest_release.html_url)
+    end
+
+    it 'does not rely on `created_at`, which GitHub rewrites to the target commit date on publish' do
+      # A published release reports the date of the commit it targets as its `created_at`, which can make it look more
+      # recent than a draft created after it. Only the release `id` reflects the order in which releases were created.
+      published_release = github_release(id: 351_929_162, draft: false, created_at: '2026-07-10T23:00:00Z')
+      newer_draft = github_release(id: 352_002_205, created_at: '2026-07-10T09:27:00Z')
+      allow(client).to receive(:releases).with(test_repo).and_return([published_release, newer_draft])
+
+      expect(client).to receive(:update_release).with(newer_draft.url, { draft: false })
+
+      expect(publish_release).to eq(newer_draft.html_url)
+    end
+
+    it 'warns when several releases share the same name' do
+      allow(client).to receive(:releases).with(test_repo).and_return([stale_release, latest_release])
+
+      expect(Fastlane::UI).to receive(:important).with(/Found 2 GitHub Releases named `25\.1`.*558354d.*1 older one/)
+
+      publish_release
+    end
+
+    it 'warns when the release it publishes has already been published' do
+      allow(client).to receive(:releases).with(test_repo).and_return([github_release(id: 1, draft: false)])
+
+      expect(Fastlane::UI).to receive(:important).with(/has already been published/)
+
+      publish_release
+    end
+
+    it 'does not warn when publishing a single draft release' do
+      allow(client).to receive(:releases).with(test_repo).and_return([latest_release])
+
+      expect(Fastlane::UI).not_to receive(:important)
+
+      publish_release
+    end
+
+    it 'keeps the prerelease status of the draft when no prerelease value is provided' do
+      allow(client).to receive(:releases).with(test_repo).and_return([latest_release])
+
+      expect(client).to receive(:update_release).with(latest_release.url, { draft: false })
+
+      publish_release
+    end
+
+    it 'publishes as a prerelease when requested' do
+      allow(client).to receive(:releases).with(test_repo).and_return([latest_release])
+
+      expect(client).to receive(:update_release).with(latest_release.url, { draft: false, prerelease: true })
+
+      publish_release(prerelease: true)
+    end
+
+    it 'publishes as a final release when prerelease is explicitly false' do
+      allow(client).to receive(:releases).with(test_repo).and_return([latest_release])
+
+      expect(client).to receive(:update_release).with(latest_release.url, { draft: false, prerelease: false })
+
+      publish_release(prerelease: false)
+    end
+
+    def github_release(id:, name: test_name, draft: true, target_commitish: 'deadbeef', created_at: '2026-07-10T09:27:00Z')
+      sawyer_resource_stub(
+        id: id,
+        name: name,
+        draft: draft,
+        target_commitish: target_commitish,
+        created_at: created_at,
+        url: "https://api.github.com/repos/#{test_repo}/releases/#{id}",
+        # GitHub only assigns a tag-based URL to a release once it is published; drafts get an `untagged-*` one
+        html_url: draft ? "https://github.com/#{test_repo}/releases/tag/untagged-#{id}" : "https://github.com/#{test_repo}/releases/tag/#{name}"
+      )
+    end
+
+    def publish_release(prerelease: nil)
+      helper.publish_release(repository: test_repo, name: test_name, prerelease: prerelease)
     end
   end
 

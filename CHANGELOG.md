@@ -6,11 +6,12 @@
 
 ### Breaking Changes
 
+- The `ios_build_preflight` and `android_build_preflight` actions have been removed. [#773]
 - `EnvManager`: populate the process `ENV` from the loaded `.env` file by default (no-override semantics — pre-existing `ENV` values win) [#723].
 
 ### New Features
 
-_None_
+- `get_prs_between_tags` now accepts a `fail_on_error:` parameter. [#772]
 
 ### Bug Fixes
 
@@ -19,6 +20,64 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 14.11.3
+
+### Bug Fixes
+
+- `GitHelper.delete_remote_branch_if_exists!` now detects branches directly on the remote instead of requiring a local remote-tracking ref. [#769]
+
+### Internal Changes
+
+Update the `Dangerfile`'s message about PR reviewers to suggest `apps-infra-tooling` team instead of `apps-infrastructure`. [#761]
+
+## 14.11.2
+
+### Bug Fixes
+
+- `publish_github_release` now publishes the most recently created GitHub Release when several share the same name, instead of whichever one the GitHub API happened to list first. It also warns when it finds more than one match, or when the release it publishes turns out to have been published already. The tag-based release lookup used by `upload_github_release_assets` is deterministic too, preferring the published release that owns the tag, and falling back to the most recently created draft when no published release claims it. [#763]
+
+### Internal Changes
+
+- Run the `GitHelper` git-lfs specs against a sandboxed `GIT_CONFIG_GLOBAL` so they no longer remove the `[filter "lfs"]` section from the developer's global git config. [#762]
+
+## 14.11.1
+
+### Bug Fixes
+
+- `create_github_release` no longer crashes with `FrozenError` when the optional `release_notes_file_path` is omitted. [#759]
+
+## 14.11.0
+
+### New Features
+
+- New `macos_verify_code_signing` action, asserting that macOS artifacts are signed, signed by the expected authority, accepted by Gatekeeper, and have a notarization ticket stapled to them. Handles `.app` bundles and `.dmg` disk images, picking the checks that apply to each. [#757]
+
+### Bug Fixes
+
+- `StringsFileValidationHelper.find_duplicated_keys` now parses unquoted keys/values and inter-token comments, matching the grammar `plutil` accepts, instead of raising `Invalid character`. This lets `ios_lint_localizations`' `check_duplicate_keys` work on `InfoPlist.strings`-style files. [#741]
+- `ios_lint_localizations`' `check_duplicate_keys` now warns and skips, rather than crashing, on a file that parses as a property list but isn't a tokenizable flat `.strings`. [#741]
+- `L10nHelper.merge_strings` now prefixes keys via a comment-aware tokenizer, so unquoted keys, unquoted values, and keys behind an inter-token comment are prefixed in the output consistently with the reported keys. [#741]
+- Bump `fastlane` to `~> 2.237` to pull in `excon >= 1.5.0`, fixing CVE-2026-54171 / GHSA-48rx-c7pg-q66r. [#754]
+- `upload_github_release_assets`: make release lookup more resilient by falling back to GitHub's direct release-by-tag lookup when the releases list does not include the requested release. [#753]
+
+### Internal Changes
+
+- Added regression coverage for `upload_github_release_assets` direct release lookup errors. [#755]
+- Centralized `.strings` duplicate-key detection behind `StringsFileValidationHelper.scan_for_duplicate_keys`, returning a `[:scanned | :unsupported_format | :unscannable, payload]` tri-state that callers can map to their own warn-and-skip vs fail-closed policy. [#741]
+- `L10nHelper.strings_file_type` and `StringsFileValidationHelper.scan_for_duplicate_keys` accept `assume_valid:` to skip a redundant `plutil -lint` when the caller has already parsed the file. [#741]
+- Bumped development Ruby version to 3.4.9 [#729]
+
+## 14.10.0
+
+### New Features
+
+- `android_prune_orphaned_translations` action: removes `<string>`, `<string-array>` and `<plurals>` entries from `values-*/strings.xml` whose keys are not declared in the source `values/strings.xml` optionally unioned with `additional_source_strings_paths`. [#734]
+
+### Bug Fixes
+
+- Bump `faraday` and `nokogiri` to address security vulnerabilities. [#749]
+- Bump `concurrent-ruby` to address CVE-2026-54904 / GHSA-h8w8-99g7-qmvj. [#751]
 
 ## 14.9.0
 
