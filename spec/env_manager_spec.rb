@@ -154,6 +154,44 @@ describe Fastlane::Wpmreleasetoolkit::EnvManager do
       end
     end
 
+    it 'resolves interpolated values against the process ENV' do
+      ENV['INTERP_BASE'] = 'from_env'
+      ENV.delete('INTERP_DERIVED')
+
+      with_tmp_file(named: 'i.env', content: "INTERP_BASE=from_file\nINTERP_DERIVED=${INTERP_BASE}\n") do |path|
+        manager = described_class.new(
+          env_file_name: File.basename(path),
+          env_file_folder: File.dirname(path),
+          print_error_lambda: print_error_lambda
+        )
+
+        expect(manager.get_required_env!('INTERP_DERIVED')).to eq('from_env')
+        expect(ENV.fetch('INTERP_DERIVED')).to eq('from_env')
+
+        manager.restore_env!
+
+        expect(ENV.fetch('INTERP_DERIVED', nil)).to be_nil
+        expect(ENV.fetch('INTERP_BASE')).to eq('from_env')
+      end
+    end
+
+    it 'resolves interpolated values against the file when mutate_env is false' do
+      ENV['INTERP_BASE'] = 'from_env'
+      ENV.delete('INTERP_DERIVED')
+
+      with_tmp_file(named: 'i.env', content: "INTERP_BASE=from_file\nINTERP_DERIVED=${INTERP_BASE}\n") do |path|
+        manager = described_class.new(
+          env_file_name: File.basename(path),
+          env_file_folder: File.dirname(path),
+          mutate_env: false,
+          print_error_lambda: print_error_lambda
+        )
+
+        expect(manager.get_required_env!('INTERP_DERIVED')).to eq('from_file')
+        expect(ENV.fetch('INTERP_DERIVED', nil)).to be_nil
+      end
+    end
+
     it 'warns when the env file does not exist' do
       ENV.delete('CI')
 

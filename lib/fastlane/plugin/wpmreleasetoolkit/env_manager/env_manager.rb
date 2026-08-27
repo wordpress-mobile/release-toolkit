@@ -43,24 +43,20 @@ module Fastlane
           @print_warning_lambda.call("Warning: env file not found at #{@env_path}. Environment variables may not be loaded.")
         end
 
-        # Always parse rather than load: it lets us track exactly which keys we
-        # add to `ENV` so `reset!` can undo only those, without disturbing keys
-        # that pre-existed in the process environment.
-        @loaded_env = File.exist?(@env_path) ? Dotenv.parse(@env_path) : {}
-        # Records the value this instance wrote for each key it added. On
-        # restore, we delete only if `ENV[key]` still matches — if a later
-        # caller overwrote it, their value is left alone.
-        @mutations = {}
-
-        return unless mutate_env
-
-        @loaded_env.each do |key, value|
-          # No-override: anything already in `ENV` (e.g. set by CI) wins.
-          next if ENV.key?(key)
-
-          ENV[key] = value
-          @mutations[key] = value
+        unless mutate_env
+          @loaded_env = File.exist?(@env_path) ? Dotenv.parse(@env_path) : {}
+          @mutations = {}
+          return
         end
+
+        # `load` rather than `parse` so interpolated values (`B=${A}`) resolve
+        # against the process `ENV`; `parse` resolves them against the file's own values.
+        env_before = ENV.to_h
+        @loaded_env = File.exist?(@env_path) ? Dotenv.load(@env_path) : {}
+        # Records the value this instance wrote for each key it added. On restore,
+        # we delete only if `ENV[key]` still matches — if a later caller overwrote
+        # it, their value is left alone.
+        @mutations = ENV.to_h.reject { |key, _| env_before.key?(key) }
       end
 
       # Remove from `ENV` any keys this instance added via `mutate_env: true`,
