@@ -7,6 +7,7 @@
 ### Breaking Changes
 
 - The `ios_build_preflight` and `android_build_preflight` actions have been removed. [#773]
+- `EnvManager` now populates the process `ENV` from the loaded `.env` file by default [#723].
 
 ### New Features
 

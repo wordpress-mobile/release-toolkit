@@ -62,7 +62,7 @@ describe Fastlane::Wpmreleasetoolkit::EnvManager do
       expect(manager.env_example_path).to eq('fastlane/example.env')
     end
 
-    it 'loads values from the .env file without mutating ENV' do
+    it 'loads values from the .env file into ENV by default' do
       ENV.delete('TEST_INIT_VAR')
 
       with_tmp_file(named: 'test.env', content: "TEST_INIT_VAR=loaded\n") do |path|
@@ -73,21 +73,39 @@ describe Fastlane::Wpmreleasetoolkit::EnvManager do
         )
 
         expect(manager.get_required_env!('TEST_INIT_VAR')).to eq('loaded')
+        expect(ENV.fetch('TEST_INIT_VAR', nil)).to eq('loaded')
+      end
+    end
+
+    it 'leaves ENV untouched when mutate_env is false' do
+      ENV.delete('TEST_INIT_VAR')
+
+      with_tmp_file(named: 'test.env', content: "TEST_INIT_VAR=loaded\n") do |path|
+        manager = described_class.new(
+          env_file_name: File.basename(path),
+          env_file_folder: File.dirname(path),
+          mutate_env: false,
+          print_error_lambda: print_error_lambda
+        )
+
+        expect(manager.get_required_env!('TEST_INIT_VAR')).to eq('loaded')
         expect(ENV.fetch('TEST_INIT_VAR', nil)).to be_nil
       end
     end
 
-    it 'keeps multiple instances isolated from each other' do
+    it 'keeps multiple instances isolated when mutate_env is false' do
       with_tmp_file(named: 'a.env', content: "SHARED_KEY=from_a\n") do |path_a|
         with_tmp_file(named: 'b.env', content: "SHARED_KEY=from_b\n") do |path_b|
           manager_a = described_class.new(
             env_file_name: File.basename(path_a),
             env_file_folder: File.dirname(path_a),
+            mutate_env: false,
             print_error_lambda: print_error_lambda
           )
           manager_b = described_class.new(
             env_file_name: File.basename(path_b),
             env_file_folder: File.dirname(path_b),
+            mutate_env: false,
             print_error_lambda: print_error_lambda
           )
 
@@ -108,6 +126,69 @@ describe Fastlane::Wpmreleasetoolkit::EnvManager do
         )
 
         expect(manager.get_required_env!('PRECEDENCE_KEY')).to eq('from_env')
+        # No-override: the pre-existing ENV value is left in place.
+        expect(ENV.fetch('PRECEDENCE_KEY')).to eq('from_env')
+      end
+    end
+
+    it 'lets the first instance win when multiple mutate_env instances share a key' do
+      ENV.delete('FIRST_WINS_KEY')
+
+      with_tmp_file(named: 'a.env', content: "FIRST_WINS_KEY=from_a\n") do |path_a|
+        with_tmp_file(named: 'b.env', content: "FIRST_WINS_KEY=from_b\n") do |path_b|
+          described_class.new(
+            env_file_name: File.basename(path_a),
+            env_file_folder: File.dirname(path_a),
+            print_error_lambda: print_error_lambda
+          )
+          described_class.new(
+            env_file_name: File.basename(path_b),
+            env_file_folder: File.dirname(path_b),
+            print_error_lambda: print_error_lambda
+          )
+
+          # The second instance's value never lands in ENV because the first
+          # already populated the key.
+          expect(ENV.fetch('FIRST_WINS_KEY')).to eq('from_a')
+        end
+      end
+    end
+
+    it 'resolves interpolated values against the process ENV' do
+      ENV['INTERP_BASE'] = 'from_env'
+      ENV.delete('INTERP_DERIVED')
+
+      with_tmp_file(named: 'i.env', content: "INTERP_BASE=from_file\nINTERP_DERIVED=${INTERP_BASE}\n") do |path|
+        manager = described_class.new(
+          env_file_name: File.basename(path),
+          env_file_folder: File.dirname(path),
+          print_error_lambda: print_error_lambda
+        )
+
+        expect(manager.get_required_env!('INTERP_DERIVED')).to eq('from_env')
+        expect(ENV.fetch('INTERP_DERIVED')).to eq('from_env')
+
+        manager.restore_env!
+
+        expect(ENV.fetch('INTERP_DERIVED', nil)).to be_nil
+        expect(ENV.fetch('INTERP_BASE')).to eq('from_env')
+      end
+    end
+
+    it 'resolves interpolated values against the file when mutate_env is false' do
+      ENV['INTERP_BASE'] = 'from_env'
+      ENV.delete('INTERP_DERIVED')
+
+      with_tmp_file(named: 'i.env', content: "INTERP_BASE=from_file\nINTERP_DERIVED=${INTERP_BASE}\n") do |path|
+        manager = described_class.new(
+          env_file_name: File.basename(path),
+          env_file_folder: File.dirname(path),
+          mutate_env: false,
+          print_error_lambda: print_error_lambda
+        )
+
+        expect(manager.get_required_env!('INTERP_DERIVED')).to eq('from_file')
+        expect(ENV.fetch('INTERP_DERIVED', nil)).to be_nil
       end
     end
 
@@ -329,6 +410,85 @@ describe Fastlane::Wpmreleasetoolkit::EnvManager do
     end
   end
 
+  describe '#restore_env!' do
+    it 'removes only the keys this instance added to ENV' do
+      ENV.delete('RESTORE_NEW_KEY')
+      ENV['RESTORE_PREEXISTING_KEY'] = 'original'
+
+      with_tmp_file(
+        named: 'restore.env',
+        content: "RESTORE_NEW_KEY=loaded\nRESTORE_PREEXISTING_KEY=from_file\n"
+      ) do |path|
+        manager = described_class.new(
+          env_file_name: File.basename(path),
+          env_file_folder: File.dirname(path),
+          print_error_lambda: print_error_lambda
+        )
+
+        expect(ENV.fetch('RESTORE_NEW_KEY')).to eq('loaded')
+        expect(ENV.fetch('RESTORE_PREEXISTING_KEY')).to eq('original')
+
+        manager.restore_env!
+
+        expect(ENV.fetch('RESTORE_NEW_KEY', nil)).to be_nil
+        expect(ENV.fetch('RESTORE_PREEXISTING_KEY')).to eq('original')
+      end
+    end
+
+    it 'is idempotent' do
+      ENV.delete('IDEMPOTENT_KEY')
+
+      with_tmp_file(named: 'restore.env', content: "IDEMPOTENT_KEY=loaded\n") do |path|
+        manager = described_class.new(
+          env_file_name: File.basename(path),
+          env_file_folder: File.dirname(path),
+          print_error_lambda: print_error_lambda
+        )
+
+        manager.restore_env!
+        expect { manager.restore_env! }.not_to raise_error
+        expect(ENV.fetch('IDEMPOTENT_KEY', nil)).to be_nil
+      end
+    end
+
+    it 'leaves a key alone when a later caller has overwritten it' do
+      ENV.delete('RESTORE_OVERWRITTEN_KEY')
+
+      with_tmp_file(named: 'restore.env', content: "RESTORE_OVERWRITTEN_KEY=loaded\n") do |path|
+        manager = described_class.new(
+          env_file_name: File.basename(path),
+          env_file_folder: File.dirname(path),
+          print_error_lambda: print_error_lambda
+        )
+
+        expect(ENV.fetch('RESTORE_OVERWRITTEN_KEY')).to eq('loaded')
+
+        # Simulate a later caller overwriting the value the manager set.
+        ENV['RESTORE_OVERWRITTEN_KEY'] = 'overwritten'
+
+        manager.restore_env!
+
+        expect(ENV.fetch('RESTORE_OVERWRITTEN_KEY')).to eq('overwritten')
+      end
+    end
+
+    it 'is a no-op when mutate_env was false' do
+      ENV.delete('NOOP_KEY')
+
+      with_tmp_file(named: 'restore.env', content: "NOOP_KEY=loaded\n") do |path|
+        manager = described_class.new(
+          env_file_name: File.basename(path),
+          env_file_folder: File.dirname(path),
+          mutate_env: false,
+          print_error_lambda: print_error_lambda
+        )
+
+        expect { manager.restore_env! }.not_to raise_error
+        expect(ENV.fetch('NOOP_KEY', nil)).to be_nil
+      end
+    end
+  end
+
   describe 'CI environment helpers' do
     subject(:manager) do
       described_class.new(
@@ -521,6 +681,42 @@ describe Fastlane::Wpmreleasetoolkit::EnvManager do
         described_class.reset!
 
         expect(described_class).not_to be_configured
+      end
+
+      it 'rolls back ENV mutations the default instance performed' do
+        described_class.reset!
+        ENV.delete('RESET_ROLLBACK_KEY')
+
+        with_tmp_file(named: 'reset.env', content: "RESET_ROLLBACK_KEY=loaded\n") do |path|
+          described_class.set_up(
+            env_file_name: File.basename(path),
+            env_file_folder: File.dirname(path),
+            print_error_lambda: print_error_lambda
+          )
+
+          expect(ENV.fetch('RESET_ROLLBACK_KEY')).to eq('loaded')
+
+          described_class.reset!
+
+          expect(ENV.fetch('RESET_ROLLBACK_KEY', nil)).to be_nil
+        end
+      end
+
+      it 'leaves pre-existing ENV entries alone on rollback' do
+        described_class.reset!
+        ENV['PREEXISTING_KEY'] = 'original'
+
+        with_tmp_file(named: 'reset.env', content: "PREEXISTING_KEY=from_file\n") do |path|
+          described_class.set_up(
+            env_file_name: File.basename(path),
+            env_file_folder: File.dirname(path),
+            print_error_lambda: print_error_lambda
+          )
+
+          described_class.reset!
+
+          expect(ENV.fetch('PREEXISTING_KEY')).to eq('original')
+        end
       end
     end
 
