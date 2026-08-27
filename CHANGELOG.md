@@ -6,12 +6,11 @@
 
 ### Breaking Changes
 
-- The `ios_build_preflight` and `android_build_preflight` actions have been removed. [#773]
-- `EnvManager` now populates the process `ENV` from the loaded `.env` file by default [#723].
+_None_
 
 ### New Features
 
-- `get_prs_between_tags` now accepts a `fail_on_error:` parameter. [#772]
+_None_
 
 ### Bug Fixes
 
@@ -20,6 +19,17 @@ _None_
 ### Internal Changes
 
 _None_
+
+## 15.0.0
+
+### Breaking Changes
+
+- The `ios_build_preflight` and `android_build_preflight` actions have been removed. [#773]
+- `EnvManager` now populates the process `ENV` from the loaded `.env` file by default [#723].
+
+### New Features
+
+- `get_prs_between_tags` now accepts a `fail_on_error:` parameter. [#772]
 
 ## 14.11.3
 
