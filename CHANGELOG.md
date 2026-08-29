@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- The backmerge PR body now use a [Mermaid](https://mermaid.js.org) graph to represent the Git tree [#594]
 
 ### Bug Fixes
 
