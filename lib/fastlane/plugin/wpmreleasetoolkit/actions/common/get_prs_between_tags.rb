@@ -105,7 +105,7 @@ module Fastlane
                                                     'See https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes#configuration-options',
                                        optional: true,
                                        type: String),
-          FastlaneCore::ConfigItem.new(**Fastlane::Helper::ConfigItemHelper::OPT_IN_FAIL_ON_ERROR_CONFIG_ITEM_OPTIONS),
+          Fastlane::Helper::ConfigItemHelper.opt_in_fail_on_error_config_item,
           Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end

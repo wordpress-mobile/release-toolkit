@@ -102,7 +102,7 @@ module Fastlane
             type: Boolean,
             default_value: false
           ),
-          FastlaneCore::ConfigItem.new(**Fastlane::Helper::ConfigItemHelper::OPT_IN_FAIL_ON_ERROR_CONFIG_ITEM_OPTIONS),
+          Fastlane::Helper::ConfigItemHelper.opt_in_fail_on_error_config_item,
         ]
       end
 
