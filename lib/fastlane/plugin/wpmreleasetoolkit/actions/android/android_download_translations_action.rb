@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../../helper/config_item_helper'
+
 # This action is the new version of android_update_metadata (AndroidUpdateMetadataAction) and should now be used instead of that one
 
 module Fastlane
@@ -19,7 +21,8 @@ module Fastlane
           res_dir: res_dir,
           glotpress_project_url: params[:glotpress_url],
           glotpress_filters: params[:status_filter].map { |s| { status: s } },
-          locales_map: params[:locales]
+          locales_map: params[:locales],
+          fail_on_error: params[:fail_on_error]
         )
 
         # Update submodules then lint translations
@@ -99,6 +102,7 @@ module Fastlane
             type: Boolean,
             default_value: false
           ),
+          Fastlane::Helper::ConfigItemHelper.opt_in_fail_on_error_config_item,
         ]
       end
 

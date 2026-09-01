@@ -295,7 +295,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
           "#{gp_fake_url.chomp('/')}/#{locale[:glotpress]}/default/export-translations/?filters%5Bstatus%5D=custom-status&filters%5Bwarnings%5D=yes&format=android"
         end
         custom_gp_urls.each do |url|
-          stub_request(:get, url)
+          stub_request(:get, url).to_return(status: 200, body: '<resources />')
         end
 
         # Act
@@ -340,6 +340,63 @@ describe Fastlane::Helper::Android::LocalizeHelper do
         expect(File.exist?(generated_file_path)).to be(true)
         expect(File.read(generated_file_path)).to eq(expected_merged_content)
       end
+
+      it 'raises instead of writing a partial export when one filter download fails' do
+        FileUtils.mkdir_p(File.dirname(generated_file(nil)))
+        FileUtils.cp(expected_file(nil), generated_file(nil))
+
+        stub_path = File.join(fixtures_dir, 'filters', 'current.xml')
+        stub_request(:get, "#{gp_fake_url.chomp('/')}/fakegploc/default/export-translations/?filters%5Bstatus%5D=current&format=android")
+          .to_return(status: 200, body: File.read(stub_path))
+        stub_request(:get, "#{gp_fake_url.chomp('/')}/fakegploc/default/export-translations/?filters%5Bstatus%5D=waiting&format=android")
+          .to_return(status: 500)
+        allow(FastlaneCore::UI).to receive(:interactive?).and_return(false)
+
+        expect do
+          described_class.download_from_glotpress(
+            res_dir: tmpdir,
+            glotpress_project_url: gp_fake_url,
+            glotpress_filters: [{ status: 'current' }, { status: 'waiting' }],
+            locales_map: [{ glotpress: 'fakegploc', android: 'fakeanloc' }],
+            fail_on_error: true
+          )
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /500/)
+
+        expect(File).not_to exist(generated_file('fakeanloc'))
+      end
+
+      it 'raises when no export filters are provided' do
+        expect do
+          described_class.download_from_glotpress(res_dir: tmpdir, glotpress_project_url: gp_fake_url, glotpress_filters: [], locales_map: [{ glotpress: 'fakegploc', android: 'fakeanloc' }], fail_on_error: true)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /At least one GlotPress filter is required/)
+      end
+    end
+
+    ['', '<html><body>Service unavailable</body></html>'].each do |response_body|
+      it "raises instead of writing an invalid successful export: #{response_body.inspect}" do
+        FileUtils.mkdir_p(File.dirname(generated_file(nil)))
+        FileUtils.cp(expected_file(nil), generated_file(nil))
+        stub_request(:get, "#{gp_fake_url.chomp('/')}/fakegploc/default/export-translations/?filters%5Bstatus%5D=current&format=android")
+          .to_return(status: 200, body: response_body)
+
+        expect do
+          described_class.download_from_glotpress(res_dir: tmpdir, glotpress_project_url: gp_fake_url, locales_map: [{ glotpress: 'fakegploc', android: 'fakeanloc' }], fail_on_error: true)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /Invalid Android translation export.*fakegploc/)
+
+        expect(File).not_to exist(generated_file('fakeanloc'))
+      end
+    end
+
+    it 'retains permissive response handling by default' do
+      FileUtils.mkdir_p(File.dirname(generated_file(nil)))
+      FileUtils.cp(expected_file(nil), generated_file(nil))
+      body = '<html><body>Service unavailable</body></html>'
+      stub_request(:get, "#{gp_fake_url.chomp('/')}/fakegploc/default/export-translations/?filters%5Bstatus%5D=current&format=android").to_return(status: 200, body: body)
+
+      expect do
+        described_class.download_from_glotpress(res_dir: tmpdir, glotpress_project_url: gp_fake_url, locales_map: [{ glotpress: 'fakegploc', android: 'fakeanloc' }])
+      end.not_to raise_error
+      expect(File.read(generated_file('fakeanloc'))).to include('<html ')
     end
 
     it 'sets a predefined User Agent so GlotPress will not rate-limit us' do
@@ -361,7 +418,7 @@ describe Fastlane::Helper::Android::LocalizeHelper do
                # - https://github.com/bblimke/webmock/tree/33d8810c2828fc17010e15cc3f21ad2c726a966f#matching-requests
                # - https://github.com/bblimke/webmock/issues/276#issuecomment-28625436
                headers: { 'User-Agent' => 'Automattic App Release Automator; https://github.com/wordpress-mobile/release-toolkit/' }
-             ).to_return(status: 200, body: '')
+             ).to_return(status: 200, body: '<resources />')
 
       # Act
       described_class.download_from_glotpress(

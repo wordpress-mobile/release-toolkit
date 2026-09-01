@@ -21,10 +21,6 @@ describe Fastlane::Actions::UpdateAppsCdnBuildMetadataAction do
     }.to_json
   end
 
-  before do
-    WebMock.disable_net_connect!
-  end
-
   describe 'updating visibility' do
     it 'successfully updates the visibility to external' do
       stub_request(:post, api_url)

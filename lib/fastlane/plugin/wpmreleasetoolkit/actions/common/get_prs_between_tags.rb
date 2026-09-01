@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'fastlane/action'
+require_relative '../../helper/config_item_helper'
 require_relative '../../helper/github_helper'
 
 module Fastlane
@@ -104,15 +105,7 @@ module Fastlane
                                                     'See https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes#configuration-options',
                                        optional: true,
                                        type: String),
-          FastlaneCore::ConfigItem.new(key: :fail_on_error,
-                                       description: 'Whether to fail the lane if the changelog cannot be computed. ' \
-                                                    'When `false` (the default), the error message is returned as the changelog itself, ' \
-                                                    'so that it ends up visible in the GitHub Release body. ' \
-                                                    'Set this to `true` if the caller publishes the release only after this action succeeds, ' \
-                                                    'and would rather stop than publish a release whose notes are an error message',
-                                       optional: true,
-                                       default_value: false,
-                                       type: Boolean),
+          Fastlane::Helper::ConfigItemHelper.opt_in_fail_on_error_config_item,
           Fastlane::Helper::GithubHelper.github_token_config_item,
         ]
       end

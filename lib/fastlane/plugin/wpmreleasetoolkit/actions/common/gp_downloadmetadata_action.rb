@@ -2,6 +2,7 @@
 
 require 'fastlane/action'
 require_relative '../../helper/metadata_download_helper'
+require_relative '../../helper/config_item_helper'
 
 module Fastlane
   module Actions
@@ -13,12 +14,13 @@ module Fastlane
         UI.message "Source locale: #{params[:source_locale].nil? ? '-' : params[:source_locale]}"
         UI.message "Path: #{params[:download_path]}"
         UI.message "Auto-retry: #{params[:auto_retry]}"
+        UI.message "Fail on error: #{params[:fail_on_error]}"
 
         # Check download path
         FileUtils.mkdir_p(params[:download_path])
 
         # Download
-        downloader = Fastlane::Helper::MetadataDownloader.new(params[:download_path], params[:target_files], params[:auto_retry])
+        downloader = Fastlane::Helper::MetadataDownloader.new(params[:download_path], params[:target_files], params[:auto_retry], fail_on_error: params[:fail_on_error])
 
         params[:locales].each do |loc|
           if loc.is_a?(Array)
@@ -77,6 +79,7 @@ module Fastlane
                                        type: FastlaneCore::Boolean,
                                        optional: true,
                                        default_value: true),
+          Fastlane::Helper::ConfigItemHelper.opt_in_fail_on_error_config_item,
         ]
       end
 

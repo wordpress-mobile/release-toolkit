@@ -9,10 +9,11 @@ module Fastlane
     class MetadataDownloader
       attr_reader :target_folder, :target_files
 
-      def initialize(target_folder, target_files, auto_retry)
+      def initialize(target_folder, target_files, auto_retry, fail_on_error: false)
         @target_folder = target_folder
         @target_files = target_files
         @auto_retry = auto_retry
+        @fail_on_error = fail_on_error
         @alternates = {}
       end
 
@@ -21,9 +22,10 @@ module Fastlane
         GlotPressDownloader.download(
           url: glotpress_url,
           locale: target_locale,
-          auto_retry: @auto_retry
+          auto_retry: @auto_retry,
+          fail_on_error: @fail_on_error
         ) do |response_body|
-          handle_glotpress_response(response_body: response_body, locale: target_locale, is_source: is_source)
+          handle_glotpress_response(response_body: response_body, locale: target_locale, is_source: is_source, url: glotpress_url)
         end
       end
 
@@ -106,16 +108,33 @@ module Fastlane
 
       private
 
-      def handle_glotpress_response(response_body:, locale:, is_source:)
+      def handle_glotpress_response(response_body:, locale:, is_source:, url:)
         # Parse the JSON response
         @alternates.clear
-        loc_data = begin
-          JSON.parse(response_body)
-        rescue StandardError
-          nil
-        end
+        loc_data = parse_metadata_response(response_body: response_body, locale: locale, url: url)
+
         parse_data(locale, loc_data, is_source)
         reparse_alternates(locale, loc_data, is_source) unless @alternates.empty?
+      end
+
+      def parse_metadata_response(response_body:, locale:, url:)
+        return JSON.parse(response_body) unless @fail_on_error
+
+        loc_data = JSON.parse(response_body)
+        UI.user_error!("Unexpected GlotPress metadata response for locale `#{locale}` (#{url})") unless valid_metadata_response?(loc_data)
+        loc_data
+      rescue JSON::ParserError, TypeError => e
+        UI.user_error!("Error parsing GlotPress response for locale `#{locale}` — #{e.message} (#{url})") if @fail_on_error
+        nil
+      end
+
+      def valid_metadata_response?(loc_data)
+        return loc_data.empty? if loc_data.is_a?(Array)
+        return false unless loc_data.is_a?(Hash) && !loc_data.empty?
+
+        loc_data.all? do |source, translations|
+          source.is_a?(String) && translations.is_a?(Array) && translations.all?(String)
+        end
       end
     end
   end
