@@ -9,16 +9,6 @@ gem 'activesupport', '~> 8.1'
 gem 'buildkite-test_collector', '~> 2.3'
 gem 'codecov', require: false
 gem 'danger-dangermattic', '~> 1.0'
-# Security:
-# - https://github.com/lostisland/faraday/pull/1665
-# - https://github.com/lostisland/faraday/pull/1681
-#
-# Faraday 2.0 is not compatible with Fastlane
-#
-# See also:
-# - https://github.com/fastlane/fastlane/issues/21334
-# - https://github.com/fastlane/fastlane/pull/30089
-gem 'faraday', '~> 1.10', '>= 1.10.6'
 gem 'pry', '~> 0.12.2'
 gem 'rmagick', '~> 5.3'
 gem 'rspec', '~> 3.8'
