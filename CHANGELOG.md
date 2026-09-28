@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-_None_
+- Bump `fastlane` to `~> 2.240` to require `rubyzip >= 3.4.0`, fixing CVE-2026-85396 / GHSA-47m2-wp7j-p9vc. [#775]
 
 ### Internal Changes
 
