@@ -51,7 +51,7 @@ describe Fastlane::Actions::GetPrsBetweenTagsAction do
 
       allow(client).to receive(:post).with(
         "repos/#{test_repo}/releases/generate-notes",
-        config_file_path: configuration_file_path,
+        configuration_file_path: configuration_file_path,
         previous_tag_name: previous_tag,
         tag_name: test_tag_name,
         target_commitish: target_commitish || test_head_ref
@@ -110,7 +110,7 @@ describe Fastlane::Actions::GetPrsBetweenTagsAction do
     def stub_failing_api_call(target_commitish: nil, previous_tag: nil, configuration_file_path: nil, error_msg: 'API Failure')
       allow(client).to receive(:post).with(
         "repos/#{test_repo}/releases/generate-notes",
-        config_file_path: configuration_file_path,
+        configuration_file_path: configuration_file_path,
         previous_tag_name: previous_tag,
         tag_name: test_tag_name,
         target_commitish: target_commitish || test_head_ref
