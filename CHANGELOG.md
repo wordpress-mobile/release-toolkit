@@ -10,12 +10,12 @@ _None_
 
 ### New Features
 
-- Add `generate_release_notes_file` to generate a version section from PR titles in existing release lanes.
+- Add `generate_release_notes_file` to generate a version section from PR titles in existing release lanes. [#776]
 - Add an opt-in `fail_on_error` mode to translation download actions so GlotPress request and response errors fail CI jobs. [#771]
 
 ### Bug Fixes
 
-- Pass the configured release notes path to GitHub using the expected `configuration_file_path` parameter.
+- Pass the configured release notes path to GitHub using the expected `configuration_file_path` parameter. [#776]
 - Bump `fastlane` to `~> 2.240` to require `rubyzip >= 3.4.0`, fixing CVE-2026-85396 / GHSA-47m2-wp7j-p9vc. [#775]
 
 ### Internal Changes
