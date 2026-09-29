@@ -11,6 +11,7 @@ module Fastlane
       # @return [String] The complete version section.
       def self.section(version:, markdown:)
         UI.user_error!('Expected a numeric release version') unless version.match?(/\A\d+(?:\.\d+){0,2}\z/)
+        markdown = markdown.sub(/\A<!-- Release notes generated using configuration in [^\n]* -->\s*/, '')
         empty_changelog = markdown.strip.match?(%r{\A\*\*Full Changelog\*\*: https://github\.com/[^/\s]+/[^/\s]+/compare/\S+\z})
         UI.user_error!('Unrecognized generated release notes') unless empty_changelog || markdown.start_with?('## New PRs since ', "## What's Changed")
 

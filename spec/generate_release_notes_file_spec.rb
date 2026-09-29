@@ -8,6 +8,8 @@ describe Fastlane::Actions::GenerateReleaseNotesFileAction do
   let(:original) { "#{header}25.7\n-----\n- Handwritten draft\n\n#{history}" }
   let(:markdown) do
     <<~MARKDOWN
+      <!-- Release notes generated using configuration in .github/developer-release-notes.yml at trunk -->
+
       ## New PRs since [25.6](https://github.com/woocommerce/woocommerce-android/releases/tag/25.6)
 
       ### Changes
@@ -129,6 +131,13 @@ describe Fastlane::Actions::GenerateReleaseNotesFileAction do
     with_tmp_file(content: original) do |path|
       generate(path)
       expect(File.read(path)).to eq("#{header}25.7\n-----\n\n\n#{history}")
+    end
+  end
+
+  it 'also accepts the default GitHub format without a configuration comment' do
+    allow(Fastlane::Actions::GetPrsBetweenTagsAction).to receive(:run).and_return(markdown.lines.drop(2).join)
+    with_tmp_file(content: original) do |path|
+      expect(generate(path)).to eq(section)
     end
   end
 
