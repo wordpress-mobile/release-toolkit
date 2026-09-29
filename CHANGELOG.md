@@ -10,15 +10,25 @@ _None_
 
 ### New Features
 
+_None_
+
+### Bug Fixes
+
+_None_
+
+### Internal Changes
+
+_None_
+
+## 15.1.0
+
+### New Features
+
 - Add an opt-in `fail_on_error` mode to translation download actions so GlotPress request and response errors fail CI jobs. [#771]
 
 ### Bug Fixes
 
 - Bump `fastlane` to `~> 2.240` to require `rubyzip >= 3.4.0`, fixing CVE-2026-85396 / GHSA-47m2-wp7j-p9vc. [#775]
-
-### Internal Changes
-
-_None_
 
 ## 15.0.0
 
