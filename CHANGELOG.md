@@ -10,11 +10,11 @@ _None_
 
 ### New Features
 
-_None_
+- Add `generate_release_notes_file` to generate a version section from PR titles in existing release lanes.
 
 ### Bug Fixes
 
-_None_
+- Pass the configured release notes path to GitHub using the expected `configuration_file_path` parameter.
 
 ### Internal Changes
 
