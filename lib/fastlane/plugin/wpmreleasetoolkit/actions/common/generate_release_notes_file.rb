@@ -2,7 +2,7 @@
 
 require 'fastlane/action'
 require_relative 'get_prs_between_tags'
-require_relative '../../helper/generated_release_notes_helper'
+require_relative '../../helper/release_notes_helper'
 
 module Fastlane
   module Actions
@@ -12,11 +12,10 @@ module Fastlane
 
         path = params[:release_notes_file_path]
         contents = File.read(path)
-        options = GetPrsBetweenTagsAction.available_options.reject { |option| option.key == :fail_on_error }.to_h { |option| [option.key, params[option.key]] }
+        options = params.values.except(:version, :release_notes_file_path, :dry_run)
         markdown = other_action.get_prs_between_tags(**options, fail_on_error: true)
-        helper = Helper::GeneratedReleaseNotesHelper
-        section = helper.section(version: params[:version], markdown: markdown)
-        updated = helper.update(contents: contents, version: params[:version], section: section)
+        section = Helper::ReleaseNotesHelper.section_from_prs(version: params[:version], markdown: markdown)
+        updated = Helper::ReleaseNotesHelper.update_section(contents: contents, version: params[:version], section: section)
 
         if params[:dry_run]
           UI.message(section)
@@ -32,12 +31,9 @@ module Fastlane
 
       def self.details
         <<~DETAILS
-          Uses get_prs_between_tags and GitHub's release notes configuration to select PRs.
-          Replaces the requested version's section, or inserts it before existing versions, preserving history and header comments.
-          Entries use `- [*] Title [PR URL]`; explicit priority stars at the start of a title are preserved.
-          Requires an explicit previous_tag. Use a published target_commitish when tag_name does not exist yet.
-          API errors and unrecognized change entries fail without writing. Does not commit changes.
-          dry_run prints and returns the proposed section without changing the file.
+          Inserts or replaces one version section using get_prs_between_tags, preserving other versions and header comments.
+          Requires an explicit previous_tag and a published target_commitish if tag_name does not exist.
+          Use dry_run to preview without writing. Does not commit changes.
         DETAILS
       end
 

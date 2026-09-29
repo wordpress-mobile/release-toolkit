@@ -50,7 +50,7 @@ describe Fastlane::Actions::GenerateReleaseNotesFileAction do
     run_described_fastlane_action(**options, version: '25.7', release_notes_file_path: path, **overrides)
   end
 
-  it 'uses an explicit comparison range and propagates API errors' do
+  it 'forwards the comparison options and requires API errors to fail' do
     expect(Fastlane::Actions::GetPrsBetweenTagsAction).to receive(:run) do |config|
       expect(config.values).to include(**options, fail_on_error: true)
       markdown
