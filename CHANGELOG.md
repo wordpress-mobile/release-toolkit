@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- Add `generate_release_notes_file` to generate a version section from PR titles in existing release lanes. [#776]
+- Add `generate_release_notes_file` to write generated GitHub Markdown into a version section in existing release lanes. [#776]
 - Add an opt-in `fail_on_error` mode to translation download actions so GlotPress request and response errors fail CI jobs. [#771]
 
 ### Bug Fixes

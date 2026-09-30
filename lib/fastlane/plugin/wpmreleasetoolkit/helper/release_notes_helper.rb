@@ -5,31 +5,6 @@ module Fastlane
     module ReleaseNotesHelper
       VERSION_HEADING = /^\d+(?:\.\d+){0,2}\r?\n[-=]+\r?\n/
 
-      # Format get_prs_between_tags output as a RELEASE-NOTES.txt version section.
-      # @param [String] version The numeric release version.
-      # @param [String] markdown Output from get_prs_between_tags.
-      # @return [String] The complete version section.
-      def self.section_from_prs(version:, markdown:)
-        UI.user_error!('Expected a numeric release version') unless version.match?(/\A\d+(?:\.\d+){0,2}\z/)
-        markdown = markdown.sub(/\A<!-- Release notes generated using configuration in [^\n]* -->\s*/, '')
-        empty_changelog = markdown.strip.match?(%r{\A\*\*Full Changelog\*\*: https://github\.com/[^/\s]+/[^/\s]+/compare/\S+\z})
-        UI.user_error!('Unrecognized generated release notes') unless empty_changelog || markdown.start_with?('## New PRs since ', "## What's Changed")
-
-        # Contributors can also contain PR links; they are not release note entries.
-        changes = markdown.split(/^## (?:New Contributors|Contributors)\s*$/, 2).first
-        entries = changes.lines.filter_map do |line|
-          next unless line.match?(/^[-*] /)
-
-          match = line.strip.match(%r{\A[-*] (.+) by @\S+ in (https://github\.com/[^/\s]+/[^/\s]+/pull/\d+)\z})
-          UI.user_error!("Unrecognized generated PR entry: #{line.strip}") unless match
-          title, url = match.captures
-          priority = title.match?(/\A\[\*+\]/) ? '' : '[*] '
-          "- #{priority}#{title} [#{url}]"
-        end
-
-        "#{version}\n-----\n#{entries.join("\n")}\n\n"
-      end
-
       # Insert or replace one version, preserving other sections and line endings.
       # @param [String] contents Existing RELEASE-NOTES.txt contents.
       # @param [String] version The section to replace or insert.
@@ -42,7 +17,8 @@ module Fastlane
         UI.user_error!('No version headings found in the release notes file') unless first_version
         UI.user_error!("Duplicate release notes sections for #{version}") if versions.count(version) > 1
 
-        section = section.gsub("\n", "\r\n") if contents.include?("\r\n")
+        newline = contents.include?("\r\n") ? "\r\n" : "\n"
+        section = section.gsub(/\r?\n/, newline)
         index = versions.index(version)
         if index
           sections[index] = section

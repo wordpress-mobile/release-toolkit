@@ -21,15 +21,7 @@ describe Fastlane::Actions::GenerateReleaseNotesFileAction do
       **Full Changelog**: https://github.com/woocommerce/woocommerce-android/compare/25.6...25.7
     MARKDOWN
   end
-  let(:section) do
-    <<~NOTES
-      25.7
-      -----
-      - [*] Fix checkout [https://github.com/woocommerce/woocommerce-android/pull/123]
-      - [*****] [WEAR] Update navigation [https://github.com/woocommerce/woocommerce-android/pull/124]
-
-    NOTES
-  end
+  let(:section) { "25.7\n-----\n#{markdown}\n" }
   let(:options) do
     {
       repository: 'woocommerce/woocommerce-android',
@@ -58,11 +50,11 @@ describe Fastlane::Actions::GenerateReleaseNotesFileAction do
     with_tmp_file(content: original) { |path| generate(path) }
   end
 
-  it 'replaces only the requested version, preserving history and header comments' do
+  it 'keeps the generated Markdown and replaces only the requested version' do
     with_tmp_file(content: original) do |path|
       expect(generate(path)).to eq(section)
       expect(File.read(path)).to eq(header + section + history)
-      expect(Fastlane::Actions::ExtractReleaseNotesForVersionAction.run(version: '25.7', release_notes_file_path: path)).to eq(section.lines.drop(2).join.chomp(''))
+      expect(Fastlane::Actions::ExtractReleaseNotesForVersionAction.run(version: '25.7', release_notes_file_path: path)).to eq(markdown.chomp(''))
     end
   end
 
@@ -84,6 +76,16 @@ describe Fastlane::Actions::GenerateReleaseNotesFileAction do
     with_tmp_file(content: original.gsub("\n", "\r\n")) do |path|
       generate(path)
       expect(File.read(path)).to eq((header + section + history).gsub("\n", "\r\n"))
+    end
+  end
+
+  ["\n", "\r\n"].each do |newline|
+    it "normalizes CRLF Markdown to the file's #{newline.inspect} line endings" do
+      allow(Fastlane::Actions::GetPrsBetweenTagsAction).to receive(:run).and_return(markdown.gsub("\n", "\r\n"))
+      with_tmp_file(content: original.gsub("\n", newline)) do |path|
+        generate(path)
+        expect(File.read(path)).to eq((header + section + history).gsub("\n", newline))
+      end
     end
   end
 
@@ -116,28 +118,21 @@ describe Fastlane::Actions::GenerateReleaseNotesFileAction do
     end
   end
 
-  ['An API error', "## New PRs since 25.6\n* Unexpected change format"].each do |invalid_markdown|
-    it "leaves the file untouched for unrecognized output: #{invalid_markdown.inspect}" do
-      allow(Fastlane::Actions::GetPrsBetweenTagsAction).to receive(:run).and_return(invalid_markdown)
-      with_tmp_file(content: original) do |path|
-        expect { generate(path) }.to raise_error(/Unrecognized generated/)
-        expect(File.read(path)).to eq(original)
-      end
+  it 'accepts changes to the generated Markdown format without parsing PR entries' do
+    notes = "## Changes\n- Fix checkout (#123) — developer\n\nThanks to our contributors!\n"
+    allow(Fastlane::Actions::GetPrsBetweenTagsAction).to receive(:run).and_return(notes)
+    with_tmp_file(content: original) do |path|
+      generate(path)
+      expect(File.read(path)).to eq("#{header}25.7\n-----\n#{notes}\n#{history}")
     end
   end
 
   it 'allows an empty release when all PRs have been excluded' do
-    allow(Fastlane::Actions::GetPrsBetweenTagsAction).to receive(:run).and_return("**Full Changelog**: https://github.com/woocommerce/woocommerce-android/compare/25.6...25.7\n")
+    notes = "**Full Changelog**: https://github.com/woocommerce/woocommerce-android/compare/25.6...25.7\n"
+    allow(Fastlane::Actions::GetPrsBetweenTagsAction).to receive(:run).and_return(notes)
     with_tmp_file(content: original) do |path|
       generate(path)
-      expect(File.read(path)).to eq("#{header}25.7\n-----\n\n\n#{history}")
-    end
-  end
-
-  it 'also accepts the default GitHub format without a configuration comment' do
-    allow(Fastlane::Actions::GetPrsBetweenTagsAction).to receive(:run).and_return(markdown.lines.drop(2).join)
-    with_tmp_file(content: original) do |path|
-      expect(generate(path)).to eq(section)
+      expect(File.read(path)).to eq("#{header}25.7\n-----\n#{notes}\n#{history}")
     end
   end
 
