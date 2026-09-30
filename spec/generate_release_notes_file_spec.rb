@@ -14,7 +14,8 @@ describe Fastlane::Actions::GenerateReleaseNotesFileAction do
 
       ### Changes
       * Fix checkout by @developer in https://github.com/woocommerce/woocommerce-android/pull/123
-      * [*****] [WEAR] Update navigation by @bot[bot] in https://github.com/woocommerce/woocommerce-android/pull/124
+      ### Android Wear
+      * Update navigation by @bot[bot] in https://github.com/woocommerce/woocommerce-android/pull/124
       ## New Contributors
       * @developer made their first contribution in https://github.com/woocommerce/woocommerce-android/pull/123
 

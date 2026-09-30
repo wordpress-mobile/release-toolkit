@@ -35,6 +35,8 @@ module Fastlane
         <<~DETAILS
           Inserts or replaces one version section using get_prs_between_tags, preserving other versions and header comments.
           Keeps the returned Markdown, including headings, authors, contributors, and links.
+          Use configuration_file_path to exclude or group PRs by GitHub labels; no title markers are needed.
+          For a separate report, such as release testing, call get_prs_between_tags with its own configuration_file_path.
           Requires an explicit previous_tag and a published target_commitish if tag_name does not exist.
           Use dry_run to preview without writing. Does not commit changes.
         DETAILS
