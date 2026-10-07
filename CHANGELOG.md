@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Add `delete_from_s3` action to delete objects from an S3 bucket, complementing the existing `upload_to_s3` action. Supports single-key deletion, bulk deletion by prefix, age-based filtering via `older_than_days`, and a `dry_run` mode. [#xxx]
 
 ### Bug Fixes
 
