@@ -10,7 +10,7 @@ module Fastlane
       # Signs the final archive using the sign_update executable from the app's resolved Sparkle release.
       # Capture output directly: sign_update can echo invalid keys in its diagnostics, and Action.sh logs output.
       #
-      # @return [Hash] the canonical base64 :ed_signature and archive :length in bytes
+      # @return [String] the canonical base64 EdDSA signature
       def self.sign_update(archive_path:, signing_tool:, private_key:, public_key:)
         key = private_key.to_s.strip
         UI.user_error!('A Sparkle private key is required; set SPARKLE_PRIVATE_KEY or private_key') if key.empty?
@@ -20,23 +20,16 @@ module Fastlane
 
         archive_path = File.expand_path(archive_path)
         signing_tool = File.expand_path(signing_tool)
-        archive_length = File.size(archive_path)
         stdout, _stderr, status = Open3.capture3(
-          { 'SPARKLE_PRIVATE_KEY' => nil }, signing_tool, '--ed-key-file', '-', archive_path,
+          { 'SPARKLE_PRIVATE_KEY' => nil }, signing_tool, '-p', '--ed-key-file', '-', archive_path,
           stdin_data: "#{key}\n"
         )
         UI.user_error!('Sparkle sign_update failed; check the signing tool and private key') unless status.success?
 
-        match = /\Asparkle:edSignature="([^"]+)" length="(\d+)"\s*\z/.match(stdout)
-        UI.user_error!('Sparkle sign_update returned unexpected output') unless match
-        validate_ed_signature!(match[1])
-        length = Integer(match[2], 10)
-        unless length == archive_length && length == File.size(archive_path)
-          UI.user_error!('Sparkle sign_update returned a length that does not match the archive')
-        end
-        verify_signature!(signature: match[1], public_key: public_key, archive_path: archive_path)
-
-        { ed_signature: match[1], length: length }
+        signature = stdout.strip
+        validate_ed_signature!(signature)
+        verify_signature!(signature: signature, public_key: public_key, archive_path: archive_path)
+        signature
       rescue SystemCallError, IOError
         # Do not retain a potentially sensitive exception as the cause in verbose error reports.
         raise FastlaneCore::Interface::FastlaneError.new, 'Unable to run Sparkle sign_update or read the archive', cause: nil

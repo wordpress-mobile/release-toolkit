@@ -63,7 +63,7 @@ module Fastlane
       end
 
       def self.return_value
-        'A Hash containing :ed_signature and :length (archive size in bytes)'
+        'The canonical base64 EdDSA signature'
       end
 
       def self.authors
@@ -81,7 +81,7 @@ module Fastlane
             signing_tool: "build/SourcePackages/artifacts/sparkle/Sparkle/bin/sign_update",
             public_key: get_info_plist_value(path: "App/Info.plist", key: "SUPublicEDKey")
           )
-          # Pass signature[:ed_signature] as ed_signature to upload_build_to_apps_cdn.',
+          # Pass signature as ed_signature to upload_build_to_apps_cdn.',
         ]
       end
     end

@@ -11,7 +11,7 @@ describe Fastlane::Actions::MacosSignUpdateAction do
   let(:public_key) { Base64.strict_encode64(key_pair.public_to_der[-32..]) }
   let(:signature) { Base64.strict_encode64(key_pair.sign(nil, archive_content)) }
   let(:params) { { archive_path: archive_path, signing_tool: signing_tool, private_key: private_key, public_key: public_key } }
-  let(:tool_output) { "sparkle:edSignature=\"#{signature}\" length=\"#{archive_content.bytesize}\"\n" }
+  let(:tool_output) { "#{signature}\n" }
   let(:status) { instance_double(Process::Status, success?: true) }
 
   around do |example|
@@ -29,32 +29,32 @@ describe Fastlane::Actions::MacosSignUpdateAction do
   def expect_signing(output: tool_output, stderr: '', input_key: private_key)
     allow(Open3).to receive(:capture3).and_return([output, stderr, status])
     expect(Open3).to receive(:capture3).with(
-      { 'SPARKLE_PRIVATE_KEY' => nil }, signing_tool, '--ed-key-file', '-', archive_path,
+      { 'SPARKLE_PRIVATE_KEY' => nil }, signing_tool, '-p', '--ed-key-file', '-', archive_path,
       stdin_data: "#{input_key}\n"
     )
   end
 
-  it 'passes the key only through stdin and returns the signature and verified archive length' do
+  it 'passes the key only through stdin and returns the verified signature' do
     expect_signing
-    expect(run_described_fastlane_action(params)).to eq(ed_signature: signature, length: archive_content.bytesize)
+    expect(run_described_fastlane_action(params)).to eq(signature)
   end
 
   it 'loads the sensitive key from SPARKLE_PRIVATE_KEY' do
     allow(ENV).to receive(:[]).with('SPARKLE_PRIVATE_KEY').and_return(private_key)
     expect_signing
-    expect(run_described_fastlane_action(params.except(:private_key))[:ed_signature]).to eq(signature)
+    expect(run_described_fastlane_action(params.except(:private_key))).to eq(signature)
     expect(described_class.available_options.find { |option| option.key == :private_key }.sensitive).to be(true)
   end
 
   it 'accepts exported legacy keys' do
     legacy_key = Base64.strict_encode64('k' * 96)
     expect_signing(input_key: legacy_key)
-    expect(run_described_fastlane_action(params.merge(private_key: legacy_key))[:ed_signature]).to eq(signature)
+    expect(run_described_fastlane_action(params.merge(private_key: legacy_key))).to eq(signature)
   end
 
   it 'accepts a trailing newline on an exported private key' do
     expect_signing
-    expect(run_described_fastlane_action(params.merge(private_key: "#{private_key}\n"))[:ed_signature]).to eq(signature)
+    expect(run_described_fastlane_action(params.merge(private_key: "#{private_key}\n"))).to eq(signature)
   end
 
   [nil, '', '  '].each do |key|
@@ -94,28 +94,13 @@ describe Fastlane::Actions::MacosSignUpdateAction do
   it 'rejects unexpected output without printing it' do
     expect_signing(output: "unexpected #{private_key}")
     expect { run_described_fastlane_action(params) }
-      .to raise_error(FastlaneCore::Interface::FastlaneError, 'Sparkle sign_update returned unexpected output')
-  end
-
-  it 'rejects malformed signatures returned by the tool' do
-    expect_signing(output: 'sparkle:edSignature="invalid" length="22"')
-    expect { run_described_fastlane_action(params) }
       .to raise_error(FastlaneCore::Interface::FastlaneError, 'EdDSA signature must be canonical base64 for exactly 64 bytes')
   end
 
-  it 'rejects output for a different archive length' do
-    expect_signing(output: "sparkle:edSignature=\"#{signature}\" length=\"999\"")
+  it 'rejects malformed signatures returned by the tool' do
+    expect_signing(output: 'invalid')
     expect { run_described_fastlane_action(params) }
-      .to raise_error(FastlaneCore::Interface::FastlaneError, 'Sparkle sign_update returned a length that does not match the archive')
-  end
-
-  it 'rejects an archive changed during signing' do
-    expect(Open3).to receive(:capture3) do
-      File.write(archive_path, 'changed')
-      [tool_output, '', status]
-    end
-    expect { run_described_fastlane_action(params) }
-      .to raise_error(FastlaneCore::Interface::FastlaneError, 'Sparkle sign_update returned a length that does not match the archive')
+      .to raise_error(FastlaneCore::Interface::FastlaneError, 'EdDSA signature must be canonical base64 for exactly 64 bytes')
   end
 
   it 'rejects a signature made by a different key than the app trusts' do
