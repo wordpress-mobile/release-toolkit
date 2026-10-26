@@ -1,0 +1,33 @@
+test_data:
+  en: |
+    "word_count_one" = "%1$ld word";
+    "word_count_zero" = "%1$ld words";
+    "latest_post_likes" = "The latest post %1$@ has received %2$@ like.";
+    "leading_omitted" = "Post %1$@ has %2$@ likes.";
+    "middle_omitted" = "A %1$@, B %2$d, C %3$@";
+    "sequential_trailing_omitted" = "%@ and %d";
+    "sequential_leading_omitted" = "%@ and %d";
+    "type_mismatch" = "%1$d items";
+    "extra_placeholder" = "%1$d items";
+    "incomplete_placeholder" = "%1$ld words";
+    "empty_translation" = "%1$@ of %2$@ used";
+  ro: |
+    "word_count_one" = "Un cuvânt";
+    "word_count_zero" = "Niciun cuvânt";
+    "latest_post_likes" = "Ultimul articol %1$@ a avut o apreciere.";
+    "leading_omitted" = "Un articol are %2$@ aprecieri.";
+    "middle_omitted" = "A %1$@, C %3$@";
+    "sequential_trailing_omitted" = "doar %@";
+    "sequential_leading_omitted" = "doar %d";
+    "type_mismatch" = "%1$@ elemente";
+    "extra_placeholder" = "%1$d elemente %2$@";
+    "incomplete_placeholder" = "%1$l cuvinte";
+    "empty_translation" = "";
+
+result:
+  ro:
+    - "`empty_translation` expected placeholders for [String,String] but found [] instead."
+    - "`extra_placeholder` expected placeholders for [Int] but found [Int,String] instead."
+    - "`incomplete_placeholder` expected placeholders for [Int] but found [] instead."
+    - "`sequential_leading_omitted` expected placeholders for [String,Int] but found [Int] instead."
+    - "`type_mismatch` expected placeholders for [Int] but found [String] instead."
