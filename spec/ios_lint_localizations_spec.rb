@@ -65,8 +65,10 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
     # @param [Boolean, nil] fail_on_strings_not_in_base_language If `nil`, the test will run the action with the default `fail_on_strings_not_in_base_language` parameter value.
     #        If a `Boolean` value is given, it will pass that.
     #        Controls whether to report violations when finding strings in translations that are not present in the base language.
+    # @param [Boolean, nil] allow_omitted_placeholders If `nil`, the test will run the action with the default `allow_omitted_placeholders` parameter value.
+    #        If a `Boolean` value is given, it will pass that.
     #
-    def run_l10n_linter_test(data_file:, check_duplicate_keys: nil, fail_on_strings_not_in_base_language: nil)
+    def run_l10n_linter_test(data_file:, check_duplicate_keys: nil, fail_on_strings_not_in_base_language: nil, allow_omitted_placeholders: nil)
       # Arrange: Prepare test files
       test_file = File.join(File.dirname(__FILE__), 'test-data', 'translations', 'ios_lint_localizations', "#{data_file}.yaml")
       yml = YAML.load_file(test_file)
@@ -90,6 +92,7 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       }
       parameters[:check_duplicate_keys] = check_duplicate_keys unless check_duplicate_keys.nil?
       parameters[:fail_on_strings_not_in_base_language] = fail_on_strings_not_in_base_language unless fail_on_strings_not_in_base_language.nil?
+      parameters[:allow_omitted_placeholders] = allow_omitted_placeholders unless allow_omitted_placeholders.nil?
       result = run_described_fastlane_action(parameters)
 
       # Assert
@@ -226,6 +229,18 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
         data_file: 'extra-strings-in-translations-error',
         fail_on_strings_not_in_base_language: true
       )
+    end
+
+    it 'reports translations that omit placeholders by default' do
+      run_l10n_linter_test(data_file: 'omitted-placeholders-not-allowed')
+    end
+
+    it 'reports translations that omit placeholders when allow_omitted_placeholders is false' do
+      run_l10n_linter_test(data_file: 'omitted-placeholders-not-allowed', allow_omitted_placeholders: false)
+    end
+
+    it 'accepts translations that only omit placeholders when allow_omitted_placeholders is true, but still reports malformed, extra, and mismatched ones' do
+      run_l10n_linter_test(data_file: 'omitted-placeholders-allowed', allow_omitted_placeholders: true)
     end
   end
 

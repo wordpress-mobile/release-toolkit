@@ -38,7 +38,8 @@ module Fastlane
           input_dir: resolve_path(params[:input_dir]),
           base_lang: params[:base_lang],
           only_langs: params[:only_langs],
-          fail_on_strings_not_in_base_language: params[:fail_on_strings_not_in_base_language]
+          fail_on_strings_not_in_base_language: params[:fail_on_strings_not_in_base_language],
+          allow_omitted_placeholders: params[:allow_omitted_placeholders]
         )
       end
 
@@ -195,6 +196,15 @@ module Fastlane
             description: 'Should we report violations when finding strings in translations that are not present in the base language',
             optional: true,
             default_value: true,
+            type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :allow_omitted_placeholders,
+            env_name: 'FL_IOS_LINT_TRANSLATIONS_ALLOW_OMITTED_PLACEHOLDERS',
+            description: 'Accept translations that use only some of the base language placeholders, as long as each one they use has the same position and type (e.g. "One word" for "%1$d word"). ' \
+                         'Malformed placeholders, extra placeholders and type mismatches are still reported',
+            optional: true,
+            default_value: false,
             type: Boolean
           ),
         ]
