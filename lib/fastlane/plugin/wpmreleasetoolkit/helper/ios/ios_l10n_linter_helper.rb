@@ -93,9 +93,11 @@ module Fastlane
         # That's the case when every placeholder in the translation exists in the base string, at the same position and with the same type, and the translation has fewer placeholders.
         # Unused arguments are ignored at runtime, so this is legitimate when a language doesn't need a value.
         #
-        # For example, the English "The latest post %1$@ has received %2$@ like.", where `%2$@` is always "1",
-        # can be translated to Romanian as "Ultimul articol %1$@ a avut o apreciere.", discarding `%2$@`
-        # because "o" is both the indefinite article and the number one for feminine nouns, so the digit would be redundant.
+        # For example, the English plural "one" form "%1$ld word" can be translated to Romanian as "Un cuvânt", discarding `%1$ld`,
+        # because Romanian uses "one" only for exactly 1, and "un" already says it.
+        #
+        # This only checks the omission is safe at runtime, not that it's right for the language.
+        # Russian also has a "one" form, but it covers 1, 21, 31, 101…, so "Одно слово" would wrongly read as one word for 21 words, and this would still accept it.
         #
         # @param [String] base The string in the base language
         # @param [String] translation The translated string
