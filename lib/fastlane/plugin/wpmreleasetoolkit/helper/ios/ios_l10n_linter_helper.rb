@@ -74,7 +74,7 @@ module Fastlane
         # @param [String] input_dir The path (ideally absolute) to the directory containing the `.lproj` folders to parse
         # @param [String] base_lang The code name (i.e the basename of one of the `.lproj` folders) of the locale to use as the baseline
         # @param [String] fail_on_strings_not_in_base_language Whether to fail on strings not in base language
-        # @param [Boolean] allow_omitted_placeholders Whether to accept translations that use only some of the base language placeholders. See `only_omits_placeholders?`.
+        # @param [Boolean] allow_omitted_placeholders Whether to accept translations that use only some of the base language placeholders.
         # @return [Hash<String, Array<String>>] A hash of violations, keyed by language code, whose values are the list of violation messages for that language
         #
         def run(input_dir:, base_lang: DEFAULT_BASE_LANG, only_langs: nil, fail_on_strings_not_in_base_language: true, allow_omitted_placeholders: false)
