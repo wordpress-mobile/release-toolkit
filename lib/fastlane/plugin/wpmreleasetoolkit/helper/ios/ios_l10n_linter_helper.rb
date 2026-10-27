@@ -91,7 +91,11 @@ module Fastlane
         # Whether a translation is safe to format with the base string's arguments while using only some of them.
         #
         # That's the case when every placeholder in the translation exists in the base string, at the same position and with the same type, and the translation has fewer placeholders.
-        # Unused arguments are ignored at runtime, so this is legitimate when a language doesn't need a value, e.g. "One word" for a singular plural form.
+        # Unused arguments are ignored at runtime, so this is legitimate when a language doesn't need a value.
+        #
+        # For example, the English "The latest post %1$@ has received %2$@ like.", where `%2$@` is always "1",
+        # can be translated to Romanian as "Ultimul articol %1$@ a avut o apreciere.", discarding `%2$@`
+        # because "o" is both the indefinite article and the number one for feminine nouns, so the digit would be redundant.
         #
         # @param [String] base The string in the base language
         # @param [String] translation The translated string
