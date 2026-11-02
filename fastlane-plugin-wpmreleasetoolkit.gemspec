@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 3.2.2'
 
-  spec.files = Dir['lib/**/*'] + %w[README.md LICENSE]
+  spec.files = Dir['lib/**/*'] + Dir['bin/*'] + %w[README.md LICENSE]
 
   # Bring in any generated executables
   spec.bindir = 'bin'
@@ -38,6 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'progress_bar', '~> 1.3'
   spec.add_dependency 'rake', '>= 12.3', '< 14.0'
   spec.add_dependency 'rake-compiler', '~> 1.0'
+  spec.add_dependency 'rubyzip', '~> 3.4'
   spec.add_dependency 'xcodeproj', '~> 1.22'
 
   # `google-cloud-storage` is required by fastlane, but we pin it in case it's not in the future
