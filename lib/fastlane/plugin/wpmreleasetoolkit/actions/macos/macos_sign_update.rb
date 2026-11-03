@@ -19,7 +19,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(
             key: :archive_path,
-            description: 'The final update archive to sign, after code signing, notarizing and stapling',
+            description: 'The final Sparkle update archive (the zip or dmg users download) to sign, after code signing, notarizing and stapling',
             type: String,
             verify_block: proc do |value|
               UI.user_error!("Archive not found at '#{value}'") unless File.file?(value)
@@ -55,7 +55,7 @@ module Fastlane
       end
 
       def self.description
-        'Sign a macOS update archive with Sparkle EdDSA'
+        'Sign the final Sparkle update archive with EdDSA'
       end
 
       def self.details
