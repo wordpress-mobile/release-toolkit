@@ -107,7 +107,7 @@ describe Fastlane::Actions::MacosSignUpdateAction do
     other_public_key = Base64.strict_encode64(OpenSSL::PKey.generate_key('ED25519').public_to_der[-32..])
     expect_signing
     expect { run_described_fastlane_action(params.merge(public_key: other_public_key)) }
-      .to raise_error(FastlaneCore::Interface::FastlaneError, 'Sparkle signature does not verify against the app public key and archive')
+      .to raise_error(FastlaneCore::Interface::FastlaneError, "Sparkle signature does not verify against the app's public key and archive")
   end
 
   it 'rejects archive changes that preserve the file length' do
@@ -116,7 +116,7 @@ describe Fastlane::Actions::MacosSignUpdateAction do
       [tool_output, '', status]
     end
     expect { run_described_fastlane_action(params) }
-      .to raise_error(FastlaneCore::Interface::FastlaneError, 'Sparkle signature does not verify against the app public key and archive')
+      .to raise_error(FastlaneCore::Interface::FastlaneError, "Sparkle signature does not verify against the app's public key and archive")
   end
 
   it 'rejects an invalid app public key before invoking the tool' do

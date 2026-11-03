@@ -42,9 +42,9 @@ module Fastlane
         key = OpenSSL::PKey.read(['302a300506032b6570032100'].pack('H*') + Base64.strict_decode64(public_key))
         return if key.verify(nil, Base64.strict_decode64(signature), File.binread(archive_path))
 
-        UI.user_error!('Sparkle signature does not verify against the app public key and archive')
+        UI.user_error!("Sparkle signature does not verify against the app's public key and archive")
       rescue OpenSSL::PKey::PKeyError
-        UI.user_error!('Unable to verify the Sparkle signature with the app public key')
+        UI.user_error!("Unable to verify the Sparkle signature with the app's public key")
       end
 
       def self.validate_public_key!(value)

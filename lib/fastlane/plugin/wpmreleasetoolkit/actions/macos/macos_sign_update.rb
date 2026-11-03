@@ -59,7 +59,7 @@ module Fastlane
       end
 
       def self.details
-        'Pass the sign_update executable from the same Sparkle release used by the app. The private key is sent through standard input and the signature is verified against the app public key. Upload the archive without modifying it after signing.'
+        'Pass the sign_update executable from the same Sparkle release used by the app. The private key is sent through standard input and the signature is verified against the app\'s public key. Upload the archive without modifying it after signing.'
       end
 
       def self.return_value
