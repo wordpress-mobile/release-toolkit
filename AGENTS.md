@@ -35,6 +35,8 @@ rake new_release                        # Start a new release (interactive)
 ## Project Structure
 
 ```
+bin/release-scan          # Standalone secret scanner, see docs/release-scan.md
+lib/release_scan/         # Its code; not loaded by the plugin
 lib/fastlane/plugin/wpmreleasetoolkit/
 ├── actions/              # Fastlane actions (entry points)
 │   ├── android/          # Android-specific actions
