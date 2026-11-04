@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Add `macos_sign_update` for Sparkle archive signing and optional `ed_signature` metadata to `upload_build_to_apps_cdn`. [#778]
 
 ### Bug Fixes
 

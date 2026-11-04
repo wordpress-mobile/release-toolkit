@@ -22,6 +22,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
   let(:test_filename) { 'test_app.zip' }
   let(:test_file_content) { 'test app binary' }
   let(:test_sha) { 'badc0ffeebadf00d' }
+  let(:test_ed_signature) { Base64.strict_encode64('s' * 64) }
   let(:test_boundary) { '----WebKitFormBoundarydabad0001234dabad000' }
   let(:stub_success_response) do
     {
@@ -119,6 +120,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
               expect(req.body).to include(expected_form_part(name: name, value: value))
             end
 
+            expect(req.body).not_to include('name="ed_signature"')
             true
           end
         )
@@ -148,6 +150,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
           build_number: test_build_number,
           file_path: file_path,
           sha: test_sha,
+          ed_signature: test_ed_signature,
           error_on_duplicate: true
         )
 
@@ -166,6 +169,7 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
             expect(req.body).to include(expected_form_part(name: 'visibility', value: 'External'))
             expect(req.body).to include(expected_form_part(name: 'install_type', value: 'Update'))
             expect(req.body).to include(expected_form_part(name: 'sha', value: test_sha))
+            expect(req.body).to include(expected_form_part(name: 'ed_signature', value: test_ed_signature))
             true
           end
         )
@@ -284,6 +288,27 @@ describe Fastlane::Actions::UploadBuildToAppsCdnAction do
   end
 
   describe 'parameter validation' do
+    ['', 'invalid-base64', Base64.strict_encode64('s' * 63), Base64.strict_encode64('s' * 65), "#{Base64.strict_encode64('s' * 64)}\n", "#{'A' * 85}B=="].each do |signature|
+      it "rejects an invalid EdDSA signature #{signature.inspect}" do
+        with_tmp_file(named: test_filename) do |file_path|
+          expect do
+            run_described_fastlane_action(
+              site_id: test_site_id,
+              api_token: test_api_token,
+              product: test_product,
+              build_type: test_build_type,
+              visibility: test_visibility,
+              platform: test_platform,
+              version: test_version,
+              file_path: file_path,
+              ed_signature: signature
+            )
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, 'EdDSA signature must be canonical base64 for exactly 64 bytes')
+          expect(WebMock).not_to have_requested(:post, api_url)
+        end
+      end
+    end
+
     it 'fails if site_id is empty' do
       with_tmp_file(named: test_filename) do |file_path|
         expect do
