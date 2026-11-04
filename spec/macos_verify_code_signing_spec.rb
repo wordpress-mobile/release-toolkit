@@ -197,6 +197,75 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
     end
   end
 
+  describe 'bare binaries' do
+    it 'verifies the signature and Gatekeeper acceptance, without expecting a stapled ticket' do
+      with_artifacts('test-cli') do |(path)|
+        expect_codesign_verify(path)
+        expect_gatekeeper_assess_execute(path)
+        expect(Open3).not_to receive(:popen2e).with('xcrun', any_args)
+
+        run_described_fastlane_action(artifact_path: path)
+      end
+    end
+
+    it 'skips Gatekeeper when `verify_notarization` is `false`' do
+      with_artifacts('test-cli') do |(path)|
+        expect_codesign_verify(path)
+        expect(Open3).not_to receive(:popen2e).with('spctl', any_args)
+
+        run_described_fastlane_action(artifact_path: path, verify_notarization: false)
+      end
+    end
+
+    it 'passes when signed by the expected authority' do
+      with_artifacts('test-cli') do |(path)|
+        expect_codesign_verify(path)
+        expect_codesign_display(path, authority: authority)
+
+        run_described_fastlane_action(artifact_path: path, expected_authority: authority, verify_notarization: false)
+      end
+    end
+
+    it 'fails when signed by a different authority' do
+      with_artifacts('test-cli') do |(path)|
+        expect_codesign_verify(path)
+        expect_codesign_display(path, authority: 'Apple Development: Someone Else (ZZZZZ99999)')
+
+        expect { run_described_fastlane_action(artifact_path: path, expected_authority: authority) }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, /is not signed by '#{Regexp.escape(authority)}'/)
+      end
+    end
+
+    it 'fails when the signature is not valid' do
+      with_artifacts('test-cli') do |(path)|
+        expect_codesign_verify(path, exitstatus: 1, output: "#{path}: invalid signature (code or signature have been modified)\n")
+
+        expect { run_described_fastlane_action(artifact_path: path) }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, /The code signature of .*test-cli is not valid/)
+      end
+    end
+
+    # Unlike a disk image, there is no container whose contents could carry the signature instead.
+    it 'fails when it is not signed at all' do
+      with_artifacts('test-cli') do |(path)|
+        expect_codesign_verify(path, exitstatus: 1, output: "#{path}: code object is not signed at all\n")
+
+        expect { run_described_fastlane_action(artifact_path: path) }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, /test-cli is not signed at all/)
+      end
+    end
+
+    it 'fails when Gatekeeper rejects it' do
+      with_artifacts('test-cli') do |(path)|
+        expect_codesign_verify(path)
+        expect_gatekeeper_assess_execute(path, exitstatus: 3)
+
+        expect { run_described_fastlane_action(artifact_path: path) }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, /test-cli was rejected by Gatekeeper/)
+      end
+    end
+  end
+
   it 'verifies every artifact when given a list of paths' do
     with_artifacts('One.app', 'Two.dmg') do |(app_path, dmg_path)|
       expect_codesign_verify_deep(app_path)

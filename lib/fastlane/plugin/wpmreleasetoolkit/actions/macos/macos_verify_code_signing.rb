@@ -20,8 +20,10 @@ module Fastlane
             verify_app_bundle(path: path, expected_authority: params[:expected_authority], verify_notarization: params[:verify_notarization])
           when '.dmg'
             verify_disk_image(path: path, expected_authority: params[:expected_authority], verify_notarization: params[:verify_notarization])
+          when ''
+            verify_binary(path: path, expected_authority: params[:expected_authority], verify_notarization: params[:verify_notarization])
           else
-            UI.user_error!("Don't know how to verify #{path}. Supported artifacts are `.app` bundles and `.dmg` disk images")
+            UI.user_error!("Don't know how to verify #{path}. Supported artifacts are `.app` bundles, `.dmg` disk images and bare binaries without an extension")
           end
         end
 
@@ -56,6 +58,16 @@ module Fastlane
         end
 
         verify!("#{path} has no notarization ticket stapled to it", 'xcrun', 'stapler', 'validate', path) if verify_notarization
+      end
+
+      # A bare binary can't carry a stapled ticket, so Gatekeeper's online lookup is the only
+      # notarization check available. It can lag a fresh submission.
+      #
+      def self.verify_binary(path:, expected_authority:, verify_notarization:)
+        UI.user_error!("#{path} is not signed at all") unless signed?(path)
+        verify_authority!(path: path, expected_authority: expected_authority) unless expected_authority.nil?
+
+        verify!("#{path} was rejected by Gatekeeper", 'spctl', '--assess', '--type', 'execute', '--verbose=2', path) if verify_notarization
       end
 
       # Distinguishes an artifact that carries no signature at all from one whose signature is
@@ -104,6 +116,7 @@ module Fastlane
           - `.app` — the signature is valid and satisfies its designated requirement, Gatekeeper accepts
             the bundle for execution, and a notarization ticket is stapled to it.
           - `.dmg` — if the image is signed, the signature is valid (and can be checked against the expected authority) and Gatekeeper accepts opening it; when `verify_notarization` is true, a notarization ticket is stapled to the image.
+          - no extension, for a bare binary — the signature is valid and can be checked against the expected authority, and Gatekeeper accepts it for execution. A bare binary can't be stapled, so that acceptance relies on an online lookup that can lag a fresh submission.
         DETAILS
       end
 
@@ -111,7 +124,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(
             key: :artifact_path,
-            description: 'The path, or list of paths, to the `.app` bundle(s) or `.dmg` disk image(s) to verify',
+            description: 'The path, or list of paths, to the `.app` bundle(s), `.dmg` disk image(s) or bare binaries to verify',
             type: Array,
             verify_block: proc do |value|
               UI.user_error!('`artifact_path` must be a String or an Array of Strings') unless value.all?(String)
@@ -127,7 +140,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :verify_notarization,
-            description: 'Whether to also assert that the artifact is accepted by Gatekeeper and has a notarization ticket stapled to it',
+            description: 'Whether to also assert that the artifact is accepted by Gatekeeper and, unless it is a bare binary, has a notarization ticket stapled to it',
             type: Boolean,
             default_value: true
           ),
