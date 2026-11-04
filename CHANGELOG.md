@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- `macos_verify_code_signing` now verifies bare binaries, identified by having no file extension. [#782]
 
 ### Bug Fixes
 
