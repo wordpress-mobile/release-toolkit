@@ -63,11 +63,14 @@ module Fastlane
       # A bare binary can't carry a stapled ticket, so Gatekeeper's online lookup is the only
       # notarization check available. It can lag a fresh submission.
       #
+      # `--type execute` is not an option here: it rejects any bare binary, notarized or not, with
+      # `the code is valid but does not seem to be an app`.
+      #
       def self.verify_binary(path:, expected_authority:, verify_notarization:)
         UI.user_error!("#{path} is not signed at all") unless signed?(path)
         verify_authority!(path: path, expected_authority: expected_authority) unless expected_authority.nil?
 
-        verify!("#{path} was rejected by Gatekeeper", 'spctl', '--assess', '--type', 'execute', '--verbose=2', path) if verify_notarization
+        verify!("#{path} was rejected by Gatekeeper", 'spctl', '--assess', '--type', 'open', '--context', 'context:primary-signature', '--verbose=2', path) if verify_notarization
       end
 
       # Distinguishes an artifact that carries no signature at all from one whose signature is
@@ -116,7 +119,7 @@ module Fastlane
           - `.app` — the signature is valid and satisfies its designated requirement, Gatekeeper accepts
             the bundle for execution, and a notarization ticket is stapled to it.
           - `.dmg` — if the image is signed, the signature is valid (and can be checked against the expected authority) and Gatekeeper accepts opening it; when `verify_notarization` is true, a notarization ticket is stapled to the image.
-          - no extension, for a bare binary — the signature is valid and can be checked against the expected authority, and Gatekeeper accepts it for execution. A bare binary can't be stapled, so that acceptance relies on an online lookup that can lag a fresh submission.
+          - no extension, for a bare binary — the signature is valid and can be checked against the expected authority, and Gatekeeper accepts it as notarized. A bare binary can't be stapled, so that acceptance relies on an online lookup that can lag a fresh submission.
         DETAILS
       end
 

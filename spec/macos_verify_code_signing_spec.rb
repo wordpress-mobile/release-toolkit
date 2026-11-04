@@ -201,7 +201,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
     it 'verifies the signature and Gatekeeper acceptance, without expecting a stapled ticket' do
       with_artifacts('test-cli') do |(path)|
         expect_codesign_verify(path)
-        expect_gatekeeper_assess_execute(path)
+        expect_gatekeeper_assess_open(path)
         expect(Open3).not_to receive(:popen2e).with('xcrun', any_args)
 
         run_described_fastlane_action(artifact_path: path)
@@ -258,7 +258,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
     it 'fails when Gatekeeper rejects it' do
       with_artifacts('test-cli') do |(path)|
         expect_codesign_verify(path)
-        expect_gatekeeper_assess_execute(path, exitstatus: 3)
+        expect_gatekeeper_assess_open(path, exitstatus: 3)
 
         expect { run_described_fastlane_action(artifact_path: path) }
           .to raise_error(FastlaneCore::Interface::FastlaneError, /test-cli was rejected by Gatekeeper/)
