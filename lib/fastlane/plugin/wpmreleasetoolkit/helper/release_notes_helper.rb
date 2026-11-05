@@ -57,12 +57,13 @@ module Fastlane
         contents.each_line do |line|
           if fence
             fence = nil if line.match?(/\A {0,3}#{Regexp.escape(fence[0])}{#{fence.length},}[ \t]*\r?\n?\z/)
-          elsif html_comment || line.match?(/\A {0,3}<!--/)
-            html_comment = !line.include?('-->')
-          elsif (match = line.match(/\A {0,3}(`{3,}(?!.*`)|~{3,})/))
+          elsif !html_comment && (match = line.match(/\A {0,3}(`{3,}(?!.*`)|~{3,})/))
             fence = match[1]
-          elsif (match = line.match(/\A {0,3}(\#{1,6})(?:[ \t]+|\r?\n?\z)/))
-            headings << [offset, match[1].length]
+          else
+            if !html_comment && (match = line.match(/\A {0,3}(\#{1,6})(?:[ \t]+|\r?\n?\z)/))
+              headings << [offset, match[1].length]
+            end
+            html_comment = html_comment_open?(line, open: html_comment) unless !html_comment && line.match?(/\A(?: {4}| {0,3}\t)/)
           end
           offset += line.length
         end
@@ -71,6 +72,31 @@ module Fastlane
         headings
       end
       private_class_method :markdown_headings
+
+      # Track comment delimiters in order, skipping matched inline code spans.
+      def self.html_comment_open?(line, open:)
+        cursor = 0
+        loop do
+          if open
+            closing = line.index('-->', cursor)
+            return true unless closing
+
+            cursor = closing + 3
+            open = false
+          else
+            marker = line.match(/<!--|`+/, cursor)
+            return false unless marker
+
+            cursor = marker.end(0)
+            if marker[0] == '<!--'
+              open = true
+            elsif (closing = line.match(/(?<!`)#{Regexp.escape(marker[0])}(?!`)/, cursor))
+              cursor = closing.end(0)
+            end
+          end
+        end
+      end
+      private_class_method :html_comment_open?
 
       # Update the release notes file (typycally RELEASE-NOTES.txt) to add a new entry.
       #

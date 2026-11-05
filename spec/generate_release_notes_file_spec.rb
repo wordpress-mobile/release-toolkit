@@ -286,6 +286,40 @@ describe Fastlane::Actions::GenerateReleaseNotesFileAction do
       end
     end
 
+    ['Draft <!-- internal detail', 'Draft <!-- first --> text <!-- internal detail'].each do |opening|
+      it "replaces the entire version when an HTML comment starts inline: #{opening.inspect}" do
+        contents = "#{header}## 25.7\n\n#{opening}\n## Hidden heading\n```markdown\n-->\n\n#{history}"
+        with_tmp_file(content: contents) do |path|
+          generate(path)
+          expect(File.read(path)).to eq(header + section + history)
+        end
+      end
+    end
+
+    it 'nests generated headings without modifying inline HTML comments' do
+      notes = "## Changes <!-- detail\n## Hidden heading\n-->\n- Fix checkout\n"
+      allow(Fastlane::Actions::GetPrsBetweenTagsAction).to receive(:run).and_return(notes)
+      with_tmp_file(content: original) do |path|
+        expect(generate(path)).to eq("## 25.7\n\n### Changes <!-- detail\n## Hidden heading\n-->\n- Fix checkout\n\n")
+      end
+    end
+
+    it 'ignores comment markers inside inline and indented code' do
+      examples = "Use `<!--` or ``a ` <!--`` literally.\n\n    <!-- indented code\n\n"
+      with_tmp_file(content: header + examples + original.delete_prefix(header)) do |path|
+        generate(path)
+        expect(File.read(path)).to eq(header + examples + section + history)
+      end
+    end
+
+    it 'tracks a comment after an inline code example and ignores code inside the comment' do
+      notes = "Use `<!--` literally. <!-- ` detail\n## Hidden heading\n--> `\n## Changes\n- Fix checkout\n"
+      allow(Fastlane::Actions::GetPrsBetweenTagsAction).to receive(:run).and_return(notes)
+      with_tmp_file(content: original) do |path|
+        expect(generate(path)).to eq("## 25.7\n\n#{notes.sub('## Changes', '### Changes')}\n")
+      end
+    end
+
     it 'keeps generated HTML comments unchanged when nesting headings' do
       notes = "<!--\n## Metadata\n-->\n## Changes\n- Fix checkout\n"
       allow(Fastlane::Actions::GetPrsBetweenTagsAction).to receive(:run).and_return(notes)
@@ -294,7 +328,7 @@ describe Fastlane::Actions::GenerateReleaseNotesFileAction do
       end
     end
 
-    ["```markdown\n", "<!-- Example\n"].each do |unclosed_block|
+    ["```markdown\n", "<!-- Example\n", "Draft <!-- Example\n"].each do |unclosed_block|
       it "leaves the file untouched when a block is unclosed: #{unclosed_block.inspect}" do
         contents = "#{header}## 25.7\n\n#{unclosed_block}#{history}"
         with_tmp_file(content: contents) do |path|
