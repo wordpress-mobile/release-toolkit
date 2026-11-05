@@ -7,7 +7,7 @@ Release notes are an important part of the release process and we aim to provide
 
 ## Manually maintained release notes workflow
 
-1. In the root folder of every project, we maintain a `RELEASE-NOTES.txt` file that is updated by every PR that adds a relevant feature. As a reminder to developers and reviewers, we usually add a note about this in the project GitHub PR template. 
+1. In the root folder of every project that adopts this approach, we maintain a `RELEASE-NOTES.txt` file that is updated by every PR that adds a relevant feature. As a reminder to developers and reviewers, we usually add a note about this in the project GitHub PR template. 
 2. During code freeze, the `code_freeze` lane of the project's `Fastfile` typically calls at some point:
    - The `extract_release_notes_for_version` action, to extract just the release notes of the version being code-frozen in a separate file (e.g. `WordPress/Resources/release_notes.txt`).
    - Then the `{ios|android}_update_release_notes`  action is then used to add a new empty section at the top of the `RELEASE-NOTES.txt` file, ready for the next version.
