@@ -73,6 +73,24 @@ describe Fastlane::Actions::GenerateReleaseNotesFileAction do
     end
   end
 
+  ["\n", "\r\n"].each do |newline|
+    it "preserves a final empty section without a trailing newline using #{newline.inspect}" do
+      final_section = "25.6#{newline}-----"
+      contents = "25.7#{newline}-----#{newline}- Draft#{newline}#{newline}#{final_section}"
+      with_tmp_file(content: contents) do |path|
+        generate(path)
+        expect(File.read(path)).to eq(section.gsub("\n", newline) + final_section)
+      end
+    end
+
+    it "replaces a final empty section without a trailing newline using #{newline.inspect}" do
+      with_tmp_file(content: "25.7#{newline}-----") do |path|
+        generate(path)
+        expect(File.read(path)).to eq(section.gsub("\n", newline))
+      end
+    end
+  end
+
   it 'preserves CRLF line endings' do
     with_tmp_file(content: original.gsub("\n", "\r\n")) do |path|
       generate(path)

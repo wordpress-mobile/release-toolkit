@@ -3,7 +3,7 @@
 module Fastlane
   module Helper
     module ReleaseNotesHelper
-      VERSION_HEADING = /^\d+(?:\.\d+){0,2}\r?\n[-=]+\r?\n/
+      VERSION_HEADING = /^\d+(?:\.\d+){0,2}\r?\n[-=]+(?:\r?\n|\z)/
 
       # Render a version section, nesting generated Markdown headings in changelog output.
       def self.format_section(version:, markdown:, format: :release_notes)
