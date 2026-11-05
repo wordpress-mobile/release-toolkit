@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export IMAGE_ID="xcode-26.6"
-export CI_TOOLKIT="automattic/a8c-ci-toolkit#5.7.0"
+export IMAGE_ID="xcode-26.6-v2"
+export CI_TOOLKIT="automattic/a8c-ci-toolkit#7.1.1"
 export DOCKER_PLUGIN="docker#v5.13.0"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RUBY_VERSION="$(cat "$SCRIPT_DIR/../.ruby-version")"
