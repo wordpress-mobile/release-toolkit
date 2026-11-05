@@ -15,7 +15,7 @@ module Fastlane
         path = params[:release_notes_file_path]
         contents = File.read(path)
         format = params[:format]
-        options = params.values.except(:version, :release_notes_file_path, :format, :dry_run)
+        options = params.values.except(*custom_options.map(&:key))
         markdown = other_action.get_prs_between_tags(**options, fail_on_error: true)
         section = Helper::ReleaseNotesHelper.format_section(version: version, markdown: markdown, format: format)
         updated = Helper::ReleaseNotesHelper.update_section(contents: contents, version: version, section: section, format: format)
@@ -48,7 +48,11 @@ module Fastlane
       end
 
       def self.available_options
-        GetPrsBetweenTagsAction.available_options.reject { |option| option.key == :fail_on_error } + [
+        GetPrsBetweenTagsAction.available_options.reject { |option| option.key == :fail_on_error } + custom_options
+      end
+
+      def self.custom_options
+        [
           FastlaneCore::ConfigItem.new(key: :version, description: 'Numeric version heading in the output file', type: String),
           FastlaneCore::ConfigItem.new(key: :release_notes_file_path, description: 'Existing release notes file', type: String, default_value: 'RELEASE-NOTES.txt'),
           FastlaneCore::ConfigItem.new(key: :format,
@@ -61,6 +65,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :dry_run, description: 'Preview the section without writing the file', type: Boolean, default_value: false),
         ]
       end
+
+      private_class_method :custom_options
 
       def self.return_value
         'The generated version section'
