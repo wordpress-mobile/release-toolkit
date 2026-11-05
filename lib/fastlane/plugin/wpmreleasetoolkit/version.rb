@@ -3,6 +3,6 @@
 module Fastlane
   module Wpmreleasetoolkit
     NAME = 'fastlane-plugin-wpmreleasetoolkit'
-    VERSION = '15.2.0'
+    VERSION = '15.3.0'
   end
 end
