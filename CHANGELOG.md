@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-- Add `generate_release_notes_file` to write generated GitHub Markdown into a version section in existing release lanes. [#776]
+- Add `generate_release_notes_file` to write generated GitHub notes into a `RELEASE-NOTES.txt` or Markdown `CHANGELOG.md` version section in existing release lanes. [#776]
 
 ### Bug Fixes
 

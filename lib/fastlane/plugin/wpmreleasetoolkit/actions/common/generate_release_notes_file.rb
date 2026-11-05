@@ -14,10 +14,11 @@ module Fastlane
 
         path = params[:release_notes_file_path]
         contents = File.read(path)
-        options = params.values.except(:version, :release_notes_file_path, :dry_run)
+        format = params[:format]
+        options = params.values.except(:version, :release_notes_file_path, :format, :dry_run)
         markdown = other_action.get_prs_between_tags(**options, fail_on_error: true)
-        section = "#{version}\n-----\n#{markdown.rstrip}\n\n"
-        updated = Helper::ReleaseNotesHelper.update_section(contents: contents, version: version, section: section)
+        section = Helper::ReleaseNotesHelper.format_section(version: version, markdown: markdown, format: format)
+        updated = Helper::ReleaseNotesHelper.update_section(contents: contents, version: version, section: section, format: format)
 
         if params[:dry_run]
           UI.message(section)
@@ -28,13 +29,17 @@ module Fastlane
       end
 
       def self.description
-        'Write generated GitHub Markdown to a RELEASE-NOTES.txt version section'
+        'Write generated GitHub notes to a release notes or Markdown changelog version section'
       end
 
       def self.details
         <<~DETAILS
           Inserts or replaces one version section using get_prs_between_tags, preserving other versions and header comments.
-          Keeps the returned Markdown, including headings, authors, contributors, and links.
+          Defaults to the underlined version headings used in RELEASE-NOTES.txt.
+          Use format: :changelog and release_notes_file_path: 'CHANGELOG.md' for numeric ## version headings.
+          Changelog output nests generated headings beneath the version and preserves Trunk/Unreleased sections.
+          The existing file must contain at least one version section in the selected format.
+          Keeps authors, contributors, and links. Does not promote Unreleased entries or edit other versions.
           Use configuration_file_path to exclude or group PRs by GitHub labels; no title markers are needed.
           For a separate report, such as release testing, call get_prs_between_tags with its own configuration_file_path.
           Requires an explicit previous_tag and a published target_commitish if tag_name does not exist.
@@ -44,8 +49,15 @@ module Fastlane
 
       def self.available_options
         GetPrsBetweenTagsAction.available_options.reject { |option| option.key == :fail_on_error } + [
-          FastlaneCore::ConfigItem.new(key: :version, description: 'Numeric version heading in RELEASE-NOTES.txt', type: String),
+          FastlaneCore::ConfigItem.new(key: :version, description: 'Numeric version heading in the output file', type: String),
           FastlaneCore::ConfigItem.new(key: :release_notes_file_path, description: 'Existing release notes file', type: String, default_value: 'RELEASE-NOTES.txt'),
+          FastlaneCore::ConfigItem.new(key: :format,
+                                       description: 'Version section format: :release_notes or :changelog',
+                                       type: Symbol,
+                                       default_value: :release_notes,
+                                       verify_block: proc do |value|
+                                         UI.user_error!('format must be :release_notes or :changelog') unless %i[release_notes changelog].include?(value)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :dry_run, description: 'Preview the section without writing the file', type: Boolean, default_value: false),
         ]
       end
