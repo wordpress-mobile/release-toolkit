@@ -311,7 +311,7 @@ module Fastlane
           tag_name: tag_name,
           target_commitish: target_commitish, # Only used if no git tag named `tag_name` exists yet
           previous_tag_name: previous_tag,
-          config_file_path: config_file_path
+          configuration_file_path: config_file_path
         )
         res.body
       end

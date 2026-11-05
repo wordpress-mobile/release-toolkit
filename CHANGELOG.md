@@ -10,11 +10,11 @@ _None_
 
 ### New Features
 
-_None_
+- Add `generate_release_notes_file` to write generated GitHub notes into a `RELEASE-NOTES.txt` or Markdown `CHANGELOG.md` version section in existing release lanes. [#776]
 
 ### Bug Fixes
 
-_None_
+- Pass the configured release notes path to GitHub using the expected `configuration_file_path` parameter. [#776]
 
 ### Internal Changes
 
