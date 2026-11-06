@@ -60,16 +60,14 @@ module Fastlane
         verify!("#{path} has no notarization ticket stapled to it", 'xcrun', 'stapler', 'validate', path) if verify_notarization
       end
 
-      # A bare binary can't carry a stapled ticket, so Gatekeeper's online lookup is the only
-      # notarization check available. It can lag a fresh submission.
-      #
-      # `--type execute` is not an option here: it rejects any bare binary, notarized or not, with
-      # `the code is valid but does not seem to be an app`.
+      # Notarization is checked online, since a bare binary can't carry a stapled ticket, so it can
+      # fail for a binary notarized only moments ago.
       #
       def self.verify_binary(path:, expected_authority:, verify_notarization:)
         UI.user_error!("#{path} is not signed at all") unless signed?(path)
         verify_authority!(path: path, expected_authority: expected_authority) unless expected_authority.nil?
 
+        # `--type execute` rejects any bare binary, notarized or not, as `does not seem to be an app`.
         verify!("#{path} was rejected by Gatekeeper", 'spctl', '--assess', '--type', 'open', '--context', 'context:primary-signature', '--verbose=2', path) if verify_notarization
       end
 
