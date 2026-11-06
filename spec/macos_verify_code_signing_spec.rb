@@ -217,11 +217,12 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
       end
     end
 
-    it 'skips the hardened runtime check with a warning' do
+    it 'skips the hardened runtime check' do
       with_artifacts('Test.dmg') do |(path)|
         expect_codesign_verify(path)
         expect(Open3).not_to receive(:popen2e).with('codesign', '--display', any_args)
-        expect(FastlaneCore::UI).to receive(:important).with(/Skipping the hardened runtime check for .*Test\.dmg/)
+        allow(FastlaneCore::UI).to receive(:message)
+        expect(FastlaneCore::UI).to receive(:message).with(/Skipping the hardened runtime check for .*Test\.dmg/)
 
         run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false)
       end

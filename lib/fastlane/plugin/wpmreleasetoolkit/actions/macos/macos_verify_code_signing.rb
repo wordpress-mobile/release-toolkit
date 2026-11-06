@@ -46,7 +46,7 @@ module Fastlane
       # check that means anything for an unsigned image.
       #
       def self.verify_disk_image(path:, expected_authority:, verify_hardened_runtime:, verify_notarization:)
-        UI.important("Skipping the hardened runtime check for #{path}: it only applies to code, not to a disk image.") if verify_hardened_runtime
+        UI.message("Skipping the hardened runtime check for #{path}: it only applies to code, not to a disk image.") if verify_hardened_runtime
 
         # Said up front because `sh` logs a non-zero exit in red regardless of it being handled,
         # which reads as a broken build in the CI log of an otherwise passing job.
@@ -120,9 +120,9 @@ module Fastlane
           - `.dmg` — if the image is signed, the signature is valid (and can be checked against the expected authority) and Gatekeeper accepts opening it; when `verify_notarization` is true, a notarization ticket is stapled to the image.
           - no extension, for a bare binary — the signature is valid and can be checked against the expected authority, and Gatekeeper accepts it as notarized. A bare binary can't be stapled, so that acceptance relies on an online lookup that can lag a fresh submission.
 
-          `verify_hardened_runtime` additionally checks that an app bundle or bare binary was signed with the hardened runtime, which notarization requires.
-          Use it to catch a missing hardened runtime before submitting for notarization, when `verify_notarization` has to be false.
-          It doesn't apply to disk images, which are skipped with a warning.
+          `verify_hardened_runtime` checks that app bundles and bare binaries are signed with the hardened runtime.
+          Notarization requires it, so `verify_notarization` already covers it implicitly. Use this option to catch a missing hardened runtime before submitting for notarization.
+          It doesn't apply to disk images.
         DETAILS
       end
 
@@ -146,7 +146,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :verify_hardened_runtime,
-            description: 'Whether to also assert that app bundles and bare binaries are signed with the hardened runtime. Disk images are skipped with a warning',
+            description: 'Whether to also assert that app bundles and bare binaries are signed with the hardened runtime. Disk images are skipped',
             type: Boolean,
             default_value: false
           ),
