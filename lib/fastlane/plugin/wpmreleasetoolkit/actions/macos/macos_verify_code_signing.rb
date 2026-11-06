@@ -62,9 +62,6 @@ module Fastlane
         verify!("#{path} has no notarization ticket stapled to it", 'xcrun', 'stapler', 'validate', path) if verify_notarization
       end
 
-      # Notarization is checked online, since a bare binary can't carry a stapled ticket, so it can
-      # fail for a binary notarized only moments ago.
-      #
       def self.verify_binary(path:, expected_authority:, verify_hardened_runtime:, verify_notarization:)
         UI.user_error!("#{path} is not signed at all") unless signed?(path)
         verify_signature_details!(path: path, expected_authority: expected_authority, verify_hardened_runtime: verify_hardened_runtime)
