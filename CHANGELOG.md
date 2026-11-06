@@ -11,6 +11,7 @@ _None_
 ### New Features
 
 - `macos_verify_code_signing` now verifies bare binaries, identified by having no file extension. [#782]
+- `macos_verify_code_signing` has a new `verify_hardened_runtime` option to check that app bundles and bare binaries are signed with the hardened runtime. [#782]
 
 ### Bug Fixes
 
