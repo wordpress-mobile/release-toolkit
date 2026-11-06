@@ -17,11 +17,11 @@ module Fastlane
 
           case File.extname(path).downcase
           when '.app'
-            verify_app_bundle(path: path, expected_authority: params[:expected_authority], verify_notarization: params[:verify_notarization])
+            verify_app_bundle(path: path, expected_authority: params[:expected_authority], verify_hardened_runtime: params[:verify_hardened_runtime], verify_notarization: params[:verify_notarization])
           when '.dmg'
-            verify_disk_image(path: path, expected_authority: params[:expected_authority], verify_notarization: params[:verify_notarization])
+            verify_disk_image(path: path, expected_authority: params[:expected_authority], verify_hardened_runtime: params[:verify_hardened_runtime], verify_notarization: params[:verify_notarization])
           when ''
-            verify_binary(path: path, expected_authority: params[:expected_authority], verify_notarization: params[:verify_notarization])
+            verify_binary(path: path, expected_authority: params[:expected_authority], verify_hardened_runtime: params[:verify_hardened_runtime], verify_notarization: params[:verify_notarization])
           else
             UI.user_error!("Don't know how to verify #{path}. Supported artifacts are `.app` bundles, `.dmg` disk images and bare binaries without an extension")
           end
@@ -30,9 +30,9 @@ module Fastlane
         UI.success("Verified #{paths.length} artifact(s)")
       end
 
-      def self.verify_app_bundle(path:, expected_authority:, verify_notarization:)
+      def self.verify_app_bundle(path:, expected_authority:, verify_hardened_runtime:, verify_notarization:)
         UI.user_error!("#{path} is not signed at all") unless signed?(path, deep: true)
-        verify_authority!(path: path, expected_authority: expected_authority) unless expected_authority.nil?
+        verify_signature_details!(path: path, expected_authority: expected_authority, verify_hardened_runtime: verify_hardened_runtime)
 
         return unless verify_notarization
 
@@ -45,13 +45,15 @@ module Fastlane
       # signature` even when it carries a notarization ticket, so the stapled ticket is the only
       # check that means anything for an unsigned image.
       #
-      def self.verify_disk_image(path:, expected_authority:, verify_notarization:)
+      def self.verify_disk_image(path:, expected_authority:, verify_hardened_runtime:, verify_notarization:)
+        UI.important("Skipping the hardened runtime check for #{path}: it only applies to code, not to a disk image.") if verify_hardened_runtime
+
         # Said up front because `sh` logs a non-zero exit in red regardless of it being handled,
         # which reads as a broken build in the CI log of an otherwise passing job.
         UI.message("Checking whether #{path} is signed. Disk images usually aren't, so a `codesign` failure due to the image being unsigned is expected and tolerated (other signature failures will still fail).")
 
         if signed?(path)
-          verify_authority!(path: path, expected_authority: expected_authority) unless expected_authority.nil?
+          verify_signature_details!(path: path, expected_authority: expected_authority, verify_hardened_runtime: false)
           verify!("#{path} was rejected by Gatekeeper", 'spctl', '--assess', '--type', 'open', '--context', 'context:primary-signature', '--verbose=2', path) if verify_notarization
         else
           UI.important("#{path} is not signed — skipping its signature checks. We expect that the app it contains is the one carrying the signature.")
@@ -63,9 +65,9 @@ module Fastlane
       # Notarization is checked online, since a bare binary can't carry a stapled ticket, so it can
       # fail for a binary notarized only moments ago.
       #
-      def self.verify_binary(path:, expected_authority:, verify_notarization:)
+      def self.verify_binary(path:, expected_authority:, verify_hardened_runtime:, verify_notarization:)
         UI.user_error!("#{path} is not signed at all") unless signed?(path)
-        verify_authority!(path: path, expected_authority: expected_authority) unless expected_authority.nil?
+        verify_signature_details!(path: path, expected_authority: expected_authority, verify_hardened_runtime: verify_hardened_runtime)
 
         # `--type execute` rejects any bare binary, notarized or not, as `does not seem to be an app`.
         verify!("#{path} was rejected by Gatekeeper", 'spctl', '--assess', '--type', 'open', '--context', 'context:primary-signature', '--verbose=2', path) if verify_notarization
@@ -93,11 +95,13 @@ module Fastlane
         sh(*command, error_callback: ->(_) { UI.user_error!(error_message) })
       end
 
-      def self.verify_authority!(path:, expected_authority:)
-        details = sh('codesign', '--display', '--verbose=2', path)
-        return if details.include?("Authority=#{expected_authority}")
+      def self.verify_signature_details!(path:, expected_authority:, verify_hardened_runtime:)
+        return if expected_authority.nil? && !verify_hardened_runtime
 
-        UI.user_error!("#{path} is not signed by '#{expected_authority}':\n#{details}")
+        details = sh('codesign', '--display', '--verbose=2', path)
+        UI.user_error!("#{path} is not signed by '#{expected_authority}':\n#{details}") unless expected_authority.nil? || details.include?("Authority=#{expected_authority}")
+        # The flags list every option the code was signed with, e.g. `flags=0x10002(adhoc,runtime)`.
+        UI.user_error!("#{path} is not signed with the hardened runtime:\n#{details}") if verify_hardened_runtime && !details.match?(/flags=0x\h+\([^)]*\bruntime\b/)
       end
 
       #####################################################
@@ -118,6 +122,10 @@ module Fastlane
             the bundle for execution, and a notarization ticket is stapled to it.
           - `.dmg` — if the image is signed, the signature is valid (and can be checked against the expected authority) and Gatekeeper accepts opening it; when `verify_notarization` is true, a notarization ticket is stapled to the image.
           - no extension, for a bare binary — the signature is valid and can be checked against the expected authority, and Gatekeeper accepts it as notarized. A bare binary can't be stapled, so that acceptance relies on an online lookup that can lag a fresh submission.
+
+          `verify_hardened_runtime` additionally checks that an app bundle or bare binary was signed with the hardened runtime, which notarization requires.
+          Use it to catch a missing hardened runtime before submitting for notarization, when `verify_notarization` has to be false.
+          It doesn't apply to disk images, which are skipped with a warning.
         DETAILS
       end
 
@@ -138,6 +146,12 @@ module Fastlane
             type: String,
             optional: true,
             default_value: nil
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :verify_hardened_runtime,
+            description: 'Whether to also assert that app bundles and bare binaries are signed with the hardened runtime. Disk images are skipped with a warning',
+            type: Boolean,
+            default_value: false
           ),
           FastlaneCore::ConfigItem.new(
             key: :verify_notarization,

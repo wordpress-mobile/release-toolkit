@@ -29,8 +29,8 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
     expect_shell_command('codesign', '--verify', '--strict', '--verbose=2', path, exitstatus: exitstatus, output: output)
   end
 
-  def expect_codesign_display(path, authority:)
-    expect_shell_command('codesign', '--display', '--verbose=2', path, output: "Executable=#{path}\nAuthority=#{authority}\n")
+  def expect_codesign_display(path, authority: 'Developer ID Application: Automattic, Inc. (ABCDE12345)', flags: '0x10000(runtime)')
+    expect_shell_command('codesign', '--display', '--verbose=2', path, output: "Executable=#{path}\nCodeDirectory v=20500 size=1234 flags=#{flags} hashes=30+7 location=embedded\nAuthority=#{authority}\n")
   end
 
   def expect_gatekeeper_assess_execute(path, exitstatus: 0)
@@ -130,6 +130,27 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
           .to raise_error(FastlaneCore::Interface::FastlaneError, /Test\.app has no notarization ticket stapled to it/)
       end
     end
+
+    describe '`verify_hardened_runtime`' do
+      it 'passes when signed with the hardened runtime' do
+        with_artifacts('Test.app') do |(path)|
+          expect_codesign_verify_deep(path)
+          expect_codesign_display(path)
+
+          run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false)
+        end
+      end
+
+      it 'fails when signed without the hardened runtime' do
+        with_artifacts('Test.app') do |(path)|
+          expect_codesign_verify_deep(path)
+          expect_codesign_display(path, flags: '0x0(none)')
+
+          expect { run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false) }
+            .to raise_error(FastlaneCore::Interface::FastlaneError, /Test\.app is not signed with the hardened runtime/)
+        end
+      end
+    end
   end
 
   describe 'disk images' do
@@ -193,6 +214,16 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
         expect(Open3).not_to receive(:popen2e).with('xcrun', any_args)
 
         run_described_fastlane_action(artifact_path: path, verify_notarization: false)
+      end
+    end
+
+    it 'skips the hardened runtime check with a warning' do
+      with_artifacts('Test.dmg') do |(path)|
+        expect_codesign_verify(path)
+        expect(Open3).not_to receive(:popen2e).with('codesign', '--display', any_args)
+        expect(FastlaneCore::UI).to receive(:important).with(/Skipping the hardened runtime check for .*Test\.dmg/)
+
+        run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false)
       end
     end
   end
@@ -262,6 +293,55 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
 
         expect { run_described_fastlane_action(artifact_path: path) }
           .to raise_error(FastlaneCore::Interface::FastlaneError, /test-cli was rejected by Gatekeeper/)
+      end
+    end
+
+    describe '`verify_hardened_runtime`' do
+      it 'passes when signed with the hardened runtime' do
+        with_artifacts('test-cli') do |(path)|
+          expect_codesign_verify(path)
+          expect_codesign_display(path)
+
+          run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false)
+        end
+      end
+
+      it 'passes when the hardened runtime is one of several flags' do
+        with_artifacts('test-cli') do |(path)|
+          expect_codesign_verify(path)
+          expect_codesign_display(path, flags: '0x10002(adhoc,runtime)')
+
+          run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false)
+        end
+      end
+
+      it 'fails when signed without the hardened runtime' do
+        with_artifacts('test-cli') do |(path)|
+          expect_codesign_verify(path)
+          expect_codesign_display(path, flags: '0x0(none)')
+
+          expect { run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false) }
+            .to raise_error(FastlaneCore::Interface::FastlaneError, /test-cli is not signed with the hardened runtime/)
+        end
+      end
+
+      it 'still checks the authority' do
+        with_artifacts('test-cli') do |(path)|
+          expect_codesign_verify(path)
+          expect_codesign_display(path, authority: 'Apple Development: Someone Else (ZZZZZ99999)')
+
+          expect { run_described_fastlane_action(artifact_path: path, expected_authority: authority, verify_hardened_runtime: true, verify_notarization: false) }
+            .to raise_error(FastlaneCore::Interface::FastlaneError, /is not signed by '#{Regexp.escape(authority)}'/)
+        end
+      end
+
+      it 'does not inspect the signature details by default' do
+        with_artifacts('test-cli') do |(path)|
+          expect_codesign_verify(path)
+          expect(Open3).not_to receive(:popen2e).with('codesign', '--display', any_args)
+
+          run_described_fastlane_action(artifact_path: path, verify_notarization: false)
+        end
       end
     end
   end
