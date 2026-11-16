@@ -18,7 +18,7 @@ _None_
 
 ### Internal Changes
 
-_None_
+- Update Addressable, Active Support, and Nokogiri to patched versions, and require Nokogiri 1.19.5 or newer for consumers of the gem.
 
 ## 15.3.0
 
