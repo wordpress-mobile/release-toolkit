@@ -95,9 +95,23 @@ module Fastlane
       def self.verify_signature_details!(path:, expected_authority:, verify_hardened_runtime:)
         return if expected_authority.nil? && !verify_hardened_runtime
 
+        signature_details(path).each do |details|
+          UI.user_error!("#{path} is not signed by '#{expected_authority}':\n#{details}") unless expected_authority.nil? || details.lines(chomp: true).include?("Authority=#{expected_authority}")
+          UI.user_error!("#{path} is not signed with the hardened runtime:\n#{details}") if verify_hardened_runtime && !code_directory_flags(details).include?('runtime')
+        end
+      end
+
+      # Each architecture of universal code carries its own signature, but `codesign --display`
+      # only shows the one matching this Mac's, so the others are displayed one at a time.
+      #
+      # @return [Array<String>] The `codesign --display` output for each architecture.
+      #
+      def self.signature_details(path)
         details = sh('codesign', '--display', '--verbose=2', path)
-        UI.user_error!("#{path} is not signed by '#{expected_authority}':\n#{details}") unless expected_authority.nil? || details.lines(chomp: true).include?("Authority=#{expected_authority}")
-        UI.user_error!("#{path} is not signed with the hardened runtime:\n#{details}") if verify_hardened_runtime && !code_directory_flags(details).include?('runtime')
+        architectures = details[/^Format=.*Mach-O universal \(([^)]+)\)/, 1]&.split
+        return [details] if architectures.nil?
+
+        architectures.map { |architecture| sh('codesign', '--display', '--verbose=2', '--arch', architecture, path) }
       end
 
       # The flags of the CodeDirectory line, e.g. `%w[adhoc runtime]` for `flags=0x10002(adhoc,runtime)`.

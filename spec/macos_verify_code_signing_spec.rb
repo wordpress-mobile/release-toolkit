@@ -29,8 +29,18 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
     expect_shell_command('codesign', '--verify', '--strict', '--verbose=2', path, exitstatus: exitstatus, output: output)
   end
 
-  def expect_codesign_display(path, authority: 'Developer ID Application: Automattic, Inc. (ABCDE12345)', flags: '0x10000(runtime)')
-    expect_shell_command('codesign', '--display', '--verbose=2', path, output: "Executable=#{path}\nCodeDirectory v=20500 size=1234 flags=#{flags} hashes=30+7 location=embedded\nAuthority=#{authority}\n")
+  def expect_codesign_display(path, authority: 'Developer ID Application: Automattic, Inc. (ABCDE12345)', flags: '0x10000(runtime)', format: 'Mach-O thin (arm64)', arch: nil)
+    arch_args = arch.nil? ? [] : ['--arch', arch]
+    expect_shell_command('codesign', '--display', '--verbose=2', *arch_args, path, output: "Executable=#{path}\nFormat=#{format}\nCodeDirectory v=20500 size=1234 flags=#{flags} hashes=30+7 location=embedded\nAuthority=#{authority}\n")
+  end
+
+  # `codesign --display` shows the native slice of universal code, so these are its outputs
+  # for the universal file and then for each slice.
+  #
+  def expect_codesign_display_universal(path, x86_64_flags:, arm64_flags: '0x10000(runtime)', format: 'Mach-O universal (x86_64 arm64)')
+    expect_codesign_display(path, flags: arm64_flags, format: format)
+    expect_codesign_display(path, flags: x86_64_flags, format: format.sub('universal (x86_64 arm64)', 'thin (x86_64)'), arch: 'x86_64')
+    expect_codesign_display(path, flags: arm64_flags, format: format.sub('universal (x86_64 arm64)', 'thin (arm64)'), arch: 'arm64')
   end
 
   def expect_gatekeeper_assess_execute(path, exitstatus: 0)
@@ -145,6 +155,16 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
         with_artifacts('Test.app') do |(path)|
           expect_codesign_verify_deep(path)
           expect_codesign_display(path, flags: '0x0(none)')
+
+          expect { run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false) }
+            .to raise_error(FastlaneCore::Interface::FastlaneError, /Test\.app is not signed with the hardened runtime/)
+        end
+      end
+
+      it 'fails when one architecture of a universal app lacks the hardened runtime' do
+        with_artifacts('Test.app') do |(path)|
+          expect_codesign_verify_deep(path)
+          expect_codesign_display_universal(path, x86_64_flags: '0x0(none)', format: 'bundle with Mach-O universal (x86_64 arm64)')
 
           expect { run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false) }
             .to raise_error(FastlaneCore::Interface::FastlaneError, /Test\.app is not signed with the hardened runtime/)
@@ -333,6 +353,25 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
 
           expect { run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false) }
             .to raise_error(FastlaneCore::Interface::FastlaneError, /test-cli is not signed with the hardened runtime/)
+        end
+      end
+
+      it 'passes when every architecture of a universal binary has the hardened runtime' do
+        with_artifacts('test-cli') do |(path)|
+          expect_codesign_verify(path)
+          expect_codesign_display_universal(path, x86_64_flags: '0x10000(runtime)')
+
+          run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false)
+        end
+      end
+
+      it 'fails when one architecture of a universal binary lacks the hardened runtime' do
+        with_artifacts('test-cli') do |(path)|
+          expect_codesign_verify(path)
+          expect_codesign_display_universal(path, x86_64_flags: '0x0(none)')
+
+          expect { run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false) }
+            .to raise_error(FastlaneCore::Interface::FastlaneError, /test-cli is not signed with the hardened runtime:\n.*thin \(x86_64\)/m)
         end
       end
 
