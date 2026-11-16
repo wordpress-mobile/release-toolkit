@@ -268,6 +268,16 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
       end
     end
 
+    it 'fails when the expected authority is only a prefix of the actual one' do
+      with_artifacts('test-cli') do |(path)|
+        expect_codesign_verify(path)
+        expect_codesign_display(path, authority: "#{authority} Evil")
+
+        expect { run_described_fastlane_action(artifact_path: path, expected_authority: authority, verify_notarization: false) }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, /is not signed by '#{Regexp.escape(authority)}'/)
+      end
+    end
+
     it 'fails when the signature is not valid' do
       with_artifacts('test-cli') do |(path)|
         expect_codesign_verify(path, exitstatus: 1, output: "#{path}: invalid signature (code or signature have been modified)\n")
@@ -318,6 +328,16 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
 
       it 'fails when signed without the hardened runtime' do
         with_artifacts('test-cli') do |(path)|
+          expect_codesign_verify(path)
+          expect_codesign_display(path, flags: '0x0(none)')
+
+          expect { run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false) }
+            .to raise_error(FastlaneCore::Interface::FastlaneError, /test-cli is not signed with the hardened runtime/)
+        end
+      end
+
+      it 'ignores a `flags=` that is part of the path' do
+        with_artifacts('flags=0x10000(runtime)/test-cli') do |(path)|
           expect_codesign_verify(path)
           expect_codesign_display(path, flags: '0x0(none)')
 

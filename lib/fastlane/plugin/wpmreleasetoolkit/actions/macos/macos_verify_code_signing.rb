@@ -96,9 +96,15 @@ module Fastlane
         return if expected_authority.nil? && !verify_hardened_runtime
 
         details = sh('codesign', '--display', '--verbose=2', path)
-        UI.user_error!("#{path} is not signed by '#{expected_authority}':\n#{details}") unless expected_authority.nil? || details.include?("Authority=#{expected_authority}")
-        # The flags list every option the code was signed with, e.g. `flags=0x10002(adhoc,runtime)`.
-        UI.user_error!("#{path} is not signed with the hardened runtime:\n#{details}") if verify_hardened_runtime && !details.match?(/flags=0x\h+\([^)]*\bruntime\b/)
+        UI.user_error!("#{path} is not signed by '#{expected_authority}':\n#{details}") unless expected_authority.nil? || details.lines(chomp: true).include?("Authority=#{expected_authority}")
+        UI.user_error!("#{path} is not signed with the hardened runtime:\n#{details}") if verify_hardened_runtime && !code_directory_flags(details).include?('runtime')
+      end
+
+      # The flags of the CodeDirectory line, e.g. `%w[adhoc runtime]` for `flags=0x10002(adhoc,runtime)`.
+      # The `Executable=` line can contain `flags=` too, as part of the path.
+      #
+      def self.code_directory_flags(details)
+        details[/^CodeDirectory\b.*?\bflags=0x\h+\(([^)]*)\)/, 1]&.split(',') || []
       end
 
       #####################################################
