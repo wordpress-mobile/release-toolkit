@@ -19,7 +19,8 @@ module Fastlane
           when '.app'
             verify_app_bundle(path: path, expected_authority: params[:expected_authority], verify_hardened_runtime: params[:verify_hardened_runtime], verify_notarization: params[:verify_notarization])
           when '.dmg'
-            verify_disk_image(path: path, expected_authority: params[:expected_authority], verify_hardened_runtime: params[:verify_hardened_runtime], verify_notarization: params[:verify_notarization])
+            UI.message("Skipping the hardened runtime check for #{path}: it only applies to code, not to a disk image.") if params[:verify_hardened_runtime]
+            verify_disk_image(path: path, expected_authority: params[:expected_authority], verify_notarization: params[:verify_notarization])
           when ''
             verify_binary(path: path, expected_authority: params[:expected_authority], verify_hardened_runtime: params[:verify_hardened_runtime], verify_notarization: params[:verify_notarization])
           else
@@ -45,9 +46,7 @@ module Fastlane
       # signature` even when it carries a notarization ticket, so the stapled ticket is the only
       # check that means anything for an unsigned image.
       #
-      def self.verify_disk_image(path:, expected_authority:, verify_hardened_runtime:, verify_notarization:)
-        UI.message("Skipping the hardened runtime check for #{path}: it only applies to code, not to a disk image.") if verify_hardened_runtime
-
+      def self.verify_disk_image(path:, expected_authority:, verify_notarization:)
         # Said up front because `sh` logs a non-zero exit in red regardless of it being handled,
         # which reads as a broken build in the CI log of an otherwise passing job.
         UI.message("Checking whether #{path} is signed. Disk images usually aren't, so a `codesign` failure due to the image being unsigned is expected and tolerated (other signature failures will still fail).")
