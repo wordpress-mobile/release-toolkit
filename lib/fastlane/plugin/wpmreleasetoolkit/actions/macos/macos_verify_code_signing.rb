@@ -15,20 +15,29 @@ module Fastlane
 
           UI.message("Verifying #{path}")
 
-          case File.extname(path).downcase
-          when '.app'
+          extension = File.extname(path).downcase
+          if extension == '.app'
             verify_app_bundle(path: path, expected_authority: params[:expected_authority], verify_hardened_runtime: params[:verify_hardened_runtime], verify_notarization: params[:verify_notarization])
-          when '.dmg'
+          elsif extension == '.dmg'
             UI.message("Skipping the hardened runtime check for #{path}: it only applies to code, not to a disk image.") if params[:verify_hardened_runtime]
             verify_disk_image(path: path, expected_authority: params[:expected_authority], verify_notarization: params[:verify_notarization])
-          when ''
+          elsif mach_o?(path)
             verify_binary(path: path, expected_authority: params[:expected_authority], verify_hardened_runtime: params[:verify_hardened_runtime], verify_notarization: params[:verify_notarization])
           else
-            UI.user_error!("Don't know how to verify #{path}. Supported artifacts are `.app` bundles, `.dmg` disk images and bare binaries without an extension")
+            UI.user_error!("Don't know how to verify #{path}. Supported artifacts are `.app` bundles, `.dmg` disk images and Mach-O binaries")
           end
         end
 
         UI.success("Verified #{paths.length} artifact(s)")
+      end
+
+      # Thin 32- and 64-bit, then universal, in both byte orders.
+      MACH_O_MAGIC_NUMBERS = %w[feedface feedfacf cefaedfe cffaedfe cafebabe cafebabf bebafeca bfbafeca].freeze
+
+      # Recognizes a bare binary by its content, because its name can look like it has an extension, e.g. `tool-v1.2.3`.
+      #
+      def self.mach_o?(path)
+        File.file?(path) && MACH_O_MAGIC_NUMBERS.include?(File.binread(path, 4).to_s.unpack1('H*'))
       end
 
       def self.verify_app_bundle(path:, expected_authority:, verify_hardened_runtime:, verify_notarization:)
@@ -132,12 +141,12 @@ module Fastlane
         <<~DETAILS
           Verify that the given macOS artifacts are signed, and optionally notarized.
 
-          The checks that apply are picked from the artifact's extension:
+          The checks that apply are picked from the kind of artifact:
 
           - `.app` — the signature is valid and satisfies its designated requirement, Gatekeeper accepts
             the bundle for execution, and a notarization ticket is stapled to it.
           - `.dmg` — if the image is signed, the signature is valid (and can be checked against the expected authority) and Gatekeeper accepts opening it; when `verify_notarization` is true, a notarization ticket is stapled to the image.
-          - no extension, for a bare binary — the signature is valid and can be checked against the expected authority, and Gatekeeper accepts it as notarized. A bare binary can't be stapled, so that acceptance relies on an online lookup that can lag a fresh submission.
+          - a bare Mach-O binary, whatever its name — the signature is valid and can be checked against the expected authority, and Gatekeeper accepts it as notarized. A bare binary can't be stapled, so that acceptance relies on an online lookup that can lag a fresh submission.
 
           `verify_hardened_runtime` checks that app bundles and bare binaries are signed with the hardened runtime.
           Notarization requires it, so `verify_notarization` already covers it implicitly. Use this option to catch a missing hardened runtime before submitting for notarization.

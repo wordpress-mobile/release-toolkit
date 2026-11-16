@@ -21,6 +21,21 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
     end
   end
 
+  # Like `with_artifacts`, but as files starting with the Mach-O magic number, which is what
+  # identifies a bare binary.
+  #
+  def with_binaries(*names)
+    in_tmp_dir do |tmp_dir|
+      paths = names.map do |name|
+        path = File.join(tmp_dir, name)
+        FileUtils.mkdir_p(File.dirname(path))
+        File.binwrite(path, "\xCF\xFA\xED\xFE")
+        path
+      end
+      yield(paths)
+    end
+  end
+
   def expect_codesign_verify_deep(path, exitstatus: 0, output: '')
     expect_shell_command('codesign', '--verify', '--deep', '--strict', '--verbose=2', path, exitstatus: exitstatus, output: output)
   end
@@ -251,7 +266,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
 
   describe 'bare binaries' do
     it 'verifies the signature and Gatekeeper acceptance, without expecting a stapled ticket' do
-      with_artifacts('test-cli') do |(path)|
+      with_binaries('test-cli') do |(path)|
         expect_codesign_verify(path)
         expect_gatekeeper_assess_open(path)
         expect(Open3).not_to receive(:popen2e).with('xcrun', any_args)
@@ -260,8 +275,27 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
       end
     end
 
+    it 'recognizes a binary whose name looks like it has an extension' do
+      with_binaries('test-cli-v1.2.3') do |(path)|
+        expect_codesign_verify(path)
+        expect_gatekeeper_assess_open(path)
+
+        run_described_fastlane_action(artifact_path: path)
+      end
+    end
+
+    it 'fails on a file without an extension that is not a Mach-O binary' do
+      in_tmp_dir do |tmp_dir|
+        path = File.join(tmp_dir, 'test-script')
+        File.write(path, "#!/bin/sh\n")
+
+        expect { run_described_fastlane_action(artifact_path: path) }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, /Don't know how to verify .*test-script/)
+      end
+    end
+
     it 'skips Gatekeeper when `verify_notarization` is `false`' do
-      with_artifacts('test-cli') do |(path)|
+      with_binaries('test-cli') do |(path)|
         expect_codesign_verify(path)
         expect(Open3).not_to receive(:popen2e).with('spctl', any_args)
 
@@ -270,7 +304,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
     end
 
     it 'passes when signed by the expected authority' do
-      with_artifacts('test-cli') do |(path)|
+      with_binaries('test-cli') do |(path)|
         expect_codesign_verify(path)
         expect_codesign_display(path, authority: authority)
 
@@ -279,7 +313,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
     end
 
     it 'fails when signed by a different authority' do
-      with_artifacts('test-cli') do |(path)|
+      with_binaries('test-cli') do |(path)|
         expect_codesign_verify(path)
         expect_codesign_display(path, authority: 'Apple Development: Someone Else (ZZZZZ99999)')
 
@@ -289,7 +323,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
     end
 
     it 'fails when the expected authority is only a prefix of the actual one' do
-      with_artifacts('test-cli') do |(path)|
+      with_binaries('test-cli') do |(path)|
         expect_codesign_verify(path)
         expect_codesign_display(path, authority: "#{authority} Evil")
 
@@ -299,7 +333,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
     end
 
     it 'fails when the signature is not valid' do
-      with_artifacts('test-cli') do |(path)|
+      with_binaries('test-cli') do |(path)|
         expect_codesign_verify(path, exitstatus: 1, output: "#{path}: invalid signature (code or signature have been modified)\n")
 
         expect { run_described_fastlane_action(artifact_path: path) }
@@ -309,7 +343,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
 
     # Unlike a disk image, there is no container whose contents could carry the signature instead.
     it 'fails when it is not signed at all' do
-      with_artifacts('test-cli') do |(path)|
+      with_binaries('test-cli') do |(path)|
         expect_codesign_verify(path, exitstatus: 1, output: "#{path}: code object is not signed at all\n")
 
         expect { run_described_fastlane_action(artifact_path: path) }
@@ -318,7 +352,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
     end
 
     it 'fails when Gatekeeper rejects it' do
-      with_artifacts('test-cli') do |(path)|
+      with_binaries('test-cli') do |(path)|
         expect_codesign_verify(path)
         expect_gatekeeper_assess_open(path, exitstatus: 3)
 
@@ -329,7 +363,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
 
     describe '`verify_hardened_runtime`' do
       it 'passes when signed with the hardened runtime' do
-        with_artifacts('test-cli') do |(path)|
+        with_binaries('test-cli') do |(path)|
           expect_codesign_verify(path)
           expect_codesign_display(path)
 
@@ -338,7 +372,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
       end
 
       it 'passes when the hardened runtime is one of several flags' do
-        with_artifacts('test-cli') do |(path)|
+        with_binaries('test-cli') do |(path)|
           expect_codesign_verify(path)
           expect_codesign_display(path, flags: '0x10002(adhoc,runtime)')
 
@@ -347,7 +381,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
       end
 
       it 'fails when signed without the hardened runtime' do
-        with_artifacts('test-cli') do |(path)|
+        with_binaries('test-cli') do |(path)|
           expect_codesign_verify(path)
           expect_codesign_display(path, flags: '0x0(none)')
 
@@ -357,7 +391,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
       end
 
       it 'passes when every architecture of a universal binary has the hardened runtime' do
-        with_artifacts('test-cli') do |(path)|
+        with_binaries('test-cli') do |(path)|
           expect_codesign_verify(path)
           expect_codesign_display_universal(path, x86_64_flags: '0x10000(runtime)')
 
@@ -366,7 +400,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
       end
 
       it 'fails when one architecture of a universal binary lacks the hardened runtime' do
-        with_artifacts('test-cli') do |(path)|
+        with_binaries('test-cli') do |(path)|
           expect_codesign_verify(path)
           expect_codesign_display_universal(path, x86_64_flags: '0x0(none)')
 
@@ -376,7 +410,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
       end
 
       it 'ignores a `flags=` that is part of the path' do
-        with_artifacts('flags=0x10000(runtime)/test-cli') do |(path)|
+        with_binaries('flags=0x10000(runtime)/test-cli') do |(path)|
           expect_codesign_verify(path)
           expect_codesign_display(path, flags: '0x0(none)')
 
@@ -386,7 +420,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
       end
 
       it 'still checks the authority' do
-        with_artifacts('test-cli') do |(path)|
+        with_binaries('test-cli') do |(path)|
           expect_codesign_verify(path)
           expect_codesign_display(path, authority: 'Apple Development: Someone Else (ZZZZZ99999)')
 
@@ -396,7 +430,7 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
       end
 
       it 'does not inspect the signature details by default' do
-        with_artifacts('test-cli') do |(path)|
+        with_binaries('test-cli') do |(path)|
           expect_codesign_verify(path)
           expect(Open3).not_to receive(:popen2e).with('codesign', '--display', any_args)
 
