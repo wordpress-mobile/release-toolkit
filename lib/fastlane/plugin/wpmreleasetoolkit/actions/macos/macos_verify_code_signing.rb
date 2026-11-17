@@ -16,13 +16,13 @@ module Fastlane
           UI.message("Verifying #{path}")
 
           extension = File.extname(path).downcase
-          if extension == '.app'
+          if mach_o?(path)
+            verify_binary(path: path, expected_authority: params[:expected_authority], verify_hardened_runtime: params[:verify_hardened_runtime], verify_notarization: params[:verify_notarization])
+          elsif extension == '.app'
             verify_app_bundle(path: path, expected_authority: params[:expected_authority], verify_hardened_runtime: params[:verify_hardened_runtime], verify_notarization: params[:verify_notarization])
           elsif extension == '.dmg'
             UI.message("Skipping the hardened runtime check for #{path}: it only applies to code, not to a disk image.") if params[:verify_hardened_runtime]
             verify_disk_image(path: path, expected_authority: params[:expected_authority], verify_notarization: params[:verify_notarization])
-          elsif mach_o?(path)
-            verify_binary(path: path, expected_authority: params[:expected_authority], verify_hardened_runtime: params[:verify_hardened_runtime], verify_notarization: params[:verify_notarization])
           else
             UI.user_error!("Don't know how to verify #{path}. Supported artifacts are `.app` bundles, `.dmg` disk images and Mach-O binaries")
           end
