@@ -284,6 +284,15 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
       end
     end
 
+    it 'verifies a binary named like a disk image as a binary' do
+      with_binaries('test-cli.dmg') do |(path)|
+        expect_codesign_verify(path, exitstatus: 1, output: "#{path}: code object is not signed at all")
+
+        expect { run_described_fastlane_action(artifact_path: path, verify_notarization: false) }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, /test-cli\.dmg is not signed at all/)
+      end
+    end
+
     it 'fails on a file without an extension that is not a Mach-O binary' do
       in_tmp_dir do |tmp_dir|
         path = File.join(tmp_dir, 'test-script')
