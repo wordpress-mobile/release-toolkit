@@ -10,12 +10,22 @@ _None_
 
 ### New Features
 
-- `macos_verify_code_signing` now verifies bare Mach-O binaries, recognized by their content rather than their name. [#782]
-- `macos_verify_code_signing` has a new `verify_hardened_runtime` option to check that app bundles and bare binaries are signed with the hardened runtime. [#782]
+_None_
 
 ### Bug Fixes
 
 _None_
+
+### Internal Changes
+
+_None_
+
+## 15.4.0
+
+### New Features
+
+- `macos_verify_code_signing` can now verify bare Mach-O binaries. [#782]
+- `macos_verify_code_signing` has a new `verify_hardened_runtime` option to check that app bundles and bare binaries are signed with the hardened runtime. [#782]
 
 ### Internal Changes
 
