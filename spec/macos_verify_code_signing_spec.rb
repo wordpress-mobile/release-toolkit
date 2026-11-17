@@ -21,6 +21,21 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
     end
   end
 
+  # Like `with_artifacts`, but as files starting with the Mach-O magic number, which is what
+  # identifies a bare binary.
+  #
+  def with_binaries(*names)
+    in_tmp_dir do |tmp_dir|
+      paths = names.map do |name|
+        path = File.join(tmp_dir, name)
+        FileUtils.mkdir_p(File.dirname(path))
+        File.binwrite(path, "\xCF\xFA\xED\xFE")
+        path
+      end
+      yield(paths)
+    end
+  end
+
   def expect_codesign_verify_deep(path, exitstatus: 0, output: '')
     expect_shell_command('codesign', '--verify', '--deep', '--strict', '--verbose=2', path, exitstatus: exitstatus, output: output)
   end
@@ -29,8 +44,18 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
     expect_shell_command('codesign', '--verify', '--strict', '--verbose=2', path, exitstatus: exitstatus, output: output)
   end
 
-  def expect_codesign_display(path, authority:)
-    expect_shell_command('codesign', '--display', '--verbose=2', path, output: "Executable=#{path}\nAuthority=#{authority}\n")
+  def expect_codesign_display(path, authority: 'Developer ID Application: Automattic, Inc. (ABCDE12345)', flags: '0x10000(runtime)', format: 'Mach-O thin (arm64)', arch: nil)
+    arch_args = arch.nil? ? [] : ['--arch', arch]
+    expect_shell_command('codesign', '--display', '--verbose=2', *arch_args, path, output: "Executable=#{path}\nFormat=#{format}\nCodeDirectory v=20500 size=1234 flags=#{flags} hashes=30+7 location=embedded\nAuthority=#{authority}\n")
+  end
+
+  # `codesign --display` shows the native slice of universal code, so these are its outputs
+  # for the universal file and then for each slice.
+  #
+  def expect_codesign_display_universal(path, x86_64_flags:, arm64_flags: '0x10000(runtime)', format: 'Mach-O universal (x86_64 arm64)')
+    expect_codesign_display(path, flags: arm64_flags, format: format)
+    expect_codesign_display(path, flags: x86_64_flags, format: format.sub('universal (x86_64 arm64)', 'thin (x86_64)'), arch: 'x86_64')
+    expect_codesign_display(path, flags: arm64_flags, format: format.sub('universal (x86_64 arm64)', 'thin (arm64)'), arch: 'arm64')
   end
 
   def expect_gatekeeper_assess_execute(path, exitstatus: 0)
@@ -130,6 +155,37 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
           .to raise_error(FastlaneCore::Interface::FastlaneError, /Test\.app has no notarization ticket stapled to it/)
       end
     end
+
+    describe '`verify_hardened_runtime`' do
+      it 'passes when signed with the hardened runtime' do
+        with_artifacts('Test.app') do |(path)|
+          expect_codesign_verify_deep(path)
+          expect_codesign_display(path)
+
+          run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false)
+        end
+      end
+
+      it 'fails when signed without the hardened runtime' do
+        with_artifacts('Test.app') do |(path)|
+          expect_codesign_verify_deep(path)
+          expect_codesign_display(path, flags: '0x0(none)')
+
+          expect { run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false) }
+            .to raise_error(FastlaneCore::Interface::FastlaneError, /Test\.app is not signed with the hardened runtime/)
+        end
+      end
+
+      it 'fails when one architecture of a universal app lacks the hardened runtime' do
+        with_artifacts('Test.app') do |(path)|
+          expect_codesign_verify_deep(path)
+          expect_codesign_display_universal(path, x86_64_flags: '0x0(none)', format: 'bundle with Mach-O universal (x86_64 arm64)')
+
+          expect { run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false) }
+            .to raise_error(FastlaneCore::Interface::FastlaneError, /Test\.app is not signed with the hardened runtime/)
+        end
+      end
+    end
   end
 
   describe 'disk images' do
@@ -193,6 +249,202 @@ describe Fastlane::Actions::MacosVerifyCodeSigningAction do
         expect(Open3).not_to receive(:popen2e).with('xcrun', any_args)
 
         run_described_fastlane_action(artifact_path: path, verify_notarization: false)
+      end
+    end
+
+    it 'skips the hardened runtime check' do
+      with_artifacts('Test.dmg') do |(path)|
+        expect_codesign_verify(path)
+        expect(Open3).not_to receive(:popen2e).with('codesign', '--display', any_args)
+        allow(FastlaneCore::UI).to receive(:message)
+        expect(FastlaneCore::UI).to receive(:message).with(/Skipping the hardened runtime check for .*Test\.dmg/)
+
+        run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false)
+      end
+    end
+  end
+
+  describe 'bare binaries' do
+    it 'verifies the signature and Gatekeeper acceptance, without expecting a stapled ticket' do
+      with_binaries('test-cli') do |(path)|
+        expect_codesign_verify(path)
+        expect_gatekeeper_assess_open(path)
+        expect(Open3).not_to receive(:popen2e).with('xcrun', any_args)
+
+        run_described_fastlane_action(artifact_path: path)
+      end
+    end
+
+    it 'recognizes a binary whose name looks like it has an extension' do
+      with_binaries('test-cli-v1.2.3') do |(path)|
+        expect_codesign_verify(path)
+        expect_gatekeeper_assess_open(path)
+
+        run_described_fastlane_action(artifact_path: path)
+      end
+    end
+
+    it 'verifies a binary named like a disk image as a binary' do
+      with_binaries('test-cli.dmg') do |(path)|
+        expect_codesign_verify(path, exitstatus: 1, output: "#{path}: code object is not signed at all")
+
+        expect { run_described_fastlane_action(artifact_path: path, verify_notarization: false) }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, /test-cli\.dmg is not signed at all/)
+      end
+    end
+
+    it 'fails on a file without an extension that is not a Mach-O binary' do
+      in_tmp_dir do |tmp_dir|
+        path = File.join(tmp_dir, 'test-script')
+        File.write(path, "#!/bin/sh\n")
+
+        expect { run_described_fastlane_action(artifact_path: path) }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, /Don't know how to verify .*test-script/)
+      end
+    end
+
+    it 'skips Gatekeeper when `verify_notarization` is `false`' do
+      with_binaries('test-cli') do |(path)|
+        expect_codesign_verify(path)
+        expect(Open3).not_to receive(:popen2e).with('spctl', any_args)
+
+        run_described_fastlane_action(artifact_path: path, verify_notarization: false)
+      end
+    end
+
+    it 'passes when signed by the expected authority' do
+      with_binaries('test-cli') do |(path)|
+        expect_codesign_verify(path)
+        expect_codesign_display(path, authority: authority)
+
+        run_described_fastlane_action(artifact_path: path, expected_authority: authority, verify_notarization: false)
+      end
+    end
+
+    it 'fails when signed by a different authority' do
+      with_binaries('test-cli') do |(path)|
+        expect_codesign_verify(path)
+        expect_codesign_display(path, authority: 'Apple Development: Someone Else (ZZZZZ99999)')
+
+        expect { run_described_fastlane_action(artifact_path: path, expected_authority: authority) }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, /is not signed by '#{Regexp.escape(authority)}'/)
+      end
+    end
+
+    it 'fails when the expected authority is only a prefix of the actual one' do
+      with_binaries('test-cli') do |(path)|
+        expect_codesign_verify(path)
+        expect_codesign_display(path, authority: "#{authority} Evil")
+
+        expect { run_described_fastlane_action(artifact_path: path, expected_authority: authority, verify_notarization: false) }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, /is not signed by '#{Regexp.escape(authority)}'/)
+      end
+    end
+
+    it 'fails when the signature is not valid' do
+      with_binaries('test-cli') do |(path)|
+        expect_codesign_verify(path, exitstatus: 1, output: "#{path}: invalid signature (code or signature have been modified)\n")
+
+        expect { run_described_fastlane_action(artifact_path: path) }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, /The code signature of .*test-cli is not valid/)
+      end
+    end
+
+    # Unlike a disk image, there is no container whose contents could carry the signature instead.
+    it 'fails when it is not signed at all' do
+      with_binaries('test-cli') do |(path)|
+        expect_codesign_verify(path, exitstatus: 1, output: "#{path}: code object is not signed at all\n")
+
+        expect { run_described_fastlane_action(artifact_path: path) }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, /test-cli is not signed at all/)
+      end
+    end
+
+    it 'fails when Gatekeeper rejects it' do
+      with_binaries('test-cli') do |(path)|
+        expect_codesign_verify(path)
+        expect_gatekeeper_assess_open(path, exitstatus: 3)
+
+        expect { run_described_fastlane_action(artifact_path: path) }
+          .to raise_error(FastlaneCore::Interface::FastlaneError, /test-cli was rejected by Gatekeeper/)
+      end
+    end
+
+    describe '`verify_hardened_runtime`' do
+      it 'passes when signed with the hardened runtime' do
+        with_binaries('test-cli') do |(path)|
+          expect_codesign_verify(path)
+          expect_codesign_display(path)
+
+          run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false)
+        end
+      end
+
+      it 'passes when the hardened runtime is one of several flags' do
+        with_binaries('test-cli') do |(path)|
+          expect_codesign_verify(path)
+          expect_codesign_display(path, flags: '0x10002(adhoc,runtime)')
+
+          run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false)
+        end
+      end
+
+      it 'fails when signed without the hardened runtime' do
+        with_binaries('test-cli') do |(path)|
+          expect_codesign_verify(path)
+          expect_codesign_display(path, flags: '0x0(none)')
+
+          expect { run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false) }
+            .to raise_error(FastlaneCore::Interface::FastlaneError, /test-cli is not signed with the hardened runtime/)
+        end
+      end
+
+      it 'passes when every architecture of a universal binary has the hardened runtime' do
+        with_binaries('test-cli') do |(path)|
+          expect_codesign_verify(path)
+          expect_codesign_display_universal(path, x86_64_flags: '0x10000(runtime)')
+
+          run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false)
+        end
+      end
+
+      it 'fails when one architecture of a universal binary lacks the hardened runtime' do
+        with_binaries('test-cli') do |(path)|
+          expect_codesign_verify(path)
+          expect_codesign_display_universal(path, x86_64_flags: '0x0(none)')
+
+          expect { run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false) }
+            .to raise_error(FastlaneCore::Interface::FastlaneError, /test-cli is not signed with the hardened runtime:\n.*thin \(x86_64\)/m)
+        end
+      end
+
+      it 'ignores a `flags=` that is part of the path' do
+        with_binaries('flags=0x10000(runtime)/test-cli') do |(path)|
+          expect_codesign_verify(path)
+          expect_codesign_display(path, flags: '0x0(none)')
+
+          expect { run_described_fastlane_action(artifact_path: path, verify_hardened_runtime: true, verify_notarization: false) }
+            .to raise_error(FastlaneCore::Interface::FastlaneError, /test-cli is not signed with the hardened runtime/)
+        end
+      end
+
+      it 'still checks the authority' do
+        with_binaries('test-cli') do |(path)|
+          expect_codesign_verify(path)
+          expect_codesign_display(path, authority: 'Apple Development: Someone Else (ZZZZZ99999)')
+
+          expect { run_described_fastlane_action(artifact_path: path, expected_authority: authority, verify_hardened_runtime: true, verify_notarization: false) }
+            .to raise_error(FastlaneCore::Interface::FastlaneError, /is not signed by '#{Regexp.escape(authority)}'/)
+        end
+      end
+
+      it 'does not inspect the signature details by default' do
+        with_binaries('test-cli') do |(path)|
+          expect_codesign_verify(path)
+          expect(Open3).not_to receive(:popen2e).with('codesign', '--display', any_args)
+
+          run_described_fastlane_action(artifact_path: path, verify_notarization: false)
+        end
       end
     end
   end

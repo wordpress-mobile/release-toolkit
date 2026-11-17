@@ -15,22 +15,34 @@ module Fastlane
 
           UI.message("Verifying #{path}")
 
-          case File.extname(path).downcase
-          when '.app'
-            verify_app_bundle(path: path, expected_authority: params[:expected_authority], verify_notarization: params[:verify_notarization])
-          when '.dmg'
+          extension = File.extname(path).downcase
+          if mach_o?(path)
+            verify_binary(path: path, expected_authority: params[:expected_authority], verify_hardened_runtime: params[:verify_hardened_runtime], verify_notarization: params[:verify_notarization])
+          elsif extension == '.app'
+            verify_app_bundle(path: path, expected_authority: params[:expected_authority], verify_hardened_runtime: params[:verify_hardened_runtime], verify_notarization: params[:verify_notarization])
+          elsif extension == '.dmg'
+            UI.message("Skipping the hardened runtime check for #{path}: it only applies to code, not to a disk image.") if params[:verify_hardened_runtime]
             verify_disk_image(path: path, expected_authority: params[:expected_authority], verify_notarization: params[:verify_notarization])
           else
-            UI.user_error!("Don't know how to verify #{path}. Supported artifacts are `.app` bundles and `.dmg` disk images")
+            UI.user_error!("Don't know how to verify #{path}. Supported artifacts are `.app` bundles, `.dmg` disk images and Mach-O binaries")
           end
         end
 
         UI.success("Verified #{paths.length} artifact(s)")
       end
 
-      def self.verify_app_bundle(path:, expected_authority:, verify_notarization:)
+      # Thin 32- and 64-bit, then universal, in both byte orders.
+      MACH_O_MAGIC_NUMBERS = %w[feedface feedfacf cefaedfe cffaedfe cafebabe cafebabf bebafeca bfbafeca].freeze
+
+      # Recognizes a bare binary by its content, because its name can look like it has an extension, e.g. `tool-v1.2.3`.
+      #
+      def self.mach_o?(path)
+        File.file?(path) && MACH_O_MAGIC_NUMBERS.include?(File.binread(path, 4).to_s.unpack1('H*'))
+      end
+
+      def self.verify_app_bundle(path:, expected_authority:, verify_hardened_runtime:, verify_notarization:)
         UI.user_error!("#{path} is not signed at all") unless signed?(path, deep: true)
-        verify_authority!(path: path, expected_authority: expected_authority) unless expected_authority.nil?
+        verify_signature_details!(path: path, expected_authority: expected_authority, verify_hardened_runtime: verify_hardened_runtime)
 
         return unless verify_notarization
 
@@ -49,13 +61,21 @@ module Fastlane
         UI.message("Checking whether #{path} is signed. Disk images usually aren't, so a `codesign` failure due to the image being unsigned is expected and tolerated (other signature failures will still fail).")
 
         if signed?(path)
-          verify_authority!(path: path, expected_authority: expected_authority) unless expected_authority.nil?
+          verify_signature_details!(path: path, expected_authority: expected_authority, verify_hardened_runtime: false)
           verify!("#{path} was rejected by Gatekeeper", 'spctl', '--assess', '--type', 'open', '--context', 'context:primary-signature', '--verbose=2', path) if verify_notarization
         else
           UI.important("#{path} is not signed — skipping its signature checks. We expect that the app it contains is the one carrying the signature.")
         end
 
         verify!("#{path} has no notarization ticket stapled to it", 'xcrun', 'stapler', 'validate', path) if verify_notarization
+      end
+
+      def self.verify_binary(path:, expected_authority:, verify_hardened_runtime:, verify_notarization:)
+        UI.user_error!("#{path} is not signed at all") unless signed?(path)
+        verify_signature_details!(path: path, expected_authority: expected_authority, verify_hardened_runtime: verify_hardened_runtime)
+
+        # `--type execute` rejects any bare binary, notarized or not, as `does not seem to be an app`.
+        verify!("#{path} was rejected by Gatekeeper", 'spctl', '--assess', '--type', 'open', '--context', 'context:primary-signature', '--verbose=2', path) if verify_notarization
       end
 
       # Distinguishes an artifact that carries no signature at all from one whose signature is
@@ -80,11 +100,33 @@ module Fastlane
         sh(*command, error_callback: ->(_) { UI.user_error!(error_message) })
       end
 
-      def self.verify_authority!(path:, expected_authority:)
-        details = sh('codesign', '--display', '--verbose=2', path)
-        return if details.include?("Authority=#{expected_authority}")
+      def self.verify_signature_details!(path:, expected_authority:, verify_hardened_runtime:)
+        return if expected_authority.nil? && !verify_hardened_runtime
 
-        UI.user_error!("#{path} is not signed by '#{expected_authority}':\n#{details}")
+        signature_details(path).each do |details|
+          UI.user_error!("#{path} is not signed by '#{expected_authority}':\n#{details}") unless expected_authority.nil? || details.lines(chomp: true).include?("Authority=#{expected_authority}")
+          UI.user_error!("#{path} is not signed with the hardened runtime:\n#{details}") if verify_hardened_runtime && !code_directory_flags(details).include?('runtime')
+        end
+      end
+
+      # Each architecture of universal code carries its own signature, but `codesign --display`
+      # only shows the one matching this Mac's, so the others are displayed one at a time.
+      #
+      # @return [Array<String>] The `codesign --display` output for each architecture.
+      #
+      def self.signature_details(path)
+        details = sh('codesign', '--display', '--verbose=2', path)
+        architectures = details[/^Format=.*Mach-O universal \(([^)]+)\)/, 1]&.split
+        return [details] if architectures.nil?
+
+        architectures.map { |architecture| sh('codesign', '--display', '--verbose=2', '--arch', architecture, path) }
+      end
+
+      # The flags of the CodeDirectory line, e.g. `%w[adhoc runtime]` for `flags=0x10002(adhoc,runtime)`.
+      # The `Executable=` line can contain `flags=` too, as part of the path.
+      #
+      def self.code_directory_flags(details)
+        details[/^CodeDirectory\b.*?\bflags=0x\h+\(([^)]*)\)/, 1]&.split(',') || []
       end
 
       #####################################################
@@ -99,11 +141,16 @@ module Fastlane
         <<~DETAILS
           Verify that the given macOS artifacts are signed, and optionally notarized.
 
-          The checks that apply are picked from the artifact's extension:
+          The checks that apply are picked from the kind of artifact:
 
           - `.app` — the signature is valid and satisfies its designated requirement, Gatekeeper accepts
             the bundle for execution, and a notarization ticket is stapled to it.
           - `.dmg` — if the image is signed, the signature is valid (and can be checked against the expected authority) and Gatekeeper accepts opening it; when `verify_notarization` is true, a notarization ticket is stapled to the image.
+          - a bare Mach-O binary, whatever its name — the signature is valid and can be checked against the expected authority, and Gatekeeper accepts it as notarized. A bare binary can't be stapled, so that acceptance relies on an online lookup that can lag a fresh submission.
+
+          `verify_hardened_runtime` checks that app bundles and bare binaries are signed with the hardened runtime.
+          Notarization requires it, so `verify_notarization` already covers it implicitly. Use this option to catch a missing hardened runtime before submitting for notarization.
+          It doesn't apply to disk images.
         DETAILS
       end
 
@@ -111,7 +158,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(
             key: :artifact_path,
-            description: 'The path, or list of paths, to the `.app` bundle(s) or `.dmg` disk image(s) to verify',
+            description: 'The path, or list of paths, to the `.app` bundle(s), `.dmg` disk image(s) or bare binaries to verify',
             type: Array,
             verify_block: proc do |value|
               UI.user_error!('`artifact_path` must be a String or an Array of Strings') unless value.all?(String)
@@ -126,8 +173,14 @@ module Fastlane
             default_value: nil
           ),
           FastlaneCore::ConfigItem.new(
+            key: :verify_hardened_runtime,
+            description: 'Whether to also assert that app bundles and bare binaries are signed with the hardened runtime. Disk images are skipped',
+            type: Boolean,
+            default_value: false
+          ),
+          FastlaneCore::ConfigItem.new(
             key: :verify_notarization,
-            description: 'Whether to also assert that the artifact is accepted by Gatekeeper and has a notarization ticket stapled to it',
+            description: 'Whether to also assert that the artifact is accepted by Gatekeeper and, unless it is a bare binary, has a notarization ticket stapled to it',
             type: Boolean,
             default_value: true
           ),
