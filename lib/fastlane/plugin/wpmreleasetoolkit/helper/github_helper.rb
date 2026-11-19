@@ -308,10 +308,13 @@ module Fastlane
         api_url = "#{repo_path}/releases/generate-notes"
         res = client.post(
           api_url,
-          tag_name: tag_name,
-          target_commitish: target_commitish, # Only used if no git tag named `tag_name` exists yet
-          previous_tag_name: previous_tag,
-          configuration_file_path: config_file_path
+          # The API rejects optional fields sent as `null`, so omit unset ones.
+          {
+            tag_name: tag_name,
+            target_commitish: target_commitish, # Only used if no git tag named `tag_name` exists yet
+            previous_tag_name: previous_tag,
+            configuration_file_path: config_file_path
+          }.compact
         )
         res.body
       end
