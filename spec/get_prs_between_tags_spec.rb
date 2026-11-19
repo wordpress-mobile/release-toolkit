@@ -49,9 +49,9 @@ describe Fastlane::Actions::GetPrsBetweenTagsAction do
         #{changelog}
       HTTP_RESULT
 
-      # Unset params must be omitted rather than sent as `null`, which the API rejects.
       allow(client).to receive(:post).with(
         "repos/#{test_repo}/releases/generate-notes",
+        # Unset params must be omitted rather than sent as `null`, which the API rejects.
         {
           configuration_file_path: configuration_file_path,
           previous_tag_name: previous_tag,
