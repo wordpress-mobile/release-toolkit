@@ -306,9 +306,9 @@ module Fastlane
       def generate_release_notes(repository:, tag_name:, previous_tag:, target_commitish: nil, config_file_path: nil)
         repo_path = Octokit::Repository.path(repository)
         api_url = "#{repo_path}/releases/generate-notes"
-        # The API rejects optional fields sent as `null`, so omit unset ones.
         res = client.post(
           api_url,
+          # The API rejects optional fields sent as `null`, so omit unset ones.
           {
             tag_name: tag_name,
             target_commitish: target_commitish, # Only used if no git tag named `tag_name` exists yet
