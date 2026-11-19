@@ -14,7 +14,7 @@ _None_
 
 ### Bug Fixes
 
-- Fix `get_prs_between_tags` failing with a 422 unless `configuration_file_path` is set, a regression in 15.3.0. Unset optional fields are now omitted rather than sent as `null`, which GitHub rejects. [#787]
+- Fix `get_prs_between_tags` failing with a 422 unless `configuration_file_path` is set, a regression in 15.3.0. [#787]
 
 ### Internal Changes
 
