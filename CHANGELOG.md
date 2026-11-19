@@ -14,11 +14,17 @@ _None_
 
 ### Bug Fixes
 
-- Fix `get_prs_between_tags` failing with a 422 unless `configuration_file_path` is set, a regression in 15.3.0. [#787]
+_None_
 
 ### Internal Changes
 
 _None_
+
+## 15.4.1
+
+### Bug Fixes
+
+- Fix `get_prs_between_tags` failing with a 422 unless `configuration_file_path` is set, a regression in 15.3.0. [#787]
 
 ## 15.4.0
 
