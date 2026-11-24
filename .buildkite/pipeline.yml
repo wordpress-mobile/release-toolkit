@@ -35,8 +35,7 @@ steps:
         matrix:
           setup:
             ruby:
-              # Temporary: go back to "$RUBY_VERSION" once .ruby-version is 3.4.13 (AINFRA-3865); the Linux agents lack it until AINFRA-3889/3890/3891.
-              - "3.4.13"
+              - "$RUBY_VERSION"
 
   #################
   # Push to RubyGems
