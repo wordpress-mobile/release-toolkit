@@ -16,9 +16,16 @@ describe Fastlane::Helper::Ios::L10nLinterHelper do
       expect(only_omits?('Post %1$@ has %2$@ like.', 'Postarea %1$@ are o apreciere.')).to be true
     end
 
-    it 'accepts dropping a leading or middle positional placeholder when the remaining positions keep their types' do
-      expect(only_omits?('Post %1$@ has %2$@ likes.', 'O postare are %2$@ aprecieri.')).to be true
-      expect(only_omits?('%1$@, %2$d, %3$@', '%1$@, %3$@')).to be true
+    it 'accepts dropping several trailing positional placeholders' do
+      expect(only_omits?('%1$@, %2$d, %3$@', '%1$@ doar')).to be true
+    end
+
+    it 'rejects dropping a leading positional placeholder, as Foundation would format the first argument in its place' do
+      expect(only_omits?('Post %1$@ has %2$@ likes.', 'O postare are %2$@ aprecieri.')).to be false
+    end
+
+    it 'rejects dropping a middle positional placeholder, as Foundation would shift the arguments after it' do
+      expect(only_omits?('%1$@, %2$d, %3$@', '%1$@, %3$@')).to be false
     end
 
     it 'accepts dropping a trailing sequential placeholder' do

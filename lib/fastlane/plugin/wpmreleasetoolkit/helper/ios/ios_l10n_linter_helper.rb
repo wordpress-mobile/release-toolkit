@@ -74,7 +74,7 @@ module Fastlane
         # @param [String] input_dir The path (ideally absolute) to the directory containing the `.lproj` folders to parse
         # @param [String] base_lang The code name (i.e the basename of one of the `.lproj` folders) of the locale to use as the baseline
         # @param [String] fail_on_strings_not_in_base_language Whether to fail on strings not in base language
-        # @param [Boolean] allow_omitted_placeholders Whether to accept translations that use only some of the base language placeholders.
+        # @param [Boolean] allow_omitted_placeholders Whether to accept translations that omit the trailing base language placeholders.
         # @return [Hash<String, Array<String>>] A hash of violations, keyed by language code, whose values are the list of violation messages for that language
         #
         def run(input_dir:, base_lang: DEFAULT_BASE_LANG, only_langs: nil, fail_on_strings_not_in_base_language: true, allow_omitted_placeholders: false)
@@ -90,8 +90,9 @@ module Fastlane
 
         # Whether a translation is safe to format with the base string's arguments while using only some of them.
         #
-        # That's the case when every placeholder in the translation exists in the base string, at the same position and with the same type, and the translation has fewer placeholders.
-        # Unused arguments are ignored at runtime, so this is legitimate when a language doesn't need a value.
+        # That's the case when the translation keeps the base string's first placeholders, at the same positions and with the same types, and drops the rest.
+        # Unused trailing arguments are ignored at runtime, so this is legitimate when a language doesn't need a value.
+        # Omitting a leading or middle placeholder isn't, because Foundation compacts gaps in positional arguments and would format the wrong value.
         #
         # For example, the English plural "one" form "%1$ld word" can be translated to Romanian as "Un cuvânt", discarding `%1$ld`,
         # because Romanian uses "one" only for exactly 1, and "un" already says it.
@@ -110,6 +111,7 @@ module Fastlane
           translation_placeholders = placeholders(translation)
           return false if base_placeholders.nil? || translation_placeholders.nil?
           return false unless translation_placeholders.size < base_placeholders.size
+          return false unless translation_placeholders.keys.sort == (1..translation_placeholders.size).to_a
 
           translation_placeholders.all? { |position, type| base_placeholders[position] == type }
         end
@@ -243,7 +245,7 @@ module Fastlane
         # @param [String] base_lang The base language used as source of truth that all other languages will be compared against
         # @param [Array<String>] only_langs The list of languages to limit the generation for. Useful to focus only on a couple of issues or just one language
         # @param [Boolean] fail_on_strings_not_in_base_language Whether to fail on strings not in base language
-        # @param [Boolean] allow_omitted_placeholders Whether to accept translations that use only some of the base language placeholders
+        # @param [Boolean] allow_omitted_placeholders Whether to accept translations that omit the trailing base language placeholders
         # @return [Hash<String, Array<String>>] A hash of violations, keyed by language code, whose values are the list of violation messages for that language
         #
         # @note The returned Hash contains keys only for locales with violations. Locales parsed but without any violations found will not appear in the resulting hash.

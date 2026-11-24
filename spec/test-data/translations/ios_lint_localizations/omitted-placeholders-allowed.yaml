@@ -29,5 +29,7 @@ result:
     - "`empty_translation` expected placeholders for [String,String] but found [] instead."
     - "`extra_placeholder` expected placeholders for [Int] but found [Int,String] instead."
     - "`incomplete_placeholder` expected placeholders for [Int] but found [] instead."
+    - "`leading_omitted` expected placeholders for [String,String] but found [String] instead."
+    - "`middle_omitted` expected placeholders for [String,Int,String] but found [String,String] instead."
     - "`sequential_leading_omitted` expected placeholders for [String,Int] but found [Int] instead."
     - "`type_mismatch` expected placeholders for [Int] but found [String] instead."

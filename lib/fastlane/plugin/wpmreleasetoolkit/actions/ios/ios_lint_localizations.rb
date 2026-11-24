@@ -201,8 +201,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :allow_omitted_placeholders,
             env_name: 'FL_IOS_LINT_TRANSLATIONS_ALLOW_OMITTED_PLACEHOLDERS',
-            description: 'Accept translations that use only some of the base language placeholders, as long as each one they use has the same position and type (e.g. "One word" for "%1$d word"). ' \
-                         'Malformed placeholders, extra placeholders and type mismatches are still reported',
+            description: 'Accept translations that omit the trailing base language placeholders, as long as the ones they keep have the same positions and types (e.g. "One word" for "%1$d word"). ' \
+                         'Omitting a leading or middle placeholder, malformed placeholders, extra placeholders and type mismatches are still reported',
             optional: true,
             default_value: false,
             type: Boolean
