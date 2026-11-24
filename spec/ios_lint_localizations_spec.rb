@@ -231,6 +231,10 @@ describe Fastlane::Actions::IosLintLocalizationsAction do
       )
     end
 
+    it 'still reports placeholders typed with a lookalike of the percent sign when allow_omitted_placeholders is true' do
+      run_l10n_linter_test(data_file: 'tricky-chars', allow_omitted_placeholders: true)
+    end
+
     it 'reports translations that omit placeholders by default' do
       run_l10n_linter_test(data_file: 'omitted-placeholders-not-allowed')
     end

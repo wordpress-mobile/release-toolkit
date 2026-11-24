@@ -81,6 +81,17 @@ describe Fastlane::Helper::Ios::L10nLinterHelper do
       expect(only_omits?('%1$@ of %2$@ used', ' ')).to be false
     end
 
+    it 'rejects a placeholder typed with a lookalike of the percent sign' do
+      expect(only_omits?('String %@ here, %d times.', "String \u{FF05}@ here.")).to be false
+      expect(only_omits?('String %1$@ here, %2$d times.', "String \u{066A}1$@ here.")).to be false
+      expect(only_omits?('String %1$@ here, %2$d times.', "String \u{FE6A}1$@ here.")).to be false
+    end
+
+    it 'accepts a lookalike of the percent sign that is not a placeholder' do
+      expect(only_omits?('%1$d%% of %2$@', "%1$d\u{066A} مكتمل")).to be true
+      expect(only_omits?('%1$d%% of %2$@', "%1$d\u{FF05}完了")).to be true
+    end
+
     it 'rejects an incomplete placeholder' do
       expect(only_omits?('%1$ld words', '%1$l 个字')).to be false
     end

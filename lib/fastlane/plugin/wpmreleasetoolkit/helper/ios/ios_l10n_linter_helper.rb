@@ -13,7 +13,10 @@ module Fastlane
 
         # A printf-style placeholder at the start of a string, capturing its optional `N$` position, its length modifier and its conversion character.
         # `*` widths and precisions are deliberately not matched, as they consume an extra argument.
-        PLACEHOLDER_REGEX = /\A%(?:(\d+)\$)?[-+ #0']*\d*(?:\.\d*)?(hh|h|ll|l|q|L|z|t|j)?([@dDiuUxXoOfFeEgGaAcCsSp])/
+        PLACEHOLDER_SPEC = /(?:(\d+)\$)?[-+ #0']*\d*(?:\.\d*)?(hh|h|ll|l|q|L|z|t|j)?([@dDiuUxXoOfFeEgGaAcCsSp])/
+        PLACEHOLDER_REGEX = /\A%#{PLACEHOLDER_SPEC}/
+        # A placeholder typed with a lookalike of `%` (fullwidth, Arabic or small percent sign), which Foundation prints verbatim
+        LOOKALIKE_PLACEHOLDER_REGEX = /[\uFF05\u066A\uFE6A]#{PLACEHOLDER_SPEC}/
         # Length modifiers that all read a 64-bit integer on Apple platforms
         LONG_INTEGER_LENGTHS = %w[l ll q z t j].freeze
 
@@ -113,9 +116,11 @@ module Fastlane
         #
         # @param [String] string The string to parse
         # @return [Hash<Integer, String>, nil] The placeholder types keyed by argument position,
-        #         or `nil` if a placeholder is malformed, the string mixes positional and sequential placeholders, or a position is reused with a different type
+        #         or `nil` if a placeholder is malformed or uses a lookalike of `%`, the string mixes positional and sequential placeholders, or a position is reused with a different type
         #
         def self.placeholders(string)
+          return nil if LOOKALIKE_PLACEHOLDER_REGEX.match?(string)
+
           placeholders = {}
           styles = []
           index = 0
