@@ -3,8 +3,11 @@
 require 'spec_helper'
 
 describe Fastlane::FirebaseTestRunner do
-  let(:default_file) { Tempfile.new('file').path }
-  let(:runner_temp_file) { Tempfile.new(%w[output log]).path }
+  # Hold the Tempfile objects: once collected, their finalizer deletes the file.
+  let(:default_tempfile) { Tempfile.new('file') }
+  let(:default_file) { default_tempfile.path }
+  let(:runner_tempfile) { Tempfile.new(%w[output log]) }
+  let(:runner_temp_file) { runner_tempfile.path }
 
   describe '#verify_has_gcloud_binary!' do
     it 'runs the correct command' do
