@@ -2,6 +2,7 @@ test_data:
   en: |
     "word_count_one" = "%1$ld word";
     "word_count_zero" = "%1$ld words";
+    "multiline\nkey" = "%1$ld\nwords";
     "latest_post_likes" = "The latest post %1$@ has received %2$@ like.";
     "leading_omitted" = "Post %1$@ has %2$@ likes.";
     "middle_omitted" = "A %1$@, B %2$d, C %3$@";
@@ -15,6 +16,7 @@ test_data:
   ro: |
     "word_count_one" = "Un cuvânt";
     "word_count_zero" = "Niciun cuvânt";
+    "multiline\nkey" = "Un\ncuvânt";
     "latest_post_likes" = "Ultimul articol %1$@ a avut o apreciere.";
     "leading_omitted" = "Un articol are %2$@ aprecieri.";
     "middle_omitted" = "A %1$@, C %3$@";
@@ -35,6 +37,7 @@ result:
     - "`leading_omitted` expected placeholders for [String,String] but found [String] instead."
     - "`length_mismatch` expected placeholders for [Int,Int] but found [Int] instead."
     - "`middle_omitted` expected placeholders for [String,Int,String] but found [String,String] instead."
+    - "`multiline\\nkey` expected placeholders for [Int] but found [] instead."
     - "`sequential_leading_omitted` expected placeholders for [String,Int] but found [Int] instead."
     - "`sequential_trailing_omitted` expected placeholders for [String,Int] but found [String] instead."
     - "`type_mismatch` expected placeholders for [Int] but found [String] instead."

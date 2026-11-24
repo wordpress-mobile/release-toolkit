@@ -240,9 +240,10 @@ module Fastlane
           [config_file, langs]
         end
 
-        # @return [Hash<String, String>] The raw `Localizable.strings` translations for a locale, keyed by string key
+        # @return [Hash<String, String>] The raw `Localizable.strings` translations for a locale, keyed by string key as SwiftGen prints it, with newlines escaped
         def strings_for(input_dir, lang)
           Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: File.join(input_dir, "#{lang}.lproj", 'Localizable.strings'))
+                                           .transform_keys { |key| key.gsub("\n", '\n').gsub("\r", '\r') }
         end
 
         # Returns a Hash mapping the list of expected parameter types for each of the keys based in the %… placeholders found in their `.strings` files
