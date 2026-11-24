@@ -36,8 +36,28 @@ describe Fastlane::Helper::Ios::L10nLinterHelper do
       expect(only_omits?('%@ and %d', 'doar %d')).to be false
     end
 
-    it 'treats length modifiers as the same type' do
-      expect(only_omits?('%1$ld of %2$ld', '%1$d')).to be true
+    it 'treats length modifiers that read the same size of integer as the same type' do
+      expect(only_omits?('%1$ld of %2$ld', '%1$lld')).to be true
+      expect(only_omits?('%1$ld of %2$ld', '%1$zd')).to be true
+      expect(only_omits?('%1$ld of %2$ld', '%1$D')).to be true
+      expect(only_omits?('%1$d of %2$d', '%1$i')).to be true
+    end
+
+    it 'rejects a length modifier that reads a different size of integer, as it would truncate the value' do
+      expect(only_omits?('%1$ld of %2$ld', '%1$d')).to be false
+      expect(only_omits?('%1$ld of %2$ld', '%1$hhd')).to be false
+      expect(only_omits?('%1$d of %2$d', '%1$hd')).to be false
+    end
+
+    it 'rejects a different conversion of the same kind of argument' do
+      expect(only_omits?('%1$ld of %2$ld', '%1$lu')).to be false
+      expect(only_omits?('%1$f of %2$f', '%1$Lf')).to be false
+      expect(only_omits?('%1$C and %2$C', '%1$c')).to be false
+    end
+
+    it 'ignores length modifiers that do not change the argument read' do
+      expect(only_omits?('%1$f of %2$f', '%1$lf')).to be true
+      expect(only_omits?('%1$C and %2$C', '%1$lc')).to be true
     end
 
     it 'ignores escaped percent signs' do

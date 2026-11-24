@@ -11,18 +11,11 @@ module Fastlane
         DEFAULT_BASE_LANG = 'en'
         CONFIG_FILE_NAME = 'swiftgen-stringtypes.yml'
 
-        # A printf-style placeholder at the start of a string, capturing its optional `N$` position and its conversion character.
+        # A printf-style placeholder at the start of a string, capturing its optional `N$` position, its length modifier and its conversion character.
         # `*` widths and precisions are deliberately not matched, as they consume an extra argument.
-        PLACEHOLDER_REGEX = /\A%(?:(\d+)\$)?[-+ #0']*\d*(?:\.\d*)?(?:hh|h|ll|l|q|L|z|t|j)?([@dDiuUxXoOfFeEgGaAcCsSp])/
-        PLACEHOLDER_TYPES = {
-          '@' => :object,
-          'c' => :char, 'C' => :char,
-          's' => :c_string, 'S' => :c_string,
-          'p' => :pointer
-        }.merge(
-          'dDiuUxXoO'.chars.to_h { |c| [c, :integer] },
-          'fFeEgGaA'.chars.to_h { |c| [c, :float] }
-        ).freeze
+        PLACEHOLDER_REGEX = /\A%(?:(\d+)\$)?[-+ #0']*\d*(?:\.\d*)?(hh|h|ll|l|q|L|z|t|j)?([@dDiuUxXoOfFeEgGaAcCsSp])/
+        # Length modifiers that all read a 64-bit integer on Apple platforms
+        LONG_INTEGER_LENGTHS = %w[l ll q z t j].freeze
 
         attr_reader :install_path, :version
 
@@ -119,7 +112,7 @@ module Fastlane
         # Parses the printf-style placeholders of a string.
         #
         # @param [String] string The string to parse
-        # @return [Hash<Integer, Symbol>, nil] The placeholder types keyed by argument position,
+        # @return [Hash<Integer, String>, nil] The placeholder types keyed by argument position,
         #         or `nil` if a placeholder is malformed, the string mixes positional and sequential placeholders, or a position is reused with a different type
         #
         def self.placeholders(string)
@@ -137,13 +130,36 @@ module Fastlane
 
             styles << (match[1].nil? ? :sequential : :positional)
             position = match[1]&.to_i || styles.count
-            type = PLACEHOLDER_TYPES[match[2]]
+            type = placeholder_type(length: match[2], conversion: match[3])
             return nil if placeholders.key?(position) && placeholders[position] != type
 
             placeholders[position] = type
             index += match[0].length
           end
           styles.uniq.size > 1 ? nil : placeholders
+        end
+
+        # The argument a placeholder reads, as its conversion with only the length modifiers that change it.
+        # Conversions and lengths are kept distinct, rather than grouped like SwiftGen does, because reading an argument with the wrong size truncates it: `%hhd` shows 300 as 44.
+        #
+        # @param [String, nil] length The length modifier, like `l` in `%ld`
+        # @param [String] conversion The conversion character, like `d` in `%ld`
+        # @return [String] A normalized placeholder, like `ld` for both `%ld` and `%qd`
+        #
+        def self.placeholder_type(length:, conversion:)
+          case conversion
+          when 'i' then conversion = 'd'
+          when 'D', 'U', 'O'
+            length = 'l'
+            conversion = conversion.downcase
+          end
+
+          case conversion
+          when 'd', 'o', 'u', 'x', 'X' then "#{LONG_INTEGER_LENGTHS.include?(length) ? 'l' : length}#{conversion}"
+          when 'f', 'F', 'e', 'E', 'g', 'G', 'a', 'A' then "#{'L' if length == 'L'}#{conversion}"
+          when 'c', 's' then length == 'l' ? conversion.upcase : conversion
+          else conversion
+          end
         end
 
         ##################
