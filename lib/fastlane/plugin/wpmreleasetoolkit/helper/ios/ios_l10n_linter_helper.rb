@@ -11,6 +11,15 @@ module Fastlane
         DEFAULT_BASE_LANG = 'en'
         CONFIG_FILE_NAME = 'swiftgen-stringtypes.yml'
 
+        # A printf-style placeholder at the start of a string, capturing its optional `N$` position, its length modifier and its conversion character.
+        # `*` widths and precisions are deliberately not matched, as they consume an extra argument.
+        PLACEHOLDER_SPEC = /(?:(\d+)\$)?[-+ #0']*\d*(?:\.\d*)?(hh|h|ll|l|q|L|z|t|j)?([@dDiuUxXoOfFeEgGaAcCsSp])/
+        PLACEHOLDER_REGEX = /\A%#{PLACEHOLDER_SPEC}/
+        # A placeholder typed with a lookalike of `%` (fullwidth, Arabic or small percent sign), which Foundation prints verbatim
+        LOOKALIKE_PLACEHOLDER_REGEX = /[\uFF05\u066A\uFE6A]#{PLACEHOLDER_SPEC}/
+        # Length modifiers that all read a 64-bit integer on Apple platforms
+        LONG_INTEGER_LENGTHS = %w[l ll q z t j].freeze
+
         attr_reader :install_path, :version
 
         # @param [String] install_path The path to install SwiftGen to. Usually something like "$PROJECT_DIR/vendor/swiftgen/#{SWIFTGEN_VERSION}".
@@ -61,11 +70,101 @@ module Fastlane
         # @param [String] input_dir The path (ideally absolute) to the directory containing the `.lproj` folders to parse
         # @param [String] base_lang The code name (i.e the basename of one of the `.lproj` folders) of the locale to use as the baseline
         # @param [String] fail_on_strings_not_in_base_language Whether to fail on strings not in base language
+        # @param [Boolean] allow_omitted_placeholders Whether to accept translations that omit the trailing base language placeholders.
         # @return [Hash<String, Array<String>>] A hash of violations, keyed by language code, whose values are the list of violation messages for that language
         #
-        def run(input_dir:, base_lang: DEFAULT_BASE_LANG, only_langs: nil, fail_on_strings_not_in_base_language: true)
+        def run(input_dir:, base_lang: DEFAULT_BASE_LANG, only_langs: nil, fail_on_strings_not_in_base_language: true, allow_omitted_placeholders: false)
           check_swiftgen_installed || install_swiftgen!
-          find_diffs(input_dir: input_dir, base_lang: base_lang, only_langs: only_langs, fail_on_strings_not_in_base_language: fail_on_strings_not_in_base_language)
+          find_diffs(
+            input_dir: input_dir,
+            base_lang: base_lang,
+            only_langs: only_langs,
+            fail_on_strings_not_in_base_language: fail_on_strings_not_in_base_language,
+            allow_omitted_placeholders: allow_omitted_placeholders
+          )
+        end
+
+        # Whether a translation is safe to format with the base string's arguments while using only some of them.
+        #
+        # That's the case when the translation keeps the base string's first placeholders, at the same positions and with the same types, and drops the rest.
+        # Unused trailing arguments are ignored at runtime, so this is legitimate when a language doesn't need a value.
+        # Omitting a leading or middle placeholder isn't, because Foundation compacts gaps in positional arguments and would format the wrong value.
+        #
+        # For example, the English plural "one" form "%1$ld word" can be translated to Romanian as "Un cuvânt", discarding `%1$ld`,
+        # because Romanian uses "one" only for exactly 1, and "un" already says it.
+        #
+        # This only checks the omission is safe at runtime, not that it's right for the language.
+        # Russian also has a "one" form, but it covers 1, 21, 31, 101…, so "Одно слово" would wrongly read as one word for 21 words, and this would still accept it.
+        #
+        # @param [String] base The string in the base language
+        # @param [String] translation The translated string
+        # @return [Boolean] `false` if the translation is blank, or either string has a placeholder this can't parse, like the incomplete `%1$l`
+        #
+        def self.only_omits_placeholders?(base:, translation:)
+          return false if translation.strip.empty?
+
+          base_placeholders = placeholders(base)
+          translation_placeholders = placeholders(translation)
+          return false if base_placeholders.nil? || translation_placeholders.nil?
+          return false unless translation_placeholders.size < base_placeholders.size
+          return false unless translation_placeholders.keys.sort == (1..translation_placeholders.size).to_a
+
+          translation_placeholders.all? { |position, type| base_placeholders[position] == type }
+        end
+
+        # Parses the printf-style placeholders of a string.
+        #
+        # @param [String] string The string to parse
+        # @return [Hash<Integer, String>, nil] The placeholder types keyed by argument position,
+        #         or `nil` if a placeholder is malformed or uses a lookalike of `%`, the string mixes positional and sequential placeholders, or a position is reused with a different type
+        #
+        def self.placeholders(string)
+          return nil if LOOKALIKE_PLACEHOLDER_REGEX.match?(string)
+
+          placeholders = {}
+          styles = []
+          index = 0
+          while (index = string.index('%', index))
+            if string[index + 1] == '%'
+              index += 2
+              next
+            end
+
+            match = PLACEHOLDER_REGEX.match(string[index..])
+            return nil if match.nil?
+
+            styles << (match[1].nil? ? :sequential : :positional)
+            position = match[1]&.to_i || styles.count
+            type = placeholder_type(length: match[2], conversion: match[3])
+            return nil if placeholders.key?(position) && placeholders[position] != type
+
+            placeholders[position] = type
+            index += match[0].length
+          end
+          styles.uniq.size > 1 ? nil : placeholders
+        end
+
+        # The argument a placeholder reads, as its conversion with only the length modifiers that change it.
+        # Conversions and lengths are kept distinct, rather than grouped like SwiftGen does, because reading an argument with the wrong size truncates it: `%hhd` shows 300 as 44.
+        #
+        # @param [String, nil] length The length modifier, like `l` in `%ld`
+        # @param [String] conversion The conversion character, like `d` in `%ld`
+        # @return [String] A normalized placeholder, like `ld` for both `%ld` and `%qd`
+        #
+        def self.placeholder_type(length:, conversion:)
+          case conversion
+          when 'i' then conversion = 'd'
+          when 'D', 'U', 'O'
+            length = 'l'
+            conversion = conversion.downcase
+          end
+
+          case conversion
+          when 'd', 'o', 'u', 'x', 'X' then "#{LONG_INTEGER_LENGTHS.include?(length) ? 'l' : length}#{conversion}"
+          when 'f', 'F', 'e', 'E', 'g', 'G', 'a', 'A' then "#{'L' if length == 'L'}#{conversion}"
+          when 'c', 's' then length == 'l' ? conversion.upcase : conversion
+          else conversion
+          end
         end
 
         ##################
@@ -141,6 +240,12 @@ module Fastlane
           [config_file, langs]
         end
 
+        # @return [Hash<String, String>] The raw `Localizable.strings` translations for a locale, keyed by string key as SwiftGen prints it, with newlines escaped
+        def strings_for(input_dir, lang)
+          Fastlane::Helper::Ios::L10nHelper.read_strings_file_as_hash(path: File.join(input_dir, "#{lang}.lproj", 'Localizable.strings'))
+                                           .transform_keys { |key| key.gsub("\n", '\n').gsub("\r", '\r') }
+        end
+
         # Returns a Hash mapping the list of expected parameter types for each of the keys based in the %… placeholders found in their `.strings` files
         #
         # @param [String] dir The temporary directory in which the file to sort lines for is located
@@ -162,11 +267,12 @@ module Fastlane
         # @param [String] base_lang The base language used as source of truth that all other languages will be compared against
         # @param [Array<String>] only_langs The list of languages to limit the generation for. Useful to focus only on a couple of issues or just one language
         # @param [Boolean] fail_on_strings_not_in_base_language Whether to fail on strings not in base language
+        # @param [Boolean] allow_omitted_placeholders Whether to accept translations that omit the trailing base language placeholders
         # @return [Hash<String, Array<String>>] A hash of violations, keyed by language code, whose values are the list of violation messages for that language
         #
         # @note The returned Hash contains keys only for locales with violations. Locales parsed but without any violations found will not appear in the resulting hash.
         #
-        def find_diffs(input_dir:, base_lang:, only_langs: nil, fail_on_strings_not_in_base_language: true)
+        def find_diffs(input_dir:, base_lang:, only_langs: nil, fail_on_strings_not_in_base_language: true, allow_omitted_placeholders: false)
           Dir.mktmpdir('a8c-lint-translations-') do |tmpdir|
             # Run SwiftGen
             langs = only_langs.nil? ? nil : (only_langs + [base_lang]).uniq
@@ -176,15 +282,26 @@ module Fastlane
             # Run diffs
             params_for_base_lang = placeholder_types_for_keys(tmpdir, base_lang)
             langs.delete(base_lang)
+            base_strings = nil
             return langs.map do |lang|
               params_for_lang = placeholder_types_for_keys(tmpdir, lang)
+              lang_strings = nil
 
               # If the lang ends up not having any translation at all (e.g. a `.lproj` without any `.strings` file in it but maybe just a storyboard or assets catalog), ignore it
               next nil if params_for_lang.nil? || params_for_lang.empty?
 
               violations = params_for_lang.map do |key, param_types|
                 next "`#{key}` was unexpected, as it is not present in the base locale." if params_for_base_lang[key].nil? && fail_on_strings_not_in_base_language
-                next "`#{key}` expected placeholders for #{params_for_base_lang[key]} but found #{param_types} instead." if !params_for_base_lang[key].nil? && params_for_base_lang[key] != param_types
+                next if params_for_base_lang[key].nil? || params_for_base_lang[key] == param_types
+
+                # SwiftGen's type lists drop argument positions, so omissions are checked against the raw strings instead.
+                if allow_omitted_placeholders
+                  base_strings ||= strings_for(input_dir, base_lang)
+                  lang_strings ||= strings_for(input_dir, lang)
+                  next if self.class.only_omits_placeholders?(base: base_strings[key].to_s, translation: lang_strings[key].to_s)
+                end
+
+                "`#{key}` expected placeholders for #{params_for_base_lang[key]} but found #{param_types} instead."
               end.compact
 
               [lang, violations] unless violations.empty?

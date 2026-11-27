@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Add an opt-in `allow_omitted_placeholders` option to `ios_lint_localizations` so translations that omit the trailing base language placeholders, keeping the others at the same positions and types, are not reported. [#779]
 
 ### Bug Fixes
 
