@@ -10,7 +10,7 @@ _None_
 
 ### New Features
 
-_None_
+- Add `release-scan`, a command-line tool that scans a release build for secrets. See [`docs/release-scan.md`](docs/release-scan.md). [#780]
 
 ### Bug Fixes
 
